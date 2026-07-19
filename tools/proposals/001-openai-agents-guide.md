@@ -55,7 +55,7 @@
 ### 1. `multi-agent` 多 Agent 编排
 
 - **大区**：coding 编程与 Agent
-- **建议层级**：`base` ｜ 理由：Manager / Handoff 这两种模式已被广泛采用并稳定，不是新冒出来的东西
+- **建议 maturity**：`stable` ｜ 理由：Manager / Handoff 这两种模式已被广泛采用并稳定，不是新冒出来的东西
 - **heat**: 0.7
 - **aliases**: Multi-agent, Manager 模式, Handoff, 交接
 
@@ -98,7 +98,7 @@
 ### 2. `guardrails` 护栏
 
 - **大区**：safety 安全与对齐
-- **建议层级**：`base` ｜ 理由：分层防御是安全工程的成熟做法，不是新概念
+- **建议 maturity**：`stable` ｜ 理由：分层防御是安全工程的成熟做法，不是新概念
 - **heat**: 0.8
 - **aliases**: Guardrails, 防护栏, 输入输出过滤
 
@@ -152,7 +152,7 @@
 ### 3. `model-selection` 模型选型与成本
 
 - **大区**：building 应用搭建
-- **建议层级**：`base` ｜ 理由：是每个 LLM 应用都要做的工程决策，方法论稳定
+- **建议 maturity**：`stable` ｜ 理由：是每个 LLM 应用都要做的工程决策，方法论稳定
 - **heat**: 0.65
 - **aliases**: Model Selection, 选型, 成本优化
 
@@ -242,7 +242,7 @@
 
 1. **`guardrails` 和现有 `prompt-injection` 的防御部分重叠**。现有 `prompt-injection` 正文里已有「纵深防御」一节列了最小权限、沙箱、人工确认。我的处理是：`prompt-injection` 讲**为什么防不住**，`guardrails` 讲**怎么系统地防**，两者用 `mitigates` 边连起来。你觉得这个分工清楚吗？还是应该合并？
 
-2. **三个新节点我都建议 `base` 而不是默认的 `emerging`**。理由是它们都不是新冒出来的东西（分层防御、按风险分级、先强后弱地选型，都是成熟工程做法）。如果你更想严守「新捕获默认进活跃层」，告诉我改。
+2. **三个新节点我都建议 `stable`**。理由是它们都是成熟工程做法，不是仍在快速演进的东西。（注：三层结构已于 2026-07-19 取消，现在只有 stable/evolving 标签，见 SPEC §3.4）
 
 3. **`model-selection` 是否该并进 `prompt-engineering` 的「实践顺序」那一节**？我判断不该——选型是独立的工程决策，有自己的方法论和成本杠杆。但它确实和「先提示、再 RAG、后微调」那条链有关联。
 

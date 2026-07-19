@@ -52,9 +52,13 @@ G.nodes.forEach(n => {
 
 // 必填字段
 G.nodes.forEach(n => {
-  ["title", "summary", "layer", "domain"].forEach(f => {
+  ["title", "summary", "domain"].forEach(f => {
     if (!n[f]) problems.push(`节点 ${n.id} 缺 ${f}`);
   });
+  if (n.maturity && !["stable", "evolving"].includes(n.maturity)) {
+    problems.push(`节点 ${n.id} 的 maturity 非法：${n.maturity}（应为 stable | evolving）`);
+  }
+  if (n.layer) problems.push(`节点 ${n.id} 仍有旧的 layer 字段，应改为 maturity`);
   if (!n.body) problems.push(`节点 ${n.id} 缺 body`);
   if (!n.cases || !n.cases.length) problems.push(`节点 ${n.id} 没有案例`);
   if (!G.domains[n.domain]) problems.push(`节点 ${n.id} 的 domain 未定义：${n.domain}`);

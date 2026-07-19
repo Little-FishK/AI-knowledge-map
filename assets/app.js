@@ -8,7 +8,10 @@
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
 
-  const LAYER_RING = { base: "#6b8cbe", emerging: "#d3a05a", news: "#cf6f6f" };
+  // 成熟度只是一个轻量标记，不再是会 gate 视图的「层」：
+  // 演进中的概念用虚线琥珀色描边标出，稳定的用中性描边，仅此而已。
+  const EVOLVING = "#d3a05a";
+  const STABLE_RING = "#3a4150";
   // 「关键关系」= 最能体现跨领域联系的几类，默认强调
   const KEY_EDGES = ["mitigates", "threatens", "constrains", "contrast"];
 
@@ -18,7 +21,6 @@
   const CORE = new Set(G.core || []);
 
   const state = {
-    layers: { base: true, emerging: false, news: false },
     domains: Object.fromEntries(Object.keys(DOMAINS).map(d => [d, true])),
     edges: Object.fromEntries(Object.keys(ETYPES).map(t => [t, true])),
     // 默认只显示核心节点：全展开在 50+ 节点时已不可读，
@@ -42,7 +44,8 @@
   G.nodes.forEach(n => {
     const el = {
       data: {
-        id: n.id, label: n.title, domain: n.domain, layer: n.layer,
+        id: n.id, label: n.title, domain: n.domain,
+        maturity: n.maturity || "stable",
         heat: typeof n.heat === "number" ? n.heat : 0.5
       }
     };
@@ -75,9 +78,10 @@
         style: {
           "label": "data(label)",
           "background-color": ele => DOMAINS[ele.data("domain")] ? DOMAINS[ele.data("domain")].color : "#888",
-          "border-width": 2.5,
-          "border-color": ele => LAYER_RING[ele.data("layer")] || "#888",
-          "border-opacity": 0.85,
+          "border-width": ele => ele.data("maturity") === "evolving" ? 3 : 2,
+          "border-color": ele => ele.data("maturity") === "evolving" ? EVOLVING : STABLE_RING,
+          "border-style": ele => ele.data("maturity") === "evolving" ? "dashed" : "solid",
+          "border-opacity": 0.9,
           "width":  ele => 30 + ele.data("heat") * 26,
           "height": ele => 30 + ele.data("heat") * 26,
           "color": "#e6eaf0",
@@ -192,9 +196,7 @@
   function applyFilters() {
     cy.batch(() => {
       cy.nodes().forEach(n => {
-        const ok = state.layers[n.data("layer")] &&
-                   state.domains[n.data("domain")] &&
-                   inScope(n.id());
+        const ok = state.domains[n.data("domain")] && inScope(n.id());
         n.toggleClass("hidden", !ok);
       });
       cy.edges().forEach(e => {
@@ -205,7 +207,6 @@
     });
     const visible = cy.nodes().not(".hidden").length;
     document.getElementById("empty-hint").classList.toggle("hidden", visible > 0);
-    updateCounts();
     updateScopeUI();
     applyFocus();
   }
@@ -259,12 +260,6 @@
     });
   }
 
-  function updateCounts() {
-    ["base", "emerging", "news"].forEach(l => {
-      const el = document.getElementById("cnt-" + l);
-      if (el) el.textContent = G.nodes.filter(n => n.layer === l).length || "";
-    });
-  }
 
   /* ───────────────────────── 详情面板 ───────────────────────── */
 
@@ -323,11 +318,12 @@
     const n = byId[id];
     if (!n) return;
     const dom = DOMAINS[n.domain] || { label: n.domain, color: "#888", emoji: "" };
-    const layerTxt = { base: "基础层", emerging: "活跃层 L1", news: "活跃层 L2" }[n.layer] || n.layer;
+    const evolving = n.maturity === "evolving";
 
     let h = "";
-    h += `<div class="d-domain" style="color:${dom.color}">${dom.emoji} ${esc(dom.label)}
-          <span style="color:var(--fg-faint)"> · ${layerTxt}</span></div>`;
+    h += `<div class="d-domain" style="color:${dom.color}">${dom.emoji} ${esc(dom.label)}`
+       + (evolving ? `<span class="mat-tag" title="较新、仍在演进的概念">演进中</span>` : "")
+       + `</div>`;
     h += `<h2 class="d-title">${esc(n.title)}</h2>`;
     if (n.aliases && n.aliases.length) h += `<div class="d-alias">${n.aliases.map(esc).join(" · ")}</div>`;
     h += `<div class="d-summary">${esc(n.summary || "")}</div>`;
@@ -392,9 +388,8 @@
     if (!node.length) return;
     const n = byId[id];
     let changed = false;
-    // 跳转到被过滤掉的节点时，自动打开它所在的层与大区
+    // 跳转到被过滤掉的节点时，自动打开它所在的大区、并揭示它
     if (jumped && n) {
-      if (!state.layers[n.layer]) { state.layers[n.layer] = true; changed = true; }
       if (!state.domains[n.domain]) { state.domains[n.domain] = true; changed = true; }
       if (!inScope(id)) { state.revealed.add(id); changed = true; }
     }
@@ -451,7 +446,6 @@
 
   document.addEventListener("change", e => {
     const t = e.target;
-    if (t.dataset.layer)  { state.layers[t.dataset.layer] = t.checked; applyFilters(); }
     if (t.dataset.domain) { state.domains[t.dataset.domain] = t.checked; applyFilters(); }
     if (t.dataset.edge)   { state.edges[t.dataset.edge] = t.checked; applyFilters(); }
     if (t.id === "focus-on") { state.focus = t.checked; applyFocus(); }
@@ -493,13 +487,11 @@
   document.getElementById("edge-key").addEventListener("click", () => setEdges(k => KEY_EDGES.includes(k)));
 
   function syncControls() {
-    document.querySelectorAll("[data-layer]").forEach(i => { i.checked = state.layers[i.dataset.layer]; });
     document.querySelectorAll("[data-domain]").forEach(i => { i.checked = state.domains[i.dataset.domain]; });
     document.querySelectorAll("[data-edge]").forEach(i => { i.checked = state.edges[i.dataset.edge]; });
   }
 
   document.getElementById("btn-reset").addEventListener("click", () => {
-    state.layers = { base: true, emerging: false, news: false };
     Object.keys(state.domains).forEach(k => { state.domains[k] = true; });
     Object.keys(state.edges).forEach(k => { state.edges[k] = true; });
     state.scope = CORE.size ? "core" : "all";
@@ -565,13 +557,12 @@
   /* ───────────────────────── 图例与启动 ───────────────────────── */
 
   document.getElementById("legend").innerHTML =
-    `<b>节点填充</b> = 大区 &nbsp;·&nbsp; <b>描边</b> = 层级 &nbsp;·&nbsp; <b>大小</b> = 热度<br>` +
+    `<b>节点填充</b> = 大区 &nbsp;·&nbsp; <b>大小</b> = 热度 &nbsp;·&nbsp; <b>虚线描边</b> = 演进中<br>` +
     `<b>连线颜色</b> = 关系类型 &nbsp;·&nbsp; 点击节点查看详情`;
 
   document.getElementById("meta-ver").textContent =
     `${G.meta.version} · ${G.meta.updatedAt}`;
 
-  updateCounts();
   applyFilters();
   runLayout();
 
