@@ -163,5 +163,5 @@ P0 已略超 plan.md 的「30~40 节点」目标，符合预期。**跨边 100% 
 - 幻觉 **mitigated-by** RAG ← 这条尤其能体现地图价值
 - 采样参数 **affects** 幻觉 ｜ CoT **variant-of** 提示工程 ｜ ReAct **combines** CoT + 工具调用
 
-> 注：`constrains` / `mitigates` / `threatens` 不在 SPEC §3.3 已定的 8 种边里。
-> M0 先用 `related` 兜底并记录，攒够实例后再决定要不要扩边类型（会动 D1，需你拍板）。
+> ✅ **已解决（2026-07-19）**：`constrains` / `mitigates` / `threatens` 已正式加入边类型，D1 修订为 **11 种边**。
+> 同时结构改为**网状图**（D6）——概念可有多个上级，不再强行选唯一父节点。详见 SPEC §3.3 与 §5。
