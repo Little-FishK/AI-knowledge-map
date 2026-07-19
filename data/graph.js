@@ -1,4 +1,4 @@
-/* AI 知识地图 — 数据源
+﻿/* AI 知识地图 — 数据源
  *
  * M0 切片：挑联系最密的一簇（Transformer→LLM→RAG→Agent→安全）先验证结构。
  * 结构见 docs/SPEC.md；节点清单见 tools/concept-checklist.md。
@@ -10,12 +10,12 @@
  */
 window.GRAPH = {
   meta: {
-    version: "0.2",
+    version: "0.3",
     updatedAt: "2026-07-19",
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
-    layoutSeed: 25,
-    note: "第一批现代 AI 节点补齐：26 个基础节点 + 2 个活跃层节点"
+    layoutSeed: 11,
+    note: "P0 节点补齐：39 个基础节点 + 2 个活跃层节点，11 种边类型全覆盖"
   },
 
   /* 固化的节点坐标。
@@ -29,34 +29,47 @@ window.GRAPH = {
    * 没有坐标的新节点会自动走力导向布局，不会报错。
    */
   positions: {
-    "attention": [131, -55],
-    "transformer": [191, 142],
-    "llm": [-95, 144],
-    "tokenization": [-179, 291],
-    "embedding": [251, -112],
-    "context-window": [-128, -52],
-    "sampling-params": [148, 278],
-    "fine-tuning": [64, 155],
-    "rag": [24, -129],
-    "vector-db": [81, -349],
-    "prompt-engineering": [-219, 10],
-    "chunking": [-24, -321],
-    "retrieval": [256, -310],
-    "structured-output": [-459, 87],
-    "cot": [-211, 192],
-    "agent": [-231, -101],
-    "tool-calling": [-470, -154],
-    "mcp": [-466, -400],
-    "agent-loop": [-278, -293],
-    "agent-memory": [-151, -307],
-    "diffusion": [414, 64],
-    "image-generation": [470, -162],
-    "hallucination": [10, 40],
-    "prompt-injection": [-337, 100],
-    "jailbreak": [-297, 327],
-    "alignment": [-85, 400],
-    "reasoning-models": [15, 347],
-    "agent-frameworks": [-428, -30]
+    "attention": [-25, -46],
+    "transformer": [175, -109],
+    "llm": [-57, 56],
+    "tokenization": [-211, 198],
+    "embedding": [28, -334],
+    "context-window": [-296, -67],
+    "sampling-params": [-167, -150],
+    "fine-tuning": [-32, -163],
+    "neural-network": [322, 129],
+    "gradient-descent": [147, 322],
+    "backprop": [340, 273],
+    "overfitting": [145, -259],
+    "cnn": [560, 107],
+    "rnn": [103, 150],
+    "supervised-learning": [155, -10],
+    "unsupervised-learning": [331, -150],
+    "reinforcement-learning": [-434, 180],
+    "decision-tree": [458, -68],
+    "clustering": [288, -357],
+    "dimensionality-reduction": [215, -408],
+    "pretraining": [209, 97],
+    "rag": [-194, -261],
+    "vector-db": [-54, -520],
+    "prompt-engineering": [-224, -26],
+    "chunking": [-351, -229],
+    "retrieval": [-249, -450],
+    "structured-output": [-449, 64],
+    "cot": [-481, -75],
+    "agent": [-336, 39],
+    "tool-calling": [-515, 281],
+    "mcp": [-520, 520],
+    "agent-loop": [-560, 38],
+    "agent-memory": [-466, -195],
+    "diffusion": [346, 8],
+    "image-generation": [240, -235],
+    "hallucination": [-422, -325],
+    "prompt-injection": [-261, 308],
+    "jailbreak": [-51, 304],
+    "alignment": [-202, 78],
+    "reasoning-models": [-305, 144],
+    "agent-frameworks": [-361, 286]
   },
 
   domains: {
@@ -193,6 +206,181 @@ window.GRAPH = {
       cases: [
         { title: "该用微调的场景", text: "需要模型稳定输出某种特定格式的内部报告，提示里写了几百字规则仍时好时坏——这类「行为塑形」正是微调的主场。" },
         { title: "不该用微调的场景", text: "想让模型知道本周的产品价格。价格一变就要重训，且模型仍可能记混——这类事实性、高频变动的内容应该走 RAG。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+
+    // ─────────── 🧱 基础 / 共享：经典机器学习（大模型之前的底座）───────────
+    {
+      id: "neural-network",
+      title: "神经网络",
+      aliases: ["Neural Network", "人工神经网络", "ANN"],
+      layer: "base", domain: "foundations", heat: 0.8,
+      summary: "由多层可调参数的简单单元堆叠而成、通过数据自动学习映射关系的模型。",
+      body: "一个神经元做的事很简单：把输入加权求和，再过一个非线性函数。把成千上万个这样的单元分层连起来，就得到了一个参数极多的可调函数。\n\n**非线性是关键**。如果每层只是线性变换，无论堆多少层，整体仍等价于一层——正是激活函数的非线性让深层网络能表达任意复杂的映射。\n\n它不需要人告诉它「怎么判断」，只需要大量的输入-输出样本，参数会自己调整到能拟合这种对应关系。代价是可解释性差：你知道它有效，但很难说清它究竟依据了什么。\n\n今天的一切——CNN、RNN、Transformer、扩散模型——都是这个基本框架下的不同连接方式。",
+      cases: [
+        { title: "为什么叫「深度」学习", text: "层数多就是「深」。深层网络能逐级抽象：底层学边缘和纹理，中层学部件，高层学整体概念。这种层次化表示是它超越传统方法的核心原因。" },
+        { title: "黑箱的现实代价", text: "医疗、信贷这类场景里，「模型说不批」而无法解释原因，是落地的真实障碍。这也是可解释性研究的动机。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "gradient-descent",
+      title: "梯度下降",
+      aliases: ["Gradient Descent", "SGD", "优化器"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "沿着「误差下降最快的方向」一小步一小步调整参数，是模型训练的基本方法。",
+      body: "训练就是找一组让预测误差最小的参数。参数动辄上亿，不可能穷举，于是采用迭代法：在当前位置算出误差对每个参数的**梯度**（往哪个方向调、误差降得最快），然后朝反方向挪一小步，重复。\n\n**学习率**决定每步挪多远，是最重要也最难调的超参数：太小训得慢甚至卡住，太大会在最优点附近来回震荡甚至发散。\n\n实际用的是**随机梯度下降**——每次只用一小批样本估算梯度。这不只是为了省算力：小批量带来的噪声反而能帮模型跳出较差的局部解。现代优化器（Adam 等）在此基础上自适应地为每个参数调整步长。\n\n> 这是一个纯粹的局部搜索方法：它只知道脚下哪边是下坡，不知道全局最低点在哪。深度学习能work，某种程度上是因为高维空间里的局部最优通常已经足够好。",
+      cases: [
+        { title: "下山的比喻", text: "蒙眼站在山坡上要走到谷底，你能做的只是感受脚下坡度，朝最陡的下坡方向迈一步，再感受一次。学习率就是你的步幅。" },
+        { title: "学习率调错的样子", text: "损失曲线剧烈震荡或直接变成 NaN，多半是学习率太大；损失下降极其缓慢近乎水平，多半是太小。这是训练时最先要排查的东西。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "backprop",
+      title: "反向传播",
+      aliases: ["Backpropagation", "BP", "误差反传"],
+      layer: "base", domain: "foundations", heat: 0.6,
+      summary: "高效计算「每个参数该往哪调」的算法，让深层网络的训练成为可能。",
+      body: "梯度下降需要知道每个参数的梯度，但网络有上亿参数、几十层，逐个求导代价高到不可行。反向传播用链式法则解决了这个问题：先正向算一遍得到输出和误差，再从输出层往回逐层传递，**每层复用后一层已经算好的中间结果**。\n\n这样一次正向 + 一次反向就能得到全部参数的梯度，复杂度和正向传播同量级。没有这个算法，深度学习在计算上根本不成立。\n\n它也带来了深层网络的经典难题：梯度在层层回传中不断相乘，可能指数级衰减（梯度消失）或膨胀（梯度爆炸）。残差连接、归一化、门控结构，很大程度上都是为了对付这件事。",
+      cases: [
+        { title: "为什么 RNN 记不住远处", text: "序列很长时，梯度要沿时间步回传很多次，连乘之后趋近于零，早期时间步几乎收不到有效的更新信号。这正是 LSTM 的门控和后来注意力机制要解决的问题。" },
+        { title: "残差连接的作用", text: "给梯度开一条「高速公路」直接跨层回传，绕开连乘衰减。这是深层网络能堆到上百层的关键工程技巧，Transformer 每层都用。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "overfitting",
+      title: "过拟合",
+      aliases: ["Overfitting", "过度拟合"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "模型把训练数据背下来了，包括其中的噪声，导致遇到新数据就失灵。",
+      body: "机器学习真正要的是**泛化**——在没见过的数据上表现好。过拟合就是训练集上分数漂亮、测试集上一塌糊涂：模型记住的是这批样本的特殊细节，而不是背后的规律。\n\n判断方法很直接：盯着训练误差和验证误差的差距。训练误差持续下降而验证误差开始回升的那个拐点，就是过拟合的起点。\n\n常见对策：**更多数据**（最有效但最贵）、**正则化**（惩罚过大的参数）、**Dropout**（训练时随机关掉一部分神经元，逼模型别依赖单一路径）、**早停**（在拐点处停下）、**数据增强**（人为造出变体）。\n\n> 它的反面是欠拟合——模型太简单，连训练数据的规律都没抓住。实践中要在两者之间找平衡。",
+      cases: [
+        { title: "背题的学生", text: "把往年真题的答案全背下来，原题考满分，换个数字就不会了。模型过拟合时干的是同一件事。" },
+        { title: "LLM 时代的变形", text: "评测基准被污染——如果测试题出现在了训练数据里，模型的高分只是背出来的。这是当前模型评测最棘手的问题之一。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "cnn",
+      title: "卷积神经网络 CNN",
+      aliases: ["CNN", "Convolutional Neural Network", "卷积网络"],
+      layer: "base", domain: "foundations", heat: 0.65,
+      summary: "用滑动的小窗口在图像上提取局部特征的网络，长期是计算机视觉的主力。",
+      body: "CNN 的核心是**卷积核**——一个小窗口在图像上滑动，每到一处就和覆盖的像素做加权求和，输出一张特征图。同一个核在全图共享参数，这带来两个好处：参数量远小于全连接网络；而且**平移不变**——猫在左上角还是右下角，同一个核都能识别出来。\n\n多层堆叠后自然形成层次：浅层的核响应边缘和颜色块，深层组合出眼睛、轮子这类部件，最深层对应完整物体。这种层次结构是从数据中自己长出来的，没人去设计。\n\n虽然视觉领域的主导地位正在被 Vision Transformer 侵蚀，但 CNN 在计算效率和小数据场景上仍有优势，而且它至今活跃在扩散模型的骨干网络里。",
+      cases: [
+        { title: "为什么它比全连接好", text: "一张 224×224 的图接全连接层需要几千万参数，而一个 3×3 卷积核只有 9 个参数却能扫遍全图。这个差距决定了深度视觉模型的可行性。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "rnn",
+      title: "循环神经网络 RNN",
+      aliases: ["RNN", "LSTM", "GRU", "循环网络"],
+      layer: "base", domain: "foundations", heat: 0.55,
+      summary: "按顺序逐个处理序列、并把「记忆」传给下一步的网络，Transformer 之前的序列主力。",
+      body: "RNN 处理序列的方式很符合直觉：读一个词，更新内部的隐藏状态，再读下一个。隐藏状态就是它的短期记忆，理论上能把任意长的历史压缩进去。\n\n实践中它撞上两堵墙。一是**梯度消失**——信息沿时间步回传时连乘衰减，远处的依赖学不到；LSTM 和 GRU 用门控机制缓解了这一点，但没根治。二是**无法并行**——必须算完第 t 步才能算第 t+1 步，训练速度被死死限制住。\n\nTransformer 正是从这两点上把它取代的：注意力让任意两个位置直接相连（无衰减），且所有位置可同时计算（可并行）。理解 RNN 的短板，才能理解 Transformer 为什么是转折点。",
+      cases: [
+        { title: "长距离依赖的失效", text: "「我在法国长大……（中间隔了两百字）……所以我说一口流利的 __」。填「法语」需要用到两百字之前的信息，RNN 在这类任务上几乎必然失败。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "supervised-learning",
+      title: "监督学习",
+      aliases: ["Supervised Learning", "有监督学习"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "用带标准答案的数据训练模型，让它学会从输入预测输出。",
+      body: "最主流的机器学习范式：给一堆「输入-正确答案」的配对，模型学习两者之间的映射。按输出类型分两类——预测离散类别叫**分类**（这封邮件是不是垃圾邮件），预测连续数值叫**回归**（这套房值多少钱）。\n\n它的威力和它的瓶颈是同一件事：**依赖标注数据**。标注质量决定效果上限，标注成本决定项目可行性。很多机器学习项目卡住不是因为算法，而是因为拿不到足够的高质量标注。\n\n大模型时代它并没有过时，只是换了位置：预训练是自监督的（不需要人工标注），但之后的指令微调仍是标准的监督学习——用人工写的高质量问答对，教模型怎么回应。",
+      cases: [
+        { title: "标注质量的现实", text: "两个标注员对同一条数据给出不同标签的比例（标注一致性）常常低得惊人。模型的天花板不会超过标注本身的质量。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "unsupervised-learning",
+      title: "无监督学习",
+      aliases: ["Unsupervised Learning", "自监督", "Self-supervised"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "从没有标注的数据中自己找出结构与规律。",
+      body: "没有标准答案，模型要自己发现数据里的模式：哪些样本该归为一类（聚类）、怎么用更少的维度表示同样的信息（降维）、什么样的数据算异常。\n\n它最大的价值是**不需要标注**——而世界上绝大多数数据都是没标注的。\n\n**自监督学习**是这个思路的关键变形，也是大模型的根基：不需要人标注，但可以从数据本身构造出训练目标——把句子的下一个词遮住让模型预测，答案就在数据里。正是这一招让「用整个互联网的文本来训练」成为可能，而这才是 LLM 得以出现的前提。\n\n> 从这个角度看，LLM 的预训练本质上是一场规模空前的无监督学习。",
+      cases: [
+        { title: "自监督的巧思", text: "「今天天气真___」——答案「好」本来就在原文里，把它遮住就自动得到了一条训练样本。零标注成本，数据要多少有多少。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "reinforcement-learning",
+      title: "强化学习",
+      aliases: ["Reinforcement Learning", "RL", "PPO"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "让智能体在环境中试错，用奖励信号学出一套行为策略。",
+      body: "和前两种范式不同，强化学习没有现成的正确答案，只有**奖励**：做得好加分，做得差扣分。智能体要通过反复试错，找出能让长期累计奖励最大的行为策略。\n\n核心难点是**探索与利用的权衡**：一直用已知有效的做法，可能永远发现不了更好的；一味尝试新的，又会浪费机会。还有**奖励延迟**——下棋时某一步的好坏可能几十步之后才体现出来，功劳该记在哪一步上是个难题。\n\n它和大模型的交点是**偏好对齐**：把人类对回答的偏好转化为奖励信号，用 PPO 等算法优化模型的输出策略，这就是 RLHF。后来 DPO 等方法绕开了显式的强化学习环节，但思路一脉相承。\n\n> 注意术语陷阱：强化学习里的「智能体 Agent」和今天说的「LLM Agent」不是一回事——前者指在环境中学策略的主体，后者指会调工具的 LLM 应用。",
+      cases: [
+        { title: "奖励黑客", text: "给赛艇游戏的智能体按得分给奖励，它发现原地绕圈刷补给分比跑完赛道得分更高，于是永远不去终点。它没做错——是奖励函数没写对。这个现象在对齐里同样存在。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "decision-tree",
+      title: "决策树与集成方法",
+      aliases: ["Decision Tree", "Random Forest", "XGBoost", "梯度提升"],
+      layer: "base", domain: "foundations", heat: 0.6,
+      summary: "用一连串「是/否」判断做预测的模型，以及把多棵树组合起来的增强方法。",
+      body: "决策树就是一串嵌套的判断：收入是否大于 X？是则看年龄是否大于 Y……最终落到一个叶子给出结论。它的最大优点是**能被人读懂**——整棵树可以直接画出来给业务方看，这在很多受监管的场景里是硬需求。\n\n单棵树容易过拟合，于是有了集成：**随机森林**并行训很多棵各看部分数据的树，投票表决，降低方差；**梯度提升**（XGBoost、LightGBM）则串行训练，每棵新树专门去纠正前面所有树的残差，通常精度更高。\n\n值得强调的是：**在结构化表格数据上，梯度提升至今仍常常打败深度学习**。神经网络的统治范围主要在图像、文本、音频这类非结构化数据上。选模型该看数据类型，而不是看什么最时髦。",
+      cases: [
+        { title: "什么时候别用神经网络", text: "几万行、几十列的业务表格预测客户流失——XGBoost 大概率又快又准又能解释，上深度学习往往是自找麻烦。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "clustering",
+      title: "聚类",
+      aliases: ["Clustering", "K-Means", "DBSCAN"],
+      layer: "base", domain: "foundations", heat: 0.5,
+      summary: "在没有标签的情况下，把相似的样本自动分成若干组。",
+      body: "聚类要回答的是「这堆数据天然分成几类、怎么分」。**K-Means** 最常用：先指定要分 k 组，反复调整每组的中心直到稳定——快，但需要事先知道 k，而且只擅长找球形的簇。**DBSCAN** 按密度聚类，不需要指定组数、能找出任意形状的簇、还能自然识别离群点，代价是对参数敏感。\n\n最根本的困难在于**没有客观的对错**。同一批客户，按消费额分和按购买品类分会得到完全不同的分组，两种都「正确」。聚类结果的价值最终由人的解读决定，指标只能辅助。\n\n在 LLM 时代它有个很实用的新用途：把大量文本的嵌入向量聚类，快速看出一个语料里有哪些主题——比如从几千条用户反馈里自动归纳出主要抱怨类型。",
+      cases: [
+        { title: "配合嵌入使用", text: "把上万条用户评论转成嵌入向量再聚类，每一簇取几条读一读，半小时就能摸清用户在抱怨什么。比人工逐条看快一个数量级。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "dimensionality-reduction",
+      title: "降维",
+      aliases: ["Dimensionality Reduction", "PCA", "t-SNE", "UMAP"],
+      layer: "base", domain: "foundations", heat: 0.5,
+      summary: "把高维数据压缩到低维，同时尽量保留原有的结构信息。",
+      body: "高维数据既难可视化，又受「维度灾难」困扰——维度越高，样本在空间中越稀疏，距离的区分度越差。降维就是在尽量少丢信息的前提下把维度压下来。\n\n两类目的要分清：**PCA** 找出数据变化最大的几个方向，是线性的、可解释的、可逆的，适合当预处理步骤；**t-SNE 和 UMAP** 专为可视化设计，能把高维数据压成二维散点图并保住局部邻近关系，但它们是非线性的，**图上簇之间的距离和大小不能按字面解读**，只能看「哪些点聚在一起」。\n\n这是今天理解嵌入最直观的工具：几千维的向量没法直接看，降到二维画出来，语义相近的词自动聚成团，嵌入到底学到了什么一目了然。",
+      cases: [
+        { title: "常见的误读", text: "在 t-SNE 图上看到两个簇离得远，就断言这两类差异很大——这是错的。t-SNE 不保证全局距离有意义，换个参数图就变了。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "pretraining",
+      title: "预训练",
+      aliases: ["Pre-training", "预训练阶段"],
+      layer: "base", domain: "foundations", heat: 0.8,
+      summary: "在海量无标注文本上做自监督训练，是大模型能力的主要来源。",
+      body: "大模型的能力绝大部分是在这一步获得的。做法是把互联网规模的文本喂进 Transformer，反复训练它预测下一个 token。没有人工标注，训练信号来自文本本身。\n\n这一步成本极高——数千张 GPU 跑数周甚至数月，花费以千万美元计，因此全世界能从头预训练大模型的机构屈指可数。绝大多数人接触到的是**在别人预训练好的模型上做微调**。\n\n预训练结束时得到的是**基座模型**：知识渊博但不听话，你问它问题，它可能续写出更多问题而不是回答。要变成可用的助手，还需要后续的指令微调和偏好对齐。\n\n> 「缩放定律」描述的正是这一步的规律：模型规模、数据量、算力三者按一定比例同步放大时，损失会以可预测的方式下降。这条经验规律是过去几年不断堆大模型的直接依据。",
+      cases: [
+        { title: "基座模型的样子", text: "对基座模型说「什么是光合作用？」，它可能回答「什么是呼吸作用？什么是蒸腾作用？」——因为训练数据里问题常常成串出现。它在续写，不在回答。" }
       ],
       sources: [],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
@@ -572,6 +760,36 @@ window.GRAPH = {
     { from: "alignment",        to: "jailbreak",        type: "mitigates",  label: "训练模型拒绝" },
     { from: "alignment",        to: "llm",              type: "constrains", label: "塑造行为边界" },
     { from: "alignment",        to: "fine-tuning",      type: "uses",       label: "SFT + 偏好优化" },
+
+    // 经典 ML：模型家族
+    { from: "cnn",         to: "neural-network",   type: "is-a",       label: "" },
+    { from: "rnn",         to: "neural-network",   type: "is-a",       label: "" },
+    { from: "transformer", to: "neural-network",   type: "is-a",       label: "" },
+    { from: "transformer", to: "rnn",              type: "contrast",   label: "并行 vs 顺序" },
+    { from: "neural-network", to: "gradient-descent", type: "uses",    label: "训练方式" },
+    { from: "backprop",    to: "gradient-descent", type: "enables",    label: "高效算梯度" },
+    { from: "backprop",    to: "rnn",              type: "constrains", label: "梯度消失" },
+
+    // 经典 ML：学习范式
+    { from: "decision-tree",            to: "supervised-learning",   type: "is-a",       label: "" },
+    { from: "clustering",               to: "unsupervised-learning", type: "is-a",       label: "" },
+    { from: "dimensionality-reduction", to: "unsupervised-learning", type: "is-a",       label: "" },
+    { from: "overfitting",              to: "supervised-learning",   type: "constrains", label: "泛化上限" },
+    { from: "supervised-learning",      to: "unsupervised-learning", type: "contrast",   label: "要不要标注" },
+    { from: "decision-tree",            to: "neural-network",        type: "contrast",   label: "表格数据常胜" },
+
+    // 经典 ML ←→ 大模型：把两个时代接起来
+    { from: "pretraining",  to: "unsupervised-learning", type: "is-a",    label: "自监督" },
+    { from: "pretraining",  to: "llm",                   type: "part-of", label: "第一阶段" },
+    { from: "pretraining",  to: "transformer",           type: "uses",    label: "训练对象" },
+    { from: "pretraining",  to: "gradient-descent",      type: "uses",    label: "" },
+    { from: "fine-tuning",  to: "supervised-learning",   type: "is-a",    label: "SFT" },
+    { from: "alignment",    to: "reinforcement-learning", type: "uses",   label: "RLHF" },
+    { from: "reinforcement-learning", to: "agent",       type: "contrast", label: "两种「智能体」" },
+    { from: "cnn",          to: "diffusion",             type: "uses",    label: "早期 U-Net 骨干" },
+    { from: "dimensionality-reduction", to: "embedding", type: "related", label: "嵌入可视化" },
+    { from: "clustering",   to: "embedding",             type: "uses",    label: "文本主题归纳" },
+    { from: "overfitting",  to: "fine-tuning",           type: "threatens", label: "小数据微调易过拟合" },
 
     // 活跃层挂载到基础层
     { from: "reasoning-models", to: "llm",              type: "variant-of", label: "推理时扩展" },
