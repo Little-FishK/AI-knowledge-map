@@ -1,4 +1,4 @@
-﻿/* AI 知识地图 — 数据源
+/* AI 知识地图 — 数据源
  *
  * M0 切片：挑联系最密的一簇（Transformer→LLM→RAG→Agent→安全）先验证结构。
  * 结构见 docs/SPEC.md；节点清单见 tools/concept-checklist.md。
@@ -10,11 +10,11 @@
  */
 window.GRAPH = {
   meta: {
-    version: "0.3",
+    version: "0.4",
     updatedAt: "2026-07-19",
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
-    layoutSeed: 11,
+    layoutSeed: 29,
     note: "P0 节点补齐：39 个基础节点 + 2 个活跃层节点，11 种边类型全覆盖"
   },
 
@@ -29,47 +29,48 @@ window.GRAPH = {
    * 没有坐标的新节点会自动走力导向布局，不会报错。
    */
   positions: {
-    "attention": [-25, -46],
-    "transformer": [175, -109],
-    "llm": [-57, 56],
-    "tokenization": [-211, 198],
-    "embedding": [28, -334],
-    "context-window": [-296, -67],
-    "sampling-params": [-167, -150],
-    "fine-tuning": [-32, -163],
-    "neural-network": [322, 129],
-    "gradient-descent": [147, 322],
-    "backprop": [340, 273],
-    "overfitting": [145, -259],
-    "cnn": [560, 107],
-    "rnn": [103, 150],
-    "supervised-learning": [155, -10],
-    "unsupervised-learning": [331, -150],
-    "reinforcement-learning": [-434, 180],
-    "decision-tree": [458, -68],
-    "clustering": [288, -357],
-    "dimensionality-reduction": [215, -408],
-    "pretraining": [209, 97],
-    "rag": [-194, -261],
-    "vector-db": [-54, -520],
-    "prompt-engineering": [-224, -26],
-    "chunking": [-351, -229],
-    "retrieval": [-249, -450],
-    "structured-output": [-449, 64],
-    "cot": [-481, -75],
-    "agent": [-336, 39],
-    "tool-calling": [-515, 281],
-    "mcp": [-520, 520],
-    "agent-loop": [-560, 38],
-    "agent-memory": [-466, -195],
-    "diffusion": [346, 8],
-    "image-generation": [240, -235],
-    "hallucination": [-422, -325],
-    "prompt-injection": [-261, 308],
-    "jailbreak": [-51, 304],
-    "alignment": [-202, 78],
-    "reasoning-models": [-305, 144],
-    "agent-frameworks": [-361, 286]
+    "attention": [98, 2],
+    "transformer": [315, 4],
+    "llm": [11, -105],
+    "tokenization": [-208, -169],
+    "embedding": [124, 247],
+    "context-window": [-171, 100],
+    "lost-in-middle": [20, 221],
+    "sampling-params": [-151, -19],
+    "fine-tuning": [69, 107],
+    "neural-network": [491, -147],
+    "gradient-descent": [322, -350],
+    "backprop": [524, -310],
+    "overfitting": [26, 357],
+    "cnn": [502, 34],
+    "rnn": [290, -240],
+    "supervised-learning": [224, 343],
+    "unsupervised-learning": [277, 174],
+    "reinforcement-learning": [-314, -305],
+    "decision-tree": [397, 130],
+    "clustering": [340, 390],
+    "dimensionality-reduction": [259, 452],
+    "pretraining": [197, -123],
+    "rag": [-185, 200],
+    "vector-db": [-123, 445],
+    "prompt-engineering": [-81, 72],
+    "chunking": [-224, 388],
+    "retrieval": [46, 461],
+    "structured-output": [-342, 61],
+    "cot": [-307, 270],
+    "agent": [-283, -59],
+    "tool-calling": [-431, -212],
+    "mcp": [-444, -461],
+    "agent-loop": [-454, 44],
+    "agent-memory": [-416, 168],
+    "diffusion": [190, 116],
+    "image-generation": [373, 274],
+    "hallucination": [-70, 309],
+    "prompt-injection": [-190, -296],
+    "jailbreak": [30, -368],
+    "alignment": [-121, -175],
+    "reasoning-models": [-251, 40],
+    "agent-frameworks": [-524, -78]
   },
 
   domains: {
@@ -176,9 +177,24 @@ window.GRAPH = {
       aliases: ["Context Window", "上下文长度"],
       layer: "base", domain: "foundations", heat: 0.85,
       summary: "模型单次能「看见」的 token 总量上限——它的工作台有多大。",
-      body: "上下文窗口是模型一次推理中能同时容纳的 token 数上限，系统提示、历史对话、检索到的资料、用户问题、模型的输出，全都要挤在这个额度里。\n\n它是一个硬性边界，而且是很多设计决策的根源：为什么 RAG 要把文档切块而不是整本塞进去、为什么长对话要做摘要压缩、为什么 Agent 需要外部记忆——都是在绕这一个约束。\n\n还有个容易被忽略的点：窗口大不等于用得好。信息放在窗口中段时，模型的利用率往往明显低于放在开头和结尾，这被称为「中间迷失」。所以「塞得进」和「读得到」是两回事。",
+      body: "**是什么**\n\n上下文窗口是模型一次推理中能同时容纳的 [[tokenization]] 数上限。系统提示、历史对话、检索到的资料、用户问题、以及模型自己的输出，全都要挤在这一个额度里——它不是「输入长度限制」，而是输入加输出的总预算。\n\n**为什么会有这个限制**\n\n根源在 [[attention]] 的计算方式：每个位置都要和所有位置算一遍相关性，计算量和显存占用都随序列长度**平方级**增长。长度翻倍，注意力开销约变四倍。所以窗口不是厂商不愿意放大，而是每放大一档，推理成本和显存都要付出超线性的代价。\n\n此外，模型的位置编码是在特定长度范围内训练出来的。超出训练时见过的长度后，模型对位置的判断会变得不可靠——这是长窗口模型即使「支持」很长上下文，实际效果仍会衰减的另一个原因。\n\n**它约束了什么**\n\n这是很多设计决策的共同根源，理解了它就理解了半个应用层：\n\n- [[chunking]] 存在的理由——整本文档塞不进去，只能切块检索\n- [[agent-memory]] 存在的理由——多轮任务的状态装不下，必须外置\n- 长对话要做摘要压缩——旧消息必须让位\n- [[cot]] 有成本——让模型多想，就是在花窗口预算\n\n**怎么应对**\n\n窗口大不等于用得好，见 [[lost-in-middle]]。实践上的顺序是：先想办法**少放**（精准检索胜过多塞）、再想办法**放对位置**（关键内容靠两端）、最后才是换更大窗口的模型。",
       cases: [
-        { title: "长对话为什么会「失忆」", text: "超出窗口后最早的消息被丢弃，模型不会告诉你它忘了什么，只会表现得像从没聊过。这是应用层必须自己处理的问题。" }
+        { title: "长对话为什么会「失忆」", text: "超出窗口后最早的消息被静默丢弃，模型不会告诉你它忘了什么，只会表现得像从没聊过。**这是应用层必须自己处理的问题**——模型侧不会报错，也没有任何信号。" },
+        { title: "算一笔预算账", text: "假设窗口 128k：系统提示 2k + 检索来的 10 个文档块 20k + 20 轮历史对话 15k + 用户问题 0.5k，已用掉约 37k，留给输出的还有很多。但如果检索块开到 50 个、历史不做压缩，很快就会挤爆——**窗口是要主动分配的预算，不是可以随便用的空间**。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "lost-in-middle",
+      title: "中间迷失",
+      aliases: ["Lost in the Middle", "长上下文衰减"],
+      layer: "base", domain: "foundations", heat: 0.7,
+      summary: "放在上下文中段的信息，模型的利用率明显低于放在开头和结尾。",
+      body: "**是什么**\n\n把同一条关键信息分别放在长上下文的开头、中间、结尾，测模型能否用上它——结果呈现明显的 U 形：两端召回率高，中段显著塌陷。这意味着「塞进了 [[context-window]]」和「模型真的读到了」是两回事。\n\n**为什么会这样**\n\n有三个互相叠加的成因：\n\n- **注意力被稀释**。[[attention]] 是在所有位置上做加权分配，位置越多，每个位置分到的权重越薄。中段内容既没有开头的位置优势，也没有结尾的邻近优势。\n- **训练数据的位置偏置**。人写的文本本来就习惯把要点放在开头（导语、摘要）和结尾（结论）。模型在这种分布上训练出来，自然学到了「重要的东西通常在两端」这个先验。\n- **位置编码的外推衰减**。窗口远超训练长度时，模型对中段位置的编码分辨力下降。\n\n**怎么应对**\n\n按性价比排序：\n\n- **少放**。这是最有效的一条：把 [[retrieval]] 做准，放 5 个高相关的块，胜过放 50 个凑数的。中段问题在短上下文里根本不存在。\n- **放对位置**。检索结果重排后，把最相关的放开头、次相关的放结尾，把不确定的塞中间。这是一行代码的改动，收益却很直接。\n- **问题重述**。在长材料的**末尾**再复述一遍用户的问题，让它紧邻生成位置。\n- **分段处理**。与其一次塞进全部材料，不如分批让模型各自总结，再汇总——用多次调用换取每次都是短上下文。\n\n> 别指望换更大窗口的模型能解决——窗口更大往往意味着中段更长，问题只会更明显。",
+      cases: [
+        { title: "大海捞针测试", text: "在几十万 token 的无关文本里藏一句「小明最喜欢的数字是 42」，然后问模型这个数字。把它放在 10% 和 90% 位置时几乎都能答对，放在 50% 位置时错误率明显上升。这是评估长上下文模型的标准做法。" },
+        { title: "RAG 里最常踩的坑", text: "「检索召回率已经很高了，答案明明就在给模型的材料里，它却说找不到。」——很可能就是那一块正好排在中段。把 [[retrieval]] 的重排结果调个顺序，问题就消失了，比换模型便宜得多。" }
       ],
       sources: [],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
@@ -694,6 +710,10 @@ window.GRAPH = {
     { from: "context-window",  to: "llm",            type: "constrains",   label: "单次可见上限" },
     { from: "context-window",  to: "rag",            type: "constrains",   label: "所以要切块" },
     { from: "attention",       to: "context-window", type: "constrains",   label: "平方级开销" },
+    { from: "lost-in-middle",  to: "context-window", type: "constrains",   label: "塞得进≠读得到" },
+    { from: "attention",       to: "lost-in-middle", type: "enables",      label: "注意力稀释是成因" },
+    { from: "lost-in-middle",  to: "rag",            type: "threatens",    label: "材料给了也用不上" },
+    { from: "retrieval",       to: "lost-in-middle", type: "mitigates",    label: "少放 + 重排放两端" },
 
     // RAG 一簇
     { from: "rag",             to: "embedding",      type: "uses",         label: "语义检索" },

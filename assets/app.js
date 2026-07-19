@@ -232,11 +232,16 @@
   }
 
   // 极简 markdown：**粗体**、`代码`、> 引用、- 列表、空行分段
+  // 以及 [[node-id]] —— 内联跳转到另一个概念。知识地图里正文提到的概念
+  // 应该能直接点过去，而不是只在侧边的「相关知识」列表里出现。
   function mdLite(text) {
     if (!text) return "";
     const inline = s => esc(s)
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/`([^`]+)`/g, "<code>$1</code>");
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\[\[([a-z0-9-]+)\]\]/g, (m, id) => byId[id]
+        ? `<span class="xref" data-goto="${id}">${esc(byId[id].title)}</span>`
+        : `<span class="xref-bad" title="没有这个节点">${id}?</span>`);
 
     return text.split(/\n\n+/).map(block => {
       const lines = block.split("\n");
