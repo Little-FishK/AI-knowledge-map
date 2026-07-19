@@ -245,6 +245,15 @@
 
     return text.split(/\n\n+/).map(block => {
       const lines = block.split("\n");
+
+      // 表格：| a | b |  第二行是 |---|---| 分隔线
+      if (lines.length >= 3 && lines[0].trim().startsWith("|") && /^\|[\s:|-]+\|$/.test(lines[1].trim())) {
+        const row = (l, tag) => "<tr>" + l.trim().replace(/^\||\|$/g, "").split("|")
+          .map(c => `<${tag}>${inline(c.trim())}</${tag}>`).join("") + "</tr>";
+        return `<table class="d-table"><thead>${row(lines[0], "th")}</thead><tbody>`
+             + lines.slice(2).map(l => row(l, "td")).join("") + "</tbody></table>";
+      }
+
       if (lines.every(l => l.trim().startsWith("- "))) {
         return "<p>" + lines.map(l => inline(l.replace(/^\s*- /, "· "))).join("<br>") + "</p>";
       }
