@@ -32,6 +32,17 @@
     <!-- 左侧控制栏 -->
     <aside id="controls">
       <section class="ctl-group">
+        <h3>视图</h3>
+        <p class="ctl-hint">默认只显示各大区的骨干概念<br>点任一节点会揭开它的邻居</p>
+        <div class="seg">
+          <button data-scope="core" class="on">核心</button>
+          <button data-scope="all">全部</button>
+        </div>
+        <div id="scope-status" class="scope-status"></div>
+        <button id="scope-collapse" class="mini wide">收起已展开的</button>
+      </section>
+
+      <section class="ctl-group">
         <h3>层级</h3>
         <p class="ctl-hint">越上层越新、越易变</p>
         <label class="chk"><input type="checkbox" data-layer="base" checked><span class="lyr lyr-base"></span>基础层<em id="cnt-base"></em></label>
@@ -58,7 +69,7 @@
       <section class="ctl-group">
         <h3>聚焦</h3>
         <p class="ctl-hint">点节点后只显示其邻域</p>
-        <label class="chk"><input type="checkbox" id="focus-on"> 聚焦模式</label>
+        <label class="chk"><input type="checkbox" id="focus-on" checked> 聚焦模式</label>
         <label class="range">跳数 <input type="range" id="focus-hops" min="1" max="3" value="1"><b id="hops-val">1</b></label>
       </section>
     </aside>

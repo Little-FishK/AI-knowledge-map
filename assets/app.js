@@ -15,14 +15,25 @@
   const byId = {};
   G.nodes.forEach(n => { byId[n.id] = n; });
 
+  const CORE = new Set(G.core || []);
+
   const state = {
     layers: { base: true, emerging: false, news: false },
     domains: Object.fromEntries(Object.keys(DOMAINS).map(d => [d, true])),
     edges: Object.fromEntries(Object.keys(ETYPES).map(t => [t, true])),
-    focus: false,
+    // 默认只显示核心节点：全展开在 50+ 节点时已不可读，
+    // 而且新读者面对一张糊住的网不知从哪看起
+    scope: CORE.size ? "core" : "all",   // core | all
+    revealed: new Set(),                  // 核心视图下被点开而揭示出来的节点
+    focus: true,                          // 默认开聚焦，配合核心视图逐层揭开
     hops: 1,
     selected: null
   };
+
+  // 某节点在当前 scope 下是否该出现
+  function inScope(id) {
+    return state.scope === "all" || CORE.has(id) || state.revealed.has(id);
+  }
 
   /* ───────────────────────── 图初始化 ───────────────────────── */
 
@@ -181,7 +192,9 @@
   function applyFilters() {
     cy.batch(() => {
       cy.nodes().forEach(n => {
-        const ok = state.layers[n.data("layer")] && state.domains[n.data("domain")];
+        const ok = state.layers[n.data("layer")] &&
+                   state.domains[n.data("domain")] &&
+                   inScope(n.id());
         n.toggleClass("hidden", !ok);
       });
       cy.edges().forEach(e => {
@@ -193,7 +206,38 @@
     const visible = cy.nodes().not(".hidden").length;
     document.getElementById("empty-hint").classList.toggle("hidden", visible > 0);
     updateCounts();
+    updateScopeUI();
     applyFocus();
+  }
+
+  // 点开一个节点时，把它在完整图里的邻居揭示出来（核心视图下的逐层展开）
+  function reveal(id) {
+    if (state.scope === "all") return false;
+    let added = false;
+    const node = cy.getElementById(id);
+    if (!node.length) return false;
+    node.connectedEdges().forEach(e => {
+      [e.source().id(), e.target().id()].forEach(nid => {
+        if (!inScope(nid)) { state.revealed.add(nid); added = true; }
+      });
+    });
+    if (!state.revealed.has(id)) state.revealed.add(id);
+    return added;
+  }
+
+  function updateScopeUI() {
+    const total = G.nodes.length;
+    const shown = cy.nodes().not(".hidden").length;
+    const el = document.getElementById("scope-status");
+    if (el) {
+      el.textContent = state.scope === "core"
+        ? `核心视图 · 显示 ${shown} / ${total}${state.revealed.size ? "（已展开 " + state.revealed.size + "）" : ""}`
+        : `全部节点 · ${shown} / ${total}`;
+    }
+    document.querySelectorAll("[data-scope]").forEach(b =>
+      b.classList.toggle("on", b.dataset.scope === state.scope));
+    const btn = document.getElementById("scope-collapse");
+    if (btn) btn.disabled = state.scope !== "core" || state.revealed.size === 0;
   }
 
   function applyFocus() {
@@ -343,17 +387,20 @@
     });
   }
 
-  function select(id, reveal) {
+  function select(id, jumped) {
     const node = cy.getElementById(id);
     if (!node.length) return;
     const n = byId[id];
+    let changed = false;
     // 跳转到被过滤掉的节点时，自动打开它所在的层与大区
-    if (reveal && n) {
-      let changed = false;
+    if (jumped && n) {
       if (!state.layers[n.layer]) { state.layers[n.layer] = true; changed = true; }
       if (!state.domains[n.domain]) { state.domains[n.domain] = true; changed = true; }
-      if (changed) { syncControls(); applyFilters(); }
+      if (!inScope(id)) { state.revealed.add(id); changed = true; }
     }
+    // 核心视图下，点开一个节点就揭开它的邻居
+    if (reveal(id)) changed = true;
+    if (changed) { syncControls(); applyFilters(); }
     state.selected = id;
     cy.nodes().removeClass("sel");
     node.addClass("sel");
@@ -421,6 +468,26 @@
     syncControls();
     applyFilters();
   }
+  // 视图范围：核心 / 全部
+  document.querySelectorAll("[data-scope]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.scope = btn.dataset.scope;
+      applyFilters();
+      fitView();
+    });
+  });
+  document.getElementById("scope-collapse").addEventListener("click", () => {
+    state.revealed.clear();
+    // 收起后如果选中的节点也被收走了，一并取消选中
+    if (state.selected && !inScope(state.selected)) {
+      state.selected = null;
+      cy.nodes().removeClass("sel");
+      detail.classList.add("closed");
+    }
+    applyFilters();
+    fitView();
+  });
+
   document.getElementById("edge-all").addEventListener("click", () => setEdges(() => true));
   document.getElementById("edge-none").addEventListener("click", () => setEdges(() => false));
   document.getElementById("edge-key").addEventListener("click", () => setEdges(k => KEY_EDGES.includes(k)));
@@ -435,6 +502,8 @@
     state.layers = { base: true, emerging: false, news: false };
     Object.keys(state.domains).forEach(k => { state.domains[k] = true; });
     Object.keys(state.edges).forEach(k => { state.edges[k] = true; });
+    state.scope = CORE.size ? "core" : "all";
+    state.revealed.clear();
     state.selected = null;
     cy.nodes().removeClass("sel");
     detail.classList.add("closed");

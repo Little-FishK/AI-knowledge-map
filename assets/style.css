@@ -103,6 +103,23 @@ html, body {
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 9px; }
 .dash { width: 14px; height: 0; border-top: 2px solid; display: inline-block; flex: 0 0 14px; }
 
+/* 视图范围切换 */
+.seg { display: flex; gap: 0; margin-bottom: 8px; }
+.seg button {
+  flex: 1; padding: 5px 0; font-size: 12px; font-family: inherit; cursor: pointer;
+  background: var(--bg-raise); color: var(--fg-faint);
+  border: 1px solid var(--line); border-right-width: 0;
+}
+.seg button:first-child { border-radius: 5px 0 0 5px; }
+.seg button:last-child  { border-radius: 0 5px 5px 0; border-right-width: 1px; }
+.seg button:hover { color: var(--fg); }
+.seg button.on { background: var(--accent); color: #12141a; border-color: var(--accent); font-weight: 600; }
+
+.scope-status { font-size: 11px; color: var(--fg-faint); margin-bottom: 8px; line-height: 1.5; }
+.mini.wide { width: 100%; }
+.mini:disabled { opacity: .4; cursor: default; }
+.mini:disabled:hover { color: var(--fg-faint); border-color: var(--line); }
+
 .edge-actions { display: flex; gap: 5px; margin-bottom: 8px; }
 .mini {
   flex: 1; padding: 3px 0; font-size: 11px; font-family: inherit;

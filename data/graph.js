@@ -18,6 +18,29 @@ window.GRAPH = {
     note: "M0 完成：51 个基础节点 + 2 个活跃层节点，全部正文按 是什么/机制/约束/对策 深化"
   },
 
+  /* 核心节点 —— 默认视图只显示这些。
+   *
+   * 为什么需要：53 个节点全展开已经到可读性极限（搜 200 个布局种子只有 14 个
+   * 不重叠），而且新读者面对一张糊在一起的网不知道从哪看起。
+   * 只显示每个大区的骨干概念，既清爽又给出一条阅读路径；点任一节点会
+   * 揭开它的邻居（逐层展开），也可以一键切到「全部」。
+   *
+   * 选取标准：热度 + 连接度 + 是否是本大区的入口概念。每区 2~7 个。
+   */
+  core: [
+    // 🧱 基础/共享
+    "llm", "transformer", "attention", "embedding", "context-window",
+    "neural-network", "pretraining",
+    // 🔧 应用搭建
+    "rag", "retrieval", "prompt-engineering", "cot",
+    // 💻 编程与 Agent
+    "agent", "tool-calling", "mcp",
+    // 🎨 内容生成
+    "diffusion", "image-generation",
+    // ⚖️ 安全与对齐
+    "hallucination", "prompt-injection", "alignment"
+  ],
+
   /* 固化的节点坐标。
    *
    * 为什么不每次现算：fcose 即使定了种子，谱初始化算特征向量时符号是任意的，
