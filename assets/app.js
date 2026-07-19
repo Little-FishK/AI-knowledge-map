@@ -26,15 +26,20 @@
 
   /* ───────────────────────── 图初始化 ───────────────────────── */
 
+  const POS = G.positions || {};
   const elements = [];
   G.nodes.forEach(n => {
-    elements.push({
+    const el = {
       data: {
         id: n.id, label: n.title, domain: n.domain, layer: n.layer,
         heat: typeof n.heat === "number" ? n.heat : 0.5
       }
-    });
+    };
+    if (POS[n.id]) el.position = { x: POS[n.id][0], y: POS[n.id][1] };
+    elements.push(el);
   });
+  // 所有节点都有固化坐标时直接用，跳过力导向——保证每次打开完全一致
+  const ALL_PINNED = G.nodes.every(n => POS[n.id]);
   G.edges.forEach((e, i) => {
     if (!byId[e.from] || !byId[e.to]) {
       console.warn("边指向了不存在的节点，已跳过：", e);
@@ -62,10 +67,10 @@
           "border-width": 2.5,
           "border-color": ele => LAYER_RING[ele.data("layer")] || "#888",
           "border-opacity": 0.85,
-          "width":  ele => 22 + ele.data("heat") * 18,
-          "height": ele => 22 + ele.data("heat") * 18,
+          "width":  ele => 30 + ele.data("heat") * 26,
+          "height": ele => 30 + ele.data("heat") * 26,
           "color": "#e6eaf0",
-          "font-size": 10.5,
+          "font-size": 13,
           "font-family": '"PingFang SC","Microsoft YaHei",sans-serif',
           "text-valign": "bottom",
           "text-margin-y": 5,
@@ -107,27 +112,68 @@
     layout: { name: "preset" }
   });
 
-  function runLayout() {
+  /* fcose 内部直接用 Math.random，没有 seed 选项。
+   * 不加干预的话每次打开布局都不一样，质量随机波动——密集簇有时糊成一团。
+   * 这里在布局期间把 Math.random 换成定种子的 PRNG，布局结束再还原，
+   * 使同一份数据每次都得到完全相同、且已经挑过的那一版布局。
+   * LAYOUT_SEED 是离线搜出来的：见 tools/find-seed.js。 */
+  const LAYOUT_SEED = (G.meta && G.meta.layoutSeed) || 1;
+
+  function withSeededRandom(seed, fn) {
+    const orig = Math.random;
+    let s = seed >>> 0;
+    Math.random = function () {              // mulberry32
+      s = (s + 0x6D2B79F5) >>> 0;
+      let t = s;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    try { return fn(); } finally { Math.random = orig; }
+  }
+
+  function runLayout(force) {
+    if (ALL_PINNED && !force) {   // 坐标已固化，无需现算
+      cy.nodes().forEach(n => n.position({ x: POS[n.id()][0], y: POS[n.id()][1] }));
+      fitView();
+      return;
+    }
     const l = cy.layout({
       name: "fcose",
       quality: "proof",
-      animate: true,
-      animationDuration: 600,
+      // 必须同步：animate:true 时 fcose 的计算是异步的，withSeededRandom 的
+      // finally 会在计算跑完前还原 Math.random，fcose 拿到半截被替换的随机流，
+      // 算出退化布局（整张图塌成 89x74，fit 后 zoom 顶到 maxZoom）。
+      // 节点量级下同步布局是瞬时的，动画本来也只是装饰。
+      animate: false,
       // 必须 randomize：初始位置共线时 fcose 会卡在退化的局部最优里，
       // 表现为整张图塌成一条对角线（2026-07-19 实测踩到）
       randomize: true,
       // 中文标签又长又宽，不把标签计入尺寸的话密集簇里的字会互相压
       nodeDimensionsIncludeLabels: true,
-      nodeSeparation: 220,
-      idealEdgeLength: 200,
-      nodeRepulsion: 60000,
-      gravity: 0.08,
+      nodeSeparation: 130,
+      idealEdgeLength: 150,
+      nodeRepulsion: 22000,
+      gravity: 0.1,
       numIter: 4000,
-      padding: 70
+      padding: 40,
+      // fcose 自己的 fit 会在动画结束后再跑一次，把下面的缩放上限覆盖掉
+      // （表现为 zoom 顶到 maxZoom=3，节点巨大、只看得见一角）。这里自己接管。
+      fit: false
     });
-    // 节点少时 fit 会把图放得过大，标签显得笨重
-    l.one("layoutstop", () => { if (cy.zoom() > 1.05) cy.zoom({ level: 1.05, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } }); });
-    l.run();
+    withSeededRandom(LAYOUT_SEED, () => l.run());
+    fitView();
+  }
+
+  function fitView() {
+    const vis = cy.nodes().not(".hidden");
+    if (!vis.length) return;
+    cy.fit(vis, 45);
+    // 节点极少时 fit 会把图放得过大
+    if (cy.zoom() > 1.5) {
+      cy.zoom({ level: 1.5, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
+      cy.center(vis);
+    }
   }
 
   /* ───────────────────────── 过滤 ───────────────────────── */
@@ -380,7 +426,7 @@
     detail.classList.add("closed");
     syncControls();
     applyFilters();
-    runLayout();
+    runLayout(true);   // 「重置」强制重算，用于数据变动后导出新坐标
   });
 
   document.getElementById("btn-panel").addEventListener("click", () => {

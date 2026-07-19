@@ -12,7 +12,41 @@ window.GRAPH = {
   meta: {
     version: "0.1-slice",
     updatedAt: "2026-07-19",
+    // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
+    // 由 tools/find-seed.js 搜出；数据变动后需重跑。
+    layoutSeed: 57,
     note: "M0 验证切片，16 个基础节点 + 2 个活跃层节点"
+  },
+
+  /* 固化的节点坐标。
+   *
+   * 为什么不每次现算：fcose 即使定了种子，谱初始化算特征向量时符号是任意的，
+   * 结果是形状确定但**朝向随机**——同一份数据两次打开会得到镜像布局，
+   * 视觉上仍然"每次都不一样"。基础层本就是稳定骨架，坐标值得固定下来。
+   *
+   * 怎么更新：改完节点/边后，在浏览器控制台跑 tools/find-seed.js 选种子，
+   * 再点「重置」重算布局，用 tools/dump-positions.js 导出新坐标覆盖这里。
+   * 没有坐标的新节点会自动走力导向布局，不会报错。
+   */
+  positions: {
+    "attention": [147, 16],
+    "transformer": [368, 7],
+    "llm": [104, -122],
+    "tokenization": [-5, -350],
+    "embedding": [302, 247],
+    "context-window": [-59, -110],
+    "sampling-params": [271, -324],
+    "fine-tuning": [327, -124],
+    "rag": [76, 119],
+    "vector-db": [89, 363],
+    "prompt-engineering": [277, 117],
+    "agent": [-134, 58],
+    "tool-calling": [-336, -49],
+    "mcp": [-340, 215],
+    "hallucination": [218, -105],
+    "prompt-injection": [-151, -197],
+    "reasoning-models": [119, -363],
+    "agent-frameworks": [-368, 88]
   },
 
   domains: {
