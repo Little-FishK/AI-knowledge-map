@@ -1,0 +1,206 @@
+/* AI 知识地图 — 样式 */
+
+:root {
+  --bg:        #14161a;
+  --bg-panel:  #1a1d23;
+  --bg-raise:  #21252d;
+  --line:      #2c313b;
+  --line-soft: #23272f;
+  --fg:        #dfe3ea;
+  --fg-dim:    #9aa2b1;
+  --fg-faint:  #6b7484;
+  --accent:    #7aa2d8;
+  --lyr-base:     #6b8cbe;
+  --lyr-emerging: #d3a05a;
+  --lyr-news:     #cf6f6f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg); color: var(--fg);
+  font: 14px/1.6 "PingFang SC", "Microsoft YaHei", -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+#app { display: flex; flex-direction: column; height: 100%; }
+
+/* ───────── 顶栏 ───────── */
+#topbar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 16px; height: 52px; flex: 0 0 52px;
+  background: var(--bg-panel); border-bottom: 1px solid var(--line);
+  z-index: 30;
+}
+.brand { display: flex; align-items: baseline; gap: 8px; }
+.brand-mark { color: var(--accent); font-size: 17px; }
+.brand-name { font-weight: 600; letter-spacing: .04em; }
+.brand-ver  { color: var(--fg-faint); font-size: 11px; }
+
+.search-wrap { position: relative; flex: 1; max-width: 380px; }
+#search {
+  width: 100%; padding: 7px 12px;
+  background: var(--bg-raise); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 6px; outline: none;
+  font-family: inherit; font-size: 13px;
+}
+#search:focus { border-color: var(--accent); }
+#search-results {
+  position: absolute; top: 38px; left: 0; right: 0;
+  background: var(--bg-raise); border: 1px solid var(--line);
+  border-radius: 6px; max-height: 300px; overflow-y: auto;
+  display: none; z-index: 40;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+#search-results.open { display: block; }
+.sr-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--line-soft); }
+.sr-item:last-child { border-bottom: none; }
+.sr-item:hover, .sr-item.sel { background: #2a303a; }
+.sr-title { font-size: 13px; }
+.sr-sum { font-size: 11px; color: var(--fg-faint); margin-top: 2px;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-none { padding: 10px 12px; color: var(--fg-faint); font-size: 12px; }
+
+.topbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.btn {
+  padding: 6px 12px; background: var(--bg-raise); color: var(--fg-dim);
+  border: 1px solid var(--line); border-radius: 6px; cursor: pointer;
+  font-family: inherit; font-size: 12px;
+}
+.btn:hover { color: var(--fg); border-color: var(--accent); }
+
+/* ───────── 布局 ───────── */
+#main { display: flex; flex: 1; min-height: 0; }
+
+/* ───────── 左侧控制栏 ───────── */
+#controls {
+  width: 224px; flex: 0 0 224px; padding: 4px 0 24px;
+  background: var(--bg-panel); border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+#controls.hidden { display: none; }
+.ctl-group { padding: 14px 16px; border-bottom: 1px solid var(--line-soft); }
+.ctl-group h3 {
+  margin: 0 0 8px; font-size: 11px; font-weight: 600;
+  color: var(--fg-faint); letter-spacing: .12em; text-transform: uppercase;
+}
+.ctl-hint { margin: -4px 0 8px; font-size: 11px; color: var(--fg-faint); line-height: 1.5; }
+
+.chk {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 0; cursor: pointer; font-size: 13px; color: var(--fg-dim);
+}
+.chk:hover { color: var(--fg); }
+.chk input { accent-color: var(--accent); cursor: pointer; margin: 0; }
+.chk em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--fg-faint); }
+
+.lyr { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.lyr-base     { background: var(--lyr-base); }
+.lyr-emerging { background: var(--lyr-emerging); }
+.lyr-news     { background: var(--lyr-news); }
+
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 9px; }
+.dash { width: 14px; height: 0; border-top: 2px solid; display: inline-block; flex: 0 0 14px; }
+
+.edge-actions { display: flex; gap: 5px; margin-bottom: 8px; }
+.mini {
+  flex: 1; padding: 3px 0; font-size: 11px; font-family: inherit;
+  background: var(--bg-raise); color: var(--fg-faint);
+  border: 1px solid var(--line); border-radius: 4px; cursor: pointer;
+}
+.mini:hover { color: var(--fg); border-color: var(--accent); }
+
+.range { display: flex; align-items: center; gap: 8px; padding: 6px 0;
+         font-size: 12px; color: var(--fg-dim); }
+.range input { flex: 1; accent-color: var(--accent); }
+
+/* ───────── 图 ───────── */
+#stage { flex: 1; position: relative; min-width: 0; }
+#cy { position: absolute; inset: 0; }
+
+#legend {
+  position: absolute; left: 14px; bottom: 14px;
+  background: rgba(26,29,35,.92); border: 1px solid var(--line);
+  border-radius: 6px; padding: 9px 12px; font-size: 11px; color: var(--fg-faint);
+  pointer-events: none; line-height: 1.9;
+}
+#legend b { color: var(--fg-dim); font-weight: 500; }
+
+#empty-hint {
+  position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; color: var(--fg-faint); font-size: 13px;
+}
+#empty-hint.hidden { display: none; }
+
+/* ───────── 右侧详情 ───────── */
+#detail {
+  width: 400px; flex: 0 0 400px; position: relative;
+  background: var(--bg-panel); border-left: 1px solid var(--line);
+  overflow-y: auto;
+}
+#detail.closed { display: none; }
+#detail-close {
+  position: absolute; top: 12px; right: 14px; z-index: 5;
+  background: none; border: none; color: var(--fg-faint);
+  font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+#detail-close:hover { color: var(--fg); }
+#detail-body { padding: 20px 22px 40px; }
+
+.d-domain { font-size: 11px; letter-spacing: .1em; margin-bottom: 8px; }
+.d-title { margin: 0 0 6px; font-size: 21px; font-weight: 600; line-height: 1.3; padding-right: 24px; }
+.d-alias { color: var(--fg-faint); font-size: 11px; margin-bottom: 14px; }
+.d-summary {
+  color: var(--fg); font-size: 14px; line-height: 1.75;
+  padding: 12px 14px; background: var(--bg-raise);
+  border-left: 2px solid var(--accent); border-radius: 0 5px 5px 0;
+  margin-bottom: 20px;
+}
+.d-sec { margin-bottom: 22px; }
+.d-sec h4 {
+  margin: 0 0 9px; font-size: 11px; font-weight: 600; color: var(--fg-faint);
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.d-body p { margin: 0 0 11px; color: var(--fg-dim); line-height: 1.8; }
+.d-body p:last-child { margin-bottom: 0; }
+.d-body strong { color: var(--fg); font-weight: 600; }
+.d-body code {
+  background: var(--bg-raise); padding: 1px 5px; border-radius: 3px;
+  font-size: 12px; color: #b8cfe8;
+}
+.d-body .quote {
+  border-left: 2px solid var(--line); padding-left: 12px;
+  color: var(--fg-faint); font-size: 13px;
+}
+
+.case { background: var(--bg-raise); border-radius: 6px; padding: 11px 13px; margin-bottom: 9px; }
+.case-t { font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 5px; }
+.case-x { font-size: 12.5px; color: var(--fg-dim); line-height: 1.75; }
+.case-x strong { color: var(--fg); }
+.case-x code { background: #191c22; padding: 1px 4px; border-radius: 3px; font-size: 11.5px; }
+
+.rel { display: flex; align-items: baseline; gap: 8px; padding: 6px 0;
+       border-bottom: 1px solid var(--line-soft); font-size: 12.5px; }
+.rel:last-child { border-bottom: none; }
+.rel-type { flex: 0 0 62px; font-size: 10.5px; padding: 1px 0; text-align: center;
+            border-radius: 3px; color: #12141a; font-weight: 600; }
+.rel-to { color: var(--accent); cursor: pointer; }
+.rel-to:hover { text-decoration: underline; }
+.rel-lbl { color: var(--fg-faint); font-size: 11px; margin-left: auto; }
+
+.act { border-left: 2px solid var(--lyr-news); padding: 2px 0 2px 11px; margin-bottom: 11px; }
+.act-d { font-size: 10.5px; color: var(--lyr-news); letter-spacing: .06em; }
+.act-t { font-size: 12.5px; font-weight: 600; margin: 2px 0 3px; }
+.act-x { font-size: 12px; color: var(--fg-dim); line-height: 1.7; }
+
+.src a { color: var(--accent); font-size: 12px; text-decoration: none; }
+.src a:hover { text-decoration: underline; }
+
+.d-empty { color: var(--fg-faint); font-size: 12px; }
+
+/* 窄屏 */
+@media (max-width: 1100px) {
+  #controls { position: absolute; left: 0; top: 52px; bottom: 0; z-index: 20; }
+  #detail { position: absolute; right: 0; top: 52px; bottom: 0; z-index: 20; width: 340px; flex-basis: 340px; }
+}

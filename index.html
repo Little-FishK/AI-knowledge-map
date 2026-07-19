@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 知识地图</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- 顶栏 -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver"></span>
+    </div>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-reset" class="btn" title="重置视图">重置</button>
+      <button id="btn-panel" class="btn" title="显示/隐藏侧栏">☰</button>
+    </div>
+  </header>
+
+  <div id="main">
+
+    <!-- 左侧控制栏 -->
+    <aside id="controls">
+      <section class="ctl-group">
+        <h3>层级</h3>
+        <p class="ctl-hint">越上层越新、越易变</p>
+        <label class="chk"><input type="checkbox" data-layer="base" checked><span class="lyr lyr-base"></span>基础层<em id="cnt-base"></em></label>
+        <label class="chk"><input type="checkbox" data-layer="emerging"><span class="lyr lyr-emerging"></span>活跃层 L1<em id="cnt-emerging"></em></label>
+        <label class="chk"><input type="checkbox" data-layer="news"><span class="lyr lyr-news"></span>活跃层 L2<em id="cnt-news"></em></label>
+      </section>
+
+      <section class="ctl-group">
+        <h3>大区</h3>
+        <div id="domain-list"></div>
+      </section>
+
+      <section class="ctl-group">
+        <h3>关系类型</h3>
+        <p class="ctl-hint">跨领域的联系是这张图的重点</p>
+        <div class="edge-actions">
+          <button class="mini" id="edge-all">全选</button>
+          <button class="mini" id="edge-none">全不选</button>
+          <button class="mini" id="edge-key">只看关键</button>
+        </div>
+        <div id="edge-list"></div>
+      </section>
+
+      <section class="ctl-group">
+        <h3>聚焦</h3>
+        <p class="ctl-hint">点节点后只显示其邻域</p>
+        <label class="chk"><input type="checkbox" id="focus-on"> 聚焦模式</label>
+        <label class="range">跳数 <input type="range" id="focus-hops" min="1" max="3" value="1"><b id="hops-val">1</b></label>
+      </section>
+    </aside>
+
+    <!-- 图 -->
+    <main id="stage">
+      <div id="cy"></div>
+      <div id="legend"></div>
+      <div id="empty-hint" class="hidden">没有符合当前筛选的节点</div>
+    </main>
+
+    <!-- 右侧详情 -->
+    <aside id="detail" class="closed">
+      <button id="detail-close" title="关闭">×</button>
+      <div id="detail-body"></div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="assets/vendor/cytoscape.min.js"></script>
+<script src="assets/vendor/layout-base.js"></script>
+<script src="assets/vendor/cose-base.js"></script>
+<script src="assets/vendor/cytoscape-fcose.js"></script>
+<script src="data/graph.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
