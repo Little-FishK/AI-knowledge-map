@@ -5,7 +5,7 @@
 | **资料** | A practical guide to building agents（OpenAI 官方，34 页 PDF） |
 | **来源** | https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf |
 | **抽取时间** | 2026-07-19 |
-| **状态** | ⏳ 待审核 |
+| **状态** | ✅ 已合并（graph v0.9，commit 见下）— 三项审核点均按方案确认：护栏独立、三个 stable、模型选型独立 |
 
 **审核方式**：直接在本文件上改（删掉不要的、改措辞、调层级），改完告诉我「合并」。
 

@@ -15,7 +15,7 @@ window.GRAPH = {
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
     layoutSeed: 147,
-    note: "取消三层结构：maturity 标签（stable/evolving）替代 base/active 层，见 SPEC D4 修订"
+    note: "入库 001 合并（OpenAI Agent 指南）：+3 节点（多Agent/护栏/模型选型）+12 边"
   },
 
   /* 核心节点 —— 默认视图只显示这些。
@@ -52,59 +52,62 @@ window.GRAPH = {
    * 没有坐标的新节点会自动走力导向布局，不会报错。
    */
   positions: {
-    "attention": [149, -253],
-    "transformer": [315, -52],
-    "residual-connection": [533, -27],
-    "vanishing-gradient": [366, -153],
-    "scaling-law": [234, 269],
-    "llm": [68, 57],
-    "tokenization": [137, -143],
-    "embedding": [276, -287],
-    "context-window": [-103, -165],
-    "lost-in-middle": [-10, -343],
-    "sampling-params": [-80, 305],
-    "fine-tuning": [198, 3],
-    "neural-network": [420, 107],
-    "gradient-descent": [339, 327],
-    "backprop": [504, 82],
-    "overfitting": [373, 225],
-    "cnn": [650, 201],
-    "rnn": [582, -139],
-    "supervised-learning": [223, 177],
-    "unsupervised-learning": [431, -49],
-    "reinforcement-learning": [-187, 349],
-    "self-supervised-learning": [479, 212],
-    "regularization": [141, 259],
-    "decision-tree": [462, 348],
-    "clustering": [469, -254],
-    "dimensionality-reduction": [445, -343],
-    "curse-of-dimensionality": [297, -488],
-    "pretraining": [302, 101],
-    "rag": [38, -191],
-    "vector-db": [115, -372],
-    "prompt-engineering": [-77, 102],
-    "chunking": [-154, -437],
-    "retrieval": [39, -496],
-    "reranking": [-132, -319],
-    "constrained-decoding": [-249, 496],
-    "prompt-caching": [-21, -96],
-    "structured-output": [-292, 276],
-    "cot": [-311, 68],
-    "agent": [-183, 51],
-    "tool-calling": [-423, 82],
-    "mcp": [-650, 187],
-    "mcp-architecture": [-420, 309],
-    "agent-loop": [-317, -152],
-    "agent-memory": [-233, -260],
-    "diffusion": [614, -1],
-    "image-generation": [555, -265],
-    "hallucination": [-212, -69],
-    "prompt-injection": [-164, 234],
-    "jailbreak": [-93, -40],
-    "reward-hacking": [-255, 145],
-    "alignment": [31, 237],
-    "reasoning-models": [-61, 203],
-    "agent-frameworks": [-408, -47]
+    "attention": [14, -80],
+    "transformer": [216, -44],
+    "residual-connection": [356, 26],
+    "vanishing-gradient": [278, -137],
+    "scaling-law": [218, 244],
+    "llm": [21, 116],
+    "tokenization": [94, -165],
+    "embedding": [217, -277],
+    "context-window": [-179, -114],
+    "lost-in-middle": [-161, -272],
+    "sampling-params": [-101, 364],
+    "fine-tuning": [169, 79],
+    "neural-network": [428, 103],
+    "gradient-descent": [405, 308],
+    "backprop": [509, 42],
+    "overfitting": [306, 388],
+    "cnn": [640, 101],
+    "rnn": [446, -187],
+    "supervised-learning": [325, 206],
+    "unsupervised-learning": [427, -60],
+    "reinforcement-learning": [-190, 181],
+    "self-supervised-learning": [505, 181],
+    "regularization": [158, 349],
+    "decision-tree": [560, 316],
+    "clustering": [468, -295],
+    "dimensionality-reduction": [382, -283],
+    "curse-of-dimensionality": [264, -471],
+    "pretraining": [275, 106],
+    "rag": [-16, -198],
+    "vector-db": [151, -489],
+    "prompt-engineering": [-104, -50],
+    "chunking": [-209, -413],
+    "retrieval": [-26, -442],
+    "reranking": [115, -312],
+    "constrained-decoding": [-280, 482],
+    "prompt-caching": [-89, 148],
+    "structured-output": [-123, 261],
+    "cot": [67, 15],
+    "agent": [-242, -21],
+    "tool-calling": [-416, 261],
+    "mcp": [-640, 393],
+    "mcp-architecture": [-409, 489],
+    "agent-loop": [-365, -40],
+    "agent-memory": [-289, -258],
+    "diffusion": [528, -89],
+    "image-generation": [432, -391],
+    "hallucination": [-256, 90],
+    "prompt-injection": [-230, 288],
+    "jailbreak": [-157, 51],
+    "reward-hacking": [-47, 31],
+    "alignment": [60, 287],
+    "reasoning-models": [-27, 266],
+    "agent-frameworks": [-480, -107],
+    "multi-agent": [-381, 107],
+    "guardrails": [-462, 45],
+    "model-selection": [-303, 211]
   },
 
   domains: {
@@ -560,9 +563,10 @@ window.GRAPH = {
       summary: "通过设计输入的措辞与结构，让模型稳定产出你想要的结果。",
       body: "**是什么**\n\n通过设计输入的措辞与结构，让模型稳定产出你要的结果。同一个模型，提示写法不同，效果可以差出一大截。\n\n**为什么会有这么大差别**\n\n因为 [[llm]] 做的是「续写最可能的内容」。**你的提示决定了它在什么样的分布里续写。** 一个含糊的提示对应着一个很宽的可能空间，模型只能给你一个平庸的中位数；一个明确了角色、任务、格式、约束的提示，把空间收窄到了你想要的那一小块。\n\n少样本示例之所以比抽象规则有效，也是同一个道理——示例直接把目标分布展示给了模型，比用语言描述它精确得多。\n\n**几条经得起反复验证的做法**\n\n- **说清角色和目标**，别让模型猜\n- **给例子**胜过讲规则。三个好例子往往抵得上三百字说明\n- **让它先想再答**（[[cot]]），复杂推理上提升明显\n- **把格式写死**（见 [[structured-output]]），需要程序消费时尤其重要\n- **约束写成正面指令**——「用三句话回答」比「不要太长」可执行得多。**告诉模型做什么，而不是不做什么**，因为「不要提到 X」反而把 X 放进了它的上下文\n- **把长材料放前面、指令放最后**，一方面利用 [[lost-in-middle]] 的两端优势，另一方面便于 [[prompt-caching]] 复用前缀\n\n**它的位置**\n\n这是成本最低的一档手段：不训练、不要数据、改一行就能试。**所以任何 LLM 应用都该先在这里榨干收益**，再考虑 [[rag]]（缺事实时）和 [[fine-tuning]]（缺行为时）。顺序搞反会浪费大量时间和钱。\n\n**它正在往哪走**\n\n随着 [[agent]] 兴起，重心从「雕琢单条提示」转向「**组织整个上下文里该放什么**」——历史对话留多少、检索结果放几条、工具描述怎么写、什么时候压缩。这被称为上下文工程，本质是在 [[context-window]] 这个预算约束下做分配。",
       cases: [
-        { title: "同一任务，两种问法", text: "「总结这篇文章」得到的往往是泛泛的三段话。「用 5 个要点总结，每点不超过 20 字，聚焦作者的论证而非背景」得到的是能直接用的东西。" }
+        { title: "同一任务，两种问法", text: "「总结这篇文章」得到的往往是泛泛的三段话。「用 5 个要点总结，每点不超过 20 字，聚焦作者的论证而非背景」得到的是能直接用的东西。" },
+        { title: "用模板代替一堆散提示", text: "与其为每个场景各维护一条提示词，不如用一条带变量的基础模板（`你正在服务 {{用户名}}，该用户最常反馈 {{问题类型}}`）。新场景来了改变量而不是重写，维护和评测成本都低得多。**这是在单个 [[agent]] 内部控制复杂度的主要手段**，也是拆成 [[multi-agent]] 之前该先试的一步。" }
       ],
-      sources: [],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
     },
 
@@ -675,7 +679,7 @@ window.GRAPH = {
         { title: "编程 Agent", text: "「修复这个测试」——它会读代码、定位问题、改文件、跑测试、看到还失败就再改。这个循环正是 Agent 与代码补全的本质区别。" },
         { title: "为什么需要步数上限", text: "Agent 可能陷入「改了跑、跑了改」的死循环，每轮都在烧 token。没有上限保护的 Agent 在生产环境是个成本黑洞。" }
       ],
-      sources: [],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
     },
     {
@@ -687,9 +691,10 @@ window.GRAPH = {
       body: "**是什么**\n\n你把可用工具的名称、用途、参数格式描述给模型；模型需要时不直接作答，而是输出一段结构化的调用请求；**你的程序**去真正执行，再把结果交回模型继续。\n\n**最关键的一点：模型从不执行任何东西**\n\n它只产出一个**意图**——本质上就是一次 [[structured-output]]。真正的执行、鉴权、参数校验、错误处理，全部在你的代码里。\n\n这个边界值得反复强调，因为它同时是两件事的答案：\n\n- **安全的着力点**。既然执行权在你手里，那么无论模型被 [[prompt-injection]] 劫持成什么样，它能造成的最大破坏都由**你的权限设计**决定，而不是由模型的听话程度决定。这是为什么工具沙箱和最小权限比「检测恶意指令」更可靠。\n- **最常见的误解**。「模型会自己上网/自己删文件」——不会。它只是输出了一句请求，是你的代码选择了照做。\n\n**工具描述就是提示工程**\n\n模型选哪个工具、传什么参数，完全依据你写的描述。描述含糊，它就选错、传错。几条实测有效的做法：\n\n- 写清**什么时候该用**，而不只是「这个工具做什么」\n- 参数给出例子和取值范围，别只给类型\n- 工具数量控制在合理范围——几十个工具塞进上下文，模型的选择准确率会明显下降，而且还吃掉 [[context-window]]\n- 错误信息要写得像给人看的：返回「城市名必须是拼音，收到的是中文」，模型下一轮就能自己改对；返回 `Error 400`，它只能瞎猜\n\n**它使什么成为可能**\n\n没有工具调用就没有 [[agent]]。它把语言模型从一个「会说话的盒子」变成了能查实时数据、读写数据库、操作文件的系统。[[mcp]] 则进一步把这件事标准化。",
       cases: [
         { title: "查天气", text: "模型输出 `get_weather(city=\"北京\")`，你的代码调真实 API 拿到 26℃，回传给模型，模型再组织成自然语言。模型全程没碰过网络。" },
-        { title: "描述质量决定成败", text: "工具的说明写得含糊，模型就会选错工具或传错参数。工具描述本身就是提示工程的一部分。" }
+        { title: "描述质量决定成败", text: "工具的说明写得含糊，模型就会选错工具或传错参数。工具描述本身就是提示工程的一部分。" },
+        { title: "工具的三种类型", text: "**数据类**（查数据库、读文档、搜网页，用来获取上下文）、**行动类**（发邮件、改记录、转人工，用来改变外部状态）、**编排类**（把另一个 [[agent]] 当作工具调用）。区分它们的实际意义在于**风险**：数据类基本只读，行动类可能不可逆——这正是工具风险分级的依据，见 [[guardrails]]。" }
       ],
-      sources: [],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
     },
     {
@@ -875,11 +880,56 @@ window.GRAPH = {
       aliases: ["LangGraph", "CrewAI", "AutoGen", "Agent SDK"],
       maturity: "evolving", domain: "coding", heat: 0.75,
       summary: "帮你搭 Agent 循环、状态管理和多 Agent 编排的工具库。",
-      body: "这一层变化极快，属于典型的活跃层内容——今天的主流框架一年后可能就换了一批，所以理解上面那些基础概念比熟练某个框架重要得多。\n\n大致分两类：**编排型**（LangGraph、CrewAI、AutoGen）帮你定义多个 Agent 之间的协作图与状态流转；**厂商 SDK**（各家的 Agent SDK）贴近自家模型的能力，抽象更薄。\n\n一个常被低估的选项是不用框架。Agent 循环的核心不过是「调模型 → 解析工具调用 → 执行 → 把结果拼回上下文 → 再调」，手写一遍往往比调试框架的抽象层更快，也更容易看清出了什么问题。",
+      body: "这一层变化极快（所以本节点标为**演进中**）——今天的主流框架一年后可能就换了一批，所以理解 [[agent]] / [[agent-loop]] / [[multi-agent]] 这些底层概念，比熟练某个框架重要得多。\n\n大致分两类：**编排型**（LangGraph、CrewAI、AutoGen）帮你定义多个 Agent 之间的协作图与状态流转；**厂商 SDK**（各家的 Agent SDK）贴近自家模型的能力，抽象更薄。\n\n一个常被低估的选项是不用框架。[[agent-loop]] 的核心不过是「调模型 → 解析工具调用 → 执行 → 把结果拼回上下文 → 再调」，手写一遍往往比调试框架的抽象层更快，也更容易看清出了什么问题。",
       cases: [
-        { title: "先手写一遍", text: "在引入任何框架前，用几十行代码手写一个能调 2 个工具的 Agent 循环。跑通之后你会清楚框架到底替你做了什么、值不值。" }
+        { title: "先手写一遍", text: "在引入任何框架前，用几十行代码手写一个能调 2 个工具的 [[agent-loop]]。跑通之后你会清楚框架到底替你做了什么、值不值。" },
+        { title: "声明式 vs 代码优先", text: "有的框架要求你预先把整个工作流画成图（节点是 Agent、边是跳转），可视化清晰，但工作流一动态就变得笨重，还得学一套专用表达方式。另一类直接用普通代码表达流程，不必预先定义整张图，更灵活。**这是选框架时的主要分歧点**，比对比功能列表更值得先想清楚。" }
       ],
-      sources: [],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+
+    // ───────── 入库 001（OpenAI Agent 指南）新增 ─────────
+    {
+      id: "multi-agent",
+      title: "多 Agent 编排",
+      aliases: ["Multi-agent", "Manager 模式", "Handoff", "交接"],
+      maturity: "stable", domain: "coding", heat: 0.7,
+      summary: "把工作拆给多个 Agent 协作完成，两种主流模式：中心调度与对等交接。",
+      body: "**是什么**\n\n当单个 [[agent]] 的工具太多、指令太复杂时，把工作拆给多个各司其职的 Agent。两种主流模式：\n\n| 模式 | 怎么运作 | 谁在控场 |\n|---|---|---|\n| **Manager（Agent 即工具）** | 一个中心 Agent 通过 [[tool-calling]] 调用各专业 Agent，自己汇总结果 | 中心 Agent 全程控场，用户只和它对话 |\n| **Decentralized（交接）** | 各 Agent 平等，一个把控制权**单向移交**给另一个，连同对话状态一起 | 移交后原 Agent 不再参与 |\n\n关键区别是**控制权**：Manager 模式里子 Agent 只是被调用的工具，结果要回到中心；交接模式里控制权真的转移了，接手的 Agent 直接面对用户。\n\n**为什么不该急着上多 Agent**\n\n多个 Agent 看起来更清晰（职责分离），但引入了真实的额外成本：跨 Agent 的上下文传递、更多的失败点、更难的调试和评测。\n\n**默认应该先把单个 Agent 的能力做满**——加工具比加 Agent 便宜得多。出现下面两种信号才考虑拆：\n\n- **逻辑过于复杂**：提示里塞满 if-then-else 分支，模板难以维护\n- **工具过载**：注意问题不在工具**数量**，而在**相似度**。十几个界限清晰的工具可能没问题，几个功能重叠的工具却会让模型频繁选错。先试着把工具描述写清楚，无效再拆\n\n**它的代价**\n\n每一次移交或调用都要传递上下文，而 [[context-window]] 是有限的——多 Agent 系统很容易在传递中丢失信息。失败也更难定位：出问题时要判断是哪个 Agent 的哪一步判断错了。这和 [[agent-loop]] 单 Agent 的「加工具」路线是一组权衡：拆开换来职责清晰，代价是协调开销。",
+      cases: [
+        { title: "两种模式的典型场景", text: "**Manager**：「把『你好』翻译成西/法/意」——中心 Agent 分别调用三个翻译 Agent（作为工具），合成一个回答，用户只感知到一个助手。**交接**：客服系统里分诊 Agent 判断是订单问题，就把控制权连同对话历史交给订单 Agent，自己退出。" },
+        { title: "工具过载不是数量问题", text: "有的系统能管好 15 个界限清晰的工具，有的却在 10 个功能重叠的工具上翻车。拆分之前先问：是不是把工具描述写清楚就能解决？" }
+      ],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "guardrails",
+      title: "护栏 Guardrails",
+      aliases: ["Guardrails", "防护栏", "输入输出过滤"],
+      maturity: "stable", domain: "safety", heat: 0.8,
+      summary: "在模型前后加多道独立检查，用分层防御把风险挡在外面。",
+      body: "**是什么**\n\n在模型的输入侧和输出侧加装的一系列独立检查，用来拦截风险内容和危险操作。\n\n**核心思路：分层，而不是找一个万能拦截器**\n\n这是护栏最该理解的一点。**任何单一手段都会被绕过**——[[jailbreak]] 那一节讲过原因：防守方要覆盖所有表达方式，攻击方只需找到一种漏网的。\n\n所以正确做法不是把一道检查做到完美，而是**叠加多道机制不同的检查**，让攻击者必须同时绕过所有层。\n\n**常见的几层**\n\n| 类型 | 拦什么 | 机制 |\n|---|---|---|\n| 规则检查 | 已知的固定威胁 | 黑名单、长度上限、正则。确定性，最便宜 |\n| 相关性判断 | 跑题的请求 | 判断输入是否在业务范围内 |\n| 安全分类 | [[jailbreak]] 与 [[prompt-injection]] | 专门训练的分类器 |\n| 内容审核 | 仇恨、骚扰、暴力等 | 通常用现成的审核模型 |\n| PII 过滤 | 个人信息泄露 | 检查**输出**，不只是输入 |\n| 输出校验 | 不合调性或存疑的回答 | 生成之后再验一遍 |\n| **工具风险分级** | 高危操作 | 见下 |\n\n**工具风险分级值得单独说**\n\n给每个工具按风险打分——**只读还是写入、能不能撤销、需要什么权限、有没有资金影响**——然后分级触发不同处理：低风险直接执行，高风险必须人工确认。\n\n这条比内容检测更可靠，因为它**不依赖识别出攻击**：哪怕 [[agent]] 被彻底劫持，它能碰的高危操作仍卡在人工确认那一关。这也正是 [[tool-calling]] 那条「执行权在你手里」的落地方式。\n\n**怎么建**\n\n别试图一次设计完备。可行的顺序是：先覆盖数据隐私和内容安全两条底线 → 遇到真实的漏网案例再补一层 → 随 Agent 演进持续调整。\n\n**它不能替代什么**\n\n护栏是**应用层**的防御，替代不了认证授权、访问控制、常规软件安全这些基础设施层面的东西。两者是叠加关系。",
+      cases: [
+        { title: "为什么 PII 要查输出而不只是输入", text: "用户没提任何隐私信息，但 Agent 从数据库检索到了别人的手机号并写进了回答。只查输入的护栏对此完全无感。" },
+        { title: "风险分级怎么落地", text: "「查询订单状态」是只读、可撤销、无资金影响 → 低风险，直接执行。「发起退款」是写入、不可撤销、有资金影响 → 高风险，必须人工确认。**这个判断和模型能力无关，是纯粹的工程设计。**" }
+      ],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "model-selection",
+      title: "模型选型与成本",
+      aliases: ["Model Selection", "选型", "成本优化"],
+      maturity: "stable", domain: "building", heat: 0.65,
+      summary: "不是所有任务都需要最强的模型——先用最强的建立基线，再往下换。",
+      body: "**是什么**\n\n在能力、延迟、成本三者之间为每个任务挑合适的模型。**同一个应用里的不同环节，通常该用不同的模型。**\n\n**为什么不能一律用最强的**\n\n因为能力、延迟、成本大致同向：更强通常也更慢更贵。而一个应用里的任务难度差异很大——意图分类、格式转换、简单检索用小模型完全够；「要不要批准这笔退款」这种需要权衡的判断才值得上最强的。一律用最强模型，等于为简单任务付了不必要的钱和延迟。\n\n**推荐的顺序（反直觉但有效）**\n\n1. **先用最强的模型把原型跑通**，建立一条性能基线\n2. 再逐个环节换成更小的模型，看结果还能不能接受\n3. 保留那些换小之后仍然合格的\n\n为什么是这个顺序：**一开始就用小模型，你无法区分「这个任务本来就做不了」和「这个模型不够强」**。先用最强的划出上界，后面每一次降级才有参照。\n\n**前提：得先有评测**\n\n没有一套能自动跑的评测，「换小之后还能不能接受」就只能靠感觉。所以选型的第一步其实是建立评测基线——这一步做不了，后面的优化都是盲调。\n\n**其他成本杠杆**\n\n换模型不是唯一手段：[[prompt-caching]] 大幅削减长提示的重复开销，批量接口通常有折扣，把 [[context-window]] 里塞的东西精简掉既省钱又常常提升效果。[[reasoning-models]] 则相反——它更贵更慢，只在真正需要推理的环节用。",
+      cases: [
+        { title: "一个应用里的分工", text: "用小模型做意图分类和格式化（每次调用便宜、快），用最强的模型做需要权衡的核心判断。**混合使用的成本可能只有一律用最强模型的几分之一，而质量几乎不降。**" },
+        { title: "为什么不能反过来", text: "先用小模型做原型，效果不好时你会陷入「是提示词不对、还是 [[rag]] 没检索到、还是模型不行」的三重猜测。先用最强的排除掉最后一项，问题空间立刻小一半。" }
+      ],
+      sources: [{ type: "doc", title: "A practical guide to building agents (OpenAI)", ref: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" }],
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
     }
   ],
@@ -992,6 +1042,20 @@ window.GRAPH = {
     { from: "reward-hacking", to: "hallucination",         type: "constrains", label: "奖励自信语气" },
     { from: "alignment",      to: "supervised-learning",   type: "uses",       label: "SFT 阶段" },
     { from: "jailbreak",      to: "lost-in-middle",        type: "uses",       label: "长上下文淹没安全指令" },
+
+    // 入库 001：多 Agent / 护栏 / 模型选型
+    { from: "multi-agent",     to: "agent",         type: "part-of",    label: "复杂时的组织方式" },
+    { from: "multi-agent",     to: "tool-calling",  type: "uses",       label: "Manager 模式靠调用" },
+    { from: "context-window",  to: "multi-agent",   type: "constrains", label: "移交时易丢上下文" },
+    { from: "multi-agent",     to: "agent-loop",    type: "contrast",   label: "拆开 vs 加工具" },
+    { from: "guardrails",      to: "prompt-injection", type: "mitigates", label: "分层防御" },
+    { from: "guardrails",      to: "jailbreak",     type: "mitigates",  label: "输入输出双侧" },
+    { from: "guardrails",      to: "hallucination", type: "mitigates",  label: "输出校验" },
+    { from: "guardrails",      to: "agent",         type: "part-of",    label: "生产必备" },
+    { from: "guardrails",      to: "tool-calling",  type: "constrains", label: "高危操作需确认" },
+    { from: "model-selection", to: "prompt-caching", type: "uses",      label: "成本杠杆之一" },
+    { from: "model-selection", to: "agent",         type: "constrains", label: "每环节选不同模型" },
+    { from: "reasoning-models", to: "model-selection", type: "contrast", label: "贵且慢，按需使用" },
 
     // MCP 架构
     { from: "mcp-architecture", to: "mcp",             type: "part-of",   label: "三角色与传输层" },
