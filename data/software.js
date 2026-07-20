@@ -2,10 +2,13 @@
  *
  * 手工精选：少而精，但门类全面。每个门类收最具代表性的几个。
  * 介绍文字均为原创；`concept` 指向知识地图里相关的概念节点（点击可跨模式跳转）。
- * 软件迭代快，这里只记「它是什么、最擅长什么」这类不易过时的判断，不记版本号/价格。
+ * 软件迭代快，正文只记「它是什么、最擅长什么」这类不易过时的判断，不记价格/榜单。
+ * 例外（2026-07-20 用户定）：单一厂商、有清晰型号线的卡片，可带 `models` 字段列出
+ * **当前主要型号**（name + 一句定位），并在详情页标注「截至 YYYY-MM」。型号会过时，
+ * 需定期按官方页面重刷；淘汰的老型号不列。分组卡/聚合类/单模型工具不加此字段。
  */
 window.SOFTWARE = {
-  meta: { version: "0.3", updatedAt: "2026-07-20" },
+  meta: { version: "0.4", updatedAt: "2026-07-20" },
 
   // 门类（软件模式自己的分类，不复用概念地图的六大区）
   categories: [
@@ -27,13 +30,28 @@ window.SOFTWARE = {
     // 💬 对话助手
     { id: "chatgpt", name: "ChatGPT", cat: "chat", by: "OpenAI", concept: "llm",
       summary: "最广为人知的对话助手，把大模型带进大众视野。",
-      body: "OpenAI 的对话产品，2022 年末引爆了整轮 AI 浪潮。综合能力强、生态最全（插件、GPTs、语音、图像、代码执行都整合在内），是很多人接触 AI 的第一站。定位是「什么都能聊、多数场景够用」的通用助手。" },
+      body: "OpenAI 的对话产品，2022 年末引爆了整轮 AI 浪潮。综合能力强、生态最全（插件、GPTs、语音、图像、代码执行都整合在内），是很多人接触 AI 的第一站。定位是「什么都能聊、多数场景够用」的通用助手。",
+      models: [
+        { name: "GPT-5.6 Sol", note: "旗舰·复杂专业任务，自带推理" },
+        { name: "GPT-5.6 Terra", note: "均衡·智能与成本兼顾" },
+        { name: "GPT-5.6 Luna", note: "高性价比·高并发场景" }
+      ] },
     { id: "claude", name: "Claude", cat: "chat", by: "Anthropic", concept: "constitutional-ai",
       summary: "以长文本、写作质量和安全性见长的对话助手。",
-      body: "Anthropic 的对话助手，训练上用了 [[constitutional-ai]]（宪法 AI）。以长上下文处理、写作与推理质量、以及相对克制的安全风格著称，在编程和长文档任务上口碑很好。Artifacts 功能能把生成的代码/网页实时预览。" },
+      body: "Anthropic 的对话助手，训练上用了 [[constitutional-ai]]（宪法 AI）。以长上下文处理、写作与推理质量、以及相对克制的安全风格著称，在编程和长文档任务上口碑很好。Artifacts 功能能把生成的代码/网页实时预览。",
+      models: [
+        { name: "Claude Opus 4.8", note: "最强·复杂推理与编程" },
+        { name: "Claude Sonnet 5", note: "均衡主力" },
+        { name: "Claude Haiku 4.5", note: "快而省" }
+      ] },
     { id: "gemini", name: "Gemini", cat: "chat", by: "Google", concept: "multimodal",
       summary: "Google 的对话助手，原生多模态、深度绑定谷歌生态。",
-      body: "Google 的大模型助手，从设计上就是 [[multimodal]] 的，图文音视频统一处理。最大优势是和搜索、Gmail、Docs、安卓深度整合，超长上下文也是它的招牌。" },
+      body: "Google 的大模型助手，从设计上就是 [[multimodal]] 的，图文音视频统一处理。最大优势是和搜索、Gmail、Docs、安卓深度整合，超长上下文也是它的招牌。",
+      models: [
+        { name: "Gemini 3.1 Pro", note: "旗舰·复杂推理与 Agent" },
+        { name: "Gemini 3 Flash", note: "快而省的主力" },
+        { name: "Gemini 3.1 Flash-Lite", note: "最省·高并发" }
+      ] },
     { id: "perplexity-chat", name: "Perplexity", cat: "chat", by: "Perplexity", concept: "rag",
       summary: "把对话和实时联网检索结合，回答带出处。",
       body: "严格说它是「AI 搜索」，但用起来像带引用的对话助手。核心是 [[rag]]：每次回答都实时检索网络、并给出 [[citations]] 出处，主打「可核实」，见 §AI 搜索。" },
@@ -42,16 +60,30 @@ window.SOFTWARE = {
       body: "字节豆包、阿里通义千问、百度文心一言等国产助手，在中文理解、本土应用整合、以及数据合规上更贴合国内需求，能力快速追近国际前沿。（同为国产旗舰的 [[deepseek]] 因开源与强推理已单列一张卡。）" },
     { id: "deepseek", name: "DeepSeek", cat: "chat", by: "DeepSeek / 幻方", concept: "reasoning-models",
       summary: "以开源和强推理著称的国产大模型，用低成本训练撼动了行业预期。",
-      body: "国产大模型的代表之一，因把 [[reasoning-models]] 能力开源、且训练成本远低于同行而引发广泛关注。通用对话之外，其 R 系列专攻长思考推理；权重开放让它成了本地部署（见 [[ollama]]）和二次开发的热门底座。它的意义不止于产品，更在于验证了「前沿能力未必要天价投入」。" },
+      body: "国产大模型的代表之一，因把 [[reasoning-models]] 能力开源、且训练成本远低于同行而引发广泛关注。通用对话之外，其 R 系列专攻长思考推理；权重开放让它成了本地部署（见 [[ollama]]）和二次开发的热门底座。它的意义不止于产品，更在于验证了「前沿能力未必要天价投入」。",
+      models: [
+        { name: "DeepSeek-V4-Pro", note: "旗舰·可开思考模式" },
+        { name: "DeepSeek-V4-Flash", note: "快而省·可开思考模式" }
+      ] },
     { id: "grok", name: "Grok", cat: "chat", by: "xAI", concept: "llm",
       summary: "xAI 的对话助手，深度接入 X（推特）的实时信息。",
-      body: "xAI 的大模型助手，最大特点是与 X 平台的实时数据打通，回答时事和舆论话题时信息更新更快。风格上走「少一些拘束」的路线，也自带文生图能力。" },
+      body: "xAI 的大模型助手，最大特点是与 X 平台的实时数据打通，回答时事和舆论话题时信息更新更快。风格上走「少一些拘束」的路线，也自带文生图能力。",
+      models: [
+        { name: "Grok 4.5", note: "旗舰·最强也最快" },
+        { name: "Grok 4.3", note: "前代·1M 超长上下文" },
+        { name: "Grok Imagine", note: "图像与视频生成" }
+      ] },
     { id: "character-ai", name: "Character.AI / Talkie / 星野", cat: "chat", by: "Character.AI/MiniMax 等", concept: "llm",
       summary: "扮演角色的陪伴式对话，把 AI 从「工具」变成「聊天对象」。",
       body: "和通用助手不同，这类产品让 [[llm]] 稳定扮演一个人设（角色、名人、虚拟伴侣），主打持续、有性格、有记忆的聊天陪伴。Character.AI 开创了这条赛道，Talkie、星野等紧随。它代表 AI 的另一种用法——不是完成任务，而是提供关系与情感价值，用户黏性极高，也带来未成年人保护等争议。" },
     { id: "mistral", name: "Le Chat / Mistral", cat: "chat", by: "Mistral AI", concept: "model-families",
       summary: "欧洲开源权重大模型的代表，兼顾能力与开放。",
-      body: "法国 Mistral AI 的对话助手 Le Chat，背后是它一系列**开放权重**的模型（见 [[model-families]] 的开源一支）。定位是欧洲的独立前沿实验室，主打「能力够用 + 权重开放 + 数据合规」，是不想只依赖美国大厂、看重开源可自托管的用户和企业的选择。" },
+      body: "法国 Mistral AI 的对话助手 Le Chat，背后是它一系列**开放权重**的模型（见 [[model-families]] 的开源一支）。定位是欧洲的独立前沿实验室，主打「能力够用 + 权重开放 + 数据合规」，是不想只依赖美国大厂、看重开源可自托管的用户和企业的选择。",
+      models: [
+        { name: "Mistral Large 3", note: "旗舰·开源权重通用多模态" },
+        { name: "Mistral Medium 3.5", note: "均衡·Agent 与编程" },
+        { name: "Mistral Small 4 / Ministral 3", note: "轻量开源·可端侧" }
+      ] },
 
     // 🔎 AI 搜索与研究
     { id: "perplexity", name: "Perplexity", cat: "search", by: "Perplexity", concept: "citations",
@@ -116,10 +148,17 @@ window.SOFTWARE = {
     // 🎨 图像生成
     { id: "midjourney", name: "Midjourney", cat: "image", by: "Midjourney", concept: "diffusion",
       summary: "以画面质感和艺术性著称的图像生成器。",
-      body: "基于 [[diffusion]] 的文生图产品，以出图的美感、风格化和一致性见长，是艺术/设计圈用得最多的之一。主打「审美在线」，[[controllable-generation]] 的各种控制手段也在持续加强。" },
+      body: "基于 [[diffusion]] 的文生图产品，以出图的美感、风格化和一致性见长，是艺术/设计圈用得最多的之一。主打「审美在线」，[[controllable-generation]] 的各种控制手段也在持续加强。",
+      models: [
+        { name: "V8.1", note: "当前默认·2K 高清、文字渲染大幅改善" },
+        { name: "V7", note: "前代" }
+      ] },
     { id: "dalle", name: "DALL·E / GPT 图像", cat: "image", by: "OpenAI", concept: "image-generation",
       summary: "整合进 ChatGPT 的图像生成，擅长理解复杂指令。",
-      body: "OpenAI 的 [[image-generation]]，最大优势是和对话打通——能在聊天里边聊边改图、理解长而复杂的描述。对「图里写文字」这类老大难也比同类更稳。" },
+      body: "OpenAI 的 [[image-generation]]，最大优势是和对话打通——能在聊天里边聊边改图、理解长而复杂的描述。对「图里写文字」这类老大难也比同类更稳。",
+      models: [
+        { name: "GPT Image 2", note: "当前旗舰图像模型" }
+      ] },
     { id: "sd", name: "Stable Diffusion / Flux", cat: "image", by: "Stability/BFL", concept: "controllable-generation",
       summary: "开源图像生成，可本地跑、可深度定制。",
       body: "开源的 [[diffusion]] 模型（SD、Flux 系列），最大价值是**开放**：可本地部署、可微调（LoRA）、生态里有海量 [[controllable-generation]] 插件（ControlNet 等）。专业用户和开发者的首选。" },
@@ -148,7 +187,11 @@ window.SOFTWARE = {
       body: "MiniMax（稀宇科技）的 [[video-generation]] 产品，在镜头运动、画面质感上口碑很好，是国产文生视频第一梯队。MiniMax 本身是家多面手公司，除海螺外还做开源大模型、[[speech]] 与音乐生成、以及 Talkie/星野这类陪伴产品——这些次要线并入本卡，不另立。" },
     { id: "veo", name: "Veo（Google）", cat: "video", by: "Google", concept: "video-generation",
       summary: "Google 的旗舰文生视频，主打高保真与原生带声。",
-      body: "Google 的 [[video-generation]] 模型，画面质量和物理合理性处于第一梯队，并能直接生成带音效/对白的视频。深度整合进 Google 的创作工具链，和 [[sora]] 同属「文生视频天花板」的争夺者。" },
+      body: "Google 的 [[video-generation]] 模型，画面质量和物理合理性处于第一梯队，并能直接生成带音效/对白的视频。深度整合进 Google 的创作工具链，是当前「文生视频天花板」的主要争夺者之一。",
+      models: [
+        { name: "Veo 3.1", note: "当前旗舰·专业视频、原生带声" },
+        { name: "Veo 3.1 Lite", note: "更省的档位" }
+      ] },
     { id: "heygen", name: "HeyGen / Synthesia", cat: "video", by: "HeyGen/Synthesia", concept: "multimodal",
       summary: "数字人视频：输入文字，生成真人形象口播。",
       body: "专攻「数字人口播」：给一段文字，生成一个逼真虚拟形象把它说出来，还能换语言、克隆音色。企业培训、营销视频的高频工具，也伴随 [[content-detection]] 的深伪担忧。" },
@@ -156,7 +199,11 @@ window.SOFTWARE = {
     // 🎵 音频·语音·音乐
     { id: "elevenlabs", name: "ElevenLabs", cat: "audio", by: "ElevenLabs", concept: "speech",
       summary: "最逼真的语音合成与音色克隆。",
-      body: "[[speech]] 合成（TTS）的标杆，语音自然度极高，几秒样本就能克隆音色，支持多语言。有声书、配音、语音助手的主力，也是「声音伪造」风险的代表。" },
+      body: "[[speech]] 合成（TTS）的标杆，语音自然度极高，几秒样本就能克隆音色，支持多语言。有声书、配音、语音助手的主力，也是「声音伪造」风险的代表。",
+      models: [
+        { name: "Eleven v3", note: "当前默认·表现力最强" },
+        { name: "Eleven Flash v2.5", note: "低延迟档" }
+      ] },
     { id: "suno", name: "Suno / Udio", cat: "audio", by: "Suno/Udio", concept: "audio-generation",
       summary: "一句话生成整首带人声的音乐。",
       body: "[[audio-generation]] 的爆款：给一句歌词或风格描述，生成完整的、带演唱的歌曲。把音乐创作门槛降到几乎为零，也把 AI 音乐的版权争议推到台前。" },

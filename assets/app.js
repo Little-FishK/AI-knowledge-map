@@ -608,6 +608,11 @@
     h += `<h2 class="d-title">${esc(it.name)}</h2>`;
     h += `<div class="d-summary">${esc(it.summary || "")}</div>`;
     if (it.body) h += `<div class="d-sec"><div class="d-body">${mdLite(it.body)}</div></div>`;
+    if (Array.isArray(it.models) && it.models.length) {
+      h += `<div class="d-sec"><h4>当前主要模型 <span class="d-asof">· 截至 2026-07</span></h4><div class="d-models">`
+        + it.models.map(m => `<div class="d-model"><b>${esc(m.name)}</b>${m.note ? `<span>${esc(m.note)}</span>` : ""}</div>`).join("")
+        + `</div></div>`;
+    }
     if (it.concept && byId[it.concept]) {
       h += `<div class="d-sec"><h4>背后的概念</h4>
         <div class="rel"><span class="rel-to" data-goto="${esc(it.concept)}">${esc(byId[it.concept].title)}</span>
