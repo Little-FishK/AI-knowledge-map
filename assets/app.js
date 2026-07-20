@@ -166,12 +166,14 @@
       randomize: true,
       // 中文标签又长又宽，不把标签计入尺寸的话密集簇里的字会互相压
       nodeDimensionsIncludeLabels: true,
-      nodeSeparation: 130,
-      idealEdgeLength: 150,
-      nodeRepulsion: 22000,
-      gravity: 0.1,
+      // 铺开参数（2026-07-19，81 节点起）：更大间距换取「同区不重叠」。
+      // 布局评分只重罚同色重叠、轻计异色重叠——见 tools/find-seed.js。
+      nodeSeparation: 175,
+      idealEdgeLength: 185,
+      nodeRepulsion: 34000,
+      gravity: 0.06,
       numIter: 4000,
-      padding: 40,
+      padding: 45,
       // fcose 自己的 fit 会在动画结束后再跑一次，把下面的缩放上限覆盖掉
       // （表现为 zoom 顶到 maxZoom=3，节点巨大、只看得见一角）。这里自己接管。
       fit: false

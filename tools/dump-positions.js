@@ -21,17 +21,21 @@
     console.warn("  请勾上全部层级与大区后重新布局再导出。");
   }
 
-  // 质量自检：标签框重叠对
+  // 质量自检：区分同区(硬伤)与异区(可接受)重叠
   const bb = ns.map(n => n.boundingBox({ includeLabels: true, includeNodes: true }));
-  const overlaps = [];
+  const same = [], cross = [];
   for (let i = 0; i < bb.length; i++) {
     for (let j = i + 1; j < bb.length; j++) {
       const ox = Math.min(bb[i].x2, bb[j].x2) - Math.max(bb[i].x1, bb[j].x1);
       const oy = Math.min(bb[i].y2, bb[j].y2) - Math.max(bb[i].y1, bb[j].y1);
-      if (ox > 0 && oy > 0) overlaps.push(ns[i].id() + " / " + ns[j].id());
+      if (ox > 0 && oy > 0) {
+        const pair = ns[i].id() + " / " + ns[j].id();
+        (ns[i].data("domain") === ns[j].data("domain") ? same : cross).push(pair);
+      }
     }
   }
-  console.log(overlaps.length ? "⚠ 标签重叠 " + overlaps.length + " 对：" : "✓ 无标签重叠", overlaps);
+  console.log(same.length ? "⚠ 同区(同色)重叠 " + same.length + " 对（必须为 0）：" : "✓ 同区无重叠", same);
+  console.log("  异区重叠 " + cross.length + " 对（可接受）", cross.length ? cross : "");
 
   const p = {};
   ns.forEach(n => { p[n.id()] = { x: n.position("x"), y: n.position("y") }; });

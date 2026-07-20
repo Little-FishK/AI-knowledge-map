@@ -24,21 +24,28 @@
     try { return fn(); } finally { Math.random = orig; }
   }
 
+  // 评分：同大区(同色)重叠是硬伤——重罚；异区重叠只是小瑕疵——轻计。
+  // 用户 2026-07-19：重叠没关系，但相同颜色的点不能重叠。
   function score() {
     const ns = cy.nodes().not(".hidden").toArray();
     const bb = ns.map(n => n.boundingBox({ includeLabels: true, includeNodes: true }));
-    let pairs = 0, area = 0;
+    let samePairs = 0, crossPairs = 0, area = 0;
     for (let i = 0; i < bb.length; i++) {
       for (let j = i + 1; j < bb.length; j++) {
         const ox = Math.min(bb[i].x2, bb[j].x2) - Math.max(bb[i].x1, bb[j].x1);
         const oy = Math.min(bb[i].y2, bb[j].y2) - Math.max(bb[i].y1, bb[j].y1);
-        if (ox > 0 && oy > 0) { pairs++; area += ox * oy; }
+        if (ox > 0 && oy > 0) {
+          area += ox * oy;
+          if (ns[i].data("domain") === ns[j].data("domain")) samePairs++;
+          else crossPairs++;
+        }
       }
     }
     const g = cy.nodes().not(".hidden").boundingBox();
     const ratio = Math.max(g.w, g.h) / Math.min(g.w, g.h);   // 越接近 1 越方正
-    return { pairs, area: Math.round(area), ratio: +ratio.toFixed(2),
-             total: pairs * 10000 + area / 100 + (ratio - 1) * 500 };
+    return { samePairs, crossPairs, area: Math.round(area), ratio: +ratio.toFixed(2),
+             // 同区重叠权重是异区的 5000 倍
+             total: samePairs * 1e6 + crossPairs * 200 + area / 200 + (ratio - 1) * 400 };
   }
 
   const results = [];
@@ -46,8 +53,8 @@
     seeded(seed, () => {
       cy.layout({
         name: "fcose", quality: "proof", animate: false, randomize: true,
-        nodeDimensionsIncludeLabels: true, nodeSeparation: 130, idealEdgeLength: 150,
-        nodeRepulsion: 22000, gravity: 0.1, numIter: 4000, padding: 40
+        nodeDimensionsIncludeLabels: true, nodeSeparation: 175, idealEdgeLength: 185,
+        nodeRepulsion: 34000, gravity: 0.06, numIter: 4000, padding: 45
       }).run();
     });
     results.push(Object.assign({ seed }, score()));
@@ -56,5 +63,6 @@
   results.sort((a, b) => a.total - b.total);
   console.table(results.slice(0, 10));
   console.log("最佳 seed =", results[0].seed, results[0]);
+  console.log("同区 0 重叠的种子数：", results.filter(r => r.samePairs === 0).length, "/", results.length);
   return results.slice(0, 10);
 })();
