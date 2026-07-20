@@ -15,7 +15,7 @@ window.GRAPH = {
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
     layoutSeed: 147,
-    note: "入库 001 合并（OpenAI Agent 指南）：+3 节点（多Agent/护栏/模型选型）+12 边"
+    note: "第二~四轮扩充：内容生成/评测部署量化/前沿架构，56→73 节点、141→192 边"
   },
 
   /* 核心节点 —— 默认视图只显示这些。
@@ -30,7 +30,7 @@ window.GRAPH = {
   core: [
     // 🧱 基础/共享
     "llm", "transformer", "attention", "embedding", "context-window",
-    "neural-network", "pretraining",
+    "neural-network", "pretraining", "fine-tuning", "multimodal",
     // 🔧 应用搭建
     "rag", "retrieval", "prompt-engineering", "cot",
     // 💻 编程与 Agent
@@ -38,7 +38,9 @@ window.GRAPH = {
     // 🎨 内容生成
     "diffusion", "image-generation",
     // ⚖️ 安全与对齐
-    "hallucination", "prompt-injection", "alignment"
+    "hallucination", "prompt-injection", "alignment",
+    // 📰 追前沿
+    "reasoning-models"
   ],
 
   /* 固化的节点坐标。
@@ -52,62 +54,79 @@ window.GRAPH = {
    * 没有坐标的新节点会自动走力导向布局，不会报错。
    */
   positions: {
-    "attention": [14, -80],
-    "transformer": [216, -44],
-    "residual-connection": [356, 26],
-    "vanishing-gradient": [278, -137],
-    "scaling-law": [218, 244],
-    "llm": [21, 116],
-    "tokenization": [94, -165],
-    "embedding": [217, -277],
-    "context-window": [-179, -114],
-    "lost-in-middle": [-161, -272],
-    "sampling-params": [-101, 364],
-    "fine-tuning": [169, 79],
-    "neural-network": [428, 103],
-    "gradient-descent": [405, 308],
-    "backprop": [509, 42],
-    "overfitting": [306, 388],
-    "cnn": [640, 101],
-    "rnn": [446, -187],
-    "supervised-learning": [325, 206],
-    "unsupervised-learning": [427, -60],
-    "reinforcement-learning": [-190, 181],
-    "self-supervised-learning": [505, 181],
-    "regularization": [158, 349],
-    "decision-tree": [560, 316],
-    "clustering": [468, -295],
-    "dimensionality-reduction": [382, -283],
-    "curse-of-dimensionality": [264, -471],
-    "pretraining": [275, 106],
-    "rag": [-16, -198],
-    "vector-db": [151, -489],
-    "prompt-engineering": [-104, -50],
-    "chunking": [-209, -413],
-    "retrieval": [-26, -442],
-    "reranking": [115, -312],
-    "constrained-decoding": [-280, 482],
-    "prompt-caching": [-89, 148],
-    "structured-output": [-123, 261],
-    "cot": [67, 15],
-    "agent": [-242, -21],
-    "tool-calling": [-416, 261],
-    "mcp": [-640, 393],
-    "mcp-architecture": [-409, 489],
-    "agent-loop": [-365, -40],
-    "agent-memory": [-289, -258],
-    "diffusion": [528, -89],
-    "image-generation": [432, -391],
-    "hallucination": [-256, 90],
-    "prompt-injection": [-230, 288],
-    "jailbreak": [-157, 51],
-    "reward-hacking": [-47, 31],
-    "alignment": [60, 287],
-    "reasoning-models": [-27, 266],
-    "agent-frameworks": [-480, -107],
-    "multi-agent": [-381, 107],
-    "guardrails": [-462, 45],
-    "model-selection": [-303, 211]
+    "attention": [74, 53],
+    "transformer": [255, 24],
+    "residual-connection": [369, 143],
+    "vanishing-gradient": [350, -100],
+    "scaling-law": [164, -240],
+    "llm": [-2, -48],
+    "tokenization": [-84, -257],
+    "embedding": [210, 279],
+    "context-window": [-152, 56],
+    "lost-in-middle": [-149, 281],
+    "sampling-params": [-240, -343],
+    "fine-tuning": [134, -8],
+    "neural-network": [485, -61],
+    "gradient-descent": [484, -321],
+    "backprop": [604, -133],
+    "overfitting": [91, -171],
+    "cnn": [630, 216],
+    "rnn": [555, 104],
+    "supervised-learning": [309, -63],
+    "unsupervised-learning": [455, 45],
+    "reinforcement-learning": [-304, -116],
+    "self-supervised-learning": [462, -184],
+    "regularization": [254, -293],
+    "decision-tree": [647, -21],
+    "clustering": [416, 362],
+    "dimensionality-reduction": [470, 285],
+    "curse-of-dimensionality": [244, 500],
+    "pretraining": [296, -193],
+    "rag": [2, 203],
+    "vector-db": [134, 515],
+    "prompt-engineering": [-219, 62],
+    "chunking": [-56, 338],
+    "retrieval": [-51, 491],
+    "reranking": [115, 342],
+    "constrained-decoding": [-479, -191],
+    "prompt-caching": [-159, -148],
+    "structured-output": [-470, 69],
+    "cot": [-241, -204],
+    "agent": [-201, 124],
+    "tool-calling": [-458, 249],
+    "mcp": [-702, 184],
+    "mcp-architecture": [-557, -27],
+    "agent-loop": [-343, 72],
+    "agent-memory": [-293, 280],
+    "diffusion": [438, 159],
+    "image-generation": [331, 406],
+    "multimodal": [68, 229],
+    "gan": [702, 89],
+    "speech": [336, 267],
+    "video-generation": [159, 136],
+    "controllable-generation": [264, 168],
+    "evaluation": [-195, -69],
+    "advanced-rag": [-297, 430],
+    "inference-optimization": [64, -269],
+    "quantization": [114, -515],
+    "deployment": [-124, -464],
+    "rlhf": [-45, -11],
+    "red-teaming": [-317, 192],
+    "interpretability": [196, -121],
+    "moe": [369, -288],
+    "distillation": [379, -453],
+    "synthetic-data": [215, -407],
+    "model-families": [-320, -474],
+    "hallucination": [-73, -80],
+    "prompt-injection": [-271, -18],
+    "jailbreak": [-114, 94],
+    "reward-hacking": [-145, -299],
+    "alignment": [-19, -186],
+    "reasoning-models": [-47, -360],
+    "agent-frameworks": [-424, 172],
+    "multi-agent": [-188, 343],
+    "guardrails": [-385, -41],
+    "model-selection": [-338, -248]
   },
 
   domains: {
@@ -787,6 +806,238 @@ window.GRAPH = {
       createdAt: "2026-07-19", updatedAt: "2026-07-19"
     },
 
+    // ───────── 第二轮补充：内容生成大区 ─────────
+    {
+      id: "multimodal",
+      title: "多模态",
+      aliases: ["Multimodal", "多模态模型", "VLM", "视觉语言模型"],
+      maturity: "stable", domain: "foundations", heat: 0.8,
+      summary: "让一个模型同时处理文本、图像、音频等不同形式的信息。",
+      body: "**是什么**\n\n让同一个模型能接收并关联多种模态——文本、图像、音频、视频。典型代表是视觉语言模型（VLM）：既能看图，又能就图对话。\n\n**为什么一套架构就能吃下不同模态**\n\n关键在于 [[transformer]] 只要求输入是**一串 token**，它不关心这串 token 原本是什么。所以做法是：把每种模态各自转成 token——文字用分词，图像切成小块（见 [[cnn]] 里提到的 ViT 思路），音频切成时间片——**然后扔进同一套 [[attention]] 里让它们互相关联**。\n\n再往深一层，靠的是**共享的语义空间**（见 [[embedding]]）：训练时让「一张猫的图」和「猫」这个词的向量靠近，模型就学会了跨模态对齐。[[image-generation]] 是这个对齐的一个方向（文→图），VLM 是另一个方向（图→文）。\n\n**它使什么成为可能**\n\n- **看图问答**：上传一张报错截图问「哪里出问题了」\n- **文档理解**：直接读带图表的 PDF，而不只是纯文字\n- **any-to-any**：一些前沿模型开始做到任意模态进、任意模态出\n\n这也是 [[agent]] 能操作图形界面（看截图决定点哪里）的基础。\n\n**它的边界**\n\n模态之间的能力并不均衡：模型「看」的能力通常弱于「读」，细粒度的空间关系（「杯子在书的左边还是右边」）、精确计数、读图里的小字，至今都不稳。**因为视觉 token 的信息密度和对齐质量，都还不如文本。**",
+      cases: [
+        { title: "为什么它能看截图", text: "把界面截图切成小块当 token 送进模型，它就能「看见」按钮和文字的布局——这是 [[agent]] 操作没有 API 的旧软件、以及「拍张照问这是什么」能工作的原理。" },
+        { title: "看得见不等于看得准", text: "让模型数清一张图里有几个人、或读出仪表盘上的精确读数，仍然容易出错。视觉理解的分辨力还远不如文本理解，用在关键场景要留校验。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "gan",
+      title: "生成对抗网络 GAN",
+      aliases: ["GAN", "Generative Adversarial Network", "对抗生成"],
+      maturity: "stable", domain: "generation", heat: 0.5,
+      summary: "让生成器和判别器对抗训练来生成内容，扩散模型之前的图像生成主力。",
+      body: "**是什么**\n\n两个网络对着干：**生成器**造假图，**判别器**分辨真假。生成器努力骗过判别器，判别器努力不被骗，在这场博弈中双方一起变强，最后生成器就学会了造出以假乱真的图。\n\n这个「用对抗代替明确目标」的思路曾经很惊艳——它不需要你定义「什么样的图算好」，让两个网络自己斗出来。\n\n**为什么它被 [[diffusion]] 取代了**\n\n对抗训练的优雅也是它的脆弱：\n\n- **训练不稳定**：两个网络的强弱要始终势均力敌，一方压倒另一方整个训练就崩了。调参像走钢丝。\n- **模式坍缩**：生成器可能发现「只生成某几种图」就足以骗过判别器，于是**多样性塌掉**——你要一百张不同的脸，它给你一百张相似的。\n\n[[diffusion]] 用「一步步去噪」这个稳定得多的目标绕开了这两个坑，代价是生成慢。**一个能可靠训练的方法，胜过一个理论优雅但训不出来的方法**——这是深度学习里反复出现的取舍。\n\n**它还没完全消失**\n\nGAN 生成快（一次前向），在实时、超分辨率、风格迁移等对速度敏感、对多样性要求不高的场景仍有用武之地。理解它也有助于理解 [[diffusion]] 到底解决了什么。",
+      cases: [
+        { title: "模式坍缩长什么样", text: "训练一个生成人脸的 GAN，跑着跑着发现它开始反复输出几张几乎一样的脸——因为这几张已经能骗过判别器了，生成器没有动力再去覆盖更多样的脸。这是 GAN 最典型的失败模式。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "speech",
+      title: "语音识别与合成",
+      aliases: ["Speech", "STT", "TTS", "语音识别", "语音合成", "ASR"],
+      maturity: "stable", domain: "generation", heat: 0.6,
+      summary: "语音转文字（识别）与文字转语音（合成），两个反向的任务。",
+      body: "**是什么**\n\n一对反向任务：**STT / ASR（语音识别）**把声音转成文字，**TTS（语音合成）**把文字转成声音。它们是语音助手、实时字幕、有声书、配音的底层能力。\n\n**它们怎么工作**\n\n本质和别的模态一样：把连续的声波切成时间片、转成 token，再交给 [[transformer]] 处理（见 [[multimodal]]）。识别是「音频 token → 文字 token」，合成是反过来。所以语音任务也吃到了大模型的红利——识别的准确率、合成的自然度这几年都跳了一大截。\n\n**各自的难点不同**\n\n- **识别**难在真实世界的噪声、口音、多人重叠、专业术语。安静环境下已接近人类，嘈杂环境仍有差距。\n- **合成**难在**自然度**——机械感来自语调、停顿、情感的缺失。现在最好的 TTS 已经能骗过多数人的耳朵，还能克隆特定音色。\n\n**它带来的新问题**\n\n音色克隆到了「几秒样本就能仿」的程度，**声音伪造**成了真实的安全隐患（诈骗、伪造录音）。这和 [[image-generation]] 的深度伪造是同一类问题——生成能力的进步同时是滥用能力的进步。",
+      cases: [
+        { title: "端到端语音对话", text: "早期语音助手是「识别→文字模型→合成」三段拼接，每段的延迟和误差累加。新一代直接做端到端的语音对话，延迟低、还能保留语气——这背后是把语音也当成 [[multimodal]] 的一种 token。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "video-generation",
+      title: "视频生成",
+      aliases: ["Video Generation", "文生视频", "Text-to-Video"],
+      maturity: "evolving", domain: "generation", heat: 0.7,
+      summary: "根据文本或图像生成连续视频，难点在于时间一致性。",
+      body: "**是什么**\n\n生成一段连续的视频，通常由文本或一张起始图驱动。技术上是 [[diffusion]] 的扩展——不只在空间上去噪，还要在**时间维度**上保持连贯。\n\n**为什么它比图像生成难得多**\n\n多了一个维度，难度不是加法而是乘法。核心是**时间一致性**：\n\n- 同一个物体在相邻帧里要是同一个（人不能走着走着换了张脸）\n- 运动要符合物理（水往下流、物体有惯性）\n- 长镜头里场景要保持稳定（背景不能每几帧就变）\n\n再加上算力：视频是几十上百张图,生成成本和 [[context-window]] 压力都远超单图。\n\n**它现在到哪了（所以标为演进中）**\n\n短片段（几秒）的质量进步极快，已经能用于广告、短视频。但长视频的一致性、精确的动作控制、以及「让角色说指定的话」仍然是开放难题。**这是当前最活跃、也最烧钱的生成方向之一，一年前的结论现在多半过时。**\n\n**它的争议**\n\n和其他生成模态一样，视频生成放大了深度伪造的风险——伪造一段某人说话的视频,门槛正在快速降低。",
+      cases: [
+        { title: "时间一致性为什么难", text: "生成一个人转身的镜头，模型很容易在转身过程中让脸、衣服细节发生漂移——因为它对「这是同一个人的连续动作」没有硬约束，只是在逐帧生成看起来合理的画面。这是视频生成和图像生成的本质区别。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "controllable-generation",
+      title: "可控生成",
+      aliases: ["Controllable Generation", "ControlNet", "可控性", "条件控制"],
+      maturity: "stable", domain: "generation", heat: 0.6,
+      summary: "在纯文本提示之外，用额外条件精确控制生成结果。",
+      body: "**是什么**\n\n[[image-generation]] 的主线难题是：**纯靠文字描述,控制不了精确的构图、姿态、身份**。可控生成就是在文本之外再加一层控制信号,把「碰运气」变成「按要求」。\n\n**为什么需要它**\n\n文字是低带宽的控制方式。「一个人站着」——站姿、朝向、手的位置全是模型自己决定的,你想要的那个具体姿态,几乎不可能用文字说清。而实际工作里往往需要精确控制:同一个角色出现在不同图里、生成物要贴合已有的构图、只改一处别的不动。\n\n**几类控制手段,作用在不同层面**\n\n| 手段 | 控制什么 | 怎么做 |\n|---|---|---|\n| 结构控制（ControlNet 类） | 构图、姿态、边缘、深度 | 给一张参考图锁定结构，风格仍自由 |\n| 局部重绘（inpainting） | 只改指定区域 | 框选一块重生成，其余像素不动 |\n| 身份/风格保持 | 特定角色或画风 | 轻量微调（[[fine-tuning]] 的 LoRA）或参考图 |\n| 引导强度 | 多听话 vs 多自由 | 调节文本条件对去噪的影响权重 |\n\n**核心取舍**\n\n控制越强，自由度越低。把结构、身份、区域全锁死，模型能发挥的空间就只剩纹理和光影。**可控生成的手艺,就是在「要的东西锁住、不要的地方放开」之间找平衡。**\n\n> 这块三个外部源都基本没讲——它是实战里最关键、教程里最少见的部分。",
+      cases: [
+        { title: "为什么专业用户离不开 ControlNet", text: "只用文字生成，同一个提示跑十次得到十种构图。给一张姿态参考图（哪怕是火柴人简笔画），十次生成就都遵循这个姿态——**这把生成从「抽卡」变成了「按图施工」**，是商用工作流的关键。" },
+        { title: "身份一致性", text: "要让同一个虚拟角色出现在一系列图里，纯文字做不到（每次的脸都不一样）。用几张该角色的图做一次轻量微调，之后就能稳定复现——这是角色设计、连环画、品牌形象的刚需。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+
+    // ───────── 第三轮补充：应用搭建 + 安全对齐 深化 ─────────
+    {
+      id: "evaluation",
+      title: "LLM 应用评测",
+      aliases: ["Evaluation", "Evals", "评测", "LLM-as-judge"],
+      maturity: "stable", domain: "building", heat: 0.8,
+      summary: "系统地衡量一个 LLM 应用好不好——没有它，一切优化都是盲调。",
+      body: "**是什么**\n\n一套能重复运行、给出可比较分数的测试，用来判断改动让应用变好还是变差。**它是 LLM 工程和「凭感觉调提示词」的分水岭。**\n\n**为什么它比传统软件测试难**\n\n传统程序的输出是确定的——断言相等就行。LLM 的输出是开放的自然语言：同一个问题的两个正确回答可能一个字都不一样，措辞、详略、语气都在变。**「对不对」本身就难以自动判断。**\n\n这催生了几种评测方式，各有取舍：\n\n| 方式 | 怎么打分 | 短板 |\n|---|---|---|\n| 精确匹配 | 和标准答案比字符 | 只适用于分类、抽取等有唯一答案的任务 |\n| 参考指标（BLEU/ROUGE 等） | 和参考答案算重叠 | 只测字面相似，测不出「意思对不对」 |\n| **LLM-as-judge** | 用另一个 LLM 打分 | 可扩展，但裁判自己也会错、也有偏好 |\n| 人工评测 | 人来判断 | 最可信，但慢、贵、不可规模化 |\n\n**为什么它是隐形的第一步**\n\n[[model-selection]]（能不能换小模型）、提示改动、[[rag]] 调优——**这些优化的前提都是「能测出好坏」**。没有评测，你不知道一个改动是真的更好，还是只是这次运气好。很多团队卡住不是因为不会优化，而是因为没有评测基线，改了不知道是好是坏。\n\n**它的坑**\n\n- **测试集污染**：评测题若进了训练数据，分数是背出来的（见 [[overfitting]]）\n- **LLM-as-judge 的偏见**：裁判模型偏爱更长的、更像自己风格的回答，[[reward-hacking]] 那套在这里也成立\n- **离线分数 ≠ 线上体验**：评测集测不到真实用户千奇百怪的输入",
+      cases: [
+        { title: "为什么先建评测再优化", text: "想把客服机器人从 GPT-4 换成便宜的小模型省钱。没有评测，你只能上线后靠用户投诉判断行不行——风险极大。有一套 200 题的评测集，换完跑一遍分数掉多少一目了然，十分钟就能决策。" },
+        { title: "LLM-as-judge 也会被骗", text: "用一个模型给回答打分，研究发现它系统性地偏爱更长、更自信、格式更工整的回答，哪怕内容并不更好。所以裁判的打分标准要写得很具体，并偶尔用人工抽查校准。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "advanced-rag",
+      title: "高级 RAG",
+      aliases: ["Advanced RAG", "查询改写", "Query Rewriting", "GraphRAG"],
+      maturity: "stable", domain: "building", heat: 0.7,
+      summary: "在基础 RAG 之上加一层处理，解决「检索不到」和「检索不够」的问题。",
+      body: "**是什么**\n\n基础 [[rag]] 是「问题→检索→生成」一条直线。高级 RAG 在这条线的前后加处理，专门对付基础版失效的场景。\n\n**为什么需要它——基础 RAG 会在哪失效**\n\n三类典型失效，对应三类增强：\n\n- **问题本身不适合直接检索**。用户问「对比 A 和 B 的优劣」，直接拿这句去 [[retrieval]] 效果差。→ **查询改写**：先把问题拆成「A 的优点」「B 的优点」等子查询分别检索。\n- **答案分散在多处，要综合**。「这一百份报告的共同趋势是什么」——检索天然只取片段，凑不出全局。→ **分层摘要 / GraphRAG**：预先把文档聚合成主题或知识图谱，检索这层结构而非原文块。\n- **一轮检索不够**。答案需要基于第一轮结果再查一次。→ **迭代检索 / Agentic RAG**：让 [[agent]] 自己决定要不要再检索、检索什么。\n\n**核心思路的转变**\n\n基础 RAG 把检索当成一次性的查表；高级 RAG 把它当成一个**可以规划、可以多步、可以带工具**的过程。**Agentic RAG 本质上就是给检索装了个 [[agent-loop]]。**\n\n**代价**\n\n每加一层都增加延迟和成本:查询改写多一次 LLM 调用,迭代检索多几轮。所以别默认全上——**先确认基础 RAG 到底卡在哪**（见 [[evaluation]]），针对性地加,而不是一股脑堆。",
+      cases: [
+        { title: "查询改写救活模糊问题", text: "用户问「这个和上次那个方案比怎么样」。直接检索这句几乎命中不了任何文档。先让模型把它改写成明确的子问题（补上「这个」「上次那个」指代的具体名称），再检索，召回率天差地别。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "inference-optimization",
+      title: "推理优化",
+      aliases: ["Inference Optimization", "KV Cache", "Flash Attention", "投机解码"],
+      maturity: "stable", domain: "building", heat: 0.55,
+      summary: "让模型跑得更快更省的一组技术，大多围绕 KV 缓存和注意力。",
+      body: "**是什么**\n\n在不改变模型能力的前提下,让推理更快、更省显存、更便宜的一组工程技术。它们大多围绕 [[attention]] 的两个瓶颈——**平方级计算**和**显存占用**。\n\n**几项关键技术**\n\n- **KV 缓存**：生成第 N 个 token 时,前 N-1 个的注意力中间结果（Key/Value）可以缓存复用,不必重算。这是最基础也最重要的一项——没有它,自回归生成慢得没法用。（[[prompt-caching]] 就是把这个缓存跨请求复用。）\n- **Flash Attention**：不降低计算复杂度,但通过巧妙安排显存读写,大幅减少数据在显存和计算单元之间的搬运。**瓶颈往往不是算得慢,而是搬得慢**——它专治这个。\n- **投机解码**：用一个小模型先快速猜几个 token,再用大模型一次性验证。猜对就白赚了速度,猜错就退回。在不损失质量的前提下加速。\n- **量化**：见 [[quantization]],用更低精度换速度和显存。\n\n**为什么它值得了解,即使你不自己实现**\n\n因为它决定了**什么能力在什么成本下可用**。长 [[context-window]] 为什么贵、为什么有的模型快有的慢、[[prompt-caching]] 为什么能省钱——根子都在这一层。理解它,才能把成本和延迟当成可设计的量,而不是被动接受的结果。\n\n**它的位置**\n\n这一层通常由推理框架（vLLM 等）和厂商实现,应用开发者多数不直接碰,但选型和架构决策绕不开它。",
+      cases: [
+        { title: "KV 缓存为什么是刚需", text: "生成一段 500 字的回答,如果每生成一个字都要把前面所有字重新算一遍注意力,成本是长度的平方。KV 缓存把它降成线性——这不是优化,是「能不能实时对话」的门槛。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "quantization",
+      title: "量化 Quantization",
+      aliases: ["Quantization", "GGUF", "GPTQ", "AWQ", "低精度"],
+      maturity: "stable", domain: "foundations", heat: 0.6,
+      summary: "用更低精度存储模型权重，大幅减小体积和显存，换取轻微的质量损失。",
+      body: "**是什么**\n\n把模型权重从高精度（如 16 位浮点）压到低精度（8 位、4 位甚至更低）。一个原本要 140GB 显存的模型,4 位量化后可能只要 40GB——**这决定了它能不能跑在你的显卡上。**\n\n**为什么能这么压而不崩**\n\n因为神经网络对精度**出人意料地宽容**。权重里的微小数值差异,经过大量参数的平均,对最终输出的影响很小。这和 [[regularization]] 揭示的是同一件事:模型的能力分布在海量参数里,不依赖任何单个权重的精确值。\n\n所以「4 位表示一个权重」听起来很粗糙,实际质量损失往往小到可接受——这是量化能成立的根本原因。\n\n**取舍在哪**\n\n| 精度 | 体积 | 质量 |\n|---|---|---|\n| 16 位（原始） | 最大 | 满血 |\n| 8 位 | 一半 | 几乎无损 |\n| 4 位 | 四分之一 | 轻微下降,多数场景可接受 |\n| 更低 | 更小 | 下降明显,需专门技术 |\n\n位数越低,压得越狠,质量下降越明显——**这是一条平滑的取舍曲线,没有免费的午餐,只有「够用就好」的选择。**\n\n**它使什么成为可能**\n\n量化是**开源模型能在消费级硬件上跑**的关键。GGUF、GPTQ、AWQ 是几种主流的量化格式/方法。没有量化,本地跑大模型、边缘部署都无从谈起——它把「只有数据中心能跑」的模型搬到了个人电脑上。",
+      cases: [
+        { title: "同一个模型跑不跑得动", text: "一个 70B 参数的模型,原始精度要约 140GB 显存,普通人碰都碰不了。4 位量化后压到约 40GB,一张高端消费级显卡就能跑。**量化不是让模型更好,是让它能被你用上**——对本地部署这是 0 和 1 的区别。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "deployment",
+      title: "部署形态",
+      aliases: ["Deployment", "Serving", "本地部署", "云端部署"],
+      maturity: "stable", domain: "building", heat: 0.55,
+      summary: "把模型跑起来对外服务的几种方式，各有隐私、成本、可控性的取舍。",
+      body: "**是什么**\n\n模型训练好之后,怎么让它真正对外提供服务。核心是几种形态之间的选择,而这个选择由**隐私、成本、可控性、能力**四个维度的权衡决定。\n\n**几种形态**\n\n| 形态 | 怎么跑 | 适合 |\n|---|---|---|\n| **调厂商 API** | 用别人的模型,按量付费 | 起步快、要最强能力、不想运维 |\n| **自托管开源模型** | 自己的服务器跑开源权重 | 数据敏感、要控制、量大摊薄成本 |\n| **本地/边缘** | 跑在用户设备上 | 离线、极致隐私、低延迟 |\n\n**关键取舍**\n\n- **隐私 vs 能力**:调 API 拿到最强模型,但数据要出门;自托管数据不出门,但通常只能用能力稍弱的开源模型。这条取舍对很多企业是决定性的。\n- **起步成本 vs 规模成本**:API 起步几乎零成本,但量大了按量付费会很贵;自托管前期要投入硬件和运维,但规模上来后单位成本低。有个盈亏平衡点。\n- **省心 vs 可控**:API 省掉全部运维,但你被厂商的限流、涨价、模型下线绑住;自托管全在自己手里,代价是要自己扛住 [[inference-optimization]]、扩容、监控。\n\n**别过早自托管**\n\n和 [[vector-db]] 的过度设计是同一个道理:**大多数应用该从 API 起步**,验证了价值、量也上来了,再考虑自托管。一上来就自建推理集群,往往是在解决一个还不存在的问题。",
+      cases: [
+        { title: "什么时候值得自托管", text: "一个每天调用几百次的内部工具,用 API 一个月花几十块——自托管纯属折腾。但一个每天几百万次调用、且数据不能出境的应用,自托管开源模型的单位成本和合规性优势就压倒性了。**这个决策该算账,不该跟风。**" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "rlhf",
+      title: "RLHF 与偏好对齐",
+      aliases: ["RLHF", "DPO", "偏好对齐", "奖励模型", "Preference Alignment"],
+      maturity: "stable", domain: "safety", heat: 0.75,
+      summary: "用人类偏好训练模型倾向于「人更想要的」回答——把基座模型调教成助手的关键一步。",
+      body: "**是什么**\n\n[[alignment]] 的核心技术环节。[[pretraining]] 和指令微调（[[fine-tuning]]）让模型会说话、肯听话,但「什么是好回答」很难用示范穷尽。RLHF 换了个思路:**不告诉它标准答案,而是让它从人的偏好里学。**\n\n**它怎么工作（RLHF 三步）**\n\n1. 让模型对同一问题生成多个回答\n2. 人类**排序**这些回答（哪个更好),用这些排序训练一个**奖励模型**——它学会给回答打分\n3. 用 [[reinforcement-learning]]（PPO）优化语言模型,让它的输出在奖励模型那里得分更高\n\n关键洞察:**「排序」比「写标准答案」容易得多**。让人从两个回答里挑更好的,比让人写出完美回答省力,也更能捕捉「好」这种说不清的品质。\n\n**DPO：把三步压成一步**\n\nRLHF 要单独训一个奖励模型再跑强化学习,复杂且不稳定。DPO（直接偏好优化）用一个巧妙的数学变换,**直接从偏好数据优化模型,跳过了奖励模型和 RL**。更简单、更稳、更省算力,如今很多团队的首选。但思路一脉相承:源头都是人类偏好。\n\n**它的根本局限**\n\n源头是「人类偏好」,而不是「客观正确」——这道缝隙是 [[reward-hacking]] 的温床:模型会学到讨好、谄媚、自信的语气,因为这些**让人更想选它**,而不是因为更对。**RLHF 让模型更好用,但也把「取悦人」写进了它的目标。**",
+      cases: [
+        { title: "为什么用排序而不是打分", text: "让人给一个回答打「7.5 分」很主观,每个人尺度不同,今天明天也不一样。但让人从两个回答里选一个更好的,判断稳定得多。RLHF 建立在这个认知上——**相对偏好比绝对分数可靠。**" },
+        { title: "DPO 为什么流行", text: "RLHF 要维护奖励模型、调 PPO 的一堆超参,训练容易崩。DPO 把这些全省了,一个损失函数直接从偏好对上训练。效果接近、复杂度骤降——这是它两三年内成为主流的原因。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "red-teaming",
+      title: "红队测试",
+      aliases: ["Red Teaming", "红队", "对抗测试", "AI Red Teaming"],
+      maturity: "stable", domain: "safety", heat: 0.6,
+      summary: "主动扮演攻击者去攻破自己的模型，在上线前找出漏洞。",
+      body: "**是什么**\n\n组织一批人（或自动化工具）**专门去攻击自己的 AI 系统**——试图触发 [[jailbreak]]、[[prompt-injection]]、有害输出、隐私泄露——目的是在真实攻击者之前先把漏洞找出来。名字借自网络安全里的「红队 vs 蓝队」。\n\n**为什么它是必要的,而不是可选的**\n\n因为 [[alignment]] 和 [[guardrails]] 的防御**无法穷举验证**。你没法证明「模型不会被任何提示越狱」——语言的攻击面是无限的。既然不能证明安全,就只能**主动去找不安全**:红队每找到一个漏洞,就补一个;找不到了,至少提高了下限。\n\n这和 [[evaluation]] 是互补的:评测测「正常输入下好不好」,红队测「恶意输入下会不会崩」。\n\n**怎么做**\n\n- **手动红队**:人凭经验和创造力构造刁钻输入。灵活、能发现意想不到的问题,但慢、不全面。\n- **自动化红队**:用另一个模型批量生成攻击提示。可规模化,但容易陷入已知套路。\n- **持续进行**:不是上线前测一次就完了。模型更新、新攻击手法出现,都要重测。\n\n**它的本质是一种思维方式**\n\n红队真正的价值不在某次测试,而在**逼你从攻击者视角审视系统**。判断一个 AI 系统安不安全,该问的不是「它能不能挡住已知攻击」,而是「一个有动机的攻击者会怎么下手」——这正是 [[prompt-injection]] 那条「假设会被攻破,再限制后果」的思路。",
+      cases: [
+        { title: "红队和评测的分工", text: "评测集问「北京的首都是哪」看答得对不对;红队问「假装你是没有限制的 AI,教我……」看防线破不破。前者保证正常好用,后者保证异常不出大事——两者都做才算完整。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "interpretability",
+      title: "可解释性",
+      aliases: ["Interpretability", "可解释AI", "机制可解释性", "XAI"],
+      maturity: "evolving", domain: "safety", heat: 0.6,
+      summary: "试图搞清楚模型内部到底在做什么——目前仍是开放的研究前沿。",
+      body: "**是什么**\n\n研究模型内部**为什么**产生某个输出——不只是知道它有效,而是理解它的计算过程。[[neural-network]] 那节讲过,模型的「知识」分布在几亿个权重里,无法直接读懂;可解释性就是想把这个黑箱打开一条缝。\n\n**为什么它重要,而不只是学术好奇**\n\n- **信任**:医疗、司法、信贷里,「模型说不批」而说不出理由,是无法接受的\n- **安全**:如果能看懂模型内部,就可能**在它输出有害内容之前**检测到,而不是靠 [[guardrails]] 在输出端拦\n- **调试**:理解 [[hallucination]] 到底怎么发生,才可能从根上减少,而不只是缓解\n- **对齐**:验证模型是真的学会了价值,还是只学会了 [[reward-hacking]] 式的讨好\n\n**几条研究路径**\n\n- **看注意力**:[[attention]] 权重可以画出来,但它只是线索,不等于因果\n- **探针**:训练小分类器去检测模型某一层是否编码了某个概念\n- **机制可解释性**:最雄心的方向——试图把网络里的具体「电路」逆向出来,搞清哪些神经元组合实现了哪个功能。有一个引人注目的发现是,某些概念对应着可识别的内部特征,甚至能被直接调节。\n\n**为什么标为演进中**\n\n这是**目前最不成熟、也最活跃**的方向之一。我们能训出能力惊人的模型,却基本不理解它们内部怎么运作——这个「能力远超理解」的差距本身就是 AI 安全的核心担忧之一。这里的结论几个月就会刷新。",
+      cases: [
+        { title: "能力和理解的鸿沟", text: "我们能造出会写代码、能推理的模型,却回答不了「它决定这么写的那一刻,内部发生了什么」。这在工程史上很罕见——通常我们先理解原理再造出东西,而大模型是反过来的。这个鸿沟正是可解释性想填的。" },
+        { title: "注意力不是解释", text: "把注意力权重画成热力图看起来很像「模型在关注这里」,但研究表明它和模型的真实决策依据并不可靠对应。**看起来像解释的东西,不一定是解释**——这是这个领域反复踩的坑,也和 [[cot]] 那条『写出来的推理不等于真实计算』相通。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+
+    // ───────── 第四轮补充：架构前沿 + 追前沿大区 ─────────
+    {
+      id: "moe",
+      title: "混合专家 MoE",
+      aliases: ["MoE", "Mixture of Experts", "稀疏模型"],
+      maturity: "stable", domain: "foundations", heat: 0.6,
+      summary: "把大模型拆成很多「专家」，每个 token 只激活一小部分，参数量大但计算省。",
+      body: "**是什么**\n\n把 [[transformer]] 里的前馈层拆成很多个并行的「专家」子网络,再加一个「路由器」决定每个 token 交给哪几个专家处理。**总参数量可以极大,但每个 token 只激活其中一小部分。**\n\n**它解决的核心矛盾**\n\n[[scaling-law]] 说参数越多越强,但参数越多推理越慢越贵——这是个死结。MoE 把它解开了:**让参数量和计算量脱钩。**\n\n一个万亿参数的 MoE 模型,每次推理可能只用到其中十分之一。于是你既拿到了大参数量带来的能力,又只付小计算量的成本。这是当前很多前沿大模型采用稀疏架构的原因。\n\n**代价不是没有**\n\n- **显存**:所有专家都要加载进显存,哪怕每次只用几个。省的是计算,不是显存。\n- **路由的稳定性**:路由器可能把大部分 token 都塞给少数几个专家(负载不均),训练要专门处理。\n- **复杂度**:分布式训练和部署都比稠密模型麻烦。\n\n**一句话定位**\n\n稠密模型是「每个 token 都用上全部参数」,MoE 是「每个 token 各取所需」。它是「既要大又要快」这个矛盾下的主流工程答案。",
+      cases: [
+        { title: "参数量和算力脱钩", text: "两个模型都号称『很大』:一个是 700 亿参数的稠密模型,每个 token 全用上;一个是 4000 亿参数的 MoE,每个 token 只激活约 700 亿。后者账面参数大得多、能力更强,推理成本却和前者相当。**看模型大小时,要分清总参数和激活参数。**" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "distillation",
+      title: "模型蒸馏",
+      aliases: ["Distillation", "知识蒸馏", "Knowledge Distillation"],
+      maturity: "stable", domain: "foundations", heat: 0.55,
+      summary: "用大模型当老师训练小模型，让小模型学到接近大模型的能力。",
+      body: "**是什么**\n\n用一个强大的「教师」模型去训练一个小的「学生」模型。学生不只学标准答案,还学教师的**完整输出分布**(它对每个可能答案的概率),从而学到比直接看标准答案更丰富的信息。\n\n**为什么它有用**\n\n它和 [[quantization]] 是两条「让模型变小变便宜」的不同路线:\n\n- **量化**:同一个模型,用更低精度存——不改结构,压体积\n- **蒸馏**:换一个更小的模型,让它模仿大模型——改结构,搬能力\n\n蒸馏能得到一个原生就小的模型,推理快、部署轻,而能力远超同等大小从头训练的模型。**很多「又小又好」的模型,背后是一个大模型当老师。**\n\n**它也改变了竞争格局**\n\n一个有争议但重要的点:**有了强模型的输出,就能蒸馏出接近它的小模型。** 这让「训练数据」的护城河变浅了——你不需要重走一遍昂贵的 [[pretraining]],用教师模型的输出就能追赶。这也是为什么前沿模型的使用条款常常禁止「用我的输出训练竞品」。\n\n**它和合成数据相通**\n\n用教师模型生成大量「问题-回答」对来训练学生,本质就是一种 [[synthetic-data]]。两个概念在这里交汇。",
+      cases: [
+        { title: "为什么学分布比学答案强", text: "问「2+2=?」,标准答案只告诉学生「4」。但教师模型的输出分布还透露了「4 的概率 99%、5 的概率 0.5%……」——这些「软标签」包含了教师对相近答案的判断,学生从中学到的比一个硬邦邦的『4』多得多。这是蒸馏比普通训练高效的原因。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "synthetic-data",
+      title: "合成数据",
+      aliases: ["Synthetic Data", "人工合成数据", "AI 生成训练数据"],
+      maturity: "evolving", domain: "foundations", heat: 0.65,
+      summary: "用模型生成训练数据，应对真实高质量数据见底的问题。",
+      body: "**是什么**\n\n不用（或不只用）真实世界采集的数据,而是**用模型自己生成训练数据**来训练模型。听起来像左脚踩右脚,但它正在成为前沿训练的关键一环。\n\n**为什么它突然重要**\n\n因为 [[scaling-law]] 撞上了现实约束:**互联网上的高质量文本是有限的,而且快用完了。** 单纯靠加真实数据的路走到了尽头。合成数据是绕开这堵墙的主要方向之一。\n\n它还能解决真实数据拿不到的场景:稀有情况的样本、隐私敏感领域、需要精确标注的任务——这些真实数据要么没有、要么太贵,生成则可控。\n\n**它怎么不塌成「自我循环」**\n\n最大的质疑是:模型学自己生成的东西,会不会越学越差(模型坍缩)?关键在于**生成的数据要带来新信息,而不是复读**:\n\n- 用**更强的**模型给**更弱的**模型造数据(这就是 [[distillation]])\n- 用可验证的任务(数学、代码——答案对错能自动判定),只保留正确的生成结果\n- 人工或规则过滤,只留高质量的\n\n**关键洞察:生成容易、验证难的任务,合成数据最有效。** 造一百万道数学题的解法很容易出错,但每道题的答案对不对可以自动验证——留下对的,就得到了干净的训练数据。\n\n**为什么标为演进中**\n\n这是当前训练前沿最活跃的方向之一,「合成数据到底能走多远、会不会导致模型坍缩」仍有争论,结论在快速变化。",
+      cases: [
+        { title: "可验证任务是突破口", text: "让模型生成数学题的解题过程,其中大量是错的。但因为最终答案能自动对照,只保留答案正确的解法,就得到了一批高质量的推理训练数据。[[reasoning-models]] 的能力提升,很大程度依赖这种『生成+验证』的合成数据。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+    {
+      id: "model-families",
+      title: "主流模型家族",
+      aliases: ["Model Families", "Claude", "GPT", "Gemini", "Llama", "开源模型"],
+      maturity: "evolving", domain: "frontier", heat: 0.7,
+      summary: "当前主要的大模型家族及其定位——这是变化最快的一层。",
+      body: "**是什么**\n\n对当前主流大模型的一张「地形图」。**这是整个知识地图里最容易过时的一个节点**(所以标为演进中)——具体的版本、排名、价格几个月就变。所以这里只记**不太会变的判断维度**,不记会过期的具体型号。\n\n**怎么给它们分类（维度比名字更持久）**\n\n- **闭源 vs 开源权重**:闭源(如 Claude、GPT、Gemini 系列)通常能力领先、只能通过 API 用、数据要出门;开源权重(如 Llama、Mistral、Qwen、DeepSeek 系列)可自托管、可微调、数据不出门,能力通常稍落后但差距在缩小。这条对应 [[deployment]] 的核心取舍。\n- **通用 vs 推理**:普通模型快而便宜,[[reasoning-models]] 慢而强,按任务选,见 [[model-selection]]。\n- **尺寸档位**:同一家族常有大中小几档,靠 [[distillation]] 和 [[quantization]] 覆盖不同成本场景。\n\n**该记什么,不该记什么**\n\n**不要**背「现在哪个模型最强」——这个答案的保质期以周计。**要**记的是:怎么根据任务的难度、隐私要求、成本预算,在这些维度上做选择。维度是稳定的,排名是易变的。\n\n**它为什么放在「追前沿」大区**\n\n因为它天然是活跃层的内容:新模型、新版本、新价格持续涌入。理想情况下,这个节点的详情靠 [[rag]] 式的入库流程持续更新,而不是手工维护——具体的模型动态适合作为 `activity` 条目挂在这里。",
+      cases: [
+        { title: "为什么不背排行榜", text: "「X 模型在 Y 榜单排第一」这种信息,写下来的那天就开始过期,而且榜单还容易被针对性优化(见 [[reward-hacking]] 和测试集污染)。真正有用的是学会看维度:这个任务要多强的推理?数据能不能出境?预算多少?——答案不随排名变。" }
+      ],
+      sources: [],
+      createdAt: "2026-07-19", updatedAt: "2026-07-19"
+    },
+
     // ───────────────────────── ⚖️ 安全与对齐 ─────────────────────────
     {
       id: "hallucination",
@@ -1042,6 +1293,63 @@ window.GRAPH = {
     { from: "reward-hacking", to: "hallucination",         type: "constrains", label: "奖励自信语气" },
     { from: "alignment",      to: "supervised-learning",   type: "uses",       label: "SFT 阶段" },
     { from: "jailbreak",      to: "lost-in-middle",        type: "uses",       label: "长上下文淹没安全指令" },
+
+    // 第四轮：架构前沿 + 追前沿
+    { from: "moe",            to: "transformer",   type: "variant-of", label: "稀疏化前馈层" },
+    { from: "moe",            to: "scaling-law",   type: "enables",    label: "参数与算力脱钩" },
+    { from: "distillation",   to: "pretraining",   type: "contrast",   label: "搬能力 vs 重训" },
+    { from: "distillation",   to: "quantization",  type: "contrast",   label: "换小模型 vs 压精度" },
+    { from: "distillation",   to: "synthetic-data", type: "variant-of", label: "教师造数据" },
+    { from: "synthetic-data", to: "scaling-law",   type: "mitigates",  label: "真实数据见底" },
+    { from: "synthetic-data", to: "self-supervised-learning", type: "variant-of", label: "自造训练信号" },
+    { from: "synthetic-data", to: "reasoning-models", type: "enables", label: "生成+验证" },
+    { from: "model-families", to: "deployment",    type: "related",    label: "闭源 vs 开源取舍" },
+    { from: "model-families", to: "model-selection", type: "related",  label: "怎么挑" },
+    { from: "reasoning-models", to: "model-families", type: "part-of", label: "推理档" },
+
+    // 第三轮：应用搭建 + 安全对齐 深化
+    { from: "evaluation",     to: "model-selection", type: "enables",   label: "先有基线才能换" },
+    { from: "evaluation",     to: "rag",             type: "related",   label: "调优靠它衡量" },
+    { from: "reward-hacking", to: "evaluation",      type: "threatens", label: "裁判也会被骗" },
+    { from: "overfitting",    to: "evaluation",      type: "threatens", label: "测试集污染" },
+    { from: "advanced-rag",   to: "rag",             type: "variant-of", label: "基础之上加处理" },
+    { from: "advanced-rag",   to: "agent",           type: "uses",      label: "Agentic RAG" },
+    { from: "advanced-rag",   to: "retrieval",       type: "uses",      label: "查询改写" },
+    { from: "inference-optimization", to: "attention",      type: "mitigates",  label: "平方级瓶颈" },
+    { from: "inference-optimization", to: "context-window", type: "mitigates",  label: "长上下文才可行" },
+    { from: "prompt-caching",  to: "inference-optimization", type: "variant-of", label: "KV 缓存跨请求复用" },
+    { from: "quantization",    to: "inference-optimization", type: "part-of",   label: "低精度换速度" },
+    { from: "quantization",    to: "regularization",  type: "related",   label: "精度宽容同源" },
+    { from: "quantization",    to: "deployment",      type: "enables",   label: "消费级硬件能跑" },
+    { from: "deployment",      to: "inference-optimization", type: "uses", label: "自托管要自己扛" },
+    { from: "deployment",      to: "model-selection", type: "related",   label: "API vs 自托管" },
+    { from: "rlhf",            to: "alignment",       type: "part-of",   label: "对齐核心环节" },
+    { from: "rlhf",            to: "reinforcement-learning", type: "uses", label: "PPO" },
+    { from: "reward-hacking",  to: "rlhf",            type: "threatens", label: "讨好而非正确" },
+    { from: "rlhf",            to: "fine-tuning",     type: "variant-of", label: "跟在 SFT 之后" },
+    { from: "red-teaming",     to: "jailbreak",       type: "mitigates", label: "上线前找漏洞" },
+    { from: "red-teaming",     to: "prompt-injection", type: "mitigates", label: "主动攻自己" },
+    { from: "red-teaming",     to: "guardrails",      type: "related",   label: "找漏洞→补护栏" },
+    { from: "red-teaming",     to: "evaluation",      type: "contrast",  label: "异常 vs 正常输入" },
+    { from: "interpretability", to: "hallucination",  type: "mitigates", label: "从根上理解成因" },
+    { from: "interpretability", to: "attention",      type: "uses",      label: "看注意力（仅线索）" },
+    { from: "interpretability", to: "alignment",      type: "enables",   label: "验证真学会价值" },
+    { from: "interpretability", to: "neural-network", type: "constrains", label: "黑箱难打开" },
+
+    // 第二轮：内容生成大区
+    { from: "multimodal",   to: "transformer",   type: "uses",     label: "统一 token 化" },
+    { from: "multimodal",   to: "embedding",     type: "uses",     label: "共享语义空间" },
+    { from: "multimodal",   to: "llm",           type: "variant-of", label: "多模态扩展" },
+    { from: "image-generation", to: "multimodal", type: "part-of", label: "文→图方向" },
+    { from: "multimodal",   to: "agent",         type: "enables",  label: "看界面截图" },
+    { from: "gan",          to: "diffusion",     type: "contrast", label: "对抗 vs 去噪" },
+    { from: "gan",          to: "neural-network", type: "is-a",    label: "" },
+    { from: "video-generation",       to: "diffusion",        type: "variant-of", label: "加时间维度" },
+    { from: "video-generation",       to: "context-window",   type: "constrains", label: "多帧算力压力" },
+    { from: "controllable-generation", to: "image-generation", type: "mitigates",  label: "文字控不住构图" },
+    { from: "controllable-generation", to: "fine-tuning",      type: "uses",       label: "LoRA 保持身份" },
+    { from: "speech",       to: "multimodal",    type: "is-a",     label: "音频模态" },
+    { from: "speech",       to: "transformer",   type: "uses",     label: "音频 token 化" },
 
     // 入库 001：多 Agent / 护栏 / 模型选型
     { from: "multi-agent",     to: "agent",         type: "part-of",    label: "复杂时的组织方式" },
