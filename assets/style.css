@@ -37,6 +37,29 @@ html, body {
 .brand-mark { color: var(--accent); font-size: 17px; }
 .brand-name { font-weight: 600; letter-spacing: .04em; }
 .brand-ver  { color: var(--fg-faint); font-size: 11px; }
+.brand { cursor: pointer; }
+.brand:hover .brand-name { color: var(--accent); }
+.mode-hint { color: var(--accent); font-size: 11px; padding: 1px 7px; border: 1px solid var(--line);
+             border-radius: 10px; margin-left: 4px; }
+.brand:hover .mode-hint { border-color: var(--accent); }
+
+/* ───────── 软件模式 ───────── */
+#software-view { position: absolute; inset: 0; overflow-y: auto; padding: 24px 28px 60px; }
+#software-view.hidden { display: none; }
+.sw-head h2 { margin: 0 0 4px; font-size: 20px; }
+.sw-head p { margin: 0 0 20px; color: var(--fg-faint); font-size: 13px; }
+.sw-head .xref { cursor: default; }
+.sw-cat { margin-bottom: 26px; }
+.sw-cat h3 { font-size: 14px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
+             border-bottom: 1px solid var(--line-soft); padding-bottom: 7px; }
+.sw-cat h3 em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--fg-faint); }
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.sw-card { background: var(--bg-raise); border: 1px solid var(--line); border-left-width: 3px;
+           border-radius: 6px; padding: 11px 13px; cursor: pointer; transition: border-color .12s; }
+.sw-card:hover { border-color: var(--accent); }
+.sw-name { font-size: 14px; font-weight: 600; color: var(--fg); }
+.sw-by { font-size: 11px; color: var(--fg-faint); margin: 1px 0 6px; }
+.sw-sum { font-size: 12px; color: var(--fg-dim); line-height: 1.6; }
 
 .search-wrap { position: relative; flex: 1; max-width: 380px; }
 #search {

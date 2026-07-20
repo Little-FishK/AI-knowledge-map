@@ -568,6 +568,78 @@
   applyFilters();
   runLayout();
 
+  /* ───────────────────────── 软件模式 ───────────────────────── */
+  const SW = window.SOFTWARE;
+  let mode = "graph";               // graph | software
+  const swView = document.getElementById("software-view");
+  let swBuilt = false;
+
+  function buildSoftware() {
+    if (swBuilt || !SW) return;
+    const catItems = {};
+    SW.categories.forEach(c => { catItems[c.id] = []; });
+    SW.items.forEach(it => { (catItems[it.cat] || (catItems[it.cat] = [])).push(it); });
+    let h = `<div class="sw-head"><h2>AI 软件目录</h2>
+      <p>手工精选、按功能分类的著名 AI 软件。点软件看详情，详情里的<span class="xref">蓝字概念</span>可跳回知识地图。</p></div>`;
+    SW.categories.forEach(c => {
+      const items = catItems[c.id] || [];
+      if (!items.length) return;
+      h += `<section class="sw-cat"><h3 style="color:${c.color}">${c.emoji} ${esc(c.label)}<em>${items.length}</em></h3><div class="sw-grid">`;
+      items.forEach(it => {
+        h += `<div class="sw-card" data-sw="${esc(it.id)}" style="border-left-color:${c.color}">
+          <div class="sw-name">${esc(it.name)}</div>
+          <div class="sw-by">${esc(it.by || "")}</div>
+          <div class="sw-sum">${esc(it.summary || "")}</div></div>`;
+      });
+      h += `</div></section>`;
+    });
+    swView.innerHTML = h;
+    swView.querySelectorAll("[data-sw]").forEach(el =>
+      el.addEventListener("click", () => openSoftware(el.getAttribute("data-sw"))));
+    swBuilt = true;
+  }
+
+  function openSoftware(id) {
+    const it = (SW.items || []).find(x => x.id === id);
+    if (!it) return;
+    const cat = SW.categories.find(c => c.id === it.cat) || { label: "", color: "#888", emoji: "" };
+    let h = `<div class="d-domain" style="color:${cat.color}">${cat.emoji} ${esc(cat.label)}`
+          + (it.by ? `<span style="color:var(--fg-faint)"> · ${esc(it.by)}</span>` : "") + `</div>`;
+    h += `<h2 class="d-title">${esc(it.name)}</h2>`;
+    h += `<div class="d-summary">${esc(it.summary || "")}</div>`;
+    if (it.body) h += `<div class="d-sec"><div class="d-body">${mdLite(it.body)}</div></div>`;
+    if (it.concept && byId[it.concept]) {
+      h += `<div class="d-sec"><h4>背后的概念</h4>
+        <div class="rel"><span class="rel-to" data-goto="${esc(it.concept)}">${esc(byId[it.concept].title)}</span>
+        <span class="rel-lbl">在知识地图里查看</span></div></div>`;
+    }
+    detailBody.innerHTML = h;
+    detail.classList.remove("closed");
+    detailBody.scrollTop = 0;
+    // 正文/概念链接 → 切回地图并选中该节点
+    detailBody.querySelectorAll("[data-goto]").forEach(el =>
+      el.addEventListener("click", () => { setMode("graph"); select(el.getAttribute("data-goto"), true); }));
+  }
+
+  function setMode(m) {
+    mode = m;
+    const isSW = m === "software";
+    if (isSW) buildSoftware();
+    document.getElementById("cy").classList.toggle("hidden", isSW);
+    document.getElementById("legend").classList.toggle("hidden", isSW);
+    document.getElementById("controls").classList.toggle("hidden", isSW);
+    swView.classList.toggle("hidden", !isSW);
+    document.getElementById("btn-reset").classList.toggle("hidden", isSW);
+    document.getElementById("brand-name").textContent = isSW ? "AI 软件目录" : "AI 知识地图";
+    document.getElementById("mode-hint").textContent = isSW ? "▸ 概念" : "▸ 软件";
+    document.getElementById("search").placeholder = isSW ? "（软件模式）" : "搜索概念…  （/ 聚焦）";
+    detail.classList.add("closed");
+    if (!isSW) setTimeout(() => cy.resize(), 30);
+  }
+
+  document.getElementById("mode-toggle").addEventListener("click", () =>
+    setMode(mode === "graph" ? "software" : "graph"));
+
   // 暴露给调试用
   window.__cy = cy;
 })();

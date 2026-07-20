@@ -12,10 +12,11 @@
 
   <!-- 顶栏 -->
   <header id="topbar">
-    <div class="brand">
+    <div class="brand" id="mode-toggle" title="点击切换 概念地图 / 软件目录">
       <span class="brand-mark">◈</span>
-      <span class="brand-name">AI 知识地图</span>
+      <span class="brand-name" id="brand-name">AI 知识地图</span>
       <span class="brand-ver" id="meta-ver"></span>
+      <span class="mode-hint" id="mode-hint">▸ 软件</span>
     </div>
     <div class="search-wrap">
       <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off">
@@ -71,6 +72,7 @@
       <div id="cy"></div>
       <div id="legend"></div>
       <div id="empty-hint" class="hidden">没有符合当前筛选的节点</div>
+      <div id="software-view" class="hidden"></div>
     </main>
 
     <!-- 右侧详情 -->
@@ -87,6 +89,7 @@
 <script src="assets/vendor/cose-base.js"></script>
 <script src="assets/vendor/cytoscape-fcose.js"></script>
 <script src="data/graph.js"></script>
+<script src="data/software.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
