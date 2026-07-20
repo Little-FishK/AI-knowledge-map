@@ -5,7 +5,7 @@
  * 软件迭代快，这里只记「它是什么、最擅长什么」这类不易过时的判断，不记版本号/价格。
  */
 window.SOFTWARE = {
-  meta: { version: "0.1", updatedAt: "2026-07-19" },
+  meta: { version: "0.2", updatedAt: "2026-07-20" },
 
   // 门类（软件模式自己的分类，不复用概念地图的六大区）
   categories: [
@@ -39,7 +39,13 @@ window.SOFTWARE = {
       body: "严格说它是「AI 搜索」，但用起来像带引用的对话助手。核心是 [[rag]]：每次回答都实时检索网络、并给出 [[citations]] 出处，主打「可核实」，见 §AI 搜索。" },
     { id: "doubao", name: "豆包 / 通义 / 文心等", cat: "chat", by: "字节/阿里/百度等", concept: "llm",
       summary: "国内主流对话助手，中文场景与本土生态更贴合。",
-      body: "字节豆包、阿里通义千问、百度文心一言、DeepSeek 等国产助手，在中文理解、本土应用整合、以及数据合规上更贴合国内需求。能力快速追近国际前沿，其中 DeepSeek 以开源和推理能力受到广泛关注。" },
+      body: "字节豆包、阿里通义千问、百度文心一言等国产助手，在中文理解、本土应用整合、以及数据合规上更贴合国内需求，能力快速追近国际前沿。（同为国产旗舰的 [[deepseek]] 因开源与强推理已单列一张卡。）" },
+    { id: "deepseek", name: "DeepSeek", cat: "chat", by: "DeepSeek / 幻方", concept: "reasoning-models",
+      summary: "以开源和强推理著称的国产大模型，用低成本训练撼动了行业预期。",
+      body: "国产大模型的代表之一，因把 [[reasoning-models]] 能力开源、且训练成本远低于同行而引发广泛关注。通用对话之外，其 R 系列专攻长思考推理；权重开放让它成了本地部署（见 [[ollama]]）和二次开发的热门底座。它的意义不止于产品，更在于验证了「前沿能力未必要天价投入」。" },
+    { id: "grok", name: "Grok", cat: "chat", by: "xAI", concept: "llm",
+      summary: "xAI 的对话助手，深度接入 X（推特）的实时信息。",
+      body: "xAI 的大模型助手，最大特点是与 X 平台的实时数据打通，回答时事和舆论话题时信息更新更快。风格上走「少一些拘束」的路线，也自带文生图能力。" },
 
     // 🔎 AI 搜索与研究
     { id: "perplexity", name: "Perplexity", cat: "search", by: "Perplexity", concept: "citations",
@@ -51,6 +57,9 @@ window.SOFTWARE = {
     { id: "notebooklm", name: "NotebookLM", cat: "search", by: "Google", concept: "rag",
       summary: "把你自己的资料变成一个能问答、能生成播客的知识库。",
       body: "上传你的文档，它基于这些资料回答问题、附出处、甚至生成一段两人对谈的音频概览。是「私有资料 [[rag]]」的消费级产品化，主打「只根据我给的材料答」，减少 [[hallucination]]。" },
+    { id: "deep-research", name: "Deep Research（深度研究）", cat: "search", by: "OpenAI/Google/Perplexity 等", concept: "agent",
+      summary: "给一个课题，AI 自主多轮检索、交叉核对，产出一份带出处的长报告。",
+      body: "各家（ChatGPT、Gemini、Perplexity 等）都推出的「深度研究」模式：不是一问一答，而是像 [[agent]] 一样自己规划、反复 [[retrieval]] 搜几十个来源、交叉验证，最后生成一份结构化、带 [[citations]] 的调研报告。把「查资料写综述」这件耗时活自动化，是 AI 搜索从「快答」走向「深做」的方向。" },
 
     // 💻 AI 编程
     { id: "cursor", name: "Cursor", cat: "coding", by: "Anysphere", concept: "coding-tools",
@@ -65,6 +74,18 @@ window.SOFTWARE = {
     { id: "v0", name: "v0 / Bolt / Lovable", cat: "coding", by: "Vercel 等", concept: "code-generation",
       summary: "一句话生成能跑的前端/全栈应用。",
       body: "「文生应用」类工具：描述你要的界面或功能，直接生成可预览、可部署的前端甚至全栈代码。把 [[code-generation]] 推向「非程序员也能做出东西」，是 AI 编程门槛下移的代表。" },
+    { id: "codex", name: "Codex", cat: "coding", by: "OpenAI", concept: "agent-loop",
+      summary: "OpenAI 的编程 Agent，终端与云端并发处理多个任务。",
+      body: "OpenAI 的 agentic 编程工具（复用了早年代码模型的招牌名）。给任务后它自己读仓库、[[planning]]、改代码、[[code-execution]] 跑测试，既能在终端里用，也能在云端并行推进多个任务。是 [[agent-loop]] 在编程场景的又一主力落地，和 [[claude-code]] 同属「终端/云端编程 Agent」这一档。" },
+    { id: "antigravity", name: "Antigravity IDE", cat: "coding", by: "Google", concept: "coding-tools",
+      summary: "Google 的 agentic 开发平台，让 Agent 主导编辑器、终端和浏览器。",
+      body: "Google 推出的 agentic IDE：不再是「编辑器里加个补全」，而是让 AI Agent 作为主角，自主跨编辑器、终端、浏览器协作完成任务，人更多是审阅和把关。代表了 [[coding-tools]] 从「AI 辅助人」向「人监督 AI」的重心转移，背靠 Gemini 模型。" },
+    { id: "opencode", name: "opencode", cat: "coding", by: "开源社区", concept: "agent-loop",
+      summary: "开源、模型无关的终端编程 Agent。",
+      body: "跑在终端里的开源编程 Agent，定位类似 [[claude-code]]，但**不绑定某一家模型**——可自由接 Anthropic、OpenAI、开源本地模型等。[[agent-loop]] + [[code-execution]] 的开源实现，主打透明、可自托管、可换底座，是不想被单一厂商锁定的开发者的选择。" },
+    { id: "windsurf", name: "Windsurf / Cline / Aider", cat: "coding", by: "多家", concept: "coding-tools",
+      summary: "一批 agentic 代码工具：编辑器、插件、纯命令行各占一路。",
+      body: "Windsurf（agentic 编辑器）、Cline（VS Code 里的自主编程插件）、Aider（纯命令行结对编程）等，和 [[cursor]]、[[codex]] 同属这波 [[coding-tools]] 浪潮，形态各异但内核都是 [[agent-loop]]：读懂仓库、跨文件改、跑测试再改。这条赛道产品极多、迭代极快，此处收其中有代表性的几个。" },
 
     // 🤖 Agent 与自动化
     { id: "manus", name: "Manus / 通用 Agent", cat: "agent", by: "多家", concept: "agent",
@@ -76,6 +97,9 @@ window.SOFTWARE = {
     { id: "n8n", name: "n8n / Zapier", cat: "agent", by: "n8n/Zapier", concept: "workflow-orchestration",
       summary: "把 AI 接进自动化工作流，连通几百个应用。",
       body: "自动化平台（本身不是 AI），但都加了 AI 节点：能把 LLM 调用嵌进「触发→处理→动作」的 [[workflow-orchestration]] 里，连通邮件、表格、数据库等几百个服务。适合把 AI 缝进现有业务流程。" },
+    { id: "devin", name: "Devin", cat: "agent", by: "Cognition", concept: "agent-loop",
+      summary: "主打「自主软件工程师」的编程 Agent。",
+      body: "Cognition 推出、以「AI 软件工程师」为卖点的自主 [[agent]]：给一个工单，它自己 [[planning]]、写代码、跑、调试、提交，目标是端到端接下整个开发任务。是把 [[agent-loop]] 推向「最少人工介入」的高调尝试，也把「Agent 到底能自主到什么程度」的讨论摆上了台面。" },
 
     // 🎨 图像生成
     { id: "midjourney", name: "Midjourney", cat: "image", by: "Midjourney", concept: "diffusion",
@@ -90,6 +114,9 @@ window.SOFTWARE = {
     { id: "firefly", name: "Adobe Firefly / 国产文生图", cat: "image", by: "Adobe/字节等", concept: "image-editing",
       summary: "深度整合进设计工具的图像生成与编辑。",
       body: "Adobe Firefly（PS/Illustrator 内置）、以及即梦/可灵等国产工具，强在把生成和 [[image-editing]] 缝进专业工作流：生成填充、局部重绘、扩图，直接在设计软件里用。" },
+    { id: "ideogram", name: "Ideogram / Recraft", cat: "image", by: "Ideogram/Recraft", concept: "image-generation",
+      summary: "擅长「图里准确写字」和品牌设计的图像生成。",
+      body: "这两家的看家本领是解决文生图的老大难——**图中文字**：海报、logo、排版里的字能拼对、摆正。Recraft 还强在矢量输出和品牌风格一致性。是 [[image-generation]] 在「设计可用」方向上的细分代表。" },
 
     // 🎬 视频生成
     { id: "sora", name: "Sora", cat: "video", by: "OpenAI", concept: "video-generation",
@@ -101,6 +128,12 @@ window.SOFTWARE = {
     { id: "kling", name: "可灵 / 即梦 / Pika 等", cat: "video", by: "快手/字节等", concept: "video-generation",
       summary: "国内外快速迭代的文生视频产品。",
       body: "可灵（快手）、即梦（字节）、Pika、Runway 之外的一众产品，[[video-generation]] 这条赛道迭代极快、格局未定。国产在时长、运镜、口型上进步很猛，是「一年前结论就过时」的典型领域。" },
+    { id: "hailuo", name: "海螺 Hailuo（MiniMax）", cat: "video", by: "MiniMax 稀宇", concept: "video-generation",
+      summary: "MiniMax 的文生视频，以运镜和画面表现力著称。",
+      body: "MiniMax（稀宇科技）的 [[video-generation]] 产品，在镜头运动、画面质感上口碑很好，是国产文生视频第一梯队。MiniMax 本身是家多面手公司，除海螺外还做开源大模型、[[speech]] 与音乐生成、以及 Talkie/星野这类陪伴产品——这些次要线并入本卡，不另立。" },
+    { id: "veo", name: "Veo（Google）", cat: "video", by: "Google", concept: "video-generation",
+      summary: "Google 的旗舰文生视频，主打高保真与原生带声。",
+      body: "Google 的 [[video-generation]] 模型，画面质量和物理合理性处于第一梯队，并能直接生成带音效/对白的视频。深度整合进 Google 的创作工具链，和 [[sora]] 同属「文生视频天花板」的争夺者。" },
     { id: "heygen", name: "HeyGen / Synthesia", cat: "video", by: "HeyGen/Synthesia", concept: "multimodal",
       summary: "数字人视频：输入文字，生成真人形象口播。",
       body: "专攻「数字人口播」：给一段文字，生成一个逼真虚拟形象把它说出来，还能换语言、克隆音色。企业培训、营销视频的高频工具，也伴随 [[content-detection]] 的深伪担忧。" },
@@ -115,6 +148,9 @@ window.SOFTWARE = {
     { id: "whisper", name: "Whisper", cat: "audio", by: "OpenAI", concept: "speech",
       summary: "开源的高精度语音识别，多语言转文字。",
       body: "OpenAI 开源的 [[speech]] 识别（STT）模型，多语言、抗噪能力强，是无数字幕、会议记录、语音输入产品背后的引擎。开源让它成了语音转文字的事实标准之一。" },
+    { id: "realtime-voice", name: "实时语音（GPT/Gemini 语音）", cat: "audio", by: "OpenAI/Google 等", concept: "speech",
+      summary: "能实时对话、可打断的端到端语音助手。",
+      body: "OpenAI、Google 等的实时语音模式：不再是「录一句→转文字→再合成」的接力，而是端到端直接听声出声，延迟低到能自然打断、还能带情绪语气。把 [[speech]] 从「转录工具」推进到「能对话的声音」，是语音助手、实时口译、陪伴类应用的新底座。" },
 
     // ✍️ 写作与文本
     { id: "notion-ai", name: "Notion AI", cat: "writing", by: "Notion", concept: "prompt-engineering",
@@ -156,6 +192,9 @@ window.SOFTWARE = {
     { id: "langsmith", name: "LangSmith / Langfuse", cat: "devtools", by: "各家", concept: "observability",
       summary: "LLM 应用的可观测性与评测平台。",
       body: "[[observability]] 与 [[evaluation]] 概念的实现产品：记录每次调用的完整轨迹、token 成本、延迟，并支持搭建评测集。是 LLM 应用从 demo 走向生产绕不开的一环。" },
+    { id: "openrouter", name: "OpenRouter", cat: "devtools", by: "OpenRouter", concept: "model-selection",
+      summary: "一个接口聚合几百个模型，方便比价、切换、兜底。",
+      body: "把各家闭源/开源模型收进**同一个 API 后面**：开发者一处接入就能调几百个模型，按 [[model-selection]] 的维度（能力/价格/延迟）自由切换，还能配置失败时自动兜底到备用模型。是不想为每家 API 单独对接、又想灵活换模型的团队的常用底座。" },
 
     // 🖥️ 本地运行与开源
     { id: "ollama", name: "Ollama / LM Studio", cat: "local", by: "Ollama 等", concept: "deployment",
