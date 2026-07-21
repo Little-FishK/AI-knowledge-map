@@ -65,4 +65,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log("✓ 23/23 核心页通过结构、练习与来源门禁");
+console.log(`✓ ${graph.core.length}/${graph.core.length} 核心页通过结构、练习与来源门禁`);

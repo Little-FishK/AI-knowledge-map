@@ -10,12 +10,12 @@
  */
 window.GRAPH = {
   meta: {
-    version: "0.15",
-    updatedAt: "2026-07-20",
+    version: "0.16",
+    updatedAt: "2026-07-21",
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
     layoutSeed: 109,
-    note: "第九轮：补经典 DL/ML 基础(批归一化/损失函数/信息论与熵/核方法SVM)，108→112 节点/330 边"
+    note: "第十轮：补现代模型训练、评测、推理时计算、Agent 权限与生成架构，112→129 节点"
   },
 
   /* 核心节点 —— 默认视图只显示这些。
@@ -30,17 +30,17 @@ window.GRAPH = {
   core: [
     // 🧱 基础/共享
     "llm", "transformer", "attention", "embedding", "context-window",
-    "neural-network", "pretraining", "fine-tuning", "multimodal",
+    "neural-network", "pretraining", "post-training", "fine-tuning", "multimodal",
     // 🔧 应用搭建
-    "rag", "retrieval", "prompt-engineering", "cot",
+    "rag", "retrieval", "prompt-engineering", "cot", "model-evaluation",
     // 💻 编程与 Agent
-    "agent", "tool-calling", "mcp", "code-generation",
+    "agent", "tool-calling", "mcp", "code-generation", "agent-identity-access",
     // 🎨 内容生成
     "diffusion", "image-generation",
     // ⚖️ 安全与对齐
-    "hallucination", "prompt-injection", "alignment",
+    "hallucination", "prompt-injection", "alignment", "training-data-governance",
     // 📰 追前沿
-    "reasoning-models"
+    "reasoning-models", "test-time-compute"
   ],
 
   /* 固化的节点坐标。
@@ -165,7 +165,24 @@ window.GRAPH = {
     "batch-norm": [550, 320],
     "loss-function": [175, 360],
     "information-theory": [-85, 314],
-    "kernel-methods": [656, 240]
+    "kernel-methods": [656, 240],
+    "post-training": [188, 407],
+    "positional-encoding": [415, -28],
+    "normalization": [588, 276],
+    "optimizer-schedule": [520, 390],
+    "peft-lora": [242, 468],
+    "distributed-training": [394, 626],
+    "contrastive-learning": [680, -265],
+    "model-merging": [150, 620],
+    "model-evaluation": [-210, 245],
+    "model-routing": [-350, 425],
+    "data-drift-monitoring": [-590, 340],
+    "agent-identity-access": [-435, -260],
+    "flow-matching": [735, -75],
+    "training-data-governance": [-255, 505],
+    "uncertainty-calibration": [-285, 155],
+    "test-time-compute": [65, 535],
+    "state-space-models": [735, 145]
   },
 
   domains: {
@@ -1750,6 +1767,196 @@ window.GRAPH = {
       ],
       sources: [{ type: "doc", title: "AI 经典教材（机器学习基础）", ref: "" }],
       createdAt: "2026-07-20", updatedAt: "2026-07-20"
+    },
+    {
+      id: "post-training",
+      title: "后训练 Post-training",
+      aliases: ["Post-training", "后训练", "模型后训练"],
+      maturity: "evolving", domain: "foundations", heat: 0.92,
+      summary: "在预训练之后，用指令、偏好与可验证反馈把基座模型塑造成可用助手。",
+      body: "**是什么**\n\n[[pretraining]] 先让模型学会语言与通用模式；后训练则在这个基座上继续优化，让它遵循指令、表达偏好、使用工具并在特定任务上更可靠。常见阶段包括监督微调、[[rlhf]]/DPO、拒绝采样和可验证奖励训练。\n\n**为什么需要**\n\n预训练目标只要求预测数据中的下一个 token，不会自动给出产品所需的帮助性、安全边界和推理策略。模型规模变大也不等于更会理解用户意图，因此必须用更贴近目标行为的数据和反馈再塑形。\n\n**它连接了什么**\n\n它是 [[pretraining]]、[[fine-tuning]]、[[alignment]]、[[synthetic-data]] 与 [[reasoning-models]] 之间的总枢纽：前者提供能力底座，后训练决定能力如何被调用和呈现。\n\n**边界与风险**\n\n后训练通常重分配已有能力，不保证凭空注入可靠事实；偏好数据会带来标注偏差，奖励信号还可能诱发 [[reward-hacking]]。必须用独立评测监控能力增益与回归。",
+      cases: [
+        { title: "从基座到助手", text: "同一份预训练权重经过指令示范和偏好优化后，才会稳定回答问题、拒绝高风险请求并按格式调用工具。" },
+        { title: "推理行为也来自后训练", text: "推理模型不仅是预训练更大，还会用可验证任务和反馈学习怎样分配 [[test-time-compute]]。" }
+      ],
+      sources: [{ type: "url", title: "InstructGPT (2022)", ref: "https://arxiv.org/abs/2203.02155" }, { type: "url", title: "Direct Preference Optimization (2023)", ref: "https://arxiv.org/abs/2305.18290" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "positional-encoding",
+      title: "位置编码与 RoPE",
+      aliases: ["Positional Encoding", "Position Embedding", "RoPE", "旋转位置编码"],
+      maturity: "stable", domain: "foundations", heat: 0.7,
+      summary: "把顺序和相对距离注入注意力，否则 Transformer 无法区分 token 的先后。",
+      body: "**是什么**\n\n不带位置信息的 [[attention]] 对排列等变，知道有哪些 token，却不知道谁在前谁在后。位置编码给每个 token 注入绝对位置或相对距离信息。\n\n**为什么 RoPE 常见**\n\nRoPE 按位置旋转 Query 和 Key，使点积自然包含相对位置信息；它能与因果注意力高效结合，因此成为许多现代 [[transformer]] 的常用方案。\n\n**约束什么**\n\n位置表示会影响顺序建模、训练长度之外的外推和长 [[context-window]] 表现。把窗口参数调大，不代表模型就学会了利用那些新位置。\n\n**怎么应对**\n\n设计长上下文系统时要同时检查位置方案、训练长度和检索表现，不能只看厂商标称窗口。",
+      cases: [{ title: "交换主客体", text: "「甲打乙」与「乙打甲」token 相同、顺序不同；没有位置表示时注意力机制本身无法表达差异。" }],
+      sources: [{ type: "url", title: "Attention Is All You Need (2017)", ref: "https://arxiv.org/abs/1706.03762" }, { type: "url", title: "RoFormer / RoPE (2021)", ref: "https://arxiv.org/abs/2104.09864" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "normalization",
+      title: "层归一化与 RMSNorm",
+      aliases: ["Layer Normalization", "LayerNorm", "RMSNorm", "层归一化"],
+      maturity: "stable", domain: "foundations", heat: 0.68,
+      summary: "按单个样本的特征维稳定激活尺度，是深层 Transformer 能稳定训练的关键组件。",
+      body: "**是什么**\n\nLayerNorm 对单个样本的一层特征计算均值与方差再缩放；RMSNorm 省略均值中心化，只按均方根控制尺度。它们与依赖批统计的 [[batch-norm]] 不同。\n\n**为什么需要**\n\n深层网络的激活尺度会随层数漂移，造成训练不稳定。归一化与 [[residual-connection]] 配合，为信息和梯度提供稳定路径。\n\n**结构差异**\n\n归一化放在子层之前或之后会形成 Pre-LN/Post-LN，影响初始化、梯度和深度扩展；这不是表面语法差异。\n\n**边界**\n\n归一化不能替代合理初始化、学习率和残差设计，也不会自动解决所有数值问题。",
+      cases: [{ title: "为什么不用 BatchNorm", text: "语言序列长度和批大小变化很大；LayerNorm 按单个样本计算，训练和推理使用同一种统计方式。" }],
+      sources: [{ type: "url", title: "Layer Normalization (2016)", ref: "https://arxiv.org/abs/1607.06450" }, { type: "url", title: "Root Mean Square Layer Normalization (2019)", ref: "https://arxiv.org/abs/1910.07467" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "optimizer-schedule",
+      title: "优化器与学习率调度",
+      aliases: ["Optimizer", "Adam", "AdamW", "Learning Rate Schedule", "学习率"],
+      maturity: "stable", domain: "foundations", heat: 0.66,
+      summary: "决定拿到梯度后怎样更新参数、每一步走多远，直接影响训练速度与稳定性。",
+      body: "**是什么**\n\n[[backprop]] 算出梯度，优化器决定如何把它变成参数更新；学习率调度决定不同训练阶段的步长。SGD 直接沿梯度走，Adam 用一阶和二阶矩的滑动估计自适应缩放。\n\n**为什么不是细枝末节**\n\n步长太大可能发散，太小则训练极慢；大模型常需要预热、衰减、梯度裁剪和权重衰减共同稳定训练。\n\n**它约束什么**\n\n同样的数据与模型，优化配方不同会得到不同质量。[[scaling-law]] 的算力预算只有被稳定转化成有效更新才有意义。\n\n**怎么应对**\n\n记录有效批量、峰值学习率、预热比例和梯度范数，用小规模实验验证配方后再扩展。",
+      cases: [{ title: "预热", text: "训练初期统计量尚不稳定，直接使用峰值学习率容易破坏权重；先从小步长逐渐升高能降低风险。" }],
+      sources: [{ type: "url", title: "Adam (2014)", ref: "https://arxiv.org/abs/1412.6980" }, { type: "url", title: "Decoupled Weight Decay Regularization (2017)", ref: "https://arxiv.org/abs/1711.05101" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "peft-lora",
+      title: "参数高效微调 PEFT / LoRA",
+      aliases: ["PEFT", "LoRA", "QLoRA", "Low-Rank Adaptation", "参数高效微调"],
+      maturity: "stable", domain: "foundations", heat: 0.76,
+      summary: "冻结大部分基础权重，只训练少量适配参数，以更低显存和存储成本定制模型。",
+      body: "**是什么**\n\nPEFT 是只更新少量参数的微调家族。LoRA 冻结原矩阵 W，把更新写成低秩乘积 BA，只训练 A、B；QLoRA 再把冻结的基础模型量化。\n\n**为什么有效**\n\n许多下游适配所需的权重变化具有较低内在秩，不必为每个任务复制整套模型参数。\n\n**使什么成为可能**\n\n它降低 [[fine-tuning]] 的显存和存储门槛，可为多个任务保存小型适配器，并与 [[quantization]]、[[deployment]] 结合。\n\n**边界**\n\n省可训练参数不等于训练免费；激活、数据和评测仍有成本。低秩约束也可能限制大幅能力迁移，多个适配器合并还会互相干扰。",
+      cases: [{ title: "一底座多适配器", text: "同一个基础模型可挂客服、代码、法律等不同 LoRA，部署时按任务加载，而不用保存多份完整权重。" }],
+      sources: [{ type: "url", title: "LoRA (2021)", ref: "https://arxiv.org/abs/2106.09685" }, { type: "url", title: "QLoRA (2023)", ref: "https://arxiv.org/abs/2305.14314" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "distributed-training",
+      title: "分布式训练与并行策略",
+      aliases: ["Distributed Training", "Data Parallelism", "Tensor Parallelism", "Pipeline Parallelism", "分布式训练"],
+      maturity: "stable", domain: "foundations", heat: 0.58,
+      summary: "把模型、数据和计算拆到多张加速卡上，突破单卡显存与训练时间限制。",
+      body: "**是什么**\n\n数据并行复制模型、切分批次；张量并行拆一个算子；流水线并行把不同层放到不同设备。真实大模型训练常混合多种策略。\n\n**为什么需要**\n\n当参数、优化器状态和激活放不进单卡时，[[pretraining]] 必须跨设备；同时还要让大量设备保持高利用率。\n\n**代价**\n\n并行会引入通信、同步、气泡和容错成本。卡数翻倍不会自动让训练快一倍，网络拓扑常成为瓶颈。\n\n**怎么应对**\n\n按模型大小、序列长度和互联带宽选择并行组合，监控计算/通信重叠和故障恢复，而不只看理论 FLOPs。",
+      cases: [{ title: "为什么三种并行要混用", text: "数据并行解决吞吐，张量并行解决单层太大，流水线并行解决层数太多；单独一种通常无法覆盖超大模型。" }],
+      sources: [{ type: "url", title: "Megatron-LM (2019)", ref: "https://arxiv.org/abs/1909.08053" }, { type: "url", title: "ZeRO (2019)", ref: "https://arxiv.org/abs/1910.02054" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "contrastive-learning",
+      title: "对比学习",
+      aliases: ["Contrastive Learning", "对比式学习", "对比损失"],
+      maturity: "stable", domain: "foundations", heat: 0.57,
+      summary: "把相关样本表示拉近、不相关样本推远，学出可检索、可迁移的表示空间。",
+      body: "**是什么**\n\n对比学习用正样本对和负样本对训练 [[embedding]]：相同语义、同一对象的不同视图应靠近，不相关内容应远离。\n\n**为什么有效**\n\n它不要求为每个样本指定类别，只需要构造哪些内容相配，从而能利用大规模弱标注配对。\n\n**它支撑什么**\n\n[[clip]] 用图文配对做跨模态对比，语义检索也依赖同类表示目标；它是 [[multimodal]] 对齐的重要路线。\n\n**边界**\n\n负样本选择、批量大小和数据偏差会塑造空间；向量接近只代表训练目标下相似，不等于逻辑蕴含或事实相同。",
+      cases: [{ title: "同一张图的两种裁剪", text: "把同一图像的不同增强视为正对、其他图像视为负对，模型会学习对颜色抖动和裁剪更稳健的表示。" }],
+      sources: [{ type: "url", title: "SimCLR (2020)", ref: "https://arxiv.org/abs/2002.05709" }, { type: "url", title: "CLIP (2021)", ref: "https://arxiv.org/abs/2103.00020" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "model-merging",
+      title: "模型合并与适配器组合",
+      aliases: ["Model Merging", "Adapter Merging", "Task Arithmetic", "模型合并"],
+      maturity: "evolving", domain: "foundations", heat: 0.48,
+      summary: "在不重新完整训练的情况下组合多个模型或适配器的能力，但容易产生参数干扰。",
+      body: "**是什么**\n\n把多个微调模型的权重差分或多个 [[peft-lora]] 适配器按规则组合，尝试得到兼具多项能力的新模型。\n\n**为什么有吸引力**\n\n它复用已有训练成果，比重新收集联合数据并完整 [[fine-tuning]] 更快，也便于实验不同能力配方。\n\n**主要困难**\n\n参数在不同训练中可能发生置换和冲突，简单平均会相互抵消；一个任务增强也可能破坏另一个任务。\n\n**怎么应对**\n\n在相同基础模型上合并、控制权重、处理符号冲突，并用多任务回归集验证；没有评测的合并只是碰运气。",
+      cases: [{ title: "能力不是颜料", text: "把代码适配器和客服适配器各取 50% 并不保证得到两者各一半能力，参数更新可能在同一方向上冲突。" }],
+      sources: [{ type: "url", title: "Editing Models with Task Arithmetic (2022)", ref: "https://arxiv.org/abs/2212.04089" }, { type: "url", title: "TIES-Merging (2023)", ref: "https://arxiv.org/abs/2306.01708" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "model-evaluation",
+      title: "模型评测与基准",
+      aliases: ["Model Evaluation", "Benchmark", "Evals", "模型基准"],
+      maturity: "evolving", domain: "building", heat: 0.88,
+      summary: "用可复现任务衡量模型能力、鲁棒性与安全性，并识别污染和指标错配。",
+      body: "**是什么**\n\n模型评测在受控条件下测量基础能力、推理、代码、长上下文、鲁棒性和安全性。它与 [[evaluation]] 不同：前者比较模型能力，后者验证具体应用是否满足业务目标。\n\n**为什么需要**\n\n模型名字、参数量和演示样例不能代表真实表现；只有固定数据、评分规则、工具权限与采样预算，结果才可比较。\n\n**最大的坑**\n\n公开题可能进入训练集形成基准污染；单一平均分会掩盖失败类型；LLM 裁判还可能偏好冗长、自家模型或特定格式。\n\n**怎么使用**\n\n组合公开基准、私有保留集、人工盲评和安全红队，报告置信区间与成本，并持续检查评测是否仍能区分模型。",
+      cases: [{ title: "pass@1 与 pass@k", text: "代码模型多采样几次更可能撞中正确答案；比较时若一个模型用 1 次、另一个用 100 次，分数没有可比性。" }, { title: "基准污染", text: "模型背过测试题时会拿高分，却不代表能泛化到同类型的新题，因此需要保留集和近时评测。" }],
+      sources: [{ type: "url", title: "HELM (2022)", ref: "https://arxiv.org/abs/2211.09110" }, { type: "url", title: "SWE-bench (2023)", ref: "https://arxiv.org/abs/2310.06770" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "model-routing",
+      title: "模型路由与级联系统",
+      aliases: ["Model Routing", "LLM Router", "Model Cascade", "模型级联"],
+      maturity: "evolving", domain: "building", heat: 0.61,
+      summary: "按请求难度、成本与风险选择不同模型，让系统不必所有任务都调用最贵模型。",
+      body: "**是什么**\n\n路由器根据请求特征选择小模型、大模型、专用模型或回退链；级联系统先用便宜模型，低置信或高风险时升级。\n\n**为什么需要**\n\n[[model-selection]] 通常是项目级决定，而路由是请求级决定。不同请求难度差异巨大，统一调用最强模型会浪费成本。\n\n**和 MoE 的区别**\n\n[[moe]] 在单个模型内部路由 token；模型路由在应用层选择完整模型或服务。\n\n**怎么评估**\n\n同时看质量、升级率、延迟、成本和最差分组表现，防止路由器把少数困难请求错误地下放给弱模型。",
+      cases: [{ title: "客服级联", text: "常见 FAQ 先交给小模型；涉及退款争议、隐私或低置信答案时升级到强模型并进入人工复核。" }],
+      sources: [{ type: "url", title: "FrugalGPT (2023)", ref: "https://arxiv.org/abs/2305.05176" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "data-drift-monitoring",
+      title: "数据漂移与持续监控",
+      aliases: ["Data Drift", "Concept Drift", "Model Monitoring", "数据漂移"],
+      maturity: "stable", domain: "building", heat: 0.56,
+      summary: "上线后的输入、用户与目标会变化，持续监控负责发现模型质量随环境悄悄退化。",
+      body: "**是什么**\n\n数据漂移是线上输入分布变化；概念漂移是输入与正确输出之间的关系变化。持续监控把这些变化与质量、成本和安全指标联系起来。\n\n**为什么离线高分仍会失效**\n\n用户语言、产品政策、攻击方式和知识都在变化，静态测试集无法永久代表未来流量。\n\n**它连接什么**\n\n[[observability]] 记录发生了什么，[[evaluation]] 判断好不好；漂移监控负责发现什么时候需要重新评测、改提示、更新检索或重新训练。\n\n**怎么应对**\n\n建立分布与任务指标基线，按用户群和场景切片，设置报警后触发人工诊断，而不是看到漂移就自动重训。",
+      cases: [{ title: "政策更新后的静默退化", text: "退款规则变了，旧模型仍流畅回答旧政策；输入没报错，但业务正确率已经下降。" }],
+      sources: [{ type: "url", title: "Learning under Concept Drift (2018)", ref: "https://arxiv.org/abs/2004.05785" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "agent-identity-access",
+      title: "Agent 身份、权限与密钥管理",
+      aliases: ["Agent Identity", "Agent Authorization", "Secrets Management", "智能体权限"],
+      maturity: "evolving", domain: "coding", heat: 0.84,
+      summary: "明确 Agent 代表谁、能访问什么、凭什么执行，并隔离密钥与高风险权限。",
+      body: "**是什么**\n\nAgent 接入外部系统时必须有可验证身份、授权范围和凭证生命周期。模型可以建议行动，但执行器只能在明确主体和权限边界内产生副作用。\n\n**为什么是核心安全边界**\n\n[[prompt-injection]] 能操纵模型输出，却不该自动获得数据库、邮箱或云账户权限。真正的硬边界位于模型之外的认证、授权与密钥系统。\n\n**关键机制**\n\n使用短期、任务范围凭证，按用户委托而非共享超级密钥执行；高风险动作结合 [[human-in-the-loop]]、审计日志和资源级策略。\n\n**常见失败**\n\n把长期 API key 放进提示、多个 Agent 共用管理员账户、只校验工具参数格式却不校验资源归属，都会把模型错误放大成真实事故。",
+      cases: [{ title: "能发邮件不等于能发所有邮件", text: "Agent 应使用当前用户委托的短期令牌，只能操作指定草稿或收件人；不能持有整个组织的共享管理员密钥。" }, { title: "提示注入被权限截断", text: "即使网页诱导 Agent 读取工资表，执行器也应因当前任务凭证无权限而拒绝。" }],
+      sources: [{ type: "url", title: "NIST Zero Trust Architecture", ref: "https://csrc.nist.gov/pubs/sp/800/207/final" }, { type: "url", title: "OAuth 2.0 Security Best Current Practice", ref: "https://www.rfc-editor.org/rfc/rfc9700" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "flow-matching",
+      title: "Flow Matching / Rectified Flow",
+      aliases: ["Flow Matching", "Rectified Flow", "流匹配", "校正流"],
+      maturity: "evolving", domain: "generation", heat: 0.63,
+      summary: "直接学习把噪声连续运输到数据的速度场，是与扩散紧密相关的现代生成路径。",
+      body: "**是什么**\n\nFlow Matching 为噪声到数据规定连续概率路径，训练网络预测路径上的速度场；采样时求解 ODE，把噪声沿流线运输成样本。\n\n**和扩散的关系**\n\n[[diffusion]] 常学习反向去噪或分数；Flow Matching 学速度。某些扩散路径可被统一进 Flow Matching 框架，但两者训练参数化和采样解释不同。\n\n**为什么重要**\n\n合适的路径可以更直、更容易用较少数值步求解，因此被用于高分辨率 [[image-generation]] 和 [[video-generation]]。\n\n**边界**\n\n步数少不代表免费：模型容量、路径设计、求解误差和条件对齐仍决定质量；Rectified Flow 也只是流匹配家族的一类。",
+      cases: [{ title: "弯路和直路", text: "若噪声到图像的运输轨迹弯曲，数值求解要很多小步；让路径更直，可以用更少步骤近似，但训练必须学准速度场。" }],
+      sources: [{ type: "url", title: "Flow Matching for Generative Modeling (2022)", ref: "https://arxiv.org/abs/2210.02747" }, { type: "url", title: "Flow Straight and Fast (2022)", ref: "https://arxiv.org/abs/2209.03003" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "training-data-governance",
+      title: "训练数据治理",
+      aliases: ["Training Data Governance", "Data Curation", "Data Provenance", "训练数据管理"],
+      maturity: "evolving", domain: "safety", heat: 0.86,
+      summary: "管理训练数据的来源、许可、质量、去重、配比与可追溯性，决定能力也决定风险。",
+      body: "**是什么**\n\n训练数据治理覆盖数据从采集、授权、清洗、去重、分类配比到删除和审计的全生命周期，并记录每份数据从哪里来、允许怎样使用。\n\n**为什么是能力问题**\n\n[[pretraining]] 学到什么取决于看过什么；重复数据会放大记忆，领域配比会改变能力，低质量或机器生成数据会污染学习信号。\n\n**为什么也是安全问题**\n\n它连接 [[privacy]]、[[bias-fairness]]、[[data-poisoning]]、版权与 [[synthetic-data]]。上线后再加护栏，无法完全修复训练阶段已经注入的偏差和后门。\n\n**怎么治理**\n\n保留来源与许可元数据，做近重复去重、敏感信息过滤、分群质量评估和版本化数据清单，并让删除请求能追踪到受影响的训练批次。",
+      cases: [{ title: "去重不只是省空间", text: "同一段文本重复上千次会让模型更易逐字记忆，也会让被重复的观点在训练中获得不成比例的权重。" }, { title: "合成数据回流", text: "模型生成内容重新进入训练集时，需要标记来源和质量，否则错误与风格会被下一代模型继续放大。" }],
+      sources: [{ type: "url", title: "The Pile (2020)", ref: "https://arxiv.org/abs/2101.00027" }, { type: "url", title: "Deduplicating Training Data Makes Language Models Better (2021)", ref: "https://arxiv.org/abs/2107.06499" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "uncertainty-calibration",
+      title: "不确定性校准与选择性预测",
+      aliases: ["Uncertainty Calibration", "Calibration", "Selective Prediction", "置信度校准"],
+      maturity: "stable", domain: "safety", heat: 0.69,
+      summary: "让置信度与真实正确率匹配，并在风险过高时拒答、检索或转人工。",
+      body: "**是什么**\n\n若模型对一组声称 80% 置信的问题确实约有 80% 正确，就称为校准良好。选择性预测允许系统在不确定时不作答。\n\n**为什么 Logprobs 不够**\n\n[[logprobs]] 是 token 的条件概率，不是整条事实的正确率；流畅常见措辞可以高概率生成错误内容，分布变化还会破坏原有校准。\n\n**它缓解什么**\n\n校准可为 [[hallucination]] 风险分级，触发检索、验证或 [[human-in-the-loop]]，使系统在覆盖率与准确率之间做明确取舍。\n\n**怎么评估**\n\n使用可靠性图、ECE、Brier 分数和风险—覆盖曲线，并在真实业务分组上重新校准；不能只在公开基准上算一个总分。",
+      cases: [{ title: "拒答是一种能力", text: "医疗问答系统宁可只回答 60% 的问题、把其余转医生，也可能比强行覆盖 100% 更安全。" }],
+      sources: [{ type: "url", title: "On Calibration of Modern Neural Networks (2017)", ref: "https://arxiv.org/abs/1706.04599" }, { type: "url", title: "Selective Classification for Deep Neural Networks (2017)", ref: "https://arxiv.org/abs/1705.08500" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "test-time-compute",
+      title: "推理时计算与验证器",
+      aliases: ["Test-time Compute", "Inference-time Scaling", "Verifier", "测试时缩放"],
+      maturity: "evolving", domain: "frontier", heat: 0.9,
+      summary: "在回答阶段投入更多候选、搜索、验证和工具计算，以成本与延迟换取成功率。",
+      body: "**是什么**\n\n同一模型在推理时可以生成更长轨迹、采样多个候选、搜索解空间、调用工具，或让验证器筛选结果；这形成区别于预训练规模的第二条计算轴。\n\n**为什么有效**\n\n一次生成可能走错路径；更多候选提高覆盖，验证器把计算集中到更可能正确的答案，代码执行和数学检查还能提供外部反馈。\n\n**与思维链的区别**\n\n[[cot]] 是生成中间步骤的一种方式；推理时计算还包括 [[self-consistency]]、[[tree-of-thoughts]]、搜索、奖励模型和工具闭环。原始轨迹也可以不展示。\n\n**边界**\n\n收益通常递减，弱验证器会选中看似合理的错误答案；比较模型时必须把 token、候选数、工具与延迟预算一起报告。",
+      cases: [{ title: "代码候选 + 测试", text: "模型生成 20 个补丁并运行测试，验证器筛掉失败者；成功率提高来自更多尝试和客观反馈，不只是答案写得更长。" }, { title: "验证器也会被骗", text: "若验证器只偏好格式完整或解释冗长，搜索会优化这些表面特征而不是正确性，形成 [[reward-hacking]]。" }],
+      sources: [{ type: "url", title: "Let's Verify Step by Step (2023)", ref: "https://arxiv.org/abs/2305.20050" }, { type: "url", title: "Self-Consistency (2022)", ref: "https://arxiv.org/abs/2203.11171" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      id: "state-space-models",
+      title: "状态空间模型与 Mamba",
+      aliases: ["State Space Model", "SSM", "Mamba", "选择性状态空间模型"],
+      maturity: "evolving", domain: "frontier", heat: 0.62,
+      summary: "用压缩状态线性处理长序列，并通过选择机制决定哪些信息保留或遗忘。",
+      body: "**是什么**\n\n状态空间模型把序列历史压进持续更新的隐藏状态；Mamba 让状态更新参数依赖当前输入，从而选择性保留或遗忘信息。\n\n**为什么被关注**\n\n标准全局 [[attention]] 的位置对随长度平方增长；SSM 的扫描和推理状态可随序列长度线性扩展。\n\n**和 RNN 的区别**\n\n它同样递归维护状态，但通过结构化参数和硬件感知并行算法改善训练效率；选择机制则增强内容相关的信息控制。\n\n**边界**\n\n线性复杂度不自动保证更强的检索和推理能力。实际系统常探索与 Transformer 混合，而非简单宣布注意力被取代。",
+      cases: [{ title: "百万长度不等于百万内容都记住", text: "能以线性成本扫描很长序列，只说明计算可承受；有限状态仍会压缩历史，信息利用能力必须单独评测。" }],
+      sources: [{ type: "url", title: "Mamba (2023)", ref: "https://arxiv.org/abs/2312.00752" }],
+      createdAt: "2026-07-21", updatedAt: "2026-07-21"
     }
   ],
 
@@ -2161,6 +2368,107 @@ window.GRAPH = {
     { from: "kernel-methods",    to: "neural-network",        type: "contrast",   label: "手工核 vs 学表示" },
     { from: "kernel-methods",    to: "curse-of-dimensionality", type: "related",  label: "高维里反而可控" },
     { from: "kernel-methods",    to: "decision-tree",         type: "contrast",   label: "两大经典分类器" },
-    { from: "kernel-methods",    to: "regularization",        type: "related",    label: "最大间隔即一种正则" }
+    { from: "kernel-methods",    to: "regularization",        type: "related",    label: "最大间隔即一种正则" },
+
+    // 第十轮：现代训练与模型内部
+    { from: "post-training", to: "pretraining", type: "prerequisite", label: "基座之后" },
+    { from: "post-training", to: "fine-tuning", type: "uses", label: "监督指令阶段" },
+    { from: "post-training", to: "rlhf", type: "uses", label: "偏好阶段" },
+    { from: "post-training", to: "alignment", type: "enables", label: "塑造助手行为" },
+    { from: "post-training", to: "synthetic-data", type: "uses", label: "生成训练任务" },
+    { from: "post-training", to: "reasoning-models", type: "enables", label: "训练推理策略" },
+
+    { from: "positional-encoding", to: "transformer", type: "part-of", label: "注入顺序" },
+    { from: "positional-encoding", to: "attention", type: "enables", label: "让注意力识别先后" },
+    { from: "positional-encoding", to: "context-window", type: "constrains", label: "影响长度外推" },
+    { from: "positional-encoding", to: "lost-in-middle", type: "related", label: "位置偏差因素" },
+
+    { from: "normalization", to: "transformer", type: "part-of", label: "每层稳定组件" },
+    { from: "normalization", to: "batch-norm", type: "contrast", label: "单样本 vs 批统计" },
+    { from: "normalization", to: "vanishing-gradient", type: "mitigates", label: "稳定激活尺度" },
+    { from: "normalization", to: "residual-connection", type: "related", label: "深层训练搭档" },
+
+    { from: "optimizer-schedule", to: "gradient-descent", type: "variant-of", label: "实际更新配方" },
+    { from: "optimizer-schedule", to: "backprop", type: "uses", label: "消费梯度" },
+    { from: "pretraining", to: "optimizer-schedule", type: "uses", label: "稳定大规模训练" },
+    { from: "fine-tuning", to: "optimizer-schedule", type: "uses", label: "控制适配幅度" },
+    { from: "optimizer-schedule", to: "loss-function", type: "uses", label: "优化目标" },
+
+    { from: "peft-lora", to: "fine-tuning", type: "variant-of", label: "只训少量参数" },
+    { from: "peft-lora", to: "quantization", type: "uses", label: "QLoRA" },
+    { from: "peft-lora", to: "deployment", type: "enables", label: "一底座多适配器" },
+    { from: "model-merging", to: "peft-lora", type: "uses", label: "组合适配器" },
+    { from: "model-merging", to: "fine-tuning", type: "contrast", label: "合并 vs 重训" },
+    { from: "model-merging", to: "evaluation", type: "uses", label: "防能力互相破坏" },
+
+    { from: "distributed-training", to: "pretraining", type: "enables", label: "突破单卡限制" },
+    { from: "distributed-training", to: "scaling-law", type: "enables", label: "把算力变成规模" },
+    { from: "distributed-training", to: "optimizer-schedule", type: "related", label: "全局批量影响配方" },
+    { from: "distributed-training", to: "deployment", type: "contrast", label: "训练并行 vs 推理服务" },
+
+    { from: "contrastive-learning", to: "embedding", type: "enables", label: "塑造表示空间" },
+    { from: "contrastive-learning", to: "clip", type: "part-of", label: "图文对比目标" },
+    { from: "contrastive-learning", to: "multimodal", type: "enables", label: "跨模态对齐" },
+    { from: "retrieval", to: "contrastive-learning", type: "uses", label: "训练语义检索器" },
+
+    // 第十轮：评测、路由与运行监控
+    { from: "model-evaluation", to: "evaluation", type: "contrast", label: "模型能力 vs 应用目标" },
+    { from: "model-evaluation", to: "model-selection", type: "enables", label: "提供选择证据" },
+    { from: "model-evaluation", to: "reasoning-models", type: "related", label: "按计算预算比较" },
+    { from: "model-evaluation", to: "code-generation", type: "related", label: "pass@k 与仓库任务" },
+    { from: "model-evaluation", to: "red-teaming", type: "related", label: "能力与安全两面" },
+
+    { from: "model-routing", to: "model-selection", type: "uses", label: "请求级选择" },
+    { from: "model-routing", to: "evaluation", type: "uses", label: "学习升级边界" },
+    { from: "model-routing", to: "deployment", type: "part-of", label: "多模型服务" },
+    { from: "model-routing", to: "moe", type: "contrast", label: "应用路由 vs token 路由" },
+    { from: "model-routing", to: "workflow-orchestration", type: "related", label: "按条件分支" },
+
+    { from: "data-drift-monitoring", to: "observability", type: "uses", label: "读取线上轨迹" },
+    { from: "data-drift-monitoring", to: "evaluation", type: "uses", label: "触发回归评测" },
+    { from: "data-drift-monitoring", to: "deployment", type: "part-of", label: "上线后职责" },
+    { from: "data-drift-monitoring", to: "model-routing", type: "related", label: "漂移时调整路由" },
+
+    // 第十轮：Agent 权限与训练数据安全
+    { from: "agent-identity-access", to: "agent", type: "part-of", label: "执行身份边界" },
+    { from: "agent-identity-access", to: "tool-calling", type: "constrains", label: "调用前授权" },
+    { from: "agent-identity-access", to: "mcp", type: "related", label: "连接不等于授权" },
+    { from: "agent-identity-access", to: "prompt-injection", type: "mitigates", label: "权限截断攻击" },
+    { from: "agent-identity-access", to: "human-in-the-loop", type: "uses", label: "高风险再确认" },
+    { from: "agent-identity-access", to: "privacy", type: "related", label: "最小数据访问" },
+
+    { from: "training-data-governance", to: "pretraining", type: "constrains", label: "数据决定能力边界" },
+    { from: "training-data-governance", to: "synthetic-data", type: "constrains", label: "标记生成来源" },
+    { from: "training-data-governance", to: "data-poisoning", type: "mitigates", label: "来源与异常审计" },
+    { from: "training-data-governance", to: "privacy", type: "mitigates", label: "敏感信息治理" },
+    { from: "training-data-governance", to: "bias-fairness", type: "mitigates", label: "分群与配比检查" },
+    { from: "training-data-governance", to: "scaling-law", type: "constrains", label: "高质量数据有限" },
+
+    { from: "uncertainty-calibration", to: "logprobs", type: "uses", label: "原始概率信号" },
+    { from: "uncertainty-calibration", to: "hallucination", type: "mitigates", label: "风险分级与拒答" },
+    { from: "uncertainty-calibration", to: "human-in-the-loop", type: "enables", label: "低置信转人工" },
+    { from: "uncertainty-calibration", to: "guardrails", type: "part-of", label: "选择性拒答" },
+    { from: "uncertainty-calibration", to: "model-evaluation", type: "uses", label: "可靠性曲线" },
+
+    // 第十轮：推理时扩展与新序列/生成架构
+    { from: "test-time-compute", to: "reasoning-models", type: "part-of", label: "推理时扩展轴" },
+    { from: "test-time-compute", to: "cot", type: "uses", label: "延长单条轨迹" },
+    { from: "test-time-compute", to: "self-consistency", type: "uses", label: "多候选投票" },
+    { from: "test-time-compute", to: "tree-of-thoughts", type: "uses", label: "搜索与回溯" },
+    { from: "test-time-compute", to: "reflection", type: "uses", label: "检查与修正" },
+    { from: "test-time-compute", to: "code-execution", type: "uses", label: "外部验证器" },
+    { from: "test-time-compute", to: "scaling-law", type: "contrast", label: "推理算力 vs 训练算力" },
+    { from: "test-time-compute", to: "reward-hacking", type: "threatens", label: "弱验证器会被钻空子" },
+
+    { from: "flow-matching", to: "diffusion", type: "related", label: "概率路径可统一" },
+    { from: "flow-matching", to: "image-generation", type: "enables", label: "现代生成引擎" },
+    { from: "flow-matching", to: "video-generation", type: "enables", label: "高维时空生成" },
+    { from: "flow-matching", to: "vae", type: "uses", label: "常在潜空间运行" },
+
+    { from: "state-space-models", to: "transformer", type: "contrast", label: "线性状态 vs 全局注意力" },
+    { from: "state-space-models", to: "attention", type: "contrast", label: "压缩状态 vs 位置两两交互" },
+    { from: "state-space-models", to: "rnn", type: "related", label: "递归状态传统" },
+    { from: "state-space-models", to: "context-window", type: "related", label: "长序列线性扫描" },
+    { from: "state-space-models", to: "model-families", type: "related", label: "替代骨架方向" }
   ]
 };
