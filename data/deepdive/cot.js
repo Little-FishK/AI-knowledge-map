@@ -1,0 +1,167 @@
+/* 理解原理页 —— 思维链 CoT Chain-of-Thought
+ * 写作规约见 docs/DEEPDIVE.md。全文原创，图示自绘。
+ */
+window.DEEPDIVE = window.DEEPDIVE || {};
+window.DEEPDIVE["cot"] = {
+  title: "思维链 CoT",
+  subtitle: "让模型先写出一步步推理，再给答案——复杂题上更准",
+  aliases: "Chain-of-Thought · CoT · 思维链",
+  meta: "建议 20–30 分钟 · 中级 · 需要：了解「大语言模型」怎样逐词生成",
+  thesis: "思维链是让模型在给出答案前，先<b>写出一步步的推理过程</b>。对需要多步推理的题，这一招常显著提升准确率。原理很朴素：模型是一次一个 token、没有全局草稿地生成的，逼它「把推理写出来」，等于给了它更多中间步骤和「思考的空间」，把大问题拆成一连串更容易答对的小步。",
+  html: `
+<div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>是什么</b>——「写出推理再答」具体指什么。</li>
+    <li><b>为什么有效</b>——写出来和不写，凭什么差这么多。</li>
+    <li><b>怎么触发</b>——怎么让模型产生思维链。</li>
+    <li><b>进阶</b>——自洽性、思维树是怎么加强它的。</li>
+    <li><b>和推理模型的关系</b>——现在的「推理模型」和思维链什么关系。</li>
+  </ul>
+</div>
+
+<div class="dd-note key">
+  <b>贯穿全页的最小例子</b>　问：「一个班 23 人，又转来 5 人，分成 4 组，每组几人？」<br>
+  <b>直接答</b>：模型可能张口就来「6 人」（错，(23+5)/4=7）。<br>
+  <b>写出推理</b>：「先算总人数 23+5=28，再 28÷4=7，每组 7 人。」——对了。全页解释这一字之差背后的机制。
+</div>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">1</span>什么是思维链<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">本节回答：怎么让模型少犯「不假思索、一步答错」的错？</p>
+  <p>办法出奇简单：<b>别让它直接蹦答案，而要它先把推理过程一步步写出来，最后再给结论。</b>就像考试时「写出解题步骤」而不是只填一个数。上面那道题，逼它写出「先求和、再相除」，答案就从错的 6 变成对的 7。</p>
+  <figure class="dd-fig">
+    <svg viewBox="0 0 560 150" role="img" aria-label="直接答容易错，写出推理更准">
+      <g>
+        <rect x="20" y="30" width="240" height="90" rx="8" fill="none" stroke="#cf6f6f"/>
+        <text x="140" y="52" text-anchor="middle" class="svg-t">直接答</text>
+        <text x="140" y="78" text-anchor="middle" class="svg-tn" font-size="13">问 → 「6 人」</text>
+        <text x="140" y="104" text-anchor="middle" class="svg-t" fill="#cf6f6f" font-size="12">一步跳到答案，容易错 ✗</text>
+      </g>
+      <g>
+        <rect x="300" y="30" width="240" height="90" rx="8" fill="none" stroke="#4f9d78"/>
+        <text x="420" y="52" text-anchor="middle" class="svg-t">写出推理</text>
+        <text x="420" y="76" text-anchor="middle" class="svg-tn" font-size="12">23+5=28 → 28÷4=7</text>
+        <text x="420" y="104" text-anchor="middle" class="svg-t" fill="#4f9d78" font-size="12">拆成小步，每步更容易对 ✓</text>
+      </g>
+    </svg>
+    <figcaption>图 1　同一道题、同一个模型：直接答容易在心算里翻车；把推理一步步写出来，就把一道难题拆成了几步简单运算，正确率明显上升。</figcaption>
+  </figure>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">2</span>为什么它有效<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">最关键的一节：写出来和不写，凭什么差这么多？模型不是本来就「会」吗？</p>
+  <p>回忆大模型怎么生成：<b>一次一个 token、没有全局草稿</b>（见「大语言模型」深读页）。这意味着：</p>
+  <ul class="dd-steps">
+    <li><b>直接答</b>，等于要求它<b>一步就蹦出整道难题的最终答案</b>——中间的多步推理全靠一次生成「暗中完成」，很容易在某一步出错还没机会纠正。</li>
+    <li><b>写出推理</b>，等于把一道难题<b>拆成一串小步</b>，每一步只需在前面步骤的基础上「接对下一步」。而且<b>已经写出的步骤，成了后面步骤的上下文</b>——模型能「看着自己刚写的」继续往下推，稳得多。</li>
+  </ul>
+  <div class="dd-note key"><b>一句话</b>　思维链相当于给模型<b>一张打草稿的纸</b>，也是给它<b>更多「用于思考」的 token</b>。它把「一步猜对整道题」这种高难动作，换成了「一步步接龙」这种模型本就擅长的动作。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">3</span>怎么触发它<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">怎么让模型产生思维链，而不是直接蹦答案？</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>方式</th><th>怎么做</th></tr></thead>
+    <tbody>
+      <tr><td><b>few-shot 思维链</b></td><td>在提示里给一两个「带推理过程」的示例，模型照着「先推理再答」的样子办（这就是上下文学习，见其深读页）</td></tr>
+      <tr><td><b>zero-shot</b></td><td>不给示例，只加一句「<b>让我们一步一步思考</b>」，也常能触发它写出步骤</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note intuition"><b>它其实是提示工程的一招</b>　思维链是「让它分步」这条提示套路的代表；而它能靠示例触发，正因为模型有上下文学习——你在示例里演示「答案要带推理」，它就照做（见「提示工程」「上下文学习」）。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>进阶变体<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">单条思维链还能怎么加强？</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>变体</th><th>思路</th></tr></thead>
+    <tbody>
+      <tr><td><b>自洽性</b></td><td>同一题<b>独立解多次</b>（用较高温度制造多样），再对答案<b>取多数票</b>，比单条链更稳（见「自洽性」）</td></tr>
+      <tr><td><b>思维树</b></td><td>不走一条道，而是像搜索一样<b>展开多个分支、评估、回溯</b>，适合更难的规划类问题（见「思维树 ToT」）</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note intuition"><b>共同点</b>　它们都在「让模型多想、想得更结构化」上做文章：一条链嫌单薄，就多来几条投票，或展开成一棵树择优。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>和「推理模型」的关系<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">现在有一类专门的「推理模型」，它和思维链是什么关系？</p>
+  <p>思维链最初是一种<b>提示技巧</b>——靠你在提示里引导，让普通模型临时「写步骤」。而<b>推理模型</b>更进一步：把「先生成一大段思考、再作答」这件事<b>内化进训练</b>，模型回答前会<b>自动</b>产生长篇推理，不需要你特意引导（见「推理模型」节点）。可以说：<b>思维链是提示层面的技巧，推理模型是把这套能力训进了模型本身。</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6</span>代价<span class="dd-badge eng">工程</span></h2>
+  <ul class="dd-steps">
+    <li><b>更慢、更贵</b>：写出推理意味着<b>输出变长</b>，生成更多 token，延迟和费用都上去了。</li>
+    <li><b>占上下文窗口</b>：长推理会挤占宝贵的窗口预算（见「上下文窗口」）。</li>
+    <li><b>不是所有题都需要</b>：简单问题上强行思维链，只会让回答啰嗦；它的价值集中在<b>多步推理</b>的难题。</li>
+  </ul>
+  <div class="dd-note warn"><b>一个提醒</b>　模型「写出来的推理」不总等于它「真实的内部计算」——有时步骤看着合理、结论却错，或结论对而步骤是事后编的。思维链<b>提升</b>准确率，但不<b>保证</b>正确，也不该被当作对模型内部的可靠解释。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <ol class="dd-chain">
+    <li>让模型先写推理再答，把「一步答难题」换成「一步步来」——这就是思维链。<span>（§1）</span></li>
+    <li>它有效，是因为模型一次一个 token、没有草稿；拆成小步后每步更易接对，且已写的步骤成了后面的上下文。<span>（§2）</span></li>
+    <li>触发靠 few-shot 示例（上下文学习）或一句「一步步思考」。<span>（§3）</span></li>
+    <li>可用自洽性（多次投票）、思维树（多分支择优）加强。<span>（§4）</span></li>
+    <li>推理模型把「先想再答」内化进训练，是思维链的「训进模型」版。<span>（§5）</span></li>
+    <li>代价是更慢更贵、占窗口、且不保证真对；简单题不必用。<span>（§6）</span></li>
+  </ol>
+  <div class="dd-note key"><b>过关标准</b>　如果你能用「模型逐词生成、没有草稿」解释「为什么写出推理会更准」，并说清「思维链和推理模型的区别」，你就抓住了它的内核。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
+    <tbody>
+      <tr><td>思维链让模型更聪明了</td><td>没改模型；只是把难题拆成小步，让它发挥得更稳</td></tr>
+      <tr><td>写出的推理=模型真实思路</td><td>不一定；步骤可能是事后编的，提升但不保证正确</td></tr>
+      <tr><td>所有任务都该用思维链</td><td>价值在多步推理难题；简单题只会啰嗦、更慢更贵</td></tr>
+      <tr><td>思维链就是推理模型</td><td>前者是提示技巧，后者把「先想再答」训进了模型</td></tr>
+      <tr><td>它零成本</td><td>输出变长，更慢、更贵、占窗口</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <ol class="dd-quiz">
+    <li>思维链具体让模型做什么？</li>
+    <li>用「逐词生成、没有草稿」解释：为什么写出推理会更准？</li>
+    <li>触发思维链有哪两种常见方式？</li>
+    <li>自洽性和思维树分别怎么加强思维链？</li>
+    <li>思维链和「推理模型」有什么区别？</li>
+    <li>思维链有哪些代价？为什么不是所有题都该用？</li>
+  </ol>
+  <details class="dd-answers"><summary>参考答案</summary>
+    <ol>
+      <li>让它在给答案前先一步步写出推理过程，最后再给结论。</li>
+      <li>模型一次一个 token、没有全局草稿；直接答等于一步蹦出难题答案易错，写推理把它拆成小步、每步只需接对，且已写步骤成为后续上下文，更稳。</li>
+      <li>few-shot：给带推理过程的示例；zero-shot：加一句「让我们一步一步思考」。</li>
+      <li>自洽性：同题多次独立解、取多数票；思维树：展开多分支、评估、回溯择优。</li>
+      <li>思维链是提示层面的技巧（靠引导临时写步骤）；推理模型把「先想再答」内化进训练、回答前自动长思考。</li>
+      <li>输出变长导致更慢更贵、占上下文窗口，且不保证推理真对；简单题不必用。</li>
+    </ol>
+  </details>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>大语言模型、逐词生成、上下文学习、提示工程</td></tr>
+      <tr><td><b>本页核心</b></td><td>写出推理、拆解难题、触发方式、代价</td></tr>
+      <tr><td>紧邻延伸</td><td>自洽性、思维树 ToT、推理模型、上下文窗口</td></tr>
+      <tr><td>更远</td><td>ReAct、自我反思、评测</td></tr>
+    </tbody>
+  </table></div>
+</section>
+`
+};
