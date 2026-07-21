@@ -8,7 +8,7 @@
  * 需定期按官方页面重刷；淘汰的老型号不列。分组卡/聚合类/单模型工具不加此字段。
  */
 window.SOFTWARE = {
-  meta: { version: "0.4", updatedAt: "2026-07-20" },
+  meta: { version: "0.5", updatedAt: "2026-07-20" },
 
   // 门类（软件模式自己的分类，不复用概念地图的六大区）
   categories: [
@@ -40,9 +40,10 @@ window.SOFTWARE = {
       summary: "以长文本、写作质量和安全性见长的对话助手。",
       body: "Anthropic 的对话助手，训练上用了 [[constitutional-ai]]（宪法 AI）。以长上下文处理、写作与推理质量、以及相对克制的安全风格著称，在编程和长文档任务上口碑很好。Artifacts 功能能把生成的代码/网页实时预览。",
       models: [
-        { name: "Claude Opus 4.8", note: "最强·复杂推理与编程" },
-        { name: "Claude Sonnet 5", note: "均衡主力" },
-        { name: "Claude Haiku 4.5", note: "快而省" }
+        { name: "Claude Fable 5", note: "最强·面向长时运行 Agent，自适应思考常开" },
+        { name: "Claude Opus 4.8", note: "复杂 Agent 编程与企业级" },
+        { name: "Claude Sonnet 5", note: "速度与智能的最佳平衡" },
+        { name: "Claude Haiku 4.5", note: "最快·接近前沿的智能" }
       ] },
     { id: "gemini", name: "Gemini", cat: "chat", by: "Google", concept: "multimodal",
       summary: "Google 的对话助手，原生多模态、深度绑定谷歌生态。",
@@ -173,9 +174,6 @@ window.SOFTWARE = {
       body: "Google 的图像模型（Imagen 系列，其原生图像编辑因「Nano Banana」之名爆火）。最大亮点是**对话式 [[image-editing]]**：用自然语言反复改同一张图、还能保持人物和场景一致，把「生成」推向「可反复精修」。和 [[dalle]] 同属「和对话打通的图像生成」，在角色一致性和局部编辑上口碑突出。" },
 
     // 🎬 视频生成
-    { id: "sora", name: "Sora", cat: "video", by: "OpenAI", concept: "video-generation",
-      summary: "以画面真实感和物理一致性著称的文生视频。",
-      body: "OpenAI 的 [[video-generation]] 模型，因逼真的画面和相对好的 [[world-models]] 式物理一致性而受关注。代表了文生视频「从能看到能用」的一次跨越，长视频一致性仍是难点。" },
     { id: "runway", name: "Runway", cat: "video", by: "Runway", concept: "video-generation",
       summary: "面向创作者的 AI 视频生成与编辑套件。",
       body: "较早做 AI 视频的公司，除了文生/图生视频，还有一整套 AI 编辑工具（抠像、运动笔刷、风格化）。定位专业创作者的工作流,不只是生成一段就完。" },
