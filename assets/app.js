@@ -323,8 +323,10 @@
     const evolving = n.maturity === "evolving";
 
     let h = "";
+    const hasDeep = !!(window.DEEPDIVE && window.DEEPDIVE[id]);
     h += `<div class="d-domain" style="color:${dom.color}">${dom.emoji} ${esc(dom.label)}`
        + (evolving ? `<span class="mat-tag" title="较新、仍在演进的概念">演进中</span>` : "")
+       + (hasDeep ? `<button class="dd-open" data-dd="${esc(id)}" title="打开理解原理深读页">📖 理解原理</button>` : "")
        + `</div>`;
     h += `<h2 class="d-title">${esc(n.title)}</h2>`;
     if (n.aliases && n.aliases.length) h += `<div class="d-alias">${n.aliases.map(esc).join(" · ")}</div>`;
@@ -382,6 +384,40 @@
 
     detailBody.querySelectorAll("[data-goto]").forEach(el => {
       el.addEventListener("click", () => select(el.getAttribute("data-goto"), true));
+    });
+    detailBody.querySelectorAll("[data-dd]").forEach(el => {
+      el.addEventListener("click", () => openDeepDive(el.getAttribute("data-dd")));
+    });
+  }
+
+  /* ───────────────────── 理解原理（深读页） ───────────────────── */
+
+  const ddEl = document.getElementById("deepdive");
+
+  function openDeepDive(id) {
+    const dd = window.DEEPDIVE && window.DEEPDIVE[id];
+    if (!dd || !ddEl) return;
+    const hero = `<div class="dd-hero">
+        <div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>
+        <h1 class="dd-h1">${esc(dd.title)}</h1>
+        ${dd.subtitle ? `<div class="dd-sub">${esc(dd.subtitle)}</div>` : ""}
+        ${dd.aliases ? `<div class="dd-ali">${esc(dd.aliases)}</div>` : ""}
+        ${dd.meta ? `<div class="dd-metabar">${esc(dd.meta)}</div>` : ""}
+        ${dd.thesis ? `<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> ${dd.thesis}</div>` : ""}
+      </div>`;
+    document.getElementById("dd-top-name").textContent = dd.title;
+    document.getElementById("dd-article").innerHTML = hero + (dd.html || "");
+    ddEl.classList.remove("hidden");
+    ddEl.querySelector(".dd-scroll").scrollTop = 0;
+  }
+
+  function closeDeepDive() { if (ddEl) ddEl.classList.add("hidden"); }
+
+  if (ddEl) {
+    document.getElementById("dd-back").addEventListener("click", closeDeepDive);
+    document.getElementById("dd-close").addEventListener("click", closeDeepDive);
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && !ddEl.classList.contains("hidden")) closeDeepDive();
     });
   }
 

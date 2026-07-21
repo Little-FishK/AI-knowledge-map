@@ -82,6 +82,16 @@
     </aside>
 
   </div>
+
+  <!-- 理解原理（深读页）全屏阅读视图 -->
+  <div id="deepdive" class="hidden">
+    <header class="dd-top">
+      <button id="dd-back" class="dd-back">← 返回详情</button>
+      <span id="dd-top-name" class="dd-top-name"></span>
+      <button id="dd-close" class="dd-x" title="关闭">×</button>
+    </header>
+    <div class="dd-scroll"><article id="dd-article"></article></div>
+  </div>
 </div>
 
 <script src="assets/vendor/cytoscape.min.js"></script>
@@ -90,6 +100,8 @@
 <script src="assets/vendor/cytoscape-fcose.js"></script>
 <script src="data/graph.js"></script>
 <script src="data/software.js"></script>
+<!-- 理解原理深读页：每个概念一个文件，注册到 window.DEEPDIVE[nodeId] -->
+<script src="data/deepdive/neural-network.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

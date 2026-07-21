@@ -268,8 +268,137 @@ html, body {
 
 .d-empty { color: var(--fg-faint); font-size: 12px; }
 
+/* ───────── 理解原理 · 深读页按钮（详情面板内） ───────── */
+.dd-open {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-raise); color: var(--accent);
+  border: 1px solid var(--accent); border-radius: 5px;
+  font-size: 11.5px; padding: 3px 10px; cursor: pointer; font-family: inherit;
+  transition: background .15s, color .15s;
+}
+.dd-open:hover { background: var(--accent); color: #12141a; }
+.d-domain { display: flex; align-items: center; gap: 8px; }
+
+/* ───────── 理解原理 · 全屏阅读视图 ───────── */
+#deepdive { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column;
+            background: var(--bg); }
+#deepdive.hidden { display: none; }
+.dd-top { display: flex; align-items: center; gap: 14px; height: 50px; flex: 0 0 50px;
+          padding: 0 16px; background: var(--bg-panel); border-bottom: 1px solid var(--line); }
+.dd-back { background: var(--bg-raise); color: var(--fg-dim); border: 1px solid var(--line);
+           border-radius: 6px; font-size: 12.5px; padding: 5px 12px; cursor: pointer; font-family: inherit; }
+.dd-back:hover { color: var(--fg); border-color: var(--accent); }
+.dd-top-name { font-size: 13px; color: var(--fg-faint); }
+.dd-x { margin-left: auto; background: none; border: none; color: var(--fg-faint);
+        font-size: 24px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.dd-x:hover { color: var(--fg); }
+.dd-scroll { flex: 1; overflow-y: auto; }
+#dd-article { max-width: 780px; margin: 0 auto; padding: 40px 28px 120px; }
+
+/* hero */
+.dd-hero { border-bottom: 1px solid var(--line); padding-bottom: 26px; margin-bottom: 8px; }
+.dd-eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--accent); text-transform: uppercase; }
+.dd-h1 { font-size: 32px; font-weight: 700; margin: 10px 0 6px; color: var(--fg); letter-spacing: .01em; }
+.dd-sub { font-size: 15px; color: var(--fg-dim); }
+.dd-ali { font-size: 12px; color: var(--fg-faint); margin-top: 8px; }
+.dd-metabar { font-size: 12px; color: var(--fg-faint); margin-top: 6px; }
+.dd-thesis { margin-top: 18px; background: var(--bg-raise); border-left: 3px solid var(--accent);
+             border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 14px; line-height: 1.8; color: var(--fg-dim); }
+.dd-thesis-l { color: var(--accent); font-weight: 700; margin-right: 6px; }
+
+/* 学习目标 */
+.dd-goals { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 8px;
+            padding: 16px 20px; margin: 24px 0; }
+.dd-goals-h { font-weight: 600; color: var(--fg); margin-bottom: 8px; }
+.dd-goals ul { margin: 0; padding-left: 20px; }
+.dd-goals li { font-size: 13.5px; line-height: 1.9; color: var(--fg-dim); }
+
+/* 章节 */
+#dd-article article, .dd-sec { margin-top: 40px; }
+.dd-sec h2 { font-size: 21px; font-weight: 700; color: var(--fg); margin: 0 0 4px;
+             padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+             display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.dd-n { display: inline-flex; align-items: center; justify-content: center;
+        width: 27px; height: 27px; border-radius: 6px; background: var(--lyr-base); color: #12141a;
+        font-size: 14px; font-weight: 700; flex: 0 0 auto; }
+.dd-sec h3 { font-size: 15.5px; font-weight: 600; color: var(--fg); margin: 26px 0 8px; }
+.dd-sec p { font-size: 14.5px; line-height: 1.9; color: var(--fg-dim); margin: 0 0 14px; }
+
+/* 层级徽标 */
+.dd-badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 10px;
+            border: 1px solid var(--line); color: var(--fg-faint); background: var(--bg-raise); }
+.dd-badge.intuition { color: #8fb0d8; border-color: #3d5170; }
+.dd-badge.math { color: #74b79a; border-color: #35604c; }
+.dd-badge.eng { color: #d3a05a; border-color: #6a552f; }
+
+/* 认知链引导句 */
+.dd-lead { font-size: 13.5px !important; color: var(--fg-faint) !important; font-style: italic;
+           border-left: 2px solid var(--line); padding-left: 12px; margin: 4px 0 18px !important; }
+
+/* 公式 */
+.dd-formula { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace; text-align: center;
+              background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px;
+              padding: 14px 12px; margin: 6px 0 8px; font-size: 15px; color: var(--fg);
+              line-height: 1.9; overflow-x: auto; }
+.dd-formula-note { font-size: 12.5px !important; color: var(--fg-faint) !important; text-align: center;
+                   margin: 0 0 16px !important; }
+
+/* 正文内联代码 */
+#dd-article code { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+                   background: var(--bg-raise); border: 1px solid var(--line-soft);
+                   border-radius: 4px; padding: 1px 5px; font-size: 13px; color: #cdd6e4; }
+.dd-formula code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+/* 提示框 */
+.dd-note { border-radius: 0 7px 7px 0; padding: 12px 16px; margin: 8px 0 18px;
+           font-size: 13.5px; line-height: 1.85; color: var(--fg-dim);
+           border-left: 3px solid var(--fg-faint); background: var(--bg-panel); }
+.dd-note b { color: var(--fg); }
+.dd-note.intuition { border-left-color: #6b8cbe; } .dd-note.intuition b { color: #9cc0e8; }
+.dd-note.math { border-left-color: #4f9d78; } .dd-note.math b { color: #7ecaa4; }
+.dd-note.eng { border-left-color: #d3a05a; } .dd-note.eng b { color: #e0b877; }
+.dd-note.warn { border-left-color: #cf6f6f; background: rgba(207,111,111,.06); } .dd-note.warn b { color: #e39494; }
+.dd-note.key { border-left-color: var(--accent); background: rgba(122,162,216,.07); } .dd-note.key b { color: var(--accent); }
+
+/* 图 */
+.dd-fig { margin: 20px 0 22px; text-align: center; }
+.dd-fig svg { max-width: 100%; height: auto; background: var(--bg-panel);
+              border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.dd-fig figcaption { font-size: 12.5px; color: var(--fg-faint); line-height: 1.7; margin-top: 10px; text-align: left; }
+.svg-t { fill: var(--fg-faint); font-size: 13px; font-family: inherit; }
+.svg-tn { fill: var(--fg); font-size: 15px; font-weight: 600; font-family: inherit; }
+
+/* 表格 */
+.dd-table { width: 100%; border-collapse: collapse; margin: 8px 0 20px; font-size: 13px; }
+.dd-table th, .dd-table td { border: 1px solid var(--line); padding: 8px 11px; text-align: left;
+                             vertical-align: top; line-height: 1.7; }
+.dd-table th { background: var(--bg-raise); color: var(--fg); font-weight: 600; }
+.dd-table td { color: var(--fg-dim); }
+.dd-table code { font-size: 12px; }
+
+/* 步骤 / 因果链 / 自测 列表 */
+.dd-steps, .dd-chain, .dd-quiz { margin: 4px 0 18px; padding-left: 22px; }
+.dd-steps li, .dd-chain li, .dd-quiz li { font-size: 14px; line-height: 1.9; color: var(--fg-dim); margin-bottom: 7px; }
+.dd-chain li span { color: var(--fg-faint); font-size: 12px; }
+.dd-answers { margin: 6px 0 8px; }
+.dd-answers summary { cursor: pointer; color: var(--accent); font-size: 13.5px; font-weight: 600; }
+.dd-answers ol { margin-top: 12px; padding-left: 22px; }
+.dd-answers li { font-size: 13px; line-height: 1.85; color: var(--fg-dim); margin-bottom: 7px; }
+
+/* 来源 */
+.dd-src { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 18px;
+          font-size: 12.5px; line-height: 1.8; color: var(--fg-faint); }
+.dd-src ul { margin: 10px 0 0; padding-left: 20px; }
+.dd-src a { color: var(--accent); text-decoration: none; }
+.dd-src a:hover { text-decoration: underline; }
+.dd-src-date { margin-top: 8px; }
+
 /* 窄屏 */
 @media (max-width: 1100px) {
   #controls { position: absolute; left: 0; top: 52px; bottom: 0; z-index: 20; }
   #detail { position: absolute; right: 0; top: 52px; bottom: 0; z-index: 20; width: 340px; flex-basis: 340px; }
+}
+@media (max-width: 720px) {
+  #dd-article { padding: 28px 18px 100px; }
+  .dd-h1 { font-size: 26px; }
 }
