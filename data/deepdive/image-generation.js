@@ -27,7 +27,7 @@ window.DEEPDIVE["image-generation"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">1</span>什么是图像生成<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：AI「画」一张没人拍过的图，它是从图库里拼出来的吗？</p>
-  <p>不是。图像生成是<b>造出一张全新的图</b>——不是检索、也不是把现成素材拼贴，而是逐像素生成一张<b>此前不存在</b>的图像。输入通常是一句文本描述（「文生图」），也可以叠加别的条件（一张参考图、一个姿势、一块要重绘的区域）。</p>
+  <p>不是简单从图库检索或拼贴。生成模型从学到的数据分布中采样新的图像表示；具体系统可能在<b>像素空间、压缩潜空间或离散视觉 token</b>中生成，再解码成图像。输出通常是训练集中未直接存在的新样本，但仍可能复现训练样本片段，因此不能把“全新”理解为绝对无记忆。</p>
 </section>
 
 <section class="dd-sec">
@@ -37,7 +37,7 @@ window.DEEPDIVE["image-generation"] = {
     <thead><tr><th>要办的事</th><th>解决什么</th><th>靠什么</th></tr></thead>
     <tbody>
       <tr><td>① 读懂文字</td><td>把「戴帽子的柯基、油画、海边」理解成图像层面的意思</td><td>文本理解 + 图文对齐（见「嵌入」「CLIP」「多模态」）</td></tr>
-      <tr><td>② 把图画出来</td><td>逐像素生成一张协调、逼真的新图</td><td>生成引擎（主流是扩散模型）</td></tr>
+      <tr><td>② 把图画出来</td><td>在像素、潜变量或视觉 token 空间生成，再解码为协调的新图</td><td>扩散、自回归等生成引擎</td></tr>
     </tbody>
   </table></div>
   <div class="dd-note intuition"><b>分清「任务」和「引擎」</b>　图像生成是<b>任务</b>；扩散模型是当前实现它最主流的<b>引擎</b>（早年还有 GAN，也有自回归等其它路线）。任务不变，引擎会换——这也是这个领域进步这么快的原因。</div>
@@ -61,13 +61,20 @@ window.DEEPDIVE["image-generation"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">5</span>它现在还做不好什么<span class="dd-badge eng">工程</span></h2>
-  <p class="dd-lead">图像生成很惊艳，但有几个稳定的软肋，知道它们能少踩坑。</p>
+  <p class="dd-lead">能力随模型快速变化，下面不是永久缺陷清单，而是部署时应持续评测的高风险维度。</p>
   <ul class="dd-steps">
-    <li><b>图里写字</b>：让画面里出现一行<b>拼写正确</b>的文字（海报、logo）长期是老大难——模型擅长「画得像字」，不擅长「写对字」（有些工具如 Ideogram 专攻此项）。</li>
-    <li><b>手指与复杂结构</b>：手、牙齿、对称物体容易出错（多根手指）。</li>
+    <li><b>图中文字与版式</b>：新模型已明显改善短文本，但长文、多语言、精确排版与可编辑字体仍需逐模型评测。</li>
+    <li><b>组合与复杂结构</b>：手部只是一个例子；更普遍的是计数、空间关系、遮挡、对称和多对象属性绑定可能出错。</li>
     <li><b>一致性</b>：让<b>同一个角色</b>在多张图里保持长相一致，很难。</li>
     <li><b>事实性</b>：它生成的是「<b>看起来对</b>」的图，不是「真的准确」的图——和大模型的<b>幻觉</b>同源。要求科学准确的示意图时尤其要核对（见「幻觉」）。</li>
   </ul>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6.5</span>怎么评估：好看、贴题与安全不是一个分数<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">“这张图质量高”到底是在说什么？</p>
+  <p>至少要分开评估：<b>感知质量</b>（是否自然）、<b>提示对齐</b>（对象、关系、文字是否符合要求）、<b>多样性</b>、<b>身份/角色一致性</b>、<b>事实与安全</b>。自动指标可用于批量回归，但难覆盖构图偏好与高风险语义；产品验收应组合固定提示集、人工盲评、失败类型标注和安全红队。</p>
+  <div class="dd-note key"><b>避免只挑最好看的样例</b>　同一提示多次采样后挑一张展示，会掩盖单次成功率。评测必须固定采样预算、分辨率、编辑条件和随机种子策略，才能比较版本。</div>
 </section>
 
 <section class="dd-sec">
@@ -98,7 +105,7 @@ window.DEEPDIVE["image-generation"] = {
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
-      <tr><td>AI 画图是从图库拼贴</td><td>是逐像素生成一张全新、此前不存在的图</td></tr>
+      <tr><td>AI 画图是从图库拼贴</td><td>通常是从学到的分布采样图像表示，不是简单检索拼贴；但模型可能记忆并复现训练片段</td></tr>
       <tr><td>图像生成 = 扩散模型</td><td>图像生成是任务，扩散是当今主流引擎（还有 GAN、自回归等）</td></tr>
       <tr><td>它生成的图是准确的</td><td>是「看起来对」，可能与事实不符，与幻觉同源</td></tr>
       <tr><td>写好提示就能让图里出现正确文字</td><td>「图中准确写字」仍是老大难，需专门能力/工具</td></tr>
@@ -119,7 +126,7 @@ window.DEEPDIVE["image-generation"] = {
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
-      <li>不是拼贴；是逐像素生成一张全新、此前不存在的图。</li>
+      <li>不是简单拼贴；它在像素、潜变量或视觉 token 空间采样并解码，但仍需防范训练样本记忆与复现。</li>
       <li>读懂文字（文本理解+图文对齐）和把图画出来（生成引擎）；分别靠 CLIP 式对齐和扩散等引擎。</li>
       <li>图像生成是任务，扩散是当今实现它最主流的引擎，此外还有 GAN、自回归等路线。</li>
       <li>可控生成（加线稿/姿势/深度等额外条件、局部重绘）和图像编辑（在已有图上按指令改）。</li>
@@ -141,5 +148,15 @@ window.DEEPDIVE["image-generation"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., Latent Diffusion Models</a>：潜空间文生图与条件交叉注意力。</li>
+    <li><a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Saharia et al., Imagen</a>：文本编码、级联扩散与图文对齐。</li>
+    <li><a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">Ramesh et al., Hierarchical Text-Conditional Image Generation with CLIP Latents</a>：CLIP 潜变量与扩散解码。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

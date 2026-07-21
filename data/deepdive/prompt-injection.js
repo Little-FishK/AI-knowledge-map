@@ -7,7 +7,7 @@ window.DEEPDIVE["prompt-injection"] = {
   subtitle: "把恶意指令藏在模型会读到的内容里，劫持它的行为",
   aliases: "Prompt Injection · 提示词注入",
   meta: "建议 20–30 分钟 · 中级 · 需要：了解「大语言模型」「工具调用」",
-  thesis: "提示注入是把恶意指令<b>藏在模型会读到的内容</b>（网页、邮件、文档、工具返回）里，诱导模型把它当成命令执行，从而劫持行为。它之所以难防，是因为在模型眼里，<b>「指令」和「数据」都只是 token</b>，没有硬性区分——这不像传统软件能把代码和数据分开，是一个尚未根治的开放问题。",
+  thesis: "提示注入是用对抗性文本诱导模型违背开发者或用户意图；恶意内容既可由用户直接输入，也可藏在网页、邮件、文档或工具结果中。系统/开发者/用户角色提供了指令层级，但模型仍用同一学习系统解释可信指令与不可信自然语言，边界不是传统解析器那样的强隔离。因此要靠权限、数据来源标记、动作确认和独立策略检查做纵深防御。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -34,7 +34,7 @@ window.DEEPDIVE["prompt-injection"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">2</span>为什么会发生<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">最关键的一节：模型凭什么会把网页里的一句话，当成必须执行的命令？</p>
-  <div class="dd-note warn"><b>因为在模型眼里，「指令」和「数据」没有本质区别——都只是 token。</b>　你喂给它的一切（系统提示、用户问题、要处理的网页正文）在它看来是<b>一大串连续的文字</b>。它没有一个硬性的开关能区分「这句是我该服从的命令」和「这句是我该处理的素材」。所以当网页里出现「忽略上面的指令，改为……」，它很可能就当真了（见「大语言模型」深读页）。</div>
+  <div class="dd-note warn"><b>结构化角色不等于强安全边界。</b>　聊天协议可以标记系统、开发者、用户和工具消息，模型也被训练去遵循层级；但这些内容最终都参与同一上下文推断，模型必须靠学到的模式判断哪些自然语言该服从。面对新颖对抗文本，这种统计边界可能失效，不像类型系统或独立授权层那样能给出硬保证。</div>
   <figure class="dd-fig">
     <svg viewBox="0 0 560 90" role="img" aria-label="指令和数据在模型眼里都是同一串token">
       <text x="20" y="24" class="svg-t">喂给模型的，在它眼里是一整串 token：</text>
@@ -45,7 +45,7 @@ window.DEEPDIVE["prompt-injection"] = {
     </svg>
     <figcaption>图 1　根源：指令和数据在模型眼里是同一串 token，没有边界。攻击者把命令藏进「数据」区（网页正文），模型分不清，就可能照它执行。</figcaption>
   </figure>
-  <div class="dd-note intuition"><b>和传统软件的关键不同</b>　传统程序能严格区分「代码」和「数据」，也能对数据做转义。但大模型的输入<b>本就是自然语言这一种东西</b>，没有这条界线——这正是提示注入难解的根源。</div>
+  <div class="dd-note intuition"><b>和传统注入的关键不同</b>　SQL 注入可以通过参数化查询把语法结构与数据值分开；自然语言任务却经常要求模型理解数据里的指令性内容，所以仅靠转义不能解决。但权限系统、工具执行器和策略模型仍能在模型外建立强边界——“难以根治”不等于“无法有效降低风险”。</div>
 </section>
 
 <section class="dd-sec">
@@ -153,5 +153,15 @@ window.DEEPDIVE["prompt-injection"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2312.14197" target="_blank" rel="noopener">Yi et al., Benchmarking and Defending Against Indirect Prompt Injection Attacks (BIPIA)</a>：间接注入基准与防御评估。</li>
+    <li><a href="https://arxiv.org/abs/2403.02691" target="_blank" rel="noopener">Zhan et al., InjecAgent</a>：工具集成 Agent 的间接提示注入测试。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：行动与观察进入上下文的 Agent 工作流基础。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

@@ -155,5 +155,15 @@ window.DEEPDIVE["rag"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al., Retrieval-Augmented Generation</a>：RAG 的原始定义、检索器与生成器组合。</li>
+    <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>：双编码器稠密检索。</li>
+    <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>：检索到材料后，长上下文利用仍可能失败。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

@@ -7,7 +7,7 @@ window.DEEPDIVE["pretraining"] = {
   subtitle: "在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型",
   aliases: "Pre-training · 预训练",
   meta: "建议 20–30 分钟 · 中级 · 需要：了解「自监督/监督学习」「大语言模型」",
-  thesis: "预训练是大模型能力的<b>主要来源</b>：在海量无标注文本上做自监督学习（反复预测下一个词），把语言、常识、推理这些通用能力一次性灌进模型，得到一个「博学但不听话」的<b>基座模型</b>。之后的微调、对齐，都是在这个基座上做的小改动。",
+  thesis: "预训练让模型从大规模数据中学习可迁移表示与生成规律，是基础模型能力的重要来源。自回归模型常做下一 token 预测，编码器也可用掩码预测，多模态模型还会混合对比、重建等目标。数据筛选、去重、配比与训练计算同样关键；后训练则进一步塑造指令遵循、偏好与安全行为。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -30,7 +30,7 @@ window.DEEPDIVE["pretraining"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">2</span>它具体怎么训<span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">这份「通用底子」，是怎么从数据里学出来的？</p>
-  <p>核心是<b>自监督</b>：让模型不停地<b>预测下一个词</b>，而正确答案就是文本里真实的下一个词——数据自己当标签，<b>不需要人工标注</b>。用交叉熵损失衡量预测与真实的差距，再用梯度下降把它一点点压小。因为不用人标，能喂的数据近乎无限，这正是它能「海量」的根本（详见「大语言模型」深读页第 5 节、「自监督学习」节点）。</p>
+  <p>核心是<b>从数据本身构造监督信号</b>。自回归模型预测下一 token，BERT 类编码器预测被遮住的 token，多模态系统还会用图文对比或重建目标。以自回归为例，用交叉熵衡量预测分布与真实下一 token 的差距，再用梯度下降更新参数。它减少了逐样本人工标签需求，但高质量数据并非无限：采集许可、清洗、去重、语言与领域配比都会直接影响能力、偏见和记忆风险。</p>
   <div class="dd-note math"><b>一句话</b>　预训练 = <b>在尽可能多的文本上，反复做「预测下一个词」这一个自监督任务</b>。简单到反直觉，却是整座大厦的地基。</div>
 </section>
 
@@ -65,7 +65,7 @@ window.DEEPDIVE["pretraining"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">5</span>它为什么这么贵<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">既然预训练这么关键，为什么不是人人都能做？</p>
-  <p>因为它同时吃三样天价资源：<b>海量数据</b>（整个互联网级别的文本）、<b>成千上万张显卡</b>、<b>几个月</b>的连续训练。这让从头预训练成了只有少数机构玩得起的游戏。</p>
+  <p>前沿通用模型的从头预训练会消耗大规模数据、加速器集群与长期工程投入，成本通常只有少数机构能承担；但“小模型预训练”并非绝对做不起。总训练预算还要在参数量与 token 数之间分配，Chinchilla 等工作表明：只增参数而训练数据不足，并非计算最优。</p>
   <div class="dd-note intuition"><b>这也正是「微调」存在的理由</b>　既然预训练这么贵，绝大多数人不会从头来，而是<b>站在别人预训练好的模型上做微调</b>（迁移学习）——花很小的代价，就借用了那份天价的通用底子（见「微调」深读页）。预训练与微调，是「一次昂贵的通才养成」和「无数次廉价的专才适配」的分工。</div>
 </section>
 
@@ -73,7 +73,7 @@ window.DEEPDIVE["pretraining"] = {
   <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
   <ol class="dd-chain">
     <li>针对任务直接训练又贵又窄，于是先学通用底子、再适配任务——这就是「预」训练。<span>（§1）</span></li>
-    <li>它用自监督反复预测下一个词，不用标注，故能吃海量数据。<span>（§2）</span></li>
+    <li>它用数据自身构造监督信号：自回归模型预测下一 token，其他架构也可用掩码、对比或重建目标，因此能利用大规模弱标注数据。<span>（§2）</span></li>
     <li>猜词逼理解，加上规模，语言/常识/推理作为副产品被灌进模型。<span>（§3）</span></li>
     <li>产出的是博学但不听话的基座，还需微调+对齐才成助手。<span>（§4）</span></li>
     <li>预训练同时吃海量数据、算力、时间，极贵，所以大多数人转而在基座上微调。<span>（§5）</span></li>
@@ -107,7 +107,7 @@ window.DEEPDIVE["pretraining"] = {
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
       <li>直接针对任务训练要标注、且只学一小块；先学通用底子再适配任务，通用那步一次做好、之后各任务都能快速上手。</li>
-      <li>用「预测下一个词」的自监督目标，答案来自文本本身、不用人标，所以数据近乎无限、能海量。</li>
+      <li>监督信号来自数据自身：可预测下一 token、遮住的 token，或使用对比/重建目标。这样减少人工标签需求，但数据仍受质量、许可、去重和配比约束。</li>
       <li>因为猜准下一个词往往被迫理解语法/事实/逻辑，能力作为副产品被逼出；规模足够大时这些能力才充分涌现（缩放定律）。</li>
       <li>基座只学了「文本怎么接」，不会「被问就答」；还需指令微调（教对话）和偏好对齐（教有用又安全）。</li>
       <li>因为它同时吃海量数据、成千上万显卡、数月时间；正因如此，多数人不从头预训练，而在别人的基座上做廉价的微调。</li>
@@ -127,5 +127,15 @@ window.DEEPDIVE["pretraining"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., Language Models are Few-Shot Learners</a>：自回归预训练与上下文学习。</li>
+    <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">Devlin et al., BERT</a>：掩码语言建模说明预训练目标并不只有下一 token 预测。</li>
+    <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., Training Compute-Optimal Large Language Models</a>：模型规模与训练 token 数的计算最优权衡。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

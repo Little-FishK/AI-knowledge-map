@@ -7,7 +7,7 @@ window.DEEPDIVE["context-window"] = {
   subtitle: "模型一次能「看见」的 token 总量上限",
   aliases: "Context Window · 上下文长度 · Context Length",
   meta: "建议 20–30 分钟 · 基础 → 中级 · 需要：了解「Token」「注意力」",
-  thesis: "上下文窗口是模型单次能「看见」的 token 总量上限——你的提示、对话历史、检索来的材料、以及它正在生成的回答，全都挤在这个窗口里。<b>窗口之外的东西，模型完全看不见</b>。它由注意力的平方级开销所约束，是长对话「失忆」、长文档处理受限的根本原因。",
+  thesis: "上下文窗口是一次请求中模型可直接条件化的 token 预算——系统指令、提示、对话历史、检索材料、工具结果与生成内容会共同占用预算。窗口之外的信息不会自动参与本次计算，除非应用重新检索、摘要或以外部记忆注入。标准全局注意力的平方开销是重要约束之一，但位置表示、训练长度、缓存、硬件和注意力变体也共同决定可用窗口。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -50,7 +50,7 @@ window.DEEPDIVE["context-window"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">3</span>为什么不能无限大<span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">既然窗口越大越方便，为什么厂商不干脆做成无限？</p>
-  <p>因为代价是<b>超线性</b>的。注意力要让每个位置都看遍所有位置，算量和显存都随序列长度<b>平方</b>增长——长度翻一倍，开销约变<b>四倍</b>（见「注意力机制」深读页第 6 节）。所以窗口越大，推理越慢、越贵。这不是厂商小气，而是机制的硬约束。</p>
+  <p>对<b>标准全局自注意力</b>，n 个位置会形成 n² 个注意力分数，朴素实现的相关算量和显存因此呈平方增长。实际推理还受 KV 缓存、带宽、位置外推和训练分布影响；滑窗、稀疏注意力与高效内核可以改变复杂度或常数。所以平方开销是重要约束，但不是唯一原因。</p>
   <div class="dd-note math"><b>一笔账</b>　1 千 token 的输入，注意力约算 100 万对；10 万 token 就是约 100 亿对。每把窗口拉长一档，都要付这种超线性的代价——这正是长上下文又慢又贵的根源。</div>
 </section>
 
@@ -77,7 +77,7 @@ window.DEEPDIVE["context-window"] = {
   <ol class="dd-chain">
     <li>上下文窗口是单次能看见的 token 上限，装着提示+历史+检索+输出，窗口外看不见。<span>（§1）</span></li>
     <li>模型本身没记忆，「记得前面」是因为前面还在窗口里被重新喂入；被挤出就真忘了。<span>（§2）</span></li>
-    <li>窗口不能无限大，因为注意力的平方级开销让长窗口又慢又贵。<span>（§3）</span></li>
+    <li>窗口不能无限大：标准全局注意力的平方开销、KV 缓存、硬件、位置表示与训练长度共同形成约束。<span>（§3）</span></li>
     <li>就算窗口够长，塞满也不等于用好：有中间迷失、有噪声稀释。<span>（§4）</span></li>
     <li>应对：RAG 只放相关的、上下文工程分配预算、压缩摘要、外挂记忆。<span>（§5）</span></li>
   </ol>
@@ -93,7 +93,7 @@ window.DEEPDIVE["context-window"] = {
       <tr><td>窗口只装我的提问</td><td>还装系统提示、历史、检索材料、以及正在生成的输出</td></tr>
       <tr><td>窗口越大总是越好</td><td>越大越慢越贵，还有中间迷失；关键是放对内容</td></tr>
       <tr><td>把资料全塞进去最保险</td><td>噪声会稀释注意力、中段易被忽略，往往更差</td></tr>
-      <tr><td>窗口不够是厂商抠门</td><td>是注意力平方级开销的硬约束</td></tr>
+      <tr><td>窗口不够只是厂商抠门</td><td>标准注意力平方开销很重要，但缓存、硬件、位置表示与训练长度也会约束可用窗口</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -111,7 +111,7 @@ window.DEEPDIVE["context-window"] = {
     <ol>
       <li>系统提示/指令、对话历史、检索来的材料、以及模型正在生成的输出。</li>
       <li>模型没记忆，每次把窗口内全部内容重新读一遍；前面的话还在窗口里才「记得」，一旦被挤出窗口就真的没了。</li>
-      <li>因为注意力开销随长度平方增长，窗口越长越慢越贵，是机制的硬约束。</li>
+      <li>标准全局注意力会形成 n² 个位置对，且 KV 缓存、带宽、位置外推和训练长度也有限；高效或稀疏变体能缓解但不能免费扩展。</li>
       <li>因为有中间迷失（中段信息利用率低），且大量无关内容会稀释注意力、引入噪声，反而变差。</li>
       <li>用 RAG 只放相关片段、用上下文工程分配预算、压缩摘要历史、给 Agent 外挂记忆。</li>
     </ol>
@@ -130,5 +130,15 @@ window.DEEPDIVE["context-window"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Attention Is All You Need</a>：标准自注意力的序列长度复杂度。</li>
+    <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>：长上下文信息位置对任务表现的影响。</li>
+    <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>：精确注意力的内存访问瓶颈与优化边界。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

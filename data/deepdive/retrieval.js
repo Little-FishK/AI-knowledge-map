@@ -151,5 +151,15 @@ window.DEEPDIVE["retrieval"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>：问题与段落双编码、内积检索。</li>
+    <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>：可用于语义相似搜索的句向量。</li>
+    <li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">Khattab &amp; Zaharia, ColBERT</a>：晚交互检索及精度—成本折中。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

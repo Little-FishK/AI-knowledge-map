@@ -27,7 +27,7 @@ window.DEEPDIVE["multimodal"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">1</span>为什么要「多模态」<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：为什么要费劲让一个模型同时处理图、文、声，而不是各任务各训一个专用模型？</p>
-  <p>两个理由。其一，<b>现实任务本就是跨模态的</b>：看图说话、听声辨物、读带插图的文档——把图文声拆开处理，就丢了它们之间的联系。其二，也是更深的一点：把不同模态放进<b>同一个模型</b>，它们的能力可以<b>互相印证、互相补充</b>，还能做跨模态推理（「这张图配这段话，矛盾吗？」）。人理解世界，本就是多感官融合的。</p>
+  <p>两个理由。其一，<b>现实任务本就是跨模态的</b>：看图说话、听声辨物、读带插图的文档——把图文声完全割裂会丢失联系。其二，把不同模态接入<b>同一模型系统</b>后，可以联合条件化并做跨模态推理。这里的“同一系统”可能是端到端统一模型，也可能由专用编码器、投影器、适配器和语言模型模块组成。</p>
   <div class="dd-note intuition"><b>一句话</b>　多模态不是「把几个模型拼在一起」，而是让<b>一个模型</b>在一个统一的表示里，同时容纳并关联不同模态——这才有「1 + 1 &gt; 2」。</div>
 </section>
 
@@ -41,7 +41,7 @@ window.DEEPDIVE["multimodal"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">3</span>第二块基石：把不同模态对齐到同一个语义空间<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">核心的一节：怎么让「猫的图」和「猫」这个词，在模型眼里对应上？</p>
-  <p>靠一个<b>共享的语义空间</b>。回忆「嵌入」深读页：嵌入把内容变成向量、让意思近的靠得近。多模态把这一步<b>跨模态</b>地做：训练时让<b>「猫的图」的向量</b>和<b>「猫」这个词的向量</b>落到同一个空间里、且靠得很近——这叫<b>模态对齐</b>。</p>
+  <p>一种重要方法是学习<b>可比较的跨模态表示</b>：让配对的图文向量靠近、不配对的推远，这正是 CLIP 的路线。但多模态系统不一定把所有 token 永久压进单一共享空间；也可以保留视觉特征，再通过投影器或交叉注意力把它们接入语言模型。共同目标是<b>建立可学习的模态对齐与信息通道</b>。</p>
   <figure class="dd-fig">
     <svg viewBox="0 0 560 220" role="img" aria-label="图像和文本被映射到同一个语义空间并对齐">
       <rect x="20" y="40" width="110" height="40" rx="6" fill="#21252d" stroke="#a86fa8"/><text x="75" y="65" text-anchor="middle" class="svg-t" font-size="12">图：猫</text>
@@ -116,7 +116,7 @@ window.DEEPDIVE["multimodal"] = {
     <li>现实任务跨模态，且一个模型统一处理能让不同模态互相印证——所以要多模态。<span>（§1）</span></li>
     <li>第一块基石：Transformer 对模态无感，什么都能切成 token 一起算。<span>（§2）</span></li>
     <li>但「能一起算」不等于「懂它们是一回事」，所以需要第二块基石。<span>（§2→3）</span></li>
-    <li>第二块基石：把不同模态对齐到同一个语义空间（CLIP 式对比训练），让图和文说同一种语言。<span>（§3）</span></li>
+    <li>第二块基石：建立跨模态对齐；可以是 CLIP 式共享表示，也可以是投影器或交叉注意力连接。<span>（§3）</span></li>
     <li>工程上，用视觉编码器把图变成视觉 token、投影进词向量空间，和文字 token 一起喂给大模型。<span>（§4）</span></li>
     <li>模态打通后解锁图文问答、文生图、看屏幕操作、无障碍等。<span>（§5）</span></li>
     <li>但对齐质量决定上限、信息密度差异大、图上也会幻觉。<span>（§6）</span></li>
@@ -174,5 +174,15 @@ window.DEEPDIVE["multimodal"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., CLIP</a>：图文对比学习与共享表示空间。</li>
+    <li><a href="https://arxiv.org/abs/2204.14198" target="_blank" rel="noopener">Alayrac et al., Flamingo</a>：视觉编码器、跨注意力与语言模型的模块化组合。</li>
+    <li><a href="https://arxiv.org/abs/2304.08485" target="_blank" rel="noopener">Liu et al., LLaVA</a>：视觉指令微调与视觉投影连接器。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

@@ -7,7 +7,7 @@ window.DEEPDIVE["diffusion"] = {
   subtitle: "学习「从一团噪声一步步去噪」，把图像「显影」出来",
   aliases: "Diffusion Model · 扩散模型 · 去噪扩散",
   meta: "建议 25–35 分钟 · 中级 · 需要：了解「神经网络」「自监督学习」",
-  thesis: "扩散模型是当今图像生成的主流方法。它的核心巧思是把「凭空生成一张图」这个难题，拆成<b>一连串简单的去噪小步</b>：训练时学会「把加了噪声的图还原一点」，生成时就从<b>纯噪声出发、反复去噪</b>，像照片显影一样，一张图逐渐浮现。",
+  thesis: "扩散模型定义一个逐步加噪的前向过程，并训练网络估计噪声、分数或干净样本，从而近似其反向生成过程。采样时从高斯噪声出发，沿离散或连续时间轨迹迭代更新。现代系统常在压缩潜空间运行，并用无分类器引导在条件一致性与多样性之间权衡。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -57,10 +57,19 @@ window.DEEPDIVE["diffusion"] = {
 </section>
 
 <section class="dd-sec">
+  <h2><span class="dd-n">2.5</span>训练目标：随机抽一步就能学整条链<span class="dd-badge math">数学</span></h2>
+  <p class="dd-lead">既然完整链有很多步，训练时是否每次都要从头走到尾？</p>
+  <p>不需要。给定干净样本 <code>x₀</code>，可以直接采样任意时刻 <code>t</code> 的带噪样本：</p>
+  <div class="dd-formula">xₜ = √ᾱₜ · x₀ + √(1−ᾱₜ) · ε，　ε ~ N(0, I)</div>
+  <p class="dd-formula-note"><code>ᾱₜ</code>由噪声日程决定。训练常让网络 <code>εθ(xₜ,t,c)</code> 预测加入的噪声，并最小化 <code>||ε−εθ||²</code>；条件 <code>c</code> 可以是文本。一次随机 t 的样本就能为整条时间轴提供无偏训练信号。</p>
+  <div class="dd-note warn"><b>“去掉一点噪声”是直觉，不是唯一参数化。</b>　模型也可预测干净样本、速度变量或数据分布的分数；不同采样器还能用更少步骤近似反向轨迹。核心是学习反向更新方向，而非必须逐像素擦除固定噪点。</div>
+</section>
+
+<section class="dd-sec">
   <h2><span class="dd-n">3</span>为什么要拆成很多步<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">既然目标是从噪声得到图，为什么不训练一个模型「一步」搞定，非要走几十步？</p>
   <p>因为「一步从纯噪声到完美图」和第 1 节说的「一步到位」一样难。而<b>拆成很多小步</b>后，每一步的任务都<b>简单得多</b>：只需从「噪声多一点的图」还原成「噪声少一点的图」——这是个模型学得会的小活。很多个简单小步<b>累积</b>起来，就完成了原本不可能的大跳跃。</p>
-  <div class="dd-note intuition"><b>和思维链是同一种智慧</b>　这和「思维链」把难题拆成一步步推理，是同一个道理：<b>把一个做不到的大跳跃，换成一连串做得到的小步</b>。扩散在像素上这么做，思维链在推理上这么做。</div>
+  <div class="dd-note intuition"><b>类比的边界</b>　两者都可用“把大跳跃拆成小步”帮助理解，但扩散是有明确前向随机过程与反向生成模型的概率建模；思维链是离散 token 轨迹。类比只解释分步直觉，不能把两套数学机制视为相同。</div>
 </section>
 
 <section class="dd-sec">
@@ -85,6 +94,12 @@ window.DEEPDIVE["diffusion"] = {
 </section>
 
 <section class="dd-sec">
+  <h2><span class="dd-n">5.5</span>潜空间与引导：速度、贴题和多样性的权衡<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">高分辨率像素空间太贵，文本条件又可能不够强，工程上怎么处理？</p>
+  <p><b>潜空间扩散</b>先用编码器把图像压缩到更小的潜变量，在那里去噪，最后解码回像素，从而显著降低计算量。<b>无分类器引导</b>把有条件与无条件的预测组合：引导尺度提高通常让图更贴提示，但过高会牺牲多样性、造成过饱和或伪影。这说明“更听话”不是免费的单向增益。</p>
+</section>
+
+<section class="dd-sec">
   <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
   <ol class="dd-chain">
     <li>凭空一步造出协调逼真的图太难。<span>（§1）</span></li>
@@ -104,7 +119,7 @@ window.DEEPDIVE["diffusion"] = {
       <tr><td>它从素材库里拼贴现成图</td><td>是从随机噪声去噪生成全新的图，不是检索拼贴</td></tr>
       <tr><td>一步就能从噪声生成图</td><td>要走很多步，每步只去掉一点噪声</td></tr>
       <tr><td>加噪那一步没用</td><td>加噪自动造出「加噪前/后」的训练样本对，是自监督的关键</td></tr>
-      <tr><td>文本靠魔法就懂了</td><td>靠图文对齐（CLIP 式），把文字条件注入每步去噪</td></tr>
+      <tr><td>文本靠魔法就懂了</td><td>文本先由编码器变成条件表示，再通过交叉注意力、拼接等方式注入去噪网络；CLIP 只是可选路线之一</td></tr>
       <tr><td>扩散一定比 GAN 好</td><td>更稳更多样更可控，但更慢；各有取舍</td></tr>
     </tbody>
   </table></div>
@@ -126,7 +141,7 @@ window.DEEPDIVE["diffusion"] = {
       <li>正向：给真图逐步加噪直到纯噪声，自动生成「加噪前/后」的训练样本对（自监督）；反向：训练模型把加了噪的图还原清晰一点。加噪那步造出了训练数据。</li>
       <li>从一团随机噪声出发，反复去噪，图像逐步「显影」出来。</li>
       <li>因为一步从纯噪声到完美图太难；拆成小步后每步只需去掉一点噪声、简单可学，累积起来完成大跳跃。</li>
-      <li>把文本作为条件注入每步去噪，让它朝符合描述的方向去噪；依赖 CLIP 式的图文对齐。</li>
+      <li>文本由编码器变成条件表示，通过交叉注意力等机制影响各步去噪；训练用配对图文建立对齐，不要求一定采用 CLIP。</li>
       <li>扩散更稳、更多样、更可控，但生成较慢；GAN 一步生成快但易不稳/模式坍缩。</li>
     </ol>
   </details>
@@ -144,5 +159,15 @@ window.DEEPDIVE["diffusion"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al., Denoising Diffusion Probabilistic Models</a>：前向加噪、反向去噪与训练目标。</li>
+    <li><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., High-Resolution Image Synthesis with Latent Diffusion Models</a>：潜空间扩散与交叉注意力条件注入。</li>
+    <li><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans, Classifier-Free Diffusion Guidance</a>：无分类器引导与条件强度权衡。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

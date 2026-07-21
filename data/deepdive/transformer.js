@@ -4,10 +4,10 @@
 window.DEEPDIVE = window.DEEPDIVE || {};
 window.DEEPDIVE["transformer"] = {
   title: "Transformer",
-  subtitle: "把注意力包装成可无限堆叠的标准积木，撑起了当今所有大模型",
+  subtitle: "把注意力包装成可深度堆叠、可并行训练的标准积木",
   aliases: "Transformer · 变换器",
   meta: "建议 30–40 分钟 · 中级 · 需要：先读过「注意力机制」深读页",
-  thesis: "Transformer 把<b>注意力</b>包装成一个可以反复堆叠的标准层：每层固定由多头注意力、前馈网络、残差连接、层归一化四件套组成。堆几十到上百层，就是今天的大模型。它真正的贡献，是把序列建模变成了一个能吃满 GPU 并行的任务——没有它，就没有「把模型和数据一起放大」这条路。",
+  thesis: "Transformer 把<b>注意力</b>与逐位置前馈、残差连接和归一化组合成可反复堆叠的标准层。它缩短了序列位置之间的信息路径，并让训练阶段能高度并行，因此成为现代大模型最常用的骨架；具体实现会采用不同的归一化位置、位置表示和注意力变体。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -58,7 +58,7 @@ window.DEEPDIVE["transformer"] = {
     <thead><tr><th>零件</th><th>做什么</th></tr></thead>
     <tbody>
       <tr><td><b>多头注意力</b></td><td>在位置之间传信息、汇总上下文（见「注意力机制」）</td></tr>
-      <tr><td><b>前馈网络</b></td><td>逐位置的非线性变换；一般认为<b>知识主要存在这里</b></td></tr>
+      <tr><td><b>前馈网络</b></td><td>对每个位置独立做非线性特征变换；部分事实关联可在其中被定位，但知识并不只存在这里</td></tr>
       <tr><td><b>残差连接</b></td><td>让输入直接绕过本层相加，是能堆到上百层的前提</td></tr>
       <tr><td><b>层归一化</b></td><td>稳定每层的数值分布，防止训练发散</td></tr>
     </tbody>
@@ -80,7 +80,7 @@ window.DEEPDIVE["transformer"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">4</span>一个容易忽略的点：位置编码<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">注意力既然只看内容匹配、不看位置，那模型到底怎么知道词的先后顺序？</p>
-  <div class="dd-note warn"><b>先意识到一件反直觉的事</b>　单纯的注意力<b>完全不知道词序</b>——把输入词打乱，它算出的结果<b>一模一样</b>。可「小明打小红」和「小红打小明」意思天差地别。所以词序信息必须<b>额外注入</b>。</div>
+  <div class="dd-note warn"><b>先意识到一件反直觉的事</b>　不带任何位置表示的自注意力对输入排列是<b>等变的</b>：把 token 顺序打乱，输出也只会按同样顺序重排，机制本身无法区分先后。可「小明打小红」和「小红打小明」意思天差地别，所以词序信息必须<b>额外注入</b>。</div>
   <figure class="dd-fig">
     <svg viewBox="0 0 560 130" role="img" aria-label="打乱词序注意力结果相同，所以要位置编码">
       <g font-size="13">
@@ -94,7 +94,7 @@ window.DEEPDIVE["transformer"] = {
       </g>
       <text x="123" y="86" text-anchor="middle" class="svg-t" font-size="12">这句</text>
       <text x="423" y="86" text-anchor="middle" class="svg-t" font-size="12">和这句</text>
-      <text x="280" y="112" text-anchor="middle" class="svg-t" fill="#cf6f6f">在「只有注意力、无位置编码」时，模型看来完全一样 —— 显然不行</text>
+      <text x="280" y="112" text-anchor="middle" class="svg-t" fill="#cf6f6f">只有注意力、无位置表示时，机制无法识别谁在前、谁在后</text>
     </svg>
     <figcaption>图 2　注意力对词序「无感」。所以 Transformer 在输入嵌入上额外叠加一层<b>位置编码</b>，把「你排第几」告诉每个词。位置编码怎么设计，还直接影响模型能否外推到训练时没见过的更长序列——这是长上下文模型的技术难点之一。</figcaption>
   </figure>
@@ -118,7 +118,7 @@ window.DEEPDIVE["transformer"] = {
   <h2><span class="dd-n">6</span>模态无关：为什么它不止用于文本<span class="dd-badge intuition">直觉</span><span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">Transformer 是为语言设计的，可为什么图像、音频、甚至蛋白质也都在用它？</p>
   <p>关键在于：Transformer <b>不关心输入是什么，只关心「能不能变成一串向量（token）」</b>。把一张图切成一个个小方块、每块当作一个「词」，同一套 Transformer 就能处理视觉（这就是 ViT）；音频、视频、蛋白质序列同理。</p>
-  <div class="dd-note key"><b>这正是多模态的技术前提</b>　既然文本、图像、音频都能被切成 token 序列，那就能用<b>同一套架构、同一个模型</b>一起处理——一个模型同时看懂图和文，靠的就是 Transformer 这种「对模态无感」的通用性（见「多模态」节点）。</div>
+  <div class="dd-note key"><b>这正是多模态的重要技术前提</b>　文本、图像、音频都能表示成向量序列，因此可复用 Transformer 模块并建立跨模态注意力。实际系统既可能端到端统一，也可能组合专用编码器、投影器与语言模型；“同一架构可处理”不等于所有模态必须由同一组参数完成。</div>
 </section>
 
 <section class="dd-sec">
@@ -170,9 +170,9 @@ window.DEEPDIVE["transformer"] = {
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
       <li>把注意力连同必要配件封装成一个可反复堆叠的标准层，让信息逐层被加工得更抽象，从而能搭成深层大模型。</li>
-      <li>多头注意力（跨位置传信息）、前馈网络（逐位置非线性变换、存知识）是主角；残差连接（梯度直通车）、层归一化（稳数值）是配件。</li>
+      <li>多头注意力负责跨位置传信息，前馈网络负责逐位置非线性变换；残差连接提供稳定的信息与梯度路径，层归一化控制激活尺度。知识由整个网络的分布式参数共同承载。</li>
       <li>直接堆深会梯度消失、深层训不动；残差让梯度绕开连乘、层归一化控住数值尺度，去掉往往几层后就无法收敛。</li>
-      <li>因为注意力只按内容匹配汇总、对顺序无感，打乱输入结果一样；Transformer 在嵌入上额外叠加位置编码来注入词序。</li>
+      <li>因为不带位置表示的注意力对排列等变，无法区分先后；Transformer 通过绝对、相对或旋转等位置表示注入顺序。</li>
       <li>编码器擅长理解、解码器擅长生成、两者都用擅长转换；根本差别是每个位置「能看到哪些词」（左右全文 vs 只看左边）。</li>
       <li>因为它只要求输入能切成 token 序列、对模态无感；图像切块当词就能处理，于是能用同一套架构统一处理多种模态，这是多模态的前提。</li>
       <li>它把序列建模变成能吃满 GPU 并行的任务，使模型和数据可一起放大，缩放定律那条路才走得通。</li>
@@ -192,5 +192,15 @@ window.DEEPDIVE["transformer"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Attention Is All You Need</a>：原始架构、缩放点积注意力、位置编码与并行性。</li>
+    <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>：标准注意力的内存访问瓶颈与精确高效实现。</li>
+    <li><a href="https://arxiv.org/abs/2002.04745" target="_blank" rel="noopener">Xiong et al., On Layer Normalization in the Transformer Architecture</a>：Pre-LN/Post-LN 差异，说明“标准层”存在重要变体。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

@@ -71,7 +71,7 @@ window.DEEPDIVE["fine-tuning"] = {
       <tr><td>让它用某种固定语气/风格答</td><td>微调</td><td>同上，风格是可训练的行为</td></tr>
       <tr><td>让它掌握某专业领域的表达方式</td><td>微调</td><td>调的是「怎么说」，不是「记住哪条」</td></tr>
       <tr><td>让它知道我公司最新的文档/数据</td><td>RAG（检索）</td><td>事实要可更新、可溯源；微调塞事实易学不牢又过时</td></tr>
-      <tr><td>只是想让它这一次按要求做</td><td>提示 / 上下文学习</td><td>零成本，不用训练</td></tr>
+      <tr><td>只是想让它这一次按要求做</td><td>提示 / 上下文学习</td><td>不用训练、迭代快，但仍有 token 与评测成本</td></tr>
     </tbody>
   </table></div>
   <div class="dd-note warn"><b>最常见的用错</b>　「我想让模型知道我们公司的知识」——很多人第一反应是微调，其实多半该用 <b>RAG</b>：知识会变，检索能随时更新、还能给出处；而把一堆事实硬塞进权重，既容易记不牢，又可能挤掉别的能力（见第 6 节的「遗忘」）。<b>记不住的事实交给检索，改不动的习惯交给微调。</b></div>
@@ -126,7 +126,7 @@ window.DEEPDIVE["fine-tuning"] = {
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>阶梯</th><th>手段</th><th>先试它，如果……</th></tr></thead>
     <tbody>
-      <tr><td>① 最轻</td><td>提示 / 上下文学习</td><td>调措辞、给几个示例就够 → 到此为止（零成本、见「上下文学习」）</td></tr>
+      <tr><td>① 最轻</td><td>提示 / 上下文学习</td><td>调措辞、给几个示例就够 → 到此为止（无需训练、见「上下文学习」）</td></tr>
       <tr><td>② 中</td><td>RAG 检索</td><td>缺的是<b>事实/最新知识</b> → 外挂检索，别塞进权重</td></tr>
       <tr><td>③ 最重</td><td>微调</td><td>要的是<b>稳定的行为/格式/风格</b>，且提示压不稳、量也上来了 → 才微调</td></tr>
     </tbody>
@@ -182,7 +182,7 @@ window.DEEPDIVE["fine-tuning"] = {
       <li>用「指令→理想回答」示范数据把基座教成会回答；指令是输入、理想回答是标签，正是监督学习。</li>
       <li>冻结原权重，只在旁边训练两个低秩小矩阵来表示改动；可训练参数常不到 1%，省显存、训得快，且一个基座能挂多个可插拔适配器。</li>
       <li>为学新任务而丢掉预训练的通用能力；可用参数高效微调、更低学习率、在数据里掺通用样本来缓解。</li>
-      <li>因为提示/上下文学习零成本又快，往往就够；缺事实用 RAG。顺序是「提示/ICL → RAG → 微调」，微调是最后一档。</li>
+      <li>因为提示/上下文学习无需训练、迭代快，往往就够；缺可更新事实时考虑 RAG。常见评估顺序是「提示/ICL → RAG → 微调」，但应按质量、延迟与维护成本选择。</li>
     </ol>
   </details>
 </section>
@@ -199,5 +199,15 @@ window.DEEPDIVE["fine-tuning"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">Hu et al., LoRA</a>：低秩适配的参数高效微调机制。</li>
+    <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., InstructGPT</a>：监督微调、偏好数据与强化学习阶段。</li>
+    <li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">Dettmers et al., QLoRA</a>：量化基础模型上的高效微调。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

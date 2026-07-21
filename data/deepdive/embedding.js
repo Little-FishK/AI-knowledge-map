@@ -161,5 +161,15 @@ window.DEEPDIVE["embedding"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al., Efficient Estimation of Word Representations in Vector Space</a>：分布式词向量及其训练目标。</li>
+    <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>：句向量、余弦相似度与语义检索。</li>
+    <li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., Learning Transferable Visual Models From Natural Language Supervision</a>：跨模态图文嵌入与对比学习。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

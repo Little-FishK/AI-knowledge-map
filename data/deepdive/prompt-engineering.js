@@ -7,7 +7,7 @@ window.DEEPDIVE["prompt-engineering"] = {
   subtitle: "设计输入的措辞与结构，让模型稳定产出你想要的结果",
   aliases: "Prompt Engineering · 提示词工程",
   meta: "建议 20–30 分钟 · 基础 → 中级 · 需要：了解「大语言模型」「上下文学习」",
-  thesis: "提示工程是通过设计输入的措辞与结构，让模型稳定产出想要结果的一门手艺。它之所以有效，是因为模型对输入<b>极其敏感</b>——同一个问题换个问法，结果可能天差地别；而它又是<b>零成本</b>的：不改一个权重，只改你怎么问。",
+  thesis: "提示工程是通过设计输入的措辞、结构、示例与约束，提高模型产出符合要求结果的概率。它不改模型权重、迭代快，但并非零成本：更长的提示会增加 token、延迟、维护与评测成本，且跨模型迁移时需要重新验证。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -31,7 +31,7 @@ window.DEEPDIVE["prompt-engineering"] = {
   <h2><span class="dd-n">1</span>什么是提示工程<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：不训练、不改模型，怎么让它稳定产出我想要的结果？</p>
   <p>答案就是<b>把「怎么问」设计好</b>。提示工程不碰模型内部，只经营你喂给它的那段输入——说清要什么、给谁看、什么格式、什么口吻、给不给例子。像开头那个手表文案：把受众、卖点、条数、字数、风格都讲明白，输出质量立刻不同。</p>
-  <div class="dd-note intuition"><b>它是「零成本」的第一手段</b>　提示工程不改一个权重、即时生效、随时可改。所以面对任何需求，它几乎总是你<b>第一个该试</b>的办法——试通了就到此为止，省下训练和检索的成本。</div>
+  <div class="dd-note intuition"><b>它是「无需训练」的第一手段</b>　提示工程不改权重、即时生效、随时可改，通常适合先验证需求。但提示越长，推理费用、延迟、维护和回归评测成本越高；“不用训练”不等于“零成本”。</div>
 </section>
 
 <section class="dd-sec">
@@ -72,7 +72,7 @@ window.DEEPDIVE["prompt-engineering"] = {
     <li><b>要稳定的复杂行为/格式</b>，提示总压不稳、或每次都要写很长 → 考虑<b>微调</b>把行为固化。</li>
     <li><b>要管理的是「整个上下文里放什么」</b>（历史、检索、示例怎么组织）→ 那是更上层的<b>上下文工程</b>（见其节点）。</li>
   </ul>
-  <div class="dd-note key"><b>务实的阶梯</b>　先提示工程（零成本）→ 缺事实上 RAG → 要稳定行为再微调。<b>提示是起点，不是终点。</b></div>
+  <div class="dd-note key"><b>务实的阶梯</b>　先用提示工程低成本验证 → 缺可更新事实时考虑 RAG → 需要跨大量请求保持特定行为时再评估微调。具体顺序仍取决于质量、延迟、隐私与运维约束。<b>提示是起点，不是终点。</b></div>
 </section>
 
 <section class="dd-sec">
@@ -99,7 +99,7 @@ window.DEEPDIVE["prompt-engineering"] = {
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
-      <tr><td>提示工程要改/训练模型</td><td>不改一个权重，只改输入，零成本、即时</td></tr>
+      <tr><td>提示工程要改/训练模型</td><td>不改权重、只改输入，通常迭代快；仍有 token、延迟、维护与评测成本</td></tr>
       <tr><td>是玄学，靠念咒语</td><td>是把任务、受众、格式、约束讲清楚，可迭代可复现</td></tr>
       <tr><td>提示能变出模型没有的知识</td><td>不能；缺事实要靠 RAG，缺行为稳定性要靠微调</td></tr>
       <tr><td>一次写好就行</td><td>要看输出迭代调整，一次改一处更易调准</td></tr>
@@ -120,7 +120,7 @@ window.DEEPDIVE["prompt-engineering"] = {
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
-      <li>没改模型；核心是设计输入的措辞与结构，让模型稳定产出想要的结果，零成本、即时。</li>
+      <li>不改模型权重；核心是设计输入的措辞、结构、示例与约束来提高命中率。它即时但并非零成本。</li>
       <li>因为模型在预测「你给的文字之后最可能接下去的内容」，提示是它接龙的起点和条件，越明确越能锁定该说什么。</li>
       <li>清晰具体、给角色、指定格式、给示例（few-shot）、让它分步（思维链）、给边界——并迭代。</li>
       <li>上下文学习：提示在演示「要什么样的输出」，模型识别模式后照做。</li>
@@ -136,11 +136,21 @@ window.DEEPDIVE["prompt-engineering"] = {
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
       <tr><td>先修</td><td>大语言模型、上下文学习</td></tr>
-      <tr><td><b>本页核心</b></td><td>措辞与结构、清晰具体/角色/格式/示例、迭代、零成本调控</td></tr>
+      <tr><td><b>本页核心</b></td><td>措辞与结构、清晰具体/角色/格式/示例、迭代、无需训练但需评测</td></tr>
       <tr><td>紧邻延伸</td><td>思维链 CoT、系统提示、上下文工程、RAG、微调、提示注入</td></tr>
       <tr><td>更远</td><td>自洽性、思维树、结构化输出、提示缓存</td></tr>
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., GPT-3</a>：零样本、单样本与少样本上下文学习。</li>
+    <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al., Chain-of-Thought Prompting</a>：示例化中间步骤对复杂推理的影响。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理提示与外部行动交错的设计。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

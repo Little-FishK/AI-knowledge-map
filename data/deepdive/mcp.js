@@ -7,7 +7,7 @@ window.DEEPDIVE["mcp"] = {
   subtitle: "让任何工具和数据，都能用同一个标准接口插进 AI 应用",
   aliases: "MCP · Model Context Protocol · 模型上下文协议",
   meta: "建议 20–30 分钟 · 中级 · 需要：先了解「工具调用」",
-  thesis: "MCP 是一个<b>开放标准协议</b>，规范「模型应用如何连接外部工具与数据源」。在它之前，每个 AI 应用接每个工具都得写一套专用对接（M×N 套集成）；MCP 像 AI 世界的「USB-C」——工具方实现一次 server、应用方实现一次 client，就能互通，把 <b>M×N 变成 M+N</b>。",
+  thesis: "MCP 是一个<b>开放协议</b>，规范模型应用如何发现并使用外部工具、资源与提示。Host 管理用户体验和权限，内部 Client 与 Server 建立一对一会话，通过 JSON-RPC 完成初始化、版本与能力协商，再经 stdio 或 Streamable HTTP 传输消息。“M×N 变 M+N”是生态复用的理想化直觉，不代表不同服务无需认证、授权和语义适配。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -113,7 +113,8 @@ window.DEEPDIVE["mcp"] = {
     </svg>
     <figcaption>图 2　一个 Host（AI 应用）里可以有多个 Client，每个 Client 连一个 Server。要多接一个工具，就在 Host 里加一个 Client 去连它的 Server——即插即用。（三角色与传输方式的细节见「MCP 架构」节点。）</figcaption>
   </figure>
-  <div class="dd-note math"><b>Server 通常暴露三类东西</b>　<b>工具（tools）</b>——可被调用的操作（如「创建一个 issue」）；<b>资源（resources）</b>——可被读取的数据（如某个文件的内容）；<b>提示（prompts）</b>——预设好的提示模板。模型应用连上 Server，就能发现并使用这些。</div>
+  <div class="dd-note math"><b>Server 通常暴露三类东西</b>　<b>工具（tools）</b>是可调用操作；<b>资源（resources）</b>是可读取上下文；<b>提示（prompts）</b>是用户可选择的模板。它们的控制主体不同：工具常由模型决定调用，资源由应用管理，提示通常由用户显式选择。</div>
+  <div class="dd-note eng"><b>连接不是“插上就直接调用”</b>　Client 与 Server 先以 JSON-RPC 完成 <code>initialize</code> 握手，协商协议版本与双方能力，再进入正常会话；本地常用 <code>stdio</code>，远程常用 Streamable HTTP。只有协商声明的能力才应被使用，生命周期与错误也要按协议处理。</div>
 </section>
 
 <section class="dd-sec">
@@ -202,5 +203,15 @@ window.DEEPDIVE["mcp"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/architecture" target="_blank" rel="noopener">MCP Specification: Architecture</a>：Host/Client/Server 边界、能力协商与连接模型。</li>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/server/index" target="_blank" rel="noopener">MCP Specification: Server Features</a>：Resources、Prompts、Tools 三类服务端原语。</li>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/basic/transports" target="_blank" rel="noopener">MCP Specification: Transports</a>：JSON-RPC 消息与 stdio、Streamable HTTP 传输。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

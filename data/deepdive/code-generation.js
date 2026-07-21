@@ -39,7 +39,7 @@ window.DEEPDIVE["code-generation"] = {
     <li><b>可执行验证</b>：代码对不对，<b>跑一下就知道</b>——报错、测试挂了，都是明确的反馈。这和散文「好不好」没有客观标准截然不同。</li>
     <li><b>模式重复、结构化</b>：语法严格、套路多（增删改查、循环、错误处理），非常适合模型「按模式续写」。</li>
   </ul>
-  <div class="dd-note key"><b>「可验证」是重中之重</b>　大模型会幻觉、会自信地写错。但在代码上，<b>写错能被运行/测试当场抓出来、还能据此改</b>。这个「客观对错 + 可纠正」的特性，是别的生成任务（写文案、写邮件）梦寐以求的——也是 AI 编程能真正干活、而不只是「看着像」的根本原因。</div>
+  <div class="dd-note key"><b>「可验证」是重中之重，但验证只覆盖已表达的规格</b>　编译器、测试和静态分析能提供客观反馈；然而测试可能缺边界条件，程序也可能“测试全绿但需求理解错了”。可靠闭环需要先把需求变成可检查的验收条件，再结合单元测试、集成测试、安全扫描与人工审查。</div>
 </section>
 
 <section class="dd-sec">
@@ -91,6 +91,13 @@ window.DEEPDIVE["code-generation"] = {
     <li><b>过度信任</b>：代码越长、越像模像样，越容易让人放松审查——恰恰危险。</li>
   </ul>
   <div class="dd-note warn"><b>把它当「很强但会犯错的初级工程师」</b>　高产、好用，但产出<b>必须审、必须测</b>。AI 编程的正确用法是「人把关的加速器」，不是「无人监督的替代品」。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6.5</span>怎么评估：片段题不等于真实仓库<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">一个模型在小函数基准上很强，能否推出它会修真实项目？</p>
+  <p>不能直接推出。函数生成常用 <b>pass@k</b>：采样 k 个候选，只要至少一个通过隐藏测试就算成功；它衡量“多试几次能否命中”。仓库级任务还要求定位相关文件、理解依赖、修改最小范围并通过回归测试，SWE-bench 一类评测更接近这种流程。比较结果时还要固定测试集、工具权限、采样预算和是否允许重试，否则分数不可直接比较。</p>
+  <div class="dd-note math"><b>指标边界</b>　pass@1 关注单次命中，pass@k 还包含采样预算带来的收益；测试通过只证明通过了现有测试，不证明代码安全、性能合格或完全符合用户意图。</div>
 </section>
 
 <section class="dd-sec">
@@ -154,5 +161,15 @@ window.DEEPDIVE["code-generation"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al., Evaluating Large Language Models Trained on Code</a>：代码模型训练与 pass@k 评测。</li>
+    <li><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">Jimenez et al., SWE-bench</a>：真实仓库级软件工程任务评测。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：工具交互与反馈循环，可迁移到编码 Agent。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

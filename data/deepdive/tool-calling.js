@@ -57,7 +57,7 @@ window.DEEPDIVE["tool-calling"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">3</span>最关键的澄清：模型自己什么都不执行<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">上一步的②和③之间藏着最大的误解：是模型自己去调了天气 API 吗？</p>
-  <div class="dd-note warn"><b>不是。</b>　模型没有网络、没有手，它<b>唯一会做的还是生成文本</b>。所谓「调用工具」，是它生成了一段<b>特殊格式的文本</b>——「我想调用 <code>get_weather</code>，参数是<code>北京</code>」。真正去调 API、拿到结果的，是<b>你的程序</b>。模型只是<b>说出意图</b>，执行永远发生在模型之外。</div>
+  <div class="dd-note warn"><b>不是模型权重本身在执行。</b>　模型生成一个结构化调用请求；编排层负责校验、授权并执行 API，再把结果作为工具消息送回模型。某些托管产品把执行器封装在平台内部，看起来像“模型直接联网”，但安全边界仍应区分<b>生成调用意图</b>与<b>产生外部副作用</b>。</div>
   <p>把这一点想透，很多事就顺了：</p>
   <ul class="dd-steps">
     <li>为什么工具要<b>你</b>来实现——因为模型只会「点单」，「做菜」是你的程序的事。</li>
@@ -70,7 +70,7 @@ window.DEEPDIVE["tool-calling"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">4</span>它靠什么成立：结构化输出<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">既然模型是「说出」调用意图，那你的程序凭什么能<b>准确解析</b>它想调什么、传什么参数？</p>
-  <p>靠<b>严格的格式</b>。模型输出的调用意图不是随口一句话，而是一段结构化数据（通常是 JSON）：函数名 + 参数，一板一眼，程序能可靠解析。这正是<b>结构化输出</b>能力的用武之地——事实上，「调用请求」就是结构化输出的一种典型形态。</p>
+  <p>靠<b>结构化协议</b>。调用请求通常包含工具名与符合 schema 的参数；有的 API 以 JSON 暴露，有的使用专门的 tool-call 消息通道。结构化格式让程序可解析，但“解析成功”不等于“参数安全或语义正确”，执行前仍要做 schema 校验、业务规则校验、权限检查与用户确认。</p>
   <div class="dd-formula">{ "name": "get_weather", "arguments": { "city": "北京" } }</div>
   <p class="dd-formula-note">模型这一步真正生成的东西，长得就像这样：一个能被程序精确解析、并据此执行的结构化调用。</p>
   <div class="dd-note eng"><b>所以工具要「说明书」</b>　你得用一份 schema 事先告诉模型：有哪些工具、每个工具的参数叫什么、什么类型、是否必填。说明书写得越清楚，模型越不容易调错、传错参（见第 6 节的工具设计）。</div>
@@ -91,7 +91,7 @@ window.DEEPDIVE["tool-calling"] = {
   <ul class="dd-steps">
     <li><b>人在回路</b>：高危、不可逆的操作（付款、删除、群发）在执行前<b>让人确认</b>（见「人在回路」）。</li>
     <li><b>最小权限</b>：只给模型完成任务<b>必需</b>的工具和权限，别一股脑全开。</li>
-    <li><b>隔离与校验</b>：危险工具放沙箱里跑，参数做校验，结果做过滤。</li>
+    <li><b>隔离与校验</b>：危险工具放沙箱里跑；schema 只保证形状，执行器还要检查取值范围、资源归属、幂等性与业务授权，并过滤不可信结果。</li>
   </ul>
 </section>
 
@@ -112,7 +112,7 @@ window.DEEPDIVE["tool-calling"] = {
     <li>大模型只会生成文本，够不到实时信息、精确计算、外部系统——需要工具。<span>（§1）</span></li>
     <li>工具调用分五步：告知工具 → 模型输出调用意图 → 程序执行 → 结果回传 → 模型作答。<span>（§2）</span></li>
     <li>关键：模型只「说出意图」，真正执行的是你的程序——这条分工解释了一切。<span>（§3）</span></li>
-    <li>意图靠结构化输出（JSON：函数名+参数）表达，程序才能可靠解析。<span>（§4）</span></li>
+    <li>意图靠结构化请求（JSON 或专用 tool-call 消息：工具名+参数）表达；程序解析后仍需校验和授权。<span>（§4）</span></li>
     <li>它是 Agent「行动」环节的实现：有工具调用，模型才能做事、Agent 才成立。<span>（§5）</span></li>
     <li>但工具放大了破坏面，提示注入可劫持它，需人在回路、最小权限、隔离。<span>（§6）</span></li>
     <li>清晰的工具说明、别太多、约束参数，能让模型少调错。<span>（§7）</span></li>
@@ -127,7 +127,7 @@ window.DEEPDIVE["tool-calling"] = {
     <tbody>
       <tr><td>模型自己会去调 API / 执行代码</td><td>模型只<b>输出调用意图</b>；真正执行的是你的程序</td></tr>
       <tr><td>工具调用是模型内置的一个功能</td><td>工具要你来实现和接入；模型只负责「决定调什么」</td></tr>
-      <tr><td>调用意图是自然语言</td><td>是<b>结构化数据</b>（JSON：函数名+参数），程序才能解析</td></tr>
+      <tr><td>调用意图是自然语言</td><td>是<b>结构化请求</b>（JSON 或专用工具消息）；可解析不等于可安全执行</td></tr>
       <tr><td>接上工具就安全了，模型很聪明</td><td>提示注入可劫持工具；高危操作要人确认、最小权限</td></tr>
       <tr><td>工具越多模型越能干</td><td>工具过载会让它选错；要按需提供、说明清楚</td></tr>
     </tbody>
@@ -150,7 +150,7 @@ window.DEEPDIVE["tool-calling"] = {
       <li>查实时信息、精确大数计算、读写外部数据库、真的发邮件、运行代码看结果等——凡是超出「生成文本」的都做不到。</li>
       <li>准备：告知有哪些工具及其参数。五步：用户提问 → 模型输出调用意图 → 程序执行工具 → 结果回传 → 模型据此作答。</li>
       <li>容易以为是模型自己去调了 API；真相是模型只生成一段「调用意图」文本，真正执行的是外部程序。</li>
-      <li>因为程序要可靠地解析出函数名和参数并据此执行，自然语言太含糊，必须用 JSON 等严格格式。</li>
+      <li>因为程序要可靠解析工具名和参数，需使用 JSON 或专用工具消息等结构化格式；随后还要做 schema、业务规则与权限校验。</li>
       <li>工具调用是 Agent「行动」环节的实现；有了它模型才能做事，Agent 的「思考-行动-观察」循环才成立。</li>
       <li>模型会读外部内容，藏在其中的恶意指令可能诱导它输出危险调用，而程序会照执行；工具越强破坏越大。防护：人在回路确认高危操作、最小权限、沙箱与校验。</li>
       <li>工具过载让模型挑花眼、易选错；应按需提供、写清名字与描述、约束参数（枚举/必填）。</li>
@@ -170,5 +170,15 @@ window.DEEPDIVE["tool-calling"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>：工具选择、参数生成与结果回注。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：行动—观察闭环。</li>
+    <li><a href="https://arxiv.org/abs/2305.15334" target="_blank" rel="noopener">Patil et al., Gorilla</a>：API 调用、检索式工具文档与调用准确性。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };

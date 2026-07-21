@@ -68,7 +68,7 @@ window.DEEPDIVE["agent"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">4</span>为什么它比聊天难得多<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">最关键的一节：模型单步表现挺好，为什么一到多步任务就频频翻车？</p>
-  <div class="dd-note warn"><b>错误会累积。</b>　假设每一步成功率是 90%，听着不错。但一个任务要连做 10 步，整体成功率就是 0.9¹⁰ ≈ <b>35%</b>——中间任何一步错了，往往把后面全带偏。步数越多，这个「连乘衰减」越致命。这是 Agent 不稳定的根本数学原因。</div>
+  <div class="dd-note warn"><b>错误会累积。</b>　仅作直觉示例：若 10 个必要步骤彼此独立、每步成功率都固定为 90%，全成功概率是 0.9¹⁰ ≈ <b>35%</b>。真实 Agent 的步骤通常不独立，重试、验证和回滚会提高成功率，相关错误也可能让结果更差；因此连乘不是通用定律，但说明了为什么长链任务必须设置检查点。</div>
   <p>除了错误累积，还有几个常见坑：</p>
   <ul class="dd-steps">
     <li><b>打转</b>：陷进「试同一个失败动作」的循环出不来。</li>
@@ -119,7 +119,7 @@ window.DEEPDIVE["agent"] = {
     <tbody>
       <tr><td>Agent 是一种新模型</td><td>是大模型 + 工具 + 循环搭起来的系统，核心仍是那个模型</td></tr>
       <tr><td>越自主越先进越好</td><td>自主不稳、难控；能写死的写死，混合更务实</td></tr>
-      <tr><td>单步准，多步就准</td><td>错误随步数连乘衰减，多步成功率可能很低</td></tr>
+      <tr><td>单步准，多步就准</td><td>必要步骤会形成联合成功条件；独立同概率时可用连乘作直觉估算，真实系统还受相关性、重试与验证影响</td></tr>
       <tr><td>给它工具就能放手不管</td><td>会被提示注入劫持；高危操作要人在回路</td></tr>
       <tr><td>Agent 会像人一样思考</td><td>它在循环里逐步生成决策，会打转、会因幻觉乱调工具</td></tr>
     </tbody>
@@ -141,7 +141,7 @@ window.DEEPDIVE["agent"] = {
       <li>聊天是你一步步指挥、一问一答；Agent 是给个目标，它自己拆解、多步执行、据结果决定下一步，由它主导流程。</li>
       <li>思考/规划 → 行动（调工具）→ 观察结果 → 再思考，直到完成；行动对应工具调用。</li>
       <li>大模型（决策大脑）、工具调用（手）、规划（拆解任务）、记忆（外挂窗口装不下的信息）。</li>
-      <li>每步成功率相乘，10 步 90% 只剩约 35%；中间一步错常把后面带偏，步数越多越不稳。</li>
+      <li>在“步骤独立且同为 90%”的简化假设下，10 步全成功约 35%；真实系统并不满足该假设，所以应通过验证、重试、回滚和缩短链路控制风险。</li>
       <li>自主灵活但不稳、贵、难调；工作流稳定可复现但死板；务实做法是混合——能写死的写死，关键处才用 Agent。</li>
       <li>它会自主调工具真操作世界，提示注入可劫持它调危险工具，破坏面更大；防护是人在回路、最小权限、沙箱校验。</li>
     </ol>
@@ -160,5 +160,15 @@ window.DEEPDIVE["agent"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理轨迹与环境行动交错的 Agent 范式。</li>
+    <li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>：语言模型学习决定何时调用外部工具。</li>
+    <li><a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">Wang et al., A Survey on Large Language Model based Autonomous Agents</a>：规划、记忆、工具与反馈组件的系统整理。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div>
 `
 };
