@@ -606,6 +606,7 @@
 
   /* ───────────────────────── 软件模式 ───────────────────────── */
   const SW = window.SOFTWARE;
+  const TUTORIALS = window.TUTORIALS;
   let mode = "graph";               // graph | software
   const swView = document.getElementById("software-view");
   let swBuilt = false;
@@ -639,8 +640,11 @@
     const it = (SW.items || []).find(x => x.id === id);
     if (!it) return;
     const cat = SW.categories.find(c => c.id === it.cat) || { label: "", color: "#888", emoji: "" };
+    const hasTutorial = !!(TUTORIALS && TUTORIALS.items && TUTORIALS.items[id]);
     let h = `<div class="d-domain" style="color:${cat.color}">${cat.emoji} ${esc(cat.label)}`
-          + (it.by ? `<span style="color:var(--fg-faint)"> · ${esc(it.by)}</span>` : "") + `</div>`;
+          + (it.by ? `<span style="color:var(--fg-faint)"> · ${esc(it.by)}</span>` : "")
+          + (hasTutorial ? `<button class="dd-open" data-tutorial="${esc(id)}" title="打开软件使用教程">🎓 使用教程</button>` : "")
+          + `</div>`;
     h += `<h2 class="d-title">${esc(it.name)}</h2>`;
     h += `<div class="d-summary">${esc(it.summary || "")}</div>`;
     if (it.body) h += `<div class="d-sec"><div class="d-body">${mdLite(it.body)}</div></div>`;
@@ -660,6 +664,55 @@
     // 正文/概念链接 → 切回地图并选中该节点
     detailBody.querySelectorAll("[data-goto]").forEach(el =>
       el.addEventListener("click", () => { setMode("graph"); select(el.getAttribute("data-goto"), true); }));
+    detailBody.querySelectorAll("[data-tutorial]").forEach(el =>
+      el.addEventListener("click", () => openTutorial(el.getAttribute("data-tutorial"))));
+  }
+
+  function openTutorial(id) {
+    const t = TUTORIALS && TUTORIALS.items && TUTORIALS.items[id];
+    if (!t || !ddEl) return;
+    let body = `<div class="dd-hero">
+        <div class="dd-eyebrow">使用教程 · SOFTWARE GUIDE</div>
+        <h1 class="dd-h1">${esc(t.title)}</h1>
+        ${t.subtitle ? `<div class="dd-sub">${esc(t.subtitle)}</div>` : ""}
+        ${t.meta ? `<div class="dd-metabar">${esc(t.meta)}</div>` : ""}
+        ${t.overview ? `<div class="dd-thesis"><span class="dd-thesis-l">核心方法</span> ${esc(t.overview)}</div>` : ""}
+      </div>`;
+
+    if (Array.isArray(t.learningPath) && t.learningPath.length) {
+      body += `<section class="dd-sec"><h2><span class="dd-n">1</span>建议学习顺序</h2><ol class="dd-chain">`
+        + t.learningPath.map(x => `<li>${esc(x)}</li>`).join("") + `</ol></section>`;
+    }
+
+    let sectionNo = 2;
+    (TUTORIALS.platforms || []).forEach(p => {
+      const resources = (t.resources || []).filter(r => r.platform === p.id);
+      body += `<section class="dd-sec tutorial-platform"><h2><span class="dd-n">${sectionNo++}</span>${p.emoji} ${esc(p.label)} <span class="tutorial-count">${resources.length}</span></h2>`;
+      if (!resources.length) {
+        body += `<div class="tutorial-empty">尚未收录经过复核的 ${esc(p.label)} 教程。</div></section>`;
+        return;
+      }
+      resources.forEach((r, idx) => {
+        body += `<article class="tutorial-card" style="border-left-color:${p.color}">
+          <div class="tutorial-card-head"><span class="tutorial-index">${idx + 1}</span><div>
+            <h3>${esc(r.title)}</h3>
+            <div class="tutorial-meta">${esc(r.creator || "")} · ${esc(r.publishedAt || "")}${r.duration ? ` · ${esc(r.duration)}` : ""}</div>
+          </div></div>
+          ${r.audience ? `<div class="tutorial-audience"><b>适合：</b>${esc(r.audience)}</div>` : ""}
+          ${r.focus ? `<p>${esc(r.focus)}</p>` : ""}
+          ${(r.takeaways || []).length ? `<h4>最有价值的内容</h4><ul class="tutorial-takeaways">${r.takeaways.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+          ${r.caution ? `<div class="dd-note warn"><b>复核提醒</b>　${esc(r.caution)}</div>` : ""}
+          <a class="tutorial-link" href="${esc(r.url)}" target="_blank" rel="noopener">在 ${esc(p.label)} 打开原教程 ↗</a>
+        </article>`;
+      });
+      body += `</section>`;
+    });
+
+    if (t.sourceNote) body += `<div class="dd-src"><b>提炼范围与时效说明</b><p>${esc(t.sourceNote)}</p>${t.accessDate ? `<div class="dd-src-date">访问日期：${esc(t.accessDate)}</div>` : ""}</div>`;
+    document.getElementById("dd-top-name").textContent = t.title;
+    document.getElementById("dd-article").innerHTML = body;
+    ddEl.classList.remove("hidden");
+    ddEl.querySelector(".dd-scroll").scrollTop = 0;
   }
 
   function setMode(m) {

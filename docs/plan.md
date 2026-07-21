@@ -36,16 +36,18 @@ ai_knowledge_map/
 ├─ data/
 │  ├─ graph.js           # 概念、边、核心列表与固定坐标
 │  ├─ software.js        # 软件目录
+│  ├─ tutorials.js       # 软件使用教程、平台分类与来源提炼
 │  └─ deepdive/          # 每个概念一份“理解原理”页
 ├─ docs/
 │  ├─ SPEC.md            # 设计规格
 │  ├─ NODES.md           # 节点标准与全量清单
 │  ├─ SOFTWARE.md        # 软件收录标准
+│  ├─ TUTORIALS.md       # 软件使用教程页标准
 │  ├─ DEEPDIVE.md        # 深读页标准与覆盖进度
 │  ├─ INGEST.md          # 半自动入库规范
 │  └─ plan.md            # 本文件
 └─ tools/
-   ├─ validate.js / validate-software.js
+   ├─ validate.js / validate-software.js / validate-tutorials.js
    └─ proposals/         # 人工审核过的入库提案
 ```
 
@@ -88,6 +90,7 @@ ai_knowledge_map/
 
 - ✅ 核心视图、搜索、聚焦、关系过滤、软件目录、响应式布局已实现。
 - ✅ 28/28 核心节点已有“理解原理”页，另有 2 个非核心扩展页。
+- ✅ 软件“使用教程”全屏页与平台分类已实现；Codex 已收录 5 个 Bilibili 教程作为首个样板。
 - ⬜ 仍需完成真实浏览器全流程验收、截图记录和必要的交互修复。
 - ⬜ 是否建立远端仓库或公开部署由用户在项目完成后另行决定，不是当前前置条件。
 
