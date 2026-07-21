@@ -1,0 +1,165 @@
+/* 理解原理页 —— 嵌入 Embedding
+ * 写作规约见 docs/DEEPDIVE.md。全文原创，图示自绘。
+ */
+window.DEEPDIVE = window.DEEPDIVE || {};
+window.DEEPDIVE["embedding"] = {
+  title: "嵌入 Embedding",
+  subtitle: "把文字变成向量，让「意思相近」变成「距离相近」",
+  aliases: "Embedding · 向量表示 · 词向量",
+  meta: "建议 25–35 分钟 · 基础 → 中级 · 需要：向量、距离/夹角的基本概念",
+  thesis: "嵌入是「语义的坐标」：把一段文本（或一张图）变成一串数字（向量），关键性质是——<b>意思相近的内容，向量之间的距离也近</b>。它把抽象的「语义」变成了可以计算的东西，是检索、向量数据库、RAG、聚类乃至多模态的共同地基。",
+  html: `
+<div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>是什么</b>——把文本变成向量，为什么是「让意思近的靠得近」。</li>
+    <li><b>凭什么</b>——向量的距离凭什么正好对应语义的远近，是巧合吗。</li>
+    <li><b>能干嘛</b>——把语义变成可计算之后，解锁了哪些以前做不到的事。</li>
+    <li><b>两个「嵌入」</b>——为什么它有时是模型的一层、有时又是一个独立模型。</li>
+    <li><b>两个坑</b>——换模型要重建索引、对「否定」不敏感，各是怎么回事。</li>
+  </ul>
+</div>
+
+<div class="dd-note key">
+  <b>贯穿全页的最小例子</b>　你在帮助中心搜「<b>怎么退货</b>」，而文档里写的是「<b>商品返还流程</b>」。两句话<b>没有一个共同的关键词</b>，传统关键词搜索会漏掉它。嵌入要做的，就是让这两句话的向量<b>靠得很近</b>，从而被找到。全页围绕它展开。
+</div>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">1</span>什么是嵌入<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">本节回答：想让机器判断「两段话意思相近」，第一步要解决什么？</p>
+  <p>机器只会算数字，不会直接比「意思」。所以第一步是把文本变成数字——但不是随便变，而要变得<b>让「意思近」体现成「数字近」</b>。嵌入就是这么一种转换：一段文本经过嵌入模型，变成一个几百到几千维的<b>向量</b>，且满足一条关键性质——<b>语义相近的文本，向量之间的距离也近</b>。可以把它想成给每段话在一张「语义地图」上标了个坐标。</p>
+  <figure class="dd-fig">
+    <svg viewBox="0 0 560 230" role="img" aria-label="语义空间里，意思相近的内容聚在一起">
+      <rect x="20" y="20" width="520" height="195" rx="8" fill="none" stroke="#2c313b"/>
+      <g font-size="12">
+        <circle cx="110" cy="70" r="5" fill="#6b8cbe"/><text x="120" y="74" class="svg-t">猫</text>
+        <circle cx="140" cy="95" r="5" fill="#6b8cbe"/><text x="150" y="99" class="svg-t">狗</text>
+        <circle cx="105" cy="120" r="5" fill="#6b8cbe"/><text x="115" y="124" class="svg-t">宠物</text>
+        <text x="120" y="52" class="svg-t" fill="#6b8cbe">动物一簇</text>
+
+        <circle cx="410" cy="65" r="5" fill="#d3a05a"/><text x="420" y="69" class="svg-t">汽车</text>
+        <circle cx="440" cy="90" r="5" fill="#d3a05a"/><text x="450" y="94" class="svg-t">火车</text>
+        <text x="410" y="47" class="svg-t" fill="#d3a05a">交通工具一簇</text>
+
+        <circle cx="240" cy="165" r="5" fill="#4f9d78"/><text x="252" y="169" class="svg-t">怎么退货</text>
+        <circle cx="300" cy="180" r="5" fill="#4f9d78"/><text x="312" y="184" class="svg-t">商品返还流程</text>
+        <text x="240" y="205" class="svg-t" fill="#4f9d78">没有共同词，但意思近 → 挨在一起</text>
+      </g>
+    </svg>
+    <figcaption>图 1　把内容放进一张「语义地图」：意思相近的自动聚成一簇。注意「怎么退货」和「商品返还流程」——它们没有共同关键词，却因为意思相近而挨在一起。这正是嵌入的全部价值所在。</figcaption>
+  </figure>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">2</span>凭什么「距离能等于语义」<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">最关键的疑问：向量的远近，凭什么正好对应意思的远近？这不会是碰巧吧？</p>
+  <p>不是碰巧，是<b>训练目标逼出来的</b>。训练嵌入模型时，喂给它大量「这两句意思相近 / 这两句无关」的样本对，让它<b>调整参数，使相近的向量靠拢、无关的向量推开</b>。反复很多遍之后，整个向量空间的几何结构，就把语义关系「学」进去了。</p>
+  <div class="dd-note intuition"><b>更早的词向量，靠一个更朴素的假设</b>　「<b>上下文相似的词，意思也相似</b>」。「猫」和「狗」周围出现的词（喂、养、可爱、宠物店）高度重合，于是让它们的向量自然靠近。无论哪种训练方式，「距离 = 语义」都不是设计出来的规则，而是<b>训练的副产品</b>。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">3</span>它把「语义」变成了可计算的东西<span class="dd-badge math">数学</span></h2>
+  <p class="dd-lead">有了这张语义地图，我们具体能算什么？</p>
+  <p>最重要的一件：判断两段话是不是在讲同一件事，<b>不再需要它们共享字面词汇</b>，只要算一下两个向量的<b>夹角</b>（余弦相似度）——夹角越小、越同向，就越相近。语义，第一次变成了能用一个数直接比较的量。</p>
+  <div class="dd-formula">相似度 = cos(θ) = (A·B) / (‖A‖ ‖B‖)</div>
+  <p class="dd-formula-note">两个向量越同向，余弦值越接近 1，语义越相近；越接近 0（垂直），越不相关。</p>
+  <div class="dd-note math"><b>一个经典演示：向量还能做算术</b>　<code>国王 − 男人 + 女人 ≈ 女王</code>。这说明向量空间里的<b>方向本身</b>就承载了语义关系（这里「从男到女」是一个稳定的方向）。语义被编码进了几何。</div>
+  <div class="dd-note key"><b>这就是一大片技术的地基</b>　「把语义变成可算的向量」直接撑起了：<b>检索与语义搜索、向量数据库、RAG、聚类</b>——它们本质都在做「找向量最近的邻居」或「把相近的向量归堆」。理解嵌入，就理解了这些的共同底层。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>两个容易混的「嵌入」<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">你可能已经注意到：有时说嵌入是「模型里的一层」，有时又说它是「一个独立模型」。这是两回事，别混。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th></th><th>Transformer 内部的输入嵌入层</th><th>RAG 里说的「嵌入模型」</th></tr></thead>
+    <tbody>
+      <tr><td>是什么</td><td>模型架构的一部分</td><td>一个独立训练的模型</td></tr>
+      <tr><td>输出谁的向量</td><td>每个 <b>token</b> 的向量</td><td>整<b>段文本</b>的一个向量</td></tr>
+      <tr><td>目标</td><td>给 Transformer 喂输入（见其深读页）</td><td>让整段话的语义可比较、可检索</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note warn"><b>为什么要分清</b>　两者名字都叫「嵌入」，但一个是把 token 送进模型的<b>第一层</b>，一个是产出「整段文本表示」的<b>专用模型</b>。做 RAG 时你需要的是后者；把两者混为一谈，选型和实现都会出错。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>最典型的用武之地：语义搜索<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">回到开头那个例子——嵌入到底让什么「关键词搜索做不到的事」成为可能？</p>
+  <p>关键词搜索靠<b>字面匹配</b>：查询词必须和文档里的词对上。所以查「怎么退货」，命中不了只写「商品返还流程」的文档。而语义搜索换了个思路：把查询和每篇文档都<b>嵌入成向量</b>，再找<b>离查询向量最近</b>的那些文档——匹配的是<b>意思</b>，不是字。于是「退货」和「返还流程」尽管没有共同词，也能被召回。</p>
+  <div class="dd-note key"><b>它是 RAG 的心脏</b>　检索增强生成（RAG）回答问题前，就是用嵌入做语义搜索、从知识库里捞出相关材料，再交给大模型作答。<b>嵌入的质量，直接决定了检索能不能捞对</b>——而检索捞得对不对，往往是 RAG 效果的真正瓶颈（见「检索」「向量数据库」「RAG」节点）。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6</span>实践里的两个坑<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">用嵌入最容易在哪翻车？两个坑几乎人人踩过。</p>
+  <ul class="dd-steps">
+    <li><b>换嵌入模型，必须重建整个索引</b>。不同模型产出的向量<b>不在同一个空间</b>——A 模型的「猫」和 B 模型的「猫」坐标毫无可比性。用 A 建的库、拿 B 的向量去查，结果会是一堆噪声。换模型 = 全部重新嵌入。</li>
+    <li><b>对「否定」不敏感</b>。「适合儿童」和「<b>不</b>适合儿童」，字面几乎一样，向量也可能<b>非常接近</b>——但意思正相反。这类「一个字翻转全意」的场景，光靠向量相似度容易出错，要用别的手段兜底（如加规则、重排、结构化过滤）。</li>
+  </ul>
+  <div class="dd-note intuition"><b>顺带解一个疑惑：几百上千维，不会「维度灾难」吗？</b>　通常高维确实会让「距离失去区分度」（维度灾难）。但嵌入是<b>有结构的</b>高维——语义把向量约束在一个低得多的「流形」上，绝大多数维度组合根本不会出现。所以它反而可用，还能被降维可视化（见「维度灾难」「降维」节点）。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <ol class="dd-chain">
+    <li>机器要比「意思」，先得把文本变成数字，且让「意思近」体现成「数字近」——这就是嵌入。<span>（§1）</span></li>
+    <li>「距离 = 语义」不是设计的，是训练让相近靠拢、无关推开逼出来的。<span>（§2）</span></li>
+    <li>于是判断两段话是否同义，只需算向量夹角；语义第一次变成可计算的量。<span>（§3）</span></li>
+    <li>注意区分两个「嵌入」：Transformer 的输入嵌入层（每个 token）vs 独立的嵌入模型（整段文本）。<span>（§4）</span></li>
+    <li>它最典型的用途是语义搜索：按意思而非字面找最近邻，这是 RAG 的心脏。<span>（§5）</span></li>
+    <li>两个必知的坑：换模型要重建索引、对否定不敏感。<span>（§6）</span></li>
+  </ol>
+  <div class="dd-note key"><b>过关标准</b>　如果你能讲清「向量的距离为什么能等于语义」，并说出「语义搜索凭什么能召回没有共同关键词的文档」，你就抓住了嵌入的内核。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
+    <tbody>
+      <tr><td>嵌入就是把词编个号</td><td>是变成<b>连续向量</b>，且让语义相近的向量靠近；编号没有「远近」可言</td></tr>
+      <tr><td>距离等于语义是设计出来的规则</td><td>是训练目标（让相近靠拢）逼出来的副产品</td></tr>
+      <tr><td>不同模型的向量可以混用</td><td>不能；不在同一空间，换模型必须重建索引</td></tr>
+      <tr><td>语义相似度什么都能判</td><td>对「否定」等一字翻转的情形不敏感，需别的手段兜底</td></tr>
+      <tr><td>「嵌入层」和「嵌入模型」是一回事</td><td>一个输出 token 向量、是架构一层；一个输出整段文本向量、是独立模型</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <ol class="dd-quiz">
+    <li>嵌入把文本变成什么？关键性质是什么？</li>
+    <li>向量的距离凭什么能对应语义的远近？（用「训练目标」解释）</li>
+    <li>有了嵌入，判断两段话是否同义为什么不再需要共享关键词？具体算什么？</li>
+    <li>「Transformer 的输入嵌入层」和「RAG 的嵌入模型」有何区别？</li>
+    <li>语义搜索为什么能召回「怎么退货 / 商品返还流程」这种没有共同词的配对？</li>
+    <li>为什么换一个嵌入模型就必须重建整个索引？</li>
+    <li>为什么嵌入对「适合儿童 / 不适合儿童」这种否定容易判错？</li>
+  </ol>
+  <details class="dd-answers"><summary>参考答案</summary>
+    <ol>
+      <li>变成一个高维连续向量；关键性质是语义相近的文本，向量距离也近。</li>
+      <li>训练时用「相近/无关」的样本对，调参数让相近的向量靠拢、无关的推开，反复后向量几何就编码了语义。</li>
+      <li>因为语义已被编码进向量，只要算两个向量的夹角（余弦相似度）即可，不必有共同字面词。</li>
+      <li>前者是架构一层、输出每个 token 的向量；后者是独立模型、输出整段文本的一个向量，用于检索。</li>
+      <li>因为它匹配的是意思而非字面：两句话意思相近，向量就靠近，于是查询能找到它。</li>
+      <li>因为不同模型的向量不在同一空间，坐标不可比；旧库的向量和新模型的查询向量混用会得到无意义的结果。</li>
+      <li>因为字面几乎一样，向量也很接近，但意思相反；纯相似度分不出这一字之差的语义翻转。</li>
+    </ol>
+  </details>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>向量、点积与夹角、Token 与分词、神经网络</td></tr>
+      <tr><td><b>本页核心</b></td><td>语义坐标、余弦相似度、嵌入层 vs 嵌入模型、语义搜索</td></tr>
+      <tr><td>紧邻延伸</td><td>检索与语义搜索、向量数据库、RAG、聚类、维度灾难、降维</td></tr>
+      <tr><td>更远</td><td>多模态（跨模态共享嵌入空间）、CLIP、知识图谱</td></tr>
+    </tbody>
+  </table></div>
+</section>
+`
+};
