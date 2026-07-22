@@ -28,9 +28,10 @@ def run(cmd):
     p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.returncode, p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
 
-def groq_transcribe(audio, model):
+def groq_transcribe(audio, model, prompt=""):
     """用 Groq API 转录。key 从环境变量 GROQ_API_KEY 读取（绝不写进代码/仓库）。
-    没有 key 返回 None，由调用方回落到本地。长音频转 16kHz 单声道并切段以避开单请求上限。"""
+    没有 key 返回 None，由调用方回落到本地。长音频转 16kHz 单声道并切段以避开单请求上限。
+    prompt：领域词表，偏置专有名词拼写。"""
     key = os.environ.get("GROQ_API_KEY")
     if not key:
         return None
@@ -46,11 +47,13 @@ def groq_transcribe(audio, model):
     chunks = sorted(glob.glob(os.path.join(tmp, "c_*.mp3")))
     out, url = [], "https://api.groq.com/openai/v1/audio/transcriptions"
     for i, ch in enumerate(chunks):
+        data = {"model": model, "language": "zh", "response_format": "verbose_json"}
+        if prompt:
+            data["prompt"] = prompt
         with open(ch, "rb") as f:
             r = requests.post(url, headers={"Authorization": "Bearer " + key},
                               files={"file": (os.path.basename(ch), f, "audio/mpeg")},
-                              data={"model": model, "language": "zh", "response_format": "verbose_json"},
-                              timeout=600)
+                              data=data, timeout=600)
         r.raise_for_status()
         base = i * 900
         for s in r.json().get("segments", []):
@@ -64,6 +67,8 @@ def main():
     ap.add_argument("--asr", choices=["auto", "groq", "local"], default="auto",
                     help="转录用哪家：auto=有 GROQ_API_KEY 就用 Groq、否则本地；groq=强制 Groq；local=强制本地")
     ap.add_argument("--groq-model", default="whisper-large-v3", help="Groq 上的 Whisper 模型")
+    ap.add_argument("--prompt", default="",
+                    help="领域词表/上下文，纠正专有名词拼写（Groq 与本地都用；如 \"Codex DeepSeek ChatGPT Ollama CC Switch config.toml\"）")
     ap.add_argument("--model", default="large-v3-turbo", help="本地回落用的 faster-whisper 模型")
     ap.add_argument("--threshold", type=float, default=27.0)
     ap.add_argument("--height", type=int, default=480, help="关键帧视频的最大高度（越小越快，够 OCR 即可）")
@@ -102,7 +107,7 @@ def main():
     pairs, asr_used = None, None
     if a.asr in ("auto", "groq"):
         try:
-            pairs = groq_transcribe(audio, a.groq_model)
+            pairs = groq_transcribe(audio, a.groq_model, a.prompt)
             if pairs is not None:
                 asr_used = f"Groq / {a.groq_model}"
                 print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
@@ -114,7 +119,8 @@ def main():
             print("  ⚠ 指定 --asr groq 但未设 GROQ_API_KEY，回落本地", flush=True)
         from faster_whisper import WhisperModel
         wm = WhisperModel(a.model, device="cpu", compute_type="int8")
-        segs, _ = wm.transcribe(audio, language="zh", vad_filter=True)
+        segs, _ = wm.transcribe(audio, language="zh", vad_filter=True,
+                                initial_prompt=(a.prompt or None), beam_size=5)
         pairs = [(float(s.start), s.text.strip()) for s in segs]
         asr_used = f"本地 faster-whisper / {a.model}"
         print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
