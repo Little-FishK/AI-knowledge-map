@@ -194,10 +194,16 @@ review: {
 为把资源从 E1（仅凭标题/简介）提到 E2（足以还原关键步骤），提供一条**本地、免费、可自动化**的取证管线：
 
 ```text
-py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--model small|large-v3-turbo]
+py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|local] [--model small|large-v3-turbo]
 ```
 
-它**免登录**完成：yt-dlp 下音频+低清视频 → faster-whisper 转录（逐段带时间戳）→ PySceneDetect 按画面切换自动选关键帧 → RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 汇成 `<前缀>.evidence.md`。
+它**免登录**完成：yt-dlp 下音频+低清视频 → **转录**（逐段带时间戳）→ PySceneDetect 按画面切换自动选关键帧 → RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 汇成 `<前缀>.evidence.md`。
+
+**转录后端**（`--asr`，默认 `auto`）：
+
+- **Groq Whisper（推荐）**：设了环境变量 `GROQ_API_KEY` 时自动启用，跑 `whisper-large-v3`——比本地准、快约百倍、近乎免费（有免费额度）。长音频自动压成 16kHz 单声道并切段以避开单请求上限。key **只从环境变量读，绝不写进代码/仓库**（`setx GROQ_API_KEY "..."` 或临时 `$env:GROQ_API_KEY="..."`）。
+- **本地 faster-whisper（回落）**：没 key 时用，零成本但 CPU 上慢；`--model` 选 small（快）或 large-v3-turbo（准）。
+- 无论哪家，ASR 都只作草稿——专有名词/命令仍以 OCR 与官方文档为准。
 
 用法要点：
 

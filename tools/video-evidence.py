@@ -28,11 +28,43 @@ def run(cmd):
     p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.returncode, p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
 
+def groq_transcribe(audio, model):
+    """用 Groq API 转录。key 从环境变量 GROQ_API_KEY 读取（绝不写进代码/仓库）。
+    没有 key 返回 None，由调用方回落到本地。长音频转 16kHz 单声道并切段以避开单请求上限。"""
+    key = os.environ.get("GROQ_API_KEY")
+    if not key:
+        return None
+    import glob, requests
+    tmp = audio + "_groqchunks"
+    os.makedirs(tmp, exist_ok=True)
+    for old in glob.glob(os.path.join(tmp, "c_*.mp3")):
+        os.remove(old)
+    # 压成 16kHz 单声道 mp3 并按 900s 切段（控体积、避开单请求大小限制）
+    subprocess.run(["ffmpeg", "-y", "-i", audio, "-ar", "16000", "-ac", "1", "-b:a", "32k",
+                    "-f", "segment", "-segment_time", "900", os.path.join(tmp, "c_%03d.mp3")],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    chunks = sorted(glob.glob(os.path.join(tmp, "c_*.mp3")))
+    out, url = [], "https://api.groq.com/openai/v1/audio/transcriptions"
+    for i, ch in enumerate(chunks):
+        with open(ch, "rb") as f:
+            r = requests.post(url, headers={"Authorization": "Bearer " + key},
+                              files={"file": (os.path.basename(ch), f, "audio/mpeg")},
+                              data={"model": model, "language": "zh", "response_format": "verbose_json"},
+                              timeout=600)
+        r.raise_for_status()
+        base = i * 900
+        for s in r.json().get("segments", []):
+            out.append((base + float(s["start"]), s["text"].strip()))
+    return out
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("url")
     ap.add_argument("prefix")
-    ap.add_argument("--model", default="large-v3-turbo")
+    ap.add_argument("--asr", choices=["auto", "groq", "local"], default="auto",
+                    help="转录用哪家：auto=有 GROQ_API_KEY 就用 Groq、否则本地；groq=强制 Groq；local=强制本地")
+    ap.add_argument("--groq-model", default="whisper-large-v3", help="Groq 上的 Whisper 模型")
+    ap.add_argument("--model", default="large-v3-turbo", help="本地回落用的 faster-whisper 模型")
     ap.add_argument("--threshold", type=float, default=27.0)
     ap.add_argument("--height", type=int, default=480, help="关键帧视频的最大高度（越小越快，够 OCR 即可）")
     a = ap.parse_args()
@@ -65,15 +97,28 @@ def main():
              f"bv*[height<={a.height}]+ba/b[height<={a.height}]/best",
              "--merge-output-format", "mp4", "--no-playlist", "-o", video, a.url])
 
-    # 4) 转录
-    print(f"[4/5] 转录（{a.model}）…", flush=True)
-    from faster_whisper import WhisperModel
-    wm = WhisperModel(a.model, device="cpu", compute_type="int8")
-    segs, info = wm.transcribe(audio, language="zh", vad_filter=True)
-    transcript = []
-    for s in segs:
-        m, sec = divmod(int(s.start), 60)
-        transcript.append(f"[{m:02d}:{sec:02d}] {s.text.strip()}")
+    # 4) 转录：优先 Groq（快、准 large-v3、近乎免费），无 key 回落本地
+    print("[4/5] 转录…", flush=True)
+    pairs, asr_used = None, None
+    if a.asr in ("auto", "groq"):
+        try:
+            pairs = groq_transcribe(audio, a.groq_model)
+            if pairs is not None:
+                asr_used = f"Groq / {a.groq_model}"
+                print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
+        except Exception as e:
+            print(f"  ⚠ Groq 转录失败，回落本地：{e}", flush=True)
+            pairs = None
+    if pairs is None:
+        if a.asr == "groq":
+            print("  ⚠ 指定 --asr groq 但未设 GROQ_API_KEY，回落本地", flush=True)
+        from faster_whisper import WhisperModel
+        wm = WhisperModel(a.model, device="cpu", compute_type="int8")
+        segs, _ = wm.transcribe(audio, language="zh", vad_filter=True)
+        pairs = [(float(s.start), s.text.strip()) for s in segs]
+        asr_used = f"本地 faster-whisper / {a.model}"
+        print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
+    transcript = [f"[{int(st)//60:02d}:{int(st)%60:02d}] {tx}" for st, tx in pairs]
 
     # 5) 场景检测 + 抽帧 + OCR
     print("[5/5] 场景检测 + OCR…", flush=True)
@@ -99,7 +144,7 @@ def main():
           f"- URL：{a.url}",
           f"- 标题：{meta.get('title','?')}",
           f"- 作者：{meta.get('uploader','?')} · 时长：{meta.get('duration','?')}s · 日期：{meta.get('upload_date','?')}",
-          f"- 转录模型：{a.model} · 生成：{time.strftime('%Y-%m-%d')}",
+          f"- 转录：{asr_used} · 生成：{time.strftime('%Y-%m-%d')}",
           "", "> 转录仅作草稿；专有名词/命令/数值以下方 OCR 与官方文档为准。", ""]
     if meta.get("chapters"):
         md += ["## 章节", ""] + [f"- [{int(t or 0)//60:02d}:{int(t or 0)%60:02d}] {title}" for t, title in meta["chapters"]] + [""]
