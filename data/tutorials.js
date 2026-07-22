@@ -4,7 +4,7 @@
  * 每条资源先还原完整教学路径，再提炼相对其他资源独有、可复现的技巧。
  */
 window.TUTORIALS = {
-  meta: { version: "0.3", updatedAt: "2026-07-21" },
+  meta: { version: "0.4", updatedAt: "2026-07-21" },
 
   /* 评分块 review（TUTORIALS.md 三层审核落到数据，由 tools/validate-tutorials.js 强制校验）：
    *   evidence : "E0"|"E1"|"E2"|"E3"          —— 第一层证据等级
@@ -27,7 +27,7 @@ window.TUTORIALS = {
       subtitle: "从安装、任务规划到扩展与真实项目验证",
       meta: "5 个 Bilibili 教程 · 逐项重写 2026-07-21 · 操作细节经当前官方资料校准",
       overview: "这里不再用几句观点代替教程。每个视频先按实际教学主题说明要做什么、怎么做以及做到什么算完成；然后再提炼它相对另外四个视频最独特的工作方法。平台通过左侧栏切换，视频卡片可折叠，新增平台不会把读者推到页面底部。",
-      sourceNote: "视频内容依据公开视频页面、简介、章节或选集标题与演示主题提炼，并非逐字字幕。为了让操作能够真正执行，Codex 的安装、配置、Memory、Skills、Plugins、MCP、第三方与本地模型部分使用 2026-07-21 的 OpenAI 官方资料校准；界面入口和兼容性仍可能随版本变化。第三方下载、中转服务与模型端点需自行核验隐私、费用和凭证风险。",
+      sourceNote: "各资源的取证方式以其 review.evidence 为准：标 E2 的（如「第三方模型驱动 Codex」）已用 yt-dlp 下载音频、faster-whisper 全程转录后逐条重写，步骤忠于视频、仅用官方资料核对术语；仍标 E1/candidate 的，只依据视频页面/简介/章节标题提炼、关键步骤经官方资料补写，尚待完整转录复核。界面入口和兼容性可能随版本变化；第三方下载、中转服务与模型端点需自行核验隐私、费用和凭证风险。",
       accessDate: "2026-07-21",
       officialSources: [
         { label: "Codex Best practices", url: "https://learn.chatgpt.com/guides/best-practices" },
@@ -117,23 +117,26 @@ window.TUTORIALS = {
           publishedAt: "2026-06-28",
           duration: "10:17",
           audience: "需要替换模型提供方、接入代理或控制调用成本的进阶用户",
-          summary: "视频聚焦把 Codex 的 Agent 外壳与默认模型服务解耦：准备第三方端点与凭证，在用户级 config.toml 定义模型提供方，选择该 provider 和模型后启动 Codex，再用一次包含读文件、改文件、运行测试和失败修复的任务验证兼容性。关键不在“聊天能回复”，而在端点是否支持 Codex 所需协议、流式响应与工具调用。",
+          summary: "视频演示不用 OpenAI 账号、改用国产模型（以 DeepSeek 为例，GLM/Kimi 同理）驱动 Codex。核心不是改 config.toml，而是借助第三方 GUI「CC Switch」新增 DeepSeek 配置，并开启它的「本地路由」在 Codex 的 Responses 协议与 DeepSeek 的 ChatCompletions 协议之间做双向格式转换——这一步才是让第三方模型真正能驱动 Codex（而不只是能聊天）的关键。最后固定/确认所用的具体模型（V4 Flash / V4 Pro）。",
           coverage: [
-            { title: "准备服务参数", steps: ["从服务商官方控制台取得 base URL、模型 ID、认证方式和计费／数据策略。", "确认端点支持 Codex 当前需要的 Responses 协议与工具调用；只兼容普通聊天接口并不等于可驱动 Agent。", "把密钥放入环境变量或受控凭证系统，不写进仓库、提示词或截图。"], done: "四项参数都有官方来源，且已知道数据会发送到哪里。" },
-            { title: "配置自定义 provider", steps: ["打开用户级 ~/.codex/config.toml；provider 认证和重定向配置不要放进项目级 .codex/config.toml。", "设置 model_provider 和 model；在 [model_providers.<名称>] 中填写 name、base_url、env_key，兼容端点需要时写 wire_api = \"responses\"。", "启动新会话；临时测试也可用命令行覆盖，但长期配置应有清晰名称并可撤销。"], done: "Codex 启动时选中目标 provider，密钥未出现在 git diff。" },
-            { title: "做 Agent 兼容性验收", steps: ["任务一：读取多个文件并准确复述依赖。", "任务二：修改一个小功能并正确生成工具调用。", "任务三：运行测试、读取失败输出、自主修复后复跑。", "再测试较长上下文、取消操作和限流错误；记录成功率、延迟与费用。"], done: "不仅能对话，而且能稳定完成读取—修改—测试—纠错闭环。" }
+            { title: "装好 Codex，确认它绕不开 OpenAI 账号", steps: ["打开 OpenAI 页面下载 Codex，按常规方式安装。", "启动后 Codex 要求登录：两个选项一是用 ChatGPT 账号，二是「其他方法」——点进去会发现「其他方法」其实是填 OpenAI API key，两条都需要 OpenAI 账号。", "先把 Codex 关掉，等第三方配置好后再打开。"], done: "你已确认默认登录都要 OpenAI 账号，并退出 Codex 准备走第三方路线。" },
+            { title: "申请 DeepSeek API key", steps: ["打开 DeepSeek 用量页面；余额为 0 就先充值，约 5 元基本够用。", "进入 API keys 页面点「创建 API key」，起个名字（如 default）后点创建。", "DeepSeek 只展示这把 key 一次，之后不再显示——立即复制并妥善离线保存，再关闭弹窗。"], done: "你手里有一把 DeepSeek API key，且已保存（页面不会再显示）。" },
+            { title: "用 CC Switch 新增并启用 DeepSeek 配置", steps: ["打开 CC Switch 官网点免费下载，会跳到 GitHub Releases；展开 Show All Assets，按系统（Windows/macOS）选对应安装包并安装。", "打开 CC Switch，点右上角「+」新增配置，在预设供应商里选 DeepSeek，往下把刚才的 API key 粘进去，点添加。", "把鼠标移到新配置上点「启用」。"], done: "CC Switch 里出现并启用了一个 DeepSeek 配置。" },
+            { title: "开启本地路由，桥接 Responses 与 ChatCompletions", steps: ["启用时 CC Switch 会警告：此供应商用 OpenAI Chat（ChatCompletions）格式，需路由服务。原因是 Codex 用的是 Responses 协议，而 DeepSeek 等多数供应商只提供 ChatCompletions，两者不兼容。", "点齿轮进设置 → 路由 → 本地路由，打开开关（让格式转换开关显示到主页，便于以后开关）。", "返回主页，点开这个路由开关。路由会把 Codex 的 Responses 请求转成 ChatCompletions 发给模型，再把模型响应转回 Responses。"], done: "路由已开启，Codex 与 DeepSeek 之间的协议格式差异被自动转换。" },
+            { title: "启动 Codex 验证，并固定/确认具体模型", steps: ["打开 Codex：这次直接进入、不再要求 OpenAI 登录，随便发条消息能正常回复。", "此时 Codex 把模型标成 Custom，看不出用的是 DeepSeek V4 Flash 还是 V4 Pro；到 CC Switch 点编辑往下看可确认当前是哪个。", "想固定用 Pro：在 CC Switch 编辑配置的「模型映射」里删掉 deepseek-v4-flash 一项、只留 pro，保存；再重启 CC Switch 和 Codex 使其生效。", "打开配置文件 ~/.codex/config.toml 确认默认模型已是 deepseek-v4-pro，回 Codex 新建对话发个请求最终验证。"], done: "Codex 无需 OpenAI 账号即可运行，且 config.toml 里确认默认模型正是你选定的 DeepSeek 模型。" }
           ],
           uniqueTechniques: [
-            { title: "可热切换的 Provider 基准卡", scenario: "适合在默认模型、代理和多家模型之间做成本／能力选择。", steps: ["为每个 provider 使用独立配置名称和相同测试仓库。", "固定三道任务：跨文件理解、带测试的小改动、故意制造一次失败后的修复。", "记录完成率、工具调用错误、总耗时、人工接管次数和实际费用。", "只有达到基线的 provider 才进入真实仓库；低成本但频繁需要人工修复的方案不算更便宜。"], result: "替换模型从主观聊天观感变成可复测的工程决策。" }
+            { title: "用「本地路由」桥接 Responses 与 ChatCompletions", scenario: "任何「第三方/兼容端点聊天能通、但在 Codex 里用不了」的情形——根因几乎都是协议格式不匹配。", steps: ["认出报错关键词：供应商用 ChatCompletions、Codex 要 Responses、需先启动路由。", "在 CC Switch 设置里开「本地路由」，它双向转换两种格式。", "验证时别只看「能不能聊天」，要让 Codex 真正读文件/改文件跑一次，确认工具调用也通——聊天通不代表 Agent 能力通。"], result: "第三方模型不仅能对话，还能真正驱动 Codex 的读写、执行等 Agent 工作流。", limitation: "依赖 CC Switch 这个第三方 GUI 及其当前行为；直接手改 config.toml 也能达到同样效果，但需自己处理 wire_api 与转换。" },
+            { title: "删「模型映射」只留一项来固定默认模型", scenario: "CC Switch 没有直接切模型的选项、Codex 侧又不显示/不切换模型（视频中疑似 bug）时的绕行办法。", steps: ["回 CC Switch 点编辑，找到「模型映射」一栏。", "把不想用的一项（如 deepseek-v4-flash）删掉，只留目标模型（pro），保存。", "重启 CC Switch 和 Codex 生效，再用 ~/.codex/config.toml 里的默认模型确认。"], result: "在 UI 缺少切换入口时，仍能把默认模型稳定固定到某个具体型号。", limitation: "是针对当前版本 bug 的临时手法；日后 Codex 补上模型切换后可能不再需要。" }
           ],
-          caution: "第三方端点涉及可靠性、隐私、计费和账号风险；本页不为任何中转服务背书，协议不兼容时不要强行用于生产代码。",
+          caution: "这是「第三方 GUI（CC Switch）+ 本地路由」方案：你的代码与请求会经路由发往 DeepSeek 云端，注意隐私与数据合规；API key 只离线保存，别写进仓库、提示词或截图，别提交到 git。CC Switch 属第三方工具、DeepSeek 需充值，均从官方来源获取并自担费用与账号风险。视频中 Codex 不显示/不切换模型疑似 bug，日后可能修复；按钮位置、模型名（DeepSeek V4 Flash/Pro）与路由入口可能随版本变化，请以 ~/.codex/config.toml 的实际内容为准。",
           review: {
-            evidence: "E1",
-            status: "candidate",
+            evidence: "E2",
+            status: "formal",
             reviewedAt: "2026-07-21",
-            standards: null,
-            quality: null,
-            notes: "证据来自视频页面/简介/章节·选集标题与演示主题，非逐段观看或字幕；配置步骤经官方资料校准。按 TUTORIALS.md 保守定 E1、暂列候选，需完整观看补足证据升 E2 后方可评分转正式收录。"
+            standards: { accuracy: 2, alignment: 2, reproducibility: 2, traceability: 2, safety: 2 },
+            quality: { closure: 4, transfer: 4, completeness: 4, structure: 3, freshness: 3, accessibility: 2 },
+            notes: "据 yt-dlp 下载音频 + faster-whisper(small) 全程转录（262 段、约 10 分钟）逐条重写；协议格式（Responses vs ChatCompletions）与模型名对照官方资料核对。质量总分 63.75（核心推荐档）。注：原视频无 CC 字幕、由音频转录取证，故 accessibility 记 2。"
           }
         },
         {
