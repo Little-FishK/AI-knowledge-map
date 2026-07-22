@@ -70,8 +70,9 @@ def main():
     ap.add_argument("--prompt", default="",
                     help="领域词表/上下文，纠正专有名词拼写（Groq 与本地都用；如 \"Codex DeepSeek ChatGPT Ollama CC Switch config.toml\"）")
     ap.add_argument("--model", default="large-v3-turbo", help="本地回落用的 faster-whisper 模型")
-    ap.add_argument("--threshold", type=float, default=27.0)
-    ap.add_argument("--height", type=int, default=480, help="关键帧视频的最大高度（越小越快，够 OCR 即可）")
+    ap.add_argument("--interval", type=int, default=8, help="抽帧间隔秒（越小越密、越慢；治长镜头漏采）")
+    ap.add_argument("--dedup", type=float, default=8.0, help="相邻帧去重阈值（灰度均值差；越大去重越激进）")
+    ap.add_argument("--height", type=int, default=480, help="抽帧视频的最大高度（480 快；难啃的小字调 720 让 OCR 更准）")
     a = ap.parse_args()
 
     frames_dir = a.prefix + "_frames"
@@ -126,24 +127,37 @@ def main():
         print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
     transcript = [f"[{int(st)//60:02d}:{int(st)%60:02d}] {tx}" for st, tx in pairs]
 
-    # 5) 场景检测 + 抽帧 + OCR
-    print("[5/5] 场景检测 + OCR…", flush=True)
+    # 5) 密采抽帧（治长镜头漏采）→ 相邻感知去重（去冗余）→ OCR
+    print("[5/5] 抽帧 + 去重 + OCR…", flush=True)
     ocr_lines = []
     try:
-        from scenedetect import detect, ContentDetector
+        import glob, cv2, numpy as np
         from rapidocr_onnxruntime import RapidOCR
         ocr = RapidOCR()
-        scenes = detect(video, ContentDetector(threshold=a.threshold, min_scene_len=15))
-        for i, (start, end) in enumerate(scenes):
-            mid = (start.seconds + end.seconds) / 2
-            fp = os.path.join(frames_dir, f"s{i:02d}_{int(mid):04d}s.jpg")
-            subprocess.run(["ffmpeg", "-y", "-ss", str(mid), "-i", video, "-vframes", "1", "-q:v", "3", fp],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for old in glob.glob(os.path.join(frames_dir, "f_*.jpg")):
+            os.remove(old)
+        # 一次过按固定间隔抽帧（frame i ≈ i×interval 秒）
+        subprocess.run(["ffmpeg", "-y", "-i", video, "-vf", f"fps=1/{a.interval}", "-q:v", "3",
+                        os.path.join(frames_dir, "f_%05d.jpg")],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        allf = sorted(glob.glob(os.path.join(frames_dir, "f_*.jpg")))
+        prev, kept = None, 0
+        for idx, fp in enumerate(allf):
+            g = cv2.imread(fp, cv2.IMREAD_GRAYSCALE)
+            if g is None:
+                continue
+            sm = cv2.resize(g, (64, 36)).astype("int16")
+            if prev is not None and float(np.mean(np.abs(sm - prev))) < a.dedup:
+                os.remove(fp)          # 与上一保留帧几乎相同 → 丢弃
+                continue
+            prev, kept = sm, kept + 1
             res, _ = ocr(fp)
             txt = re.sub(r"\s+", " ", " | ".join(t for _, t, c in res if float(c) >= 0.6)) if res else ""
-            ocr_lines.append(f"- [{int(mid)//60:02d}:{int(mid)%60:02d}] `{os.path.basename(fp)}` — {txt[:400]}")
+            sec = idx * a.interval
+            ocr_lines.append(f"- [{sec//60:02d}:{sec%60:02d}] `{os.path.basename(fp)}` — {txt[:400]}")
+        print(f"  抽样 {len(allf)} 帧 → 去重后保留 {kept} 帧", flush=True)
     except Exception as e:
-        ocr_lines.append(f"（场景/OCR 阶段失败：{e}）")
+        ocr_lines.append(f"（抽帧/OCR 阶段失败：{e}）")
 
     # 写证据包
     md = [f"# 视频取证证据包 — {a.prefix}", "",

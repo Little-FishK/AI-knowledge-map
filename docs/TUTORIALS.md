@@ -194,10 +194,12 @@ review: {
 为把资源从 E1（仅凭标题/简介）提到 E2（足以还原关键步骤），提供一条**本地、免费、可自动化**的取证管线：
 
 ```text
-py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|local] [--model small|large-v3-turbo]
+py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|local] [--prompt "领域词表"] [--interval 8] [--height 480|720]
 ```
 
-它**免登录**完成：yt-dlp 下音频+低清视频 → **转录**（逐段带时间戳）→ PySceneDetect 按画面切换自动选关键帧 → RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 汇成 `<前缀>.evidence.md`。
+它**免登录**完成：yt-dlp 下音频+低清视频 → **转录**（逐段带时间戳）→ 按固定间隔**密采关键帧**并**相邻感知去重**（治长镜头漏采、去冗余）→ RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 汇成 `<前缀>.evidence.md`。
+
+调参：`--prompt` 领域词表纠专名拼写（Groq/本地都用）；`--interval` 抽帧间隔秒（越小越密）；`--height 720` 抽更高清帧、OCR 小字更准；`--dedup` 相邻帧去重阈值。
 
 **转录后端**（`--asr`，默认 `auto`）：
 
