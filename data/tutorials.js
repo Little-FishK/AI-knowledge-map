@@ -4,7 +4,7 @@
  * 每条资源先还原完整教学路径，再提炼相对其他资源独有、可复现的技巧。
  */
 window.TUTORIALS = {
-  meta: { version: "0.4", updatedAt: "2026-07-21" },
+  meta: { version: "0.5", updatedAt: "2026-07-22" },
 
   /* 评分块 review（TUTORIALS.md 三层审核落到数据，由 tools/validate-tutorials.js 强制校验）：
    *   evidence : "E0"|"E1"|"E2"|"E3"          —— 第一层证据等级
@@ -25,9 +25,9 @@ window.TUTORIALS = {
     codex: {
       title: "Codex 使用教程",
       subtitle: "从安装、任务规划到扩展与真实项目验证",
-      meta: "5 个 Bilibili 教程 · 逐项重写 2026-07-21 · 操作细节经当前官方资料校准",
+      meta: "5 个 Bilibili 教程 · 全部逐段转录后重写 2026-07-22 · 均达 E2 正式收录",
       overview: "这里不再用几句观点代替教程。每个视频先按实际教学主题说明要做什么、怎么做以及做到什么算完成；然后再提炼它相对另外四个视频最独特的工作方法。平台通过左侧栏切换，视频卡片可折叠，新增平台不会把读者推到页面底部。",
-      sourceNote: "各资源的取证方式以其 review.evidence 为准：标 E2 的（如「第三方模型驱动 Codex」）已用 yt-dlp 下载音频、faster-whisper 全程转录后逐条重写，步骤忠于视频、仅用官方资料核对术语；仍标 E1/candidate 的，只依据视频页面/简介/章节标题提炼、关键步骤经官方资料补写，尚待完整转录复核。界面入口和兼容性可能随版本变化；第三方下载、中转服务与模型端点需自行核验隐私、费用和凭证风险。",
+      sourceNote: "5 条资源均已用 yt-dlp 下载音频（合集按 11 分P分别下载）、Groq/whisper-large-v3 全程转录并对关键帧 OCR，逐条按视频改写、仅用官方资料核对术语，evidence 均为 E2、status 均为 formal。界面入口、模型名与兼容性可能随版本变化；第三方下载、中转服务、OAuth 授权与模型端点需自行核验隐私、费用和凭证风险。",
       accessDate: "2026-07-21",
       officialSources: [
         { label: "Codex Best practices", url: "https://learn.chatgpt.com/guides/best-practices" },
@@ -52,30 +52,30 @@ window.TUTORIALS = {
           publishedAt: "2026-06-07",
           duration: "1:34:36（11 节）",
           audience: "第一次系统使用 Codex，希望把全部基础能力实际走一遍的读者",
-          summary: "这是一条全景式入门路线：先准备运行环境并安装、登录 Codex，再认识对话、文件修改、命令执行和审批等核心模块；随后学习怎样用明确提示和计划模式控制大型修改，用 Git 与审查保护代码，用 Memory 和 AGENTS.md 保存不同层级的长期信息；最后把稳定流程做成 Skill，把外部工具接成 MCP，并理解插件与自动化分别解决分发和重复执行问题。下面将 11 个章节还原成 10 组可完成的操作。",
+          summary: "「尚学堂·百战程序员／编程大佬陈悠秀」用一个 codex-shop 电商项目贯穿 11 节，把 Codex 从安装讲到 MCP。前半是基础：装好并登录、认识对话/文件修改/命令执行/审批等模块、用计划模式（点加号 → 计划模式）先规划大改造（示范把 codex-shop 改成 Vue3）、用 Git 与分叉/worktree 保护代码；后半是长期记忆与扩展：用 AGENTS.md 和「设置→个性化→自定义指令」让规则跨对话生效，用插件（GitHub、Gmail，需 OAuth）配合自动化把「每周拉 Star Top10 发邮件」做成定时任务，用 / 触发官方/第三方/自建 Skill 产出 PDF·PPT·海报，用 MCP（设置→MCP 服务器 + config.toml 的 [mcp_servers.github] + GitHub 令牌）接上 GitHub 管 Issue/PR。下面把 11 个章节还原成 10 组可完成的操作。",
           coverage: [
             { title: "前置准备", steps: ["确认项目能在本机独立运行，并记录构建、测试和启动命令；否则 Codex 无法判断改动是否成功。", "安装 Git；若走 CLI 路线再准备 Node.js 与 npm。进入项目目录执行 git status，先提交或备份已有工作。", "在项目根目录准备 AGENTS.md：至少写目录结构、运行命令、代码规范、禁止修改项和验收标准。没有该文件时，可在 CLI 用 /init 生成骨架后再人工补全。"], done: "Codex 打开的正是目标仓库，git status 可读，项目基线命令能够运行。" },
             { title: "安装与首次启动", steps: ["CLI 可执行 npm install --global @openai/codex；桌面端或 IDE 用户则安装对应官方客户端／扩展。", "运行 codex，选择 Sign in with ChatGPT；也可执行 codex login 后完成浏览器登录。", "用 codex --version 和 codex login status 检查安装与认证，再从项目根目录启动会话。"], done: "能在正确目录进入 Codex，且它可读取仓库、回答项目结构问题。" },
             { title: "功能模块", steps: ["先让 Codex只读扫描仓库并复述入口文件、依赖、测试与风险点，验证上下文是否正确。", "再给一个小任务，观察它读取文件、修改文件、运行命令、请求审批、返回差异与验证结果的完整循环。", "在提交前打开 diff／Review 面板逐块检查；发现问题时直接对具体改动给反馈，再让 Codex 修正。"], done: "你能区分对话结论、真实文件改动、终端执行结果和待审批动作，而不是只看最终回复。" },
             { title: "控制与引导", steps: ["提示中写清 Goal、Context、Constraints 和 Done when，例如目标功能、相关目录、不可改接口以及必须通过的测试。", "用文件引用或明确路径限制阅读范围；涉及删除、联网、密钥或大规模改动时先要求说明影响。", "运行中发现方向错误就立即补充约束；把新的长期仓库规则写回 AGENTS.md，不要只留在本次聊天。"], done: "Codex 能复述目标与边界，最终报告逐条对应验收条件。" },
-            { title: "计划模式", steps: ["复杂任务先输入 /plan 或用 Shift+Tab 进入 Plan mode。", "要求计划列出要检查和修改的文件、依赖关系、测试方式、风险与需要你决定的问题。", "审核计划：删掉越界工作、补上遗漏验收项；确认后再切回执行，让 Codex 按阶段实现并在每阶段验证。"], done: "编码开始前已有可审查的文件级计划，执行后能逐项对照，而不是边猜边改。" },
+            { title: "计划模式", steps: ["普通模式下你一描述需求 AI 就直接写代码；复杂改造建议先开计划模式：点输入框左侧的加号 → 选「计划模式」（不是斜杠命令）。", "计划模式的流程是：你的需求 → AI 提出澄清问题 → 生成含架构与测试方案的详细计划 → 你确认 → 才真正执行。视频用「把 codex-shop 从 HTML/CSS/JS 改造成 Vue3」演示。", "先看计划再放行：删掉越界工作、补上遗漏验收项，确认后 Codex 才按计划动工。"], done: "大改造在写代码前先有可审的计划，你确认后才执行，而不是边猜边改。" },
             { title: "代码管理", steps: ["任务开始前创建分支或独立 worktree，并留下干净基线提交。", "每完成一个可运行的小阶段就检查 git diff，运行相关测试；稳定后提交一个语义清晰的 commit。", "出错时优先根据 diff 定位并回退单个块或文件；不要把无关的用户改动一起覆盖。"], done: "每个阶段都可从 Git 恢复，最终提交只包含本任务文件且测试结果可追溯。" },
-            { title: "记忆系统", steps: ["桌面端打开 Settings > Personalization > Enable memories，或在 config.toml 写入 [features] 下 memories = true。", "在会话中输入 /memories，分别决定本会话是否读取旧记忆、是否可成为未来记忆来源。", "个人偏好可交给 Memory；必须执行的团队规则放进仓库 AGENTS.md。不要依赖 Memory 保存密钥，也不要假设聊天结束后会立即生成记忆。"], done: "新会话能复用允许保存的个人上下文，而换成员或关闭 Memory 时，仓库关键规则仍由 AGENTS.md 生效。" },
-            { title: "插件与自动化", steps: ["需要现成外部能力时从 Plugins 目录安装插件；插件可以打包 Skills、连接器或 MCP 能力。", "重复且稳定的任务先在普通会话测试提示，再创建 Scheduled task，明确频率、项目、运行位置和输出。", "会修改代码的后台任务优先放到 worktree；先审查前几次运行，再决定是否长期启用。"], done: "插件确实提供了所需工具；自动化每次运行都有固定输入、隔离位置、结果入口和失败处理方式。" },
-            { title: "Skills", steps: ["选择一个反复出现的单一工作，例如发布前检查；写清输入、步骤、输出、必做项与禁止项。", "用 $skill-creator 生成，或在 .agents/skills/<name>/SKILL.md 写 name、description 和操作指令；description 要能准确触发。", "用真实任务测试自动触发与 $技能名 显式触发，修正漏步骤后再提交到仓库；需要跨团队安装时再打包为插件。"], done: "同类任务无需重复长提示，Skill 每次都产出相同结构且不会误触发无关任务。" },
-            { title: "MCP", steps: ["先明确缺少的外部上下文或动作，例如文档检索、浏览器或 Figma；不要为已有本地能力重复接入。", "桌面端在 Settings > MCP servers 添加 STDIO 命令或 Streamable HTTP URL；CLI 也可用 codex mcp add <name> -- <command>。", "重启客户端，输入 /mcp 或运行 codex mcp list 查看连接；用一个只读小请求确认工具可发现、参数正确，再决定写操作的审批策略。"], done: "服务器处于 connected，Codex 能调用目标工具并返回可核验结果，失败时能定位到启动、认证或权限层。" }
+            { title: "记忆系统", steps: ["痛点：每开一个新对话就是全新上下文，AI 不记得之前的对话、对项目也一片空白；项目一复杂就得反复交代背景。", "项目级方案是 AGENTS.md（写给 Codex 的项目规则文件，必须在当前项目里用）：可直接让 Codex「通读当前项目，把学到的信息用中文清晰地写进 AGENTS.md」，它会自动生成含用户偏好、项目概览、运行命令、关键文件、页面结构的规则文件。", "全局方案是 设置 → 个性化 → 自定义指令（讲师视其为 AGENTS.md 的等价物），写通用工作约定，如「改 JS 必跑 npm test」「装依赖优先 pnpm」。若刚写完没生效，关掉 Codex 重开即可。"], done: "换新对话后，项目规则（AGENTS.md）与全局约定（自定义指令）仍自动生效，不必每次重讲背景。" },
+            { title: "插件与自动化", steps: ["插件是第三方为 Codex 打包的能力包，市场很丰富（GitHub、Gmail、Chrome、Linear、Vercel…）。点左侧「插件」装 GitHub 与 Gmail，各需用账号 OAuth 授权（邮件插件目前只有 Gmail）；装好后在对话里打 / 就能看到 github、gmail。", "组合示范：一句话让「/github 拉本月 AI 项目 Star 增长 Top10 → /gmail 发到我邮箱」，Codex 依次调两个插件完成。", "自动化：接着说「把上述任务做成自动化，每周五 17:30 发邮件」，左侧「自动化」就多出一个定时任务；也能用自然语言「每天上午 9 点提醒我喝水」让它自动识别频率、生成一个 automation。"], done: "插件按需接上外部服务；把一次成功的流程固化成按时或按事件触发的自动化任务。" },
+            { title: "Skills", steps: ["视频把 Skills 分三种用法：官方、第三方、自己编写（编写细节引用了作者另一期专讲）；用 / 斜杠即可触发某个 Skill。", "官方 Skill 示范：装官方 PDF Skill，用「/pdf 在当前目录创建一个 PDF，把对话历史都放进去」生成（Codex 用 reportlab 生成、pdftoppm 抽查中文排版）。", "第三方 Skill 示范：下载 guizang-ppt-skill 的 zip 解压，放进项目下的 codex-skills 文件夹，用「/guizang-ppt-skill 根据以下材料生成 PPT…」产出单文件网页 PPT；自写 Skill 用已有的 /iwen-creative 生成一张海报（走 imagegen 技能）。"], done: "官方/第三方/自建三类 Skill 都能用 / 触发，把重复产出（PDF、PPT、海报）标准化。" },
+            { title: "MCP", steps: ["MCP（模型上下文协议）是给大模型的标准化工具箱，用来接第三方文档、外部工具或共享信息；示范接 GitHub MCP 管 Issue/PR（这些操作光靠 git 命令做不了，需要 GitHub API）。", "设置 → MCP 服务器 → 添加服务器，两种方式：本地 STDIO 命令，或流式 HTTP（远程）。GitHub 支持远程，最简用 config.toml 写 [mcp_servers.github] 加 url=\"https://api.githubcopilot.com/mcp/\"；GUI 里选流式 HTTP 填名称、URL 和 Bearer 令牌（令牌到 GitHub → Settings → Developer settings → Personal access tokens 生成、勾选所需权限）。", "关键：配置完必须退出 Codex 重开才生效。再用「用 GitHub 的 MCP 看我项目最近 5 个 Issue 并按优先级排序」验证工具确实可用。"], done: "MCP 服务器连接成功，Codex 能调用 GitHub 等外部工具并返回可核验结果。" }
           ],
           uniqueTechniques: [
             { title: "把“全功能参观”变成一套仓库上手验收表", scenario: "最适合第一次把 Codex 引入真实项目，而不是看完视频后只记住功能名。", steps: ["按视频顺序建立十项清单：安装、读仓库、小改动、Plan、Git、Memory、Plugin／自动化、Skill、MCP。", "每项都在同一个练习仓库留下证据：命令输出、diff、commit、AGENTS.md、Skill 文件或 MCP 状态。", "只有当前一项达到上面的“完成标志”才进入下一项；失败就记录是环境、权限、提示还是模型能力问题。"], result: "最终得到的是一个可运行、可回退、带规则与扩展的 Codex 样板仓库，而不是一页功能名词笔记。" }
           ],
-          caution: "覆盖很广，适合作为主目录；视频中的按钮位置、模型名和额度可能变化，本页已按 2026-07-21 官方资料校准操作。",
+          caution: "覆盖很广，适合作主目录入口。视频用桌面版 Codex + VS Code、demo 项目 codex-shop 演示；按钮位置、模型名（GPT-5.5）、套餐额度与插件/MCP 入口会随版本变化。涉及授权与外发的操作要当心：Gmail/GitHub 插件是 OAuth 授权第三方访问你的邮箱/仓库；MCP 的 GitHub 令牌等同仓库钥匙、只离线保存别提交；自动化会按时自动执行，后台改代码建议放 worktree 并先审几次再长期启用。",
           review: {
-            evidence: "E1",
-            status: "candidate",
-            reviewedAt: "2026-07-21",
-            standards: null,
-            quality: null,
-            notes: "证据来自视频页面/简介/章节·选集标题与演示主题，非逐段观看或字幕；部分步骤经 2026-07-21 官方资料校准补全而非从画面提取。按 TUTORIALS.md 保守定 E1、暂列候选，需完整观看补足证据升 E2 后方可评分转正式收录。"
+            evidence: "E2",
+            status: "formal",
+            reviewedAt: "2026-07-22",
+            standards: { accuracy: 2, alignment: 2, reproducibility: 2, traceability: 2, safety: 2 },
+            quality: { closure: 4, transfer: 4, completeness: 4, structure: 4, freshness: 3, accessibility: 2 },
+            notes: "据 yt-dlp 逐 P 下载 11 个分P音频 + Groq/whisper-large-v3 全程转录（约 900 段）并对各 P 关键帧 OCR。进阶 5 章已逐段核对并按视频改写：计划模式=加号菜单（非 /plan）、记忆=AGENTS.md 与 个性化·自定义指令（非 Enable memories 开关）、插件与自动化=GitHub+Gmail OAuth 组合+定时、Skills=/ 斜杠触发官方/三方/自写（非 $skill-creator）、MCP=设置→MCP 服务器 + config.toml [mcp_servers.github] + GitHub 令牌 + 退出重开（非 codex mcp add）；纠正了旧稿多处凭官方文档臆测的写法。安装/前置/功能/控制/代码管理各章转录一致、表述与官方文档对齐。demo 项目 codex-shop；质量总分 66.25；原视频无 CC 字幕、由音频取证，accessibility 记 2。"
           }
         },
         {
@@ -87,25 +87,26 @@ window.TUTORIALS = {
           publishedAt: "2026-06-08",
           duration: "58:37",
           audience: "已完成安装，希望管理复杂任务、并行方案和可复用流程的用户",
-          summary: "这条视频不再重复基础安装，而是围绕一个任务的生命周期展开：先用 Plan 明确修改范围；在 diff 上 Annotate，把反馈绑定到具体代码；当存在两种实现路线时 Fork 当前上下文并行试验；把完成或暂停的聊天 Archive；最后把验证过的做法做成 Skill，并在需要连接外部服务或团队分发时组合进 Plugin。",
+          summary: "马克用一个 HTML 记事本「马克笔记」从 0 迭代到 Electron 桌面版，串起 Codex 的进阶用法。建出首版后在网页预览上做 Annotate（把反馈绑定到具体界面元素）；进阶用 Fork 复制对话（Local 复用原目录、New Worktree 用 git worktree 开隔离目录，二者都只复制对话、不回滚代码，回滚要靠 git）、用 Archive 归档而非删除、用 AGENTS.md 让「每次自动 git commit」等规则跨对话生效、用 Plan mode 规划大改造、用 Side Chat 与 Steer 在任务运行中插话；扩展篇讲 Plugin（App 提供工具即 Action + Skill 提供说明，示范 Presentations 做 PPT、Chrome 抓 Product Hunt、Computer Use 操作日历）、自建 Skill、定时任务与 Codex Mobile 手机远程操控。",
           coverage: [
-            { title: "Plan：先冻结问题与验收", steps: ["切到 Plan mode，让 Codex 只调查不修改。", "要求输出受影响文件、方案选项、风险、测试和待确认问题。", "你确认选项与验收条件后才允许实现。"], done: "计划中的每个步骤都能对应到文件或检查命令。" },
-            { title: "Annotate：对着差异反馈", steps: ["实现后打开 diff／Review 面板，定位到错误的具体行或代码块。", "写清“现状为什么错、期望行为是什么、如何验证”，把批注送回当前任务。", "让 Codex只修批注涉及的范围，再次查看差异和测试。"], done: "反馈不再是笼统的“改好一点”，每条批注都被修复或明确解释。" },
-            { title: "Fork：保留上下文做 A／B 方案", steps: ["在架构选择或修复路线不确定时，从已有任务执行 Fork。", "原任务保留方案 A，新分支明确只探索方案 B，并给两边相同验收命令。", "比较 diff 大小、测试、性能和维护成本，选择一个继续；不要把两个方案未经审查地混合。"], done: "两个方案共享问题背景但拥有独立改动，可用同一标准比较。" },
-            { title: "Archive：完成任务的收尾", steps: ["确认最终结果已提交或结论已记录。", "把已完成、重复或明确暂停的任务归档，保留仍需要跟进的任务。", "需要恢复时从 Settings 的 Archived chats 查找并取消归档。"], done: "活跃任务列表只保留当前工作，历史任务仍可检索。" },
-            { title: "Plugin 与 Skill：从一次成功到重复成功", steps: ["先把重复流程写成聚焦的 Skill，并用真实输入验证。", "需要给团队安装、同时携带多个 Skills 或连接器时，再创建 Plugin 作为分发包。", "安装后用显式调用测试触发、工具权限和输出格式，再开放自动选择。"], done: "工作流可重复执行；Skill 负责怎么做，Plugin 负责把流程与连接能力安装和分发。" }
+            { title: "Annotate：把反馈钉在界面元素上", steps: ["建出首版马克笔记后，在网页预览区选中某个具体元素做 Annotate（如「把左上角的‘2条笔记’去掉」）。", "批注作为 1 annotation 回到对话，Codex 只改这一处并同步调整测试。", "用 Annotate 而非整句描述，反馈定位更准、改动范围更小。"], done: "每条批注都对应界面上一个明确元素，被精确修掉。" },
+            { title: "Fork：复制对话，Local vs New Worktree", steps: ["在某条消息上点 Fork 图标，两个选项：Fork into Local（新对话复用当前目录）与 Fork into New Worktree（用 git worktree 开一个隔离新目录，两条对话代码互不影响，适合并行做两个功能）。", "关键：两者都只复制对话、都不回滚代码。", "要回滚代码得用 git：Cmd+J 开终端 → git log → reset 到某个 commit。"], done: "你能按需要选隔离或共享目录做 A/B，并清楚代码回滚归 git 管。" },
+            { title: "Archive 与 AGENTS.md：收纳对话、固化规则", steps: ["归档（点对话旁图标 → Confirm）是隐藏不是删除，可在 Cmd+, → Archived Chats 里恢复或彻底删。", "想让「每次改完自动 git commit」跨对话生效，别只在输入框说（只对当前对话有效），而在项目根写 AGENTS.md——Codex 每开新对话都会读它当指令。", "AGENTS.md 里还可写代码风格、命名、技术栈、项目背景；写得越好 Codex 越顺手。"], done: "历史对话可归档可找回；换新对话后仓库级规则仍自动生效。" },
+            { title: "Plan / Side Chat / Steer：驾驭大任务", steps: ["大改造（如把网页版改成 Electron+React+TS 桌面端）先点 + → Plan mode，Codex 先问清关键选择，再产出含测试与架构的计划，你确认或提修改意见后才动工。", "任务运行时输入 -site 开 Side Chat 问轻量问题，不打断左侧主任务。", "想中途立刻插入要求（如「logo 两种模式都要清晰」）就点 Steer 按钮把消息即时发给 Codex，而不是等它做完。"], done: "大任务先有可审计划，运行中还能不打断地追加信息与纠偏。" },
+            { title: "Plugin / Skill / 自动化 / 手机远程", steps: ["侧栏 Plugins 里安装插件；一个 Plugin = App（把 Codex 连到某服务、提供一批工具即 Action，类似 MCP 工具；如 Gmail App 有 24 个）+ Skill（给模型看的说明书）。", "示范：Presentations 插件做 PPT（可用 @presentations 强制）、Chrome 插件抓 Product Hunt 热门产品、Computer Use 用独立虚拟鼠标操作日历。", "还能用 Attach Electron 把运行中的应用截图喂给 Codex（ImageGen 技能做海报）、自建 Skill（如 MarkNotes Code Review）、用 Add Automation 建每日定时任务、用 Codex Mobile 扫码后在手机上远程指挥电脑端 Codex。"], done: "你能给 Codex 装外部能力、沉淀自有 Skill、让任务定时或从手机触发。" }
           ],
           uniqueTechniques: [
-            { title: "Fork + Annotate 的双路线评审", scenario: "适合重构、框架选择、性能修复等无法仅靠讨论决定的任务。", steps: ["先用 Plan 固定共同验收标准。", "Fork 后让 A 方案追求最小改动，让 B 方案追求长期结构；两边都必须运行同一组测试。", "分别在 diff 上 Annotate 风险点，让两个分支各修一轮。", "按通过率、改动面、复杂度和回退成本打表，只合入胜出的方案，归档另一分支。"], result: "架构选择有可运行证据，主任务不会被试验性代码和反复讨论污染。" }
+            { title: "Fork 复制对话、git 回滚代码——分清两件事", scenario: "想在某个中间状态开分支试不同方向，又担心代码被搞乱。", steps: ["在目标消息上 Fork；要两条对话完全隔离就选 New Worktree（git worktree 开新目录），只想复制对话历史就选 Local。", "无论哪种，代码都不会自动回滚。", "要回滚就 Cmd+J 开终端，用 git log / reset 到对应 commit。"], result: "对话分支与代码版本各自独立管理，A/B 试验不互相污染。", limitation: "New Worktree 依赖 git worktree 概念，非 git 项目或不熟 worktree 时收益有限。" },
+            { title: "用 Side Chat 问、用 Steer 插——不打断长任务", scenario: "Codex 正在跑一个耗时任务，你既想问点别的、又想临时追加一条要求。", steps: ["想问轻量问题就在输入框打 -site 开 Side Chat，不影响左侧主任务。", "想让当前任务立刻纳入新要求就点 Steer 立即下发，而不是等它做完。", "Steer 用清晰指令，避免打断模型正在进行的思路。"], result: "长任务运行期间仍能并行提问与实时纠偏。", limitation: "Side Chat 只适合轻量问题；Steer 打断可能改变模型正在进行的思路。" }
           ],
-          caution: "功能名称和入口会随客户端更新；稳定价值在于计划、行级反馈、上下文分支、任务归档和流程复用。",
+          caution: "功能入口（Fork/Archive/Plan/Steer/Plugins/Automations/Codex Mobile）与套餐、模型名（GPT-5.5）会随客户端更新变化；Computer Use 与 Codex Mobile 会让 Codex 用虚拟鼠标操作你的电脑、并允许手机远程触发，涉及较高权限，请在可控环境下使用并逐次确认。Plugin 的 App 会把 Codex 接到 Gmail 等外部服务，安装即授予其一批 Action，注意数据与授权范围。",
           review: {
-            evidence: "E1",
-            status: "candidate",
-            reviewedAt: "2026-07-21",
-            standards: null,
-            quality: null,
-            notes: "证据来自视频页面/简介/章节·选集标题与演示主题，非逐段观看或字幕。按 TUTORIALS.md 保守定 E1、暂列候选，需完整观看补足证据升 E2 后方可评分转正式收录。"
+            evidence: "E2",
+            status: "formal",
+            reviewedAt: "2026-07-22",
+            standards: { accuracy: 2, alignment: 2, reproducibility: 2, traceability: 2, safety: 2 },
+            quality: { closure: 4, transfer: 4, completeness: 4, structure: 4, freshness: 3, accessibility: 2 },
+            notes: "据 yt-dlp 下载音频 + Groq/whisper-large-v3 全程转录（569 段）并对 167 帧界面 OCR 逐条重写；Fork 的 Local/New Worktree 差异、AGENTS.md 跨对话生效、Plan/Side Chat(-site)/Steer、Plugin 的 App+Skill 结构（Gmail 24 个 Action）、Presentations/Chrome/Computer Use、Attach Electron+ImageGen、Add Automation 与 Codex Mobile 扫码远程均取自转录与 OCR、并对照官方资料。质量总分 66.25；原视频无 CC 字幕、由音频取证，accessibility 记 2。"
           }
         },
         {
@@ -148,23 +149,25 @@ window.TUTORIALS = {
           publishedAt: "2026-05-27",
           duration: "12:52",
           audience: "重视代码不出本机、离线使用或固定算力成本的用户",
-          summary: "这条视频把第三方 provider 进一步落到本机：先安装 Ollama 或 llama.cpp，下载适合显存／内存的代码模型并启动本地 API；再让 Codex 的 OSS 模式或自定义 provider 指向本地地址；最后通过真实仓库测试工具调用、长上下文、速度和显存占用。Ollama 是 Codex 可直接选择的本地提供方；llama.cpp 则必须启动与当前 Codex wire API 兼容的服务端点，否则只能聊天、不能可靠执行 Agent 工作流。",
+          summary: "零度解说用桌面版 Codex 演示两条本地模型路线，全程可离线、免 OpenAI 账号与 API key。主线走 Ollama：装最新版 Ollama（视频强调只有 0.24+ 才完全适配 Codex），按显存在 4B–40B 里拉取代码模型（编程首选 Qwen3.6 与 Gemma 4），再用一键命令 ollama launch codex-app 在弹出的模型选择器里选中本地模型。进阶走 llama.cpp：改 ~/.codex/config.toml 指向本地端点，用带 --jinja 的固定命令启动 llama-server，可加载 GGUF（含无审查版）模型。视频还给出一个高价值排错：Ollama 默认上下文过长会让 Codex 卡在重连死循环，必须调小。",
           coverage: [
-            { title: "建立本地推理服务", steps: ["从 Ollama、llama.cpp 和模型作者的官方来源安装或下载，先根据显存／内存选择量化和上下文长度。", "Ollama 拉取模型后启动服务；llama.cpp 用 server 模式加载模型，并确认监听地址只开放到需要的网卡。", "先用服务自身的命令或 HTTP 健康检查验证模型能响应，再接 Codex。"], done: "本地 API 稳定响应，任务管理器或 GPU 工具能看到模型确实在本机运行。" },
-            { title: "让 Codex 选择本地模型", steps: ["Ollama 可运行 codex --oss --local-provider ollama；长期使用可在 config.toml 设置 oss_provider = \"ollama\"。", "若用自定义兼容端点，在用户 config.toml 创建 model_providers 项，填写本地 base_url 与 model，并确认端点支持 Responses 与工具调用。", "启动后先让 Codex读取一个小文件，再尝试一次无副作用命令；失败时区分模型不存在、端口错误、协议不兼容和上下文溢出。"], done: "网络请求指向本地端口，Codex 能连续完成读取与工具调用。" },
-            { title: "验证质量与资源成本", steps: ["在真实仓库依次测试导航、修改、编译／测试和错误恢复。", "记录首 token 延迟、总耗时、峰值显存／内存、上下文上限和工具调用失败率。", "降低模型尺寸或上下文虽可提速，但每次调整后都要重跑同一基准。"], done: "你知道该模型在哪类任务可用、何时必须换回更强模型，而不是只确认它能聊天。" }
+            { title: "装应用、拉本地模型", steps: ["下载安装 Codex 桌面应用（约 1.9GB；Mac 版分 Intel 与 M 芯片，别下错）。", "安装并升级到最新版 Ollama——视频强调只有 0.24 及以上才完全适配 Codex，旧版必须升级。", "按显存在 4B–40B 里选代码模型：编程首选 Qwen3.6（27B / 35B-A3B）与 Gemma 4（31B），用 ollama run qwen3.6:27b 之类命令拉取（27B 量化约 17GB）；不确定就用应用内「选择模型」让它按显存自动推荐。"], done: "Ollama 服务在跑，目标模型已拉到本地。" },
+            { title: "一键把 Ollama 接进 Codex", steps: ["执行 ollama launch codex-app，会弹出模型选择器，同时列出本地模型与 kimi-k2.6、glm-5.1 等云端项，选你的本地模型。", "Codex 自动重启，右下角显示 Ollama 即接管成功；问它模型它可能自称「基于 GPT-5」——这是幻觉，不可信。", "要完全自动化可在设置开「完全访问权限」（免逐次批准即可读写文件、联网执行，风险自负）；要让它自动操作浏览器，则允许「控制内置浏览器」、装 Chrome 的 Codex 扩展并开「电脑操控」。"], done: "Codex 用的是本地模型，且能连续读写文件。" },
+            { title: "治卡顿：把上下文调小", steps: ["默认装好后 Agent 常卡在 Reconnecting 1/5 的死循环、跑得极慢。", "根因是 Ollama 默认上下文长度（32K）过长；到 Ollama 设置把 Context length 改成 16K 或 8K。", "重跑同一任务对比：Agent 代理速度明显提升，不再反复重连。"], done: "同一任务能连续完成读文件—改代码—执行，而不是卡在重连。" },
+            { title: "进阶：llama.cpp 跑 GGUF 模型", steps: ["改用户 ~/.codex/config.toml，新增 [model_providers.llamacpp] 指向本地地址、设 wire_api 与对应 profile，并把 model 名写成你 llama.cpp 加载的 GGUF 名。", "用固定命令启动：llama-server.exe -m models\\你的模型.gguf -ngl 999 -c 16384 -n 2048 -fa on --jinja --host 127.0.0.1 --port 8080；视频强调必须带 --jinja，否则后续会出错。", "回 Codex 确认它连到本地 8080 端点、工具调用可用，再进真实任务。"], done: "config.toml 的 model 与 llama.cpp 端点一致，Codex 能连上本地端点执行 Agent 工作流。" }
           ],
           uniqueTechniques: [
-            { title: "本地隐私闭环验收", scenario: "适合私有代码、离线环境或不能把源码发送给外部服务的项目。", steps: ["关闭不需要的外部 MCP、插件和网络工具，避免“模型本地”但工具仍向外发送数据。", "让 Codex 读取带有虚构敏感标记的测试仓库，同时观察本机端口与外连记录。", "完成一次修改—构建—修复循环，并记录资源峰值。", "确认日志、缓存和会话文件的保存位置与清理策略，再决定是否进入真实私有仓库。"], result: "隐私判断覆盖模型、工具、日志和缓存整条数据路径，而不是仅凭 localhost 地址。" }
+            { title: "调小 Ollama 上下文，解开 Agent 重连死循环", scenario: "本地模型接进 Codex 后能聊天，一旦真正干活就不停 Reconnecting、慢到不可用。", steps: ["先确认卡点是重连，而非模型不存在或端口错误。", "到 Ollama 设置把 Context length 从默认 32K 降到 16K 或 8K。", "重跑同一任务，对比首 token 与总耗时确认提速。"], result: "本地 Agent 从「能连不能干」变成可连续完成工具调用。", limitation: "上下文调小会牺牲可处理的长文件/长历史，需按任务在速度与上下文间取舍。" },
+            { title: "断网验证「真本地」，别信模型自报家门", scenario: "想确认 Codex 真在用本地模型，而不是偷偷走云端。", steps: ["直接问模型时它可能自称「基于 GPT-5」——这是幻觉，不能作为依据。", "改为开飞行模式或物理断网，再让它执行一个任务。", "仍能正常思考并读写文件，即证明推理在本机进行。"], result: "用可观察的行为、而非模型自述来判定本地化。", limitation: "只证明「推理在本地」，工具、日志、缓存是否外发仍需单独核查。" }
           ],
-          caution: "视频简介含第三方下载入口；优先使用 Ollama、llama.cpp 和模型作者的官方来源。llama.cpp 是否兼容取决于服务端点和当前 Codex 协议。",
+          caution: "视频简介与演示含第三方博客的下载入口与「越狱版/无审查」GGUF 模型：优先从 Ollama、llama.cpp 与模型作者官方来源获取，无审查模型有合规与安全风险，来路不明的「一键对接/启动命令」务必看懂再粘贴。「完全访问权限」会让 Codex 免批准读写文件并联网执行，仅在隔离环境开启。模型名（Qwen3.6、Gemma 4）、Ollama 适配版本号与命令参数会随版本变化，以官方文档和 ~/.codex/config.toml 实际内容为准。",
           review: {
-            evidence: "E1",
-            status: "candidate",
-            reviewedAt: "2026-07-21",
-            standards: null,
-            quality: null,
-            notes: "证据来自视频页面/简介/章节·选集标题与演示主题，非逐段观看或字幕；本地部署步骤经官方资料校准。按 TUTORIALS.md 保守定 E1、暂列候选，需完整观看补足证据升 E2 后方可评分转正式收录。"
+            evidence: "E2",
+            status: "formal",
+            reviewedAt: "2026-07-22",
+            standards: { accuracy: 2, alignment: 2, reproducibility: 2, traceability: 2, safety: 2 },
+            quality: { closure: 4, transfer: 4, completeness: 4, structure: 3, freshness: 3, accessibility: 2 },
+            notes: "据 yt-dlp 下载音频 + Groq/whisper-large-v3 全程转录（135 段）并对 82 帧界面 OCR 逐条重写；ollama launch codex-app、config.toml 的 [model_providers.llamacpp]、llama-server 启动命令（含 --jinja）、Ollama 上下文 32K→16K/8K 排错均取自画面 OCR 并与官方文档核对。修正了旧稿凭文档臆测的 CLI 写法（codex --oss / oss_provider）——视频实际走桌面版一键接入。质量总分 63.75；原视频无 CC 字幕、由音频取证，accessibility 记 2。"
           }
         },
         {
@@ -176,25 +179,25 @@ window.TUTORIALS = {
           publishedAt: "2026-04-07",
           duration: "18:29",
           audience: "希望观察真实项目从生成、编译到修错闭环的开发者",
-          summary: "这条视频用可运行项目检验 Codex，而不是继续介绍功能：在 VS Code 中准备 C++ 编译器、Qt 与构建工具，让 Codex 先识别环境并规划文件结构；再按游戏状态、移动规则、碰撞与食物、Qt 绘制、输入和计分逐层实现；每一层立刻编译运行，把错误日志交回 Codex 修复；最后与公开视频提供的源码仓库比较结构并复现构建。",
+          summary: "这是「工业软件开发训练营」里的实战演示：作者全程不写一行代码，只做需求整理与和 Codex 交互，做出一个 C++/Qt Widgets 的贪吃蛇。关键在动手前先把自己当产品经理写清需求与技术约束（Qt Widgets 不用 QML、CMake 管理、纯代码不使用 .ui 文件、src/bin 目录结构），再给一份编程规范模板约定命名等习惯；随后在 VS Code 里把需求发给 Codex，让它生成工程、本地用 CMake 构建并跑起来，再把「多余控制台窗口」「加注释」「设置软件图标」等问题逐个交回 Codex 修改重编。",
           coverage: [
-            { title: "准备可验证的 C++／Qt 环境", steps: ["安装 VS Code、与 Qt 套件匹配的 C++ 编译器、Qt 和 CMake／qmake，并在终端确认版本。", "先手工创建最小窗口项目并成功构建，排除环境问题。", "把真实构建与运行命令写入 AGENTS.md，让 Codex 不必猜测工具链。"], done: "空白 Qt 窗口可启动，Codex 在同一终端环境能执行构建命令。" },
-            { title: "先规划项目骨架", steps: ["让 Codex 先给出文件树和职责：游戏状态／规则、Qt 窗口／绘制、输入与构建配置分离。", "明确网格尺寸、移动节拍、反向移动规则、碰撞、计分、暂停与重新开始等验收条件。", "确认计划后只生成最小骨架并立即编译。"], done: "骨架能构建，规则层不依赖具体绘图细节。" },
-            { title: "按功能切片实现", steps: ["先实现蛇身数据、方向和定时移动；用可观察输出验证。", "再加食物随机位置、增长、自撞／边界判定和重新开始。", "最后接 Qt paintEvent／定时器／键盘事件，加入计分和界面反馈。"], done: "每增加一项功能都能单独运行验证，失败不会同时跨越多个层。" },
-            { title: "把编译错误变成下一轮输入", steps: ["每次只执行实际项目的构建命令，把完整首个错误及上下文交给 Codex。", "要求先解释根因和将改哪些文件，再执行最小修复。", "重新全量构建并手测移动、吃食物、碰撞、暂停和重开；通过后再提交。"], done: "项目从干净检出可复现构建，核心玩法逐项通过。" },
-            { title: "用源码仓库复盘", steps: ["打开视频给出的 GitHub 仓库 zhouxuan2023/snakerewind，记录依赖和构建说明。", "比较自己的文件结构、规则实现和构建配置，不直接用最终代码覆盖过程。", "从新目录克隆并按 README 构建，确认教程结果不是仅在作者机器上可运行。"], done: "读者能独立复现，并能解释自己的实现与参考仓库的差异。" }
+            { title: "先当产品经理：写清需求与技术约束", steps: ["列出功能需求：蛇自动移动、方向键控制、吃食物增长、撞墙或自撞即结束。", "写死技术约束：C++、Qt Widgets（不用 QML）、CMake 管理、纯代码不使用 .ui 文件；交互用键盘、定时器实时刷新。", "定好界面与工程结构：左游戏区右侧边栏、积分板、重开/暂停按钮、绿蛇红食物、结束弹窗；源码放 src/、exe/pdb 等产物放 bin/。"], done: "一份 AI 能照着做的需求，而不是一句「写个贪吃蛇」。" },
+            { title: "给一份编程规范模板", steps: ["在 doc/ 下放一个 md，约定命名与代码习惯：私有成员用 m_ 还是 _、类名大驼峰还是小驼峰等。", "因为不明说 AI 不会知道你的习惯，模板可网上找现成或让 AI 先生成再改。", "把模板作为文件交给 Codex，而不是塞进一句话 prompt。"], done: "生成代码的命名与结构符合你的规范，而非随机风格。" },
+            { title: "发给 Codex 生成并本地构建", steps: ["在 VS Code 打开项目文件夹，切到 Codex，把需求 prompt 发过去。", "它生成 CMake 工程后在本地构建；遇到需要执行命令（如调用 CMake）会请求批准，选是。", "编译通过后 exe 落到 bin/，并附一份说明技术栈与架构的 README。"], done: "项目能在本机构建运行，重开、暂停/继续、缩放都正常。" },
+            { title: "把问题逐个交回 Codex 修", steps: ["发现多余的控制台黑窗 → 告诉现象，它把可执行改成 GUI 子系统并重新调用本地 CMake 重编。", "要注释 → 它只在状态流转、绘制逻辑等阅读门槛高处加简明注释，不改功能、不塞无意义注释。", "要图标 → 从图标站（如 iconfont）取 64/128px 图放进项目，让它设为软件图标；若提示 exe 被占用，先关掉运行中的程序再编。"], done: "每个改动都在本地立即重编验证，功能不被破坏。" }
           ],
           uniqueTechniques: [
-            { title: "以“可编译切片”驱动 Agent", scenario: "适合 C++、Qt、原生依赖等环境错误和代码错误容易混在一起的项目。", steps: ["先锁定一个已通过的最小构建基线。", "每轮只加入一个纵向切片，例如“方向输入 → 状态更新 → 画面可见”，而不是一次生成完整游戏。", "失败时只修当前切片的第一个根因；构建通过后做对应手测并提交。", "最终从空目录复现构建，防止 Codex 无意依赖未提交文件或本机缓存。"], result: "错误定位范围始终很小，生成代码是否真的可运行由编译器和行为测试决定。" }
+            { title: "需求 + 规范模板前置，把「写个贪吃蛇」变成可交付工单", scenario: "从 0 到 1 让 Agent 写原生 C++/Qt 这类强约束项目。", steps: ["先把功能、技术约束、交互、界面、目录结构逐条写死。", "再单独给一份命名/风格规范模板。", "两份都作为文件交给 Codex，而不是塞进一句话 prompt；生成后按约束逐条验收。"], result: "生成代码在结构、命名、构建方式上可控可验收，作者评价比自己手写更好。", limitation: "演示未展示完整 CMakeLists 与源码细节（源码需到作者主页领取），复现的是流程而非逐行代码。" },
+            { title: "用「现象 → 根因 → 最小修改 → 重编」迭代收尾", scenario: "生成的程序能跑但有细节问题：多余窗口、缺注释、缺图标。", steps: ["把可观察的现象（如出现一个多余控制台窗口）告诉 Codex，让它定位根因（此处是 GUI 子系统设置）。", "要求最小改动，并让它重新调用本地 CMake 构建。", "每次改完立即运行手测，再进入下一处。"], result: "依赖 Codex 读写本地文件、调用本地 CMake 的 agent 能力，把演示级项目打磨到可用。", limitation: "改动默认直接落到本地文件，需自己用 git 基线与 diff 审阅把关。" }
           ],
-          caution: "演示项目证明的是工作流，不代表生成代码无需人工审查；Qt 版本、编译器套件、构建缓存和平台差异仍由开发者负责。",
+          caution: "这是演示性质的小项目，证明的是「需求整理 + 规范前置 + 本地构建迭代」这套工作流，不代表生成代码免人工审查；源码需到作者主页领取，视频并未提供公开 GitHub 仓库。Qt 版本、编译器套件、CMake 配置与平台差异仍由开发者负责；Codex 默认会把改动直接写入本地文件，建议用 git 基线与 diff 审阅把关。",
           review: {
-            evidence: "E1",
-            status: "candidate",
-            reviewedAt: "2026-07-21",
-            standards: null,
-            quality: null,
-            notes: "证据来自视频页面/简介/章节·选集标题与演示主题及公开源码仓库线索，非逐段观看或字幕。按 TUTORIALS.md 保守定 E1、暂列候选，需完整观看补足证据升 E2 后方可评分转正式收录。"
+            evidence: "E2",
+            status: "formal",
+            reviewedAt: "2026-07-22",
+            standards: { accuracy: 2, alignment: 2, reproducibility: 2, traceability: 2, safety: 2 },
+            quality: { closure: 4, transfer: 4, completeness: 3, structure: 3, freshness: 3, accessibility: 2 },
+            notes: "据 yt-dlp 下载音频 + Groq/whisper-large-v3 全程转录（171 段）逐条重写；需求/技术约束（Qt Widgets 不用 QML、CMake、不用 .ui、src/bin 结构）、GUI 子系统修控制台窗口、注释与 iconfont 图标接入均来自转录与标题页 OCR。修正旧稿虚构的 GitHub 源码仓库（zhouxuan2023/snakerewind 在视频中不存在，源码经作者主页领取）与「可编译切片」的理想化描述（视频实为一次性生成 + 迭代修问题）。低清视频未下全、OCR 帧偏少但转录完整。质量总分 60。"
           }
         }
       ]
