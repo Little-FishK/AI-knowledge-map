@@ -43,6 +43,99 @@ window.GRAPH = {
     "reasoning-models", "test-time-compute"
   ],
 
+  /* 官方推荐学习路径
+   *
+   * 数字表示知识依赖层级，而不是大区：学完所有 1 / 1.x 才进入 2 / 2.x。
+   * 同一层可以横跨多个大区；129 个节点恰好出现一次，最后的整数就是总层数。
+   */
+  recommendedLearningPath: [
+    { phase: "学习与数学地基", steps: [
+      ["1", "supervised-learning"],
+      ["1.1", "information-theory"], ["1.2", "loss-function"],
+      ["1.3", "gradient-descent"], ["1.4", "unsupervised-learning"],
+      ["1.5", "reinforcement-learning"], ["1.6", "overfitting"],
+      ["1.7", "regularization"], ["1.8", "dimensionality-reduction"],
+      ["1.9", "curse-of-dimensionality"], ["1.10", "decision-tree"],
+      ["1.11", "clustering"], ["1.12", "kernel-methods"]
+    ]},
+    { phase: "表示与模型架构", steps: [
+      ["2", "neural-network"], ["2.1", "backprop"],
+      ["2.2", "vanishing-gradient"], ["2.3", "batch-norm"],
+      ["2.4", "optimizer-schedule"], ["2.5", "residual-connection"],
+      ["2.6", "cnn"], ["2.7", "rnn"],
+      ["2.8", "tokenization"], ["2.9", "embedding"],
+      ["2.10", "positional-encoding"], ["2.11", "attention"],
+      ["2.12", "normalization"], ["2.13", "transformer"],
+      ["2.14", "state-space-models"], ["2.15", "self-supervised-learning"],
+      ["2.16", "contrastive-learning"], ["2.17", "clip"]
+    ]},
+    { phase: "基础模型训练与适配", steps: [
+      ["3", "llm"], ["3.1", "pretraining"],
+      ["3.2", "post-training"], ["3.3", "fine-tuning"],
+      ["3.4", "peft-lora"], ["3.5", "distillation"],
+      ["3.6", "distributed-training"], ["3.7", "synthetic-data"],
+      ["3.8", "quantization"], ["3.9", "moe"],
+      ["3.10", "model-merging"], ["3.11", "scaling-law"],
+      ["3.12", "model-families"], ["3.13", "multimodal"]
+    ]},
+    { phase: "推理、提示与上下文", steps: [
+      ["4", "context-window"], ["4.1", "lost-in-middle"],
+      ["4.2", "in-context-learning"], ["4.3", "sampling-params"],
+      ["4.4", "logprobs"], ["4.5", "prompt-engineering"],
+      ["4.6", "system-prompt"], ["4.7", "context-engineering"],
+      ["4.8", "constrained-decoding"], ["4.9", "structured-output"],
+      ["4.10", "streaming"], ["4.11", "prefilling"],
+      ["4.12", "prompt-caching"], ["4.13", "context-compaction"],
+      ["4.14", "inference-optimization"], ["4.15", "model-selection"],
+      ["4.16", "model-routing"]
+    ]},
+    { phase: "检索与应用工程", steps: [
+      ["5", "rag"], ["5.1", "retrieval"],
+      ["5.2", "vector-db"], ["5.3", "chunking"],
+      ["5.4", "reranking"], ["5.5", "advanced-rag"],
+      ["5.6", "knowledge-graph"], ["5.7", "citations"],
+      ["5.8", "evaluation"], ["5.9", "model-evaluation"],
+      ["5.10", "observability"], ["5.11", "deployment"],
+      ["5.12", "data-drift-monitoring"], ["5.13", "hallucination"],
+      ["5.14", "uncertainty-calibration"], ["5.15", "privacy"],
+      ["5.16", "prompt-injection"], ["5.17", "guardrails"]
+    ]},
+    { phase: "推理策略与规划", steps: [
+      ["6", "reasoning-models"], ["6.1", "cot"],
+      ["6.2", "self-consistency"], ["6.3", "tree-of-thoughts"],
+      ["6.4", "test-time-compute"], ["6.5", "reflection"],
+      ["6.6", "planning"]
+    ]},
+    { phase: "Agent 与工具系统", steps: [
+      ["7", "agent"], ["7.1", "agent-loop"],
+      ["7.2", "react"], ["7.3", "tool-calling"],
+      ["7.4", "code-execution"], ["7.5", "mcp-architecture"],
+      ["7.6", "mcp"], ["7.7", "agent-frameworks"],
+      ["7.8", "agent-memory"], ["7.9", "agent-skills"],
+      ["7.10", "workflow-orchestration"], ["7.11", "multi-agent"],
+      ["7.12", "human-in-the-loop"], ["7.13", "computer-use"],
+      ["7.14", "code-generation"], ["7.15", "coding-tools"],
+      ["7.16", "agent-identity-access"]
+    ]},
+    { phase: "多模态生成系统", steps: [
+      ["8", "diffusion"], ["8.1", "vae"],
+      ["8.2", "gan"], ["8.3", "flow-matching"],
+      ["8.4", "image-generation"], ["8.5", "controllable-generation"],
+      ["8.6", "image-editing"], ["8.7", "super-resolution"],
+      ["8.8", "video-generation"], ["8.9", "speech"],
+      ["8.10", "audio-generation"], ["8.11", "world-models"],
+      ["8.12", "content-detection"]
+    ]},
+    { phase: "安全、对齐与治理", steps: [
+      ["9", "alignment"], ["9.1", "interpretability"],
+      ["9.2", "jailbreak"], ["9.3", "red-teaming"],
+      ["9.4", "data-poisoning"], ["9.5", "adversarial-robustness"],
+      ["9.6", "bias-fairness"], ["9.7", "reward-hacking"],
+      ["9.8", "rlhf"], ["9.9", "constitutional-ai"],
+      ["9.10", "training-data-governance"], ["9.11", "governance"]
+    ]}
+  ],
+
   /* 固化的节点坐标。
    *
    * 为什么不每次现算：fcose 即使定了种子，谱初始化算特征向量时符号是任意的，

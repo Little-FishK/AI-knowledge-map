@@ -19,9 +19,13 @@
   G.nodes.forEach(n => { byId[n.id] = n; });
 
   const CORE = new Set(G.core || []);
+  const RECOMMENDED_PATH = (G.recommendedLearningPath || []).reduce((all, phase) =>
+    all.concat((phase.steps || []).map(step => ({ order: String(step[0]), id: step[1], phase: phase.phase }))), []);
   const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
   const learnedNodes = loadLearnedNodes();
   let activeDeepDiveId = null;
+  let officialPathActive = false;
+  let officialPathRestore = null;
 
   function loadLearnedNodes() {
     try {
@@ -104,6 +108,66 @@
   function bindLearningButton() {
     const button = document.querySelector("[data-learn-node]");
     if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
+  }
+
+  function removeOfficialPathMarkers() {
+    cy.nodes(".official-path-node").removeData("officialOrder");
+    cy.nodes().removeClass("official-path-node official-path-muted");
+  }
+
+  function addOfficialPathMarkers() {
+    RECOMMENDED_PATH.forEach(step => {
+      const target = cy.getElementById(step.id);
+      if (!target.length) return;
+      target.data("officialOrder", step.order);
+      target.addClass("official-path-node");
+    });
+    cy.nodes().not(".official-path-node").addClass("official-path-muted");
+  }
+
+  function setOfficialPath(active) {
+    const button = document.getElementById("official-path-toggle");
+    const note = document.getElementById("official-path-note");
+    if (!button || active === officialPathActive) return;
+
+    if (active) {
+      officialPathRestore = {
+        scope: state.scope,
+        focus: state.focus,
+        domains: Object.assign({}, state.domains)
+      };
+      officialPathActive = true;
+      state.scope = "all";
+      state.focus = false;
+      Object.keys(state.domains).forEach(key => { state.domains[key] = true; });
+      document.getElementById("focus-on").checked = false;
+      syncControls();
+      applyFilters();
+      addOfficialPathMarkers();
+      button.classList.add("on");
+      button.setAttribute("aria-pressed", "true");
+      button.querySelector("span").textContent = "✦ 关闭推荐";
+      note.classList.remove("hidden");
+      fitView();
+      return;
+    }
+
+    officialPathActive = false;
+    removeOfficialPathMarkers();
+    if (officialPathRestore) {
+      state.scope = officialPathRestore.scope;
+      state.focus = officialPathRestore.focus;
+      Object.assign(state.domains, officialPathRestore.domains);
+    }
+    document.getElementById("focus-on").checked = state.focus;
+    officialPathRestore = null;
+    syncControls();
+    applyFilters();
+    button.classList.remove("on");
+    button.setAttribute("aria-pressed", "false");
+    button.querySelector("span").textContent = "✦ 官方推荐";
+    note.classList.add("hidden");
+    fitView();
   }
 
   const state = {
@@ -200,6 +264,37 @@
       { selector: "node.dim", style: { "opacity": 0.12, "text-opacity": 0.15 } },
       { selector: "edge.dim", style: { "opacity": 0.04 } },
       { selector: "node.sel", style: { "border-width": 5, "border-color": "#eaeef5" } },
+      {
+        selector: "node.official-path-node",
+        style: {
+          "label": "data(officialOrder)",
+          "width": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
+          "height": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
+          "background-color": ele => String(ele.data("officialOrder")).includes(".")
+            ? "#202733"
+            : "#e4b85d",
+          "border-width": ele => String(ele.data("officialOrder")).includes(".") ? 3 : 6,
+          "border-color": ele => String(ele.data("officialOrder")).includes(".")
+            ? "#a99667"
+            : "#fff0b8",
+          "color": ele => String(ele.data("officialOrder")).includes(".")
+            ? "#f4dfa8"
+            : "#17130b",
+          "font-family": '"Bahnschrift SemiBold", "Aptos Display", "Segoe UI Variable Display", "Arial", sans-serif',
+          "font-size": ele => {
+            const order = String(ele.data("officialOrder"));
+            if (!order.includes(".")) return 26;
+            return order.length <= 3 ? 22 : 19;
+          },
+          "font-weight": ele => String(ele.data("officialOrder")).includes(".") ? 600 : 800,
+          "text-valign": "center",
+          "text-halign": "center",
+          "text-margin-y": 0,
+          "text-outline-color": "#0d1118",
+          "text-outline-width": ele => String(ele.data("officialOrder")).includes(".") ? 1.25 : 0
+        }
+      },
+      { selector: "node.official-path-muted", style: { "opacity": 0.14, "text-opacity": 0.16 } },
       {
         selector: "edge.hl",
         style: { "opacity": 1, "width": 2.6, "label": "data(label)",
@@ -330,9 +425,14 @@
   }
 
   function applyFocus() {
+    const previouslyFocused = cy.elements(".dim, .hl");
+    if (!state.focus || !state.selected) {
+      if (previouslyFocused.length) previouslyFocused.removeClass("dim hl");
+      return;
+    }
+
     cy.batch(() => {
-      cy.elements().removeClass("dim hl");
-      if (!state.focus || !state.selected) return;
+      previouslyFocused.removeClass("dim hl");
       const root = cy.getElementById(state.selected);
       if (!root.length || root.hasClass("hidden")) return;
 
@@ -517,6 +617,37 @@
     });
   }
 
+  let viewportMoveToken = 0;
+
+  function centerOnNode(node, afterDetailResize) {
+    const token = ++viewportMoveToken;
+    const move = () => {
+      if (token !== viewportMoveToken || state.selected !== node.id()) return;
+      cy.stop(true, false);
+      cy.animate(
+        { center: { eles: node } },
+        {
+          duration: officialPathActive ? 160 : 300,
+          easing: "ease-out",
+          queue: false
+        }
+      );
+    };
+
+    if (!afterDetailResize) {
+      move();
+      return;
+    }
+
+    // 第一次打开详情栏会让地图容器缩窄 400px。等两帧让 flex 布局与画布尺寸
+    // 先稳定，再居中；否则布局变化和视口动画抢同一批帧，表现为第一次点击卡顿。
+    requestAnimationFrame(() => {
+      if (token !== viewportMoveToken) return;
+      cy.resize();
+      requestAnimationFrame(move);
+    });
+  }
+
   function select(id, jumped) {
     const node = cy.getElementById(id);
     if (!node.length) return;
@@ -531,25 +662,29 @@
     if (reveal(id)) changed = true;
     if (changed) { syncControls(); applyFilters(); }
     state.selected = id;
-    cy.nodes().removeClass("sel");
+    cy.nodes(".sel").removeClass("sel");
     node.addClass("sel");
-    applyFocus();
+    if (state.focus) applyFocus();
+    const detailWasClosed = detail.classList.contains("closed");
     openDetail(id);
-    cy.animate({ center: { eles: node } }, { duration: 300 });
+    centerOnNode(node, detailWasClosed);
   }
 
   document.getElementById("detail-close").addEventListener("click", () => {
+    viewportMoveToken++;
+    cy.stop(true, false);
     detail.classList.add("closed");
     state.selected = null;
-    cy.nodes().removeClass("sel");
+    cy.nodes(".sel").removeClass("sel");
     applyFocus();
+    requestAnimationFrame(() => cy.resize());
   });
 
   cy.on("tap", "node", evt => select(evt.target.id(), false));
   cy.on("tap", evt => {
     if (evt.target === cy) {
       state.selected = null;
-      cy.nodes().removeClass("sel");
+      cy.nodes(".sel").removeClass("sel");
       applyFocus();
     }
   });
@@ -567,6 +702,10 @@
     domList.appendChild(lab);
   });
   renderLearningPanel();
+  document.querySelector("#official-path-toggle em").textContent =
+    `${RECOMMENDED_PATH.length} 节点 · ${(G.recommendedLearningPath || []).length} 层`;
+  document.getElementById("official-path-toggle").addEventListener("click", () =>
+    setOfficialPath(!officialPathActive));
 
   // 关系类型
   const edgeList = document.getElementById("edge-list");
@@ -627,6 +766,7 @@
   }
 
   document.getElementById("btn-reset").addEventListener("click", () => {
+    if (officialPathActive) setOfficialPath(false);
     Object.keys(state.domains).forEach(k => { state.domains[k] = true; });
     Object.keys(state.edges).forEach(k => { state.edges[k] = true; });
     state.scope = CORE.size ? "core" : "all";

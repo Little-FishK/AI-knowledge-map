@@ -24,6 +24,36 @@ const G = global.window.GRAPH;
 const ids = new Set(G.nodes.map(n => n.id));
 const problems = [];
 
+// 官方推荐学习路径：节点与显示序号都必须唯一，并且必须回到真实节点
+const recommendedSteps = (G.recommendedLearningPath || []).flatMap(phase => phase.steps || []);
+const pathIds = recommendedSteps.map(step => step[1]);
+const pathOrders = recommendedSteps.map(step => String(step[0]));
+const duplicatePathIds = pathIds.filter((v, i, a) => a.indexOf(v) !== i);
+const duplicatePathOrders = pathOrders.filter((v, i, a) => a.indexOf(v) !== i);
+if (!recommendedSteps.length) problems.push("缺官方推荐学习路径 recommendedLearningPath");
+if (recommendedSteps.length !== G.nodes.length) {
+  problems.push(`官方推荐路径应覆盖全部 ${G.nodes.length} 个节点，实际 ${recommendedSteps.length} 个`);
+}
+if (duplicatePathIds.length) problems.push("官方推荐路径有重复节点：" + [...new Set(duplicatePathIds)].join(", "));
+if (duplicatePathOrders.length) problems.push("官方推荐路径有重复序号：" + [...new Set(duplicatePathOrders)].join(", "));
+recommendedSteps.forEach((step, index) => {
+  if (!/^\d+(?:\.\d+)?$/.test(String(step[0]))) problems.push(`官方推荐路径 #${index + 1} 序号非法：${step[0]}`);
+  if (!ids.has(step[1])) problems.push(`官方推荐路径 #${index + 1} 指向不存在的节点：${step[1]}`);
+});
+(G.recommendedLearningPath || []).forEach((phase, phaseIndex) => {
+  const prefix = String(phaseIndex + 1);
+  const orders = (phase.steps || []).map(step => String(step[0]));
+  if (orders[0] !== prefix) problems.push(`官方推荐路径「${phase.phase}」必须从整数 ${prefix} 开始`);
+  if (orders.filter(order => !order.includes(".")).length !== 1) {
+    problems.push(`官方推荐路径「${phase.phase}」必须且只能有一个整数入口`);
+  }
+  orders.forEach(order => {
+    if (order !== prefix && !order.startsWith(prefix + ".")) {
+      problems.push(`官方推荐路径「${phase.phase}」出现跨区序号：${order}`);
+    }
+  });
+});
+
 // 重复 id
 const dup = G.nodes.map(n => n.id).filter((v, i, a) => a.indexOf(v) !== i);
 if (dup.length) problems.push("重复的节点 id：" + dup.join(", "));
@@ -75,7 +105,7 @@ G.edges.forEach(e => { connected.add(e.from); connected.add(e.to); });
 const orphans = G.nodes.filter(n => !connected.has(n.id)).map(n => n.id);
 
 // 报告
-console.log(`节点 ${G.nodes.length} · 边 ${G.edges.length} · 内联引用 ${refCount}`);
+console.log(`节点 ${G.nodes.length} · 边 ${G.edges.length} · 内联引用 ${refCount} · 推荐路径 ${recommendedSteps.length}`);
 const byDomain = {};
 G.nodes.forEach(n => { byDomain[n.domain] = (byDomain[n.domain] || 0) + 1; });
 console.log("大区分布：" + Object.entries(byDomain).map(([k, v]) => `${k}=${v}`).join(" "));
