@@ -7,7 +7,7 @@
 
 软件详情页回答“它是什么、最擅长什么”；使用教程页继续回答“怎样可靠地开始使用”。入口位于软件详情页顶部，阅读形态与概念的“理解原理”页一致。
 
-教程数据独立存放在 `data/tutorials.js`，以软件 `id` 为键注册到 `window.TUTORIALS.items`。没有经过本规范三层审核的资源，不得作为正式教程显示。
+教程数据以 `data/tutorials.js` 为主入口，并可按软件拆分为 `data/tutorials-*.js` 扩展文件；统一以软件 `id` 为键注册到 `window.TUTORIALS.items`。没有经过本规范三层审核的资源，不得作为正式教程显示。
 
 ## 二、平台分类与阅读方式
 
@@ -215,9 +215,10 @@ py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|loc
 - 依赖：`yt-dlp faster-whisper scenedetect[opencv] rapidocr-onnxruntime` + 系统 ffmpeg。
 - 只下载低清视频/音频供内部取证，正文必须原创、不整段转载字幕（见 §五）。
 
-## 七、当前进度（2026-07-21）
+## 七、当前进度（2026-07-23）
 
-- 已建立 1 个软件教程页：Codex。
-- Codex 当前展示 5 个 Bilibili 教程；这些存量资源需要按本标准补记证据等级、关键标准和质量评分，未复核前不自动视为全部达标。
-- 小红书、YouTube、GitHub、文章与文档分类结构已建立，资源待后续按同一标准补充。
+- 已建立 2 个软件教程页：Codex、Claude Code。
+- Codex 展示 10 条正式教程：Bilibili 5 + YouTube 5。
+- Claude Code 展示 10 条正式教程：Bilibili 5 + YouTube 5。
+- 当前合计 20 条资源，全部具有 E2 及以上证据、五项标准全 2、质量评分达到正式收录线；小红书、GitHub、文章与文档分类结构保留，等待后续按同一标准扩充。
 - 修改后运行 `node tools/validate-tutorials.js`，同时继续运行软件目录和页面级校验。

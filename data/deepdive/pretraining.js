@@ -35,14 +35,25 @@ window.DEEPDIVE["pretraining"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>凭什么这一步能灌进这么多能力<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">3</span>手算一次 next-token 训练信号<span class="dd-badge math">数值例子</span></h2>
+  <p class="dd-lead">一句文本怎样同时产生多个训练样本，预测变准又怎样让损失下降？</p>
+  <p>文本 <code>猫 喜欢 鱼 &lt;EOS&gt;</code> 经过右移，会产生三次预测：看到“猫”预测“喜欢”，看到“猫 喜欢”预测“鱼”，再预测结束符。假设模型给三个正确 token 的概率依次为 0.50、0.25、0.80：</p>
+  <table class="dd-table"><thead><tr><th>前缀</th><th>正确下一个 token</th><th>正确概率 p</th><th>损失 −ln p</th></tr></thead><tbody><tr><td>猫</td><td>喜欢</td><td>0.50</td><td>0.693</td></tr><tr><td>猫 喜欢</td><td>鱼</td><td>0.25</td><td>1.386</td></tr><tr><td>猫 喜欢 鱼</td><td>&lt;EOS&gt;</td><td>0.80</td><td>0.223</td></tr></tbody></table>
+  <div class="dd-formula">平均交叉熵=(0.693+1.386+0.223)/3≈0.767；困惑度=exp(0.767)≈2.15</div>
+  <p>第二个位置最不确定，贡献最大损失。反向传播会同时调整共享参数，使相似上下文下正确 token 的 logit 相对上升。若一次更新后“鱼”的概率从 0.25 升到 0.50，该位置损失就从 1.386 降到 0.693。</p>
+  <figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="同一文本右移产生三个下一 token 训练目标"><defs><marker id="pre-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g class="svg-t"><text x="55" y="60">猫</text><text x="170" y="60">喜欢</text><text x="300" y="60">鱼</text><text x="405" y="60">&lt;EOS&gt;</text><text x="55" y="125">输入前缀逐步增长</text><text x="55" y="190">每个位置都有一个监督目标</text></g><g stroke-width="3" fill="none" marker-end="url(#pre-a)"><path d="M75 70C105 100 140 100 165 70" stroke="#8b5cf6"/><path d="M195 70C220 100 270 100 295 70" stroke="#0ea5e9"/><path d="M320 70C340 100 380 100 400 70" stroke="#10b981"/></g><g class="svg-t"><text x="105" y="145">预测“喜欢”</text><text x="255" y="145">预测“鱼”</text><text x="420" y="145">预测结束</text></g></svg><figcaption>训练不是每段文本只给一个标签；长度为 L 的序列通常贡献约 L 个 next-token 监督位置，因此大规模原始文本可自动产生密集训练信号。</figcaption></figure>
+  <div class="dd-note warn"><b>低困惑度不等于事实更真或助手更好。</b>它只表示在评测文本分布上更会预测 token；数据污染、记忆、风格捷径和任务错位都可能让该指标与真实能力分离。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>凭什么这一步能灌进这么多能力<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">最关键的疑问：只是预测下一个词，怎么就学到了语法、常识，甚至推理？</p>
   <p>因为<b>要把下一个词猜准，往往被迫理解到位</b>：续写推理就得会推理，续写代码就得懂语法，续写对话就得建模意图。于是「预测下一个词」暗中要求模型掌握语言、事实、逻辑——这些能力不是被显式教的，而是为了把词猜得更准，<b>作为副产品被逼出来的</b>（这一点在「大语言模型」深读页第 6 节讲透）。</p>
   <div class="dd-note intuition"><b>规模是前提</b>　这些能力只有当预训练的<b>规模足够大</b>（参数、数据、算力按比例一起放大）时才充分涌现。「越大越强」这条经验规律叫<b>缩放定律</b>，正是它让「不断把预训练做大」成了可以持续下注的方向。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>产出的是「基座模型」<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">5</span>产出的是「基座模型」<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">预训练跑完，我们是不是就得到一个能用的助手了？</p>
   <div class="dd-note warn"><b>还不是。</b>　预训练结束时得到的是<b>基座模型（base model）</b>：知识渊博，但<b>不听话</b>——你问它一个问题，它可能顺着续写出<b>更多问题</b>，而不是回答。因为它只学了「文本通常怎么接下去」，没学「被提问时应该回答」。</div>
   <p>要把基座变成能对话的助手，还要两步：<b>指令微调</b>教它「被问就答」，<b>偏好对齐</b>教它答得有用又安全（见「微调」「对齐」深读页）。</p>
@@ -63,40 +74,43 @@ window.DEEPDIVE["pretraining"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>它为什么这么贵<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">6</span>它为什么这么贵<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">既然预训练这么关键，为什么不是人人都能做？</p>
   <p>前沿通用模型的从头预训练会消耗大规模数据、加速器集群与长期工程投入，成本通常只有少数机构能承担；但“小模型预训练”并非绝对做不起。总训练预算还要在参数量与 token 数之间分配，Chinchilla 等工作表明：只增参数而训练数据不足，并非计算最优。</p>
   <div class="dd-note intuition"><b>这也正是「微调」存在的理由</b>　既然预训练这么贵，绝大多数人不会从头来，而是<b>站在别人预训练好的模型上做微调</b>（迁移学习）——花很小的代价，就借用了那份天价的通用底子（见「微调」深读页）。预训练与微调，是「一次昂贵的通才养成」和「无数次廉价的专才适配」的分工。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从原始文本到基座模型，监督信号、优化与后训练怎样接成一条链？</p>
   <ol class="dd-chain">
     <li>针对任务直接训练又贵又窄，于是先学通用底子、再适配任务——这就是「预」训练。<span>（§1）</span></li>
     <li>它用数据自身构造监督信号：自回归模型预测下一 token，其他架构也可用掩码、对比或重建目标，因此能利用大规模弱标注数据。<span>（§2）</span></li>
-    <li>猜词逼理解，加上规模，语言/常识/推理作为副产品被灌进模型。<span>（§3）</span></li>
-    <li>产出的是博学但不听话的基座，还需微调+对齐才成助手。<span>（§4）</span></li>
-    <li>预训练同时吃海量数据、算力、时间，极贵，所以大多数人转而在基座上微调。<span>（§5）</span></li>
+    <li>每个位置以 −ln p 贡献损失，整段文本自动产生密集监督；梯度让正确 token 的相对概率上升。<span>（§3）</span></li>
+    <li>预测目标迫使模型压缩许多可复用结构，但能力与数据、规模和任务分布共同决定。<span>（§4）</span></li>
+    <li>产出的是博学但不听话的基座，还需微调+对齐才成助手。<span>（§5）</span></li>
+    <li>预训练同时消耗数据、算力、通信与工程时间，所以多数团队复用基座再适配。<span>（§6）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「预训练为什么能不用标注就学到这么多」，并说出「基座模型和对话助手差在哪两步」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">哪些说法把自监督、语言建模指标和助手行为混成了一件事？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
       <tr><td>预训练需要大量人工标注</td><td>是<b>自监督</b>，答案来自文本本身，不用人标</td></tr>
       <tr><td>预训练完就是 ChatGPT</td><td>得到的是不听话的基座，还需指令微调和对齐</td></tr>
       <tr><td>模型的能力主要靠微调</td><td>绝大部分知识和能力来自预训练；微调主要改行为</td></tr>
-      <tr><td>预训练目标很复杂</td><td>就一个简单目标：预测下一个词；复杂的是规模</td></tr>
+      <tr><td>所有预训练都只有下一 token 目标</td><td>自回归模型常用它；编码器、多模态模型还会用掩码、对比、重建等目标</td></tr>
       <tr><td>谁都能预训练一个大模型</td><td>需海量数据+算力+时间，极贵；多数人做微调</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>为什么要先「预」训练，而不是直接针对任务训练？</li>
     <li>预训练用什么目标、什么监督方式？为什么能用海量数据？</li>
@@ -116,7 +130,7 @@ window.DEEPDIVE["pretraining"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>

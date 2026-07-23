@@ -7,7 +7,7 @@ window.DEEPDIVE["attention"] = {
   subtitle: "处理每个词时，让模型自己决定该「看」句子里的哪些词",
   aliases: "Attention · Self-Attention · 自注意力",
   meta: "建议 30–40 分钟 · 中级 · 需要：向量点积、softmax、了解「神经网络」",
-  thesis: "注意力机制让模型在处理每一个词时，都对句子里<b>所有</b>词算一遍相关性权重、再按权重把信息汇总过来。所谓「注意力」，本质就是一次<b>由内容决定权重的加权平均</b>。它靠「任意两个词直接相连、且能并行计算」，一举解决了旧序列模型的两大死穴，成了当今所有大模型的基石。",
+  thesis: "标准全局注意力让每个查询与可见键计算匹配分数，再按归一化权重汇总值；本质是一次<b>由内容、位置与掩码共同决定权重的加权和</b>。它缩短远距离信息路径并允许训练时并行处理位置，但权重不是解释保证，也不自动等于正确因果关系。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -28,7 +28,7 @@ window.DEEPDIVE["attention"] = {
   <h2><span class="dd-n">1</span>要解决的核心难题<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：理解一句话里的某个词，到底难在哪？</p>
   <p>理解一个词，几乎总要看它和句子里<b>哪些别的词</b>有关。处理「她」，就得联系到「小红」；而「小红」可能在好几个词之外。难点有二：<b>相关的词可能离得很远</b>，而且<b>该看谁是随内容变的</b>——换句话说，不能靠固定规则，得让模型自己动态判断。</p>
-  <div class="dd-note intuition"><b>旧办法为什么不够</b>　在注意力之前，主流是循环网络（RNN）：像读书一样<b>按顺序</b>一个词一个词处理，把「记忆」沿着链条往后传。问题是——传得越远，早先的信息衰减得越厉害（「读到句尾忘了句首」），而且必须一个接一个算、<b>没法并行</b>。这两条短板，正是第 4 节注意力要一举解决的。</div>
+  <div class="dd-note intuition"><b>旧办法为什么不够</b>　在注意力之前，主流是循环网络（RNN）：像读书一样<b>按顺序</b>一个词一个词处理，把“记忆”沿链条往后传。长路径会让早先信息更难保留，而且时间步之间难以并行；门控 RNN 能缓解但不能消除这两个结构约束。第 5 节会逐项比较。</div>
 </section>
 
 <section class="dd-sec">
@@ -75,16 +75,25 @@ window.DEEPDIVE["attention"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>自注意力：句子内部互相看<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">3</span>手算一次缩放点积注意力<span class="dd-badge math">数值例子</span></h2>
+  <p class="dd-lead">从两组匹配分数到最终输出，softmax 和 Value 各改变了什么？</p>
+  <p>设单个查询 <code>q=[1,0]</code>，两个键 <code>k₁=[1,0]</code>、<code>k₂=[0,1]</code>，键维度 <code>d=2</code>；对应值为 <code>v₁=[2,0]</code>、<code>v₂=[0,4]</code>：</p>
+  <table class="dd-table"><thead><tr><th>步骤</th><th>计算</th><th>结果（约）</th></tr></thead><tbody><tr><td>点积</td><td><code>[q·k₁,q·k₂]</code></td><td><code>[1,0]</code></td></tr><tr><td>缩放</td><td><code>[1,0]/√2</code></td><td><code>[0.707,0]</code></td></tr><tr><td>softmax</td><td><code>exp(s)/Σexp(s)</code></td><td><code>[0.670,0.330]</code></td></tr><tr><td>加权和</td><td><code>0.670v₁+0.330v₂</code></td><td><code>[1.340,1.320]</code></td></tr></tbody></table>
+  <p>第一把键更匹配，所以它的 Value 权重更大；输出却不是复制 <code>v₁</code>，而是两个 Value 的混合。Key 决定“取多少”，Value 决定“取什么”，二者不能混为一谈。</p>
+  <div class="dd-note warn"><b>注意力权重不是解释概率。</b>它只描述当前头、当前层的一次信息混合系数；残差、其他头和后续层仍会改写表示。高权重不证明某 token 是模型结论的唯一原因。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>自注意力：句子内部互相看<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">上一节的 Q、K、V 都从哪来？这决定了「谁在看谁」。</p>
   <p>最常见的一种叫<b>自注意力（self-attention）</b>：Q、K、V <b>全部来自同一句话</b>。也就是说，句子里的每个词都在看这句话里的所有词（包括自己），据此更新自己的表示。我们的运行示例——「她」在同一句里找到「小红」——就是自注意力。</p>
   <div class="dd-note intuition"><b>还有一种「跨着看」</b>　如果 Query 来自一个序列、Key/Value 来自<b>另一个</b>序列，就是<b>交叉注意力</b>，常见于翻译（让译文的每个词去看原文）。机制完全一样，只是「看的对象」换成了另一串。本页之后仍以自注意力为主。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>为什么它是转折点<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
+  <h2><span class="dd-n">5</span>为什么它是转折点<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">最关键的一节：注意力到底比之前的 RNN 强在哪，值得取而代之？</p>
-  <p>它一次解决了 RNN 的<b>两个致命伤</b>：</p>
+  <p>相较于按时间步串行传递的经典 RNN，它改善了两个关键瓶颈：</p>
 
   <figure class="dd-fig">
     <svg viewBox="0 0 560 200" role="img" aria-label="RNN 逐步传递路径长，注意力任意两词直连">
@@ -103,7 +112,7 @@ window.DEEPDIVE["attention"] = {
       </g>
       <defs><marker id="d1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
     </svg>
-    <figcaption>图 2　RNN 里两个相隔 n 个词的位置要经过 n 次传递，梯度连乘导致远距离信息衰减；注意力让<b>任意两个位置直接相连</b>，无论隔多远，路径长度都是 1。</figcaption>
+    <figcaption>图 2　经典 RNN 中相隔 n 个时间步的信息要经过长度随 n 增长的传递链；全局注意力让任意两个可见位置在一层内直接交互。路径更短有利于学习远距依赖，但仍要经过投影、softmax 与后续层，并非“没有衰减”。</figcaption>
   </figure>
 
   <ul class="dd-steps">
@@ -114,14 +123,14 @@ window.DEEPDIVE["attention"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>多头注意力：为什么要好几组<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">6</span>多头注意力：为什么要好几组<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">一组注意力只能按一种方式衡量「相关」。可词与词的关系有很多种，一组够吗？</p>
-  <p>不够，所以用<b>多头注意力</b>：在同一层里<b>并行跑十几组</b>注意力，每组学各自的 Q/K/V，从不同角度看「相关」。研究发现，不同的头确实会<b>自发分工</b>：有的稳定盯语法依存，有的盯指代（像我们的「她→小红」），有的盯句首句尾。</p>
-  <div class="dd-note intuition"><b>分工是学出来的，不是指定的</b>　没人告诉某个头「你专管指代」；这种分工是训练过程中自己长出来的。多头，本质是让模型<b>同时从多个视角</b>汇总信息，再把结果拼起来。</div>
+  <p>所以用<b>多头注意力</b>：在同一层里并行运行多组投影，每组有自己的 Q/K/V 子空间，从不同角度形成信息混合。有些头会呈现语法、指代或位置模式，也有许多头相互冗余；“每头都有清晰固定职责”不是架构保证。</p>
+  <div class="dd-note intuition"><b>分工若出现，是训练学出来的</b>　没人预先指定某个头“专管指代”。多头提供的是多个表示子空间和并行路由机会，最后拼接并投影；能否形成稳定可解释分工要靠实证分析。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>它的代价：平方级开销<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">7</span>它的代价：平方级开销<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">这么强，代价是什么？答案藏在「每个词都要看所有词」这句话里。</p>
   <p>在<b>标准全局自注意力</b>中，每个位置都要和所有位置算一次匹配，因此注意力分数矩阵有 n² 个元素；该部分的计算量与朴素显存占用随长度平方增长。实际总成本还包含投影与前馈层，FlashAttention、滑窗或稀疏注意力也会改变显存常数或复杂度。</p>
   <div class="dd-note math"><b>算一笔账</b>　1 千个 token 的输入，注意力要算约 100 万对；10 万个 token 就是约 <b>100 亿</b>对。这就是长上下文推理又慢又贵的原因——不是厂商不愿意给，而是每一档长度都要付超线性的代价。</div>
@@ -131,23 +140,27 @@ window.DEEPDIVE["attention"] = {
     <li>长窗口还会暴露<b>「中间迷失」</b>等位置偏差：模型可能更善用开头和结尾的信息。这是训练分布、位置表示和注意模式等多因素结果，不能只归因于“权重被摊薄”。</li>
   </ul>
   <div class="dd-note eng"><b>一整条优化路线</b>　围绕这个瓶颈，有稀疏注意力（只算部分位置对）、滑窗注意力（只看邻近范围）、以及工程层面的 FlashAttention（不降复杂度，但大幅减少显存搬运）。它们缓解开销，但「平方」这个根本量级仍在。</div>
+  <div class="dd-note key"><b>怎样验证优化真的有效：</b>固定模型权重、精度、batch 和硬件，按 1K、4K、16K 等长度同时记录任务正确率、峰值显存、吞吐与 p95 延迟；再做证据位置置换，确认加速没有通过截断或局部窗口悄悄损伤远距信息。若速度提高但长距离题准确率下降，先诊断可见范围与 mask，再比较内核实现，而不是只看注意力热图。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从匹配分数到可扩展序列建模，关键因果环节怎样闭合？</p>
   <ol class="dd-chain">
     <li>理解一个词要看句中相关的词，而相关的词可能很远、且随内容变——旧的 RNN 应付不了。<span>（§1）</span></li>
     <li>注意力用 Q/K/V 三步：Query·Key 算匹配、softmax 成权重、按权重加权求和 Value。<span>（§2）</span></li>
-    <li>Q/K/V 都来自同一句话时，就是自注意力：句子内部互相看。<span>（§3）</span></li>
-    <li>它任意两词路径长度为 1（不衰减）、又能并行（可放大），一举解决 RNN 两大死穴。<span>（§4）</span></li>
-    <li>多头让模型从多个视角同时看「相关」，分工是训练中自发形成的。<span>（§5）</span></li>
-    <li>标准全局注意力的分数矩阵有平方级开销；长上下文还会出现位置偏差，但“中间迷失”不能只归因于平方复杂度。<span>（§6）</span></li>
+    <li>softmax 把缩放分数变成权重，Value 加权和产生新的表示；权重不是因果解释。<span>（§3）</span></li>
+    <li>Q/K/V 都来自同一句话时，就是自注意力：句子内部互相看。<span>（§4）</span></li>
+    <li>它让任意两位置在一层内直接交互、又能并行训练，改善经典 RNN 的长路径与串行瓶颈。<span>（§5）</span></li>
+    <li>多头提供多个投影子空间；专门化可能出现，也可能冗余。<span>（§6）</span></li>
+    <li>标准全局注意力的分数矩阵有平方级开销；长上下文还会出现位置偏差，但“中间迷失”不能只归因于平方复杂度。<span>（§7）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「注意力的权重为什么由内容而非位置决定」，并说出「它凭哪两点取代了 RNN、又为什么这对大模型规模至关重要」，你就抓住了它的内核。下一步：看这块机制怎样被包装成可堆叠的标准层——「Transformer」深读页。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">哪些直觉把信息混合、解释性与位置关系混成了一件事？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -156,12 +169,13 @@ window.DEEPDIVE["attention"] = {
       <tr><td>多头是为了算得更快</td><td>是为了从<b>多个不同视角</b>看相关，分工是学出来的</td></tr>
       <tr><td>上下文窗口不够是厂商小气</td><td>是注意力平方级开销的硬约束，每加长一档都超线性变贵</td></tr>
       <tr><td>注意力自己知道词序</td><td>不带位置表示的自注意力对排列等变；词序要另外注入（见 Transformer 的位置编码）</td></tr>
+      <tr><td>最高注意力权重就是模型答案的原因</td><td>它只是某层某头的混合系数；残差、其他头和后续层共同决定输出</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>Query、Key、Value 各自扮演什么角色？三步流程是怎样的？</li>
     <li>为什么说注意力的权重「由内容决定，不由位置远近决定」？</li>
@@ -185,7 +199,7 @@ window.DEEPDIVE["attention"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>

@@ -48,6 +48,24 @@
         <div id="domain-list"></div>
       </section>
 
+      <section class="ctl-group learning-panel" aria-labelledby="learning-heading">
+        <h3 id="learning-heading">学习</h3>
+        <div class="learning-overview">
+          <div><strong id="learning-done-count">0</strong><span id="learning-total-count"> / 0 个节点</span></div>
+          <span id="learning-percent">0%</span>
+        </div>
+        <div class="learning-progress" aria-hidden="true"><span id="learning-progress-bar"></span></div>
+        <details class="learning-group" open>
+          <summary>已学习 <em id="learning-done-label">0</em></summary>
+          <div id="learning-done-list" class="learning-node-list"></div>
+        </details>
+        <details class="learning-group">
+          <summary>未学习 <em id="learning-todo-label">0</em></summary>
+          <div id="learning-todo-list" class="learning-node-list"></div>
+        </details>
+        <p class="ctl-hint learning-storage-note">进度保存在当前浏览器</p>
+      </section>
+
       <section class="ctl-group">
         <h3>关系类型</h3>
         <p class="ctl-hint">跨领域的联系是这张图的重点</p>
@@ -101,7 +119,12 @@
 <script src="data/graph.js"></script>
 <script src="data/software.js"></script>
 <script src="data/tutorials.js"></script>
+<script src="data/tutorials-codex-youtube.js"></script>
+<script src="data/tutorials-claude-code.js"></script>
 <!-- 理解原理深读页：每个概念一个文件，注册到 window.DEEPDIVE[nodeId] -->
+<script src="data/deepdive/00-deepdive-factory.js"></script>
+<!-- 共享补全包先注册兜底页；后续独立文件可用更高质量版本覆盖同 id。 -->
+<script src="data/deepdive/01-completion-pages.js"></script>
 <script src="data/deepdive/neural-network.js"></script>
 <script src="data/deepdive/llm.js"></script>
 <script src="data/deepdive/in-context-learning.js"></script>
@@ -128,10 +151,92 @@
 <script src="data/deepdive/image-generation.js"></script>
 <script src="data/deepdive/reasoning-models.js"></script>
 <script src="data/deepdive/post-training.js"></script>
+<script src="data/deepdive/world-models.js"></script>
 <script src="data/deepdive/model-evaluation.js"></script>
+<script src="data/deepdive/model-families.js"></script>
+<script src="data/deepdive/uncertainty-calibration.js"></script>
 <script src="data/deepdive/training-data-governance.js"></script>
 <script src="data/deepdive/test-time-compute.js"></script>
 <script src="data/deepdive/agent-identity-access.js"></script>
+<script src="data/deepdive/agent-loop.js"></script>
+<script src="data/deepdive/react.js"></script>
+<script src="data/deepdive/evaluation.js"></script>
+<script src="data/deepdive/scaling-law.js"></script>
+<script src="data/deepdive/jailbreak.js"></script>
+<script src="data/deepdive/deployment.js"></script>
+<script src="data/deepdive/rlhf.js"></script>
+<script src="data/deepdive/constitutional-ai.js"></script>
+<script src="data/deepdive/context-engineering.js"></script>
+<script src="data/deepdive/lost-in-middle.js"></script>
+<script src="data/deepdive/reward-hacking.js"></script>
+<script src="data/deepdive/model-selection.js"></script>
+<script src="data/deepdive/loss-function.js"></script>
+<script src="data/deepdive/constrained-decoding.js"></script>
+<script src="data/deepdive/structured-output.js"></script>
+<script src="data/deepdive/streaming.js"></script>
+<script src="data/deepdive/synthetic-data.js"></script>
+<script src="data/deepdive/code-execution.js"></script>
+<script src="data/deepdive/reflection.js"></script>
+<script src="data/deepdive/planning.js"></script>
+<script src="data/deepdive/prompt-caching.js"></script>
+<script src="data/deepdive/vanishing-gradient.js"></script>
+<script src="data/deepdive/self-supervised-learning.js"></script>
+<script src="data/deepdive/agent-memory.js"></script>
+<script src="data/deepdive/gradient-descent.js"></script>
+<script src="data/deepdive/sampling-params.js"></script>
+<script src="data/deepdive/overfitting.js"></script>
+<script src="data/deepdive/regularization.js"></script>
+<script src="data/deepdive/curse-of-dimensionality.js"></script>
+<script src="data/deepdive/batch-norm.js"></script>
+<script src="data/deepdive/optimizer-schedule.js"></script>
+<script src="data/deepdive/residual-connection.js"></script>
+<script src="data/deepdive/backprop.js"></script>
+<script src="data/deepdive/rnn.js"></script>
+<script src="data/deepdive/state-space-models.js"></script>
+<script src="data/deepdive/unsupervised-learning.js"></script>
+<script src="data/deepdive/reinforcement-learning.js"></script>
+<script src="data/deepdive/quantization.js"></script>
+<script src="data/deepdive/logprobs.js"></script>
+<script src="data/deepdive/information-theory.js"></script>
+<script src="data/deepdive/kernel-methods.js"></script>
+<script src="data/deepdive/distillation.js"></script>
+<script src="data/deepdive/clip.js"></script>
+<script src="data/deepdive/positional-encoding.js"></script>
+<script src="data/deepdive/normalization.js"></script>
+<script src="data/deepdive/peft-lora.js"></script>
+<script src="data/deepdive/distributed-training.js"></script>
+<script src="data/deepdive/contrastive-learning.js"></script>
+<script src="data/deepdive/cnn.js"></script>
+<script src="data/deepdive/decision-tree.js"></script>
+<script src="data/deepdive/clustering.js"></script>
+<script src="data/deepdive/dimensionality-reduction.js"></script>
+<script src="data/deepdive/moe.js"></script>
+<script src="data/deepdive/model-merging.js"></script>
+<script src="data/deepdive/tokenization.js"></script>
+<script src="data/deepdive/model-routing.js"></script>
+<script src="data/deepdive/reranking.js"></script>
+<script src="data/deepdive/inference-optimization.js"></script>
+<script src="data/deepdive/self-consistency.js"></script>
+<script src="data/deepdive/context-compaction.js"></script>
+<script src="data/deepdive/vector-db.js"></script>
+<script src="data/deepdive/chunking.js"></script>
+<script src="data/deepdive/advanced-rag.js"></script>
+<script src="data/deepdive/tree-of-thoughts.js"></script>
+<script src="data/deepdive/observability.js"></script>
+<script src="data/deepdive/prefilling.js"></script>
+<script src="data/deepdive/data-drift-monitoring.js"></script>
+<script src="data/deepdive/batch-27-protocol-evidence.js"></script>
+<script src="data/deepdive/batch-28-agent-systems.js"></script>
+<script src="data/deepdive/batch-29-agent-toolchain.js"></script>
+<script src="data/deepdive/batch-30-safety-governance.js"></script>
+<script src="data/deepdive/batch-31a-control-boundaries.js"></script>
+<script src="data/deepdive/batch-31b-audio-speech.js"></script>
+<script src="data/deepdive/batch-31c-visual-temporal.js"></script>
+<script src="data/deepdive/batch-32a-generative-foundations.js"></script>
+<script src="data/deepdive/batch-32b-control-editing.js"></script>
+<script src="data/deepdive/batch-32c-evidence-security.js"></script>
+<script src="data/deepdive/z-batch-32-jailbreak-final.js"></script>
+<script src="data/deepdive/zz-deepdive-quality-completion.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

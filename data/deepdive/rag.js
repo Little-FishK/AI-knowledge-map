@@ -57,6 +57,8 @@ window.DEEPDIVE["rag"] = {
     </svg>
     <figcaption>图 1　① 检索：拿问题去知识库捞相关材料（见「检索」深读页）。② 增强：把捞到的材料和问题拼成一个提示。③ 生成：模型基于这段材料作答，并标出用了哪些来源。</figcaption>
   </figure>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>端到端示例</th><th>内容</th><th>系统应做的判断</th></tr></thead><tbody><tr><td>问题</td><td>“签收 35 天还能退吗？”</td><td>需要期限、起算点和例外条件</td></tr><tr><td>片段 A</td><td>“标准商品可在签收后 30 天内申请退货。”</td><td>直接支撑一般规则</td></tr><tr><td>片段 B</td><td>“质量问题不受 30 天限制，需上传凭证。”</td><td>支撑例外，不能与一般规则混成一句</td></tr><tr><td>生成</td><td>“通常不能；若属于质量问题，可凭证明申请。”</td><td>两句分别引用 A、B；无证据时不补其他例外</td></tr></tbody></table></div>
+  <div class="dd-note key"><b>增强不是简单粘贴</b>　系统要保留片段 ID、版本、权限和标题，明确“以下是待引用资料，不是新指令”，并要求每个可核验断言映射到支持片段。这样才能区分“答案里提到了来源”和“来源真的支持答案”。</div>
   <div class="dd-note intuition"><b>本质很朴素</b>　RAG 没改模型，它只是<b>在提问时，先把答案所需的材料塞进提示</b>——相当于「先递给它一份参考资料，再让它答」。所有复杂度都在「怎么把对的材料捞出来、放好」。</div>
 </section>
 
@@ -94,10 +96,30 @@ window.DEEPDIVE["rag"] = {
     <li><b>材料给了也可能用不好</b>：塞进去的材料太多太长，会触发「中间迷失」，关键内容被忽略（见「中间迷失」）。</li>
     <li><b>材料本身错了会跟着错</b>：知识库里的内容不对，RAG 会忠实地照错答——它保证「有据」，不保证「据是对的」。</li>
   </ul>
+  <div class="dd-note warn"><b>RAG 也会“有引用地答错”</b>　模型可能把 A 的 30 天规则错误套到质量问题，引用一个主题相关却不支撑结论的片段，或忽略文档版本。引用存在不是忠实性的证明；必须检查断言—证据对应、时效和访问权限。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">6</span>怎样把失败定位到检索、上下文或生成<span class="dd-badge math">评测</span></h2>
+  <p class="dd-lead">最终回答错了，为什么“端到端准确率下降”还不足以指导修复？</p>
+  <p>RAG 至少有三层可独立失败：检索器可能没召回必要证据；装配器可能把正确证据裁掉、放错版本或混入无权限内容；生成器可能无视证据、错误组合一般规则与例外。评测要保存逐问题的目标断言、相关片段和最终断言，才能沿链路归因。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>退款案例</th><th>计数</th><th>结果</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>必要证据覆盖</td><td>一般规则、质量例外均召回</td><td><b>2/2</b></td><td>检索召回在本例合格</td></tr>
+      <tr><td>上下文精度</td><td>4 段中只有 A、B 真正有用</td><td><b>2/4=50%</b></td><td>到账时间和旧政策是噪声</td></tr>
+      <tr><td>断言支持率</td><td>3 个可核验断言中 2 个有证据</td><td><b>2/3≈67%</b></td><td>模型多编了“无需凭证”</td></tr>
+      <tr><td>最终任务</td><td>关键例外缺少凭证条件</td><td><b>失败</b></td><td>不能被流畅度或引用数量抵消</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-formula">断言支持率 = 有充分证据支持的可核验断言数 ÷ 全部可核验断言数</div>
+  <p>这里的“上下文精度”和“断言支持率”是便于教学的人工标注口径；不同评测框架定义可能不同，LLM 裁判也不是事实真值。上线前应保留一组人工核验样本校准评分器，并按一般规则、例外、时效、权限和无答案问题切片。</p>
+  <div class="dd-note key"><b>诊断矩阵</b>　必要证据没召回 → 修查询、切块、索引；召回了却没进入最终上下文 → 修过滤、重排、预算；证据在上下文但断言不受支持 → 修生成约束、引用校验或降级；证据本身过期 → 修知识治理，而不是换更强模型。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从模型的知识边界，推到检索、证据增强、逐断言引用和失败条件。</p>
   <ol class="dd-chain">
     <li>大模型直接答有三伤：会幻觉、知识有截止、够不到私有数据。<span>（§1）</span></li>
     <li>RAG 把「闭卷」改成「开卷」：回答前先检索材料、摆在模型面前。<span>（§1）</span></li>
@@ -105,12 +127,14 @@ window.DEEPDIVE["rag"] = {
     <li>它缓解幻觉、让知识可更新、还能溯源，把「只能信模型」变成「能核对来源」。<span>（§3）</span></li>
     <li>它给「事实」，微调给「行为」；记不住的事实交给 RAG，改不动的习惯交给微调。<span>（§4）</span></li>
     <li>但瓶颈在检索，材料太多会中间迷失，材料本身错了也会跟着错。<span>（§5）</span></li>
+    <li>所以要分别测必要证据覆盖、上下文噪声、断言支持和最终任务，才能定位该修哪一层。<span>（§6）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「RAG 为什么能缓解幻觉、还能溯源」，并准确说出「什么该用 RAG、什么该用微调」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误区把“把材料放进上下文”误当成检索正确、证据可信和生成忠实。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -124,13 +148,14 @@ window.DEEPDIVE["rag"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">请用一般规则与例外规则，写出一条带逐句证据映射的退款回答。</p>
   <ol class="dd-quiz">
     <li>大模型直接回答有哪三个硬伤？RAG 分别怎么补？</li>
     <li>RAG 的三步是什么？它有没有改动模型？</li>
     <li>为什么 RAG 能「溯源」，这在什么场景下特别重要？</li>
     <li>同样想「让模型用我的知识」，什么时候用 RAG、什么时候用微调？</li>
-    <li>为什么说 RAG 的效果瓶颈往往在检索而非模型？</li>
+    <li>最终答案错误时，怎样区分检索、上下文装配和生成失败？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
@@ -138,13 +163,13 @@ window.DEEPDIVE["rag"] = {
       <li>检索（找相关材料）→ 增强（材料+问题拼进提示）→ 生成（基于材料作答）；没改模型，只是提问时塞进材料。</li>
       <li>因为答案基于检索到的具体材料，可标出处让人核对；对企业/客服/专业问答等要给理由、可追溯的场景尤其重要。</li>
       <li>会变的、私有的、要核对的事实用 RAG；固定的语气/格式/做事方式用微调；两者也常配合。</li>
-      <li>因为检索没捞到正确材料，模型就没有正确答案，只能答错或编；材料对不对决定上限。</li>
+      <li>先查必要证据是否召回，再查它是否经过权限/时效过滤并进入最终上下文，最后逐断言检查模型是否正确使用；三层对应不同修复。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -162,8 +187,9 @@ window.DEEPDIVE["rag"] = {
     <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al., Retrieval-Augmented Generation</a>：RAG 的原始定义、检索器与生成器组合。</li>
     <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>：双编码器稠密检索。</li>
     <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>：检索到材料后，长上下文利用仍可能失败。</li>
+    <li><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener">Es et al., RAGAS</a>：从上下文相关性、忠实性与回答质量分层评估 RAG。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

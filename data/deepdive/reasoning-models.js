@@ -51,6 +51,7 @@ window.DEEPDIVE["reasoning-models"] = {
   <p class="dd-lead">最关键的一节：它为什么被看作和「把模型做大」并列的一个大方向？</p>
   <p>过去让模型更强，主要靠<b>预训练缩放</b>——把参数、数据、算力在<b>训练时</b>一起做大（缩放定律，见其节点）。但这条路越来越贵、且高质量数据在见底。推理模型开辟了<b>第二条轴</b>：</p>
   <div class="dd-note key"><b>测试时缩放（test-time scaling）</b>　同一个模型或模型系统，在回答时投入更多算力：延长单条推理、采样多条候选再投票、搜索解空间、调用工具验证，或让验证器筛选答案。更多计算在许多难题上能提高准确率，但通常存在收益递减，且错误的搜索策略也可能白白烧算力。</div>
+  <div class="dd-note math"><b>数值例子：多候选为何可能有用</b>　仅作直觉假设：每条候选独立，单条做对概率为 35%。采样 4 条时，“至少一条正确”的概率为 <code>1−(1−0.35)⁴≈82%</code>；但如果验证器在存在正确候选时只有 80% 概率选中，端到端上限约为 <code>0.82×0.80≈66%</code>，且计算接近 4 倍。真实候选高度相关，收益通常低于独立假设；验证器变强与候选多样性同样重要。</div>
   <figure class="dd-fig">
     <svg viewBox="0 0 560 120" role="img" aria-label="普通模型直接答，推理模型先长思考再答">
       <g>
@@ -71,7 +72,25 @@ window.DEEPDIVE["reasoning-models"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>代价<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">4</span>预算怎样分配才值得<span class="dd-badge math">推导</span></h2>
+  <p class="dd-lead">多想一次带来多少新增成功，是否值得额外延迟与费用？</p>
+  <div class="dd-formula"><code>期望效用(b) = 成功概率(b) × 任务价值 − 计算成本(b) − 延迟损失(b)</code></div>
+  <p><code>b</code> 是候选数、搜索步数或推理努力等级。下面是教学用的同一批 100 道题，不代表任何特定模型：预算从 1 增至 4，正确数由 48 增至 67，额外 300 单位计算换来 19 道题；再增至 8，只多 3 道题却再花 400 单位。收益递减意味着系统应按题目难度、可验证性和错误代价路由，而不是给所有请求同一最高预算。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>任务</th><th>建议预算</th><th>理由</th><th>主要验收</th></tr></thead>
+    <tbody>
+      <tr><td>改日期格式</td><td>低：单次生成</td><td>简单、可确定性检查</td><td>模式匹配与样例测试</td></tr>
+      <tr><td>竞赛数学题</td><td>中高：多候选+验证</td><td>难但答案常可验证</td><td>代回、符号计算或证明检查</td></tr>
+      <tr><td>冷门事实问答</td><td>推理预算不是主旋钮</td><td>多想不能创造缺失证据</td><td>检索、引用与拒答</td></tr>
+      <tr><td>高影响决策</td><td>按风险增加验证而非只加长度</td><td>验证器也可能同源犯错</td><td>独立工具、规则与人工复核</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note key"><b>可验证性决定预算价值</b>　当答案能被单元测试、代回或形式规则快速判断时，多候选搜索更容易兑现收益；若没有外部真值信号，延长同一模型的思考可能只让错误更完整。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>代价<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">多一份推理预算具体花在哪里，为什么简单任务常得不偿失？</p>
   <ul class="dd-steps">
     <li><b>慢、贵</b>：更长轨迹、更多候选或额外验证都会增加计算、延迟和费用。</li>
     <li><b>占资源</b>：可见或隐藏的推理 token、候选轨迹和工具结果都消耗推理预算；不同服务是否计入公开上下文由实现决定。</li>
@@ -81,24 +100,44 @@ window.DEEPDIVE["reasoning-models"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>局限：想得久 ≠ 一定对<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">6</span>局限：想得久 ≠ 一定对<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">如果搜索方向、候选或验证器本身错了，增加计算会发生什么？</p>
   <div class="dd-note warn"><b>别把高预算当成正确保证</b>　模型可能在错误前提上搜索得更深，验证器也可能被“看起来合理”的答案骗过。可见的解释不保证忠实反映全部内部计算；隐藏的原始轨迹又无法由用户直接审计。数学应做独立验算，代码应执行测试，事实应核对来源。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">7</span>失败发生在哪一层<span class="dd-badge eng">诊断</span></h2>
+  <p class="dd-lead">“高预算仍答错”不是一种故障；先分清候选、验证器、停止规则还是外部证据出了问题。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>失败层</th><th>可观察现象</th><th>优先改什么</th></tr></thead>
+    <tbody>
+      <tr><td>候选覆盖</td><td>采样很多次都没有正确路径</td><td>模型能力、提示、工具或分解策略</td></tr>
+      <tr><td>候选相关</td><td>多条答案换措辞但共享同一错误</td><td>提高采样多样性或引入异构方法</td></tr>
+      <tr><td>验证器选择</td><td>正确候选存在却被错误答案压过</td><td>验证数据、过程检查与独立规则</td></tr>
+      <tr><td>停止规则</td><td>早停漏掉正确解，或无收益仍继续烧算力</td><td>基于边际收益、置信与硬预算停止</td></tr>
+      <tr><td>证据缺失</td><td>逻辑连贯但事实前提不可核验</td><td>检索、工具或拒答，而非继续内省</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note warn"><b>验证器不是裁判真理。</b>　过程监督能帮助定位中间错误，但验证器也受训练分布、覆盖和偏差限制；生产评测应分别记录“正确候选是否出现”和“出现后是否被选中”。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从后训练得到的推理策略，一路推到测试时预算、收益递减与外部验证。</p>
   <ol class="dd-chain">
     <li>推理模型经后训练学会把更多计算用于拆解、搜索、验证和修正。<span>（§1）</span></li>
     <li>它与提示式思维链相关，但原始轨迹可以隐藏，计算也不只是一条长文字链。<span>（§2）</span></li>
     <li>测试时缩放可以增加轨迹长度、候选数、搜索或验证；收益随任务而异并会递减。<span>（§3）</span></li>
-    <li>代价是慢、贵、占窗口，简单任务不值得。<span>（§4）</span></li>
-    <li>但想得久不等于一定对，思考过程也未必忠实——重要结论仍需核对。<span>（§5）</span></li>
+    <li>预算要按任务价值、难度与可验证性分配，收益通常递减。<span>（§4）</span></li>
+    <li>代价是慢、贵、占窗口，简单任务不值得。<span>（§5）</span></li>
+    <li>但想得久不等于一定对；候选覆盖、验证器、停止规则和证据都可能失败。<span>（§6–7）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「推理模型和思维链的区别」，并说出「测试时缩放为什么是一条新的扩展轴」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">下面这些说法分别把延迟、可见文字长度、计算预算和正确性画了等号。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -112,27 +151,28 @@ window.DEEPDIVE["reasoning-models"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">请为一个简单格式化任务和一道难数学题分别选择预算，并解释为什么不同。</p>
   <ol class="dd-quiz">
     <li>推理模型回答问题时和普通模型有什么不同？为什么这被当成进步？</li>
     <li>推理模型和思维链最关键的区别是什么？</li>
     <li>什么是「测试时缩放」？它和「预训练缩放」有何不同？</li>
-    <li>推理模型有哪些代价？为什么不是所有任务都该用？</li>
-    <li>为什么说「想得久不等于一定对」？该怎么对待它的思考过程？</li>
+    <li>为什么可验证任务更适合增加测试时预算？</li>
+    <li>高预算仍答错时，怎样区分候选覆盖失败和验证器失败？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
       <li>它经专门后训练，能在难题上投入更多拆解、搜索和验证计算；慢是额外预算的结果，不是目的本身。</li>
       <li>思维链是用提示引出中间步骤；推理模型学习怎样有效使用推理预算，原始轨迹可能隐藏，也不只靠一条长链。</li>
       <li>测试时缩放是在回答阶段增加轨迹、候选、搜索或验证计算；预训练缩放是在训练阶段扩大模型、数据和算力。前者的收益依任务而异且会递减。</li>
-      <li>增加计算、延迟和费用，也可能消耗更多 token、候选与工具调用；简单任务通常不值得。</li>
-      <li>因为搜索可以建立在错误前提上，验证器也会犯错；可见解释不保证忠实，隐藏轨迹又无法直接审计，所以结论仍需外部验证。</li>
+      <li>因为单元测试、代回或规则能低成本筛选候选，把额外搜索转化为可确认的收益；无真值信号时，多想可能只放大同一错误。</li>
+      <li>先看正确候选是否曾出现：从未出现是覆盖问题；已出现却没被选中是验证器问题。两者应分别计量。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -150,8 +190,10 @@ window.DEEPDIVE["reasoning-models"] = {
     <li><a href="https://openai.com/index/learning-to-reason-with-llms/" target="_blank" rel="noopener">OpenAI：Learning to reason with LLMs（训练时与测试时计算）↗</a></li>
     <li><a href="https://openai.com/index/evaluating-chain-of-thought-monitorability/" target="_blank" rel="noopener">OpenAI：Evaluating chain-of-thought monitorability（隐藏推理与可监控性）↗</a></li>
     <li><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al.：Self-Consistency Improves Chain of Thought Reasoning ↗</a></li>
+    <li><a href="https://arxiv.org/abs/2408.03314" target="_blank" rel="noopener">Snell et al.：Scaling LLM Test-Time Compute Optimally（按难度分配预算）↗</a></li>
+    <li><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noopener">Lightman et al.：Let's Verify Step by Step（过程监督与验证器）↗</a></li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-23</div>
 </div>
 `
 };

@@ -59,6 +59,7 @@ window.DEEPDIVE["hallucination"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">4</span>什么时候更容易幻觉<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">幻觉不是均匀发生的：哪些信号说明模型正在从“有依据回答”滑向“按语言模式补全”？</p>
   <ul class="dd-steps">
     <li><b>训练数据里没有或很稀疏</b>：冷门人物、小众事实、你公司的私有信息——它没见过，只能编。</li>
     <li><b>问了训练截止之后的事</b>：最新消息它压根不知道（知识截止）。</li>
@@ -78,22 +79,69 @@ window.DEEPDIVE["hallucination"] = {
     <li><b>提示允许「不知道」</b>：明确告诉它「不确定就说不知道，别编」，能减少一部分。</li>
   </ul>
   <div class="dd-note warn"><b>关键认知：这些都是「缓解」，不是「根治」</b>　RAG 检索错了、材料本身错了、或问题超出材料范围，幻觉照样发生。只要底层目标是似然而非真相，<b>就没有一劳永逸的解法</b>。正确心态：<b>凡是重要的事实，都要核对</b>，别把它的自信当保证。</div>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>案例推演：核验“张伟论文”</th><th>系统获得的证据</th><th>应该怎样回答</th></tr></thead>
+    <tbody>
+      <tr><td>直接生成</td><td>只有用户预设和模型参数记忆</td><td>不能据此补标题、期刊和 DOI</td></tr>
+      <tr><td>作者+年份+主题检索</td><td>学术索引无精确匹配，却有多位同名作者</td><td>把“论文存在”降为未证实，而非挑最像的一篇</td></tr>
+      <tr><td>交叉核对</td><td>作者主页、DOI 注册库仍无匹配</td><td>明确说未找到，并列出检索范围与同名歧义</td></tr>
+      <tr><td>请求补充</td><td>让用户提供机构、题名片段或链接</td><td>把拒绝编造转成可继续取证的下一步</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note key"><b>校准不是语气变软</b>　可靠输出要让断言强度跟证据覆盖匹配：“未在这些来源找到”比“这篇论文不存在”更准确；“可能是同名作者”比凭空选定一个张伟更可核验。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">6</span>怎样把长回答拆成可核验事实<span class="dd-badge math">评测</span></h2>
+  <p class="dd-lead">一段回答往往真假混杂；只打“整段正确/错误”会掩盖最危险的那一句。</p>
+  <p>先把输出拆成最小的可核验原子断言，再根据指定证据集标为“支持、矛盾、证据未覆盖、不可核验”。这评测的是<b>相对证据的事实精度</b>，不等于穷尽世界真相。</p>
+  <div class="dd-formula"><code>原子事实支持率 = 被可靠来源支持的可核验断言数 ÷ 全部可核验断言数</code></div>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>“张伟论文”回答中的原子断言</th><th>证据判定</th><th>处置</th></tr></thead>
+    <tbody>
+      <tr><td>作者名为张伟</td><td>未覆盖：同名作者过多</td><td>请求机构等消歧信息</td></tr>
+      <tr><td>发表于 2019 年</td><td>未覆盖</td><td>不得补全</td></tr>
+      <tr><td>题名为《Graph…》</td><td>矛盾：所给 DOI 指向另一论文</td><td>关键错误，整段不得发布</td></tr>
+      <tr><td>主题涉及图神经网络</td><td>仅来自用户预设</td><td>标为待证，而非引用用户当来源</td></tr>
+      <tr><td>“我没有找到精确匹配”</td><td>由检索日志支持</td><td>可输出，并说明检索范围</td></tr>
+    </tbody>
+  </table></div>
+  <p>假设 5 个可核验断言中只有 3 个被支持，支持率是 <code>3÷5=60%</code>。但平均分不是唯一门槛：若那 1 个矛盾项是药物剂量、金额或 DOI 等关键字段，即使其余都对也应整体失败。生产评测应同时报告支持率、关键矛盾率、证据覆盖率和拒答后的任务覆盖率。</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>定位失败：检索、生成还是引用<span class="dd-badge eng">诊断</span></h2>
+  <p class="dd-lead">“有引用”并不等于“引用支持这句话”，错误需要沿流水线分层归因。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>评测层</th><th>核心问题</th><th>典型失败</th></tr></thead>
+    <tbody>
+      <tr><td>检索覆盖</td><td>需要的证据是否被取回？</td><td>索引缺失、查询错、同名消歧失败</td></tr>
+      <tr><td>证据质量</td><td>来源是否原始、可信且仍有效？</td><td>二手转述、过期页面、来源互相抄袭</td></tr>
+      <tr><td>忠实性</td><td>回答是否只陈述材料真正支持的内容？</td><td>把“相关”扩写成因果，把未提及写成否定</td></tr>
+      <tr><td>引用正确性</td><td>每个引用是否指向对应断言？</td><td>真实链接却不支持邻近句子</td></tr>
+      <tr><td>选择性回答</td><td>证据不足时是否拒答或转人工？</td><td>为追求覆盖率而强答</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note key"><b>区分三个目标</b>　闭卷事实性问“与世界事实是否一致”；给定材料忠实性问“是否受证据支持”；引用正确性问“链接是否真的支撑相邻断言”。三者相关，但不能互相替代。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从下一 token 似然推到为什么重要事实需要取证、来源映射和适时拒答。</p>
   <ol class="dd-chain">
     <li>幻觉是流畅、自信却编造的内容，比普通答错更难识别。<span>（§1）</span></li>
     <li>它是结构性的：模型建模似然不是真相，答对和瞎编是同一个动作。<span>（§2）</span></li>
     <li>它这么自信，是因为「像人写的」是训练目标、与对错无关，且它不知道自己不知道。<span>（§3）</span></li>
     <li>数据稀疏、超训练截止、被诱导、高温时更易发生。<span>（§4）</span></li>
     <li>可用 RAG、可核验引用、外部工具、校准与人工复核来降低风险；任何单一措施都有失效模式。<span>（§5）</span></li>
+    <li>长回答应拆成原子断言，并分别检查检索覆盖、证据质量、忠实性、引用与拒答。<span>（§6–7）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能解释“语言似然不等于事实真值”，并能为具体场景设计检索、引用验证、拒答和人工复核的组合控制，你就抓住了幻觉治理的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误区分别把规模、自信语气、RAG 和自我报告错当成了事实保证。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -107,13 +155,14 @@ window.DEEPDIVE["hallucination"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">请为一个“可能不存在的对象”设计先取证、再作答或拒答的流程。</p>
   <ol class="dd-quiz">
     <li>幻觉和普通「答错」有什么不同？为什么更危险？</li>
     <li>为什么说幻觉是结构性的？「答对」和「瞎编」有什么关系？</li>
     <li>它为什么总是那么自信？</li>
     <li>哪些情况下更容易幻觉？</li>
-    <li>有哪些缓解手段？为什么它们都不是「根治」？</li>
+    <li>为什么原子事实支持率还要搭配关键矛盾率和证据覆盖率？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
@@ -121,13 +170,13 @@ window.DEEPDIVE["hallucination"] = {
       <li>因为模型建模的是「最可能接下去的内容」（似然）而非真相，没有真值约束；答对和瞎编都是「挑最可能的下一个词」这同一个动作。</li>
       <li>因为「流畅自信、像人写的」是训练追求的口吻，和内容对错无关，而且它不知道自己不知道。</li>
       <li>训练数据没有或稀疏、问了训练截止后的事、被问题预设诱导、采样温度高。</li>
-      <li>可组合 RAG、可核验引用、外部计算/验证、经校准的不确定性指标、拒答与人工复核。它们能显著降错，但检索、材料、验证器与覆盖范围本身也会失败，因此不能承诺零错误。</li>
+      <li>平均支持率可能掩盖一个高影响错误，且低覆盖时系统可通过少说话“刷高”支持率；所以要同时看关键矛盾、证据覆盖和拒答后的任务覆盖。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -145,8 +194,9 @@ window.DEEPDIVE["hallucination"] = {
     <li><a href="https://arxiv.org/abs/2311.14648" target="_blank" rel="noopener">Kalai &amp; Vempala, Calibrated Language Models Must Hallucinate</a>：对任意事实分布中不可避免错误的理论边界；不等于所有幻觉都无法降低。</li>
     <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al., Retrieval-Augmented Generation</a>：外部检索对知识密集任务的帮助及其边界。</li>
     <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., InstructGPT</a>：后训练如何改善有用性、真实性与拒答行为。</li>
+    <li><a href="https://arxiv.org/abs/2305.14251" target="_blank" rel="noopener">Min et al., FActScore</a>：把长文本拆成原子事实并计算有可靠来源支持的比例。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-23</div>
 </div>
 `
 };

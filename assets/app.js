@@ -19,6 +19,92 @@
   G.nodes.forEach(n => { byId[n.id] = n; });
 
   const CORE = new Set(G.core || []);
+  const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
+  const learnedNodes = loadLearnedNodes();
+  let activeDeepDiveId = null;
+
+  function loadLearnedNodes() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LEARNING_STORAGE_KEY) || "[]");
+      return new Set(Array.isArray(saved) ? saved.filter(id => !!byId[id]) : []);
+    } catch (e) {
+      console.warn("学习进度读取失败，将使用空进度：", e);
+      return new Set();
+    }
+  }
+
+  function saveLearnedNodes() {
+    try {
+      localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(Array.from(learnedNodes)));
+    } catch (e) {
+      console.warn("学习进度保存失败：", e);
+    }
+  }
+
+  function learningButtonHtml(id) {
+    const learned = learnedNodes.has(id);
+    return `<section class="dd-learning-complete">
+      <div>
+        <div class="dd-learning-kicker">${learned ? "学习进度已更新" : "完成本页学习了吗？"}</div>
+        <div class="dd-learning-copy">${learned ? "这个节点已计入主页的“已学习”列表。" : "标记后可在主页侧栏随时查看已学与未学节点。"}</div>
+      </div>
+      <button type="button" class="dd-learn-btn${learned ? " is-learned" : ""}" data-learn-node="${esc(id)}" aria-pressed="${learned}">
+        ${learned ? "✓ 已学习" : "标记为已学习"}
+      </button>
+    </section>`;
+  }
+
+  function renderLearningPanel() {
+    const done = G.nodes.filter(n => learnedNodes.has(n.id));
+    const todo = G.nodes.filter(n => !learnedNodes.has(n.id));
+    const total = G.nodes.length;
+    const percent = total ? Math.round(done.length / total * 100) : 0;
+    const doneCount = document.getElementById("learning-done-count");
+    if (!doneCount) return;
+
+    doneCount.textContent = done.length;
+    document.getElementById("learning-total-count").textContent = ` / ${total} 个节点`;
+    document.getElementById("learning-percent").textContent = `${percent}%`;
+    document.getElementById("learning-progress-bar").style.width = `${percent}%`;
+    document.getElementById("learning-done-label").textContent = done.length;
+    document.getElementById("learning-todo-label").textContent = todo.length;
+
+    const nodeButtons = nodes => nodes.length
+      ? nodes.map(n => {
+          const domain = DOMAINS[n.domain] || { color: "#888", label: n.domain };
+          return `<button type="button" class="learning-node" data-learning-goto="${esc(n.id)}" title="${esc(domain.label)}">
+            <span class="dot" style="background:${domain.color}"></span><span>${esc(n.title)}</span>
+          </button>`;
+        }).join("")
+      : `<div class="learning-empty">${nodes === done ? "还没有标记已学习的节点" : "所有节点都已学习"}</div>`;
+
+    document.getElementById("learning-done-list").innerHTML = nodeButtons(done);
+    document.getElementById("learning-todo-list").innerHTML = nodeButtons(todo);
+    document.querySelectorAll("[data-learning-goto]").forEach(button => {
+      button.addEventListener("click", () => select(button.getAttribute("data-learning-goto"), true));
+    });
+  }
+
+  function toggleLearnedNode(id) {
+    if (!byId[id]) return;
+    if (learnedNodes.has(id)) learnedNodes.delete(id);
+    else learnedNodes.add(id);
+    saveLearnedNodes();
+    renderLearningPanel();
+
+    if (activeDeepDiveId === id) {
+      const current = document.querySelector(".dd-learning-complete");
+      if (current) {
+        current.outerHTML = learningButtonHtml(id);
+        bindLearningButton();
+      }
+    }
+  }
+
+  function bindLearningButton() {
+    const button = document.querySelector("[data-learn-node]");
+    if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
+  }
 
   const state = {
     domains: Object.fromEntries(Object.keys(DOMAINS).map(d => [d, true])),
@@ -397,6 +483,7 @@
   function openDeepDive(id) {
     const dd = window.DEEPDIVE && window.DEEPDIVE[id];
     if (!dd || !ddEl) return;
+    activeDeepDiveId = id;
     const hero = `<div class="dd-hero">
         <div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>
         <h1 class="dd-h1">${esc(dd.title)}</h1>
@@ -406,12 +493,21 @@
         ${dd.thesis ? `<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> ${dd.thesis}</div>` : ""}
       </div>`;
     document.getElementById("dd-top-name").textContent = dd.title;
-    document.getElementById("dd-article").innerHTML = hero + (dd.html || "");
+    document.getElementById("dd-article").innerHTML = hero + (dd.html || "") + learningButtonHtml(id);
+    bindLearningButton();
     ddEl.classList.remove("hidden");
     ddEl.querySelector(".dd-scroll").scrollTop = 0;
   }
 
-  function closeDeepDive() { if (ddEl) ddEl.classList.add("hidden"); }
+  function closeDeepDive() {
+    if (ddEl) ddEl.classList.add("hidden");
+    activeDeepDiveId = null;
+  }
+
+  // 仅在本地质量审计查询参数存在时暴露稳定测试入口；正常页面不增加全局 API。
+  if (new URLSearchParams(window.location.search).has("quality-audit")) {
+    window.__DEEPDIVE_QUALITY_AUDIT__ = { open: openDeepDive, close: closeDeepDive };
+  }
 
   if (ddEl) {
     document.getElementById("dd-back").addEventListener("click", closeDeepDive);
@@ -470,6 +566,7 @@
                      <span class="dot" style="background:${d.color}"></span>${d.label}<em>${count || ""}</em>`;
     domList.appendChild(lab);
   });
+  renderLearningPanel();
 
   // 关系类型
   const edgeList = document.getElementById("edge-list");
@@ -680,37 +777,82 @@
       </div>`;
 
     if (Array.isArray(t.learningPath) && t.learningPath.length) {
-      body += `<section class="dd-sec"><h2><span class="dd-n">1</span>建议学习顺序</h2><ol class="dd-chain">`
+      body += `<section class="dd-sec tutorial-learning"><h2>建议学习顺序</h2><ol class="dd-chain">`
         + t.learningPath.map(x => `<li>${esc(x)}</li>`).join("") + `</ol></section>`;
     }
 
-    let sectionNo = 2;
-    (TUTORIALS.platforms || []).forEach(p => {
+    const platforms = TUTORIALS.platforms || [];
+    const firstPopulated = platforms.find(p => (t.resources || []).some(r => r.platform === p.id));
+    const initialPlatform = firstPopulated ? firstPopulated.id : (platforms[0] && platforms[0].id);
+    body += `<div class="tutorial-layout">
+      <nav class="tutorial-sidebar" aria-label="教程平台">
+        <div class="tutorial-sidebar-title">资源平台</div>
+        ${platforms.map(p => {
+          const count = (t.resources || []).filter(r => r.platform === p.id).length;
+          return `<button class="tutorial-platform-btn${p.id === initialPlatform ? " active" : ""}" type="button" data-platform="${esc(p.id)}" style="--platform-color:${p.color}">
+            <span class="tutorial-platform-label"><span>${p.emoji}</span>${esc(p.label)}</span><span class="tutorial-count">${count}</span>
+          </button>`;
+        }).join("")}
+      </nav>
+      <div class="tutorial-platform-content" id="tutorial-platform-content"></div>
+    </div>`;
+
+    if (t.sourceNote) body += `<div class="dd-src"><b>提炼范围与时效说明</b><p>${esc(t.sourceNote)}</p>
+      ${(t.officialSources || []).length ? `<b>操作校准来源</b><ul>${t.officialSources.map(source => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener">${esc(source.label)}</a></li>`).join("")}</ul>` : ""}
+      ${t.accessDate ? `<div class="dd-src-date">访问日期：${esc(t.accessDate)}</div>` : ""}</div>`;
+    document.getElementById("dd-top-name").textContent = t.title;
+    document.getElementById("dd-article").innerHTML = body;
+
+    const contentEl = document.getElementById("tutorial-platform-content");
+    const renderPlatform = platformId => {
+      const p = platforms.find(item => item.id === platformId);
+      if (!p || !contentEl) return;
       const resources = (t.resources || []).filter(r => r.platform === p.id);
-      body += `<section class="dd-sec tutorial-platform"><h2><span class="dd-n">${sectionNo++}</span>${p.emoji} ${esc(p.label)} <span class="tutorial-count">${resources.length}</span></h2>`;
+      let html = `<section class="tutorial-platform"><header class="tutorial-platform-head">
+        <div><div class="tutorial-platform-kicker">当前平台</div><h2>${p.emoji} ${esc(p.label)}</h2></div>
+        <span>${resources.length} 条已复核教程</span>
+      </header>`;
       if (!resources.length) {
-        body += `<div class="tutorial-empty">尚未收录经过复核的 ${esc(p.label)} 教程。</div></section>`;
+        html += `<div class="tutorial-empty">尚未收录经过复核的 ${esc(p.label)} 教程。你仍可通过左侧栏切换其他平台。</div></section>`;
+        contentEl.innerHTML = html;
         return;
       }
       resources.forEach((r, idx) => {
-        body += `<article class="tutorial-card" style="border-left-color:${p.color}">
-          <div class="tutorial-card-head"><span class="tutorial-index">${idx + 1}</span><div>
+        const coverage = (r.coverage || []).map(item => `<section class="tutorial-action">
+          <h5>${esc(item.title)}</h5>
+          ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
+          ${item.done ? `<div class="tutorial-done"><b>完成标志</b>${esc(item.done)}</div>` : ""}
+        </section>`).join("");
+        const unique = (r.uniqueTechniques || []).map(item => `<section class="tutorial-unique">
+          <h5>${esc(item.title)}</h5>
+          ${item.scenario ? `<p><b>适用场景：</b>${esc(item.scenario)}</p>` : ""}
+          ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
+          ${item.result ? `<div class="tutorial-done"><b>最终得到</b>${esc(item.result)}</div>` : ""}
+        </section>`).join("");
+        html += `<details class="tutorial-card" style="border-left-color:${p.color}"${idx === 0 ? " open" : ""}>
+          <summary class="tutorial-card-head"><div>
             <h3>${esc(r.title)}</h3>
             <div class="tutorial-meta">${esc(r.creator || "")} · ${esc(r.publishedAt || "")}${r.duration ? ` · ${esc(r.duration)}` : ""}</div>
-          </div></div>
-          ${r.audience ? `<div class="tutorial-audience"><b>适合：</b>${esc(r.audience)}</div>` : ""}
-          ${r.focus ? `<p>${esc(r.focus)}</p>` : ""}
-          ${(r.takeaways || []).length ? `<h4>最有价值的内容</h4><ul class="tutorial-takeaways">${r.takeaways.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          ${r.caution ? `<div class="dd-note warn"><b>复核提醒</b>　${esc(r.caution)}</div>` : ""}
-          <a class="tutorial-link" href="${esc(r.url)}" target="_blank" rel="noopener">在 ${esc(p.label)} 打开原教程 ↗</a>
-        </article>`;
+          </div><span class="tutorial-expand" aria-hidden="true">⌄</span></summary>
+          <div class="tutorial-card-body">
+            ${r.audience ? `<div class="tutorial-audience"><b>适合：</b>${esc(r.audience)}</div>` : ""}
+            ${r.summary ? `<h4>完整内容总结</h4><p class="tutorial-summary">${esc(r.summary)}</p>` : ""}
+            ${coverage ? `<h4>视频教授的完整操作</h4><div class="tutorial-actions">${coverage}</div>` : ""}
+            ${unique ? `<h4>独门内容 <span>· 相对本页其他四条教程</span></h4><div class="tutorial-uniques">${unique}</div>` : ""}
+            ${r.caution ? `<div class="dd-note warn"><b>复核提醒</b>　${esc(r.caution)}</div>` : ""}
+            <a class="tutorial-link" href="${esc(r.url)}" target="_blank" rel="noopener">在 ${esc(p.label)} 打开原教程 ↗</a>
+          </div>
+        </details>`;
       });
-      body += `</section>`;
-    });
+      contentEl.innerHTML = html + `</section>`;
+    };
 
-    if (t.sourceNote) body += `<div class="dd-src"><b>提炼范围与时效说明</b><p>${esc(t.sourceNote)}</p>${t.accessDate ? `<div class="dd-src-date">访问日期：${esc(t.accessDate)}</div>` : ""}</div>`;
-    document.getElementById("dd-top-name").textContent = t.title;
-    document.getElementById("dd-article").innerHTML = body;
+    ddEl.querySelectorAll(".tutorial-platform-btn").forEach(btn => btn.addEventListener("click", () => {
+      ddEl.querySelectorAll(".tutorial-platform-btn").forEach(item => item.classList.remove("active"));
+      btn.classList.add("active");
+      renderPlatform(btn.getAttribute("data-platform"));
+    }));
+    if (initialPlatform) renderPlatform(initialPlatform);
     ddEl.classList.remove("hidden");
     ddEl.querySelector(".dd-scroll").scrollTop = 0;
   }

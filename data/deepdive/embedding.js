@@ -7,7 +7,7 @@ window.DEEPDIVE["embedding"] = {
   subtitle: "把文字变成向量，让「意思相近」变成「距离相近」",
   aliases: "Embedding · 向量表示 · 词向量",
   meta: "建议 25–35 分钟 · 基础 → 中级 · 需要：向量、距离/夹角的基本概念",
-  thesis: "嵌入是「语义的坐标」：把一段文本（或一张图）变成一串数字（向量），关键性质是——<b>意思相近的内容，向量之间的距离也近</b>。它把抽象的「语义」变成了可以计算的东西，是检索、向量数据库、RAG、聚类乃至多模态的共同地基。",
+  thesis: "嵌入是由训练目标塑造的表示坐标：它把 token、句子、图像等对象映射为连续向量，使<b>对当前任务重要的相似性</b>能由距离或夹角近似。它不是天然完整的“语义真值”；训练配对、池化、相似度和负样本共同决定空间保留什么、忽略什么。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
@@ -68,7 +68,16 @@ window.DEEPDIVE["embedding"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>两个容易混的「嵌入」<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">4</span>手算一个余弦相似度<span class="dd-badge math">数值例子</span></h2>
+  <p class="dd-lead">“更同向”怎样变成一个可复算的排名？</p>
+  <p>用二维玩具向量代替真实的数百维向量。查询 <code>q=[1,0]</code>，候选“返还商品”是 <code>a=[0.8,0.6]</code>，候选“列车时刻”是 <code>b=[−0.6,0.8]</code>；三者长度都为 1：</p>
+  <table class="dd-table"><thead><tr><th>候选</th><th>点积</th><th>余弦与结论</th></tr></thead><tbody><tr><td>a</td><td><code>0.8</code></td><td><code>0.8</code>，更相关</td></tr><tr><td>b</td><td><code>−0.6</code></td><td><code>−0.6</code>，更不相关</td></tr></tbody></table><p>展开计算分别是 <code>1×0.8 + 0×0.6 = 0.8</code> 与 <code>1×(−0.6) + 0×0.8 = −0.6</code>；因为三个向量都是单位长度，分母均为 1。</p>
+  <figure class="dd-fig"><svg viewBox="0 0 650 270" role="img" aria-label="查询向量与两个候选向量的夹角比较"><defs><marker id="emb-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><line x1="120" y1="215" x2="560" y2="215" stroke="currentColor" opacity=".3"/><line x1="300" y1="245" x2="300" y2="25" stroke="currentColor" opacity=".3"/><g stroke-width="5" fill="none" marker-end="url(#emb-a)"><path d="M300 215L510 215" stroke="#8b5cf6"/><path d="M300 215L468 89" stroke="#10b981"/><path d="M300 215L174 47" stroke="#ef4444"/></g><path d="M380 215A80 80 0 0 0 364 167" fill="none" stroke="#10b981" stroke-width="3"/><g class="svg-t"><text x="520" y="218">q=[1,0]</text><text x="475" y="82">a，cos=0.8</text><text x="80" y="42">b，cos=−0.6</text><text x="382" y="174">夹角小</text></g></svg><figcaption>余弦只比较方向，不比较长度。真实检索常先把向量归一化，使点积直接等于余弦相似度。</figcaption></figure>
+  <div class="dd-note warn"><b>数值高只表示模型空间里的相似，不等于业务上正确。</b>阈值必须在真实查询、难负例与标签上校准；不同模型的 0.8 没有统一含义。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>两个容易混的「嵌入」<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">你可能已经注意到：有时说嵌入是「模型里的一层」，有时又说它是「一个独立模型」。这是两回事，别混。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th></th><th>Transformer 内部的输入嵌入层</th><th>RAG 里说的「嵌入模型」</th></tr></thead>
@@ -82,37 +91,41 @@ window.DEEPDIVE["embedding"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>最典型的用武之地：语义搜索<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">6</span>最典型的用武之地：语义搜索<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">回到开头那个例子——嵌入到底让什么「关键词搜索做不到的事」成为可能？</p>
   <p>关键词搜索靠<b>字面匹配</b>：查询词必须和文档里的词对上。所以查「怎么退货」，命中不了只写「商品返还流程」的文档。而语义搜索换了个思路：把查询和每篇文档都<b>嵌入成向量</b>，再找<b>离查询向量最近</b>的那些文档——匹配的是<b>意思</b>，不是字。于是「退货」和「返还流程」尽管没有共同词，也能被召回。</p>
   <div class="dd-note key"><b>它是 RAG 的心脏</b>　检索增强生成（RAG）回答问题前，就是用嵌入做语义搜索、从知识库里捞出相关材料，再交给大模型作答。<b>嵌入的质量，直接决定了检索能不能捞对</b>——而检索捞得对不对，往往是 RAG 效果的真正瓶颈（见「检索」「向量数据库」「RAG」节点）。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>实践里的两个坑<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">7</span>实践里的两个坑<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">用嵌入最容易在哪翻车？两个坑几乎人人踩过。</p>
   <ul class="dd-steps">
     <li><b>换嵌入模型，必须重建整个索引</b>。不同模型产出的向量<b>不在同一个空间</b>——A 模型的「猫」和 B 模型的「猫」坐标毫无可比性。用 A 建的库、拿 B 的向量去查，结果会是一堆噪声。换模型 = 全部重新嵌入。</li>
     <li><b>对「否定」不敏感</b>。「适合儿童」和「<b>不</b>适合儿童」，字面几乎一样，向量也可能<b>非常接近</b>——但意思正相反。这类「一个字翻转全意」的场景，光靠向量相似度容易出错，要用别的手段兜底（如加规则、重排、结构化过滤）。</li>
   </ul>
   <div class="dd-note intuition"><b>顺带解一个疑惑：几百上千维，不会「维度灾难」吗？</b>　通常高维确实会让「距离失去区分度」（维度灾难）。但嵌入是<b>有结构的</b>高维——语义把向量约束在一个低得多的「流形」上，绝大多数维度组合根本不会出现。所以它反而可用，还能被降维可视化（见「维度灾难」「降维」节点）。</div>
+  <div class="dd-note key"><b>如何验证检索质量：</b>先建立带相关等级的查询—文档小金集，报告 Recall@k、nDCG 或 MRR，再按否定表达、数字、专有名词、语言和文本长度切片。若平均召回很好但“不适合儿童”仍命中“适合儿童”，应诊断为困难负例与排序边界问题，加入结构化过滤或重排；不要只看二维降维图是否“聚成一团”。换模型时还要在同一金集上复测并重建索引。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从对象到向量、再到检索结果，中间哪些选择共同定义“相似”？</p>
   <ol class="dd-chain">
     <li>机器要比「意思」，先得把文本变成数字，且让「意思近」体现成「数字近」——这就是嵌入。<span>（§1）</span></li>
     <li>「距离 = 语义」不是设计的，是训练让相近靠拢、无关推开逼出来的。<span>（§2）</span></li>
     <li>于是判断两段话是否同义，只需算向量夹角；语义第一次变成可计算的量。<span>（§3）</span></li>
-    <li>注意区分两个「嵌入」：Transformer 的输入嵌入层（每个 token）vs 独立的嵌入模型（整段文本）。<span>（§4）</span></li>
-    <li>它最典型的用途是语义搜索：按意思而非字面找最近邻，这是 RAG 的心脏。<span>（§5）</span></li>
-    <li>两个必知的坑：换模型要重建索引、对否定不敏感。<span>（§6）</span></li>
+    <li>余弦相似度把向量方向关系变成可排序的数，但阈值只能由真实任务校准。<span>（§4）</span></li>
+    <li>注意区分两个「嵌入」：Transformer 的输入嵌入层（每个 token）vs 独立的嵌入模型（整段文本）。<span>（§5）</span></li>
+    <li>它最典型的用途是语义搜索：按意思而非字面找最近邻，这是 RAG 的心脏。<span>（§6）</span></li>
+    <li>两个必知的坑：换模型要重建索引、对否定不敏感。<span>（§7）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「向量的距离为什么能等于语义」，并说出「语义搜索凭什么能召回没有共同关键词的文档」，你就抓住了嵌入的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">哪些说法把任务相关的表示空间误当成了天然语义真理？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -126,7 +139,7 @@ window.DEEPDIVE["embedding"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>嵌入把文本变成什么？关键性质是什么？</li>
     <li>向量的距离凭什么能对应语义的远近？（用「训练目标」解释）</li>
@@ -150,7 +163,7 @@ window.DEEPDIVE["embedding"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>

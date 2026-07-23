@@ -6,6 +6,8 @@ global.window = {};
 try {
   require(path.join(__dirname, "..", "data", "software.js"));
   require(path.join(__dirname, "..", "data", "tutorials.js"));
+  require(path.join(__dirname, "..", "data", "tutorials-codex-youtube.js"));
+  require(path.join(__dirname, "..", "data", "tutorials-claude-code.js"));
 } catch (e) {
   console.error("✗ 语法错误：\n  " + e.message);
   process.exit(1);
@@ -72,6 +74,8 @@ function checkReview(r) {
 const indexHtml = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const appJs = fs.readFileSync(path.join(__dirname, "..", "assets", "app.js"), "utf8");
 if (!indexHtml.includes('src="data/tutorials.js"')) problems.push("index.html 未加载 data/tutorials.js");
+if (!indexHtml.includes('src="data/tutorials-codex-youtube.js"')) problems.push("index.html 未加载 Codex YouTube 教程扩展");
+if (!indexHtml.includes('src="data/tutorials-claude-code.js"')) problems.push("index.html 未加载 Claude Code 教程");
 if (!appJs.includes("data-tutorial") || !appJs.includes("openTutorial")) problems.push("app.js 未接入软件教程按钮或打开逻辑");
 
 const platformDup = T.platforms.map(x => x.id).filter((v, i, a) => a.indexOf(v) !== i);

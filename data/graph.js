@@ -10,8 +10,8 @@
  */
 window.GRAPH = {
   meta: {
-    version: "0.16",
-    updatedAt: "2026-07-21",
+    version: "0.17",
+    updatedAt: "2026-07-22",
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
     layoutSeed: 109,

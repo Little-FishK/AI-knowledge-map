@@ -78,6 +78,10 @@ window.DEEPDIVE["supervised-learning"] = {
   <p>把要学的规则看成一个<b>带参数的函数</b> <code>f_θ</code>：喂进输入 x，吐出预测 <code>f_θ(x)</code>。学习，就是<b>调参数 θ，让预测尽量贴近标签</b>：</p>
   <div class="dd-formula">找 θ，使 &nbsp; Σᵢ L( f_θ(xᵢ) , yᵢ ) &nbsp; 最小</div>
   <p class="dd-formula-note"><code>L</code> 是损失函数，衡量「预测」离「标签」有多远；对全部样本求和再最小化，就是训练。</p>
+  <h3>3.1 手算一个二分类批次</h3>
+  <p>设“垃圾邮件”为标签 1。模型对第一封垃圾邮件给出 <code>p=0.80</code>，对第二封正常邮件给出“垃圾”概率 0.30，因此正确类别“正常”的概率是 0.70。二分类交叉熵只看正确类别概率：</p>
+  <table class="dd-table"><thead><tr><th>样本</th><th>正确类别概率</th><th>损失 −ln p</th></tr></thead><tbody><tr><td>垃圾邮件</td><td>0.80</td><td>0.223</td></tr><tr><td>正常邮件</td><td>1−0.30=0.70</td><td>0.357</td></tr><tr><td>批平均</td><td>—</td><td><code>(0.223+0.357)/2=0.290</code></td></tr></tbody></table>
+  <p>若更新后第一封的正确概率升到 0.90，它的损失降到 <code>−ln(0.90)=0.105</code>。损失把“更相信正确标签”变成连续可优化的方向；但错误标签也会产生同样强的错误方向。</p>
   <div class="dd-note math"><b>这就把很多东西接上了</b>　「有标签 + 一个可微函数 + 一个损失 + 梯度下降」正是训练一个<b>神经网络</b>的标准配方（见「神经网络」深读页）。<b>神经网络是模型，监督学习是训练它的方式之一。</b>决策树、支持向量机（SVM）等经典模型同样用监督学习来训。</div>
 </section>
 
@@ -141,6 +145,7 @@ window.DEEPDIVE["supervised-learning"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从人工标签到未知样本上的可靠预测，证据链怎样逐步建立？</p>
   <ol class="dd-chain">
     <li>给「输入 + 正确答案」的样本，让模型学一个从输入到输出的规则——这就是监督学习。<span>（§1）</span></li>
     <li>答案离散就是分类，连续就是回归。<span>（§2）</span></li>
@@ -203,5 +208,7 @@ window.DEEPDIVE["supervised-learning"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://www.deeplearningbook.org/contents/ml.html" target="_blank" rel="noopener">Deep Learning, Chapter 5: Machine Learning Basics</a>：监督学习、泛化与评测基础。</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>：分类、回归、模型选择与统计学习框架。</li><li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf" target="_blank" rel="noopener">Stanford CS229 Lecture Notes</a>：监督学习算法与数学推导。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>
 `
 };

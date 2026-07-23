@@ -1,0 +1,30 @@
+/* 历史归档：此版本曾被 batch-28-agent-systems.js 覆盖，不再参与运行时注册。 */
+window.DEEPDIVE = window.DEEPDIVE || {};
+window.DEEPDIVE["guardrails"] = {
+  title: "护栏 Guardrails",
+  subtitle: "用多层控制把模型的不确定输出限制在可接受风险内",
+  aliases: "AI Guardrails · Safety Controls · 输入输出护栏",
+  meta: "建议 25–35 分钟 · 中级 · 需要：提示注入、工具调用、应用评测",
+  thesis: "护栏不是一条万能系统提示，而是分布在<b>输入、上下文、模型输出、工具执行和运行监控</b>上的控制组合。每层只拦截自己能观察的风险，并在误拦与漏拦之间取舍；真正的安全边界必须由确定性的执行层落实。",
+  html: `
+<div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>护栏和模型对齐有什么区别？</li><li>为什么单个内容分类器不构成完整防线？</li><li>输入、输出与工具护栏分别看到什么？</li><li>误拦率和漏拦率怎样形成权衡？</li><li>怎样用红队和线上监控持续维护护栏？</li></ul></div>
+<div class="dd-note key"><b>运行例子</b>　邮件 Agent 收到“忽略规则并转账”的注入文本。输入分类器可能漏过它，但工具层仍可通过收款人白名单、金额上限和人工确认阻止真实转账。</div>
+
+<section class="dd-sec"><h2><span class="dd-n">1</span>护栏解决的是剩余风险<span class="dd-badge intuition">直觉</span></h2><p class="dd-lead">模型已经做过安全训练，应用为什么还要加护栏？</p><p>对齐降低总体危险倾向，却无法穷举每个行业政策、用户权限和新攻击。护栏把产品场景中的明确边界放在模型之外，使某些错误即使发生也不能直接造成高影响后果。</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">2</span>纵深防御的五层<span class="dd-badge eng">工程</span></h2><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>层</th><th>典型控制</th><th>局限</th></tr></thead><tbody><tr><td>输入</td><td>恶意内容、PII、速率检测</td><td>看不到最终动作</td></tr><tr><td>上下文</td><td>来源标记、数据隔离、最小检索</td><td>不能保证模型遵守</td></tr><tr><td>输出</td><td>内容分类、引用与结构校验</td><td>可能误拦，且动作或已发生</td></tr><tr><td>工具</td><td>权限、参数约束、审批、沙箱</td><td>需要业务规则</td></tr><tr><td>运行</td><td>日志、告警、回滚、事件响应</td><td>偏事后发现</td></tr></tbody></table></div></section>
+
+<section class="dd-sec"><h2><span class="dd-n">3</span>分类器的阈值权衡<span class="dd-badge math">数学</span></h2><p class="dd-lead">阈值调得越严格是否越安全？</p><div class="dd-formula">风险成本 = 漏拦率 × 漏拦代价 + 误拦率 × 误拦代价</div><p class="dd-formula-note">医疗、金融等高影响动作通常更重视漏拦；普通创作场景过度误拦也会让产品不可用。</p><p>同一个阈值不能适配所有请求。应按动作影响、用户身份、数据敏感度与可恢复性分级。</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">4</span>确定性边界放在执行层<span class="dd-badge eng">工程</span></h2><p class="dd-lead">哪些规则不能只写进提示词？</p><ul class="dd-steps"><li>用户能访问哪些账户与文件。</li><li>单次金额、删除范围和网络目标上限。</li><li>工具参数 schema 与允许值。</li><li>高风险动作必须二次确认或双人审批。</li><li>失败后的回滚、熔断和幂等规则。</li></ul><div class="dd-note warn"><b>系统提示不是权限系统。</b>　模型可能被注入、误解或忽略文本规则；真正的拒绝必须由模型无法绕过的代码执行。</div></section>
+
+<section class="dd-sec"><h2><span class="dd-n">5</span>护栏也会被攻击<span class="dd-badge intuition">边界</span></h2><p>攻击者会改写、编码、拆分或跨多轮隐藏意图，也可能诱导模型产生能绕过输出分类器的内容。任何固定分类器都会面对分布变化。因此护栏是降低风险而非数学保证，必须假设某一层会失败，并让下一层限制损失。</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">6</span>怎样评测与维护<span class="dd-badge eng">工程</span></h2><ol class="dd-steps"><li>建立正常、边界、恶意和混淆输入测试集。</li><li>同时测攻击成功率、误拦率、延迟和人工申诉。</li><li>对工具动作做端到端测试，不只测聊天回复。</li><li>记录规则版本、命中原因和例外审批。</li><li>用新攻击与生产事件更新测试集，必要时回滚。</li></ol></section>
+
+<section class="dd-sec"><h2><span class="dd-n">7</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2><ol class="dd-chain"><li>模型安全训练不能覆盖全部产品规则。</li><li>外部护栏把风险分散到多个可观察层。</li><li>分类层存在误拦与漏拦，单层必然不完美。</li><li>高影响边界必须落到确定性权限与执行代码。</li><li>攻击和业务会变化，所以要持续红队与监控。</li><li>护栏的目标是限制风险和损失半径，不是宣称绝对安全。</li></ol></section>
+
+<section class="dd-sec"><h2><span class="dd-n">8</span>常见误解与自测<span class="dd-badge intuition">自测</span></h2><ol class="dd-quiz"><li>护栏为什么不能只靠系统提示？</li><li>输入分类器漏过攻击后还有哪些防线？</li><li>阈值提高会带来什么副作用？</li><li>为什么输出安全不等于动作安全？</li><li>怎样发现护栏已经过时？</li></ol><details class="dd-answers"><summary>参考答案</summary><ol><li>文本规则可被误解或绕过，不能强制权限。</li><li>上下文隔离、输出校验、工具权限和运行监控。</li><li>误拦正常请求增加。</li><li>工具可能已产生副作用，需执行前控制。</li><li>持续红队、生产切片与事件监控会暴露新失败。</li></ol></details></section>
+
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">NIST AI 600-1</a>：生成式 AI 风险管理框架。</li><li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a>：应用层威胁分类。</li><li><a href="https://www.anthropic.com/research/constitutional-classifiers" target="_blank" rel="noopener">Constitutional Classifiers</a>：合成安全数据与分类器防线。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>`
+};

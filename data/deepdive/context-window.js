@@ -37,13 +37,15 @@ window.DEEPDIVE["context-window"] = {
       <tr><td>它正在生成的回答</td><td>输出也占窗口</td></tr>
     </tbody>
   </table></div>
-  <p>这些加起来一旦超过上限，最早的内容就会被<b>截断</b>——模型再也看不见它。</p>
+  <p>这些加起来一旦超过上限，系统就必须拒绝、裁剪或压缩；若应用采用“丢掉最早内容”的策略，开头信息会先消失，但具体行为取决于产品实现。</p>
+  <figure class="dd-fig"><svg viewBox="0 0 650 205" role="img" aria-label="十六千 token 窗口的预算分配与超预算重排"><rect x="20" y="48" width="80" height="42" fill="#6b8cbe"/><rect x="100" y="48" width="210" height="42" fill="#d3a05a"/><rect x="310" y="48" width="180" height="42" fill="#4f9d78"/><rect x="490" y="48" width="120" height="42" fill="#cf6f6f"/><text x="60" y="74" text-anchor="middle" class="svg-tn" font-size="10">规则 1K</text><text x="205" y="74" text-anchor="middle" class="svg-tn" font-size="10">历史 7K</text><text x="400" y="74" text-anchor="middle" class="svg-tn" font-size="10">证据 6K</text><text x="550" y="74" text-anchor="middle" class="svg-tn" font-size="10">输出 4K</text><text x="325" y="35" text-anchor="middle" class="svg-t">原计划 18K ＞ 16K：至少 2K 无法同时存在</text><rect x="20" y="132" width="80" height="42" fill="#6b8cbe"/><rect x="100" y="132" width="90" height="42" fill="#d3a05a"/><rect x="190" y="132" width="120" height="42" fill="#4f9d78"/><rect x="310" y="132" width="120" height="42" fill="#cf6f6f"/><rect x="430" y="132" width="180" height="42" fill="none" stroke="#6b7484" stroke-dasharray="5 4"/><text x="60" y="158" text-anchor="middle" class="svg-tn" font-size="10">规则 1K</text><text x="145" y="158" text-anchor="middle" class="svg-tn" font-size="10">摘要 3K</text><text x="250" y="158" text-anchor="middle" class="svg-tn" font-size="10">证据 4K</text><text x="370" y="158" text-anchor="middle" class="svg-tn" font-size="10">输出 4K</text><text x="520" y="158" text-anchor="middle" class="svg-t" font-size="10">余量 4K</text><text x="325" y="196" text-anchor="middle" class="svg-t" font-size="10">压缩和检索不是为了塞满，而是给关键证据、工具往返和输出留下余量</text></svg><figcaption>图 1　上下文窗口是共享预算，不是“输入最多 16K、输出永远另算”。实际计数规则因服务而异，设计时应同时核算输入、输出预留和工具往返。</figcaption></figure>
+  <div class="dd-note key"><b>数值例子</b>　在 16K 预算里，规则 1K + 历史 7K + 证据 6K + 计划输出 4K = 18K，超出 2K。若粗暴截掉最早 2K，可能正好丢掉用户姓名或约束；更稳的方案是把历史压成 3K、只检索 4K 高价值证据，总占用 12K，留下 4K 给工具结果波动或更长回答。</div>
 </section>
 
 <section class="dd-sec">
   <h2><span class="dd-n">2</span>关键澄清：它不是「记忆」<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">开头那个例子的真正原因，藏在一个常见误解里：模型是不是把对话「记住」了？</p>
-  <div class="dd-note warn"><b>不是。模型本身没有记忆。</b>　每一次调用，它都把「当前窗口里能看见的全部内容」<b>从头到尾重新读一遍</b>，答完就忘。所谓它「记得前面说过的话」，其实是因为——前面那些话<b>还被原样塞在这次的窗口里</b>重新喂了进去。一旦某句话因为太靠前被挤出窗口，它就<b>真的消失了</b>，模型再也无从知晓。</div>
+  <div class="dd-note warn"><b>基础推理调用通常是无状态的。</b>　模型不会自动保留上一次请求；应用需要把相关历史、摘要或外部记忆重新放进本次输入。聊天产品可以在服务端保存会话，所以用户体验上像“记得”，但真正参与当前生成的仍是被装配进本次上下文的内容。某句话若既未保留、也未摘要或检索回来，模型本次就无从使用。</div>
   <div class="dd-note eng"><b>这解释了两件事</b>　① 为什么用 API 做多轮对话，每次都要<b>把历史一起发过去</b>——因为模型不会自己存；② 为什么长对话越聊越贵——历史越长，每次重发的 token 越多，而<b>计费按 token 算</b>。</div>
 </section>
 
@@ -55,14 +57,31 @@ window.DEEPDIVE["context-window"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>「塞得进」不等于「用得好」<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">4</span>注意力计算、KV 容量和有效长度不是一回事<span class="dd-badge math">数学</span><span class="dd-badge eng">系统</span></h2>
+  <p class="dd-lead">同样宣称支持 16K，为什么有的请求慢、有的并发一高就 OOM，还有的虽然跑完却答错？</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>限制</th><th>它约束什么</th><th>典型观察</th><th>不能由什么替代</th></tr></thead>
+    <tbody>
+      <tr><td>注意力计算/IO</td><td>处理长前缀的时间和中间读写</td><td>输入越长，首 token 越慢</td><td>显存放得下不代表算得快</td></tr>
+      <tr><td>KV cache</td><td>活跃 token 与并发请求容量</td><td>单请求能跑，并发后 OOM/驱逐</td><td>FlashAttention 不会消除长期 KV</td></tr>
+      <tr><td>位置与训练分布</td><td>模型是否学会在该长度取用信息</td><td>短文本好，长文本准确率下降</td><td>API 接受 16K 不证明有效利用 16K</td></tr>
+      <tr><td>应用装配</td><td>关键证据是否进入且摆在可用位置</td><td>换顺序或去噪后答案改变</td><td>换更长窗口不修复错误证据</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-formula">KV bytes ≈ 2 × 层数 × KV 头数 × 头维度 × 已缓存 token × 每元素字节</div>
+  <p>例如 32 层、8 个 KV 头、头维度 128、FP16、16K token：<code>2×32×8×128×16000×2</code> ≈ 2.10×10⁹ 字节，约 1.95 GiB/请求，还没算模型权重、激活工作区和碎片。采用分组查询注意力、KV 量化或分页管理会改变数字，但“上下文长度同时消耗并发容量”这条关系仍在。</p>
+  <div class="dd-note warn"><b>声明窗口 ≠ 有效窗口。</b>　接口能接收某个长度，只证明输入没有被立即拒绝；要按长度、证据位置、任务类型和语言画准确率曲线，并同时记录首 token 延迟、KV 占用和失败率。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>「塞得进」不等于「用得好」<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">就算模型支持很长的窗口，把所有资料一股脑塞进去，就万事大吉了吗？</p>
   <div class="dd-note warn"><b>并不是。</b>　长窗口有两个陷阱：其一，<b>中间迷失</b>——放在上下文<b>中段</b>的信息，利用率明显低于放在开头和结尾，模型容易「看漏」中间（见「中间迷失」节点）；其二，塞进大量<b>无关内容</b>会稀释注意力、混入噪声，反而让回答变差。</div>
   <div class="dd-note key"><b>一句话</b>　长上下文是一种<b>能力</b>，不是「无脑往里塞」的许可。<b>放什么、放多少、放在哪</b>，比「能放多少」更影响效果——关键材料尽量放在开头或结尾。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>怎么应对窗口限制<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">6</span>怎么应对窗口限制<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">当要处理的内容超过窗口，或长对话开始失忆，有哪些办法？</p>
   <ul class="dd-steps">
     <li><b>只放相关的（RAG）</b>：不把整个知识库塞进去，而是<b>检索</b>出与当前问题最相关的少量片段再喂给模型（见「RAG」「检索」）。</li>
@@ -73,19 +92,22 @@ window.DEEPDIVE["context-window"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从一次调用的共享预算，推到无状态、计算代价、有效利用与外部记忆。</p>
   <ol class="dd-chain">
     <li>上下文窗口是单次能看见的 token 上限，装着提示+历史+检索+输出，窗口外看不见。<span>（§1）</span></li>
     <li>模型本身没记忆，「记得前面」是因为前面还在窗口里被重新喂入；被挤出就真忘了。<span>（§2）</span></li>
     <li>窗口不能无限大：标准全局注意力的平方开销、KV 缓存、硬件、位置表示与训练长度共同形成约束。<span>（§3）</span></li>
-    <li>就算窗口够长，塞满也不等于用好：有中间迷失、有噪声稀释。<span>（§4）</span></li>
-    <li>应对：RAG 只放相关的、上下文工程分配预算、压缩摘要、外挂记忆。<span>（§5）</span></li>
+    <li>计算、KV 容量、有效利用和应用装配是四个不同瓶颈，声明长度不能互相替代它们。<span>（§4）</span></li>
+    <li>就算窗口够长，塞满也不等于用好：有中间迷失、有噪声稀释。<span>（§5）</span></li>
+    <li>应对：RAG 只放相关的、上下文工程分配预算、压缩摘要、外挂记忆。<span>（§6）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「模型为什么其实没有记忆、却像记得对话」，并说出「窗口为什么不能无限大、以及塞满为什么不等于用好」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误解把产品保存的会话、模型可见上下文、声明容量和有效利用混为一谈。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -99,12 +121,13 @@ window.DEEPDIVE["context-window"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">请为一个 16K 请求分配规则、历史、证据、工具结果和输出预算，并说明裁剪顺序。</p>
   <ol class="dd-quiz">
     <li>上下文窗口里到底装着哪些东西？</li>
     <li>模型「记得前面说过的话」的真实机制是什么？超出窗口会怎样？</li>
     <li>为什么窗口不能做成无限大？</li>
-    <li>窗口足够大时，为什么「把所有资料都塞进去」不是好主意？</li>
+    <li>为什么 API 接受 16K 输入，不能证明模型能有效使用全部 16K？</li>
     <li>内容超出窗口或长对话失忆时，有哪些应对手段？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
@@ -112,14 +135,14 @@ window.DEEPDIVE["context-window"] = {
       <li>系统提示/指令、对话历史、检索来的材料、以及模型正在生成的输出。</li>
       <li>模型没记忆，每次把窗口内全部内容重新读一遍；前面的话还在窗口里才「记得」，一旦被挤出窗口就真的没了。</li>
       <li>标准全局注意力会形成 n² 个位置对，且 KV 缓存、带宽、位置外推和训练长度也有限；高效或稀疏变体能缓解但不能免费扩展。</li>
-      <li>因为有中间迷失（中段信息利用率低），且大量无关内容会稀释注意力、引入噪声，反而变差。</li>
+      <li>声明容量只说明输入被接受；位置/训练分布、证据装配、中间迷失和噪声仍会降低实际任务准确率，需要按长度和位置实测。</li>
       <li>用 RAG 只放相关片段、用上下文工程分配预算、压缩摘要历史、给 Agent 外挂记忆。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -137,8 +160,9 @@ window.DEEPDIVE["context-window"] = {
     <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Attention Is All You Need</a>：标准自注意力的序列长度复杂度。</li>
     <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>：长上下文信息位置对任务表现的影响。</li>
     <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>：精确注意力的内存访问瓶颈与优化边界。</li>
+    <li><a href="https://arxiv.org/abs/2308.14508" target="_blank" rel="noopener">Bai et al., LongBench</a>：跨任务、跨语言的长上下文理解评测。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

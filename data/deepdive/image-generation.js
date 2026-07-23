@@ -41,6 +41,9 @@ window.DEEPDIVE["image-generation"] = {
     </tbody>
   </table></div>
   <div class="dd-note intuition"><b>分清「任务」和「引擎」</b>　图像生成是<b>任务</b>；扩散模型是当前实现它最主流的<b>引擎</b>（早年还有 GAN，也有自回归等其它路线）。任务不变，引擎会换——这也是这个领域进步这么快的原因。</div>
+  <figure class="dd-fig"><svg viewBox="0 0 650 185" role="img" aria-label="文本条件经过编码器进入生成引擎并解码为图像"><defs><marker id="ig1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="60" width="132" height="60" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="84" y="84" text-anchor="middle" class="svg-t">文本条件</text><text x="84" y="104" text-anchor="middle" class="svg-t" font-size="10">柯基 · 帽子 · 海边</text><path d="M150,90 L198,90" stroke="#6b7484" marker-end="url(#ig1)"/><rect x="200" y="60" width="110" height="60" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="255" y="84" text-anchor="middle" class="svg-t">文本编码器</text><text x="255" y="104" text-anchor="middle" class="svg-t" font-size="10">条件表示 c</text><path d="M310,90 L358,90" stroke="#6b7484" marker-end="url(#ig1)"/><rect x="360" y="48" width="126" height="84" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="423" y="76" text-anchor="middle" class="svg-t">生成引擎</text><text x="423" y="96" text-anchor="middle" class="svg-t" font-size="10">噪声/视觉 token</text><text x="423" y="114" text-anchor="middle" class="svg-t" font-size="10">逐步受 c 条件化</text><path d="M486,90 L534,90" stroke="#6b7484" marker-end="url(#ig1)"/><rect x="536" y="60" width="96" height="60" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="584" y="84" text-anchor="middle" class="svg-t">解码成图</text><text x="584" y="104" text-anchor="middle" class="svg-t" font-size="10">再做验收</text><text x="325" y="160" text-anchor="middle" class="svg-t" font-size="10">语义对齐决定“画什么”，生成引擎决定“怎样形成图像表示”</text></svg><figcaption>图 1　文生图不是一句文字直接变像素。文本先成为条件表示，生成引擎在像素、潜空间或视觉 token 中采样，再解码并接受独立验收。</figcaption></figure>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>运行示例：固定 4 个验收项</th><th>样本 1</th><th>样本 2</th></tr></thead><tbody><tr><td>柯基主体</td><td>✓</td><td>✓</td></tr><tr><td>帽子戴在头上</td><td>✗（漂浮）</td><td>✓</td></tr><tr><td>海边场景</td><td>✓</td><td>✓</td></tr><tr><td>油画风格</td><td>✓</td><td>△（偏照片）</td></tr></tbody></table></div>
+  <div class="dd-note warn"><b>“整体相似”会掩盖属性绑定错误</b>　两张图都可能获得很高的图文相似度，但只有样本 2 满足帽子与柯基的空间关系。评测要拆成对象、数量、属性、关系、文字和风格，而不是只看一分或挑最好看的样例。</div>
 </section>
 
 <section class="dd-sec">
@@ -89,6 +92,7 @@ window.DEEPDIVE["image-generation"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从文本语义、条件注入到图像采样与分项验收，把“看起来不错”拆成可检查机制。</p>
   <ol class="dd-chain">
     <li>图像生成是造一张全新的图，不是检索拼贴。<span>（§1）</span></li>
     <li>它要同时办两件事：读懂文字（图文对齐）+ 把图画出来（生成引擎）。<span>（§2）</span></li>
@@ -156,7 +160,7 @@ window.DEEPDIVE["image-generation"] = {
     <li><a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Saharia et al., Imagen</a>：文本编码、级联扩散与图文对齐。</li>
     <li><a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">Ramesh et al., Hierarchical Text-Conditional Image Generation with CLIP Latents</a>：CLIP 潜变量与扩散解码。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

@@ -62,6 +62,7 @@ window.DEEPDIVE["diffusion"] = {
   <p>不需要。给定干净样本 <code>x₀</code>，可以直接采样任意时刻 <code>t</code> 的带噪样本：</p>
   <div class="dd-formula">xₜ = √ᾱₜ · x₀ + √(1−ᾱₜ) · ε，　ε ~ N(0, I)</div>
   <p class="dd-formula-note"><code>ᾱₜ</code>由噪声日程决定。训练常让网络 <code>εθ(xₜ,t,c)</code> 预测加入的噪声，并最小化 <code>||ε−εθ||²</code>；条件 <code>c</code> 可以是文本。一次随机 t 的样本就能为整条时间轴提供无偏训练信号。</p>
+  <div class="dd-note key"><b>数值例子：一维加噪与去噪估计</b>　取干净值 <code>x₀=2</code>、<code>ᾱₜ=0.64</code>，则 <code>√ᾱₜ=0.8</code>、<code>√(1−ᾱₜ)=0.6</code>。这次随机噪声若为 <code>ε=−1</code>，带噪值就是 <code>xₜ=0.8×2+0.6×(−1)=1.0</code>。若网络预测 <code>εθ=−0.8</code>，本样本噪声损失是 <code>(−1+0.8)²=0.04</code>，反推出的干净值约为 <code>(1−0.6×(−0.8))/0.8=1.85</code>。一次预测并未完美还原 2，多步采样会沿模型估计的反向方向逐步修正。</div>
   <div class="dd-note warn"><b>“去掉一点噪声”是直觉，不是唯一参数化。</b>　模型也可预测干净样本、速度变量或数据分布的分数；不同采样器还能用更少步骤近似反向轨迹。核心是学习反向更新方向，而非必须逐像素擦除固定噪点。</div>
 </section>
 
@@ -97,10 +98,12 @@ window.DEEPDIVE["diffusion"] = {
   <h2><span class="dd-n">5.5</span>潜空间与引导：速度、贴题和多样性的权衡<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">高分辨率像素空间太贵，文本条件又可能不够强，工程上怎么处理？</p>
   <p><b>潜空间扩散</b>先用编码器把图像压缩到更小的潜变量，在那里去噪，最后解码回像素，从而显著降低计算量。<b>无分类器引导</b>把有条件与无条件的预测组合：引导尺度提高通常让图更贴提示，但过高会牺牲多样性、造成过饱和或伪影。这说明“更听话”不是免费的单向增益。</p>
+  <div class="dd-note key"><b>评测与失败诊断：</b>固定提示集和随机种子，对采样步数、调度器与引导尺度做网格实验，同时记录耗时、提示遵循、样本多样性和伪影率；FID 或图文相似度只能作为代理，还要检查计数、文字、手部和身份一致性等困难切片。若高引导只提升相似度却让样本趋同，应归因于贴题—多样性权衡；若结构普遍模糊，再分别检查去噪器、VAE 解码和采样步数。</div>
 </section>
 
 <section class="dd-sec">
   <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">现在从“一步生成太难”推到“随机抽一个时刻训练，也能学会整条反向轨迹”。</p>
   <ol class="dd-chain">
     <li>凭空一步造出协调逼真的图太难。<span>（§1）</span></li>
     <li>扩散把它拆开：正向加噪造训练样本，反向学去噪。<span>（§2）</span></li>
@@ -167,7 +170,7 @@ window.DEEPDIVE["diffusion"] = {
     <li><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., High-Resolution Image Synthesis with Latent Diffusion Models</a>：潜空间扩散与交叉注意力条件注入。</li>
     <li><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans, Classifier-Free Diffusion Guidance</a>：无分类器引导与条件强度权衡。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

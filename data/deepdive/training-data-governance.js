@@ -1,45 +1,23 @@
 /* 理解原理页 —— 训练数据治理 */
 window.DEEPDIVE = window.DEEPDIVE || {};
-window.DEEPDIVE["training-data-governance"] = {
-  title: "训练数据治理",
-  subtitle: "从数据来源到退役：让模型所学内容可解释、可审计、可纠偏",
-  aliases: "Training Data Governance · 数据谱系 · 数据生命周期",
-  meta: "建议 25–35 分钟 · 中级 · 需要：预训练、数据工程、安全治理",
-  thesis: "训练数据治理不是一次性清洗，而是贯穿<b>获取、授权、筛选、去重、配比、训练、评测、响应与退役</b>的控制系统。它的目标不是得到“绝对干净”的语料，而是知道数据从哪里来、为何能用、怎样影响模型，以及出现问题时能够定位和处置。",
-  html: `
-<div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul>
-  <li>数据治理为什么不等同于数据清洗？</li><li>来源、许可和处理记录为何必须形成谱系？</li>
-  <li>去重怎样同时影响记忆、评测污染和训练效率？</li><li>数据配比为什么是模型行为的隐性控制杆？</li><li>删除原始样本为何不等于删除模型中的影响？</li>
-</ul></div>
-<div class="dd-note key"><b>运行例子</b>　一个团队发现模型会复述某段个人信息。仅删除对象存储里的文件并不能证明已部署权重不再受它影响；团队还需要靠谱系定位训练批次、判断是否重训或使用遗忘技术，并更新过滤器与回归测试。</div>
-
-<section class="dd-sec"><h2><span class="dd-n">1</span>治理对象是一条生命周期<span class="dd-badge intuition">直觉</span></h2>
-<p class="dd-lead">为什么“训练前清洗一次”远远不够？</p><p>数据会被抓取、转换、复制、混合并生成多个训练快照。来源规则会变化，隐私或版权请求会在训练后出现，模型失败又会产生新的修复数据。治理因此要保存每一步的输入、版本、规则、责任人和产物，让一次训练能够被复现和追溯。</p></section>
-
-<section class="dd-sec"><h2><span class="dd-n">2</span>谱系：回答从哪里来<span class="dd-badge eng">工程</span></h2>
-<p>最小谱系至少记录来源 URI、获取时间、许可或使用依据、内容哈希、处理规则、数据集版本和进入过的训练任务。哈希能识别同一内容的副本，但不能单独证明权利；许可证标签能表达规则，但不能替代对来源真实性的核验。</p>
-<ul class="dd-steps"><li><b>原始层</b>：尽量保留不可变快照与来源元数据。</li><li><b>处理层</b>：记录过滤、去重、脱敏和分类器版本。</li><li><b>混合层</b>：记录各来源权重和采样策略。</li><li><b>训练层</b>：把模型版本反向链接到确切数据快照。</li></ul></section>
-
-<section class="dd-sec"><h2><span class="dd-n">3</span>质量、过滤与去重<span class="dd-badge eng">工程</span></h2>
-<p class="dd-lead">删除重复项只是节省磁盘吗？</p><p>重复内容会获得更高的有效采样权重，增加逐字记忆风险，也可能让公开测试题泄漏到训练集。精确哈希只能抓完全相同的副本；近似去重要在文档、段落和语义层面寻找变体，并权衡误删少数语言或合法模板的风险。</p><div class="dd-note warn"><b>过滤器也会带偏差。</b>　“高质量”分类器常继承主流语言和写作风格偏好，因此应按来源、语言与群体检查保留率，而不是只看总删除量。</div></section>
-
-<section class="dd-sec"><h2><span class="dd-n">4</span>数据配比是行为控制杆<span class="dd-badge math">机制</span></h2>
-<p>训练不是简单地把所有文本拼起来。若来源 <i>i</i> 的采样概率为 p<sub>i</sub>，改变 p<sub>i</sub> 就改变模型看到该分布的频率。高质量代码、数学或多语言语料的权重会改变能力结构；配比过度又可能损伤通用能力或放大特定偏差。</p><div class="dd-formula">训练分布 P(x) = Σ p<sub>i</sub> P<sub>i</sub>(x)，且 Σ p<sub>i</sub> = 1</div><p class="dd-formula-note">配比是模型设计决策，必须与能力、安全和公平性评测一起版本化。</p></section>
-
-<section class="dd-sec"><h2><span class="dd-n">5</span>许可、隐私与删除请求<span class="dd-badge intuition">边界</span></h2>
-<p>许可决定允许怎样使用，隐私控制决定是否应收集和保留，两者不是同一问题。收到删除请求后，可以可靠删除未来训练快照中的样本；但已经训练出的参数是许多样本共同作用的结果，不能把文件删除等同于模型遗忘。必要时需评估重训、机器遗忘、输出拦截及其验证证据。</p></section>
-
-<section class="dd-sec"><h2><span class="dd-n">6</span>污染、投毒与合成反馈环<span class="dd-badge eng">风险</span></h2>
-<ul class="dd-steps"><li><b>评测污染</b>：测试题或答案进入训练集，分数虚高。</li><li><b>数据投毒</b>：攻击者注入触发器、错误事实或后门行为。</li><li><b>合成回流</b>：模型输出未经标识地重新进入语料，错误被放大。</li><li><b>来源漂移</b>：同一站点的内容与许可随时间改变。</li></ul><p>防线包括来源信誉、异常比例监控、相似样本检测、隔离高风险来源、签名或哈希清单，以及独立保留的评测集。</p></section>
-
-<section class="dd-sec"><h2><span class="dd-n">7</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
-<ol class="dd-chain"><li>数据来源决定可用内容与初始风险。</li><li>授权和谱系决定是否能解释与追溯。</li><li>过滤、去重和配比重塑实际训练分布。</li><li>训练分布影响能力、偏差、记忆与安全行为。</li><li>独立评测检查这些影响是否符合目标。</li><li>事故和请求通过谱系反馈到数据、模型和控制措施。</li></ol></section>
-
-<section class="dd-sec"><h2><span class="dd-n">8</span>常见误解与自测<span class="dd-badge intuition">自测</span></h2>
-<div class="dd-table-wrap"><table class="dd-table"><tbody><tr><td>开源可见就能任意训练</td><td>公开访问不自动等于许可、隐私和用途均无约束</td></tr><tr><td>去重越彻底越好</td><td>误删会损害稀有语言、模板任务和真实频率结构</td></tr><tr><td>删文件等于模型遗忘</td><td>已训练参数中的影响仍需单独评估和处置</td></tr></tbody></table></div>
-<ol class="dd-quiz"><li>数据谱系最少要记录哪些信息？</li><li>为什么近似去重需要按群体检查？</li><li>数据配比怎样改变模型行为？</li><li>评测污染与数据投毒有何区别？</li><li>为何删除请求需要模型级验证？</li></ol>
-<details class="dd-answers"><summary>参考答案</summary><ol><li>来源、时间、授权、哈希、处理规则、版本和训练关联。</li><li>过滤器可能对稀有语言或格式产生不成比例的误删。</li><li>它改变各类样本的有效采样概率。</li><li>前者让评测失真，后者意在改变或破坏模型行为。</li><li>删除源文件不会自动逆转其对既有权重的贡献。</li></ol></details></section>
-
-<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2101.00027" target="_blank" rel="noopener">The Pile</a>：大规模语言模型语料的来源与构成。</li><li><a href="https://arxiv.org/abs/2107.06499" target="_blank" rel="noopener">Deduplicating Training Data Makes Language Models Better</a>：重复数据、记忆与污染。</li><li><a href="https://arxiv.org/abs/1803.09010" target="_blank" rel="noopener">Datasheets for Datasets</a>：数据集文档与生命周期问责框架。</li></ul><div class="dd-src-date">访问日期：2026-07-21</div></div>
-`
-};
+window.DEEPDIVE['training-data-governance'] = window.createDeepDive({
+  title:'训练数据治理：让模型所学内容可追溯、可审计、可处置',
+  subtitle:'从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。',
+  thesis:'训练数据治理不是训练前清洗一次，而是贯穿获取、授权、处理、配比、训练、评测、响应和退役的控制系统。目标不是声称数据“绝对干净”，而是建立<b>样本—处理—快照—模型—评测</b>的可追溯关系，并在风险出现时知道能做什么、不能证明什么。',
+  goals:['设计数据谱系和版本清单','推导重复与配比的有效权重','区分许可、隐私、污染和投毒','处理删除请求与模型影响验证'],
+  sections:[
+    {title:'治理对象是生命周期，不是一个文件夹',badge:'直觉',lead:'为什么训练前删过敏感词，部署后仍会遇到版权、隐私和记忆事故？',body:'<p>数据会被抓取、解压、规范化、切块、去重、分类、混合和复制成多个快照；规则、许可和当事人请求也会在训练后变化。模型失败又会产生修复数据与新的评测题。因此每次转换都需要版本、责任人、输入与产物关系。</p><p>治理回答四件事：数据为何能用；经历了什么处理；进入了哪些模型；发现问题后能定位和处置到什么程度。只保存最终 parquet 不能回答这些问题。</p><div class="dd-note"><b>证据链：</b>来源记录证明“从哪里来”，授权记录说明“为何可用”，处理谱系说明“怎样改变”，训练清单说明“影响了哪些模型”。</div>'},
+    {title:'谱系要从样本连到模型发布',kind:'eng',badge:'机制',lead:'发现一段个人信息被复述时，怎样找到所有副本和受影响模型？',body:'<p>为原始对象保存稳定 source id、获取时间、URI、内容哈希、许可/用途、地域与敏感分类；每个处理任务保存代码/规则版本、父产物和删除原因；数据混合保存来源权重、抽样种子和快照哈希；训练运行反向链接确切清单。</p><figure class="dd-fig"><svg viewBox="0 0 710 255" role="img" aria-label="训练数据从来源、处理、混合到模型和事故响应的谱系图"><defs><marker id="tg1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="76" y="101" text-anchor="middle" class="svg-t">来源 S17</text><text x="76" y="122" text-anchor="middle" class="svg-t" font-size="11">URI/许可/哈希</text><path d="M134,111 L174,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="176" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="234" y="101" text-anchor="middle" class="svg-t">处理 P9</text><text x="234" y="122" text-anchor="middle" class="svg-t" font-size="11">脱敏/去重/过滤</text><path d="M292,111 L332,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="334" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="392" y="101" text-anchor="middle" class="svg-t">快照 D42</text><text x="392" y="122" text-anchor="middle" class="svg-t" font-size="11">清单/配比/种子</text><path d="M450,111 L490,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="492" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="550" y="101" text-anchor="middle" class="svg-t">模型 M8</text><text x="550" y="122" text-anchor="middle" class="svg-t" font-size="11">训练运行/权重</text><path d="M608,111 L680,111" stroke="#6b7484" marker-end="url(#tg1)"/><text x="645" y="91" text-anchor="middle" class="svg-t" font-size="11">部署</text><path d="M550,147 C546,215 235,220 234,148" fill="none" stroke="#c77b72" stroke-dasharray="5 4" marker-end="url(#tg1)"/><text x="392" y="208" text-anchor="middle" class="svg-t" font-size="11">事故/删除请求：反查快照与模型，更新规则、数据和回归评测</text></svg><figcaption>图 1　谱系必须双向可查：从模型回到数据，也能从问题样本找到所有受影响产物。</figcaption></figure>'},
+    {title:'授权、隐私与质量是三个不同判断',kind:'eng',badge:'治理',lead:'公开网页、内容质量高，是否就能安全用于任何训练？',body:'<p>公开可访问不自动等于获得训练许可；有许可不表示不含个人敏感信息；合法合规也不表示数据准确或代表目标群体。分别记录来源权利/用途限制、个人数据目的与最小化、内容质量/安全标签，避免用一个“approved=true”掩盖不同责任。</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>轴</th><th>核心问题</th><th>证据</th><th>处置</th></tr></thead><tbody><tr><td>授权/许可</td><td>能否按此目的使用</td><td>合同、许可、来源条款</td><td>排除或限制用途</td></tr><tr><td>隐私</td><td>是否必要、可识别、可删除</td><td>目的、同意/依据、分类</td><td>最小化、脱敏、访问控制</td></tr><tr><td>质量</td><td>是否准确、代表、非垃圾</td><td>抽样审计与分布</td><td>过滤、降权、补充</td></tr><tr><td>安全</td><td>是否投毒、恶意或含秘密</td><td>信誉、异常与扫描</td><td>隔离、人工复核</td></tr></tbody></table></div>'},
+    {title:'去重改变的是有效训练权重',kind:'math',badge:'机制',lead:'同一段文本出现 20 次，除了浪费计算，还改变了什么？',body:'<p>若均匀按样本采样，一条内容的近似有效概率与副本数成正比。它会增加逐字记忆、让高重复来源支配梯度，并把评测题镜像泄漏到训练。精确哈希只抓完全相同内容；MinHash/局部敏感哈希抓词面近邻，语义去重抓改写，但误删风险依次上升。</p><div class="dd-formula">内容 z 的有效权重 w(z) ∝ Σⱼ 1[样本 j 属于 z 的重复簇] · 采样权重ⱼ</div><p>近似去重应在文档、段落和跨数据集层面运行，并按语言、来源、格式和群体报告保留率。模板化代码、法律条款和稀有语言可能天然相似，盲目追求最低重复率会删掉有效结构。</p><div class="dd-note warn"><b>测试集先隔离。</b>　应在训练混合前用精确与语义近邻检查评测题及衍生讲解；训练后再检测只能发现风险，不能恢复独立性。</div>'},
+    {title:'运行示例：去重与配比怎样重塑一个 100 万样本快照',kind:'math',badge:'逐步演算',lead:'客服语料只有 10 万条，却因重复 5 次占到多少训练曝光？',body:'<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>来源</th><th>原始条数</th><th>去重后</th><th>原始混合曝光</th><th>治理后目标曝光</th></tr></thead><tbody><tr><td>通用网页</td><td>700k</td><td>500k</td><td>70%</td><td>55%</td></tr><tr><td>客服对话</td><td>100k×平均5副本</td><td>100k</td><td>等效约 25%–40%</td><td>20%</td></tr><tr><td>政策文档</td><td>50k</td><td>45k</td><td>5%</td><td>15%</td></tr><tr><td>多语言长尾</td><td>150k</td><td>140k</td><td>15%</td><td>10%</td></tr></tbody></table></div><p>假设原始拼接总记录 1.4M，其中客服物理副本 500k，它的均匀采样曝光约 35.7%，而语义内容只有 100k。去重后总独特约 785k，客服自然比例约 12.7%。团队若根据任务将其显式设为 20%，这是可审计配比决策，不再由抓取重复偶然决定。</p><div class="dd-formula">P训练(x)=Σᵢ pᵢPᵢ(x)，Σpᵢ=1；100k 步下政策目标曝光 15%≈15k 步</div><p>配比提高政策能力也可能损害通用、多语言或旧知识保持。必须在能力、安全、公平和记忆切片做消融，不能只看退款准确率。</p>'},
+    {title:'过滤器也会系统性偏向某些数据',kind:'eng',badge:'失败边界',lead:'“高质量分类器”保留 90% 英文、只保留 45% 某低资源语言，意味着什么？',body:'<p>质量分类器常把主流百科文风当标准，把口语、方言、残障表达、代码混排或低资源语言误判为垃圾。毒性过滤也可能过删讨论被歧视群体的文本。总体保留率会掩盖这种分布重塑。</p><p>对每条规则保存原因码和分数；在来源/语言/群体切片抽样双标，测精确率、召回率和保留差异；对高不确定样本隔离人工复核。过滤前后都保存统计摘要，原始敏感内容则受限访问并按保留政策处理。</p><div class="dd-note warn"><b>过滤不是中立清洁。</b>　它定义了模型可见世界的一部分，是能力和价值决策，应接受评测与治理审批。</div>'},
+    {title:'污染、投毒和合成回流的因果不同',kind:'eng',badge:'风险',lead:'测试题泄漏、攻击者注入后门、模型输出再训练，为什么不能用同一过滤器解决？',body:'<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>风险</th><th>目标/机制</th><th>观测</th><th>防线</th></tr></thead><tbody><tr><td>评测污染</td><td>题或答案进入训练</td><td>异常相似、时间矛盾</td><td>隔离保留集、近邻扫描</td></tr><tr><td>数据投毒</td><td>恶意改变行为/后门</td><td>来源异常、触发器、簇突增</td><td>信誉、签名、配额、红队</td></tr><tr><td>合成回流</td><td>生成分布替代真实尾部</td><td>措辞同质、来源不明</td><td>合成标记、真实锚点、配比</td></tr><tr><td>来源漂移</td><td>站点内容/许可随时间变</td><td>版本与分布变化</td><td>定期复核、快照许可</td></tr></tbody></table></div><p>异常数据不能自动进入重训。生产失败回流要脱敏、去重、确认标签与来源，避免攻击者通过反馈渠道投毒。</p>'},
+    {title:'删除文件不等于模型已经遗忘',kind:'eng',badge:'处置',lead:'收到删除请求后，哪些结果能可靠承诺，哪些不能？',body:'<p>可以从原始存储、派生数据集、缓存和未来训练清单删除已定位对象，并用谱系阻止再次摄取。已经训练的权重是大量样本共同优化结果，删除文件不会逆转参数更新；输出拦截也只降低暴露，不证明内部影响消失。</p><ol class="dd-steps"><li>验证请求主体、范围和法律/合同依据。</li><li>用精确/近似标识找到副本与派生产物。</li><li>更新删除清单、过滤器和未来快照。</li><li>反查受影响训练运行与部署模型。</li><li>按风险选择重训、机器遗忘、检索/输出控制或退役。</li><li>用成员推断、诱导复现和任务回归验证，但如实说明证据边界。</li></ol><p>机器遗忘本身需证明效用损失和残余记忆；不能把运行一个脚本等同于合规完成。</p>'},
+    {title:'治理控制要落到发布门禁和事故演练',badge:'工程',lead:'有 datasheet 和清单，为什么仍可能在下一次训练重复犯错？',body:'<p>将治理变成自动门禁：未知来源、缺许可、敏感等级不明、评测近邻、异常重复率或混合权重超界时阻断快照；人工豁免必须有期限和责任人。训练前输出数据卡，训练后运行记忆、偏差、安全和能力消融。</p><p>演练“发现某来源撤销授权”：能否在小时内列出快照、训练运行、模型、部署和下游衍生数据；能否构建不含来源的新快照并估算重训/替代成本。无法执行的谱系只是文档装饰。</p><div class="dd-note warn"><b>治理不是绝对保证。</b>　来源元数据可能错误、近似匹配会漏、模型影响难以逐样本归因；报告残余风险和证据强度。</div>'},
+    {title:'常见误区与概念依赖',badge:'常见误区与学习路线',lead:'可靠治理不声称数据无瑕，而是让关键决策与问题处置有证据可循。',body:'<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>误区</th><th>更准确的理解</th></tr></thead><tbody><tr><td>公开可访问即可任意训练</td><td>访问、许可、隐私与用途是不同问题</td></tr><tr><td>去重越彻底越好</td><td>语义误删会伤害稀有语言和真实模板</td></tr><tr><td>过滤器只提高质量</td><td>它也重塑群体、语言和价值分布</td></tr><tr><td>删源文件即模型遗忘</td><td>既有参数影响需模型级处置与验证</td></tr><tr><td>生产反馈可自动训练</td><td>需防错标、隐私、选择偏差和投毒</td></tr></tbody></table></div><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>层级</th><th>概念依赖与延伸学习</th></tr></thead><tbody><tr><td>先修</td><td>预训练、数据工程、概率采样与评测</td></tr><tr><td><b>本页核心</b></td><td>授权、谱系、去重、配比、删除与快照门禁</td></tr><tr><td>数据方法</td><td>合成数据、自监督学习、数据投毒</td></tr><tr><td>生命周期</td><td>隐私、偏见公平、模型评测、漂移监控与治理</td></tr></tbody></table></div>'}
+  ],
+  chain:['登记来源/授权/敏感等级','版本化处理与去重原因','显式设计混合配比并隔离评测','冻结清单连接训练运行与模型','训练后评测记忆/偏差/能力','事故或请求沿谱系处置并更新门禁'],
+  quiz:[{q:'谱系为何要双向可查？',a:'既要从模型复现确切数据，也要从问题样本找出所有受影响快照和模型。'},{q:'重复为什么改变模型而不只是磁盘？',a:'副本提高有效采样权重、记忆和污染风险。'},{q:'示例中客服去重后自然比例约多少？',a:'100k/785k≈12.7%，显式设为 20% 是另一个配比决策。'},{q:'删除文件为何不等于遗忘？',a:'训练更新已分布在权重中，需重训/遗忘/控制及模型级验证。'},{q:'生产失败为何不能自动回流？',a:'可能含错标、选择偏差、个人数据与攻击者投毒。'}],
+  sources:[{title:'Datasheets for Datasets',url:'https://arxiv.org/abs/1803.09010',note:'数据集文档与生命周期问责'},{title:'Data Statements for NLP',url:'https://aclanthology.org/Q18-1041/',note:'语言数据群体与语境记录'},{title:'Deduplicating Training Data Makes Language Models Better',url:'https://arxiv.org/abs/2107.06499',note:'重复、记忆与评测污染'},{title:'The Pile',url:'https://arxiv.org/abs/2101.00027',note:'大规模训练语料来源与构成'}]
+});

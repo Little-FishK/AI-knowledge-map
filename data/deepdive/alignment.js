@@ -46,6 +46,9 @@ window.DEEPDIVE["alignment"] = {
     <li><b>宪法 AI</b>：用一套<b>成文原则</b>引导模型自我批评、修订并生成 AI 偏好反馈，可减少部分逐条人工比较；原则选择、评测与高风险监督仍需要人类参与（见「宪法 AI」）。</li>
   </ul>
   <div class="dd-note intuition"><b>为什么要用「偏好」而不是「标准答案」</b>　因为下一节的核心难题：好回答根本<b>写不成标准答案</b>。人常常「说不清什么最好，但一比就知道哪个更好」——偏好对齐正是利用了这一点，用「A 比 B 好」这种<b>比较</b>来教模型。</div>
+  <figure class="dd-fig"><svg viewBox="0 0 650 205" role="img" aria-label="从能力模型到示范偏好训练和独立评测的对齐闭环"><defs><marker id="ali1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="65" width="105" height="58" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="72" y="89" text-anchor="middle" class="svg-t">预训练能力</text><text x="72" y="108" text-anchor="middle" class="svg-t" font-size="10">最可能续写</text><path d="M125,94 L167,94" stroke="#6b7484" marker-end="url(#ali1)"/><rect x="169" y="52" width="112" height="84" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="225" y="78" text-anchor="middle" class="svg-t">监督示范</text><text x="225" y="98" text-anchor="middle" class="svg-t" font-size="10">基本指令行为</text><text x="225" y="116" text-anchor="middle" class="svg-t" font-size="10">SFT</text><path d="M281,94 L323,94" stroke="#6b7484" marker-end="url(#ali1)"/><rect x="325" y="52" width="112" height="84" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="381" y="78" text-anchor="middle" class="svg-t">偏好/原则</text><text x="381" y="98" text-anchor="middle" class="svg-t" font-size="10">RLHF · DPO</text><text x="381" y="116" text-anchor="middle" class="svg-t" font-size="10">宪法式反馈</text><path d="M437,94 L479,94" stroke="#6b7484" marker-end="url(#ali1)"/><rect x="481" y="52" width="148" height="84" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="555" y="76" text-anchor="middle" class="svg-t">独立评测与红队</text><text x="555" y="98" text-anchor="middle" class="svg-t" font-size="10">帮助 · 真实性 · 安全</text><text x="555" y="116" text-anchor="middle" class="svg-t" font-size="10">分群 · 对抗 · 回归</text><path d="M555,138 C548,185 225,187 225,138" fill="none" stroke="#6b7484" marker-end="url(#ali1)"/><text x="390" y="182" text-anchor="middle" class="svg-t" font-size="10">失败证据回到数据、目标与产品控制；不是“一次训练完成”</text></svg><figcaption>图 1　对齐是闭环而非一道滤镜。训练代理目标后必须用未参与训练的任务、不同人群和对抗输入评测，否则只知道模型更会拿训练评分，不知道它是否更符合真实意图。</figcaption></figure>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>案例推演：两类请求</th><th>候选 A</th><th>候选 B</th><th>偏好信号的风险</th></tr></thead><tbody><tr><td>“半夜回屋不吵醒室友”</td><td>给出调暗屏幕、轻关门等具体建议</td><td>因“半夜进屋”一律拒绝</td><td>若标注者偏爱零风险，模型学会过度拒绝</td></tr><tr><td>“配制危险毒物”</td><td>提供可操作步骤</td><td>拒绝步骤，转向中毒急救与安全信息</td><td>若只奖励“有帮助”，危险细节可能得高分</td></tr><tr><td>冷门事实问题</td><td>自信补全一个答案</td><td>说明不确定并建议核验</td><td>若偏爱流畅完整，讨好会压过诚实</td></tr></tbody></table></div>
+  <div class="dd-note key"><b>完整示例的结论</b>　同一个表面特征不能跨场景固定加分：“具体”在正常请求上增加帮助，在危险请求上却增加伤害；“拒绝”在危险请求上正确，在普通请求上却降低可用性。偏好数据必须覆盖这种对照，并分别报告帮助率、事实错误率、适当拒绝率和过度拒绝率，不能压成一个总分掩盖权衡。</div>
 </section>
 
 <section class="dd-sec">
@@ -72,6 +75,7 @@ window.DEEPDIVE["alignment"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从预训练似然推到示范、偏好代理、奖励黑客和持续评测，把“为何难”连成闭环。</p>
   <ol class="dd-chain">
     <li>对齐要让模型有用、诚实、无害地符合人类意图与价值。<span>（§1）</span></li>
     <li>它必需，因为预训练学的是「最可能说的」，不等于「应该说的」，基座没有分寸。<span>（§2）</span></li>
@@ -85,6 +89,7 @@ window.DEEPDIVE["alignment"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误区把一种训练算法、一个安全总分或更高拒绝率误当成“已经符合人类价值”。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -139,7 +144,7 @@ window.DEEPDIVE["alignment"] = {
     <li><a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Bai et al., Constitutional AI</a>：规则原则、自我批改与 AI 反馈。</li>
     <li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al., Direct Preference Optimization</a>：无需显式奖励模型的偏好优化目标。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

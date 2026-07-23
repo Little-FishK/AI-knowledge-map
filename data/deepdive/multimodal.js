@@ -59,6 +59,7 @@ window.DEEPDIVE["multimodal"] = {
     <figcaption>图 1　对齐：不同模态各有自己的编码器，但都被映射进<b>同一个</b>语义空间，让「猫的图」和「猫」这个词落在相近的位置。有了对齐，图 token 和字 token 才「说同一种语言」。</figcaption>
   </figure>
   <div class="dd-note math"><b>CLIP 就是干这个的</b>　用海量「图 + 对应文字说明」的配对，训练两个编码器（一个看图、一个读文），<b>让配对的图和文向量靠拢、不配对的推开</b>——正是「嵌入」里那套对比训练，只不过跨了模态。训练完，图和文就共享了一个空间。这也是文生图能「按文字找到对应画面」的地基（见「CLIP」「图像生成」节点）。</div>
+  <div class="dd-note key"><b>数值例子：对齐如何变成可比较分数</b>　设猫图向量 <code>v=(0.8,0.6)</code>，文本“猫”向量 <code>t₁=(1,0)</code>，文本“键盘”向量 <code>t₂=(0.6,0.8)</code>，三者长度都为 1。余弦相似度为点积：<code>v·t₁=0.8</code>，<code>v·t₂=0.96</code>。这张“猫趴键盘”的局部视觉表示会更匹配“键盘”。训练会提高正确图文配对相对批内错误配对的分数；但单个相似度不是概率，也不保证模型能数清键帽或理解空间关系。</div>
   <div class="dd-note key"><b>对齐是多模态的灵魂</b>　Transformer 让不同模态<b>能一起算</b>，对齐让它们<b>说同一种语言</b>。没有对齐，多模态就只是几串互不相干的 token 硬凑在一起。</div>
 </section>
 
@@ -112,6 +113,7 @@ window.DEEPDIVE["multimodal"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">现在从“现实任务跨模态”一路推到“为什么统一 token 之后仍需要对齐和验证”。</p>
   <ol class="dd-chain">
     <li>现实任务跨模态，且一个模型统一处理能让不同模态互相印证——所以要多模态。<span>（§1）</span></li>
     <li>第一块基石：Transformer 对模态无感，什么都能切成 token 一起算。<span>（§2）</span></li>
@@ -126,6 +128,7 @@ window.DEEPDIVE["multimodal"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">下面这些说法分别混淆了统一计算接口、共享表示、模块化系统和客观感知。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -182,7 +185,7 @@ window.DEEPDIVE["multimodal"] = {
     <li><a href="https://arxiv.org/abs/2204.14198" target="_blank" rel="noopener">Alayrac et al., Flamingo</a>：视觉编码器、跨注意力与语言模型的模块化组合。</li>
     <li><a href="https://arxiv.org/abs/2304.08485" target="_blank" rel="noopener">Liu et al., LLaVA</a>：视觉指令微调与视觉投影连接器。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

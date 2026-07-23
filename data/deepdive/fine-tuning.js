@@ -105,6 +105,11 @@ window.DEEPDIVE["fine-tuning"] = {
     </svg>
     <figcaption>图 2　全量微调更新整块权重（贵、每个任务存一整个模型）；LoRA 冻结原权重，只训练旁边两个低秩小矩阵。可训练参数常能降到不足 1%，显存大减，而且一个基座能挂多个「适配器」按需切换。</figcaption>
   </figure>
+  <h3>5.1 运行示例：一个秩 1 LoRA 怎样改写输出</h3>
+  <p>用 2×2 玩具权重展示低秩更新。设基座矩阵 <code>W=I</code>，LoRA 用列向量 <code>B=[0.2,0.1]ᵀ</code> 与行向量 <code>A=[1,−1]</code> 相乘：</p>
+  <div class="dd-formula">ΔW=BA=[[0.2,−0.2],[0.1,−0.1]]　（秩至多为 1）</div>
+  <table class="dd-table"><thead><tr><th>步骤</th><th>输入 x=[3,1] 时的结果</th></tr></thead><tbody><tr><td>基座输出 <code>Wx</code></td><td><code>[3,1]</code></td></tr><tr><td>适配器增量 <code>ΔWx</code></td><td><code>[0.4,0.2]</code></td></tr><tr><td>合并输出 <code>(W+ΔW)x</code></td><td><code>[3.4,1.2]</code></td></tr></tbody></table>
+  <p>训练只更新 A、B，W 保持冻结；部署时可动态挂载适配器，也可把 ΔW 合并进 W。真实 LoRA 还有缩放因子、目标层选择与 dropout，这些都会改变有效更新强度。</p>
   <div class="dd-note eng"><b>为什么这在实践里是默认</b>　LoRA 这类方法省显存、训得快，还能<b>一个基座 + 多个可插拔适配器</b>——切任务就换个小矩阵，不必各存一份满血大模型。对大多数团队，参数高效微调是起点，全量微调只在必要时才上。</div>
 </section>
 
@@ -136,6 +141,7 @@ window.DEEPDIVE["fine-tuning"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从预训练权重到稳定新行为，数据、更新范围和验证怎样共同约束迁移？</p>
   <ol class="dd-chain">
     <li>从零训练太贵，于是拿预训练模型当起点、用少量数据继续训一小会儿——这就是微调。<span>（§1）</span></li>
     <li>它有效，是因为预训练已学到通用能力，微调只需小幅调整（迁移学习）。<span>（§2）</span></li>

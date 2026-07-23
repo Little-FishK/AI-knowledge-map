@@ -58,6 +58,7 @@ window.DEEPDIVE["cot"] = {
     <li><b>写出推理</b>，等于把一道难题<b>拆成一串小步</b>，每一步只需在前面步骤的基础上「接对下一步」。而且<b>已经写出的步骤，成了后面步骤的上下文</b>——模型能「看着自己刚写的」继续往下推，稳得多。</li>
   </ul>
   <div class="dd-note key"><b>一句话</b>　思维链可类比为给模型一张<b>外显草稿纸</b>：增加中间 token，让后续 token 能条件化在已生成步骤上。但这是有用直觉，不等于这些文字完整揭示了模型真实内部计算。</div>
+  <div class="dd-note math"><b>逐步演算：步骤的价值在于可检查</b>　题目“23 人转来 5 人，平均分 4 组”可写成状态序列：<code>n₀=23</code>，转入后 <code>n₁=23+5=28</code>，分组后 <code>g=n₁/4=7</code>。最后还可反向验算 <code>7×4=28</code>。若中间误写 <code>23+5=27</code>，可见步骤让错误位置暴露；但语言步骤本身仍可能写错，所以机器可计算的算术最好交给计算器或代码验证。</div>
 </section>
 
 <section class="dd-sec">
@@ -94,6 +95,7 @@ window.DEEPDIVE["cot"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">6</span>代价<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">多生成中间步骤带来额外计算，什么时候这份“草稿纸”反而不值得？</p>
   <ul class="dd-steps">
     <li><b>更慢、更贵</b>：写出推理意味着<b>输出变长</b>，生成更多 token，延迟和费用都上去了。</li>
     <li><b>占上下文窗口</b>：长推理会挤占宝贵的窗口预算（见「上下文窗口」）。</li>
@@ -104,6 +106,7 @@ window.DEEPDIVE["cot"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">现在从逐 token 生成推到“为何中间步骤能帮忙、又为何不能当作真相证明”。</p>
   <ol class="dd-chain">
     <li>让模型先写推理再答，把「一步答难题」换成「一步步来」——这就是思维链。<span>（§1）</span></li>
     <li>它有效，是因为模型一次一个 token、没有草稿；拆成小步后每步更易接对，且已写的步骤成了后面的上下文。<span>（§2）</span></li>
@@ -117,6 +120,7 @@ window.DEEPDIVE["cot"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">下面这些说法把准确率提升、模型能力、解释忠实性和使用成本混成了一件事。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -171,7 +175,7 @@ window.DEEPDIVE["cot"] = {
     <li><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al., Self-Consistency</a>：多条推理路径采样与答案聚合。</li>
     <li><a href="https://openai.com/index/evaluating-chain-of-thought-monitorability/" target="_blank" rel="noopener">OpenAI, Evaluating chain-of-thought monitorability</a>：可见推理文本、内部过程与监控边界。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

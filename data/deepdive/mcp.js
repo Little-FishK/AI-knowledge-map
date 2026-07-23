@@ -118,18 +118,36 @@ window.DEEPDIVE["mcp"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>标准化带来了什么<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">5</span>运行示例：从握手到调用工具<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">把“连接一个天气 Server 并查纽约天气”走一遍：协议负责把能力变成可发现、可验证的消息序列，但不替 Host 决定是否授权。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>阶段</th><th>消息</th><th>这一步解决什么</th></tr></thead>
+    <tbody>
+      <tr><td>① 发起握手</td><td>Client → Server：<code>initialize</code></td><td>声明协议版本、Client 信息与支持的能力</td></tr>
+      <tr><td>② 协商结果</td><td>Server → Client：<code>InitializeResult</code></td><td>选定协议版本，返回 Server 信息及它支持的能力</td></tr>
+      <tr><td>③ 握手完成</td><td>Client → Server：<code>notifications/initialized</code></td><td>确认初始化结束，双方进入正常会话</td></tr>
+      <tr><td>④ 发现能力</td><td>Client → Server：<code>tools/list</code></td><td>取得工具名、描述和输入 schema，例如 <code>get_weather(city)</code></td></tr>
+      <tr><td>⑤ 发起调用</td><td>Client → Server：<code>tools/call</code></td><td>Host 选中工具并验证参数后，发送 <code>{city: "New York"}</code></td></tr>
+      <tr><td>⑥ 处理结果</td><td>Server → Client：调用结果</td><td>Host 标记来源、检查错误，再决定哪些内容进模型、哪些动作需用户确认</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note math"><b>关键边界</b>　能力协商只说明“双方会什么”，不等于“用户授权做什么”。即使 Server 声明了写文件或发消息工具，Host 仍应独立执行权限检查；工具返回值也是外部数据，不会因为走了 MCP 就自动可信。</div>
+  <div class="dd-note key"><b>把协议看成状态机</b>　初始化完成前不能随意调用；发现工具后，模型提出的是候选调用；真正执行前还要经过参数校验、权限与同意检查。MCP 规范消息交换，Host 保留最终控制权。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6</span>标准化带来了什么<span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">把接口统一之后，AI 工具生态发生了什么实质变化？</p>
   <ul class="dd-steps">
-    <li><b>工具可复用</b>：GitHub 官方（或社区）写一个 MCP server，<b>所有</b>支持 MCP 的应用都能直接用，不必各写各的。</li>
-    <li><b>应用可扩展</b>：一个 Agent 支持了 MCP，就能接入整个 MCP 生态里已有的成百上千个 server，能力随生态增长。</li>
+    <li><b>工具可复用</b>：工具方实现一次 MCP server，兼容相同核心原语、传输和授权条件的 Host 就能复用，不必两两重写。</li>
+    <li><b>应用可扩展</b>：一个 Agent 支持 MCP 后，可以按需接入兼容的 server；实际可用性仍取决于协议版本、认证授权和扩展能力。</li>
     <li><b>可组合</b>：文件系统 + 数据库 + 浏览器几个 server 拼起来，同一个 Agent 就能跨系统协作完成复杂任务。</li>
   </ul>
   <div class="dd-note key"><b>为什么这是件大事</b>　它把「给 AI 接工具」从<b>一次性的定制活</b>，变成了<b>可积累的公共生态</b>——就像有了 USB 标准之后，外设厂商和电脑厂商不用再两两适配。这是 AI 应用能快速长出「手和脚」的关键基础设施之一（所以它被标为演进中的活跃方向）。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>安全：连外部 Server 的代价<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">7</span>安全：连外部 Server 的代价<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">「插上就能用」很爽，但连接外部 server 也引入了新的信任问题。</p>
   <ul class="dd-steps">
     <li><b>Server 本身可能不可信</b>：一个恶意或被攻陷的 server，可能滥用它被授予的权限，或返回误导性内容。<b>只连你信任的 server。</b></li>
@@ -140,21 +158,24 @@ window.DEEPDIVE["mcp"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">现在把“为什么要标准化”一路连到“为什么协议不能替代授权”，检查每个结论从哪里来。</p>
   <ol class="dd-chain">
     <li>工具调用让模型会「点单」，但没解决「成千上万工具怎么标准接入各种应用」。<span>（§1）</span></li>
     <li>没有标准时是 M×N 套两两定制，会爆炸。<span>（§1）</span></li>
     <li>MCP 是一个开放标准（AI 界的 USB-C），两边各按标准实现一次即可互通，M×N 降到 M+N。<span>（§2）</span></li>
     <li>它和工具调用分属两层：一个是模型能力，一个是连接标准；MCP 底下仍用工具调用。<span>（§3）</span></li>
     <li>一次连接有三个角色：Host（应用）、Client（连接器）、Server（暴露工具/数据/提示）。<span>（§4）</span></li>
-    <li>标准化让工具可复用、应用可扩展、能力可组合，形成公共生态。<span>（§5）</span></li>
-    <li>但连外部 server 引入信任问题：恶意 server、工具结果里的提示注入、权限管理。<span>（§6）</span></li>
+    <li>连接先经历初始化、能力协商、发现与调用；协议规定消息顺序，Host 负责授权和结果处置。<span>（§5）</span></li>
+    <li>标准化让工具可复用、应用可扩展、能力可组合，形成公共生态。<span>（§6）</span></li>
+    <li>但连外部 server 引入信任问题：恶意 server、工具结果里的提示注入、权限管理。<span>（§7）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「MCP 为什么把 M×N 变成 M+N」，并说出「它和工具调用分别解决哪一层的问题」，你就抓住了 MCP 的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">下面这些说法都把“协议兼容”“能力声明”和“安全授权”混成了一件事。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -163,12 +184,13 @@ window.DEEPDIVE["mcp"] = {
       <tr><td>用了 MCP 就自动安全</td><td>它只管「怎么连」；连不可信 server、给太大权限的风险仍需你把控</td></tr>
       <tr><td>Server 只能提供「工具」</td><td>还能暴露资源（可读数据）和提示（模板）</td></tr>
       <tr><td>接一个新工具要改所有应用</td><td>工具方实现一次 server，所有支持 MCP 的应用即可复用</td></tr>
+      <tr><td>Server 声明了能力就等于获准执行</td><td>能力协商只说明支持什么；Host 仍须按用户意图、权限和风险独立授权</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>已经有工具调用了，MCP 还多解决了什么问题？</li>
     <li>为什么说没有标准时是「M×N」，有了 MCP 是「M+N」？</li>
@@ -176,6 +198,7 @@ window.DEEPDIVE["mcp"] = {
     <li>MCP 和工具调用分别解决哪一层的问题？两者什么关系？</li>
     <li>Host、Client、Server 各是谁？举例说明。</li>
     <li>MCP 的 Server 通常暴露哪三类东西？</li>
+    <li>从 <code>initialize</code> 到 <code>tools/call</code> 要经过哪些关键阶段？能力协商为何不等于授权？</li>
     <li>连接外部 MCP server 有哪些安全风险？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
@@ -186,13 +209,14 @@ window.DEEPDIVE["mcp"] = {
       <li>工具调用是模型层面的能力（怎么表达要调工具）；MCP 是连接层面的标准（工具怎么暴露、应用怎么连）；MCP 底下仍用工具调用。</li>
       <li>Host 是跑模型的应用（如 Claude Desktop/IDE）；Client 是 Host 里连某个 Server 的连接器；Server 暴露某工具/数据源（如 GitHub server）。</li>
       <li>工具（可调用的操作）、资源（可读的数据）、提示（预设模板）。</li>
+      <li>初始化请求 → 返回协商结果 → initialized 通知 → tools/list 发现 → 校验并 tools/call → 处理结果；协商只描述能力，是否允许执行仍由 Host 的权限和用户意图决定。</li>
       <li>恶意或被攻陷的 server、工具返回内容里夹带的提示注入、以及过大的权限；应只连可信 server、最小权限、高危操作人在回路。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -207,11 +231,12 @@ window.DEEPDIVE["mcp"] = {
 <div class="dd-src">
   <b>资料来源与改编说明</b>
   <ul>
-    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/architecture" target="_blank" rel="noopener">MCP Specification: Architecture</a>：Host/Client/Server 边界、能力协商与连接模型。</li>
-    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/server/index" target="_blank" rel="noopener">MCP Specification: Server Features</a>：Resources、Prompts、Tools 三类服务端原语。</li>
-    <li><a href="https://modelcontextprotocol.io/specification/2025-06-18/basic/transports" target="_blank" rel="noopener">MCP Specification: Transports</a>：JSON-RPC 消息与 stdio、Streamable HTTP 传输。</li>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-11-25/server/index" target="_blank" rel="noopener">MCP Specification 2025-11-25: Server Features</a>：Resources、Prompts、Tools 三类服务端原语与控制边界。</li>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-11-25/schema" target="_blank" rel="noopener">MCP Specification 2025-11-25: Schema Reference</a>：初始化、能力协商、工具发现和调用的消息结构。</li>
+    <li><a href="https://modelcontextprotocol.io/docs/learn/architecture" target="_blank" rel="noopener">MCP Architecture Overview</a>：Host/Client/Server 连接模型与 stdio、Streamable HTTP 传输。</li>
+    <li><a href="https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices" target="_blank" rel="noopener">MCP Security Best Practices</a>：最小权限、令牌与本地 Server 风险。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

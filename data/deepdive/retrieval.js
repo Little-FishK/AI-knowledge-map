@@ -44,7 +44,11 @@ window.DEEPDIVE["retrieval"] = {
     </tbody>
   </table></div>
   <div class="dd-note math"><b>语义检索靠嵌入</b>　把每篇文档和查询都变成向量（意思近则向量近，见「嵌入」深读页），再算查询向量和各文档向量的<b>相似度</b>（余弦距离），取最近的几个。这就是「退货」能召回「商品返还流程」的原因——它们没有共同词，但向量靠得近。</div>
+  <div class="dd-formula">cos(q,d) = (q·d) ÷ (‖q‖‖d‖)</div>
+  <p>用二维玩具向量演算：查询 <code>q=(1,1)</code>，片段 A 为 <code>(1,0)</code>，片段 B 为 <code>(2,2)</code>。则 <code>cos(q,A)=1/√2≈0.707</code>，<code>cos(q,B)=4/(√2·√8)=1</code>，所以 B 在这个表示空间里方向更接近查询。真实嵌入有数百到数千维，分数只表示该模型学到的几何相似，不等于事实正确或足以回答。</p>
   <div class="dd-note eng"><b>实践常用「混合检索」</b>　关键词和语义各有盲区，把两者结果<b>融合</b>，往往比单用一种更稳——既不漏精确的编号词，也不错过换了说法的表达。</div>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>运行示例：查询“退款期限”</th><th>关键词分</th><th>语义分</th><th>融合后</th></tr></thead><tbody><tr><td>A《退款与返还：30 天》</td><td>0.90</td><td>0.82</td><td><b>第 1</b></td></tr><tr><td>B《商品返还流程：签收后 30 天》</td><td>0.10</td><td>0.94</td><td><b>第 2</b></td></tr><tr><td>C《退款到账时间：3–5 天》</td><td>0.88</td><td>0.70</td><td>第 3</td></tr></tbody></table></div>
+  <div class="dd-note key"><b>分数不能只看“高不高”</b>　A 和 B 都能回答“可申请多久”，C 说的是批准后多久到账，字面相似却回答了不同问题。若 Top-2 取 A、B，则本例两个相关片段都召回，<code>Recall@2=2/2=100%</code>；只按关键词取 A、C，<code>Recall@2=1/2=50%</code>。检索评测需要先标注“什么算相关”，不是盯着相似度自我感觉良好。</div>
 </section>
 
 <section class="dd-sec">
@@ -84,6 +88,7 @@ window.DEEPDIVE["retrieval"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">5</span>怎么捞得更准<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">初始 Top-K 混入了“退款到账时间”，怎样提高召回又不让噪声淹没答案？</p>
   <ul class="dd-steps">
     <li><b>重排</b>：先用快而糙的检索捞回一批候选（比如 50 条），再用一个更精细的模型<b>逐条精算相关性、重新排序</b>，取最好的几条。「先粗筛后精排」（见「重排」）。</li>
     <li><b>查询改写</b>：把用户口语化的问题改写、扩展成更利于检索的形式，或拆成多个子查询（属「高级 RAG」）。</li>
@@ -91,22 +96,43 @@ window.DEEPDIVE["retrieval"] = {
     <li><b>调切块</b>：块太大混入噪声、太小切散语义，切法直接影响能不能命中。</li>
   </ul>
   <div class="dd-note intuition"><b>怎么知道捞得准不准</b>　要用<b>评测</b>：常看召回率（该捞的有没有捞到）等指标。没有评测，检索的好坏就只能靠感觉，优化无从下手（见「LLM 应用评测」）。</div>
+  <div class="dd-note warn"><b>相似不等于可回答</b>　文档可能主题相关，却不包含问题所需的对象、时间或条件。重排器也会犯错；生产评测应同时看相关性、答案覆盖、时效、权限过滤和最终引用是否真的支撑结论。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">6</span>Recall@K、MRR 和 nDCG 各在测什么<span class="dd-badge math">评测</span></h2>
+  <p class="dd-lead">两个系统都召回了正确文档，为什么把它排第 1 和排第 20 不是同样好？</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>指标</th><th>回答的问题</th><th>适合</th><th>盲区</th></tr></thead>
+    <tbody>
+      <tr><td>Recall@K</td><td>需要的相关材料有多少进入前 K？</td><td>RAG 候选召回、避免漏证据</td><td>不关心前 K 内部顺序和噪声</td></tr>
+      <tr><td>Precision@K</td><td>前 K 中有多少真正相关？</td><td>控制上下文噪声与成本</td><td>可能奖励只取很少材料而漏掉例外</td></tr>
+      <tr><td>MRR</td><td>第一个相关结果出现得多早？</td><td>每题只需一个答案入口</td><td>忽略后续其他相关材料</td></tr>
+      <tr><td>nDCG@K</td><td>多档相关性是否被正确排到前面？</td><td>有“完全/部分/无关”等等级标注</td><td>依赖稳定的相关等级和截断 K</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-formula">MRR = (1/N) Σ 1/rankᵢ　　Recall@K = 前 K 命中的相关项数 ÷ 全部相关项数</div>
+  <p>三道测试题中，第一个相关片段分别排第 1、2、5，则 <code>MRR=(1+1/2+1/5)/3≈0.567</code>。若每题其实都需要“一般规则 + 例外”两个片段，MRR 仍可能很好却漏掉例外，因此必须同时看 Recall@K。指标由任务需要决定，不能把排行榜上的单一 nDCG 自动当作产品质量。</p>
+  <div class="dd-note warn"><b>离线相关性不是最终成功。</b>　还要按文档版本、权限、语言、查询长度和难例切片，并在线观察引用支持率、无答案处理、用户重问和任务完成。点击率可能偏爱标题党，不能直接当正确性标签。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从窗口约束推到混合召回、重排和 Recall@K，检查每一步为何必要。</p>
   <ol class="dd-chain">
     <li>窗口装不下整个知识库，所以要先检索出最相关的少量材料。<span>（§1）</span></li>
     <li>检索有两条路：对字面的关键词检索、对意思的语义检索（靠嵌入找最近邻），常混合使用。<span>（§2）</span></li>
     <li>流程分离线建库（切块→嵌入→存向量库）和在线查询（查询嵌入→找最近邻→Top-K）。<span>（§3）</span></li>
     <li>它是 RAG 的瓶颈：检索捞不对，模型没有正确材料，只能答错或编。<span>（§4）</span></li>
     <li>用重排、查询改写、混合检索、调切块来提升，并用评测衡量。<span>（§5）</span></li>
+    <li>Recall@K 管漏证据，Precision@K 管噪声，MRR/nDCG 管排序；最终还要连接到引用和任务成功。<span>（§6）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能讲清「语义检索为什么能召回没有共同关键词的文档」，并说出「为什么检索是 RAG 效果的天花板」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误区把字面匹配、向量相似度、Top-K 数量和最终可回答性混为一谈。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -120,13 +146,14 @@ window.DEEPDIVE["retrieval"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">9</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">请为一个同时包含“退款期限”和“到账时间”的知识库设计相关性标注。</p>
   <ol class="dd-quiz">
     <li>为什么不把整个知识库直接塞给模型，而要先检索？</li>
     <li>关键词检索和语义检索的根本区别是什么？各自更擅长哪种情况？</li>
     <li>语义检索的离线和在线两阶段各做什么？</li>
     <li>为什么说检索是 RAG 的真正瓶颈？</li>
-    <li>有哪些提升检索准确度的手段？「重排」是怎么工作的？</li>
+    <li>Recall@K 和 MRR 分别回答什么问题？为什么 RAG 常不能只看 MRR？</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
@@ -134,13 +161,13 @@ window.DEEPDIVE["retrieval"] = {
       <li>关键词对字面词是否重合，语义对意思是否相近；前者擅长精确词/编号/专名，后者擅长换了说法/同义/跨语言，常混合。</li>
       <li>离线把文档切块、嵌入、存进向量库；在线把查询嵌入、到库里找最近邻、返回 Top-K 片段。</li>
       <li>因为若检索没捞到正确文档，模型就没有正确材料，只能答错或编；效果天花板在检索而非模型。</li>
-      <li>重排（先粗筛一批候选、再精算相关性重新排序取最好几条）、查询改写、混合检索、调切块，并用评测衡量。</li>
+      <li>Recall@K 看全部必要材料有多少进入前 K，MRR 看第一个相关结果排多早；RAG 往往需要一般规则和例外等多条证据，第一个结果很靠前仍可能漏关键材料。</li>
     </ol>
   </details>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
@@ -158,8 +185,9 @@ window.DEEPDIVE["retrieval"] = {
     <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>：问题与段落双编码、内积检索。</li>
     <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>：可用于语义相似搜索的句向量。</li>
     <li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">Khattab &amp; Zaharia, ColBERT</a>：晚交互检索及精度—成本折中。</li>
+    <li><a href="https://arxiv.org/abs/2104.08663" target="_blank" rel="noopener">Thakur et al., BEIR</a>：跨领域检索基准与稀疏、稠密、重排方法比较。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

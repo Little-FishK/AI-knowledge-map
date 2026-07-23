@@ -67,18 +67,27 @@ window.DEEPDIVE["transformer"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>为什么残差和层归一化缺一不可<span class="dd-badge math">数学</span></h2>
+  <h2><span class="dd-n">3</span>手算一次 Pre-Norm Transformer 块<span class="dd-badge math">数值例子</span></h2>
+  <p class="dd-lead">注意力、前馈和两条残差路径怎样先后改变同一个 token 的表示？</p>
+  <p>用二维玩具向量演示结构，不代表真实权重。输入 <code>x=[1,2]</code>；忽略 ε、令归一化仿射参数 γ=1、β=0，则 <code>Norm(x)=[−1,1]</code>。假设注意力汇总结果为 <code>A=[0.4,−0.2]</code>：</p>
+  <table class="dd-table"><thead><tr><th>阶段</th><th>计算</th><th>结果</th></tr></thead><tbody><tr><td>注意力残差</td><td><code>r=x+A</code></td><td><code>[1.4,1.8]</code></td></tr><tr><td>再次归一化</td><td><code>Norm(r)</code></td><td><code>[−1,1]</code></td></tr><tr><td>前馈变换</td><td>假设 <code>F(Norm(r))=[0.3,0.5]</code></td><td><code>[0.3,0.5]</code></td></tr><tr><td>前馈残差</td><td><code>y=r+F(Norm(r))</code></td><td><code>[1.7,2.3]</code></td></tr></tbody></table>
+  <p>注意力先把其他位置的信息写入当前 token，前馈网络再对当前位置独立加工；两次相加都保留了进入子层前的主干。真实网络对所有 token 并行执行，并由多头注意力产生 A。</p>
+  <div class="dd-note warn"><b>结构图必须标明 Pre-Norm 还是 Post-Norm。</b>本例是 <code>x+Sublayer(Norm(x))</code>；原始论文常写成 <code>Norm(x+Sublayer(x))</code>。两者张量形状相同，却有不同梯度路径，不能在已训练权重上随意互换。</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>为什么残差和层归一化缺一不可<span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">注意力和前馈是主角，那两个「配件」为什么不能省？</p>
   <p>因为把很多层<b>直接</b>堆起来会立刻出问题：层一深，梯度在回传时会指数级衰减（这就是<b>梯度消失</b>），深层根本训不动。两个配件正是对症下药：</p>
   <ul class="dd-steps">
     <li><b>残差连接</b>给梯度开了条「直通车」——让输入原样绕过本层相加，梯度可以沿这条路直接传回浅层，绕开连乘衰减。</li>
     <li><b>层归一化</b>把每层的数值分布拉回可控范围，防止越传越大或越传越小、导致训练发散。</li>
   </ul>
-  <div class="dd-note warn"><b>它们不是可有可无的装饰</b>　把 Transformer 的残差连接去掉再训练，模型往往在几层之后就<b>完全无法收敛</b>。这两个看起来像「工程补丁」的东西，实际上是深层网络能成立的<b>结构性前提</b>。（残差为什么这么关键，见「残差连接」「梯度消失」节点。）</div>
+  <div class="dd-note warn"><b>它们不是可有可无的装饰</b>　移除残差或改变 Norm 位置，会显著改变深层优化条件，常需重新设计初始化、学习率和残差缩放；不能把已验证的深层配方当成仍然等价。（残差为什么关键，见“残差连接”“梯度消失”节点。）</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>一个容易忽略的点：位置编码<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
+  <h2><span class="dd-n">5</span>一个容易忽略的点：位置编码<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">注意力既然只看内容匹配、不看位置，那模型到底怎么知道词的先后顺序？</p>
   <div class="dd-note warn"><b>先意识到一件反直觉的事</b>　不带任何位置表示的自注意力对输入排列是<b>等变的</b>：把 token 顺序打乱，输出也只会按同样顺序重排，机制本身无法区分先后。可「小明打小红」和「小红打小明」意思天差地别，所以词序信息必须<b>额外注入</b>。</div>
   <figure class="dd-fig">
@@ -101,7 +110,7 @@ window.DEEPDIVE["transformer"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">5</span>三种搭法：编码器与解码器<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">6</span>三种搭法：编码器与解码器<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">同样一块标准积木，怎么搭出不同用途的模型？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>搭法</th><th>代表</th><th>擅长</th></tr></thead>
@@ -115,35 +124,38 @@ window.DEEPDIVE["transformer"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">6</span>模态无关：为什么它不止用于文本<span class="dd-badge intuition">直觉</span><span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">7</span>模态无关：为什么它不止用于文本<span class="dd-badge intuition">直觉</span><span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">Transformer 是为语言设计的，可为什么图像、音频、甚至蛋白质也都在用它？</p>
   <p>关键在于：Transformer <b>不关心输入是什么，只关心「能不能变成一串向量（token）」</b>。把一张图切成一个个小方块、每块当作一个「词」，同一套 Transformer 就能处理视觉（这就是 ViT）；音频、视频、蛋白质序列同理。</p>
   <div class="dd-note key"><b>这正是多模态的重要技术前提</b>　文本、图像、音频都能表示成向量序列，因此可复用 Transformer 模块并建立跨模态注意力。实际系统既可能端到端统一，也可能组合专用编码器、投影器与语言模型；“同一架构可处理”不等于所有模态必须由同一组参数完成。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">7</span>为什么它改变了一切<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">8</span>为什么它改变了一切<span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">一句话，Transformer 的历史意义到底是什么？</p>
-  <p>它把序列建模，变成了一个<b>能吃满 GPU 并行能力</b>的任务。在它之前，模型规模主要受限于<b>训练时间</b>（RNN 只能一步步串行算）；在它之后，规模只受限于你有<b>多少张卡、多少数据</b>。</p>
-  <div class="dd-note key"><b>它打通了通往规模的路</b>　正因为可并行、能高效地把模型和数据一起放大，<b>缩放定律</b>那条「越大越强」的路才走得通，才有了大语言模型（见其深读页）。可以说：注意力提供了能力，而 Transformer 把这能力变成了<b>可规模化</b>的工程现实——这才是它成为一切大模型骨架的原因。</div>
+  <p>它把训练时的序列位置计算变成大规模矩阵运算，显著提高 GPU/TPU 利用率；相较经典 RNN 的时间步依赖，更容易做数据、张量和流水线并行。代价是注意力的长度开销、通信、显存和推理自回归仍构成硬约束。</p>
+  <div class="dd-note key"><b>它打通了通往规模的重要道路</b>　可并行训练、稳定深层堆叠和统一序列接口，使扩大参数、数据和算力更可行；缩放定律还依赖训练目标、数据质量、优化和硬件系统，不能归功于单一模块。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <h2><span class="dd-n">9</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从 token 向量到深层可训练模型，四类零件怎样分工并闭环？</p>
   <ol class="dd-chain">
     <li>注意力只管「位置间传信息」，要搭成大模型，需要一块可无限堆叠的标准积木——Transformer。<span>（§1）</span></li>
     <li>每层四件套：多头注意力 + 前馈网络（两主角）+ 残差 + 层归一化（两配件）。<span>（§2）</span></li>
-    <li>残差给梯度直通车、层归一化稳数值，正是它们让「堆上百层」得以成立。<span>（§3）</span></li>
-    <li>注意力不知词序，所以要额外叠加位置编码。<span>（§4）</span></li>
-    <li>只用编码器/只用解码器/两者都用，靠「能看到哪些词」搭出理解型、生成型、转换型。<span>（§5）</span></li>
-    <li>它对模态无感，只要能切成 token 就能处理，于是成了多模态的前提。<span>（§6）</span></li>
-    <li>它把序列建模变成可并行、可放大的任务，打通了通往缩放定律和大模型的路。<span>（§7）</span></li>
+    <li>一次数值前向显示：注意力写入跨位置内容，前馈逐位置变换，残差保留主干。<span>（§3）</span></li>
+    <li>残差提供短梯度路径，层归一化控制子层输入尺度，使深层堆叠更可优化。<span>（§4）</span></li>
+    <li>注意力本身不含完整词序，所以要额外注入位置表示。<span>（§5）</span></li>
+    <li>编码器/解码器/二者组合，通过可见范围与交叉注意力形成不同任务骨架。<span>（§6）</span></li>
+    <li>只要对象能表示为 token 序列，架构可扩展到图像、音频等模态。<span>（§7）</span></li>
+    <li>矩阵化并行与稳定堆叠共同提高可扩展性，但算力、数据和系统仍是约束。<span>（§8）</span></li>
   </ol>
   <div class="dd-note key"><b>过关标准</b>　如果你能说清「一层里四件套各自为什么必需」，并讲明「Transformer 相对注意力多做了什么、为什么这对大模型规模是决定性的」，你就抓住了它的内核。</div>
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">10</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">哪些说法把一个架构骨架夸成了自动获得能力的充分条件？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -157,7 +169,7 @@ window.DEEPDIVE["transformer"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <h2><span class="dd-n">11</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>注意力已经能在位置间传信息，Transformer 在它之上多做了什么？</li>
     <li>一层里的四件套分别是什么？两个「主角」和两个「配件」各负责什么？</li>
@@ -181,7 +193,7 @@ window.DEEPDIVE["transformer"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <h2><span class="dd-n">12</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>

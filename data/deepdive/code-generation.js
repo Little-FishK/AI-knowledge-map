@@ -61,6 +61,17 @@ window.DEEPDIVE["code-generation"] = {
   <h2><span class="dd-n">4</span>关键搭档：代码执行<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">光会「写」代码还不够。要让它真正靠谱，还差最重要的一步。</p>
   <p>那就是<b>把代码真的跑起来</b>。让模型写完就执行、拿运行或测试的结果回来，它就能<b>发现自己写错了、并据此修改</b>——「写 → 跑 → 看报错 → 改 → 再跑」，形成闭环（见「代码执行与沙箱」）。</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>运行示例</th><th>证据怎样改变下一步</th></tr></thead>
+    <tbody>
+      <tr><td>需求与验收</td><td>把“更快”改写成三个可检查条件：相同参数第二次不调用后端；不同用户不能共享结果；原测试保持通过。</td></tr>
+      <tr><td>首个补丁</td><td>模型用 <code>query</code> 作全局缓存键；单元测试通过，但安全审查发现键缺少 <code>user_id</code>。</td></tr>
+      <tr><td>失败测试</td><td><code>test_cache_isolated_by_user</code> 显示用户 B 得到用户 A 的结果，把“逻辑正确”改成“缓存键不完整”。</td></tr>
+      <tr><td>最小修复</td><td>键改为 <code>(user_id, query)</code> 并只缓存成功响应；目标测试与全量测试通过，diff 未修改测试。</td></tr>
+      <tr><td>交付</td><td>报告改动、测试命令与剩余风险，不自动合并；测试全绿不替代代码审查和发布授权。</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note key"><b>闭环为何比“再生成一次”强</b>　第二个补丁不是因为模型随机换了写法，而是失败测试提供了反例：同一 query 在两个 user_id 下必须产生两个缓存槽。可执行反馈把模糊的“可能有 bug”收缩成可定位、可复验的约束。</div>
   <figure class="dd-fig">
     <svg viewBox="0 0 420 130" role="img" aria-label="写-跑-改的闭环">
       <rect x="30" y="48" width="90" height="34" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="75" y="70" text-anchor="middle" class="svg-t" font-size="12">写代码</text>
@@ -102,6 +113,7 @@ window.DEEPDIVE["code-generation"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从代码为何适合语言模型，一路推到为什么“测试全绿”仍不是无人审查合并的许可证。</p>
   <ol class="dd-chain">
     <li>AI 编程让模型把意图翻译成能跑的代码，从补全到实现功能。<span>（§1）</span></li>
     <li>它成功，因为代码是文本（海量训练）、可执行验证（对错能测）、模式多。<span>（§2）</span></li>
@@ -169,7 +181,7 @@ window.DEEPDIVE["code-generation"] = {
     <li><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">Jimenez et al., SWE-bench</a>：真实仓库级软件工程任务评测。</li>
     <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：工具交互与反馈循环，可迁移到编码 Agent。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };

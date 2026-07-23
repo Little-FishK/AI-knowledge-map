@@ -62,6 +62,11 @@ window.DEEPDIVE["in-context-learning"] = {
     <figcaption>图 1　few-shot 提示的骨架：前面几行用「输入 → 输出」演示任务，最后一行只给输入、把输出留空。模型要做的，还是它唯一会做的事——预测下一个 token，而此刻「最可能的下一个 token」正好是「正面」。</figcaption>
   </figure>
 
+  <h3>1.1 运行示例：连标签含义也由上下文临时定义</h3>
+  <p>把熟悉的“正面/负面”换成任意标签 <code>zorp</code>/<code>blip</code>，就能更清楚地看到模型究竟从提示里恢复了什么：</p>
+  <table class="dd-table"><thead><tr><th>提示行</th><th>模型可提取的信息</th></tr></thead><tbody><tr><td>“太棒了” → zorp</td><td>zorp 与正向情感关联</td></tr><tr><td>“又贵又难吃” → blip</td><td>blip 与负向情感关联</td></tr><tr><td>“服务很周到” → ?</td><td>沿临时映射应输出 zorp</td></tr></tbody></table>
+  <p>这不是把 <code>zorp</code> 的新含义永久写入权重，而是在当前 token 序列里利用示例建立临时映射。删除前两行后，模型没有理由在下一次请求中继续按这个约定回答。</p>
+
   <div class="dd-note warn"><b>「学习」二字要小心</b>　它并没有像人那样把知识「记住」。这里的「学」是<b>当场照着示例办</b>，全程不改一个权重；<b>对话一结束就忘</b>，下次还得把示例重新给一遍。后面第 2、7 节会把这层含义说透。</div>
 </section>
 
@@ -255,5 +260,7 @@ window.DEEPDIVE["in-context-learning"] = {
     </tbody>
   </table></div>
 </section>
+
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Language Models are Few-Shot Learners</a>：大模型 few-shot 上下文学习的系统实验。</li><li><a href="https://arxiv.org/abs/2202.12837" target="_blank" rel="noopener">Rethinking the Role of Demonstrations</a>：标签、格式与输入分布在示例中的作用。</li><li><a href="https://arxiv.org/abs/2111.02080" target="_blank" rel="noopener">An Explanation of In-context Learning as Implicit Bayesian Inference</a>：上下文学习机制的一种理论解释。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>
 `
 };

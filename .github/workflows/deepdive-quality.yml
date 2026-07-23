@@ -1,0 +1,49 @@
+name: Deep-dive quality gate
+
+on:
+  pull_request:
+    paths:
+      - "assets/app.js"
+      - "assets/style.css"
+      - "data/graph.js"
+      - "data/deepdive/**"
+      - "docs/deepdive-quality-baseline.json"
+      - "docs/deepdive-l3-benchmark.json"
+      - "docs/deepdive-l3-baseline.json"
+      - "docs/deepdive-quality-reviews.json"
+      - "index.html"
+      - "package.json"
+      - "tools/**"
+      - ".github/workflows/deepdive-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deepdive-quality:
+    name: L1 + L2 + L3 + browser/WCAG
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEEPDIVE_BASE_REF: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install test runtime
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Exercise failure fixtures
+        run: npm run test:quality-gates
+
+      - name: Enforce deep-dive quality gate
+        run: npm run quality:deepdives

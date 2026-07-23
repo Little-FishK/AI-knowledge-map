@@ -43,6 +43,8 @@ window.DEEPDIVE["prompt-engineering"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">3</span>几招通用套路<span class="dd-badge eng">工程</span></h2>
+  <p class="dd-lead">怎样把一句含糊愿望，改写成模型和评测器都能执行的任务契约？</p>
+  <figure class="dd-fig"><svg viewBox="0 0 620 180" role="img" aria-label="提示从目标、上下文、约束到输出契约的分层结构"><defs><marker id="pe1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="55" width="115" height="62" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="77" y="80" text-anchor="middle" class="svg-t">目标</text><text x="77" y="100" text-anchor="middle" class="svg-t" font-size="10">回答退款政策</text><path d="M135,86 L172,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="174" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="236" y="80" text-anchor="middle" class="svg-t">上下文</text><text x="236" y="100" text-anchor="middle" class="svg-t" font-size="10">用户订单 + 资料</text><path d="M299,86 L336,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="338" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="400" y="80" text-anchor="middle" class="svg-t">边界</text><text x="400" y="100" text-anchor="middle" class="svg-t" font-size="10">无依据就澄清</text><path d="M463,86 L500,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="502" y="55" width="98" height="62" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="551" y="80" text-anchor="middle" class="svg-t">输出契约</text><text x="551" y="100" text-anchor="middle" class="svg-t" font-size="10">结论 + 引用</text><text x="310" y="148" text-anchor="middle" class="svg-t" font-size="10">每一层都应能用测试样例检查，而不是靠“更专业一点”等主观咒语</text></svg><figcaption>图 1　有效提示像接口契约：先定义目标，再提供必要上下文，写清禁止越过的边界，最后规定可验证输出。角色描述只是辅助，不应代替权限或事实来源。</figcaption></figure>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>套路</th><th>做什么</th><th>例</th></tr></thead>
     <tbody>
@@ -55,6 +57,7 @@ window.DEEPDIVE["prompt-engineering"] = {
     </tbody>
   </table></div>
   <div class="dd-note eng"><b>提示是要迭代的</b>　很少一次就写好。看输出哪里不对 → 针对性补一句约束 → 再看。把提示当成<b>可调的参数</b>，一次改一处、观察效果，比一次堆一大段更容易调准。</div>
+  <div class="dd-note key"><b>运行示例：退款助手</b>　初版“回答退款问题”在 20 个测试里只有 11 个同时给出期限和出处。加入任务范围、允许引用的资料、无证据时的澄清策略，以及 JSON 字段 <code>decision/reason/source</code> 后，17 个通过；剩余 3 个失败都涉及质量问题例外，说明下一步应补检索证据或业务规则，而不是继续堆“请认真、请专业”。提示改进应对应可观察失败。</div>
 </section>
 
 <section class="dd-sec">
@@ -83,6 +86,7 @@ window.DEEPDIVE["prompt-engineering"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+  <p class="dd-lead">从条件生成推到任务契约、迭代评测、能力边界和提示注入风险。</p>
   <ol class="dd-chain">
     <li>不改模型，只把「怎么问」设计好，让模型稳定产出想要的结果——这就是提示工程。<span>（§1）</span></li>
     <li>它有效，是因为模型在「接龙」，你的提示是它的起点和条件，越明确它越准。<span>（§2）</span></li>
@@ -96,6 +100,7 @@ window.DEEPDIVE["prompt-engineering"] = {
 
 <section class="dd-sec">
   <h2><span class="dd-n">8</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">这些误区把提示当训练、知识库、一次性文案或安全控制面。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
@@ -150,7 +155,7 @@ window.DEEPDIVE["prompt-engineering"] = {
     <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al., Chain-of-Thought Prompting</a>：示例化中间步骤对复杂推理的影响。</li>
     <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理提示与外部行动交错的设计。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
 </div>
 `
 };
