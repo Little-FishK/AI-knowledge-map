@@ -9,6 +9,7 @@
  */
 "use strict";
 const path = require("path");
+const layoutQuality = require(path.join(__dirname, "..", "assets", "layout-quality.js"));
 
 global.window = {};
 try {
@@ -97,6 +98,21 @@ G.nodes.forEach(n => {
 // 坐标
 const missPos = G.nodes.filter(n => !G.positions || !G.positions[n.id]).map(n => n.id);
 const extraPos = Object.keys(G.positions || {}).filter(id => !ids.has(id));
+if (!missPos.length) {
+  const layoutPositions = {};
+  G.nodes.forEach(n => {
+    layoutPositions[n.id] = { x: G.positions[n.id][0], y: G.positions[n.id][1] };
+  });
+  const layoutReport = layoutQuality.audit(G.nodes, layoutPositions);
+  if (layoutReport.sameDomainOverlaps.length) {
+    problems.push("同区节点视觉框重叠：" + layoutReport.sameDomainOverlaps
+      .map(pair => `${pair.a}/${pair.b}`).join(", "));
+  }
+  if (layoutReport.occlusionViolations.length) {
+    problems.push("节点遮挡超过 3/4：" + layoutReport.occlusionViolations
+      .map(pair => `${pair.a}/${pair.b} ${Math.round(pair.ratio * 100)}%`).join(", "));
+  }
+}
 if (extraPos.length) problems.push("positions 里有已删除的节点：" + extraPos.join(", "));
 
 // 孤岛节点（没有任何边）

@@ -1,12 +1,16 @@
-name: Deep-dive quality gate
+name: Project quality gate
 
 on:
   pull_request:
     paths:
       - "assets/app.js"
+      - "assets/layout-quality.js"
       - "assets/style.css"
       - "data/graph.js"
+      - "data/software.js"
+      - "data/tutorials*.js"
       - "data/deepdive/**"
+      - "docs/**"
       - "docs/deepdive-quality-baseline.json"
       - "docs/deepdive-l3-benchmark.json"
       - "docs/deepdive-l3-baseline.json"
@@ -22,7 +26,7 @@ permissions:
 
 jobs:
   deepdive-quality:
-    name: L1 + L2 + L3 + browser/WCAG
+    name: Data + layout + L1/L2/L3 + browser/WCAG
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -44,6 +48,9 @@ jobs:
 
       - name: Exercise failure fixtures
         run: npm run test:quality-gates
+
+      - name: Validate graph, layout, software and tutorials
+        run: npm run validate
 
       - name: Enforce deep-dive quality gate
         run: npm run quality:deepdives

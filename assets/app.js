@@ -328,38 +328,58 @@
     try { return fn(); } finally { Math.random = orig; }
   }
 
-  function runLayout(force) {
-    if (ALL_PINNED && !force) {   // 坐标已固化，无需现算
-      cy.nodes().forEach(n => n.position({ x: POS[n.id()][0], y: POS[n.id()][1] }));
-      fitView();
-      return;
-    }
-    const l = cy.layout({
-      name: "fcose",
-      quality: "proof",
-      // 必须同步：animate:true 时 fcose 的计算是异步的，withSeededRandom 的
-      // finally 会在计算跑完前还原 Math.random，fcose 拿到半截被替换的随机流，
-      // 算出退化布局（整张图塌成 89x74，fit 后 zoom 顶到 maxZoom）。
-      // 节点量级下同步布局是瞬时的，动画本来也只是装饰。
-      animate: false,
-      // 必须 randomize：初始位置共线时 fcose 会卡在退化的局部最优里，
-      // 表现为整张图塌成一条对角线（2026-07-19 实测踩到）
-      randomize: true,
-      // 中文标签又长又宽，不把标签计入尺寸的话密集簇里的字会互相压
-      nodeDimensionsIncludeLabels: true,
-      // 铺开参数（2026-07-19，81 节点起）：更大间距换取「同区不重叠」。
-      // 布局评分只重罚同色重叠、轻计异色重叠——见 tools/find-seed.js。
-      nodeSeparation: 175,
-      idealEdgeLength: 185,
-      nodeRepulsion: 34000,
-      gravity: 0.06,
-      numIter: 4000,
-      padding: 45,
-      // fcose 自己的 fit 会在动画结束后再跑一次，把下面的缩放上限覆盖掉
-      // （表现为 zoom 顶到 maxZoom=3，节点巨大、只看得见一角）。这里自己接管。
-      fit: false
+  function enforceLayoutQuality() {
+    if (!window.LAYOUT_QUALITY) return;
+    const input = {};
+    cy.nodes().forEach(node => {
+      input[node.id()] = { x: node.position("x"), y: node.position("y") };
     });
-    withSeededRandom(LAYOUT_SEED, () => l.run());
+    const result = window.LAYOUT_QUALITY.resolve(G.nodes, input);
+    cy.batch(() => {
+      cy.nodes().forEach(node => {
+        const position = result.positions[node.id()];
+        if (position) node.position(position);
+      });
+    });
+    if (result.report.sameDomainOverlaps.length || result.report.occlusionViolations.length) {
+      console.warn("布局碰撞消解未完全收敛：", result.report);
+    }
+  }
+
+  function runLayout(force) {
+    // display:none 的节点不会可靠参与 fCoSE。排布期间临时让全图参与，
+    // 在同一事件循环内恢复过滤，因此用户看不到中间状态。
+    cy.elements().removeClass("hidden");
+    if (ALL_PINNED && !force) {
+      cy.nodes().forEach(n => n.position({ x: POS[n.id()][0], y: POS[n.id()][1] }));
+    } else {
+      const l = cy.layout({
+        name: "fcose",
+        quality: "proof",
+        // 必须同步：animate:true 时 fcose 的计算是异步的，withSeededRandom 的
+        // finally 会在计算跑完前还原 Math.random，fcose 拿到半截被替换的随机流，
+        // 算出退化布局（整张图塌成 89x74，fit 后 zoom 顶到 maxZoom）。
+        // 节点量级下同步布局是瞬时的，动画本来也只是装饰。
+        animate: false,
+        // 必须 randomize：初始位置共线时 fcose 会卡在退化的局部最优里，
+        // 表现为整张图塌成一条对角线（2026-07-19 实测踩到）
+        randomize: true,
+        // 中文标签又长又宽，不把标签计入尺寸的话密集簇里的字会互相压
+        nodeDimensionsIncludeLabels: true,
+        nodeSeparation: 175,
+        idealEdgeLength: 185,
+        nodeRepulsion: 34000,
+        gravity: 0.06,
+        numIter: 4000,
+        padding: 45,
+        // fcose 自己的 fit 会在动画结束后再跑一次，把下面的缩放上限覆盖掉
+        // （表现为 zoom 顶到 maxZoom=3，节点巨大、只看得见一角）。这里自己接管。
+        fit: false
+      });
+      withSeededRandom(LAYOUT_SEED, () => l.run());
+    }
+    enforceLayoutQuality();
+    applyFilters();
     fitView();
   }
 

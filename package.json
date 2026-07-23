@@ -2,11 +2,13 @@
   "name": "ai-knowledge-map",
   "private": true,
   "scripts": {
+    "validate": "node tools/validate.js && node tools/validate-deepdives.js && node tools/validate-software.js && node tools/validate-tutorials.js",
     "validate:tutorials": "node tools/validate-tutorials.js",
     "quality:deepdives": "node tools/check-deepdive-quality.js",
     "quality:l3": "node tools/audit-deepdive-benchmark.js",
     "quality:browser": "node tools/audit-deepdive-browser.js --changed",
-    "test:quality-gates": "node tools/test-deepdive-quality.js"
+    "test:quality-gates": "node tools/test-deepdive-quality.js",
+    "quality:all": "npm run validate && npm run test:quality-gates && npm run quality:deepdives"
   },
   "devDependencies": {
     "playwright": "1.61.1"

@@ -59,3 +59,10 @@
 ## 七、使用教程页
 
 软件可在 `data/tutorials.js` 注册独立“使用教程”页；注册后，软件详情顶部自动出现教程按钮。教程资源按 Bilibili、小红书、YouTube、GitHub、文章与文档分类，写作与复核规则见 [TUTORIALS.md](TUTORIALS.md)。教程页记录的是可迁移的方法和来源，不把易变的按钮、价格或第三方配置写成永久事实。
+
+## 八、当前进度（2026-07-23）
+
+- 软件目录共 62 个条目，覆盖 12 个门类，正文含 104 个可校验的内联概念/软件引用。
+- 已建立 Codex、Claude Code 两个使用教程页，共 20 条正式视频资源。
+- 两个教程页均为 Bilibili 5 条 + YouTube 5 条；每条均按 [TUTORIALS.md](TUTORIALS.md) 保存证据等级、五项标准和质量评分。
+- 修改后统一运行 `npm run validate`；其中 `tools/validate-software.js` 与 `tools/validate-tutorials.js` 分别负责软件和教程数据门禁。
