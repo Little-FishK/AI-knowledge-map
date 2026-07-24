@@ -47,6 +47,16 @@ function reviewBatch(manifest, options = {}) {
           ? "blocked"
           : "reviewed",
         summary: report.summary,
+        candidates: report.candidates.map(candidate => ({
+          term: candidate.term,
+          proposalDecision: candidate.proposalDecision,
+          independentDecision: candidate.independentDecision,
+          decisionsAgree: candidate.decisionsAgree,
+          predictedDecision: candidate.decisionsAgree ? candidate.independentDecision : null,
+          predictedCore: candidate.shadowEligibility.coreNode,
+          eligibleNew: candidate.shadowEligibility.newNode,
+          blockers: candidate.blockers
+        })),
         proposalErrors: report.validation.proposalErrors,
         assessmentErrors: report.validation.assessmentErrors
       };
@@ -55,6 +65,7 @@ function reviewBatch(manifest, options = {}) {
         id,
         status: "error",
         error: error.message,
+        candidates: [],
         summary: {
           candidateCount: 0,
           agreementCount: 0,

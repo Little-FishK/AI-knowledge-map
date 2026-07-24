@@ -495,3 +495,56 @@ npm run video:node-package -- `
 - `tools/video-ingest/schemas/node-package-content.schema.json`
 - `tools/video-ingest/schemas/node-package.schema.json`
 - `tools/test-video-node-package.js`
+
+## 11. v0.5：批量影子校准与开放门禁
+
+v0.5 不生成或应用节点。它把批量影子预测与版本化的标准答案逐候选比较，回答一个更严格的问题：当前自动裁判是否已经积累了足够多、足够多样的证据，可以开始开发正式自动应用。
+
+标准答案保存在 `tools/proposals/video/calibration-labels-v05.json`。每个样本按候选术语记录期望决定与核心身份；标签属于项目编辑基线，不从提案自报分数自动复制。
+
+运行：
+
+```powershell
+npm run video:calibrate -- `
+  --batch "tools/_raw/video/shadow-batch.summary.json" `
+  --labels "tools/proposals/video/calibration-labels-v05.json" `
+  --output "tools/_raw/video/calibration-v05.json"
+```
+
+默认开放条件全部不可互相补偿：
+
+| 指标 | 最低要求 |
+|---|---:|
+| 视频任务数 | 10 |
+| 标注候选数 | 30 |
+| 真实新节点样本 | 5 |
+| 已有节点合并/补充样本 | 10 |
+| 应拒绝样本 | 5 |
+| 真实核心节点样本 | 3 |
+| 独立复核解析覆盖率 | 95% |
+| 已解析候选决策准确率 | 90% |
+| 新节点精确率 | 100% |
+| 新节点召回率 | 80% |
+| 已有节点逃逸成新节点 | 0% |
+| 拒绝项误收成新节点 | 0% |
+| 核心节点精确率 | 100% |
+| 核心节点召回率 | 80% |
+
+这里优先保护精确率：漏掉一个新节点可以以后补，误建重复节点或误授予核心身份会直接污染地图和新人导航，因此不能用总体准确率抵消。
+
+首个真实基线只有 n8n 一个任务、8 个候选，且没有独立复核结果。校准器正确给出：
+
+- 已解析覆盖率 0；
+- 真实新节点与核心节点样本均为 0；
+- `readyForAutomaticApplicationDevelopment: false`；
+- `formalWrites: 0`。
+
+这不是失败，而是防止系统在样本不足时宣称成熟。下一步需要扩充 10–20 个来自不同类型官方视频的标注影子集，尤其补足真正的新节点、已有节点、产品按钮/配置和核心候选四类边界样本。
+
+实现与合同：
+
+- `tools/video-ingest/calibration.js`
+- `tools/video-ingest/calibrate-shadow.js`
+- `tools/video-ingest/schemas/calibration-labels.schema.json`
+- `tools/proposals/video/calibration-labels-v05.json`
+- `tools/test-video-calibration.js`

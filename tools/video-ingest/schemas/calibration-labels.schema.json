@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-shadow-calibration-labels-v1.json",
+  "title": "Video shadow calibration labels v1",
+  "type": "object",
+  "required": ["schemaVersion", "samples"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "policy": { "type": "object" },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "expected"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "expected": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["term", "decision", "coreCandidate"],
+              "properties": {
+                "term": { "type": "string", "minLength": 1 },
+                "decision": { "enum": ["new", "merge", "supplement", "reject", "uncertain"] },
+                "coreCandidate": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
