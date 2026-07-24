@@ -123,8 +123,8 @@ window.GRAPH = {
       ["8.4", "image-generation"], ["8.5", "controllable-generation"],
       ["8.6", "image-editing"], ["8.7", "super-resolution"],
       ["8.8", "video-generation"], ["8.9", "speech"],
-      ["8.11", "audio-generation"], ["8.12", "world-models"],
-      ["8.13", "content-detection"]
+      ["8.10", "audio-generation"], ["8.11", "world-models"],
+      ["8.12", "content-detection"]
     ]},
     { phase: "安全、对齐与治理", steps: [
       ["9", "alignment"], ["9.1", "interpretability"],

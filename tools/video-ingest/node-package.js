@@ -119,7 +119,11 @@ function packageErrors(pkg, graph) {
   const allOrders = new Set((graph.recommendedLearningPath || []).flatMap(phase =>
     (phase.steps || []).map(step => String(step[0]))
   ));
-  if (pkg.learningPath && allOrders.has(String(pkg.learningPath.order))) {
+  if (
+    pkg.learningPath
+    && allOrders.has(String(pkg.learningPath.order))
+    && !(Array.isArray(pkg.learningPath.reindex) && pkg.learningPath.reindex.length)
+  ) {
     errors.push(`learningPath.order 已存在：${pkg.learningPath.order}`);
   }
   const page = pkg.deepDive;
@@ -135,6 +139,27 @@ function packageErrors(pkg, graph) {
     errors.push("v0.4 预览包 formalWrite 必须为 false");
   }
   return [...new Set(errors)];
+}
+
+function proposeLearningPathReindex(graph, learningPath) {
+  if (!learningPath || !learningPath.order) return [];
+  const order = String(learningPath.order);
+  const phase = (graph.recommendedLearningPath || []).find(item =>
+    (item.steps || []).some(step => String(step[0]) === order)
+  );
+  if (!phase) return [];
+  const index = phase.steps.findIndex(step => String(step[0]) === order);
+  const occupant = phase.steps[index] && phase.steps[index][1];
+  if (!(learningPath.beforeNodes || []).includes(occupant)) return [];
+  const match = order.match(/^(\d+)\.(\d+)$/);
+  if (!match) return [];
+  const prefix = match[1];
+  const start = Number(match[2]);
+  return phase.steps.slice(index).map((step, offset) => ({
+    nodeId: step[1],
+    from: String(step[0]),
+    to: `${prefix}.${start + offset + 1}`
+  }));
 }
 
 function buildNodePackage(proposal, evidence, assessment, content, options = {}) {
@@ -186,7 +211,10 @@ function buildNodePackage(proposal, evidence, assessment, content, options = {})
     candidateTerm: term,
     node,
     edges: assessmentItem.proposedEdges,
-    learningPath: assessmentItem.proposedLearningPath,
+    learningPath: {
+      ...assessmentItem.proposedLearningPath,
+      reindex: proposeLearningPathReindex(graph, assessmentItem.proposedLearningPath)
+    },
     deepDive: content.deepDive,
     layout,
     core: {
@@ -316,6 +344,7 @@ module.exports = {
   buildNodePackage,
   deepDiveHash,
   packageErrors,
+  proposeLearningPathReindex,
   proposePosition,
   renderDeepDiveRegistration,
   runDeepDiveGates,

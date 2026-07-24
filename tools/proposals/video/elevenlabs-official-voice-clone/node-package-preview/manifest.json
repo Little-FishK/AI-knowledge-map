@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "mode": "node-atomic-package-preview",
   "status": "draft",
-  "generatedAt": "2026-07-24T18:48:19.307Z",
+  "generatedAt": "2026-07-24T18:51:03.708Z",
   "bindings": {
     "proposalHash": "sha256:9685216228988afbcba2d89d9af847e2b1fe4d2d89958699431ab5c1831340fb",
     "evidenceHash": "sha256:ecfd1fd17bf74c351ad9eb117674be563f5d506fa40954a698a2511b4b6f5b96",
     "assessmentHash": "sha256:d43093c7b2b78c6fed30b7027f1d4ebe5337b2b03165eca3e9ba35e859b567ee",
     "contentHash": "sha256:74982904e450e3e47fe845754bb281a9f4dfb61fbdc14b6a868996271e4b8516",
-    "graphHash": "sha256:1d9fdbd24a93b7bd2995b70dab7e35f9a0a134d8fd7684b6e9601dbf4ac3cde3"
+    "graphHash": "sha256:9f9296c93648fc5540324d852a931d1e26a4ad28582e4b7c812561de429ecda2"
   },
   "candidateTerm": "Voice Cloning",
   "node": {
@@ -111,7 +111,24 @@
     "beforeNodes": [
       "audio-generation"
     ],
-    "rationale": "先理解一般 STT/TTS，再学习目标说话者条件化、零样本克隆与说话者微调；随后再扩展到非语音音效和音乐生成。"
+    "rationale": "先理解一般 STT/TTS，再学习目标说话者条件化、零样本克隆与说话者微调；随后再扩展到非语音音效和音乐生成。",
+    "reindex": [
+      {
+        "nodeId": "audio-generation",
+        "from": "8.10",
+        "to": "8.11"
+      },
+      {
+        "nodeId": "world-models",
+        "from": "8.11",
+        "to": "8.12"
+      },
+      {
+        "nodeId": "content-detection",
+        "from": "8.12",
+        "to": "8.13"
+      }
+    ]
   },
   "deepDive": {
     "title": "声音克隆",

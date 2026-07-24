@@ -9,6 +9,7 @@ const {
 } = require("./video-ingest/core");
 const {
   buildNodePackage,
+  proposeLearningPathReindex,
   runDeepDiveGates
 } = require("./video-ingest/node-package");
 const {
@@ -148,6 +149,25 @@ assert.strictEqual(pkg.shadowEligibility.formalWrite, false);
 assert(pkg.layout.position);
 assert.strictEqual(pkg.layout.report.sameDomainOverlaps, 0);
 assert.strictEqual(pkg.layout.report.occlusionViolations, 0);
+
+const insertionPlan = proposeLearningPathReindex(projectData.graph, {
+  order: "8.10",
+  afterNodes: ["speech"],
+  beforeNodes: ["audio-generation"]
+});
+assert.deepStrictEqual(insertionPlan, [
+  { nodeId: "audio-generation", from: "8.10", to: "8.11" },
+  { nodeId: "world-models", from: "8.11", to: "8.12" },
+  { nodeId: "content-detection", from: "8.12", to: "8.13" }
+]);
+assert.deepStrictEqual(
+  proposeLearningPathReindex(projectData.graph, {
+    order: "8.10",
+    beforeNodes: ["world-models"]
+  }),
+  [],
+  "只有明确把当前占位节点列为后继时，才允许生成顺延计划"
+);
 
 const gates = runDeepDiveGates(pkg);
 assert.strictEqual(gates.l1, "passed", JSON.stringify(gates, null, 2));
