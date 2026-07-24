@@ -3,7 +3,7 @@
 - 视频：Create n8n Workflows With Agents | Official MCP
 - URL：https://www.youtube.com/watch?v=qgoGuwRpndU
 - 证据：E2 · `sha256:911693c6292d634e19c9d28249b66668cb471fdd14d391a1b1d150a507a3ad1f`
-- 状态：draft
+- 状态：ready
 
 ## 教程轨
 

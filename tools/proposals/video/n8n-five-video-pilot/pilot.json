@@ -4,7 +4,7 @@
   "platform": "youtube",
   "softwareId": "n8n",
   "publisher": "n8n",
-  "mode": "proposal-only",
+  "mode": "ready-plus-independent-shadow-review",
   "summary": {
     "videos": 5,
     "formalTutorialCandidates": 3,
@@ -12,7 +12,13 @@
     "newNodeCandidates": 0,
     "coreNodeCandidates": 0,
     "supplementQueueItems": 6,
-    "automaticApplications": 0
+    "automaticApplications": 0,
+    "readyProposals": 5,
+    "independentReviews": 5,
+    "conceptCandidates": 18,
+    "conceptAgreementCount": 13,
+    "conceptConflictCount": 5,
+    "coreFlagConflictCount": 6
   },
   "items": [
     {
@@ -183,6 +189,27 @@
       }
     }
   ],
+  "independentReview": {
+    "formalWrites": 0,
+    "autoEligibleNewNodes": 0,
+    "autoEligibleCoreNodes": 0,
+    "agreedSupplements": [
+      "workflow-orchestration",
+      "agent",
+      "mcp",
+      "system-prompt",
+      "human-in-the-loop",
+      "observability"
+    ],
+    "conceptConflicts": [
+      "Quick Start: llm（第一阶段 reject，独立复核 supplement）",
+      "Official MCP: agent（reject / supplement）",
+      "Official MCP: Claude Code（reject / supplement）",
+      "Human Review: agent（reject / supplement）",
+      "n8n Assistant: agent（reject / supplement）"
+    ],
+    "coreFlagAmbiguity": "独立复核把已有核心节点 agent、llm、mcp 标为 coreCandidate；第一阶段把 coreCandidate 理解为本批次是否提议晋升。门禁现已显式报告该冲突，未产生核心节点自动资格。"
+  },
   "pipelineFindings": [
     {
       "severity": "fixed",
@@ -203,6 +230,11 @@
       "severity": "open",
       "finding": "20 分钟快速入门视频仍有少量英文被 Whisper 错识别成中文。",
       "resolution": "正式教程写作前需要按 OCR 和关键帧校对专有名词与关键步骤；不能仅凭 ASR 逐字稿发布。"
+    },
+    {
+      "severity": "fixed",
+      "finding": "影子复核只比较概念 decision，没有显式报告两阶段 coreCandidate 不一致。",
+      "resolution": "shadow-review 现已输出 coreDecisionsAgree、coreConflictCount 和阻断原因。"
     }
   ]
 }

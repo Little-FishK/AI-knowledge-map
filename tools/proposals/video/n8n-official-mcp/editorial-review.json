@@ -1,13 +1,4 @@
 {
-  "schemaVersion": 1,
-  "status": "ready",
-  "evidenceHash": "sha256:911693c6292d634e19c9d28249b66668cb471fdd14d391a1b1d150a507a3ad1f",
-  "contextHash": "sha256:03254f2d4f515572fd83b80d0778f249e0c6b2b95b23da0cf6e51f294c2cc987",
-  "source": {
-    "url": "https://www.youtube.com/watch?v=qgoGuwRpndU",
-    "title": "Create n8n Workflows With Agents | Official MCP",
-    "creator": "n8n"
-  },
   "tutorialTrack": {
     "decision": "formal",
     "action": "append-resource",
@@ -30,21 +21,9 @@
     },
     "rationale": "官方视频给出 n8n 版本前提、Instance Level MCP 地址、Claude Connector 授权、工具批准策略以及通用编码 Agent 的令牌配置，形成从连接到验证的完整闭环。",
     "evidenceRefs": [
-      {
-        "start": 50,
-        "end": 131,
-        "note": "版本要求、启用 MCP、连接 Claude 并设置审批边界。"
-      },
-      {
-        "start": 148,
-        "end": 195,
-        "note": "在编码 Agent 项目中用指令文件建立工作约束。"
-      },
-      {
-        "start": 196,
-        "end": 270,
-        "note": "通用 MCP 客户端配置、令牌安全输入和重启验证。"
-      }
+      {"start": 50, "end": 131, "note": "版本要求、启用 MCP、连接 Claude 并设置审批边界。"},
+      {"start": 148, "end": 195, "note": "在编码 Agent 项目中用指令文件建立工作约束。"},
+      {"start": 196, "end": 270, "note": "通用 MCP 客户端配置、令牌安全输入和重启验证。"}
     ],
     "resourceDraft": {
       "id": "yt-n8n-official-mcp-agent-workflows",
@@ -99,157 +78,68 @@
     }
   },
   "conceptTrack": {
-    "instructions": "这些只是命中已有名称的上下文种子，不代表应当补充。AI 可删除、改判，也可新增视频中出现但地图不存在的候选概念。",
     "candidates": [
       {
         "term": "Claude",
         "decision": "reject",
         "targetNode": "model-families",
         "rationale": "Claude 是本视频使用的具体产品，不构成新的模型家族机制。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "具体产品名"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["具体产品名"]
       },
       {
         "term": "mcp",
         "decision": "supplement",
         "targetNode": "mcp",
         "rationale": "提供 MCP Server 地址、客户端授权、工具批准与访问令牌边界的完整实例。",
-        "nodeScores": null,
+        "evidenceRefs": [{"start": 50, "end": 282}],
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [
-          {
-            "start": 50,
-            "end": 282
-          }
-        ],
-        "disqualifiers": [
-          "与已有节点语义重合"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["与已有节点语义重合"]
       },
       {
         "term": "agent",
         "decision": "reject",
         "targetNode": "agent",
         "rationale": "Agent 只是 MCP 的客户端载体，视频没有扩展 Agent 的通用机制。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "仅为使用场景"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["仅为使用场景"]
       },
       {
         "term": "Claude Code",
         "decision": "reject",
         "targetNode": "coding-tools",
         "rationale": "属于具体软件使用方式，不应成为通用概念补充。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "具体产品名"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["具体产品名"]
       },
       {
         "term": "System Prompt",
         "decision": "supplement",
         "targetNode": "system-prompt",
         "rationale": "展示项目级指令文件如何作为编码 Agent 的持续系统约束。",
-        "nodeScores": null,
+        "evidenceRefs": [{"start": 162, "end": 195}],
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [
-          {
-            "start": 162,
-            "end": 195
-          }
-        ],
-        "disqualifiers": [
-          "与已有节点语义重合"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["与已有节点语义重合"]
       },
       {
         "term": "planning",
         "decision": "reject",
         "targetNode": "planning",
         "rationale": "只顺带提到规划工作流，没有讲解规划机制。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "仅被顺带提及"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["仅被顺带提及"]
       },
       {
         "term": "streaming",
         "decision": "reject",
         "targetNode": "streaming",
         "rationale": "属于转录或画面误命中，与视频主题无关。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "证据不足"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["证据不足"]
       }
     ]
   },
   "approval": {
-    "tutorialApproved": false,
-    "approvedConceptTerms": [],
-    "rejectedConceptTerms": [],
     "notes": "ready 只表示第一阶段提案完整，尚未批准写入。"
   }
 }

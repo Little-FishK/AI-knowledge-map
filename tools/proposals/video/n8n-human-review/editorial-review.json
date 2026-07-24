@@ -1,13 +1,4 @@
 {
-  "schemaVersion": 1,
-  "status": "ready",
-  "evidenceHash": "sha256:eb5a892c23c424a759e8eb5becfab06e68e083661a9a9fcf23e2c00dd74e2908",
-  "contextHash": "sha256:e49ecc9695c49a153cb2e3013b96905bac0d17734a41766eea9ec0d8cadbcb36",
-  "source": {
-    "url": "https://www.youtube.com/watch?v=1540pDeGZD0",
-    "title": "1 Click Human in The Loop | New Human Review n8n Node",
-    "creator": "n8n"
-  },
   "tutorialTrack": {
     "decision": "formal",
     "action": "append-resource",
@@ -30,21 +21,9 @@
     },
     "rationale": "官方视频用邮件、Slack 退款审批和聊天澄清三个场景完整展示 Human Review 的连接、真实参数呈现、批准/拒绝与自由文本响应，安全价值和操作步骤都清楚。",
     "evidenceRefs": [
-      {
-        "start": 28,
-        "end": 168,
-        "note": "为邮件工具增加人工审批并展示真实工具参数。"
-      },
-      {
-        "start": 171,
-        "end": 245,
-        "note": "用 Slack 完成异步退款审批。"
-      },
-      {
-        "start": 246,
-        "end": 295,
-        "note": "用 Chat Tool 获取按钮选择或自由文本反馈。"
-      }
+      {"start": 28, "end": 168, "note": "为邮件工具增加人工审批并展示真实工具参数。"},
+      {"start": 171, "end": 245, "note": "用 Slack 完成异步退款审批。"},
+      {"start": 246, "end": 295, "note": "用 Chat Tool 获取按钮选择或自由文本反馈。"}
     ],
     "resourceDraft": {
       "id": "yt-n8n-human-review-node",
@@ -99,76 +78,35 @@
     }
   },
   "conceptTrack": {
-    "instructions": "这些只是命中已有名称的上下文种子，不代表应当补充。AI 可删除、改判，也可新增视频中出现但地图不存在的候选概念。",
     "candidates": [
       {
         "term": "agent",
         "decision": "reject",
         "targetNode": "agent",
         "rationale": "Agent 是示例载体，视频的新信息集中在人为审批机制。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "仅为使用场景"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["仅为使用场景"]
       },
       {
         "term": "human-in-the-loop",
         "decision": "supplement",
         "targetNode": "human-in-the-loop",
         "rationale": "视频清楚展示副作用执行前批准、真实参数可见性、异步审批与主动澄清。",
-        "nodeScores": null,
+        "evidenceRefs": [{"start": 0, "end": 299}],
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [
-          {
-            "start": 0,
-            "end": 299
-          }
-        ],
-        "disqualifiers": [
-          "与已有节点语义重合"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["与已有节点语义重合"]
       },
       {
         "term": "streaming",
         "decision": "reject",
         "targetNode": "streaming",
         "rationale": "与视频主题无关，属于弱文本命中。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "证据不足"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["证据不足"]
       }
     ]
   },
   "approval": {
-    "tutorialApproved": false,
-    "approvedConceptTerms": [],
-    "rejectedConceptTerms": [],
     "notes": "ready 只表示第一阶段提案完整，尚未批准写入。"
   }
 }

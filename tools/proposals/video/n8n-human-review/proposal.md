@@ -3,7 +3,7 @@
 - 视频：1 Click Human in The Loop | New Human Review n8n Node
 - URL：https://www.youtube.com/watch?v=1540pDeGZD0
 - 证据：E2 · `sha256:eb5a892c23c424a759e8eb5becfab06e68e083661a9a9fcf23e2c00dd74e2908`
-- 状态：draft
+- 状态：ready
 
 ## 教程轨
 

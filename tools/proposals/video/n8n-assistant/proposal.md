@@ -3,7 +3,7 @@
 - 视频：n8n Now Builds For You (n8n Assistant)
 - URL：https://www.youtube.com/watch?v=2T-xz4DmacE
 - 证据：E2 · `sha256:b88ebcddfcafea2dc93859fbbe6a25c33c642aa18ce165dfced8668893985b68`
-- 状态：draft
+- 状态：ready
 
 ## 教程轨
 

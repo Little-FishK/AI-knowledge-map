@@ -14,6 +14,7 @@ const {
 } = require("./video-ingest/core");
 const { buildContext } = require("./video-ingest/build-context");
 const { createDraft } = require("./video-ingest/create-proposal");
+const { finalizeProposal } = require("./video-ingest/finalize-proposal");
 
 ["evidence.schema.json", "proposal.schema.json", "approval.schema.json"].forEach(file => {
   const schema = JSON.parse(fs.readFileSync(path.join(__dirname, "video-ingest", "schemas", file), "utf8"));
@@ -184,6 +185,29 @@ const draft = createDraft(evidence, context);
 assert.strictEqual(draft.status, "draft");
 assert.strictEqual(draft.tutorialTrack.action, "append-resource");
 assert.deepStrictEqual(validateProposal(draft, evidence).errors, []);
+
+const finalized = finalizeProposal(draft, {
+  tutorialTrack: {
+    decision: "candidate",
+    action: "append-resource",
+    softwareId: "codex",
+    evidenceLevel: "E2",
+    standards: { accuracy: 2, alignment: 2, reproducibility: 1, traceability: 2, safety: 2 },
+    quality: { closure: 2, transfer: 2, completeness: 2, structure: 2, freshness: 2, accessibility: 2 },
+    rationale: "Fixture editorial review",
+    resourceDraft: null
+  },
+  conceptTrack: {
+    candidates: draft.conceptTrack.candidates.map(candidate => ({
+      term: candidate.term,
+      decision: "reject",
+      rationale: "Fixture rejection",
+      coreCandidate: false
+    }))
+  }
+});
+assert.strictEqual(finalized.status, "ready");
+assert.deepStrictEqual(validateProposal(finalized, evidence, { ready: true }).errors, []);
 
 const valid = readyProposal(evidence);
 assert.deepStrictEqual(validateProposal(valid, evidence, { ready: true }).errors, []);

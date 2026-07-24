@@ -1,13 +1,4 @@
 {
-  "schemaVersion": 1,
-  "status": "ready",
-  "evidenceHash": "sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59",
-  "contextHash": "sha256:114184ab7ac23372bce3407de7d4d5c84a0dedabe911f20580eb54c54ac0d3b5",
-  "source": {
-    "url": "https://www.youtube.com/watch?v=GuaKeDS6UKU",
-    "title": "n8n Quick Start Tutorial: Build Your First AI Agent [2026]",
-    "creator": "n8n"
-  },
   "tutorialTrack": {
     "decision": "formal",
     "action": "append-resource",
@@ -99,100 +90,44 @@
     }
   },
   "conceptTrack": {
-    "instructions": "这些只是命中已有名称的上下文种子，不代表应当补充。AI 可删除、改判，也可新增视频中出现但地图不存在的候选概念。",
     "candidates": [
       {
         "term": "agent",
         "decision": "supplement",
         "targetNode": "agent",
         "rationale": "视频展示了模型、记忆和数据工具如何共同形成可执行的 Agent，但概念身份已由现有节点承载。",
-        "nodeScores": null,
+        "evidenceRefs": [{"start": 736, "end": 1010}],
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [
-          {
-            "start": 736,
-            "end": 1010
-          }
-        ],
-        "disqualifiers": [
-          "与已有节点语义重合"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["与已有节点语义重合"]
       },
       {
         "term": "工作流",
         "decision": "supplement",
         "targetNode": "workflow-orchestration",
         "rationale": "触发、条件分支、逐项数据流、合流和跨工作流分工构成了可迁移的编排案例。",
-        "nodeScores": null,
+        "evidenceRefs": [{"start": 80, "end": 405}],
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [
-          {
-            "start": 80,
-            "end": 405
-          }
-        ],
-        "disqualifiers": [
-          "与已有节点语义重合"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["与已有节点语义重合"]
       },
       {
         "term": "llm",
         "decision": "reject",
         "targetNode": "llm",
         "rationale": "只把 LLM 作为标签生成和 Agent 模型使用，没有提供足以改变 LLM 原理页的新机制。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "仅为实现组件"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["仅为实现组件"]
       },
       {
         "term": "mcp",
         "decision": "reject",
         "targetNode": "mcp",
         "rationale": "MCP 不是本视频的教学主题，命中来自弱文本噪声。",
-        "nodeScores": null,
         "coreCandidate": false,
-        "coreScores": null,
-        "coreReason": null,
-        "requiresHumanCoreApproval": false,
-        "nearestNodes": [],
-        "proposedEdges": [],
-        "externalSources": [],
-        "evidenceRefs": [],
-        "disqualifiers": [
-          "证据不足"
-        ],
-        "proposedNode": null
+        "disqualifiers": ["证据不足"]
       }
     ]
   },
   "approval": {
-    "tutorialApproved": false,
-    "approvedConceptTerms": [],
-    "rejectedConceptTerms": [],
     "notes": "ready 只表示第一阶段提案完整，尚未批准写入。"
   }
 }

@@ -409,6 +409,9 @@ function reviewProposal(proposal, evidence, assessment = null, options = {}) {
       : null;
     const scores = independentScores(independent, targetMetrics);
     const decisionsAgree = Boolean(independent && independent.decision === candidate.decision);
+    const coreDecisionsAgree = Boolean(
+      independent && independent.coreCandidate === candidate.coreCandidate
+    );
     const newGate = Boolean(
       decisionsAgree &&
       candidate.decision === "new" &&
@@ -432,6 +435,9 @@ function reviewProposal(proposal, evidence, assessment = null, options = {}) {
     if (!assessment) blockers.push("缺独立复核文件");
     else if (assessmentErrors.length) blockers.push("独立复核文件无效");
     else if (!decisionsAgree) blockers.push("提案与独立复核结论不一致");
+    if (independent && !coreDecisionsAgree) {
+      blockers.push("提案与独立复核的核心候选结论不一致");
+    }
     if (candidate.decision === "new") {
       if (duplicate.verdict !== "clear") blockers.push("全图去重未明确通过");
       if (!claims.passForNew) blockers.push("来源—断言映射未通过");
@@ -446,6 +452,9 @@ function reviewProposal(proposal, evidence, assessment = null, options = {}) {
       proposalDecision: candidate.decision,
       independentDecision: independent ? independent.decision : null,
       decisionsAgree,
+      proposalCoreCandidate: candidate.coreCandidate,
+      independentCoreCandidate: independent ? independent.coreCandidate : null,
+      coreDecisionsAgree,
       duplicateAudit: duplicate,
       evidenceAudit: evidenceResult,
       claimAudit: claims,
@@ -465,6 +474,7 @@ function reviewProposal(proposal, evidence, assessment = null, options = {}) {
     candidateCount: candidates.length,
     agreementCount: candidates.filter(item => item.decisionsAgree).length,
     conflictCount: candidates.filter(item => assessment && !item.decisionsAgree).length,
+    coreConflictCount: candidates.filter(item => assessment && !item.coreDecisionsAgree).length,
     autoEligibleNewCount: candidates.filter(item => item.shadowEligibility.newNode).length,
     autoEligibleCoreCount: candidates.filter(item => item.shadowEligibility.coreNode).length,
     formalWrites: 0

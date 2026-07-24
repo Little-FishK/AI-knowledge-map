@@ -1,0 +1,45 @@
+{
+  "tutorialTrack": {
+    "decision": "candidate",
+    "action": "append-resource",
+    "softwareId": "n8n",
+    "evidenceLevel": "E2",
+    "standards": {
+      "accuracy": 2,
+      "alignment": 2,
+      "reproducibility": 1,
+      "traceability": 2,
+      "safety": 2
+    },
+    "quality": {
+      "closure": 2,
+      "transfer": 3,
+      "completeness": 2,
+      "structure": 4,
+      "freshness": 4,
+      "accessibility": 4
+    },
+    "rationale": "视频准确解释 n8n 的 OpenTelemetry 工作流 trace、父子 span、W3C 传播和组件责任，但没有给出两个环境变量的准确名称，也把完整安装步骤引向文档，因此不足以单独生成正式教程。",
+    "evidenceRefs": [
+      {"start": 11, "end": 105, "note": "工作流与节点 span、W3C 传播、采样配置。"},
+      {"start": 115, "end": 223, "note": "标签、Collector、下游服务和 Jaeger 入门边界。"}
+    ],
+    "resourceDraft": null
+  },
+  "conceptTrack": {
+    "candidates": [
+      {
+        "term": "Tracing",
+        "decision": "supplement",
+        "targetNode": "observability",
+        "rationale": "提供 trace、父子 span、上下游传播、Collector 和可视化工具责任分工的清晰案例。",
+        "evidenceRefs": [{"start": 11, "end": 223}],
+        "coreCandidate": false,
+        "disqualifiers": ["与已有节点语义重合"]
+      }
+    ]
+  },
+  "approval": {
+    "notes": "保留为候选资源；补齐当前官方配置文档后再考虑正式收录。"
+  }
+}

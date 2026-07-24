@@ -1,0 +1,60 @@
+{
+  "tutorialTrack": {
+    "decision": "candidate",
+    "action": "append-resource",
+    "softwareId": "n8n",
+    "evidenceLevel": "E2",
+    "standards": {
+      "accuracy": 2,
+      "alignment": 1,
+      "reproducibility": 1,
+      "traceability": 2,
+      "safety": 2
+    },
+    "quality": {
+      "closure": 1,
+      "transfer": 2,
+      "completeness": 1,
+      "structure": 3,
+      "freshness": 4,
+      "accessibility": 4
+    },
+    "rationale": "视频适合了解 n8n Assistant 的入口、可视化共建、参数与凭证设置以及自托管边界，但它是预览功能发布概览，没有完成一条可复现任务，不能作为正式教程。",
+    "evidenceRefs": [
+      {"start": 0, "end": 92, "note": "入口、可视化共建、参数凭证和测试可见性。"},
+      {"start": 92, "end": 126, "note": "预览状态、Cloud credits 与自托管 BYOK。"}
+    ],
+    "resourceDraft": null
+  },
+  "conceptTrack": {
+    "candidates": [
+      {
+        "term": "agent",
+        "decision": "reject",
+        "targetNode": "agent",
+        "rationale": "内容描述具体 Builder Agent 产品功能，没有扩展通用 Agent 机制。",
+        "coreCandidate": false,
+        "disqualifiers": ["具体产品功能"]
+      },
+      {
+        "term": "mcp",
+        "decision": "reject",
+        "targetNode": "mcp",
+        "rationale": "MCP 只用于对比外部编码 Agent，与本视频实际功能不是同一教学主题。",
+        "coreCandidate": false,
+        "disqualifiers": ["仅为对比项"]
+      },
+      {
+        "term": "Skills",
+        "decision": "reject",
+        "targetNode": "agent-skills",
+        "rationale": "Skills 只被用于说明外部 Agent 的限制，没有讲技能的结构或加载机制。",
+        "coreCandidate": false,
+        "disqualifiers": ["仅被顺带提及"]
+      }
+    ]
+  },
+  "approval": {
+    "notes": "保留为候选资源，待预览功能稳定并出现完整任务教程后再升级。"
+  }
+}

@@ -97,6 +97,25 @@ function run() {
     "existing"
   );
 
+  const independentCoreConflict = independentAssessment(proposal, evidence, {});
+  const independentOnlyCoreAgent = independentCoreConflict.candidates.find(item => item.term === "AI Agent");
+  independentOnlyCoreAgent.coreCandidate = true;
+  independentOnlyCoreAgent.coreScores = {
+    learningGateway: 4,
+    graphCentrality: 0,
+    crossRouteReuse: 4,
+    beginnerNavigation: 4,
+    stability: 4
+  };
+  const coreConflictReview = reviewProposal(proposal, evidence, independentCoreConflict, {
+    projectData,
+    generatedAt: "2026-07-24T00:00:00.000Z"
+  });
+  const independentOnlyCore = coreConflictReview.candidates.find(item => item.term === "AI Agent");
+  assert.strictEqual(coreConflictReview.summary.coreConflictCount, 1);
+  assert.strictEqual(independentOnlyCore.coreDecisionsAgree, false);
+  assert(independentOnlyCore.blockers.includes("提案与独立复核的核心候选结论不一致"));
+
   const conflictedAssessment = independentAssessment(proposal, evidence, { "AI Agent": "reject" });
   const conflict = reviewProposal(proposal, evidence, conflictedAssessment, {
     projectData,

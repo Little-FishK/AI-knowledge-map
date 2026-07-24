@@ -3,7 +3,7 @@
 - 视频：n8n Now Speaks OpenTelemetry: Production Tracing for Workflows
 - URL：https://www.youtube.com/watch?v=xOi8K_-GLRM
 - 证据：E2 · `sha256:421d64baa02b437c8df840be8dcfa2d817e2df06d24fb46099745e0347685ac5`
-- 状态：draft
+- 状态：ready
 
 ## 教程轨
 

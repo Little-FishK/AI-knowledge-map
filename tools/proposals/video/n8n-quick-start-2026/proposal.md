@@ -3,7 +3,7 @@
 - 视频：n8n Quick Start Tutorial: Build Your First AI Agent [2026]
 - URL：https://www.youtube.com/watch?v=GuaKeDS6UKU
 - 证据：E2 · `sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59`
-- 状态：draft
+- 状态：ready
 
 ## 教程轨
 
