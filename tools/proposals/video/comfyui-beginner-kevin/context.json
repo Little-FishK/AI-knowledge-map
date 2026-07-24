@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:e0e6da614228b7d02d235c9f241e6533de381a15ea7a75cc03b9d0a680efa98c",
+  "generatedAt": "2026-07-24T18:12:55.805Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=hl7kwMwkLJU",
+    "title": "How to Use ComfyUI (Step-by-Step Tutorial)",
+    "creator": "Kevin Stratvert",
+    "durationSeconds": 549,
+    "transcriptSegments": 119,
+    "frames": 40,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "comfyui",
+      "name": "ComfyUI / Automatic1111",
+      "category": "local",
+      "concept": "controllable-generation",
+      "summary": "本地图像生成的节点式工作流工具。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "comfyui",
+        "name": "ComfyUI / Automatic1111",
+        "occurrences": 11,
+        "matchedTerms": [
+          {
+            "term": "comfyui",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "id": "grok",
+        "name": "Grok",
+        "occurrences": 4,
+        "matchedTerms": [
+          {
+            "term": "Grok",
+            "count": 2
+          },
+          {
+            "term": "grok",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "id": "sd",
+        "name": "Stable Diffusion / Flux",
+        "occurrences": 1,
+        "matchedTerms": [
+          {
+            "term": "sd",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "existingTutorial": null,
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "vae",
+        "title": "变分自编码器 VAE",
+        "aliases": [
+          "VAE",
+          "Variational Autoencoder",
+          "自编码器",
+          "潜在空间"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "把数据压进一个连续的潜在空间再重建，生成模型三巨头之一。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "vae",
+            "count": 6
+          },
+          {
+            "term": "VAE",
+            "count": 6
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "diffusion",
+            "type": "part-of",
+            "title": "扩散模型"
+          },
+          {
+            "direction": "out",
+            "node": "gan",
+            "type": "contrast",
+            "title": "生成对抗网络 GAN"
+          },
+          {
+            "direction": "out",
+            "node": "neural-network",
+            "type": "is-a",
+            "title": "神经网络"
+          },
+          {
+            "direction": "in",
+            "node": "flow-matching",
+            "type": "uses",
+            "title": "Flow Matching / Rectified Flow"
+          }
+        ]
+      },
+      {
+        "id": "clip",
+        "title": "CLIP 图文对比学习",
+        "aliases": [
+          "CLIP",
+          "对比学习",
+          "图文对齐",
+          "Contrastive Learning"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "用海量图文配对训练，让图片和描述它的文字在向量空间里对齐。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "clip",
+            "count": 5
+          },
+          {
+            "term": "CLIP",
+            "count": 5
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "out",
+            "node": "image-generation",
+            "type": "enables",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "part-of",
+            "title": "多模态"
+          },
+          {
+            "direction": "in",
+            "node": "contrastive-learning",
+            "type": "part-of",
+            "title": "对比学习"
+          }
+        ]
+      },
+      {
+        "id": "image-editing",
+        "title": "图像编辑",
+        "aliases": [
+          "Image Editing",
+          "Inpainting",
+          "指令编辑",
+          "图生图"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "在已有图片上按指令修改，而不是从零生成——实用场景的主力。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Image Editing",
+            "count": 5
+          },
+          {
+            "term": "Inpainting",
+            "count": 2
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "image-generation",
+            "type": "variant-of",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "controllable-generation",
+            "type": "related",
+            "title": "可控生成"
+          }
+        ]
+      },
+      {
+        "id": "super-resolution",
+        "title": "超分辨率与修复",
+        "aliases": [
+          "Super-Resolution",
+          "Upscaling",
+          "图像修复",
+          "去模糊",
+          "Restoration"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "把低清图放大、把破损图修好——用生成能力补出缺失的细节。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Upscaling",
+            "count": 6
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "image-generation",
+            "type": "variant-of",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "hallucination",
+            "type": "related",
+            "title": "幻觉 Hallucination"
+          }
+        ]
+      },
+      {
+        "id": "image-generation",
+        "title": "图像生成",
+        "aliases": [
+          "Image Generation",
+          "文生图",
+          "Text-to-Image"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "根据文本描述生成图像，当前主要由扩散模型驱动。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "Image Generation",
+            "count": 4
+          },
+          {
+            "term": "Text-to-Image",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "diffusion",
+            "type": "enables",
+            "title": "扩散模型"
+          },
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "in",
+            "node": "clip",
+            "type": "enables",
+            "title": "CLIP 图文对比学习"
+          },
+          {
+            "direction": "in",
+            "node": "image-editing",
+            "type": "variant-of",
+            "title": "图像编辑"
+          },
+          {
+            "direction": "in",
+            "node": "super-resolution",
+            "type": "variant-of",
+            "title": "超分辨率与修复"
+          },
+          {
+            "direction": "in",
+            "node": "content-detection",
+            "type": "threatens",
+            "title": "AIGC 检测与水印"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "part-of",
+            "title": "多模态"
+          },
+          {
+            "direction": "in",
+            "node": "controllable-generation",
+            "type": "mitigates",
+            "title": "可控生成"
+          },
+          {
+            "direction": "in",
+            "node": "flow-matching",
+            "type": "enables",
+            "title": "Flow Matching / Rectified Flow"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:86070f6e4fd9bee0176bbb9fd1e27c2d121e861c185e33a5ac343106a571229d"
+}

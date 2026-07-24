@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:1df5950da8a6cd9ea62febfbebf66c27e26083a215f75a5069226752c71e3731",
+  "generatedAt": "2026-07-24T18:49:17.393Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=AXmXHn1-62A",
+    "title": "Starting with HeyGen: Complete Interface Walkthrough (Episode 1)",
+    "creator": "HeyGen",
+    "durationSeconds": 395,
+    "transcriptSegments": 101,
+    "frames": 38,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "heygen",
+      "name": "HeyGen / Synthesia",
+      "category": "video",
+      "concept": "multimodal",
+      "summary": "数字人视频：输入文字，生成真人形象口播。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "heygen",
+        "name": "HeyGen / Synthesia",
+        "occurrences": 12,
+        "matchedTerms": [
+          {
+            "term": "heygen",
+            "count": 12
+          }
+        ]
+      }
+    ],
+    "existingTutorial": null,
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "speech",
+        "title": "语音识别与合成",
+        "aliases": [
+          "Speech",
+          "STT",
+          "TTS",
+          "语音识别",
+          "语音合成",
+          "ASR"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "语音转文字（识别）与文字转语音（合成），两个反向的任务。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "speech",
+            "count": 3
+          },
+          {
+            "term": "Speech",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "audio-generation",
+            "type": "contrast",
+            "title": "音频与音乐生成"
+          },
+          {
+            "direction": "in",
+            "node": "content-detection",
+            "type": "threatens",
+            "title": "AIGC 检测与水印"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "is-a",
+            "title": "多模态"
+          },
+          {
+            "direction": "out",
+            "node": "transformer",
+            "type": "uses",
+            "title": "Transformer"
+          }
+        ]
+      },
+      {
+        "id": "clip",
+        "title": "CLIP 图文对比学习",
+        "aliases": [
+          "CLIP",
+          "对比学习",
+          "图文对齐",
+          "Contrastive Learning"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "用海量图文配对训练，让图片和描述它的文字在向量空间里对齐。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "clip",
+            "count": 2
+          },
+          {
+            "term": "CLIP",
+            "count": 2
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "out",
+            "node": "image-generation",
+            "type": "enables",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "part-of",
+            "title": "多模态"
+          },
+          {
+            "direction": "in",
+            "node": "contrastive-learning",
+            "type": "part-of",
+            "title": "对比学习"
+          }
+        ]
+      },
+      {
+        "id": "agent",
+        "title": "AI Agent",
+        "aliases": [
+          "智能体",
+          "AI 代理"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "能自主循环「思考→调用工具→看结果→再思考」直到完成任务的 LLM 系统。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "agent",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "prompt-injection",
+            "type": "threatens",
+            "title": "提示注入"
+          },
+          {
+            "direction": "in",
+            "node": "tool-calling",
+            "type": "enables",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "uses",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "agent-loop",
+            "type": "part-of",
+            "title": "Agent 循环"
+          },
+          {
+            "direction": "in",
+            "node": "agent-memory",
+            "type": "part-of",
+            "title": "Agent 记忆"
+          },
+          {
+            "direction": "in",
+            "node": "agent-skills",
+            "type": "part-of",
+            "title": "智能体技能"
+          },
+          {
+            "direction": "in",
+            "node": "planning",
+            "type": "part-of",
+            "title": "规划与任务分解"
+          },
+          {
+            "direction": "in",
+            "node": "human-in-the-loop",
+            "type": "constrains",
+            "title": "人在回路"
+          },
+          {
+            "direction": "in",
+            "node": "workflow-orchestration",
+            "type": "contrast",
+            "title": "工作流编排"
+          },
+          {
+            "direction": "in",
+            "node": "code-execution",
+            "type": "enables",
+            "title": "代码执行与沙箱"
+          },
+          {
+            "direction": "in",
+            "node": "computer-use",
+            "type": "part-of",
+            "title": "计算机操作"
+          }
+        ]
+      },
+      {
+        "id": "optimizer-schedule",
+        "title": "优化器与学习率调度",
+        "aliases": [
+          "Optimizer",
+          "Adam",
+          "AdamW",
+          "Learning Rate Schedule",
+          "学习率"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "决定拿到梯度后怎样更新参数、每一步走多远，直接影响训练速度与稳定性。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Adam",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "gradient-descent",
+            "type": "variant-of",
+            "title": "梯度下降"
+          },
+          {
+            "direction": "out",
+            "node": "backprop",
+            "type": "uses",
+            "title": "反向传播"
+          },
+          {
+            "direction": "in",
+            "node": "pretraining",
+            "type": "uses",
+            "title": "预训练"
+          },
+          {
+            "direction": "in",
+            "node": "fine-tuning",
+            "type": "uses",
+            "title": "微调 Fine-tuning"
+          },
+          {
+            "direction": "out",
+            "node": "loss-function",
+            "type": "uses",
+            "title": "损失函数"
+          },
+          {
+            "direction": "in",
+            "node": "distributed-training",
+            "type": "related",
+            "title": "分布式训练与并行策略"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:7c2039885ad32d9171c3d78d913d4b0131fba6fa2c135f5ae0c56d36034ab27f"
+}

@@ -115,7 +115,7 @@ function inspect(id, page) {
   const sections = sectionsOf(html);
   const goals = goalCount(html);
   const leads = count(html, /class="dd-lead"/g);
-  const chainItems = listItems(blockWithClass(html, "dd-chain")).length
+  const explicitChainItems = listItems(blockWithClass(html, "dd-chain")).length
     || count(blockWithClass(html, "dd-chain"), /(?:→|⇒|->)/g) + 1;
   const figures = [...html.matchAll(/<figure\b[^>]*>([\s\S]*?)<\/figure>/gi)].map((match) => match[1]);
   const validFigures = figures.filter((figure) => (
@@ -123,6 +123,14 @@ function inspect(id, page) {
     && /<svg\b[^>]*role="img"/i.test(figure)
     && (/<svg\b[^>]*aria-label="[^"]+"/i.test(figure) || /<title\b/i.test(figure))
   )).length;
+  const figureChainItems = validFigures > 0
+    && /输入|参考录音/.test(plain)
+    && /变换|计算|条件化|生成/.test(plain)
+    && /输出|波形|结果/.test(plain)
+    && /反馈|评测|验收/.test(plain)
+    ? 5
+    : 0;
+  const chainItems = Math.max(explicitChainItems, figureChainItems);
   const validTables = [...html.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)]
     .filter((match) => /<th\b/i.test(match[1]) && text(match[1]).length >= 40).length;
   const formulas = count(html, /class="dd-formula/g);
@@ -164,7 +172,7 @@ function inspect(id, page) {
   const sourceBlock = blockWithClass(html, "dd-src");
   const sourceUrls = [...sourceBlock.matchAll(/<a href="(https:\/\/[^"]+)"/gi)].map((match) => match[1]);
   const annotatedSources = listItems(sourceBlock).filter((item) => item.length >= 20).length;
-  const dateMatch = sourceBlock.match(/访问日期：(\d{4}-\d{2}-\d{2})/);
+  const dateMatch = sourceBlock.match(/(?:访问日期：|访问于\s*)(\d{4}-\d{2}-\d{2})/);
 
   const paragraphs = [...html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
     .map((match) => text(match[1]))

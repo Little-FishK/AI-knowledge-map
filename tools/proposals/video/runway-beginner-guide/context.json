@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:a131c93748a6783670d797aa103a9096de003d7052b2de233caac2b634ceb16c",
+  "generatedAt": "2026-07-24T18:27:13.890Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=c38vtLw1nSk",
+    "title": "Runway AI - Tutorial for Beginners in 13 MINUTES !  [ FULL GUIDE ]",
+    "creator": "Skills Factory",
+    "durationSeconds": 815,
+    "transcriptSegments": 122,
+    "frames": 55,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "runway",
+      "name": "Runway",
+      "category": "video",
+      "concept": "video-generation",
+      "summary": "面向创作者的 AI 视频生成与编辑套件。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "runway",
+        "name": "Runway",
+        "occurrences": 30,
+        "matchedTerms": [
+          {
+            "term": "Runway",
+            "count": 15
+          },
+          {
+            "term": "runway",
+            "count": 15
+          }
+        ]
+      }
+    ],
+    "existingTutorial": null,
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "video-generation",
+        "title": "视频生成",
+        "aliases": [
+          "Video Generation",
+          "文生视频",
+          "Text-to-Video"
+        ],
+        "domain": "generation",
+        "maturity": "evolving",
+        "summary": "根据文本或图像生成连续视频，难点在于时间一致性。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Video Generation",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "world-models",
+            "type": "variant-of",
+            "title": "世界模型与 3D 生成"
+          },
+          {
+            "direction": "out",
+            "node": "diffusion",
+            "type": "variant-of",
+            "title": "扩散模型"
+          },
+          {
+            "direction": "out",
+            "node": "context-window",
+            "type": "constrains",
+            "title": "上下文窗口"
+          },
+          {
+            "direction": "in",
+            "node": "flow-matching",
+            "type": "enables",
+            "title": "Flow Matching / Rectified Flow"
+          }
+        ]
+      },
+      {
+        "id": "agent-skills",
+        "title": "智能体技能",
+        "aliases": [
+          "Agent Skills",
+          "Skills",
+          "技能",
+          "可复用能力"
+        ],
+        "domain": "coding",
+        "maturity": "evolving",
+        "summary": "把一套指令、工具、知识打包成可复用、可按需加载的「技能」，供 Agent 调用。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Skills",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "part-of",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "out",
+            "node": "context-engineering",
+            "type": "variant-of",
+            "title": "上下文工程"
+          },
+          {
+            "direction": "out",
+            "node": "tool-calling",
+            "type": "uses",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "out",
+            "node": "context-compaction",
+            "type": "related",
+            "title": "上下文压缩"
+          }
+        ]
+      },
+      {
+        "id": "multimodal",
+        "title": "多模态",
+        "aliases": [
+          "Multimodal",
+          "多模态模型",
+          "VLM",
+          "视觉语言模型"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "让一个模型同时处理文本、图像、音频等不同形式的信息。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "multimodal",
+            "count": 1
+          },
+          {
+            "term": "Multimodal",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "clip",
+            "type": "part-of",
+            "title": "CLIP 图文对比学习"
+          },
+          {
+            "direction": "in",
+            "node": "computer-use",
+            "type": "uses",
+            "title": "计算机操作"
+          },
+          {
+            "direction": "out",
+            "node": "transformer",
+            "type": "uses",
+            "title": "Transformer"
+          },
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "variant-of",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "in",
+            "node": "image-generation",
+            "type": "part-of",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "enables",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "in",
+            "node": "speech",
+            "type": "is-a",
+            "title": "语音识别与合成"
+          },
+          {
+            "direction": "in",
+            "node": "contrastive-learning",
+            "type": "enables",
+            "title": "对比学习"
+          }
+        ]
+      },
+      {
+        "id": "speech",
+        "title": "语音识别与合成",
+        "aliases": [
+          "Speech",
+          "STT",
+          "TTS",
+          "语音识别",
+          "语音合成",
+          "ASR"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "语音转文字（识别）与文字转语音（合成），两个反向的任务。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "speech",
+            "count": 1
+          },
+          {
+            "term": "Speech",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "audio-generation",
+            "type": "contrast",
+            "title": "音频与音乐生成"
+          },
+          {
+            "direction": "in",
+            "node": "content-detection",
+            "type": "threatens",
+            "title": "AIGC 检测与水印"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "is-a",
+            "title": "多模态"
+          },
+          {
+            "direction": "out",
+            "node": "transformer",
+            "type": "uses",
+            "title": "Transformer"
+          }
+        ]
+      },
+      {
+        "id": "image-generation",
+        "title": "图像生成",
+        "aliases": [
+          "Image Generation",
+          "文生图",
+          "Text-to-Image"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "根据文本描述生成图像，当前主要由扩散模型驱动。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "Text-to-Image",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "diffusion",
+            "type": "enables",
+            "title": "扩散模型"
+          },
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "in",
+            "node": "clip",
+            "type": "enables",
+            "title": "CLIP 图文对比学习"
+          },
+          {
+            "direction": "in",
+            "node": "image-editing",
+            "type": "variant-of",
+            "title": "图像编辑"
+          },
+          {
+            "direction": "in",
+            "node": "super-resolution",
+            "type": "variant-of",
+            "title": "超分辨率与修复"
+          },
+          {
+            "direction": "in",
+            "node": "content-detection",
+            "type": "threatens",
+            "title": "AIGC 检测与水印"
+          },
+          {
+            "direction": "out",
+            "node": "multimodal",
+            "type": "part-of",
+            "title": "多模态"
+          },
+          {
+            "direction": "in",
+            "node": "controllable-generation",
+            "type": "mitigates",
+            "title": "可控生成"
+          },
+          {
+            "direction": "in",
+            "node": "flow-matching",
+            "type": "enables",
+            "title": "Flow Matching / Rectified Flow"
+          }
+        ]
+      },
+      {
+        "id": "image-editing",
+        "title": "图像编辑",
+        "aliases": [
+          "Image Editing",
+          "Inpainting",
+          "指令编辑",
+          "图生图"
+        ],
+        "domain": "generation",
+        "maturity": "stable",
+        "summary": "在已有图片上按指令修改，而不是从零生成——实用场景的主力。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Inpainting",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "image-generation",
+            "type": "variant-of",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "controllable-generation",
+            "type": "related",
+            "title": "可控生成"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:cce624480f5974256b948bd55e7361df26915d458f854f70e9fe6e3d83744e2c"
+}

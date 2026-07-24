@@ -1,0 +1,1150 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:5c55e8df5bb869b4f1578ae71d677f83e048811ff5b06123e657fb616e119de4",
+  "generatedAt": "2026-07-24T18:27:13.586Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=2E8iTvGo9Hs",
+    "title": "10 min Walkthrough of Langfuse – Open Source LLM Observability, Evaluation, and Prompt Management",
+    "creator": "Langfuse",
+    "durationSeconds": 609,
+    "transcriptSegments": 102,
+    "frames": 40,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "langchain",
+      "name": "LangChain / LlamaIndex",
+      "category": "devtools",
+      "concept": "agent-frameworks",
+      "summary": "搭 RAG 和 Agent 的开发框架。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "langchain",
+        "name": "LangChain / LlamaIndex",
+        "occurrences": 3,
+        "matchedTerms": [
+          {
+            "term": "langchain",
+            "count": 3
+          }
+        ]
+      },
+      {
+        "id": "ollama",
+        "name": "Ollama / LM Studio",
+        "occurrences": 1,
+        "matchedTerms": [
+          {
+            "term": "ollama",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "existingTutorial": null,
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "evaluation",
+        "title": "LLM 应用评测",
+        "aliases": [
+          "Evaluation",
+          "Evals",
+          "评测",
+          "LLM-as-judge"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "系统地衡量一个 LLM 应用好不好——没有它，一切优化都是盲调。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "evaluation",
+            "count": 20
+          },
+          {
+            "term": "Evaluation",
+            "count": 20
+          },
+          {
+            "term": "Evals",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "tree-of-thoughts",
+            "type": "uses",
+            "title": "思维树 ToT"
+          },
+          {
+            "direction": "in",
+            "node": "observability",
+            "type": "related",
+            "title": "可观测性与追踪"
+          },
+          {
+            "direction": "out",
+            "node": "model-selection",
+            "type": "enables",
+            "title": "模型选型与成本"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "related",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "reward-hacking",
+            "type": "threatens",
+            "title": "奖励黑客"
+          },
+          {
+            "direction": "in",
+            "node": "overfitting",
+            "type": "threatens",
+            "title": "过拟合"
+          },
+          {
+            "direction": "in",
+            "node": "red-teaming",
+            "type": "contrast",
+            "title": "红队测试"
+          },
+          {
+            "direction": "in",
+            "node": "loss-function",
+            "type": "contrast",
+            "title": "损失函数"
+          },
+          {
+            "direction": "in",
+            "node": "model-merging",
+            "type": "uses",
+            "title": "模型合并与适配器组合"
+          },
+          {
+            "direction": "in",
+            "node": "model-evaluation",
+            "type": "contrast",
+            "title": "模型评测与基准"
+          },
+          {
+            "direction": "in",
+            "node": "model-routing",
+            "type": "uses",
+            "title": "模型路由与级联系统"
+          },
+          {
+            "direction": "in",
+            "node": "data-drift-monitoring",
+            "type": "uses",
+            "title": "数据漂移与持续监控"
+          }
+        ]
+      },
+      {
+        "id": "llm",
+        "title": "大语言模型 LLM",
+        "aliases": [
+          "Large Language Model",
+          "大模型"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "在海量文本上训练出的超大 Transformer，本质是在预测下一个 token。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "llm",
+            "count": 18
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "transformer",
+            "type": "enables",
+            "title": "Transformer"
+          },
+          {
+            "direction": "in",
+            "node": "tokenization",
+            "type": "prerequisite",
+            "title": "Token 与分词"
+          },
+          {
+            "direction": "in",
+            "node": "sampling-params",
+            "type": "part-of",
+            "title": "采样与解码参数"
+          },
+          {
+            "direction": "in",
+            "node": "context-window",
+            "type": "constrains",
+            "title": "上下文窗口"
+          },
+          {
+            "direction": "in",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "prompt-injection",
+            "type": "threatens",
+            "title": "提示注入"
+          },
+          {
+            "direction": "in",
+            "node": "agent",
+            "type": "uses",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "in",
+            "node": "fine-tuning",
+            "type": "uses",
+            "title": "微调 Fine-tuning"
+          },
+          {
+            "direction": "out",
+            "node": "prompt-engineering",
+            "type": "related",
+            "title": "提示工程"
+          },
+          {
+            "direction": "in",
+            "node": "jailbreak",
+            "type": "threatens",
+            "title": "越狱 Jailbreak"
+          },
+          {
+            "direction": "in",
+            "node": "alignment",
+            "type": "constrains",
+            "title": "对齐 Alignment"
+          },
+          {
+            "direction": "in",
+            "node": "code-generation",
+            "type": "uses",
+            "title": "代码生成 / AI 编程"
+          }
+        ]
+      },
+      {
+        "id": "observability",
+        "title": "可观测性与追踪",
+        "aliases": [
+          "Observability",
+          "Tracing",
+          "可观测性",
+          "日志追踪",
+          "监控"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "记录 LLM 应用每次调用的全过程，让你能看清、能调试、能算账。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "Tracing",
+            "count": 9
+          },
+          {
+            "term": "observability",
+            "count": 4
+          },
+          {
+            "term": "Observability",
+            "count": 4
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "agent-loop",
+            "type": "mitigates",
+            "title": "Agent 循环"
+          },
+          {
+            "direction": "out",
+            "node": "evaluation",
+            "type": "related",
+            "title": "LLM 应用评测"
+          },
+          {
+            "direction": "out",
+            "node": "prompt-caching",
+            "type": "uses",
+            "title": "提示缓存"
+          },
+          {
+            "direction": "in",
+            "node": "data-drift-monitoring",
+            "type": "uses",
+            "title": "数据漂移与持续监控"
+          }
+        ]
+      },
+      {
+        "id": "retrieval",
+        "title": "检索与语义搜索",
+        "aliases": [
+          "Retrieval",
+          "Semantic Search",
+          "向量检索"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "根据问题从知识库里找出最相关的内容——RAG 效果的真正瓶颈。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "retrieval",
+            "count": 3
+          },
+          {
+            "term": "Retrieval",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "lost-in-middle",
+            "type": "mitigates",
+            "title": "中间迷失"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "part-of",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "out",
+            "node": "embedding",
+            "type": "uses",
+            "title": "嵌入 Embedding"
+          },
+          {
+            "direction": "out",
+            "node": "vector-db",
+            "type": "uses",
+            "title": "向量数据库"
+          },
+          {
+            "direction": "in",
+            "node": "chunking",
+            "type": "constrains",
+            "title": "文档切分 Chunking"
+          },
+          {
+            "direction": "in",
+            "node": "curse-of-dimensionality",
+            "type": "threatens",
+            "title": "维度灾难"
+          },
+          {
+            "direction": "in",
+            "node": "advanced-rag",
+            "type": "uses",
+            "title": "高级 RAG"
+          },
+          {
+            "direction": "in",
+            "node": "agent-memory",
+            "type": "uses",
+            "title": "Agent 记忆"
+          },
+          {
+            "direction": "in",
+            "node": "reranking",
+            "type": "part-of",
+            "title": "重排 Reranking"
+          },
+          {
+            "direction": "out",
+            "node": "contrastive-learning",
+            "type": "uses",
+            "title": "对比学习"
+          }
+        ]
+      },
+      {
+        "id": "hallucination",
+        "title": "幻觉 Hallucination",
+        "aliases": [
+          "Hallucination",
+          "编造",
+          "一本正经胡说八道"
+        ],
+        "domain": "safety",
+        "maturity": "stable",
+        "summary": "模型生成了流畅、自信，但事实上错误或纯属虚构的内容。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "hallucination",
+            "count": 2
+          },
+          {
+            "term": "Hallucination",
+            "count": 2
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "rag",
+            "type": "mitigates",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "prompt-engineering",
+            "type": "mitigates",
+            "title": "提示工程"
+          },
+          {
+            "direction": "in",
+            "node": "sampling-params",
+            "type": "related",
+            "title": "采样与解码参数"
+          },
+          {
+            "direction": "in",
+            "node": "cot",
+            "type": "mitigates",
+            "title": "思维链 CoT"
+          },
+          {
+            "direction": "in",
+            "node": "reward-hacking",
+            "type": "constrains",
+            "title": "奖励黑客"
+          },
+          {
+            "direction": "in",
+            "node": "citations",
+            "type": "mitigates",
+            "title": "引用与溯源"
+          },
+          {
+            "direction": "in",
+            "node": "super-resolution",
+            "type": "related",
+            "title": "超分辨率与修复"
+          },
+          {
+            "direction": "in",
+            "node": "code-generation",
+            "type": "threatens",
+            "title": "代码生成 / AI 编程"
+          },
+          {
+            "direction": "in",
+            "node": "logprobs",
+            "type": "mitigates",
+            "title": "Logprobs 与置信度"
+          },
+          {
+            "direction": "in",
+            "node": "self-consistency",
+            "type": "mitigates",
+            "title": "自洽性"
+          },
+          {
+            "direction": "in",
+            "node": "code-execution",
+            "type": "mitigates",
+            "title": "代码执行与沙箱"
+          },
+          {
+            "direction": "in",
+            "node": "reflection",
+            "type": "constrains",
+            "title": "自我反思"
+          }
+        ]
+      },
+      {
+        "id": "embedding",
+        "title": "嵌入 Embedding",
+        "aliases": [
+          "向量表示",
+          "词向量",
+          "Embedding"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "把文本变成一串数字（向量），让语义相近的内容在向量空间里也靠得近。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "embedding",
+            "count": 2
+          },
+          {
+            "term": "Embedding",
+            "count": 2
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "transformer",
+            "type": "part-of",
+            "title": "Transformer"
+          },
+          {
+            "direction": "in",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "vector-db",
+            "type": "uses",
+            "title": "向量数据库"
+          },
+          {
+            "direction": "in",
+            "node": "retrieval",
+            "type": "uses",
+            "title": "检索与语义搜索"
+          },
+          {
+            "direction": "in",
+            "node": "image-generation",
+            "type": "uses",
+            "title": "图像生成"
+          },
+          {
+            "direction": "out",
+            "node": "curse-of-dimensionality",
+            "type": "mitigates",
+            "title": "维度灾难"
+          },
+          {
+            "direction": "in",
+            "node": "clip",
+            "type": "uses",
+            "title": "CLIP 图文对比学习"
+          },
+          {
+            "direction": "in",
+            "node": "knowledge-graph",
+            "type": "contrast",
+            "title": "知识图谱与 GraphRAG"
+          },
+          {
+            "direction": "in",
+            "node": "multimodal",
+            "type": "uses",
+            "title": "多模态"
+          },
+          {
+            "direction": "in",
+            "node": "dimensionality-reduction",
+            "type": "related",
+            "title": "降维"
+          },
+          {
+            "direction": "in",
+            "node": "clustering",
+            "type": "uses",
+            "title": "聚类"
+          },
+          {
+            "direction": "in",
+            "node": "contrastive-learning",
+            "type": "enables",
+            "title": "对比学习"
+          }
+        ]
+      },
+      {
+        "id": "model-evaluation",
+        "title": "模型评测与基准",
+        "aliases": [
+          "Model Evaluation",
+          "Benchmark",
+          "Evals",
+          "模型基准"
+        ],
+        "domain": "building",
+        "maturity": "evolving",
+        "summary": "用可复现任务衡量模型能力、鲁棒性与安全性，并识别污染和指标错配。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "Evals",
+            "count": 3
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "evaluation",
+            "type": "contrast",
+            "title": "LLM 应用评测"
+          },
+          {
+            "direction": "out",
+            "node": "model-selection",
+            "type": "enables",
+            "title": "模型选型与成本"
+          },
+          {
+            "direction": "out",
+            "node": "reasoning-models",
+            "type": "related",
+            "title": "推理模型"
+          },
+          {
+            "direction": "out",
+            "node": "code-generation",
+            "type": "related",
+            "title": "代码生成 / AI 编程"
+          },
+          {
+            "direction": "out",
+            "node": "red-teaming",
+            "type": "related",
+            "title": "红队测试"
+          },
+          {
+            "direction": "in",
+            "node": "uncertainty-calibration",
+            "type": "uses",
+            "title": "不确定性校准与选择性预测"
+          }
+        ]
+      },
+      {
+        "id": "guardrails",
+        "title": "护栏 Guardrails",
+        "aliases": [
+          "Guardrails",
+          "防护栏",
+          "输入输出过滤"
+        ],
+        "domain": "safety",
+        "maturity": "stable",
+        "summary": "在模型前后加多道独立检查，用分层防御把风险挡在外面。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "guardrails",
+            "count": 1
+          },
+          {
+            "term": "Guardrails",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "human-in-the-loop",
+            "type": "part-of",
+            "title": "人在回路"
+          },
+          {
+            "direction": "in",
+            "node": "streaming",
+            "type": "constrains",
+            "title": "流式输出"
+          },
+          {
+            "direction": "in",
+            "node": "code-execution",
+            "type": "uses",
+            "title": "代码执行与沙箱"
+          },
+          {
+            "direction": "out",
+            "node": "privacy",
+            "type": "mitigates",
+            "title": "隐私与数据合规"
+          },
+          {
+            "direction": "in",
+            "node": "governance",
+            "type": "related",
+            "title": "AI 治理与法规"
+          },
+          {
+            "direction": "in",
+            "node": "red-teaming",
+            "type": "related",
+            "title": "红队测试"
+          },
+          {
+            "direction": "out",
+            "node": "prompt-injection",
+            "type": "mitigates",
+            "title": "提示注入"
+          },
+          {
+            "direction": "out",
+            "node": "jailbreak",
+            "type": "mitigates",
+            "title": "越狱 Jailbreak"
+          },
+          {
+            "direction": "out",
+            "node": "hallucination",
+            "type": "mitigates",
+            "title": "幻觉 Hallucination"
+          },
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "part-of",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "out",
+            "node": "tool-calling",
+            "type": "constrains",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "in",
+            "node": "uncertainty-calibration",
+            "type": "part-of",
+            "title": "不确定性校准与选择性预测"
+          }
+        ]
+      },
+      {
+        "id": "fine-tuning",
+        "title": "微调 Fine-tuning",
+        "aliases": [
+          "Fine-tuning",
+          "SFT",
+          "精调"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "在预训练模型的基础上，用特定数据继续训练，改变模型的权重。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "fine-tuning",
+            "count": 1
+          },
+          {
+            "term": "Fine-tuning",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "rag",
+            "type": "contrast",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "prompt-engineering",
+            "type": "contrast",
+            "title": "提示工程"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "uses",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "in",
+            "node": "alignment",
+            "type": "uses",
+            "title": "对齐 Alignment"
+          },
+          {
+            "direction": "in",
+            "node": "regularization",
+            "type": "mitigates",
+            "title": "正则化"
+          },
+          {
+            "direction": "in",
+            "node": "in-context-learning",
+            "type": "contrast",
+            "title": "上下文学习"
+          },
+          {
+            "direction": "in",
+            "node": "rlhf",
+            "type": "variant-of",
+            "title": "RLHF 与偏好对齐"
+          },
+          {
+            "direction": "in",
+            "node": "controllable-generation",
+            "type": "uses",
+            "title": "可控生成"
+          },
+          {
+            "direction": "out",
+            "node": "supervised-learning",
+            "type": "is-a",
+            "title": "监督学习"
+          },
+          {
+            "direction": "in",
+            "node": "overfitting",
+            "type": "threatens",
+            "title": "过拟合"
+          },
+          {
+            "direction": "in",
+            "node": "post-training",
+            "type": "uses",
+            "title": "后训练 Post-training"
+          },
+          {
+            "direction": "out",
+            "node": "optimizer-schedule",
+            "type": "uses",
+            "title": "优化器与学习率调度"
+          }
+        ]
+      },
+      {
+        "id": "model-families",
+        "title": "主流模型家族",
+        "aliases": [
+          "Model Families",
+          "Claude",
+          "GPT",
+          "Gemini",
+          "Llama",
+          "开源模型"
+        ],
+        "domain": "frontier",
+        "maturity": "evolving",
+        "summary": "当前主要的大模型家族及其定位——这是变化最快的一层。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "GPT",
+            "count": 2
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "deployment",
+            "type": "related",
+            "title": "部署形态"
+          },
+          {
+            "direction": "out",
+            "node": "model-selection",
+            "type": "related",
+            "title": "模型选型与成本"
+          },
+          {
+            "direction": "in",
+            "node": "reasoning-models",
+            "type": "part-of",
+            "title": "推理模型"
+          },
+          {
+            "direction": "in",
+            "node": "state-space-models",
+            "type": "related",
+            "title": "状态空间模型与 Mamba"
+          }
+        ]
+      },
+      {
+        "id": "deployment",
+        "title": "部署形态",
+        "aliases": [
+          "Deployment",
+          "Serving",
+          "本地部署",
+          "云端部署"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "把模型跑起来对外服务的几种方式，各有隐私、成本、可控性的取舍。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "deployment",
+            "count": 1
+          },
+          {
+            "term": "Deployment",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "privacy",
+            "type": "constrains",
+            "title": "隐私与数据合规"
+          },
+          {
+            "direction": "in",
+            "node": "model-families",
+            "type": "related",
+            "title": "主流模型家族"
+          },
+          {
+            "direction": "in",
+            "node": "quantization",
+            "type": "enables",
+            "title": "量化 Quantization"
+          },
+          {
+            "direction": "out",
+            "node": "inference-optimization",
+            "type": "uses",
+            "title": "推理优化"
+          },
+          {
+            "direction": "out",
+            "node": "model-selection",
+            "type": "related",
+            "title": "模型选型与成本"
+          },
+          {
+            "direction": "in",
+            "node": "peft-lora",
+            "type": "enables",
+            "title": "参数高效微调 PEFT / LoRA"
+          },
+          {
+            "direction": "in",
+            "node": "distributed-training",
+            "type": "contrast",
+            "title": "分布式训练与并行策略"
+          },
+          {
+            "direction": "in",
+            "node": "model-routing",
+            "type": "part-of",
+            "title": "模型路由与级联系统"
+          },
+          {
+            "direction": "in",
+            "node": "data-drift-monitoring",
+            "type": "part-of",
+            "title": "数据漂移与持续监控"
+          }
+        ]
+      },
+      {
+        "id": "prompt-engineering",
+        "title": "提示工程",
+        "aliases": [
+          "Prompt Engineering",
+          "提示词工程"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "通过设计输入的措辞与结构，让模型稳定产出你想要的结果。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "Prompt Engineering",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "hallucination",
+            "type": "mitigates",
+            "title": "幻觉 Hallucination"
+          },
+          {
+            "direction": "out",
+            "node": "fine-tuning",
+            "type": "contrast",
+            "title": "微调 Fine-tuning"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "contrast",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "llm",
+            "type": "related",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "in",
+            "node": "cot",
+            "type": "variant-of",
+            "title": "思维链 CoT"
+          },
+          {
+            "direction": "in",
+            "node": "structured-output",
+            "type": "part-of",
+            "title": "结构化输出"
+          },
+          {
+            "direction": "in",
+            "node": "system-prompt",
+            "type": "part-of",
+            "title": "系统提示与角色提示"
+          },
+          {
+            "direction": "in",
+            "node": "in-context-learning",
+            "type": "enables",
+            "title": "上下文学习"
+          },
+          {
+            "direction": "in",
+            "node": "context-engineering",
+            "type": "variant-of",
+            "title": "上下文工程"
+          },
+          {
+            "direction": "in",
+            "node": "prompt-caching",
+            "type": "constrains",
+            "title": "提示缓存"
+          }
+        ]
+      },
+      {
+        "id": "prompt-injection",
+        "title": "提示注入",
+        "aliases": [
+          "Prompt Injection",
+          "间接提示注入"
+        ],
+        "domain": "safety",
+        "maturity": "stable",
+        "summary": "把恶意指令藏在模型会读到的内容里，劫持它的行为。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "Prompt Injection",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "threatens",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "threatens",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "out",
+            "node": "tool-calling",
+            "type": "threatens",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "in",
+            "node": "jailbreak",
+            "type": "related",
+            "title": "越狱 Jailbreak"
+          },
+          {
+            "direction": "out",
+            "node": "computer-use",
+            "type": "threatens",
+            "title": "计算机操作"
+          },
+          {
+            "direction": "in",
+            "node": "data-poisoning",
+            "type": "contrast",
+            "title": "数据投毒"
+          },
+          {
+            "direction": "in",
+            "node": "red-teaming",
+            "type": "mitigates",
+            "title": "红队测试"
+          },
+          {
+            "direction": "in",
+            "node": "guardrails",
+            "type": "mitigates",
+            "title": "护栏 Guardrails"
+          },
+          {
+            "direction": "out",
+            "node": "mcp-architecture",
+            "type": "threatens",
+            "title": "MCP 架构"
+          },
+          {
+            "direction": "in",
+            "node": "agent-identity-access",
+            "type": "mitigates",
+            "title": "Agent 身份、权限与密钥管理"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:58018f49a3f6aa94609921c67284326c7caffdc76593affbeb20563c9b485360"
+}

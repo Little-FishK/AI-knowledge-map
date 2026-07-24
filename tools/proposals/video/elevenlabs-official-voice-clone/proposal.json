@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "evidenceHash": "sha256:ecfd1fd17bf74c351ad9eb117674be563f5d506fa40954a698a2511b4b6f5b96",
+  "contextHash": "sha256:38cc94fab21db0b12a0543b8293f5157d94c58a4ae9d98ab3bf48248622ac15d",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=AiRksVoiUAI",
+    "title": "How to Clone Your Voice with AI - Realistic AI Voice Clones (Full Tutorial)",
+    "creator": "ElevenLabs"
+  },
+  "tutorialTrack": {
+    "decision": "formal",
+    "action": "create-page",
+    "softwareId": "elevenlabs",
+    "evidenceLevel": "E2",
+    "standards": {
+      "accuracy": 2,
+      "alignment": 2,
+      "reproducibility": 2,
+      "traceability": 2,
+      "safety": 2
+    },
+    "quality": {
+      "closure": 4,
+      "transfer": 4,
+      "completeness": 4,
+      "structure": 4,
+      "freshness": 3,
+      "accessibility": 4
+    },
+    "rationale": "ElevenLabs 官方教程完整演示即时声音克隆与专业声音克隆，从样本录制、清理、说话人分离、权利确认和声音验证一直到生成测试，操作闭环完整，并明确展示了质量与授权边界。",
+    "evidenceRefs": [
+      {
+        "start": 0,
+        "end": 49,
+        "note": "区分即时克隆与专业克隆，并说明数据量、速度和质量差异。"
+      },
+      {
+        "start": 53,
+        "end": 232,
+        "note": "录制、清理、预览、语言标记、权利确认和即时克隆创建。"
+      },
+      {
+        "start": 299,
+        "end": 586,
+        "note": "专业克隆的录音条件、样本长度、上传、裁剪和说话人分离。"
+      },
+      {
+        "start": 588,
+        "end": 628,
+        "note": "声音验证、训练等待和生成工具验证。"
+      }
+    ],
+    "resourceDraft": {
+      "id": "yt-elevenlabs-official-voice-cloning",
+      "platform": "youtube",
+      "title": "How to Clone Your Voice with AI - Realistic AI Voice Clones",
+      "creator": "ElevenLabs",
+      "url": "https://www.youtube.com/watch?v=AiRksVoiUAI",
+      "publishedAt": "2025-09-04",
+      "duration": "11:15",
+      "audience": "希望使用 ElevenLabs 创建本人声音克隆，并理解快速克隆与高保真专业克隆差异的内容创作者和开发者。",
+      "summary": "教程先用短录音创建 Instant Voice Clone，再用较长且经过清理的单说话人素材创建 Professional Voice Clone，覆盖模型选择、录音质量、样本管理、说话人分离、同意确认、声音验证和生成测试。",
+      "coverage": [
+        {
+          "title": "创建即时声音克隆",
+          "steps": [
+            "进入 Voices，选择 Create or Clone a Voice 和 Instant Voice Clone。",
+            "录制或上传仅包含本人声音的干净样本，预览并删除不合格片段。",
+            "填写语言与说明，确认拥有声音权利和同意后保存。",
+            "在 Text to Speech 中选择克隆声音并生成测试语句。"
+          ],
+          "done": "能够用短样本创建可用的即时克隆，并通过测试语句检查音色与表达稳定性。"
+        },
+        {
+          "title": "准备专业克隆素材",
+          "steps": [
+            "在安静、低混响环境中用稳定设备录制至少约半小时素材。",
+            "保持单一说话人、稳定音量与麦克风位置，去除音乐、噪声和其他人声。",
+            "上传素材后检查总时长，必要时裁剪、降噪或分离说话人。"
+          ],
+          "done": "样本达到平台质量提示要求，并且训练集合只保留目标说话人的清晰语音。"
+        },
+        {
+          "title": "验证并训练专业声音",
+          "steps": [
+            "创建 Professional Voice Clone，填写名称、语言、口音和说明。",
+            "提交样本后完成现场声音验证，证明声音主体与样本相符。",
+            "等待训练完成，再分别测试文本转语音、语音转语音或多语言输出。"
+          ],
+          "done": "专业克隆通过声音验证并完成训练，测试结果在音色、可懂度和跨句一致性上可接受。"
+        }
+      ],
+      "uniqueTechniques": [
+        {
+          "title": "把即时条件化与专用微调分开选择",
+          "scenario": "需要先验证声音是否适合克隆，但又不想一开始就投入长录音和数小时训练。",
+          "steps": [
+            "先用一至两分钟干净单人录音创建 Instant Voice Clone。",
+            "用未出现在样本中的句子测试音色、口音、数字和专有名词。",
+            "只有即时克隆的身份方向正确、且确实需要更高一致性时，再收集长素材创建 Professional Voice Clone。"
+          ],
+          "result": "短样本路径适合快速试验；长样本专用训练适合追求音色、情绪和跨内容一致性。",
+          "limitation": "即时克隆表现不佳可能来自样本质量或分布外口音，不能只凭一次失败断定专业克隆也不可行。"
+        },
+        {
+          "title": "在训练前处理多人录音",
+          "scenario": "可用素材来自访谈或播客，除了目标说话人还包含主持人、嘉宾和背景声。",
+          "steps": [
+            "先按说话人分离或切出只含目标主体的片段。",
+            "逐段预听，删除串话、音乐、明显混响和错误分离片段。",
+            "上传后再次抽查平台预处理结果，确保训练集合没有其他人的声音。"
+          ],
+          "result": "先分离说话人并只选择声音主体，避免模型把其他人声或背景伪影学习进克隆。",
+          "limitation": "自动说话人分离会漏分或产生伪影；高质量专业克隆仍优先使用从源头单独录制的素材。"
+        },
+        {
+          "title": "把声音验证放在训练许可之前",
+          "scenario": "样本技术质量已经达标，但平台仍需确认提交者有权训练这一身份声音。",
+          "steps": [
+            "先阅读并确认样本权利、使用目的和平台条款。",
+            "由声音主体现场朗读随机验证句，完成活体式声音核验。",
+            "验证通过后才提交专业训练，并保留授权与生成记录。"
+          ],
+          "result": "技术上可合成不等于获得授权；验证步骤把声音主体与训练请求绑定。",
+          "limitation": "一次平台验证不能替代所有地区、用途和后续传播所需的法律授权，也不能阻止输出被二次滥用。"
+        }
+      ],
+      "caution": "只克隆本人或已按平台规则获得授权的声音。公开录音不等于允许克隆；原始音频和说话人表示都属于敏感身份数据。模型可能复制噪声、混响、口音与录音伪影，生成内容还需检查可懂度、数字和专有名词，不能把“听起来像”当成身份认证。"
+    }
+  },
+  "conceptTrack": {
+    "instructions": "这些只是命中已有名称的上下文种子，不代表应当补充。AI 可删除、改判，也可新增视频中出现但地图不存在的候选概念。",
+    "candidates": [
+      {
+        "term": "speech",
+        "decision": "reject",
+        "targetNode": "speech",
+        "rationale": "视频使用了语音合成能力，但没有改变语音识别与合成这一总览节点的基本边界。",
+        "nodeScores": null,
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [],
+        "proposedEdges": [],
+        "externalSources": [],
+        "evidenceRefs": [],
+        "disqualifiers": [
+          "已有上位节点"
+        ],
+        "proposedNode": null
+      },
+      {
+        "term": "agent",
+        "decision": "reject",
+        "targetNode": "agent",
+        "rationale": "对 conversational AI agent 的提及只是克隆声音的下游用途，不构成 Agent 机制证据。",
+        "nodeScores": null,
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [],
+        "proposedEdges": [],
+        "externalSources": [],
+        "evidenceRefs": [],
+        "disqualifiers": [
+          "仅为使用场景"
+        ],
+        "proposedNode": null
+      },
+      {
+        "term": "clip",
+        "decision": "reject",
+        "targetNode": "clip",
+        "rationale": "视频中的 clip 指音频片段，不是 CLIP 图文对比模型。",
+        "nodeScores": null,
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [],
+        "proposedEdges": [],
+        "externalSources": [],
+        "evidenceRefs": [],
+        "disqualifiers": [
+          "同形词误命中"
+        ],
+        "proposedNode": null
+      },
+      {
+        "term": "privacy",
+        "decision": "reject",
+        "targetNode": "privacy",
+        "rationale": "权利确认和声音验证将成为新候选节点自身的必要边界，本视频没有提供需要单独改写隐私总览页的新机制。",
+        "nodeScores": null,
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [],
+        "proposedEdges": [],
+        "externalSources": [],
+        "evidenceRefs": [],
+        "disqualifiers": [
+          "由更具体候选承载"
+        ],
+        "proposedNode": null
+      },
+      {
+        "term": "Prompt Engineering",
+        "decision": "reject",
+        "targetNode": "prompt-engineering",
+        "rationale": "输入文本用于生成测试，不是提示工程教学。",
+        "nodeScores": null,
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [],
+        "proposedEdges": [],
+        "externalSources": [],
+        "evidenceRefs": [],
+        "disqualifiers": [
+          "仅为普通文本输入"
+        ],
+        "proposedNode": null
+      },
+      {
+        "term": "Voice Cloning",
+        "decision": "new",
+        "targetNode": null,
+        "rationale": "声音克隆不是普通 TTS 的产品按钮：它以目标说话人样本为身份条件，使新文本保留音色、韵律和口音；即时条件化与专用微调具有不同的数据、泛化和一致性边界，并引入独立的声音授权、验证和生物特征治理问题。现有 speech 节点只作总览，尚未把这套机制与安全边界作为独立知识单元展开。",
+        "nodeScores": {
+          "identity": 4,
+          "mechanism": 4,
+          "nonDuplication": 3,
+          "practicalValue": 4,
+          "relationshipPotential": 4,
+          "sourceQuality": 4
+        },
+        "coreCandidate": false,
+        "coreScores": null,
+        "coreReason": null,
+        "requiresHumanCoreApproval": false,
+        "nearestNodes": [
+          "speech",
+          "fine-tuning",
+          "privacy"
+        ],
+        "proposedEdges": [
+          {
+            "from": "voice-cloning",
+            "to": "speech",
+            "type": "is-a",
+            "label": "身份条件化的语音合成"
+          },
+          {
+            "from": "voice-cloning",
+            "to": "fine-tuning",
+            "type": "uses",
+            "label": "专业克隆可用专用微调"
+          },
+          {
+            "from": "privacy",
+            "to": "voice-cloning",
+            "type": "constrains",
+            "label": "声音身份、同意与用途约束"
+          },
+          {
+            "from": "voice-cloning",
+            "to": "content-detection",
+            "type": "threatens",
+            "label": "逼真合成削弱仅凭听感的真伪判断"
+          }
+        ],
+        "externalSources": [
+          {
+            "title": "ElevenLabs: Voice cloning—how it works",
+            "url": "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
+            "supports": "即时克隆使用推理时条件信号，专业克隆通过样本微调模型；两者的数据量、一致性和泛化边界不同。"
+          },
+          {
+            "title": "YourTTS: Zero-Shot Multi-Speaker TTS and Voice Conversion",
+            "url": "https://arxiv.org/abs/2112.02418",
+            "supports": "多说话人、多语言的零样本 TTS 与少样本说话人适配构成声音克隆的研究基础。"
+          },
+          {
+            "title": "FTC Voice Cloning Challenge",
+            "url": "https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge",
+            "supports": "声音克隆具有诈骗、身份冒用、生物特征和创作者权益风险，需要技术、产品和治理联合防护。"
+          }
+        ],
+        "evidenceRefs": [
+          {
+            "start": 0,
+            "end": 49
+          },
+          {
+            "start": 53,
+            "end": 84
+          },
+          {
+            "start": 299,
+            "end": 384
+          },
+          {
+            "start": 559,
+            "end": 605
+          }
+        ],
+        "claims": [
+          {
+            "text": "声音克隆从参考音频提取说话人的音色、韵律、口音与发音特征，并把这种身份条件用于合成原说话人从未录制的新文本。",
+            "sourceUrls": [
+              "https://www.youtube.com/watch?v=AiRksVoiUAI",
+              "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
+              "https://arxiv.org/abs/2112.02418"
+            ],
+            "evidenceRefs": [
+              {
+                "start": 0,
+                "end": 49
+              }
+            ]
+          },
+          {
+            "text": "即时克隆主要在推理时使用短参考样本进行条件化，专业克隆则用更长的单说话人素材微调专用模型，因此质量、数据需求、等待时间与跨风格一致性不同。",
+            "sourceUrls": [
+              "https://www.youtube.com/watch?v=AiRksVoiUAI",
+              "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning"
+            ],
+            "evidenceRefs": [
+              {
+                "start": 15,
+                "end": 49
+              },
+              {
+                "start": 299,
+                "end": 319
+              }
+            ]
+          },
+          {
+            "text": "样本中的噪声、混响、其他说话人和录音链路特征会进入学习信号；训练前的单说话人筛选、清理与质量切片直接影响克隆结果。",
+            "sourceUrls": [
+              "https://www.youtube.com/watch?v=AiRksVoiUAI",
+              "https://elevenlabs.io/docs/eleven-creative/voices/voice-cloning/professional-voice-cloning"
+            ],
+            "evidenceRefs": [
+              {
+                "start": 53,
+                "end": 84
+              },
+              {
+                "start": 319,
+                "end": 384
+              },
+              {
+                "start": 549,
+                "end": 581
+              }
+            ]
+          },
+          {
+            "text": "声音克隆把可用于身份关联的生物特征转化为可生成能力，因此需要声音主体同意、用途限制、验证与可追溯措施；合成声音不能单独作为身份认证。",
+            "sourceUrls": [
+              "https://www.youtube.com/watch?v=AiRksVoiUAI",
+              "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
+              "https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge"
+            ],
+            "evidenceRefs": [
+              {
+                "start": 224,
+                "end": 232
+              },
+              {
+                "start": 588,
+                "end": 605
+              }
+            ]
+          }
+        ],
+        "proposedLearningPath": {
+          "phase": "多模态生成系统",
+          "order": "8.9",
+          "afterNodes": [
+            "speech"
+          ],
+          "beforeNodes": [
+            "audio-generation",
+            "content-detection"
+          ],
+          "rationale": "先理解通用语音识别与合成，再学习以说话人身份为条件的声音克隆，随后进入更开放的音频生成和生成内容检测。"
+        },
+        "disqualifiers": [],
+        "proposedNode": {
+          "id": "voice-cloning",
+          "title": "声音克隆",
+          "domain": "generation",
+          "summary": "从参考语音提取说话人身份特征，并在合成新文本时保持其音色、口音和韵律，同时处理样本质量、授权验证与冒用风险。"
+        }
+      }
+    ]
+  },
+  "approval": {
+    "tutorialApproved": false,
+    "approvedConceptTerms": [],
+    "rejectedConceptTerms": [],
+    "notes": "ready 仅表示第一阶段提案完整；新节点必须继续通过去锚定独立复核和完整原子包门禁。"
+  }
+}

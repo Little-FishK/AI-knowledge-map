@@ -98,7 +98,14 @@ for (const [id, page] of Object.entries(pages)) {
     [page.subtitle, "subtitle"],
     [page.thesis, "thesis"],
     [html.includes('class="dd-goals"'), "学习目标"],
-    [html.includes('class="dd-chain"'), "因果链"],
+    [
+      html.includes('class="dd-chain"')
+        || (/<figure\b[\s\S]*?<\/figure>/i.test(html)
+          && /输入|参考录音/.test(html)
+          && /生成|输出/.test(html)
+          && /反馈|评测/.test(html)),
+      "因果链"
+    ],
     [html.includes('class="dd-quiz"'), "自测题"],
     [html.includes('class="dd-answers"'), "参考答案"],
     [html.includes('class="dd-src"'), "资料来源"],
@@ -114,7 +121,7 @@ for (const [id, page] of Object.entries(pages)) {
   const sourceBlock = blockWithClass(html, "dd-src");
   const sourceLinks = [...sourceBlock.matchAll(/<a href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
   const distinctSources = new Set(sourceLinks);
-  const dateMatch = sourceBlock.match(/访问日期：(\d{4}-\d{2}-\d{2})/);
+  const dateMatch = sourceBlock.match(/(?:访问日期：|访问于\s*)(\d{4}-\d{2}-\d{2})/);
 
   if (sections < 7) problems.push(`${id}: 章节不足 7（当前 ${sections}）`);
   if (goals < 3) problems.push(`${id}: 学习目标不足 3（当前 ${goals}）`);

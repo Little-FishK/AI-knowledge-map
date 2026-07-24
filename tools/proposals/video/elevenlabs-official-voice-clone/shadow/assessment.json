@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 1,
+  "mode": "independent",
+  "proposalHash": "sha256:9685216228988afbcba2d89d9af847e2b1fe4d2d89958699431ab5c1831340fb",
+  "evidenceHash": "sha256:ecfd1fd17bf74c351ad9eb117674be563f5d506fa40954a698a2511b4b6f5b96",
+  "reviewer": {
+    "id": "independent-reviewer-voice-cloning-v1",
+    "note": "复核者应先读原始证据和受限图谱上下文，再独立填写；不要复制提案分数。"
+  },
+  "candidates": [
+    {
+      "term": "speech",
+      "decision": "reject",
+      "rationale": "视频使用文字转语音和语音转语音来播放已克隆音色，但没有解释通用语音识别、语音合成或音频 token 化机制。实质证据集中在声音克隆这一更具体的目标说话者适配任务，不能作为宽泛 speech 候选的补充。",
+      "targetNode": null,
+      "nodeScores": null,
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [
+        {
+          "start": 79.18,
+          "end": 84.66
+        },
+        {
+          "start": 245.065,
+          "end": 255.825
+        },
+        {
+          "start": 621.355,
+          "end": 624.755
+        }
+      ],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [
+        "仅把现有语音工具作为产品使用入口",
+        "缺少通用语音识别或合成机制"
+      ],
+      "proposedNode": null
+    },
+    {
+      "term": "agent",
+      "decision": "reject",
+      "rationale": "Conversational AI agent 只作为克隆声音的一种使用入口被一句带过，没有 Agent 循环、工具调用、状态或权限机制证据。",
+      "targetNode": null,
+      "nodeScores": null,
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [
+        {
+          "start": 237.905,
+          "end": 240.705
+        }
+      ],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [
+        "仅有产品用途级提及",
+        "缺少 Agent 机制"
+      ],
+      "proposedNode": null
+    },
+    {
+      "term": "clip",
+      "decision": "reject",
+      "rationale": "转录没有讨论 CLIP、图文配对、对比学习或跨模态表示；画面中的 Clip FX Editor 只是音频剪辑界面，与 CLIP 图文对比学习同名不同义。",
+      "targetNode": null,
+      "nodeScores": null,
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [
+        "同名异义误命中",
+        "没有图文对比学习证据"
+      ],
+      "proposedNode": null
+    },
+    {
+      "term": "privacy",
+      "decision": "supplement",
+      "rationale": "视频给出现有隐私摘要未覆盖的声音生物特征授权边界：上传克隆样本前必须确认拥有权利和同意，专业克隆还要求本人朗读指定内容进行声音验证，使克隆权限不只依赖文件持有。权利确认与说话者验证适用于任何声音克隆系统，不依赖 ElevenLabs 的具体界面。",
+      "targetNode": "privacy",
+      "nodeScores": null,
+      "supplementCriteria": {
+        "transferableBeyondProduct": true,
+        "notCoveredByExistingNode": true,
+        "mechanismOrBoundary": true
+      },
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [
+        {
+          "start": 223.985,
+          "end": 229.745
+        },
+        {
+          "start": 588.515,
+          "end": 606.935
+        }
+      ],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [],
+      "proposedNode": null
+    },
+    {
+      "term": "Prompt Engineering",
+      "decision": "reject",
+      "rationale": "Prompt Engineering 只出现在模型选择界面的说明文字中，转录没有展示提示的措辞、结构、控制变量或效果比较，因此证据不足。",
+      "targetNode": null,
+      "nodeScores": null,
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [
+        "仅有界面说明文字",
+        "缺少提示设计机制"
+      ],
+      "proposedNode": null
+    },
+    {
+      "term": "Voice Cloning",
+      "decision": "new",
+      "rationale": "来源增强后，声音克隆可以与普通 TTS 稳定消歧：普通 TTS 的核心是把文本映射为语音，声音克隆额外接收目标说话者参考音频，并把说话者身份作为独立条件注入合成。即时或零样本克隆可在推理时从数秒参考语音提取 speaker embedding，或把声学 codec tokens 作为 prompt，不更新目标说话者专属权重；专业克隆则用较长目标语音微调模型参数。它还具有独立评测轴：除可懂度和自然度外，必须测目标说话者相似度；并具有授权、身份冒用、检测与溯源等专属安全边界。现有 speech 总览仅区分 STT 与 TTS，没有覆盖目标身份条件化、零样本与微调双机制、说话者相似度评测和克隆专属治理，因此值得拆为新节点。",
+      "targetNode": null,
+      "nodeScores": {
+        "identity": 4,
+        "mechanism": 4,
+        "nonDuplication": 3,
+        "practicalValue": 4,
+        "relationshipPotential": 4,
+        "sourceQuality": 4
+      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [
+        {
+          "start": 0,
+          "end": 50.06
+        },
+        {
+          "start": 53.3,
+          "end": 84.66
+        },
+        {
+          "start": 285.285,
+          "end": 319.105
+        },
+        {
+          "start": 588.515,
+          "end": 628.775
+        }
+      ],
+      "nearestNodes": [
+        "speech",
+        "controllable-generation"
+      ],
+      "proposedEdges": [
+        {
+          "from": "voice-cloning",
+          "label": "目标说话者条件化的语音合成",
+          "to": "speech",
+          "type": "is-a"
+        },
+        {
+          "from": "voice-cloning",
+          "label": "参考音频控制说话者身份",
+          "to": "controllable-generation",
+          "type": "is-a"
+        },
+        {
+          "from": "voice-cloning",
+          "label": "专业克隆更新目标说话者参数",
+          "to": "fine-tuning",
+          "type": "uses"
+        },
+        {
+          "from": "voice-cloning",
+          "label": "复制可识别的声音生物特征",
+          "to": "privacy",
+          "type": "threatens"
+        },
+        {
+          "from": "content-detection",
+          "label": "鉴别合成或冒用音频",
+          "to": "voice-cloning",
+          "type": "mitigates"
+        }
+      ],
+      "externalSources": [
+        {
+          "title": "Transfer Learning from Speaker Verification to Multispeaker Text-To-Speech Synthesis",
+          "url": "https://arxiv.org/abs/1806.04558",
+          "authorityType": "primary research paper",
+          "supportScope": "给出 speaker encoder、受 speaker embedding 条件化的 TTS synthesizer 与 vocoder 三组件机制；数秒参考语音可为训练未见说话者生成语音，并以自然度、说话者相似度和说话者验证 EER 评测。"
+        },
+        {
+          "title": "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers",
+          "url": "https://arxiv.org/abs/2301.02111",
+          "authorityType": "primary research paper",
+          "supportScope": "给出以三秒声学提示和文本音素为条件生成 codec tokens 的零样本克隆机制，并使用 WER、自然度和 speaker similarity 评测未见说话者。"
+        },
+        {
+          "title": "Voice cloning: how it works",
+          "url": "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
+          "authorityType": "official technical documentation",
+          "supportScope": "明确即时克隆是推理时 few-shot conditioning、无权重更新；专业克隆通过目标语音微调权重，并说明数据质量、跨风格一致性与 voice-captcha 的边界。"
+        },
+        {
+          "title": "The FTC Voice Cloning Challenge",
+          "url": "https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge",
+          "authorityType": "government consumer-protection authority",
+          "supportScope": "确认声音克隆带来欺诈、冒用生物特征和创作者声音的专属风险，并把干预分为预防或认证、实时检测和事后鉴别。"
+        },
+        {
+          "title": "ASVspoof 2021 Evaluation Plan",
+          "url": "https://www.asvspoof.org/asvspoof2021/asvspoof2021_evaluation_plan.pdf",
+          "authorityType": "research benchmark specification",
+          "supportScope": "提供真人语音与 spoofed speech 二分类的标准评测设置，并以 t-DCF 和 EER 评估反欺骗系统。"
+        }
+      ],
+      "claims": [
+        {
+          "text": "即时或零样本声音克隆可在不更新目标说话者专属权重的情况下，用短参考语音形成 speaker embedding 或声学 prompt，在推理时条件化语音合成。",
+          "sourceUrls": [
+            "https://arxiv.org/abs/1806.04558",
+            "https://arxiv.org/abs/2301.02111",
+            "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning"
+          ],
+          "evidenceRefs": [
+            {
+              "start": 15.74,
+              "end": 50.06
+            }
+          ]
+        },
+        {
+          "text": "专业声音克隆与即时克隆不是单纯速度差异：前者用目标说话者数据微调模型权重，数据量和质量会直接影响一致性与跨风格表现。",
+          "sourceUrls": [
+            "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning"
+          ],
+          "evidenceRefs": [
+            {
+              "start": 285.285,
+              "end": 319.105
+            }
+          ]
+        },
+        {
+          "text": "声音克隆评测至少包含语音可懂度、自然度和目标说话者相似度三个相互独立的轴；常用证据包括 WER、MOS/CMOS、SMOS、嵌入相似度和说话者验证 EER。",
+          "sourceUrls": [
+            "https://arxiv.org/abs/1806.04558",
+            "https://arxiv.org/abs/2301.02111"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "text": "声音克隆复制可识别的声音身份，风险不等同于普通 TTS；治理需要覆盖生成前授权或认证、生成中的实时检测，以及生成后的 spoof 鉴别和溯源。",
+          "sourceUrls": [
+            "https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge",
+            "https://www.asvspoof.org/asvspoof2021/asvspoof2021_evaluation_plan.pdf",
+            "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning"
+          ],
+          "evidenceRefs": [
+            {
+              "start": 588.515,
+              "end": 605.17
+            }
+          ]
+        }
+      ],
+      "proposedLearningPath": {
+        "phase": "多模态生成系统",
+        "order": "8.10",
+        "afterNodes": [
+          "speech"
+        ],
+        "beforeNodes": [
+          "audio-generation"
+        ],
+        "rationale": "先理解一般 STT/TTS，再学习目标说话者条件化、零样本克隆与说话者微调；随后再扩展到非语音音效和音乐生成。"
+      },
+      "disqualifiers": [],
+      "proposedNode": {
+        "id": "voice-cloning",
+        "title": "声音克隆",
+        "aliases": [
+          "Voice Cloning",
+          "语音克隆",
+          "音色克隆",
+          "Voice Clone",
+          "Zero-shot Voice Cloning"
+        ],
+        "domain": "generation",
+        "maturity": "evolving",
+        "summary": "从目标说话者的参考语音提取身份表示或声学提示，生成该说话者从未说过的新语音；可在推理时零样本条件化，也可用较长语音微调模型提高一致性。",
+        "definition": "声音克隆是目标说话者条件化的语音合成：输入不仅包含要说的文本，还包含代表某个说话者身份、音色、口音和部分韵律的参考语音条件。",
+        "mechanisms": [
+          "零样本或即时克隆：speaker encoder 将数秒参考语音压成说话者 embedding，或 neural codec 模型直接把参考声学 tokens 作为 prompt；生成时条件化，不更新目标说话者权重。",
+          "专业或适配式克隆：用较长的目标说话者数据微调模型参数，提高跨文本、情绪和说话风格的一致性。",
+          "合成阶段同时受文本内容条件和说话者身份条件控制，再由声学模型或 codec 解码器生成波形。"
+        ],
+        "boundaries": [
+          "普通 TTS 解决文本到语音；声音克隆额外要求从参考音频适配指定说话者，尤其是训练时未见说话者。",
+          "Voice conversion 变换已有源语音的说话者身份；文本驱动的声音克隆可直接让目标声音说任意新文本。",
+          "Voice design 从描述创造新声音；声音克隆以真实目标说话者为参照，因而带来更强的授权与身份冒用风险。"
+        ],
+        "evaluation": [
+          "可懂度：WER 或人工转录准确性。",
+          "自然度：MOS、CMOS 等主观语音质量评分。",
+          "说话者保持：SMOS、speaker-embedding cosine similarity、说话者验证 EER。",
+          "鲁棒性：跨文本、语言、情绪、语速、噪声与录音设备的一致性。"
+        ],
+        "safety": [
+          "采集和克隆前取得目标说话者明确授权，并验证提交者与声音所有者的关系。",
+          "对生成音频保留来源追踪、水印或可审计记录。",
+          "部署实时 deepfake 检测与事后 spoof 鉴别，并明确检测存在误报、漏报和分布漂移。"
+        ]
+      }
+    }
+  ]
+}
