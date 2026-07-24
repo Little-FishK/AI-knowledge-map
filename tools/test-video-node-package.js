@@ -150,7 +150,18 @@ assert(pkg.layout.position);
 assert.strictEqual(pkg.layout.report.sameDomainOverlaps, 0);
 assert.strictEqual(pkg.layout.report.occlusionViolations, 0);
 
-const insertionPlan = proposeLearningPathReindex(projectData.graph, {
+const insertionGraph = {
+  recommendedLearningPath: [{
+    phase: "fixture",
+    steps: [
+      ["8.9", "speech"],
+      ["8.10", "audio-generation"],
+      ["8.11", "world-models"],
+      ["8.12", "content-detection"]
+    ]
+  }]
+};
+const insertionPlan = proposeLearningPathReindex(insertionGraph, {
   order: "8.10",
   afterNodes: ["speech"],
   beforeNodes: ["audio-generation"]
@@ -161,7 +172,7 @@ assert.deepStrictEqual(insertionPlan, [
   { nodeId: "content-detection", from: "8.12", to: "8.13" }
 ]);
 assert.deepStrictEqual(
-  proposeLearningPathReindex(projectData.graph, {
+  proposeLearningPathReindex(insertionGraph, {
     order: "8.10",
     beforeNodes: ["world-models"]
   }),

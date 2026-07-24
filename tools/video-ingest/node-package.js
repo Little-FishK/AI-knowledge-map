@@ -325,6 +325,9 @@ function runDeepDiveGates(pkg) {
 
 function writeNodePackage(directory, pkg) {
   const output = path.resolve(directory);
+  const sealPayload = JSON.parse(JSON.stringify(pkg));
+  delete sealPayload.packageHash;
+  pkg.packageHash = sha256(sealPayload);
   fs.mkdirSync(output, { recursive: true });
   fs.mkdirSync(path.join(output, "deepdive"), { recursive: true });
   fs.writeFileSync(path.join(output, "manifest.json"), JSON.stringify(pkg, null, 2) + "\n", "utf8");

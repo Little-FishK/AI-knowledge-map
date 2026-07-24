@@ -10,10 +10,13 @@
 "use strict";
 const path = require("path");
 const layoutQuality = require(path.join(__dirname, "..", "assets", "layout-quality.js"));
+const graphRoot = process.env.GRAPH_ROOT
+  ? path.resolve(process.env.GRAPH_ROOT)
+  : path.join(__dirname, "..");
 
 global.window = {};
 try {
-  require(path.join(__dirname, "..", "data", "graph.js"));
+  require(path.join(graphRoot, "data", "graph.js"));
 } catch (e) {
   console.error("✗ graph.js 语法错误：");
   console.error("  " + e.message);

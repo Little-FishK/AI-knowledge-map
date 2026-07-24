@@ -18,12 +18,14 @@
     "video:shadow-batch": "node tools/video-ingest/review-shadow-batch.js",
     "video:node-content-packet": "node tools/video-ingest/create-node-content-packet.js",
     "video:node-package": "node tools/video-ingest/create-node-package.js",
+    "video:node-apply": "node tools/video-ingest/apply-node-package.js",
+    "video:node-rollback": "node tools/video-ingest/rollback-node-application.js",
     "video:calibrate": "node tools/video-ingest/calibrate-shadow.js",
     "quality:deepdives": "node tools/check-deepdive-quality.js",
     "quality:l3": "node tools/audit-deepdive-benchmark.js",
     "quality:browser": "node tools/audit-deepdive-browser.js --changed",
     "test:quality-gates": "node tools/test-deepdive-quality.js",
-    "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-calibration.js",
+    "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-node-apply.js && node tools/test-video-calibration.js",
     "quality:all": "npm run validate && npm run test:quality-gates && npm run test:video-ingest && npm run quality:deepdives"
   },
   "devDependencies": {

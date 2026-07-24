@@ -123,8 +123,8 @@ window.GRAPH = {
       ["8.4", "image-generation"], ["8.5", "controllable-generation"],
       ["8.6", "image-editing"], ["8.7", "super-resolution"],
       ["8.8", "video-generation"], ["8.9", "speech"],
-      ["8.10", "audio-generation"], ["8.11", "world-models"],
-      ["8.12", "content-detection"]
+      ["8.10", "voice-cloning"], ["8.11", "audio-generation"], ["8.12", "world-models"],
+      ["8.13", "content-detection"]
     ]},
     { phase: "安全、对齐与治理", steps: [
       ["9", "alignment"], ["9.1", "interpretability"],
@@ -275,7 +275,8 @@ window.GRAPH = {
     "training-data-governance": [-255, 505],
     "uncertainty-calibration": [-285, 171],
     "test-time-compute": [65, 535],
-    "state-space-models": [735, 145]
+    "state-space-models": [735, 145],
+    "voice-cloning": [134.68,77.21]
   },
 
   domains: {
@@ -2050,6 +2051,65 @@ window.GRAPH = {
       cases: [{ title: "百万长度不等于百万内容都记住", text: "能以线性成本扫描很长序列，只说明计算可承受；有限状态仍会压缩历史，信息利用能力必须单独评测。" }],
       sources: [{ type: "url", title: "Mamba (2023)", ref: "https://arxiv.org/abs/2312.00752" }],
       createdAt: "2026-07-21", updatedAt: "2026-07-21"
+    },
+    {
+      "id": "voice-cloning",
+      "title": "声音克隆",
+      "aliases": [
+        "Voice Cloning",
+        "语音克隆",
+        "音色克隆",
+        "Voice Clone",
+        "Zero-shot Voice Cloning"
+      ],
+      "maturity": "evolving",
+      "domain": "generation",
+      "heat": 0.76,
+      "summary": "从目标说话者的参考语音提取身份表示或声学提示，生成该说话者从未说过的新语音；可在推理时零样本条件化，也可用较长语音微调模型提高一致性。",
+      "body": "**是什么**：声音克隆是目标说话人条件化的语音合成：除了“说什么”，系统还从一段参考录音中获得“像谁说”，再生成该说话人未录过的新语句。它建立在 [[speech]] 上，但多出独立的身份条件与评测轴。\n\n**机制**：即时或零样本克隆在推理时把参考音频压成 speaker embedding，或直接把声学 codec token 当作提示；专业克隆则用更长的目标语音做 [[fine-tuning]]。两条路线最终都把文本内容和说话人条件送入合成器，再由声学解码器生成波形，因此属于 [[controllable-generation]]。\n\n**约束与影响**：可懂度、自然度和说话人相似度是不同目标；参考音频里的噪声、混响、口音与情绪也可能被复制。声音是可识别的生物特征，未经授权的克隆会威胁 [[privacy]]，还可用于身份冒用。\n\n**怎么应对**：用独立测试集分别测 WER、主观自然度和说话人相似度；在采集前确认权利与同意，生成时保留来源记录，发布后结合水印、溯源与 [[content-detection]]。检测器有误报和漏报，不能替代授权。",
+      "cases": [
+        {
+          "title": "即时克隆：少量参考音频快速生成",
+          "text": "用户提交一至数分钟干净、单人、风格一致的录音。系统不为该人训练专属模型，而是在推理时提取说话人表示，并把它作为新文本合成的条件。速度快，但特殊口音、强情绪和跨语言稳定性可能较弱。"
+        },
+        {
+          "title": "专业克隆：用较长语料做目标适配",
+          "text": "经授权收集更长且覆盖充分的目标语音，清洗、切分并用于参数适配。它可能提高跨文本和长段落的一致性，但也会把数据中的房间声、表演风格和发音偏差学得更牢，需要留出独立测试语句。"
+        },
+        {
+          "title": "内容修补与风险控制",
+          "text": "创作者可用自己的授权克隆补录漏句、制作多语言版本。上线前应确认生成文本、说话人身份和用途都在授权范围内；高风险场景还要披露合成属性、保存审计记录并防止把克隆音频当作身份认证凭据。"
+        }
+      ],
+      "sources": [
+        {
+          "type": "url",
+          "title": "SV2TTS：从说话人验证迁移到多说话人语音合成",
+          "ref": "https://arxiv.org/abs/1806.04558"
+        },
+        {
+          "type": "url",
+          "title": "VALL-E：以声学提示进行零样本语音合成",
+          "ref": "https://arxiv.org/abs/2301.02111"
+        },
+        {
+          "type": "url",
+          "title": "ElevenLabs Voice Cloning 技术说明",
+          "ref": "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning"
+        },
+        {
+          "type": "url",
+          "title": "FTC Voice Cloning Challenge",
+          "ref": "https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge"
+        },
+        {
+          "type": "url",
+          "title": "ASVspoof 2021 Evaluation Plan",
+          "ref": "https://www.asvspoof.org/asvspoof2021/asvspoof2021_evaluation_plan.pdf"
+        }
+      ],
+      "createdAt": "2026-07-24",
+      "updatedAt": "2026-07-24"
     }
   ],
 
@@ -2562,6 +2622,36 @@ window.GRAPH = {
     { from: "state-space-models", to: "attention", type: "contrast", label: "压缩状态 vs 位置两两交互" },
     { from: "state-space-models", to: "rnn", type: "related", label: "递归状态传统" },
     { from: "state-space-models", to: "context-window", type: "related", label: "长序列线性扫描" },
-    { from: "state-space-models", to: "model-families", type: "related", label: "替代骨架方向" }
+    { from: "state-space-models", to: "model-families", type: "related", label: "替代骨架方向" },
+    {
+      "from": "voice-cloning",
+      "label": "目标说话者条件化的语音合成",
+      "to": "speech",
+      "type": "is-a"
+    },
+    {
+      "from": "voice-cloning",
+      "label": "参考音频控制说话者身份",
+      "to": "controllable-generation",
+      "type": "is-a"
+    },
+    {
+      "from": "voice-cloning",
+      "label": "专业克隆更新目标说话者参数",
+      "to": "fine-tuning",
+      "type": "uses"
+    },
+    {
+      "from": "voice-cloning",
+      "label": "复制可识别的声音生物特征",
+      "to": "privacy",
+      "type": "threatens"
+    },
+    {
+      "from": "content-detection",
+      "label": "鉴别合成或冒用音频",
+      "to": "voice-cloning",
+      "type": "mitigates"
+    }
   ]
 };

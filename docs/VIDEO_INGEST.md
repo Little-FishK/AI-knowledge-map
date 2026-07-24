@@ -573,3 +573,44 @@ npm run video:calibrate -- `
 - `tools/video-ingest/schemas/calibration-labels.schema.json`
 - `tools/proposals/video/calibration-labels-v05.json`
 - `tools/test-video-calibration.js`
+
+## 12. 正式节点应用：仅做两类机械检查
+
+通过提案评审、独立复核和 v0.4 原子包门禁后，正式应用阶段不再重复评分，也不重新判断概念是否应成为节点。它只执行两类检查：
+
+1. **封包完整性检查**：验证 `packageHash`、各拆分文件、原始提案/证据/独立复核/内容/图谱哈希，以及 L1–L3 通过状态，防止审核后的内容被替换。
+2. **地图集成检查**：验证节点 ID、关系端点、学习路径序号、布局、入口注册和目标文件状态；写入后只运行结构校验与深读页注册校验。
+
+先生成 dry-run 计划：
+
+```powershell
+npm run video:node-apply -- `
+  --package "<node-package-preview>" `
+  --plan "<node-application-plan.json>"
+```
+
+确认同一份计划后正式写入并保存回执：
+
+```powershell
+npm run video:node-apply -- `
+  --package "<node-package-preview>" `
+  --plan "<node-application-plan.json>" `
+  --write `
+  --receipt "<node-application-receipt.json>"
+```
+
+写入采用原子替换；任一集成校验失败会自动恢复全部目标文件。重复应用同一封包会返回 `no-op`。需要回退时：
+
+```powershell
+npm run video:node-rollback -- `
+  --receipt "<node-application-receipt.json>"
+```
+
+回退前会校验正式文件仍与应用回执记录的哈希一致，避免覆盖应用后产生的其他人工或自动修改。
+
+实现与测试：
+
+- `tools/video-ingest/node-application.js`
+- `tools/video-ingest/apply-node-package.js`
+- `tools/video-ingest/rollback-node-application.js`
+- `tools/test-video-node-apply.js`
