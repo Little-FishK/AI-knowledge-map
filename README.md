@@ -42,6 +42,12 @@ npm run quality:all
 
 Windows PowerShell 若阻止 `npm.ps1`，可将命令中的 `npm` 改为 `npm.cmd`。
 
+## 视频双轨入库
+
+v0.1 可以把同一份视频证据转成两条独立提案：一条判断是否进入软件教程页，另一条判断是否新增、合并或补充概念节点，并单独评价核心节点资格。当前只生成和校验提案，不修改正式网站。
+
+完整命令、评分和数据合同见 [docs/VIDEO_INGEST.md](docs/VIDEO_INGEST.md)。
+
 ## 内容与来源
 
 正文采用原创表达；外部资料用于选题、事实核对和继续阅读，具体来源与第三方许可说明见 [CREDITS.md](CREDITS.md)。教程资源的收录标准见 [docs/TUTORIALS.md](docs/TUTORIALS.md)。

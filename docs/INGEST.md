@@ -25,7 +25,7 @@ data/graph.js
 |---|---|
 | 网页 | WebFetch；403 时改用 PowerShell `Invoke-WebRequest` 或找镜像/原始版本 |
 | PDF | 下载后 `py -3.11` + `pypdf` 抽文本（**注意**：默认 python 环境没有 pip，必须用 `py -3.11`） |
-| 视频 | 优先找字幕/文字稿；没有就请用户提供要点 |
+| 视频 | 使用 `tools/video-evidence.py` 生成字幕、关键帧 OCR 与带哈希的 evidence JSON；双轨提案规范见 [VIDEO_INGEST.md](VIDEO_INGEST.md) |
 | 本地文档 | 直接 Read |
 
 抽出的原文放 `tools/_raw/`（已 gitignore，**不入库、不发布**）。

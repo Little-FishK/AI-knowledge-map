@@ -197,7 +197,9 @@ review: {
 py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|local] [--prompt "领域词表"] [--interval 8] [--height 480|720]
 ```
 
-它**免登录**完成：yt-dlp 下音频+低清视频 → **转录**（逐段带时间戳）→ 按固定间隔**密采关键帧**并**相邻感知去重**（治长镜头漏采、去冗余）→ RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 汇成 `<前缀>.evidence.md`。
+它**免登录**完成：yt-dlp 下音频+低清视频 → **转录**（逐段带时间戳）→ 按固定间隔**密采关键帧**并**相邻感知去重**（治长镜头漏采、去冗余）→ RapidOCR 读出屏幕上的命令/URL/配置/型号名 → 同时生成供人阅读的 `<前缀>.evidence.md` 和供双轨入库读取、带内容哈希的 `<前缀>.evidence.json`。
+
+从视频证据同时产生教程候选和节点候选的 v0.1 流程、评分与提案 Schema 见 [VIDEO_INGEST.md](VIDEO_INGEST.md)。当前只生成提案，不自动修改正式教程或地图。
 
 调参：`--prompt` 领域词表纠专名拼写（Groq/本地都用）；`--interval` 抽帧间隔秒（越小越密）；`--height 720` 抽更高清帧、OCR 小字更准；`--dedup` 相邻帧去重阈值。
 

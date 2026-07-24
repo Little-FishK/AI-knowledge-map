@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-dual-proposal-v1.json",
+  "title": "Dual-track video ingestion proposal v1",
+  "type": "object",
+  "required": ["schemaVersion", "status", "evidenceHash", "source", "tutorialTrack", "conceptTrack"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["draft", "ready"] },
+    "evidenceHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "source": {
+      "type": "object",
+      "required": ["url", "title"],
+      "properties": {
+        "url": { "type": "string", "pattern": "^https?://" },
+        "title": { "type": "string", "minLength": 1 },
+        "creator": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "tutorialTrack": {
+      "type": "object",
+      "required": ["decision", "action", "softwareId", "evidenceLevel", "standards", "quality", "resourceDraft"],
+      "properties": {
+        "decision": { "enum": ["undecided", "formal", "candidate", "reject"] },
+        "action": { "enum": ["append-resource", "create-page", "software-candidate", "none"] },
+        "softwareId": { "type": ["string", "null"] },
+        "evidenceLevel": { "type": ["string", "null"] },
+        "standards": { "type": ["object", "null"] },
+        "quality": { "type": ["object", "null"] },
+        "resourceDraft": { "type": ["object", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "conceptTrack": {
+      "type": "object",
+      "required": ["candidates"],
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["term", "decision", "coreCandidate"],
+            "properties": {
+              "term": { "type": "string", "minLength": 1 },
+              "decision": { "enum": ["undecided", "new", "merge", "supplement", "reject", "uncertain"] },
+              "targetNode": { "type": ["string", "null"] },
+              "nodeScores": { "type": ["object", "null"] },
+              "coreCandidate": { "type": "boolean" },
+              "coreScores": { "type": ["object", "null"] },
+              "coreReason": { "type": ["string", "null"] },
+              "nearestNodes": { "type": "array" },
+              "proposedEdges": { "type": "array" },
+              "externalSources": { "type": "array" },
+              "evidenceRefs": { "type": "array" },
+              "disqualifiers": { "type": "array" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

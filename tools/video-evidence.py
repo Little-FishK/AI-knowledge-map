@@ -13,7 +13,8 @@
     py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--model small|large-v3-turbo|large-v3] [--threshold 27]
 
 产物：
-    <前缀>.evidence.md      元数据 + 逐段转录（带时间戳）+ 每个场景关键帧的 OCR
+    <前缀>.evidence.md      供人阅读的元数据、逐段转录与关键帧 OCR
+    <前缀>.evidence.json    供双轨入库工具读取的结构化证据（含内容哈希）
     <前缀>_frames/          抽出的关键帧（可再人工 Read 核对界面）
 
 原则（见 docs/TUTORIALS.md）：
@@ -21,12 +22,37 @@
     · 只下载低清视频+音频供内部取证；教程正文必须原创，不整段转载字幕。
     · 免登录即可取证；证据等级达 E2 后方可进入正式评分。
 """
-import argparse, json, os, subprocess, sys, re, time
+import argparse, hashlib, json, os, subprocess, sys, re, time
 
 def run(cmd):
     # 不用 text=True，避免 Windows 下用 gbk 解码 yt-dlp 输出报错
     p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.returncode, p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
+
+def require_success(result, step):
+    rc, out, err = result
+    if rc != 0:
+        detail = (err or out or "未知错误").strip()[-1200:]
+        raise RuntimeError(f"{step}失败（退出码 {rc}）：{detail}")
+    return out
+
+def stable_hash(value):
+    def canonical(item):
+        if isinstance(item, dict):
+            return {key: canonical(item[key]) for key in sorted(item)}
+        if isinstance(item, list):
+            return [canonical(entry) for entry in item]
+        if isinstance(item, float) and item.is_integer():
+            return int(item)
+        return item
+    payload = json.dumps(canonical(value), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+def iso_date(value):
+    text = str(value or "")
+    if re.fullmatch(r"\d{8}", text):
+        return f"{text[:4]}-{text[4:6]}-{text[6:8]}"
+    return text or None
 
 def groq_transcribe(audio, model, prompt=""):
     """用 Groq API 转录。key 从环境变量 GROQ_API_KEY 读取（绝不写进代码/仓库）。
@@ -88,20 +114,35 @@ def main():
         j = json.loads(out)
         meta = {"title": j.get("title"), "uploader": j.get("uploader"),
                 "duration": j.get("duration"), "upload_date": j.get("upload_date"),
-                "chapters": [(c.get("start_time"), c.get("title")) for c in (j.get("chapters") or [])]}
+                "extractor": j.get("extractor_key") or j.get("extractor"),
+                "webpage_url": j.get("webpage_url") or a.url,
+                "chapters": [{"start": c.get("start_time"), "end": c.get("end_time"),
+                              "title": c.get("title")} for c in (j.get("chapters") or [])]}
     except Exception:
         print("  ⚠ 元数据解析失败（可能是合集/需分P处理）", flush=True)
+    if rc != 0 and not meta:
+        raise RuntimeError("视频元数据获取失败：" + (err or out or "未知错误").strip()[-1200:])
 
     # 2) 下载音频
     print("[2/5] 下载音频…", flush=True)
     if not os.path.exists(audio):
-        run([sys.executable, "-m", "yt_dlp", "-f", "bestaudio", "--no-playlist", "-o", audio, a.url])
+        require_success(
+            run([sys.executable, "-m", "yt_dlp", "-f", "bestaudio", "--no-playlist", "-o", audio, a.url]),
+            "下载音频"
+        )
+    if not os.path.exists(audio):
+        raise RuntimeError("下载音频后未找到输出文件：" + audio)
     # 3) 下载低清视频（合并 mp4，供抽帧）
     print("[3/5] 下载低清视频…", flush=True)
     if not os.path.exists(video):
-        run([sys.executable, "-m", "yt_dlp", "-f",
-             f"bv*[height<={a.height}]+ba/b[height<={a.height}]/best",
-             "--merge-output-format", "mp4", "--no-playlist", "-o", video, a.url])
+        require_success(
+            run([sys.executable, "-m", "yt_dlp", "-f",
+                 f"bv*[height<={a.height}]+ba/b[height<={a.height}]/best",
+                 "--merge-output-format", "mp4", "--no-playlist", "-o", video, a.url]),
+            "下载视频"
+        )
+    if not os.path.exists(video):
+        raise RuntimeError("下载视频后未找到输出文件：" + video)
 
     # 4) 转录：优先 Groq（快、准 large-v3、近乎免费），无 key 回落本地
     print("[4/5] 转录…", flush=True)
@@ -125,11 +166,24 @@ def main():
         pairs = [(float(s.start), s.text.strip()) for s in segs]
         asr_used = f"本地 faster-whisper / {a.model}"
         print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
-    transcript = [f"[{int(st)//60:02d}:{int(st)%60:02d}] {tx}" for st, tx in pairs]
+    transcript_segments = []
+    for index, (start, text) in enumerate(pairs):
+        fallback_end = float(meta.get("duration") or start)
+        end = float(pairs[index + 1][0]) if index + 1 < len(pairs) else fallback_end
+        transcript_segments.append({
+            "start": round(float(start), 3),
+            "end": round(max(float(start), end), 3),
+            "text": text
+        })
+    transcript = [
+        f"[{int(item['start'])//60:02d}:{int(item['start'])%60:02d}] {item['text']}"
+        for item in transcript_segments
+    ]
 
     # 5) 密采抽帧（治长镜头漏采）→ 相邻感知去重（去冗余）→ OCR
     print("[5/5] 抽帧 + 去重 + OCR…", flush=True)
-    ocr_lines = []
+    frame_evidence = []
+    limitations = []
     try:
         import glob, cv2, numpy as np
         from rapidocr_onnxruntime import RapidOCR
@@ -137,10 +191,17 @@ def main():
         for old in glob.glob(os.path.join(frames_dir, "f_*.jpg")):
             os.remove(old)
         # 一次过按固定间隔抽帧（frame i ≈ i×interval 秒）
-        subprocess.run(["ffmpeg", "-y", "-i", video, "-vf", f"fps=1/{a.interval}", "-q:v", "3",
-                        os.path.join(frames_dir, "f_%05d.jpg")],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        frame_run = subprocess.run(
+            ["ffmpeg", "-y", "-i", video, "-vf", f"fps=1/{a.interval}", "-q:v", "3",
+             os.path.join(frames_dir, "f_%05d.jpg")],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        if frame_run.returncode != 0:
+            raise RuntimeError(f"ffmpeg 抽帧失败（退出码 {frame_run.returncode}）")
         allf = sorted(glob.glob(os.path.join(frames_dir, "f_*.jpg")))
+        if not allf:
+            raise RuntimeError("ffmpeg 未生成任何关键帧")
         prev, kept = None, 0
         for idx, fp in enumerate(allf):
             g = cv2.imread(fp, cv2.IMREAD_GRAYSCALE)
@@ -154,23 +215,67 @@ def main():
             res, _ = ocr(fp)
             txt = re.sub(r"\s+", " ", " | ".join(t for _, t, c in res if float(c) >= 0.6)) if res else ""
             sec = idx * a.interval
-            ocr_lines.append(f"- [{sec//60:02d}:{sec%60:02d}] `{os.path.basename(fp)}` — {txt[:400]}")
+            frame_evidence.append({
+                "time": sec,
+                "file": os.path.join(os.path.basename(frames_dir), os.path.basename(fp)).replace("\\", "/"),
+                "ocr": txt[:400]
+            })
         print(f"  抽样 {len(allf)} 帧 → 去重后保留 {kept} 帧", flush=True)
     except Exception as e:
-        ocr_lines.append(f"（抽帧/OCR 阶段失败：{e}）")
+        limitations.append(f"抽帧/OCR 阶段失败：{e}")
+
+    generated_at = time.strftime("%Y-%m-%d")
+    source = {
+        "url": meta.get("webpage_url") or a.url,
+        "platform": meta.get("extractor") or "unknown",
+        "title": meta.get("title"),
+        "creator": meta.get("uploader"),
+        "publishedAt": iso_date(meta.get("upload_date")),
+        "durationSeconds": meta.get("duration"),
+        "accessedAt": generated_at
+    }
+    evidence_payload = {
+        "schemaVersion": 1,
+        "source": source,
+        "chapters": meta.get("chapters") or [],
+        "transcript": transcript_segments,
+        "frames": frame_evidence,
+        "acquisition": {
+            "asr": asr_used,
+            "transcriptComplete": bool(transcript_segments),
+            "ocrComplete": not limitations,
+            "limitations": limitations,
+            "evidenceLevelSuggestion": "E2" if transcript_segments else "E1",
+            "requiresEditorialReview": True
+        }
+    }
+    evidence_payload["contentHash"] = stable_hash(evidence_payload)
 
     # 写证据包
     md = [f"# 视频取证证据包 — {a.prefix}", "",
           f"- URL：{a.url}",
           f"- 标题：{meta.get('title','?')}",
           f"- 作者：{meta.get('uploader','?')} · 时长：{meta.get('duration','?')}s · 日期：{meta.get('upload_date','?')}",
-          f"- 转录：{asr_used} · 生成：{time.strftime('%Y-%m-%d')}",
+          f"- 转录：{asr_used} · 生成：{generated_at}",
+          f"- 证据哈希：`{evidence_payload['contentHash']}`",
           "", "> 转录仅作草稿；专有名词/命令/数值以下方 OCR 与官方文档为准。", ""]
     if meta.get("chapters"):
-        md += ["## 章节", ""] + [f"- [{int(t or 0)//60:02d}:{int(t or 0)%60:02d}] {title}" for t, title in meta["chapters"]] + [""]
-    md += ["## 关键帧 OCR（场景检测自动选帧）", ""] + ocr_lines + ["", "## 逐段转录", "", "```", *transcript, "```", ""]
+        md += ["## 章节", ""] + [
+            f"- [{int(item.get('start') or 0)//60:02d}:{int(item.get('start') or 0)%60:02d}] {item.get('title')}"
+            for item in meta["chapters"]
+        ] + [""]
+    ocr_lines = [
+        f"- [{int(item['time'])//60:02d}:{int(item['time'])%60:02d}] `{item['file']}` — {item['ocr']}"
+        for item in frame_evidence
+    ]
+    if limitations:
+        ocr_lines += [f"- ⚠ {item}" for item in limitations]
+    md += ["## 关键帧 OCR（固定间隔密采并相邻去重）", ""] + ocr_lines + ["", "## 逐段转录", "", "```", *transcript, "```", ""]
     open(a.prefix + ".evidence.md", "w", encoding="utf-8").write("\n".join(md))
-    print(f"✓ 完成：{a.prefix}.evidence.md（{len(transcript)} 段转录，{len(ocr_lines)} 个关键帧）")
+    with open(a.prefix + ".evidence.json", "w", encoding="utf-8") as handle:
+        json.dump(evidence_payload, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+    print(f"✓ 完成：{a.prefix}.evidence.md + .json（{len(transcript)} 段转录，{len(frame_evidence)} 个关键帧）")
 
 if __name__ == "__main__":
     main()

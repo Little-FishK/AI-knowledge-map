@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-evidence-v1.json",
+  "title": "Video evidence package v1",
+  "type": "object",
+  "required": ["schemaVersion", "source", "chapters", "transcript", "frames", "acquisition", "contentHash"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "source": {
+      "type": "object",
+      "required": ["url", "title", "accessedAt"],
+      "properties": {
+        "url": { "type": "string", "pattern": "^https?://" },
+        "platform": { "type": "string" },
+        "title": { "type": "string", "minLength": 1 },
+        "creator": { "type": ["string", "null"] },
+        "publishedAt": { "type": ["string", "null"] },
+        "durationSeconds": { "type": ["number", "null"], "minimum": 0 },
+        "accessedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      },
+      "additionalProperties": false
+    },
+    "chapters": { "type": "array" },
+    "transcript": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["start", "end", "text"],
+        "properties": {
+          "start": { "type": "number", "minimum": 0 },
+          "end": { "type": "number", "minimum": 0 },
+          "text": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["time", "file", "ocr"],
+        "properties": {
+          "time": { "type": "number", "minimum": 0 },
+          "file": { "type": "string", "minLength": 1 },
+          "ocr": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "required": ["asr", "transcriptComplete", "ocrComplete", "limitations", "evidenceLevelSuggestion", "requiresEditorialReview"],
+      "properties": {
+        "asr": { "type": ["string", "null"] },
+        "transcriptComplete": { "type": "boolean" },
+        "ocrComplete": { "type": "boolean" },
+        "limitations": { "type": "array", "items": { "type": "string" } },
+        "evidenceLevelSuggestion": { "enum": ["E1", "E2"] },
+        "requiresEditorialReview": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "contentHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  },
+  "additionalProperties": false
+}
