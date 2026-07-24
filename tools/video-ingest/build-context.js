@@ -30,7 +30,7 @@ function occurrenceCount(haystack, rawNeedle) {
 }
 
 function nodeTerms(node) {
-  const values = [node.title, ...(node.aliases || [])];
+  const values = [node.id, node.title, ...(node.aliases || [])];
   const titleParts = String(node.title || "").split(/[·/（）()]/).map(item => item.trim()).filter(Boolean);
   return [...new Set([...values, ...titleParts].filter(value => String(value).trim().length >= 2))];
 }

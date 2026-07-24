@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59",
+  "generatedAt": "2026-07-24T16:13:26.807Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=GuaKeDS6UKU",
+    "title": "n8n Quick Start Tutorial: Build Your First AI Agent [2026]",
+    "creator": "n8n",
+    "durationSeconds": 1251,
+    "transcriptSegments": 470,
+    "frames": 27,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "n8n",
+      "name": "n8n / Zapier",
+      "category": "agent",
+      "concept": "workflow-orchestration",
+      "summary": "把 AI 接进自动化工作流，连通几百个应用。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "n8n",
+        "name": "n8n / Zapier",
+        "occurrences": 37,
+        "matchedTerms": [
+          {
+            "term": "n8n",
+            "count": 37
+          }
+        ]
+      },
+      {
+        "id": "chatgpt",
+        "name": "ChatGPT",
+        "occurrences": 4,
+        "matchedTerms": [
+          {
+            "term": "ChatGPT",
+            "count": 2
+          },
+          {
+            "term": "chatgpt",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "existingTutorial": {
+      "title": "n8n / Zapier 使用教程",
+      "resourceCount": 1,
+      "resourceSummaries": [
+        {
+          "id": "yt-n8n-ai-agent-part1",
+          "platform": "youtube",
+          "title": "Building AI Agents: Chat Trigger, Memory, and System/User Messages Explained [Part 1]",
+          "url": "https://www.youtube.com/watch?v=yzvLfHb0nqE",
+          "audience": "第一次使用 n8n，希望从空白画布搭出带系统提示、会话记忆和公开聊天入口的 AI Agent 初学者"
+        }
+      ]
+    },
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "agent",
+        "title": "AI Agent",
+        "aliases": [
+          "智能体",
+          "AI 代理"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "能自主循环「思考→调用工具→看结果→再思考」直到完成任务的 LLM 系统。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "agent",
+            "count": 21
+          },
+          {
+            "term": "AI Agent",
+            "count": 17
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "prompt-injection",
+            "type": "threatens",
+            "title": "提示注入"
+          },
+          {
+            "direction": "in",
+            "node": "tool-calling",
+            "type": "enables",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "uses",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "agent-loop",
+            "type": "part-of",
+            "title": "Agent 循环"
+          },
+          {
+            "direction": "in",
+            "node": "agent-memory",
+            "type": "part-of",
+            "title": "Agent 记忆"
+          },
+          {
+            "direction": "in",
+            "node": "agent-skills",
+            "type": "part-of",
+            "title": "智能体技能"
+          },
+          {
+            "direction": "in",
+            "node": "planning",
+            "type": "part-of",
+            "title": "规划与任务分解"
+          },
+          {
+            "direction": "in",
+            "node": "human-in-the-loop",
+            "type": "constrains",
+            "title": "人在回路"
+          },
+          {
+            "direction": "in",
+            "node": "workflow-orchestration",
+            "type": "contrast",
+            "title": "工作流编排"
+          },
+          {
+            "direction": "in",
+            "node": "code-execution",
+            "type": "enables",
+            "title": "代码执行与沙箱"
+          },
+          {
+            "direction": "in",
+            "node": "computer-use",
+            "type": "part-of",
+            "title": "计算机操作"
+          }
+        ]
+      },
+      {
+        "id": "workflow-orchestration",
+        "title": "工作流编排",
+        "aliases": [
+          "Workflow Orchestration",
+          "工作流",
+          "流程编排",
+          "DAG"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "用预先定义好的固定流程串起多次 LLM 调用，和自主 Agent 是两条路。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "工作流",
+            "count": 4
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "contrast",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "out",
+            "node": "multi-agent",
+            "type": "related",
+            "title": "多 Agent 编排"
+          },
+          {
+            "direction": "out",
+            "node": "tool-calling",
+            "type": "uses",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "in",
+            "node": "model-routing",
+            "type": "related",
+            "title": "模型路由与级联系统"
+          }
+        ]
+      },
+      {
+        "id": "llm",
+        "title": "大语言模型 LLM",
+        "aliases": [
+          "Large Language Model",
+          "大模型"
+        ],
+        "domain": "foundations",
+        "maturity": "stable",
+        "summary": "在海量文本上训练出的超大 Transformer，本质是在预测下一个 token。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "llm",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "transformer",
+            "type": "enables",
+            "title": "Transformer"
+          },
+          {
+            "direction": "in",
+            "node": "tokenization",
+            "type": "prerequisite",
+            "title": "Token 与分词"
+          },
+          {
+            "direction": "in",
+            "node": "sampling-params",
+            "type": "part-of",
+            "title": "采样与解码参数"
+          },
+          {
+            "direction": "in",
+            "node": "context-window",
+            "type": "constrains",
+            "title": "上下文窗口"
+          },
+          {
+            "direction": "in",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "prompt-injection",
+            "type": "threatens",
+            "title": "提示注入"
+          },
+          {
+            "direction": "in",
+            "node": "agent",
+            "type": "uses",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "in",
+            "node": "fine-tuning",
+            "type": "uses",
+            "title": "微调 Fine-tuning"
+          },
+          {
+            "direction": "out",
+            "node": "prompt-engineering",
+            "type": "related",
+            "title": "提示工程"
+          },
+          {
+            "direction": "in",
+            "node": "jailbreak",
+            "type": "threatens",
+            "title": "越狱 Jailbreak"
+          },
+          {
+            "direction": "in",
+            "node": "alignment",
+            "type": "constrains",
+            "title": "对齐 Alignment"
+          },
+          {
+            "direction": "in",
+            "node": "code-generation",
+            "type": "uses",
+            "title": "代码生成 / AI 编程"
+          }
+        ]
+      },
+      {
+        "id": "mcp",
+        "title": "MCP 模型上下文协议",
+        "aliases": [
+          "Model Context Protocol"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "把「模型如何连接外部工具与数据」标准化的开放协议。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "mcp",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "tool-calling",
+            "type": "variant-of",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "in",
+            "node": "mcp-architecture",
+            "type": "part-of",
+            "title": "MCP 架构"
+          },
+          {
+            "direction": "in",
+            "node": "agent-identity-access",
+            "type": "related",
+            "title": "Agent 身份、权限与密钥管理"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:114184ab7ac23372bce3407de7d4d5c84a0dedabe911f20580eb54c54ac0d3b5"
+}

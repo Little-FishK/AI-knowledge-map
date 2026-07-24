@@ -171,6 +171,15 @@ assert.strictEqual(context.tutorialContext.selectedSoftware.id, "codex");
 assert(context.conceptContext.relevantNodes.some(node => node.id === "context-compaction"));
 assert(context.conceptContext.relevantNodes.some(node => node.id === "transformer"));
 
+const idOnlyEvidence = fixtureEvidence();
+idOnlyEvidence.source.title = "Official MCP connector walkthrough";
+idOnlyEvidence.transcript = [{ start: 0, end: 20, text: "Connect the MCP server and verify it." }];
+idOnlyEvidence.frames = [];
+delete idOnlyEvidence.contentHash;
+idOnlyEvidence.contentHash = sha256(idOnlyEvidence);
+const idOnlyContext = buildContext(idOnlyEvidence, { softwareId: "codex", limit: 20 });
+assert(idOnlyContext.conceptContext.relevantNodes.some(node => node.id === "mcp"));
+
 const draft = createDraft(evidence, context);
 assert.strictEqual(draft.status, "draft");
 assert.strictEqual(draft.tutorialTrack.action, "append-resource");

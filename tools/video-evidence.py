@@ -61,7 +61,7 @@ def iso_date(value):
         return f"{text[:4]}-{text[4:6]}-{text[6:8]}"
     return text or None
 
-def groq_transcribe(audio, model, prompt=""):
+def groq_transcribe(audio, model, prompt="", language="auto"):
     """用 Groq API 转录。key 从环境变量 GROQ_API_KEY 读取（绝不写进代码/仓库）。
     没有 key 返回 None，由调用方回落到本地。长音频转 16kHz 单声道并切段以避开单请求上限。
     prompt：领域词表，偏置专有名词拼写。"""
@@ -80,7 +80,9 @@ def groq_transcribe(audio, model, prompt=""):
     chunks = sorted(glob.glob(os.path.join(tmp, "c_*.mp3")))
     out, url = [], "https://api.groq.com/openai/v1/audio/transcriptions"
     for i, ch in enumerate(chunks):
-        data = {"model": model, "language": "zh", "response_format": "verbose_json"}
+        data = {"model": model, "response_format": "verbose_json"}
+        if language != "auto":
+            data["language"] = language
         if prompt:
             data["prompt"] = prompt
         with open(ch, "rb") as f:
@@ -106,6 +108,8 @@ def main():
     ap.add_argument("--interval", type=int, default=8, help="抽帧间隔秒（越小越密、越慢；治长镜头漏采）")
     ap.add_argument("--dedup", type=float, default=8.0, help="相邻帧去重阈值（灰度均值差；越大去重越激进）")
     ap.add_argument("--height", type=int, default=480, help="抽帧视频的最大高度（480 快；难啃的小字调 720 让 OCR 更准）")
+    ap.add_argument("--language", default="auto",
+                    help="ASR language code such as en or zh; auto lets Whisper detect it")
     a = ap.parse_args()
 
     frames_dir = a.prefix + "_frames"
@@ -156,7 +160,7 @@ def main():
     pairs, asr_used = None, None
     if a.asr in ("auto", "groq"):
         try:
-            pairs = groq_transcribe(audio, a.groq_model, a.prompt)
+            pairs = groq_transcribe(audio, a.groq_model, a.prompt, a.language)
             if pairs is not None:
                 asr_used = f"Groq / {a.groq_model}"
                 print(f"  用 {asr_used}（{len(pairs)} 段）", flush=True)
@@ -168,7 +172,7 @@ def main():
             print("  ⚠ 指定 --asr groq 但未设 GROQ_API_KEY，回落本地", flush=True)
         from faster_whisper import WhisperModel
         wm = WhisperModel(a.model, device="cpu", compute_type="int8")
-        segs, _ = wm.transcribe(audio, language="zh", vad_filter=True,
+        segs, _ = wm.transcribe(audio, language=(None if a.language == "auto" else a.language), vad_filter=True,
                                 initial_prompt=(a.prompt or None), beam_size=5)
         pairs = [(float(s.start), s.text.strip()) for s in segs]
         asr_used = f"本地 faster-whisper / {a.model}"

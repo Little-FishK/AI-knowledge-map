@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "evidenceHash": "sha256:eb5a892c23c424a759e8eb5becfab06e68e083661a9a9fcf23e2c00dd74e2908",
+  "generatedAt": "2026-07-24T16:13:27.463Z",
+  "limits": {
+    "relevantNodeLimit": 20,
+    "relationLimitPerNode": 12,
+    "includesFullNodeBodies": false,
+    "note": "上下文只包含标题、别名、摘要和局部关系；AI 不得据此假定未提供的正文内容。"
+  },
+  "source": {
+    "url": "https://www.youtube.com/watch?v=1540pDeGZD0",
+    "title": "1 Click Human in The Loop | New Human Review n8n Node",
+    "creator": "n8n",
+    "durationSeconds": 320,
+    "transcriptSegments": 73,
+    "frames": 25,
+    "acquisitionLimitations": []
+  },
+  "tutorialContext": {
+    "selectedSoftware": {
+      "id": "n8n",
+      "name": "n8n / Zapier",
+      "category": "agent",
+      "concept": "workflow-orchestration",
+      "summary": "把 AI 接进自动化工作流，连通几百个应用。"
+    },
+    "detectedSoftware": [
+      {
+        "id": "n8n",
+        "name": "n8n / Zapier",
+        "occurrences": 8,
+        "matchedTerms": [
+          {
+            "term": "n8n",
+            "count": 8
+          }
+        ]
+      },
+      {
+        "id": "openrouter",
+        "name": "OpenRouter",
+        "occurrences": 8,
+        "matchedTerms": [
+          {
+            "term": "OpenRouter",
+            "count": 4
+          },
+          {
+            "term": "openrouter",
+            "count": 4
+          }
+        ]
+      }
+    ],
+    "existingTutorial": {
+      "title": "n8n / Zapier 使用教程",
+      "resourceCount": 1,
+      "resourceSummaries": [
+        {
+          "id": "yt-n8n-ai-agent-part1",
+          "platform": "youtube",
+          "title": "Building AI Agents: Chat Trigger, Memory, and System/User Messages Explained [Part 1]",
+          "url": "https://www.youtube.com/watch?v=yzvLfHb0nqE",
+          "audience": "第一次使用 n8n，希望从空白画布搭出带系统提示、会话记忆和公开聊天入口的 AI Agent 初学者"
+        }
+      ]
+    },
+    "duplicateUrlMatches": []
+  },
+  "conceptContext": {
+    "totalExistingNodes": 129,
+    "relevantNodes": [
+      {
+        "id": "agent",
+        "title": "AI Agent",
+        "aliases": [
+          "智能体",
+          "AI 代理"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "能自主循环「思考→调用工具→看结果→再思考」直到完成任务的 LLM 系统。",
+        "isCore": true,
+        "matchedTerms": [
+          {
+            "term": "agent",
+            "count": 18
+          },
+          {
+            "term": "AI Agent",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "in",
+            "node": "prompt-injection",
+            "type": "threatens",
+            "title": "提示注入"
+          },
+          {
+            "direction": "in",
+            "node": "tool-calling",
+            "type": "enables",
+            "title": "工具调用 / 函数调用"
+          },
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "uses",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "out",
+            "node": "rag",
+            "type": "uses",
+            "title": "RAG 检索增强生成"
+          },
+          {
+            "direction": "in",
+            "node": "agent-loop",
+            "type": "part-of",
+            "title": "Agent 循环"
+          },
+          {
+            "direction": "in",
+            "node": "agent-memory",
+            "type": "part-of",
+            "title": "Agent 记忆"
+          },
+          {
+            "direction": "in",
+            "node": "agent-skills",
+            "type": "part-of",
+            "title": "智能体技能"
+          },
+          {
+            "direction": "in",
+            "node": "planning",
+            "type": "part-of",
+            "title": "规划与任务分解"
+          },
+          {
+            "direction": "in",
+            "node": "human-in-the-loop",
+            "type": "constrains",
+            "title": "人在回路"
+          },
+          {
+            "direction": "in",
+            "node": "workflow-orchestration",
+            "type": "contrast",
+            "title": "工作流编排"
+          },
+          {
+            "direction": "in",
+            "node": "code-execution",
+            "type": "enables",
+            "title": "代码执行与沙箱"
+          },
+          {
+            "direction": "in",
+            "node": "computer-use",
+            "type": "part-of",
+            "title": "计算机操作"
+          }
+        ]
+      },
+      {
+        "id": "human-in-the-loop",
+        "title": "人在回路",
+        "aliases": [
+          "Human-in-the-loop",
+          "HITL",
+          "人工确认",
+          "人工介入"
+        ],
+        "domain": "coding",
+        "maturity": "stable",
+        "summary": "在关键或不可逆的步骤上让人介入确认，是 Agent 安全落地的现实底线。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "human-in-the-loop",
+            "count": 1
+          },
+          {
+            "term": "Human-in-the-loop",
+            "count": 1
+          },
+          {
+            "term": "HITL",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "agent",
+            "type": "constrains",
+            "title": "AI Agent"
+          },
+          {
+            "direction": "out",
+            "node": "guardrails",
+            "type": "part-of",
+            "title": "护栏 Guardrails"
+          },
+          {
+            "direction": "out",
+            "node": "logprobs",
+            "type": "uses",
+            "title": "Logprobs 与置信度"
+          },
+          {
+            "direction": "in",
+            "node": "agent-identity-access",
+            "type": "uses",
+            "title": "Agent 身份、权限与密钥管理"
+          },
+          {
+            "direction": "in",
+            "node": "uncertainty-calibration",
+            "type": "enables",
+            "title": "不确定性校准与选择性预测"
+          }
+        ]
+      },
+      {
+        "id": "streaming",
+        "title": "流式输出",
+        "aliases": [
+          "Streaming",
+          "流式",
+          "SSE 输出",
+          "逐字输出"
+        ],
+        "domain": "building",
+        "maturity": "stable",
+        "summary": "模型一边生成一边把 token 逐个吐出来，而不是等全部生成完再返回。",
+        "isCore": false,
+        "matchedTerms": [
+          {
+            "term": "streaming",
+            "count": 1
+          },
+          {
+            "term": "Streaming",
+            "count": 1
+          }
+        ],
+        "relations": [
+          {
+            "direction": "out",
+            "node": "llm",
+            "type": "uses",
+            "title": "大语言模型 LLM"
+          },
+          {
+            "direction": "out",
+            "node": "structured-output",
+            "type": "contrast",
+            "title": "结构化输出"
+          },
+          {
+            "direction": "out",
+            "node": "guardrails",
+            "type": "constrains",
+            "title": "护栏 Guardrails"
+          }
+        ]
+      }
+    ],
+    "allowedEdgeTypes": [
+      "is-a",
+      "part-of",
+      "prerequisite",
+      "uses",
+      "variant-of",
+      "enables",
+      "constrains",
+      "mitigates",
+      "threatens",
+      "contrast",
+      "related"
+    ],
+    "nodeExclusions": [
+      "产品、厂商或具体模型名",
+      "API 对象、命令、按钮、配置和实现细节",
+      "评价指标和参数细项",
+      "通用软件工程常识",
+      "职业、流程和学习资源",
+      "与已有节点语义重复的别名"
+    ]
+  },
+  "contextHash": "sha256:e49ecc9695c49a153cb2e3013b96905bac0d17734a41766eea9ec0d8cadbcb36"
+}

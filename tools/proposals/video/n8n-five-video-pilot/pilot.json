@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "pilotId": "n8n-youtube-five-2026-07-24",
+  "platform": "youtube",
+  "softwareId": "n8n",
+  "publisher": "n8n",
+  "mode": "proposal-only",
+  "summary": {
+    "videos": 5,
+    "formalTutorialCandidates": 3,
+    "candidateTutorialResources": 2,
+    "newNodeCandidates": 0,
+    "coreNodeCandidates": 0,
+    "supplementQueueItems": 6,
+    "automaticApplications": 0
+  },
+  "items": [
+    {
+      "slug": "n8n-quick-start-2026",
+      "url": "https://www.youtube.com/watch?v=GuaKeDS6UKU",
+      "title": "n8n Quick Start Tutorial: Build Your First AI Agent [2026]",
+      "publishedAt": "2026-02-13",
+      "durationSeconds": 1251,
+      "evidenceHash": "sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59",
+      "transcriptSegments": 470,
+      "frames": 27,
+      "tutorialTrack": {
+        "decision": "formal-candidate",
+        "reason": "官方、近期、从表单触发到数据表再到带记忆和工具的问答 Agent，具备完整操作闭环；正式发布前应校对长视频中少量被 Whisper 错识别为中文的英文段落。",
+        "coverage": [
+          "表单触发与字段采集",
+          "If 分支、Edit Fields 与 Merge",
+          "基础 LLM 链和结构化标签",
+          "Data Tables",
+          "Chat Trigger、AI Agent、Memory 与数据表工具"
+        ]
+      },
+      "conceptTrack": {
+        "newNodes": [],
+        "coreNodes": [],
+        "supplements": [
+          {
+            "targetNode": "workflow-orchestration",
+            "evidenceRange": [80, 405],
+            "reason": "提供了触发器、动作、逐项数据流、条件分支与合流的连续实操。"
+          },
+          {
+            "targetNode": "agent",
+            "evidenceRange": [736, 1010],
+            "reason": "展示 Chat Trigger、模型、记忆和数据工具组合成 Agent 的完整落地。"
+          }
+        ],
+        "rejectedMentions": ["llm", "mcp"]
+      }
+    },
+    {
+      "slug": "n8n-official-mcp",
+      "url": "https://www.youtube.com/watch?v=qgoGuwRpndU",
+      "title": "Create n8n Workflows With Agents | Official MCP",
+      "publishedAt": "2026-04-29",
+      "durationSeconds": 311,
+      "evidenceHash": "sha256:911693c6292d634e19c9d28249b66668cb471fdd14d391a1b1d150a507a3ad1f",
+      "transcriptSegments": 66,
+      "frames": 23,
+      "tutorialTrack": {
+        "decision": "formal-candidate",
+        "reason": "给出版本前提、服务器 URL、授权流程、只读/写入工具批准边界、Claude 与通用编码 Agent 两种连接方式，操作路径可复现。",
+        "coverage": [
+          "启用 Instance Level MCP",
+          "Claude Connectors 授权",
+          "只读与写入工具审批策略",
+          "编码 Agent 配置和令牌安全输入"
+        ]
+      },
+      "conceptTrack": {
+        "newNodes": [],
+        "coreNodes": [],
+        "supplements": [
+          {
+            "targetNode": "mcp",
+            "evidenceRange": [0, 282],
+            "reason": "是 MCP 从能力发现、授权到工具执行的产品级案例，适合进入现有 MCP 页补充队列。"
+          },
+          {
+            "targetNode": "system-prompt",
+            "evidenceRange": [162, 195],
+            "reason": "展示编码 Agent 从项目文件加载持续指令的实际形态。"
+          }
+        ],
+        "rejectedMentions": ["model-families", "coding-tools", "planning", "streaming"]
+      }
+    },
+    {
+      "slug": "n8n-human-review",
+      "url": "https://www.youtube.com/watch?v=1540pDeGZD0",
+      "title": "1 Click Human in The Loop | New Human Review n8n Node",
+      "publishedAt": "2026-02-17",
+      "durationSeconds": 320,
+      "evidenceHash": "sha256:eb5a892c23c424a759e8eb5becfab06e68e083661a9a9fcf23e2c00dd74e2908",
+      "transcriptSegments": 73,
+      "frames": 25,
+      "tutorialTrack": {
+        "decision": "formal-candidate",
+        "reason": "用邮件、退款和聊天澄清三个场景演示批准/拒绝、真实参数展示和自由文本响应，步骤明确且安全边界突出。",
+        "coverage": [
+          "为工具连接 Human Review",
+          "ChatHub 响应方式调整",
+          "展示工具真实参数而非让模型重复生成",
+          "Slack 异步审批",
+          "审批按钮和自由文本响应"
+        ]
+      },
+      "conceptTrack": {
+        "newNodes": [],
+        "coreNodes": [],
+        "supplements": [
+          {
+            "targetNode": "human-in-the-loop",
+            "evidenceRange": [0, 299],
+            "reason": "直接展示高风险副作用前人工批准，以及审批界面必须展示真实执行参数的关键机制。"
+          }
+        ],
+        "rejectedMentions": ["agent", "streaming"]
+      }
+    },
+    {
+      "slug": "n8n-opentelemetry",
+      "url": "https://www.youtube.com/watch?v=xOi8K_-GLRM",
+      "title": "n8n Now Speaks OpenTelemetry: Production Tracing for Workflows",
+      "publishedAt": "2026-06-04",
+      "durationSeconds": 243,
+      "evidenceHash": "sha256:421d64baa02b437c8df840be8dcfa2d817e2df06d24fb46099745e0347685ac5",
+      "transcriptSegments": 46,
+      "frames": 20,
+      "tutorialTrack": {
+        "decision": "candidate",
+        "reason": "机制解释清楚，但视频没有说出两个环境变量的准确名称，也把完整安装引向文档；可作为概览资源，不能单独生成完整可复现教程页。",
+        "coverage": [
+          "工作流父 span 与节点子 span",
+          "W3C Trace Context 传播",
+          "采样率、节点 span 开关与自定义 telemetry tags",
+          "Collector、下游服务和可视化工具的责任边界"
+        ]
+      },
+      "conceptTrack": {
+        "newNodes": [],
+        "coreNodes": [],
+        "supplements": [
+          {
+            "targetNode": "observability",
+            "evidenceRange": [11, 223],
+            "reason": "可用于补强 trace、span、上下游传播与 collector 责任边界的解释。"
+          }
+        ],
+        "rejectedMentions": []
+      }
+    },
+    {
+      "slug": "n8n-assistant",
+      "url": "https://www.youtube.com/watch?v=2T-xz4DmacE",
+      "title": "n8n Now Builds For You (n8n Assistant)",
+      "publishedAt": "2026-07-10",
+      "durationSeconds": 126,
+      "evidenceHash": "sha256:b88ebcddfcafea2dc93859fbbe6a25c33c642aa18ce165dfced8668893985b68",
+      "transcriptSegments": 25,
+      "frames": 10,
+      "tutorialTrack": {
+        "decision": "candidate",
+        "reason": "适合说明预览功能入口、可视化共建、凭证设置和自托管边界，但它是功能发布概览，不含一条从输入到验证的完整操作任务。",
+        "coverage": [
+          "New AI Chat 入口",
+          "边聊天边查看工作流构建",
+          "在聊天中设置参数和凭证",
+          "Cloud credits 与自托管 BYOK"
+        ]
+      },
+      "conceptTrack": {
+        "newNodes": [],
+        "coreNodes": [],
+        "supplements": [],
+        "rejectedMentions": ["agent", "mcp", "agent-skills"],
+        "reason": "内容描述的是 n8n 的具体预览产品功能，没有提供足以改变通用 Agent、MCP 或技能概念边界的新机制。"
+      }
+    }
+  ],
+  "pipelineFindings": [
+    {
+      "severity": "fixed",
+      "finding": "ASR 语言被固定为中文，英文官方视频出现大面积错误识别。",
+      "resolution": "video-evidence.py 新增 --language，Groq 与本地 Whisper 均支持 auto/en/zh。"
+    },
+    {
+      "severity": "operational",
+      "finding": "多个 RapidOCR 任务并行会严重争抢 CPU。",
+      "resolution": "本次改为顺序 OCR；后续调度器应把下载/ASR 与 OCR 分开限流。"
+    },
+    {
+      "severity": "fixed",
+      "finding": "受限上下文只查标题和别名，漏掉以节点 ID 出现的 MCP。",
+      "resolution": "nodeTerms 已纳入 node.id，并新增回归测试。"
+    },
+    {
+      "severity": "open",
+      "finding": "20 分钟快速入门视频仍有少量英文被 Whisper 错识别成中文。",
+      "resolution": "正式教程写作前需要按 OCR 和关键帧校对专有名词与关键步骤；不能仅凭 ASR 逐字稿发布。"
+    }
+  ]
+}
