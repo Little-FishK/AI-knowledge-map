@@ -208,6 +208,7 @@ function validateProposal(proposal, evidence, options = {}) {
     errors.push("无法加载项目数据：" + error.message);
   }
   const existingNodeIds = new Set(projectData ? projectData.graph.nodes.map(node => node.id) : []);
+  const coreNodeIds = new Set(projectData ? (projectData.graph.core || []) : []);
   const domains = new Set(projectData ? Object.keys(projectData.graph.domains || {}) : []);
   const allowedEdgeTypes = new Set(projectData
     ? (Array.isArray(projectData.graph.edgeTypes)
@@ -288,11 +289,25 @@ function validateProposal(proposal, evidence, options = {}) {
       ? ["new", "merge", "supplement", "reject", "uncertain"]
       : ["undecided", "new", "merge", "supplement", "reject", "uncertain"];
     if (!decisions.includes(candidate.decision)) errors.push(`${prefix}.decision 非法`);
+    if (candidate.decision === "supplement") {
+      const criteria = candidate.supplementCriteria;
+      if (!criteria || typeof criteria !== "object") {
+        errors.push(`${prefix}.supplementCriteria 缺失`);
+      } else {
+        ["transferableBeyondProduct", "notCoveredByExistingNode", "mechanismOrBoundary"].forEach(key => {
+          if (criteria[key] !== true) errors.push(`${prefix}.supplementCriteria.${key} 必须为 true`);
+        });
+      }
+    }
     const localErrors = [];
     const total = candidate.nodeScores == null ? null : nodeTotal(candidate.nodeScores, localErrors);
     localErrors.forEach(message => errors.push(`${prefix}: ${message.replace("conceptTrack.", "")}`));
     let computedCore = null;
     if (candidate.coreCandidate) {
+      if (candidate.decision === "reject") errors.push(`${prefix} reject 候选不能晋升核心`);
+      if (candidate.targetNode && coreNodeIds.has(candidate.targetNode)) {
+        errors.push(`${prefix}.coreCandidate 只能表示晋升尚非核心的节点；${candidate.targetNode} 已是核心节点`);
+      }
       const coreErrors = [];
       computedCore = coreTotal(candidate.coreScores, coreErrors);
       coreErrors.forEach(message => errors.push(`${prefix}: ${message.replace("conceptTrack.", "")}`));

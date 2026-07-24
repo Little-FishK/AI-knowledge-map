@@ -4,35 +4,26 @@
   "proposalHash": "sha256:6fe9d62c324ea689f57ce5811f8ff806ad1fabdd57dcff9066750971d602969b",
   "evidenceHash": "sha256:b88ebcddfcafea2dc93859fbbe6a25c33c642aa18ce165dfced8668893985b68",
   "reviewer": {
-    "id": "independent-reviewer-2026-07-24",
-    "note": "复核者已先读原始证据和受限图谱上下文，再独立填写；未读取或推断原提案决定、理由、目标节点或分数。"
+    "id": "independent-reviewer-policy-v2",
+    "note": "复核者应先读原始证据和受限图谱上下文，再独立填写；不要复制提案分数。"
   },
   "candidates": [
     {
       "term": "agent",
-      "decision": "supplement",
-      "rationale": "视频展示一个面向工作流构建的 Agent：它根据目标创建流程，允许用户在可视化画布上与其协作、在对话中补充参数和安全设置凭据，并主动测试生成的工作流。该内容是现有 AI Agent 节点关于领域化构建 Agent 与人机协作界面的具体案例。",
-      "targetNode": "agent",
+      "decision": "reject",
+      "rationale": "内置 builder agent 在可视化画布中创建工作流、向用户索取参数、设置凭据并运行测试，属于 n8n 的产品交互与操作能力。视频没有提出当前 Agent 节点未覆盖的通用循环、状态、规划或权限机制。",
+      "targetNode": null,
       "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 4,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 4,
-        "stability": 4
-      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
       "evidenceRefs": [
         {
           "start": 3.28,
           "end": 18.32
         },
         {
-          "start": 45.88,
-          "end": 67.994
-        },
-        {
-          "start": 67.994,
+          "start": 52.88,
           "end": 91.634
         }
       ],
@@ -41,15 +32,19 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "产品界面与体验案例",
+        "未提供新的跨软件 Agent 机制或边界"
+      ],
       "proposedNode": null
     },
     {
       "term": "mcp",
       "decision": "reject",
-      "rationale": "MCP 只作为 Claude Code 可连接 n8n 的既有方式和外部 Agent 的能力边界被提到；视频没有解释 MCP 的协议角色、传输、工具发现或调用机制，证据不足以补充 MCP 节点。",
+      "rationale": "MCP 只用于对比外部 Claude Code 与内置助手的接入方式，没有解释协议角色、工具发现、传输、授权或调用机制，无法补充现有 MCP 节点。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -64,17 +59,18 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "只用于产品能力对比",
-        "缺少协议机制解释"
+        "仅为产品能力对比",
+        "缺少协议机制证据"
       ],
       "proposedNode": null
     },
     {
       "term": "Skills",
       "decision": "reject",
-      "rationale": "Skills 仅在“外部工具受限于 skills 和 MCPs”这句对比中出现，没有说明技能如何封装指令、工具或知识，也没有展示加载或调用过程，因此不能形成智能体技能节点的有效补充。",
+      "rationale": "Skills 只在“外部工具受限于 skills 和 MCPs”这句产品对比中出现，没有说明如何封装指令、工具和知识，也没有加载、选择或执行技能的证据。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -90,7 +86,7 @@
       "proposedLearningPath": null,
       "disqualifiers": [
         "仅有名词级提及",
-        "缺少技能封装与调用机制"
+        "缺少技能封装和调用机制"
       ],
       "proposedNode": null
     }

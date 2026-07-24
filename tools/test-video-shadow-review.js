@@ -55,6 +55,9 @@ function independentAssessment(proposal, evidence, decisions) {
           sourceQuality: 4
         }
         : null,
+      supplementCriteria: (decisions[candidate.term] || candidate.decision) === "supplement"
+        ? candidate.supplementCriteria
+        : null,
       coreCandidate: false,
       coreScores: null,
       evidenceRefs: candidate.evidenceRefs || [],
@@ -85,6 +88,27 @@ function run() {
 
   const assessment = independentAssessment(proposal, evidence, {});
   assert.deepStrictEqual(validateAssessment(assessment, proposal, evidence), []);
+
+  const missingCriteriaAssessment = independentAssessment(proposal, evidence, {});
+  delete missingCriteriaAssessment.candidates.find(item => item.decision === "supplement").supplementCriteria;
+  assert(validateAssessment(missingCriteriaAssessment, proposal, evidence).some(error =>
+    /supplementCriteria/.test(error)
+  ));
+
+  const alreadyCoreAssessment = independentAssessment(proposal, evidence, {});
+  const alreadyCoreAgent = alreadyCoreAssessment.candidates.find(item => item.term === "AI Agent");
+  alreadyCoreAgent.coreCandidate = true;
+  alreadyCoreAgent.coreScores = {
+    learningGateway: 4,
+    graphCentrality: 0,
+    crossRouteReuse: 4,
+    beginnerNavigation: 4,
+    stability: 4
+  };
+  assert(validateAssessment(alreadyCoreAssessment, proposal, evidence).some(error =>
+    /已是核心节点/.test(error)
+  ));
+
   const reviewed = reviewProposal(proposal, evidence, assessment, {
     projectData,
     generatedAt: "2026-07-24T00:00:00.000Z"
@@ -98,9 +122,9 @@ function run() {
   );
 
   const independentCoreConflict = independentAssessment(proposal, evidence, {});
-  const independentOnlyCoreAgent = independentCoreConflict.candidates.find(item => item.term === "AI Agent");
-  independentOnlyCoreAgent.coreCandidate = true;
-  independentOnlyCoreAgent.coreScores = {
+  const independentOnlyCoreCandidate = independentCoreConflict.candidates.find(item => item.term === "System Prompt");
+  independentOnlyCoreCandidate.coreCandidate = true;
+  independentOnlyCoreCandidate.coreScores = {
     learningGateway: 4,
     graphCentrality: 0,
     crossRouteReuse: 4,
@@ -111,7 +135,7 @@ function run() {
     projectData,
     generatedAt: "2026-07-24T00:00:00.000Z"
   });
-  const independentOnlyCore = coreConflictReview.candidates.find(item => item.term === "AI Agent");
+  const independentOnlyCore = coreConflictReview.candidates.find(item => item.term === "System Prompt");
   assert.strictEqual(coreConflictReview.summary.coreConflictCount, 1);
   assert.strictEqual(independentOnlyCore.coreDecisionsAgree, false);
   assert(independentOnlyCore.blockers.includes("提案与独立复核的核心候选结论不一致"));
@@ -126,21 +150,21 @@ function run() {
   assert(agentConflict.blockers.includes("提案与独立复核结论不一致"));
 
   const coreProposal = JSON.parse(JSON.stringify(proposal));
-  const coreAgent = coreProposal.conceptTrack.candidates.find(item => item.term === "AI Agent");
-  coreAgent.coreCandidate = true;
-  coreAgent.coreScores = {
+  const coreCandidate = coreProposal.conceptTrack.candidates.find(item => item.term === "System Prompt");
+  coreCandidate.coreCandidate = true;
+  coreCandidate.coreScores = {
     learningGateway: 4,
     graphCentrality: 4,
     crossRouteReuse: 4,
     beginnerNavigation: 4,
     stability: 4
   };
-  coreAgent.coreReason = "测试真实图中心性覆盖自报分数";
-  coreAgent.requiresHumanCoreApproval = false;
+  coreCandidate.coreReason = "测试真实图中心性覆盖自报分数";
+  coreCandidate.requiresHumanCoreApproval = false;
   const coreAssessment = independentAssessment(coreProposal, evidence, {});
-  const independentCoreAgent = coreAssessment.candidates.find(item => item.term === "AI Agent");
-  independentCoreAgent.coreCandidate = true;
-  independentCoreAgent.coreScores = {
+  const independentCoreCandidate = coreAssessment.candidates.find(item => item.term === "System Prompt");
+  independentCoreCandidate.coreCandidate = true;
+  independentCoreCandidate.coreScores = {
     learningGateway: 4,
     graphCentrality: 0,
     crossRouteReuse: 4,
@@ -151,7 +175,7 @@ function run() {
     projectData,
     generatedAt: "2026-07-24T00:00:00.000Z"
   });
-  const auditedCore = coreReview.candidates.find(item => item.term === "AI Agent");
+  const auditedCore = coreReview.candidates.find(item => item.term === "System Prompt");
   assert.strictEqual(
     auditedCore.independentScores.coreScores.graphCentrality,
     auditedCore.graphMetrics.graphCentralityLevel,

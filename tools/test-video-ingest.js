@@ -106,6 +106,11 @@ function readyProposal(evidence) {
           term: "上下文压缩",
           decision: "supplement",
           targetNode: "context-compaction",
+          supplementCriteria: {
+            transferableBeyondProduct: true,
+            notCoveredByExistingNode: true,
+            mechanismOrBoundary: true
+          },
           nodeScores: null,
           coreCandidate: false,
           coreScores: null,
@@ -211,6 +216,28 @@ assert.deepStrictEqual(validateProposal(finalized, evidence, { ready: true }).er
 
 const valid = readyProposal(evidence);
 assert.deepStrictEqual(validateProposal(valid, evidence, { ready: true }).errors, []);
+
+const missingSupplementCriteria = readyProposal(evidence);
+delete missingSupplementCriteria.conceptTrack.candidates[0].supplementCriteria;
+assert(validateProposal(missingSupplementCriteria, evidence, { ready: true }).errors.some(error =>
+  /supplementCriteria/.test(error)
+));
+
+const alreadyCoreCandidate = readyProposal(evidence);
+const alreadyCore = alreadyCoreCandidate.conceptTrack.candidates[0];
+alreadyCore.targetNode = "agent";
+alreadyCore.coreCandidate = true;
+alreadyCore.coreScores = {
+  learningGateway: 4,
+  graphCentrality: 4,
+  crossRouteReuse: 4,
+  beginnerNavigation: 4,
+  stability: 4
+};
+alreadyCore.coreReason = "Fixture should be blocked because agent is already core";
+assert(validateProposal(alreadyCoreCandidate, evidence, { ready: true }).errors.some(error =>
+  /已是核心节点/.test(error)
+));
 
 const weakTutorial = readyProposal(evidence);
 weakTutorial.tutorialTrack.evidenceLevel = "E1";

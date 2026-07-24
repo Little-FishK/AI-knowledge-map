@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "mode": "shadow",
-  "generatedAt": "2026-07-24T16:48:18.324Z",
-  "proposalHash": "sha256:7cc4aee430853fd25c4075c8e7c24a3e1f56dcc7c75f1867b7d68eec68938e58",
+  "generatedAt": "2026-07-24T17:35:41.616Z",
+  "proposalHash": "sha256:9320b92bfaaf1ca77fc482ed1e72583252fd01a82b99d3d0aa82e3b8c430b5ac",
   "evidenceHash": "sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59",
   "graphHash": "sha256:9f9296c93648fc5540324d852a931d1e26a4ad28582e4b7c812561de429ecda2",
   "policy": {
@@ -18,9 +18,9 @@
   },
   "summary": {
     "candidateCount": 4,
-    "agreementCount": 3,
-    "conflictCount": 1,
-    "coreConflictCount": 2,
+    "agreementCount": 4,
+    "conflictCount": 0,
+    "coreConflictCount": 0,
     "autoEligibleNewCount": 0,
     "autoEligibleCoreCount": 0,
     "formalWrites": 0
@@ -28,12 +28,12 @@
   "candidates": [
     {
       "term": "agent",
-      "proposalDecision": "supplement",
-      "independentDecision": "supplement",
+      "proposalDecision": "reject",
+      "independentDecision": "reject",
       "decisionsAgree": true,
       "proposalCoreCandidate": false,
-      "independentCoreCandidate": true,
-      "coreDecisionsAgree": false,
+      "independentCoreCandidate": false,
+      "coreDecisionsAgree": true,
       "duplicateAudit": {
         "verdict": "existing",
         "exactMatches": [
@@ -47,7 +47,7 @@
           "agent-skills",
           "agent-identity-access"
         ],
-        "targetMatched": true,
+        "targetMatched": false,
         "rankedMatches": [
           {
             "nodeId": "agent",
@@ -82,8 +82,8 @@
         ]
       },
       "evidenceAudit": {
-        "referenceCount": 4,
-        "validReferenceCount": 4,
+        "referenceCount": 3,
+        "validReferenceCount": 3,
         "pass": true
       },
       "claimAudit": {
@@ -107,115 +107,7 @@
         ],
         "placement": null
       },
-      "graphMetrics": {
-        "degree": 22,
-        "degreePercentile": 1,
-        "betweenness": 1069.8294,
-        "betweennessPercentile": 0.9922,
-        "crossDomainCount": 3,
-        "graphCentralityLevel": 4
-      },
-      "independentScores": {
-        "nodeTotal": null,
-        "coreScores": {
-          "learningGateway": 4,
-          "graphCentrality": 4,
-          "crossRouteReuse": 4,
-          "beginnerNavigation": 4,
-          "stability": 4
-        },
-        "coreTotal": 100
-      },
-      "shadowEligibility": {
-        "newNode": false,
-        "coreNode": false,
-        "formalWrite": false
-      },
-      "blockers": [
-        "提案与独立复核的核心候选结论不一致"
-      ]
-    },
-    {
-      "term": "工作流",
-      "proposalDecision": "supplement",
-      "independentDecision": "supplement",
-      "decisionsAgree": true,
-      "proposalCoreCandidate": false,
-      "independentCoreCandidate": false,
-      "coreDecisionsAgree": true,
-      "duplicateAudit": {
-        "verdict": "existing",
-        "exactMatches": [
-          "workflow-orchestration"
-        ],
-        "targetMatched": true,
-        "rankedMatches": [
-          {
-            "nodeId": "workflow-orchestration",
-            "title": "工作流编排",
-            "score": 1,
-            "exact": true
-          },
-          {
-            "nodeId": "agent",
-            "title": "AI Agent",
-            "score": 0.0197,
-            "exact": false
-          },
-          {
-            "nodeId": "agent-frameworks",
-            "title": "Agent 框架",
-            "score": 0.0194,
-            "exact": false
-          },
-          {
-            "nodeId": "agent-identity-access",
-            "title": "Agent 身份、权限与密钥管理",
-            "score": 0.0161,
-            "exact": false
-          },
-          {
-            "nodeId": "human-in-the-loop",
-            "title": "人在回路",
-            "score": 0.0161,
-            "exact": false
-          }
-        ]
-      },
-      "evidenceAudit": {
-        "referenceCount": 4,
-        "validReferenceCount": 4,
-        "pass": true
-      },
-      "claimAudit": {
-        "externalSourceCount": 0,
-        "claimCount": 0,
-        "externallySupportedClaimCount": 0,
-        "errors": [],
-        "passForNew": false
-      },
-      "relationAudit": {
-        "edgeCount": 0,
-        "errors": [
-          "新节点至少需要两条关系"
-        ],
-        "pass": false
-      },
-      "learningPathAudit": {
-        "pass": false,
-        "errors": [
-          "缺 proposedLearningPath"
-        ],
-        "placement": null
-      },
-      "graphMetrics": {
-        "degree": 4,
-        "degreePercentile": 0.3721,
-        "betweenness": 28.453,
-        "betweennessPercentile": 0.3721,
-        "crossDomainCount": 1,
-        "graphCentralityLevel": 1
-      },
+      "graphMetrics": null,
       "independentScores": {
         "nodeTotal": null,
         "coreScores": null,
@@ -229,50 +121,48 @@
       "blockers": []
     },
     {
-      "term": "llm",
+      "term": "工作流",
       "proposalDecision": "reject",
-      "independentDecision": "supplement",
-      "decisionsAgree": false,
+      "independentDecision": "reject",
+      "decisionsAgree": true,
       "proposalCoreCandidate": false,
-      "independentCoreCandidate": true,
-      "coreDecisionsAgree": false,
+      "independentCoreCandidate": false,
+      "coreDecisionsAgree": true,
       "duplicateAudit": {
         "verdict": "existing",
         "exactMatches": [
-          "llm",
-          "evaluation",
-          "model-routing"
+          "workflow-orchestration"
         ],
-        "targetMatched": true,
+        "targetMatched": false,
         "rankedMatches": [
           {
-            "nodeId": "llm",
-            "title": "大语言模型 LLM",
-            "score": 1,
-            "exact": true
-          },
-          {
-            "nodeId": "evaluation",
-            "title": "LLM 应用评测",
-            "score": 1,
-            "exact": true
-          },
-          {
-            "nodeId": "model-routing",
-            "title": "模型路由与级联系统",
+            "nodeId": "workflow-orchestration",
+            "title": "工作流编排",
             "score": 1,
             "exact": true
           },
           {
             "nodeId": "human-in-the-loop",
             "title": "人在回路",
-            "score": 0.0285,
+            "score": 0.0289,
             "exact": false
           },
           {
-            "nodeId": "reinforcement-learning",
-            "title": "强化学习",
-            "score": 0.0244,
+            "nodeId": "agent-frameworks",
+            "title": "Agent 框架",
+            "score": 0.0206,
+            "exact": false
+          },
+          {
+            "nodeId": "agent-identity-access",
+            "title": "Agent 身份、权限与密钥管理",
+            "score": 0.0169,
+            "exact": false
+          },
+          {
+            "nodeId": "agent",
+            "title": "AI Agent",
+            "score": 0.0162,
             "exact": false
           }
         ]
@@ -303,34 +193,106 @@
         ],
         "placement": null
       },
-      "graphMetrics": {
-        "degree": 20,
-        "degreePercentile": 0.9922,
-        "betweenness": 1315.2571,
-        "betweennessPercentile": 1,
-        "crossDomainCount": 4,
-        "graphCentralityLevel": 4
-      },
+      "graphMetrics": null,
       "independentScores": {
         "nodeTotal": null,
-        "coreScores": {
-          "learningGateway": 4,
-          "graphCentrality": 4,
-          "crossRouteReuse": 4,
-          "beginnerNavigation": 4,
-          "stability": 4
-        },
-        "coreTotal": 100
+        "coreScores": null,
+        "coreTotal": null
       },
       "shadowEligibility": {
         "newNode": false,
         "coreNode": false,
         "formalWrite": false
       },
-      "blockers": [
-        "提案与独立复核结论不一致",
-        "提案与独立复核的核心候选结论不一致"
-      ]
+      "blockers": []
+    },
+    {
+      "term": "llm",
+      "proposalDecision": "reject",
+      "independentDecision": "reject",
+      "decisionsAgree": true,
+      "proposalCoreCandidate": false,
+      "independentCoreCandidate": false,
+      "coreDecisionsAgree": true,
+      "duplicateAudit": {
+        "verdict": "existing",
+        "exactMatches": [
+          "llm",
+          "evaluation",
+          "model-routing"
+        ],
+        "targetMatched": false,
+        "rankedMatches": [
+          {
+            "nodeId": "evaluation",
+            "title": "LLM 应用评测",
+            "score": 1,
+            "exact": true
+          },
+          {
+            "nodeId": "llm",
+            "title": "大语言模型 LLM",
+            "score": 1,
+            "exact": true
+          },
+          {
+            "nodeId": "model-routing",
+            "title": "模型路由与级联系统",
+            "score": 1,
+            "exact": true
+          },
+          {
+            "nodeId": "state-space-models",
+            "title": "状态空间模型与 Mamba",
+            "score": 0.032,
+            "exact": false
+          },
+          {
+            "nodeId": "super-resolution",
+            "title": "超分辨率与修复",
+            "score": 0.025,
+            "exact": false
+          }
+        ]
+      },
+      "evidenceAudit": {
+        "referenceCount": 2,
+        "validReferenceCount": 2,
+        "pass": true
+      },
+      "claimAudit": {
+        "externalSourceCount": 0,
+        "claimCount": 0,
+        "externallySupportedClaimCount": 0,
+        "errors": [],
+        "passForNew": false
+      },
+      "relationAudit": {
+        "edgeCount": 0,
+        "errors": [
+          "新节点至少需要两条关系"
+        ],
+        "pass": false
+      },
+      "learningPathAudit": {
+        "pass": false,
+        "errors": [
+          "缺 proposedLearningPath"
+        ],
+        "placement": null
+      },
+      "graphMetrics": null,
+      "independentScores": {
+        "nodeTotal": null,
+        "coreScores": null,
+        "coreTotal": null
+      },
+      "shadowEligibility": {
+        "newNode": false,
+        "coreNode": false,
+        "formalWrite": false
+      },
+      "blockers": []
     },
     {
       "term": "mcp",
@@ -361,21 +323,21 @@
             "exact": true
           },
           {
+            "nodeId": "observability",
+            "title": "可观测性与追踪",
+            "score": 0.0138,
+            "exact": false
+          },
+          {
+            "nodeId": "agent-frameworks",
+            "title": "Agent 框架",
+            "score": 0.0129,
+            "exact": false
+          },
+          {
             "nodeId": "post-training",
             "title": "后训练 Post-training",
-            "score": 0.0151,
-            "exact": false
-          },
-          {
-            "nodeId": "model-evaluation",
-            "title": "模型评测与基准",
-            "score": 0.0143,
-            "exact": false
-          },
-          {
-            "nodeId": "test-time-compute",
-            "title": "推理时计算与验证器",
-            "score": 0.0142,
+            "score": 0.0122,
             "exact": false
           }
         ]

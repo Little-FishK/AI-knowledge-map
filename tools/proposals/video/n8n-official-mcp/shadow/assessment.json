@@ -1,28 +1,25 @@
 {
   "schemaVersion": 1,
   "mode": "independent",
-  "proposalHash": "sha256:41bb1a40dbec42ad1bc32f9569ec2e84e7350c4ce2d9206bbef53b4544a7c025",
+  "proposalHash": "sha256:fe059cf65df60516f35079bb0cdd84d97aa9fc40e2bb6b2715fab5f67f791c70",
   "evidenceHash": "sha256:911693c6292d634e19c9d28249b66668cb471fdd14d391a1b1d150a507a3ad1f",
   "reviewer": {
-    "id": "independent-reviewer-2026-07-24",
-    "note": "复核者已先读原始证据和受限图谱上下文，再独立填写；未读取或推断原提案决定、理由、目标节点或分数。"
+    "id": "independent-reviewer-policy-v2-final",
+    "note": "复核者应先读原始证据和受限图谱上下文，再独立填写；不要复制提案分数。"
   },
   "candidates": [
     {
       "term": "Claude",
       "decision": "reject",
-      "rationale": "视频将 Claude 作为连接 n8n MCP 的具体产品界面和模型选择来演示，并给出一项短期性能偏好；没有形成对 Claude 模型家族能力、机制或稳定定位的独立解释。该证据属于产品选择与配置，不足以补充概念地图。",
+      "rationale": "Claude 在视频中是具体连接器、订阅能力和模型选择，性能偏好也来自短期产品测试。没有形成对模型家族的稳定机制、能力边界或可迁移的新知识。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
         {
           "start": 61.98,
-          "end": 70.8
-        },
-        {
-          "start": 70.8,
           "end": 91.229
         }
       ],
@@ -32,77 +29,32 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "具体产品和型号推荐具有时效性",
-        "内容集中于连接器界面与设置步骤"
+        "具体产品与型号选择",
+        "结论具有明显时效性"
       ],
       "proposedNode": null
     },
     {
       "term": "mcp",
-      "decision": "supplement",
-      "rationale": "视频展示 MCP 将 Agent 与 n8n 实例连接后可直接验证模式、创建数据表、创建或编辑并测试工作流，说明它比复制工作流 JSON 更接近结构化工具连接；同时展示官方连接器、OAuth 或自定义 MCP 配置及跨不同编码 Agent 的兼容性。这是现有 MCP 节点的具体实现案例。",
-      "targetNode": "mcp",
+      "decision": "reject",
+      "rationale": "视频展示 n8n MCP 直接创建和编辑工作流、连接不同编码 Agent，以及读写工具的审批配置。领域专用语法、SDK 与模式验证只被概括为产品实现，没有足够机制细节支持跨软件迁移；连接和写权限分离的边界也已由现有 Agent 身份权限节点及其与 MCP 的关系覆盖。",
+      "targetNode": null,
       "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 3,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 3,
-        "stability": 4
-      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
       "evidenceRefs": [
         {
           "start": 20.46,
-          "end": 48.14
+          "end": 50.48
         },
         {
-          "start": 95.469,
-          "end": 116.229
+          "start": 116.229,
+          "end": 131.269
         },
         {
           "start": 198.898,
           "end": 203.938
-        },
-        {
-          "start": 222.918,
-          "end": 278.207
-        }
-      ],
-      "nearestNodes": [],
-      "proposedEdges": [],
-      "externalSources": [],
-      "claims": [],
-      "proposedLearningPath": null,
-      "disqualifiers": [],
-      "proposedNode": null
-    },
-    {
-      "term": "agent",
-      "decision": "supplement",
-      "rationale": "视频解释编码 Agent 可获得一个本地工作目录并访问其中内容，还能编辑配置、接入 MCP、保存系统提示并由 Agent 自行完成连接设置。这是现有 AI Agent 节点在编码工作流中的可追溯实践侧面。",
-      "targetNode": "agent",
-      "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 4,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 4,
-        "stability": 4
-      },
-      "evidenceRefs": [
-        {
-          "start": 148.269,
-          "end": 165.098
-        },
-        {
-          "start": 169.738,
-          "end": 187.998
-        },
-        {
-          "start": 211.518,
-          "end": 226.958
         },
         {
           "start": 274.047,
@@ -114,15 +66,50 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "特定 MCP 服务的产品功能与配置",
+        "可迁移机制细节不足",
+        "授权边界已由现有节点覆盖"
+      ],
+      "proposedNode": null
+    },
+    {
+      "term": "agent",
+      "decision": "reject",
+      "rationale": "给编码 Agent 一个本地文件夹并允许其访问、编辑配置和测试连接，是现有 Agent 与 AI 编程工具节点已覆盖的工作方式。视频没有提出新的 Agent 循环、状态管理或权限机制。",
+      "targetNode": null,
+      "nodeScores": null,
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
+      "evidenceRefs": [
+        {
+          "start": 148.269,
+          "end": 165.098
+        },
+        {
+          "start": 215.958,
+          "end": 240.147
+        }
+      ],
+      "nearestNodes": [],
+      "proposedEdges": [],
+      "externalSources": [],
+      "claims": [],
+      "proposedLearningPath": null,
+      "disqualifiers": [
+        "编码 Agent 产品操作案例",
+        "机制已由 Agent 与 AI 编程工具节点覆盖"
+      ],
       "proposedNode": null
     },
     {
       "term": "Claude Code",
-      "decision": "supplement",
-      "rationale": "视频把 Claude Code 作为 AI 编程工具的完整案例：Agent 获得工作目录访问权，通过项目文件承载持续指令，能编辑 MCP 配置并执行连接测试。它是现有 AI 编程工具节点的实例和工作方式补充，而不是独立基础概念。",
-      "targetNode": "coding-tools",
+      "decision": "reject",
+      "rationale": "Claude Code 是现有 AI 编程工具节点中的具体产品实例。文件夹访问、MCP 设置和终端配置均为该类工具的操作展示，没有给出超出现有代码生成、执行与仓库理解整合定义的新通用机制。",
+      "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -131,12 +118,8 @@
           "end": 165.098
         },
         {
-          "start": 165.098,
-          "end": 195.858
-        },
-        {
-          "start": 211.518,
-          "end": 226.958
+          "start": 215.958,
+          "end": 270.287
         }
       ],
       "nearestNodes": [],
@@ -144,15 +127,23 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "现有类别中的具体产品",
+        "内容主要是设置与操作"
+      ],
       "proposedNode": null
     },
     {
       "term": "System Prompt",
       "decision": "supplement",
-      "rationale": "视频说明编码 Agent 会从项目文件读取系统提示，该文本作为持续基线承载工作规则和用户偏好，并可按项目需要扩展。这为现有系统提示节点提供了文件化、项目级使用案例。",
+      "rationale": "证据说明编码 Agent 可从项目目录中的文本文件读取系统提示，其他编码 Agent 也采用同类项目指令文件，且文件可持续扩展项目偏好。该做法把系统提示从单次对话前缀扩展为项目级、文件化、持久的指令作用域；这一机制能够跨编码 Agent 迁移，并未被现有节点“在对话最前面设定身份、规则和边界”的摘要覆盖。",
       "targetNode": "system-prompt",
       "nodeScores": null,
+      "supplementCriteria": {
+        "transferableBeyondProduct": true,
+        "notCoveredByExistingNode": true,
+        "mechanismOrBoundary": true
+      },
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -172,9 +163,10 @@
     {
       "term": "planning",
       "decision": "reject",
-      "rationale": "规划只在推荐某一模型用于“创建和规划工作流”时出现，视频没有展示目标分解、步骤生成、重规划或计划执行机制，无法形成对规划与任务分解节点的有效补充。",
+      "rationale": "Planning 仅出现在“创建和规划工作流”的用途短语中，没有目标拆解、计划表示、执行监控或重规划过程，证据不足以补充现有规划与任务分解节点。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -189,17 +181,18 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "仅有用途短语",
-        "缺少规划机制或过程证据"
+        "仅有用途级提及",
+        "缺少规划机制证据"
       ],
       "proposedNode": null
     },
     {
       "term": "streaming",
       "decision": "reject",
-      "rationale": "Streaming 只作为设置页导航中的“Log Streaming”文字出现，转录没有讨论模型流式输出、token 增量传输或相关机制；该界面文字不足以支持概念地图内容。",
+      "rationale": "Streaming 只作为产品设置页中的 Log Streaming 导航文字出现，语义也不是模型逐 token 流式输出。转录没有相关机制或边界证据。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [],
@@ -209,8 +202,8 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "仅有界面导航文字",
-        "该文字指向日志流而非模型流式输出"
+        "仅有产品界面文字",
+        "术语语义与流式输出节点不一致"
       ],
       "proposedNode": null
     }

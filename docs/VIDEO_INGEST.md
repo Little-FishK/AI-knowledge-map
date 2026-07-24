@@ -136,7 +136,7 @@ npm run video:validate-proposal -- `
 
 - `new`：新节点候选。
 - `merge`：与已有节点相同，只建议增加别名。
-- `supplement`：给已有节点补充案例、来源或侧面。
+- `supplement`：只在视频提供了**现有原理页尚未覆盖、且可迁移到其他软件的新机制或新边界**时，给已有节点增加待写作材料。单一产品如何使用既有概念的操作案例、按钮、配置或功能展示必须判为 `reject`。
 - `reject`：不够格、重复或属于排除项。
 - `uncertain`：证据足够讨论，但需要人工判断。
 - `undecided`：仅允许出现在草稿。
@@ -186,6 +186,31 @@ npm run video:validate-proposal -- `
 | 稳定性 `stability` | 10 |
 
 `coreCandidate: true` 必须至少 85/100，并提供 `coreReason`。`requiresHumanCoreApproval` 自 v0.3 起废弃，仅为旧提案兼容保留；未来是否自动授予核心身份取决于独立复核、真实图指标和完整影响门禁，而不是逐项人工批准。视频中的高频出现不能自动证明核心地位。
+
+### 5.1 `coreCandidate` 与 `supplement` 的确定语义
+
+- `coreCandidate: true` 只表示：**本次建议把一个尚非核心的节点晋升为核心节点**。
+- 目标节点已经位于 `graph.core` 时必须填写 `false`；它已经是核心，不是“核心候选”。
+- 新节点尚未获得核心身份，因此在同时满足新节点门禁和核心门禁时仍可填写 `true`。
+- `reject` 候选不得填写 `coreCandidate: true`。
+- `supplement` 必须同时证明三件事：
+  1. `transferableBeyondProduct`：机制或边界可以迁移到其他软件；
+  2. `notCoveredByExistingNode`：现有原理页尚未覆盖这项内容；
+  3. `mechanismOrBoundary`：材料解释的是机制或边界，而不只是操作步骤。
+- 三项中任意一项不成立，就不能进入现有原理页补充队列。产品教程价值与原理页补充资格分别判断：一条视频可以是优秀教程，同时对概念轨全部 `reject`。
+
+机器可读提案和独立复核都使用：
+
+```json
+{
+  "decision": "supplement",
+  "supplementCriteria": {
+    "transferableBeyondProduct": true,
+    "notCoveredByExistingNode": true,
+    "mechanismOrBoundary": true
+  }
+}
+```
 
 ## 6. 机器可执行门禁
 

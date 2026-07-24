@@ -1,35 +1,26 @@
 {
   "schemaVersion": 1,
   "mode": "independent",
-  "proposalHash": "sha256:bcf8fd70c45be806a0ffdf4b79924bb42e22a215813b0dcf36e6b9c9aed8901a",
+  "proposalHash": "sha256:90eabc181672702c55de85c08baab5626694d7b835533a6e94101a2439817d9f",
   "evidenceHash": "sha256:eb5a892c23c424a759e8eb5becfab06e68e083661a9a9fcf23e2c00dd74e2908",
   "reviewer": {
-    "id": "independent-reviewer-2026-07-24",
-    "note": "复核者已先读原始证据和受限图谱上下文，再独立填写；未读取或推断原提案决定、理由、目标节点或分数。"
+    "id": "independent-reviewer-policy-v2",
+    "note": "复核者应先读原始证据和受限图谱上下文，再独立填写；不要复制提案分数。"
   },
   "candidates": [
     {
       "term": "agent",
-      "decision": "supplement",
-      "rationale": "视频以能发邮件、安排会议和退款的工具型 Agent 为例，明确展示自主工具调用在高风险操作上的控制边界，以及如何把真实待执行参数交给人确认。这是现有 AI Agent 节点关于工具风险与监督边界的具体案例。",
-      "targetNode": "agent",
+      "decision": "reject",
+      "rationale": "邮件、会议和退款 Agent 都是已有 Agent 调用外部工具的产品场景；风险操作受人工确认也已由人在回路与 Agent 身份权限节点覆盖。候选没有带来尚未覆盖的 Agent 循环、状态或授权机制。",
+      "targetNode": null,
       "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 4,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 4,
-        "stability": 4
-      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
       "evidenceRefs": [
         {
           "start": 27.56,
           "end": 41.72
-        },
-        {
-          "start": 89.269,
-          "end": 115.609
         },
         {
           "start": 171.398,
@@ -41,29 +32,29 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "仅为既有 Agent 工具调用场景",
+        "监督与权限关系已由现有节点覆盖"
+      ],
       "proposedNode": null
     },
     {
       "term": "human-in-the-loop",
       "decision": "supplement",
-      "rationale": "视频完整说明人在回路如何成为工具调用的强制审批门：未批准则工具无法执行；审阅消息应显示实际工具参数而非另一次模型生成值；审阅者可在聊天或外部协作渠道批准、拒绝或提供额外信息。这是现有人在回路节点的高质量实践补充。",
+      "rationale": "视频给出两个现有人在回路摘要未覆盖、且可跨软件迁移的控制边界：第一，审批消息必须直接绑定即将提交给工具的真实参数，不能由模型另行生成一份可能不一致的值；第二，负责审阅的人可以与正在对话的用户分离，通过外部渠道执行审批。前者保证批准对象与实际执行对象一致，后者把人在回路扩展为异步、职责分离的控制点。",
       "targetNode": "human-in-the-loop",
       "nodeScores": null,
+      "supplementCriteria": {
+        "transferableBeyondProduct": true,
+        "notCoveredByExistingNode": true,
+        "mechanismOrBoundary": true
+      },
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
         {
-          "start": 0,
-          "end": 26.56
-        },
-        {
-          "start": 41.72,
-          "end": 73.4
-        },
-        {
           "start": 89.269,
-          "end": 167.618
+          "end": 171.398
         },
         {
           "start": 171.398,
@@ -71,7 +62,7 @@
         },
         {
           "start": 232.438,
-          "end": 283.827
+          "end": 246.947
         }
       ],
       "nearestNodes": [],
@@ -85,9 +76,10 @@
     {
       "term": "streaming",
       "decision": "reject",
-      "rationale": "Streaming 只作为聊天触发器设置界面中的字段出现，转录没有解释逐 token 返回、增量传输或流式响应机制，因此只是界面配置痕迹，不足以补充流式输出节点。",
+      "rationale": "Streaming 只作为聊天触发器设置中的字段出现，转录没有讨论增量 token 返回、传输协议、延迟权衡或中断处理，因此只是产品界面痕迹。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [],
@@ -97,7 +89,7 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "仅在设置界面出现",
+        "仅在产品设置界面出现",
         "缺少流式输出机制证据"
       ],
       "proposedNode": null

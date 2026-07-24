@@ -312,6 +312,8 @@ function graphMetrics(graph) {
 
 function validateAssessment(assessment, proposal, evidence) {
   const errors = [];
+  const projectData = loadProjectData();
+  const coreNodeIds = new Set(projectData.graph.core || []);
   if (!assessment || typeof assessment !== "object") return ["独立复核必须是对象"];
   if (assessment.schemaVersion !== 1) errors.push("assessment.schemaVersion 必须为 1");
   if (assessment.mode !== "independent") errors.push("assessment.mode 必须为 independent");
@@ -326,6 +328,18 @@ function validateAssessment(assessment, proposal, evidence) {
     if (seen.has(item.term)) errors.push(`assessment.candidates[${index}] term 重复`);
     seen.add(item.term);
     if (!DECISIONS.has(item.decision)) errors.push(`assessment.candidates[${index}].decision 非法`);
+    if (item.decision === "supplement") {
+      const criteria = item.supplementCriteria;
+      if (!criteria || typeof criteria !== "object") {
+        errors.push(`assessment.candidates[${index}].supplementCriteria 缺失`);
+      } else {
+        ["transferableBeyondProduct", "notCoveredByExistingNode", "mechanismOrBoundary"].forEach(key => {
+          if (criteria[key] !== true) {
+            errors.push(`assessment.candidates[${index}].supplementCriteria.${key} 必须为 true`);
+          }
+        });
+      }
+    }
     if (["merge", "supplement"].includes(item.decision) && !item.targetNode) {
       errors.push(`assessment.candidates[${index}].targetNode 缺失`);
     }
@@ -344,6 +358,12 @@ function validateAssessment(assessment, proposal, evidence) {
       scoreErrors.forEach(error => errors.push(`assessment.candidates[${index}]: ${error}`));
     }
     if (item.coreCandidate) {
+      if (item.decision === "reject") {
+        errors.push(`assessment.candidates[${index}] reject 候选不能晋升核心`);
+      }
+      if (item.targetNode && coreNodeIds.has(item.targetNode)) {
+        errors.push(`assessment.candidates[${index}].coreCandidate 只能表示晋升尚非核心的节点；${item.targetNode} 已是核心节点`);
+      }
       const scoreErrors = [];
       coreTotal(item.coreScores, scoreErrors);
       scoreErrors.forEach(error => errors.push(`assessment.candidates[${index}]: ${error}`));
@@ -557,6 +577,7 @@ function createAssessmentTemplate(proposal, evidence, reviewerId = "") {
       rationale: "",
       targetNode: null,
       nodeScores: null,
+      supplementCriteria: null,
       coreCandidate: false,
       coreScores: null,
       evidenceRefs: [],

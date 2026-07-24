@@ -11,14 +11,14 @@
     "candidateTutorialResources": 2,
     "newNodeCandidates": 0,
     "coreNodeCandidates": 0,
-    "supplementQueueItems": 6,
+    "supplementQueueItems": 3,
     "automaticApplications": 0,
     "readyProposals": 5,
     "independentReviews": 5,
     "conceptCandidates": 18,
-    "conceptAgreementCount": 13,
-    "conceptConflictCount": 5,
-    "coreFlagConflictCount": 6
+    "conceptAgreementCount": 18,
+    "conceptConflictCount": 0,
+    "coreFlagConflictCount": 0
   },
   "items": [
     {
@@ -44,18 +44,7 @@
       "conceptTrack": {
         "newNodes": [],
         "coreNodes": [],
-        "supplements": [
-          {
-            "targetNode": "workflow-orchestration",
-            "evidenceRange": [80, 405],
-            "reason": "提供了触发器、动作、逐项数据流、条件分支与合流的连续实操。"
-          },
-          {
-            "targetNode": "agent",
-            "evidenceRange": [736, 1010],
-            "reason": "展示 Chat Trigger、模型、记忆和数据工具组合成 Agent 的完整落地。"
-          }
-        ],
+        "supplements": [],
         "rejectedMentions": ["llm", "mcp"]
       }
     },
@@ -82,11 +71,6 @@
         "newNodes": [],
         "coreNodes": [],
         "supplements": [
-          {
-            "targetNode": "mcp",
-            "evidenceRange": [0, 282],
-            "reason": "是 MCP 从能力发现、授权到工具执行的产品级案例，适合进入现有 MCP 页补充队列。"
-          },
           {
             "targetNode": "system-prompt",
             "evidenceRange": [162, 195],
@@ -194,21 +178,12 @@
     "autoEligibleNewNodes": 0,
     "autoEligibleCoreNodes": 0,
     "agreedSupplements": [
-      "workflow-orchestration",
-      "agent",
-      "mcp",
       "system-prompt",
       "human-in-the-loop",
       "observability"
     ],
-    "conceptConflicts": [
-      "Quick Start: llm（第一阶段 reject，独立复核 supplement）",
-      "Official MCP: agent（reject / supplement）",
-      "Official MCP: Claude Code（reject / supplement）",
-      "Human Review: agent（reject / supplement）",
-      "n8n Assistant: agent（reject / supplement）"
-    ],
-    "coreFlagAmbiguity": "独立复核把已有核心节点 agent、llm、mcp 标为 coreCandidate；第一阶段把 coreCandidate 理解为本批次是否提议晋升。门禁现已显式报告该冲突，未产生核心节点自动资格。"
+    "conceptConflicts": [],
+    "coreFlagAmbiguity": null
   },
   "pipelineFindings": [
     {
@@ -235,6 +210,11 @@
       "severity": "fixed",
       "finding": "影子复核只比较概念 decision，没有显式报告两阶段 coreCandidate 不一致。",
       "resolution": "shadow-review 现已输出 coreDecisionsAgree、coreConflictCount 和阻断原因。"
+    },
+    {
+      "severity": "fixed",
+      "finding": "产品使用案例可能被误判为通用节点补充，已有核心节点也可能被重复标记为核心候选。",
+      "resolution": "supplement 现在必须同时证明跨产品可迁移、现有页未覆盖且属于机制或边界；coreCandidate 只允许晋升尚非核心的节点，两条规则均已加入提案与独立复核门禁。"
     }
   ]
 }

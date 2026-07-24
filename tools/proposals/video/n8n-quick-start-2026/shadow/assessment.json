@@ -1,27 +1,22 @@
 {
   "schemaVersion": 1,
   "mode": "independent",
-  "proposalHash": "sha256:7cc4aee430853fd25c4075c8e7c24a3e1f56dcc7c75f1867b7d68eec68938e58",
+  "proposalHash": "sha256:9320b92bfaaf1ca77fc482ed1e72583252fd01a82b99d3d0aa82e3b8c430b5ac",
   "evidenceHash": "sha256:09288223a0f05272c15bedff1859ca966eeba68d58680f3a12f8035413783f59",
   "reviewer": {
-    "id": "independent-reviewer-2026-07-24",
-    "note": "复核者已先读原始证据和受限图谱上下文，再独立填写；未读取或推断原提案决定、理由、目标节点或分数。"
+    "id": "independent-reviewer-policy-v2-final",
+    "note": "复核者应先读原始证据和受限图谱上下文，再独立填写；不要复制提案分数。"
   },
   "candidates": [
     {
       "term": "agent",
-      "decision": "supplement",
-      "rationale": "视频不只是提到 Agent，而是完整展示了聊天入口、模型、会话记忆、数据表工具、工具描述与系统消息如何组合，并通过一次多步骤执行说明 Agent 会选择并调用工具完成任务。这是现有 AI Agent 节点的可追溯实践侧面，不构成新概念。",
-      "targetNode": "agent",
+      "decision": "reject",
+      "rationale": "视频在 n8n 中把聊天入口、LLM、会话记忆和数据表工具接到 Agent，并展示其选择工具执行多步任务。这完整体现了现有 Agent、Agent 记忆和工具调用节点已经描述的机制，但仍是单一产品中的搭建案例，没有提出尚未覆盖且可迁移到其他软件的新机制或边界。",
+      "targetNode": null,
       "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 4,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 4,
-        "stability": 4
-      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
       "evidenceRefs": [
         {
           "start": 19.62,
@@ -32,12 +27,8 @@
           "end": 848.64
         },
         {
-          "start": 907.92,
-          "end": 928.04
-        },
-        {
           "start": 1039.66,
-          "end": 1060.66
+          "end": 1070.02
         }
       ],
       "nearestNodes": [],
@@ -45,15 +36,19 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "单一产品中的已有 Agent 组件搭建",
+        "相关机制已由 Agent、Agent 记忆和工具调用节点覆盖"
+      ],
       "proposedNode": null
     },
     {
       "term": "工作流",
-      "decision": "supplement",
-      "rationale": "视频用两个相连但职责分离的流程展示工作流编排：表单触发的数据摄取流程与基于聊天触发的 Agent 流程，并解释触发器启动流程、动作执行步骤、条件分支以及每次运行产生执行记录。这些是现有工作流编排节点的具体案例。",
-      "targetNode": "workflow-orchestration",
+      "decision": "reject",
+      "rationale": "表单触发器启动流程、动作节点执行步骤，以及摄取流程与 Agent 流程的拆分，都是 n8n 对既有工作流编排概念的操作演示。证据没有给出新的跨软件编排机制、执行语义或边界。",
+      "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
@@ -64,14 +59,6 @@
         {
           "start": 82,
           "end": 99.96
-        },
-        {
-          "start": 190.86,
-          "end": 204.02
-        },
-        {
-          "start": 1157.84,
-          "end": 1170.98
         }
       ],
       "nearestNodes": [],
@@ -79,23 +66,21 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "产品工作流搭建教程",
+        "未超出现有工作流编排节点的原理覆盖"
+      ],
       "proposedNode": null
     },
     {
       "term": "llm",
-      "decision": "supplement",
-      "rationale": "视频明确把聊天模型作为 AI 节点和 Agent 必须连接的推理核心，并展示在流程中选择模型提供方和凭据的应用位置。它提供的是现有 LLM 节点在自动化流程中的实践侧面，而不是独立的新概念。",
-      "targetNode": "llm",
+      "decision": "reject",
+      "rationale": "视频只把聊天模型作为 AI 节点和 Agent 的推理核心，并演示选择 OpenAI 与凭据。现有图谱已经明确 Agent 使用 LLM；这里没有 LLM 原理、能力边界或可迁移的新机制。",
+      "targetNode": null,
       "nodeScores": null,
-      "coreCandidate": true,
-      "coreScores": {
-        "learningGateway": 4,
-        "graphCentrality": 0,
-        "crossRouteReuse": 4,
-        "beginnerNavigation": 4,
-        "stability": 4
-      },
+      "supplementCriteria": null,
+      "coreCandidate": false,
+      "coreScores": null,
       "evidenceRefs": [
         {
           "start": 444.68,
@@ -103,7 +88,7 @@
         },
         {
           "start": 786.76,
-          "end": 801.08
+          "end": 795.8
         }
       ],
       "nearestNodes": [],
@@ -111,20 +96,24 @@
       "externalSources": [],
       "claims": [],
       "proposedLearningPath": null,
-      "disqualifiers": [],
+      "disqualifiers": [
+        "模型与凭据配置案例",
+        "Agent 使用 LLM 的关系已被覆盖"
+      ],
       "proposedNode": null
     },
     {
       "term": "mcp",
       "decision": "reject",
-      "rationale": "MCP 只在可选工具类型列表中与 HTTP 和应用工具并列出现，视频没有解释协议身份、角色、传输、连接机制或实际调用过程，证据不足以形成地图补充。",
+      "rationale": "MCP 只在可选工具类型列表中与 HTTP 和应用工具并列出现，没有协议角色、传输、工具发现、授权或调用过程的解释，证据不足以补充现有 MCP 节点。",
       "targetNode": null,
       "nodeScores": null,
+      "supplementCriteria": null,
       "coreCandidate": false,
       "coreScores": null,
       "evidenceRefs": [
         {
-          "start": 856.64,
+          "start": 854.64,
           "end": 862.64
         }
       ],
@@ -134,8 +123,8 @@
       "claims": [],
       "proposedLearningPath": null,
       "disqualifiers": [
-        "仅在产品工具列表中顺带提及",
-        "缺少 MCP 机制或用途解释"
+        "菜单级顺带提及",
+        "缺少协议机制和边界证据"
       ],
       "proposedNode": null
     }

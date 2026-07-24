@@ -8,24 +8,24 @@
 - 3 条达到“正式教程候选”：Quick Start、Official MCP、Human Review。
 - 2 条只适合作为候选资料：OpenTelemetry 缺准确配置项，n8n Assistant 是预览功能概览而不是完整任务教程。
 - 没有新节点，也没有核心节点候选。
-- 6 个现有节点补充进入队列：`workflow-orchestration`、`agent`、`mcp`、`system-prompt`、`human-in-the-loop`、`observability`；其中 n8n Assistant 不产生概念补充。
+- 3 个现有节点补充进入队列：`system-prompt`、`human-in-the-loop`、`observability`；产品特定的 Agent、工作流和 n8n MCP 使用案例不再计作通用原理补充。
 - 按既定规则，本批次不会直接改写任何现有理解原理页。
 
 ## Ready 与独立复核结果
 
 - 5 份提案全部通过 `--ready` 严格门禁。
 - 教程分依次为：Quick Start 68.75、Official MCP 66.25、Human Review 66.25、OpenTelemetry 48.75、n8n Assistant 33.75（满分 70）。
-- 独立复核覆盖 18 个概念候选：13 个判断一致，5 个冲突。
+- 独立复核覆盖 18 个概念候选；在统一 `supplement` 与 `coreCandidate` 语义并重新盲审后，18 个判断全部一致。
 - 一致结论仍为：0 个新节点、0 个自动合格核心节点、0 次正式写入。
-- 五个概念冲突全部是第一阶段更保守：Quick Start 的 `llm`，Official MCP 的 `agent` 和 `Claude Code`，Human Review 的 `agent`，n8n Assistant 的 `agent`。
-- 独立复核把已有核心节点 `agent`、`llm`、`mcp` 标为 `coreCandidate=true`，第一阶段则把该字段理解为“本批次是否提议晋升核心”。门禁已增加核心标志一致性检查，6 处歧义全部被明确阻断。
+- `coreCandidate` 现在只表示“本批次提议把一个尚非核心的节点晋升为核心”；已有核心节点必须为 `false`。
+- `supplement` 只允许可跨产品迁移、现有节点尚未覆盖、且属于机制或边界的内容；具体按钮、配置和单一产品案例必须拒绝。
 
 ## 五条视频
 
 | 视频 | 教程轨 | 节点轨 |
 |---|---|---|
-| Quick Start 2026 | 正式候选；完整搭建问答 Agent | 补充工作流编排、AI Agent |
-| Official MCP | 正式候选；连接与授权闭环完整 | 补充 MCP、System Prompt |
+| Quick Start 2026 | 正式候选；完整搭建问答 Agent | 无通用概念补充 |
+| Official MCP | 正式候选；连接与授权闭环完整 | 补充 System Prompt |
 | Human Review | 正式候选；三种审批模式 | 补充人在回路 |
 | OpenTelemetry | 候选；缺精确环境变量与完整安装 | 补充可观测性 |
 | n8n Assistant | 候选；预览功能概览 | 不新增、不补充通用概念 |

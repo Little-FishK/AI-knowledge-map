@@ -89,9 +89,9 @@
       },
       {
         "term": "mcp",
-        "decision": "supplement",
+        "decision": "reject",
         "targetNode": "mcp",
-        "rationale": "提供 MCP Server 地址、客户端授权、工具批准与访问令牌边界的完整实例。",
+        "rationale": "服务器地址、连接器授权和 n8n 工具批准构成了有价值的产品教程，但没有增加现有 MCP 节点尚未覆盖的可迁移机制或边界。",
         "evidenceRefs": [{"start": 50, "end": 282}],
         "coreCandidate": false,
         "disqualifiers": ["与已有节点语义重合"]
@@ -115,6 +115,11 @@
       {
         "term": "System Prompt",
         "decision": "supplement",
+        "supplementCriteria": {
+          "transferableBeyondProduct": true,
+          "notCoveredByExistingNode": true,
+          "mechanismOrBoundary": true
+        },
         "targetNode": "system-prompt",
         "rationale": "展示项目级指令文件如何作为编码 Agent 的持续系统约束。",
         "evidenceRefs": [{"start": 162, "end": 195}],

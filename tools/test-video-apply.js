@@ -123,6 +123,11 @@ function proposalFixture(evidence) {
           term: "Agent Memory",
           decision: "supplement",
           targetNode: "agent-memory",
+          supplementCriteria: {
+            transferableBeyondProduct: true,
+            notCoveredByExistingNode: true,
+            mechanismOrBoundary: true
+          },
           rationale: "补充 session ID 的可复现实例。",
           nodeScores: {
             identity: 4,

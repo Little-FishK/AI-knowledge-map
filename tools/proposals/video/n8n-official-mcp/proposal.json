@@ -122,9 +122,9 @@
       },
       {
         "term": "mcp",
-        "decision": "supplement",
+        "decision": "reject",
         "targetNode": "mcp",
-        "rationale": "提供 MCP Server 地址、客户端授权、工具批准与访问令牌边界的完整实例。",
+        "rationale": "服务器地址、连接器授权和 n8n 工具批准构成了有价值的产品教程，但没有增加现有 MCP 节点尚未覆盖的可迁移机制或边界。",
         "nodeScores": null,
         "coreCandidate": false,
         "coreScores": null,
@@ -142,7 +142,12 @@
         "disqualifiers": [
           "与已有节点语义重合"
         ],
-        "proposedNode": null
+        "proposedNode": null,
+        "supplementCriteria": {
+          "transferableBeyondProduct": true,
+          "notCoveredByExistingNode": true,
+          "mechanismOrBoundary": true
+        }
       },
       {
         "term": "agent",
@@ -204,7 +209,12 @@
         "disqualifiers": [
           "与已有节点语义重合"
         ],
-        "proposedNode": null
+        "proposedNode": null,
+        "supplementCriteria": {
+          "transferableBeyondProduct": true,
+          "notCoveredByExistingNode": true,
+          "mechanismOrBoundary": true
+        }
       },
       {
         "term": "planning",

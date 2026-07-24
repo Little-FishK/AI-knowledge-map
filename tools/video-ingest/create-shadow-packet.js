@@ -78,17 +78,18 @@ function createShadowPacket(proposal, evidence, options = {}) {
       decisionDefinitions: {
         new: "具有独立身份和机制，与全图现有节点不重复，值得生成完整新节点原子包。",
         merge: "与现有节点是同一概念或别名，只建议合并名称。",
-        supplement: "现有节点已覆盖概念；视频提供可追溯的新案例或侧面，只进入待写作队列。",
+        supplement: "现有节点已覆盖概念；视频提供现有原理页尚未覆盖、可迁移到其他软件的新机制或新边界，只进入待写作队列。单一产品的操作案例、按钮、配置或功能展示必须 reject。",
         reject: "只是产品功能、按钮、配置、顺带提及、证据不足或没有地图价值。",
         uncertain: "证据值得讨论但不足以作出稳定决定。"
       },
       rules: [
         "先独立阅读证据，再评估候选；不要根据候选名称猜测视频内容。",
         "merge / supplement 必须填写真实 targetNode 和至少一个有效 evidenceRefs。",
+        "supplement 必须填写 supplementCriteria，且 transferableBeyondProduct、notCoveredByExistingNode、mechanismOrBoundary 三项都为 true；只展示某软件如何使用已有概念时必须 reject。",
         "new / uncertain 必须独立填写 nodeScores；不得复制或推测提案分数。",
         "new 必须给出两个相近现有节点、至少两条合法关系、两个视频之外的独立 HTTPS 来源、至少两条断言—来源映射、学习路径位置和完整节点草稿。",
         "外部来源必须实际打开核对；externalSources 应记录标题、URL、权威类型和支持范围。",
-        "核心候选单独评分。graphCentrality 填 0 占位，系统会用真实图指标覆盖。",
+        "coreCandidate 只表示本次是否建议把尚非核心的节点晋升为核心；目标已经是核心节点时必须为 false。新节点也可在满足核心门禁时成为候选。graphCentrality 填 0 占位，系统会用真实图指标覆盖。",
         "视频中高频出现、产品首页展示或短期流行不能单独证明核心地位。",
         "只输出符合 outputTemplate 形状的 JSON，不输出 Markdown 或解释性前后缀。"
       ]
