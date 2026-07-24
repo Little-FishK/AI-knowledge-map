@@ -2,19 +2,35 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-global.window = {};
+const vm = require("vm");
+const root = process.env.TUTORIAL_ROOT
+  ? path.resolve(process.env.TUTORIAL_ROOT)
+  : path.join(__dirname, "..");
+const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const tutorialScripts = [...indexHtml.matchAll(/<script src="(data\/tutorials[^"]*\.js)"><\/script>/g)]
+  .map((match) => match[1]);
+const requiredTutorialScripts = [
+  "data/tutorials.js",
+  "data/tutorials-codex-youtube.js",
+  "data/tutorials-claude-code.js",
+  "data/tutorials-video-generated.js"
+];
+const context = { window: {} };
+vm.createContext(context);
 try {
-  require(path.join(__dirname, "..", "data", "software.js"));
-  require(path.join(__dirname, "..", "data", "tutorials.js"));
-  require(path.join(__dirname, "..", "data", "tutorials-codex-youtube.js"));
-  require(path.join(__dirname, "..", "data", "tutorials-claude-code.js"));
+  const softwareFile = path.join(root, "data", "software.js");
+  vm.runInContext(fs.readFileSync(softwareFile, "utf8"), context, { filename: softwareFile });
+  tutorialScripts.forEach((src) => {
+    const file = path.join(root, ...src.split("/"));
+    vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
+  });
 } catch (e) {
   console.error("✗ 语法错误：\n  " + e.message);
   process.exit(1);
 }
 
-const S = global.window.SOFTWARE;
-const T = global.window.TUTORIALS;
+const S = context.window.SOFTWARE;
+const T = context.window.TUTORIALS;
 const softwareIds = new Set(S.items.map(x => x.id));
 const platformIds = new Set(T.platforms.map(x => x.id));
 const problems = [];
@@ -71,11 +87,10 @@ function checkReview(r) {
   }
 }
 
-const indexHtml = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-const appJs = fs.readFileSync(path.join(__dirname, "..", "assets", "app.js"), "utf8");
-if (!indexHtml.includes('src="data/tutorials.js"')) problems.push("index.html 未加载 data/tutorials.js");
-if (!indexHtml.includes('src="data/tutorials-codex-youtube.js"')) problems.push("index.html 未加载 Codex YouTube 教程扩展");
-if (!indexHtml.includes('src="data/tutorials-claude-code.js"')) problems.push("index.html 未加载 Claude Code 教程");
+const appJs = fs.readFileSync(path.join(root, "assets", "app.js"), "utf8");
+requiredTutorialScripts.forEach((src) => {
+  if (!tutorialScripts.includes(src)) problems.push(`index.html 未加载 ${src}`);
+});
 if (!appJs.includes("data-tutorial") || !appJs.includes("openTutorial")) problems.push("app.js 未接入软件教程按钮或打开逻辑");
 
 const platformDup = T.platforms.map(x => x.id).filter((v, i, a) => a.indexOf(v) !== i);

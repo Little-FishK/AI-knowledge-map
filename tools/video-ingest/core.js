@@ -83,7 +83,8 @@ function loadProjectData() {
     "data/software.js",
     "data/tutorials.js",
     "data/tutorials-codex-youtube.js",
-    "data/tutorials-claude-code.js"
+    "data/tutorials-claude-code.js",
+    "data/tutorials-video-generated.js"
   ];
   try {
     files.forEach(relative => {
@@ -297,7 +298,6 @@ function validateProposal(proposal, evidence, options = {}) {
       coreErrors.forEach(message => errors.push(`${prefix}: ${message.replace("conceptTrack.", "")}`));
       if (computedCore != null && computedCore < 85) errors.push(`${prefix} 核心候选总分必须至少为 85/100`);
       if (!candidate.coreReason) errors.push(`${prefix}.coreReason 缺失`);
-      if (candidate.requiresHumanCoreApproval !== true) errors.push(`${prefix} 必须标记 requiresHumanCoreApproval=true`);
     }
     if (["new", "uncertain"].includes(candidate.decision) && total == null) {
       errors.push(`${prefix}.nodeScores 缺失`);

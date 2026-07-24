@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-shadow-assessment-v1.json",
+  "title": "Independent video concept assessment v1",
+  "type": "object",
+  "required": ["schemaVersion", "mode", "proposalHash", "evidenceHash", "reviewer", "candidates"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "mode": { "const": "independent" },
+    "proposalHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "evidenceHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "reviewer": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "decision", "coreCandidate"],
+        "properties": {
+          "term": { "type": "string", "minLength": 1 },
+          "decision": { "enum": ["new", "merge", "supplement", "reject", "uncertain"] },
+          "rationale": { "type": "string" },
+          "targetNode": { "type": ["string", "null"] },
+          "nodeScores": { "type": ["object", "null"] },
+          "coreCandidate": { "type": "boolean" },
+          "coreScores": { "type": ["object", "null"] },
+          "evidenceRefs": { "type": "array" },
+          "nearestNodes": { "type": "array" },
+          "proposedEdges": { "type": "array" },
+          "externalSources": { "type": "array" },
+          "claims": { "type": "array" },
+          "proposedLearningPath": { "type": ["object", "null"] },
+          "disqualifiers": { "type": "array" },
+          "proposedNode": { "type": ["object", "null"] }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

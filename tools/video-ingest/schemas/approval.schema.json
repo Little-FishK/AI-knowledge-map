@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-approval-v1.json",
+  "title": "Human approval for a dual-track video proposal",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "status",
+    "proposalHash",
+    "evidenceHash",
+    "tutorial",
+    "concepts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["draft", "approved"] },
+    "proposalHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "evidenceHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "approvedAt": { "type": ["string", "null"] },
+    "approvedBy": { "type": ["string", "null"] },
+    "tutorial": {
+      "type": "object",
+      "required": ["decision"],
+      "properties": {
+        "decision": { "enum": ["pending", "approve", "reject"] }
+      },
+      "additionalProperties": false
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "decision"],
+        "properties": {
+          "term": { "type": "string", "minLength": 1 },
+          "decision": { "enum": ["pending", "approve", "reject"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

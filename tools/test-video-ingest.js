@@ -15,7 +15,7 @@ const {
 const { buildContext } = require("./video-ingest/build-context");
 const { createDraft } = require("./video-ingest/create-proposal");
 
-["evidence.schema.json", "proposal.schema.json"].forEach(file => {
+["evidence.schema.json", "proposal.schema.json", "approval.schema.json"].forEach(file => {
   const schema = JSON.parse(fs.readFileSync(path.join(__dirname, "video-ingest", "schemas", file), "utf8"));
   assert.strictEqual(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
 });
