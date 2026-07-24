@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-node-package-content-v1.json",
+  "title": "Video node atomic package content v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "candidateTerm",
+    "proposalHash",
+    "evidenceHash",
+    "assessmentHash",
+    "createdAt",
+    "node",
+    "deepDive"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "candidateTerm": { "type": "string", "minLength": 1 },
+    "proposalHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "evidenceHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "assessmentHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "node": {
+      "type": "object",
+      "required": ["body", "cases", "sources"],
+      "properties": {
+        "aliases": { "type": "array" },
+        "maturity": { "enum": ["stable", "evolving"] },
+        "heat": { "type": "number", "minimum": 0, "maximum": 1 },
+        "body": { "type": "string", "minLength": 1 },
+        "cases": { "type": "array", "minItems": 1 },
+        "sources": { "type": "array", "minItems": 2 }
+      },
+      "additionalProperties": true
+    },
+    "deepDive": {
+      "type": "object",
+      "required": ["title", "subtitle", "thesis", "html"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "subtitle": { "type": "string", "minLength": 1 },
+        "thesis": { "type": "string", "minLength": 1 },
+        "html": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -15,11 +15,13 @@
     "video:shadow-import": "node tools/video-ingest/import-shadow-assessment.js",
     "video:shadow-review": "node tools/video-ingest/review-proposal-shadow.js",
     "video:shadow-batch": "node tools/video-ingest/review-shadow-batch.js",
+    "video:node-content-packet": "node tools/video-ingest/create-node-content-packet.js",
+    "video:node-package": "node tools/video-ingest/create-node-package.js",
     "quality:deepdives": "node tools/check-deepdive-quality.js",
     "quality:l3": "node tools/audit-deepdive-benchmark.js",
     "quality:browser": "node tools/audit-deepdive-browser.js --changed",
     "test:quality-gates": "node tools/test-deepdive-quality.js",
-    "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js",
+    "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js",
     "quality:all": "npm run validate && npm run test:quality-gates && npm run test:video-ingest && npm run quality:deepdives"
   },
   "devDependencies": {

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://little-fishk.github.io/AI-knowledge-map/schemas/video-node-atomic-package-v1.json",
+  "title": "Video node atomic package preview v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "mode",
+    "status",
+    "bindings",
+    "candidateTerm",
+    "node",
+    "edges",
+    "learningPath",
+    "deepDive",
+    "layout",
+    "core",
+    "shadowEligibility",
+    "validation"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "mode": { "const": "node-atomic-package-preview" },
+    "status": { "enum": ["draft", "validated"] },
+    "bindings": { "type": "object" },
+    "candidateTerm": { "type": "string", "minLength": 1 },
+    "node": { "type": "object" },
+    "edges": { "type": "array", "minItems": 2 },
+    "learningPath": { "type": "object" },
+    "deepDive": { "type": "object" },
+    "layout": { "type": "object" },
+    "core": { "type": "object" },
+    "shadowEligibility": {
+      "type": "object",
+      "required": ["newNode", "coreNode", "formalWrite"],
+      "properties": {
+        "newNode": { "const": true },
+        "coreNode": { "type": "boolean" },
+        "formalWrite": { "const": false }
+      }
+    },
+    "validation": { "type": "object" }
+  },
+  "additionalProperties": false
+}

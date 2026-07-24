@@ -422,3 +422,76 @@ npm run video:shadow-batch -- `
 - `tools/video-ingest/review-shadow-batch.js`
 - `tools/video-ingest/schemas/shadow-assessment.schema.json`
 - `tools/test-video-shadow-review.js`
+
+## 10. v0.4：新节点完整原子包预览
+
+v0.4 只接受同时满足以下条件的候选：
+
+- 提案决定与独立复核决定一致；
+- 独立新节点评分至少 80；
+- 去重、来源—断言、视频证据、关系和学习路径审计全部通过；
+- v0.3 报告中的 `shadowEligibility.newNode` 为 `true`。
+
+现有节点的 `supplement` / `merge` 不进入本流程，继续只保留在待写作队列。
+
+### 10.1 模型中立的内容写作包
+
+通过影子门禁后，先生成写作任务包。它不指定模型，可由任意隔离模型或人工写作者完成：
+
+```powershell
+npm run video:node-content-packet -- `
+  --proposal "<proposal.json>" `
+  --evidence "<evidence.json>" `
+  --assessment "<assessment.json>" `
+  --term "<候选术语>" `
+  --output "<content-packet.json>"
+```
+
+任务包固定要求：详情正文四段骨架、机制闭环、至少 9 节、4 个学习目标、可复现贯穿示例、原创教学制品、误区与诊断、至少 5 道迁移型自测及答案、至少 3 个优先级清楚的来源。
+
+### 10.2 组装原子包
+
+写作者只返回 `outputTemplate` JSON。填好的内容文件与提案、证据、独立复核哈希绑定，然后生成预览：
+
+```powershell
+npm run video:node-package -- `
+  --proposal "<proposal.json>" `
+  --evidence "<evidence.json>" `
+  --assessment "<assessment.json>" `
+  --content "<content.json>" `
+  --output "<preview-directory>"
+```
+
+预览目录同时包含：
+
+- `manifest.json`：完整绑定、资格和门禁结果；
+- `node.json`：节点详情正文、案例与来源；
+- `edges.json`：至少两条合法关系；
+- `learning-path.json`：官方推荐学习路径位置；
+- `layout.json`：基于邻居重心和确定性搜索得到的坐标及遮挡报告；
+- `deepdive/<node-id>.js`：完整理解原理页。
+
+### 10.3 原子门禁
+
+一个包必须整体通过：
+
+1. 提案、证据、独立复核、内容和当前图谱五类哈希一致；
+2. 节点 ID、标题、大区、正文、案例和至少两个来源有效；
+3. 正文内联引用全部指向真实节点；
+4. 至少两条关系连接新节点且端点、方向类型合法；
+5. 学习路径序号不重复，位置满足前置/后续约束；
+6. 新坐标不造成同区视觉框重叠，也不遮挡任一节点超过 3/4；
+7. 理解原理页严格通过现有 L1、L2、L3 工具。
+
+任一项失败，包保持 `draft`，不得进入后续应用阶段。v0.4 的 `formalWrite` 在 Schema 中固定为 `false`，工具没有修改 `data/graph.js`、核心列表、学习路径、入口文件或深读页的代码路径。
+
+当前 n8n 真实提案没有新节点候选，因此正确结果是“不生成原子包”，而不是为了测试流程虚构正式节点。自动测试另用明确标记的虚构夹具验证完整成功和失败路径。
+
+实现与合同：
+
+- `tools/video-ingest/create-node-content-packet.js`
+- `tools/video-ingest/create-node-package.js`
+- `tools/video-ingest/node-package.js`
+- `tools/video-ingest/schemas/node-package-content.schema.json`
+- `tools/video-ingest/schemas/node-package.schema.json`
+- `tools/test-video-node-package.js`
