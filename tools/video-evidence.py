@@ -3,10 +3,11 @@
 """video-evidence.py —— 本地、免费的视频取证管线（软件教程页 E2 证据）
 
 把一条视频转成「逐段转录 + 关键帧 OCR」证据包，供人据此写忠于视频的 E2 教程。
-全部本地开源、零 API 费用，适合日后定时自动跑。
+下载、抽帧与 OCR 均在本地完成；ASR 可选 Groq，未配置时回落到本地
+faster-whisper。适合日后定时自动跑。
 
 依赖（一次性安装）：
-    py -3.11 -m pip install yt-dlp faster-whisper "scenedetect[opencv]" rapidocr-onnxruntime
+    py -3.11 -m pip install yt-dlp faster-whisper "scenedetect[opencv]" rapidocr-onnxruntime requests
     另需系统 ffmpeg（已装）。
 
 用法：
@@ -23,6 +24,12 @@
     · 免登录即可取证；证据等级达 E2 后方可进入正式评分。
 """
 import argparse, hashlib, json, os, subprocess, sys, re, time
+
+# Windows PowerShell 常使用 GBK；进度信息含 Unicode 符号时会让已完成的取证任务
+# 因输出编码而中断。统一为 UTF-8，同时保留 replace 回落以适配重定向输出。
+for stream in (sys.stdout, sys.stderr):
+    if hasattr(stream, "reconfigure"):
+        stream.reconfigure(encoding="utf-8", errors="replace")
 
 def run(cmd):
     # 不用 text=True，避免 Windows 下用 gbk 解码 yt-dlp 输出报错

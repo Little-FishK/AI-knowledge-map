@@ -215,9 +215,23 @@ npm run test:video-ingest
 - 核心候选低于 85 分或绕过人工批准；
 - 提案复用不匹配的证据哈希。
 
+### 6.1 首次真实视频试跑
+
+2026-07-24 使用 n8n 官方视频
+[Building AI Agents: Chat Trigger, Memory, and System/User Messages Explained [Part 1]](https://www.youtube.com/watch?v=yzvLfHb0nqE)
+完成首轮真实试跑：
+
+- 证据包：20:16，250 段时间戳转录，101 帧抽样、去重后 77 帧 OCR，E2 建议；
+- 教程轨：建议为 `n8n` 创建教程页并正式收录，质量 60 / 70；
+- 概念轨：新增节点 0；建议补充 `agent`、`system-prompt`、`agent-memory`、`workflow-orchestration`；
+- 拒绝把具体模型名、顺带提及的多模态/向量数据库和产品节点 Chat Trigger 误建为知识节点；
+- `--ready` 严格校验通过，正式数据保持不变。
+
+可审查提案位于 `tools/proposals/video/n8n-ai-agent-part1/`。原始音视频、转录和帧仍只保存在被 Git 忽略的 `tools/_raw/`。
+
 ## 7. v0.1 明确不做
 
-- 不调用模型 API。
+- 提案生成与门禁本身不调用生成式模型 API；证据采集的 ASR 可按配置使用 Groq 或本地 faster-whisper。
 - 不自动把提案写入正式数据。
 - 不自动创建节点、关系或教程页。
 - 不自动生成理解原理页。

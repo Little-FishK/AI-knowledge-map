@@ -213,8 +213,8 @@ py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|loc
 
 - **转录（ASR）只作步骤草稿**；专有名词、命令、路径、数值以 **OCR 与官方文档为准**，不照抄转录（本地小模型常把 Ollama 听成 Olonema、显存听成线传）。
 - **三源交叉**——转录给步骤顺序、OCR 给界面与确切命令、官方文档给语法与型号——都印证过的才写进教程；未印证的标「未能核实」。
-- 全程本地、**零 API 费用**，适合日后定时自动运行。CPU 上大模型转录较慢（large-v3-turbo 约 1.4× 实时），追求速度可用 small 并更依赖 OCR/文档纠名。
-- 依赖：`yt-dlp faster-whisper scenedetect[opencv] rapidocr-onnxruntime` + 系统 ffmpeg。
+- 下载、抽帧与 OCR 均在本地完成；选择本地 faster-whisper 时**零 API 费用**，选择 Groq 时使用其 API 与额度。CPU 上本地大模型转录较慢（large-v3-turbo 约 1.4× 实时），追求速度可用 small 并更依赖 OCR/文档纠名。
+- 依赖：`yt-dlp faster-whisper scenedetect[opencv] rapidocr-onnxruntime requests` + 系统 ffmpeg。
 - 只下载低清视频/音频供内部取证，正文必须原创、不整段转载字幕（见 §五）。
 
 ## 七、当前进度（2026-07-23）
