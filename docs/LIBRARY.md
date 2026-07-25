@@ -45,10 +45,12 @@ npm run validate
 
 页面不能只显示一句定位。它必须把定位、发展背景、运营组织和发起团队组织成连续介绍，并继续展示：
 
+- 不少于 90 个中文字符的正式介绍；
+- 至少 3 项平台优势与特征；
 - 这个网站或来源主要提供什么；
 - 在资料库中应当如何使用；
 - 不能由该来源单独支持什么。
 
-九类来源的通用介绍指南位于 `window.LIBRARY_PROFILE_GUIDANCE`。具体平台可以用 `offers`、`howToUse` 和 `caution` 覆盖通用指南，例如 IEEE Standards 使用标准检索、访问方式、编号引用和法律效力的专用说明。
+九类来源的通用介绍指南位于 `window.LIBRARY_PROFILE_GUIDANCE`。具体平台可以用 `overview`、`strengths`、`offers`、`howToUse` 和 `caution` 覆盖通用指南，例如 IEEE Standards 使用强调标准全生命周期、共识机制、工程覆盖和实施生态的专用说明。
 
 平台档案用于帮助用户判断来源，不改变资料的权威等级，也不替代逐条证据审核。

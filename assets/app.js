@@ -1091,6 +1091,8 @@
     const profile = libraryPlatformProfile(source, subcategory);
     if (!subcategory || !profile) return "";
     const guidance = LIBRARY_PROFILE_GUIDANCE[source.id] || {};
+    const overview = profile.overview || `${profile.positioning}${profile.background}其运营或维护主体为${profile.organization}；关于创始或发起团队：${profile.foundingTeam}`;
+    const strengths = profile.strengths || guidance.strengths || [];
     const offers = profile.offers || guidance.offers || [];
     const howToUse = profile.howToUse || guidance.howToUse || [];
     const caution = profile.caution || guidance.caution || "";
@@ -1103,10 +1105,15 @@
         ${website}
       </header>
       <div class="lib-profile-intro">
-        <p class="lib-profile-position">${esc(profile.positioning)}</p>
-        <p><b>发展背景</b>${esc(profile.background)}</p>
-        <p><b>运营与发起</b>${esc(profile.organization)} ${esc(profile.foundingTeam)}</p>
+        <span>正式介绍</span>
+        <p>${esc(overview)}</p>
       </div>
+      <section class="lib-profile-strengths"><h4>平台优势与特征</h4><div>${strengths.map(item => `<p>${esc(item)}</p>`).join("")}</div></section>
+      <dl class="lib-profile-facts">
+        <div><dt>发展背景</dt><dd>${esc(profile.background)}</dd></div>
+        <div><dt>相关公司 / 组织</dt><dd>${esc(profile.organization)}</dd></div>
+        <div><dt>创始人 / 发起团队</dt><dd>${esc(profile.foundingTeam)}</dd></div>
+      </dl>
       <div class="lib-profile-sections">
         <section><h4>这个网站主要提供什么</h4><ul>${offers.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
         <section><h4>在资料库中如何使用</h4><ul>${howToUse.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>

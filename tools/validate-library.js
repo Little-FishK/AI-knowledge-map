@@ -86,6 +86,12 @@ Object.keys(profiles).forEach(key => {
   if (profile.caution !== undefined && (typeof profile.caution !== "string" || !profile.caution.trim())) {
     problems.push(`二级来源档案 ${key} 的自定义 caution 不能为空`);
   }
+  if (profile.overview !== undefined && (typeof profile.overview !== "string" || profile.overview.trim().length < 90)) {
+    problems.push(`二级来源档案 ${key} 的自定义 overview 少于 90 字`);
+  }
+  if (profile.strengths !== undefined && (!Array.isArray(profile.strengths) || profile.strengths.length < 3)) {
+    problems.push(`二级来源档案 ${key} 的自定义 strengths 至少需要 3 项`);
+  }
 });
 expectedClasses.forEach(classId => {
   const guidance = profileGuidance[classId];
@@ -93,7 +99,7 @@ expectedClasses.forEach(classId => {
     problems.push(`一级来源 ${classId} 缺少平台介绍指南`);
     return;
   }
-  ["offers", "howToUse"].forEach(field => {
+  ["strengths", "offers", "howToUse"].forEach(field => {
     if (!Array.isArray(guidance[field]) || guidance[field].length < 3) {
       problems.push(`一级来源 ${classId} 的平台介绍指南 ${field} 至少需要 3 项`);
     }
@@ -101,6 +107,15 @@ expectedClasses.forEach(classId => {
   if (typeof guidance.caution !== "string" || !guidance.caution.trim()) {
     problems.push(`一级来源 ${classId} 的平台介绍指南缺少 caution`);
   }
+});
+expectedProfileKeys.forEach(key => {
+  const [classId] = key.split("/");
+  const profile = profiles[key];
+  const overview = profile.overview ||
+    `${profile.positioning}${profile.background}其运营或维护主体为${profile.organization}；关于创始或发起团队：${profile.foundingTeam}`;
+  const strengths = profile.strengths || (profileGuidance[classId] && profileGuidance[classId].strengths);
+  if (overview.length < 90) problems.push(`二级来源 ${key} 的最终正式介绍少于 90 字`);
+  if (!Array.isArray(strengths) || strengths.length < 3) problems.push(`二级来源 ${key} 的最终优势与特征少于 3 项`);
 });
 const itemIds = new Set();
 const counts = Object.fromEntries(expectedClasses.map(id => [id, 0]));

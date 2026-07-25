@@ -119,11 +119,22 @@ html, body {
 .lib-profile-link { border: 1px solid #496486; color: #b9d5fb; text-decoration: none; }
 .lib-profile-link:hover { background: #29394d; }
 .lib-profile-no-link { color: var(--fg-faint); background: #171a20; }
-.lib-profile-intro { max-width: 920px; margin: 10px 0 13px; }
-.lib-profile-intro p { margin: 5px 0; color: var(--fg-dim); font-size: 12px; line-height: 1.75; }
-.lib-profile-intro .lib-profile-position { color: #d5dbe4; font-size: 13px; }
-.lib-profile-intro b { display: inline-block; min-width: 68px; margin-right: 7px; color: #8ea8ca;
-                       font-size: 10px; letter-spacing: .05em; vertical-align: 1px; }
+.lib-profile-intro { max-width: 1040px; margin: 11px 0 13px; padding: 12px 14px;
+                     border-left: 2px solid #55779f; background: rgba(28,35,45,.62); }
+.lib-profile-intro span { color: #8eabd0; font-size: 9px; letter-spacing: .1em; }
+.lib-profile-intro p { margin: 4px 0 0; color: #d1d7e0; font-size: 12px; line-height: 1.85; }
+.lib-profile-strengths { margin-bottom: 10px; }
+.lib-profile-strengths h4 { margin: 0 0 6px; color: var(--fg); font-size: 11px; }
+.lib-profile-strengths > div { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.lib-profile-strengths p { position: relative; margin: 0; padding: 8px 9px 8px 25px;
+                           border: 1px solid #303946; border-radius: 5px; background: #191d23;
+                           color: var(--fg-dim); font-size: 10px; line-height: 1.55; }
+.lib-profile-strengths p::before { content: "◆"; position: absolute; left: 9px; top: 9px;
+                                   color: #6e90b8; font-size: 7px; }
+.lib-profile-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 0 0 10px; }
+.lib-profile-facts > div { padding: 8px 9px; border-radius: 5px; background: rgba(15,17,21,.48); }
+.lib-profile-facts dt { margin-bottom: 2px; color: var(--fg-faint); font-size: 9px; }
+.lib-profile-facts dd { margin: 0; color: var(--fg-dim); font-size: 10px; line-height: 1.55; }
 .lib-profile-sections { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .lib-profile-sections section { padding: 11px 12px; border-radius: 6px; background: rgba(15,17,21,.55); }
 .lib-profile-sections h4 { margin: 0 0 6px; color: var(--fg); font-size: 11px; }
@@ -177,6 +188,7 @@ html, body {
   .lib-sub-overview { align-items: stretch; flex-direction: column; gap: 7px; }
   .lib-sub-select { width: 100%; min-width: 0; }
   .lib-profile-sections { grid-template-columns: 1fr; }
+  .lib-profile-strengths > div, .lib-profile-facts { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
