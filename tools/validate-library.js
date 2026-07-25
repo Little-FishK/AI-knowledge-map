@@ -16,6 +16,7 @@ try {
 
 const L = global.window.PRO_LIBRARY;
 const profiles = global.window.LIBRARY_PLATFORM_PROFILES || {};
+const profileGuidance = global.window.LIBRARY_PROFILE_GUIDANCE || {};
 const expectedClasses = [
   "academic", "standards", "official", "knowledge-base", "industry-analysis",
   "public-talks", "hackathon", "creator", "open-source"
@@ -76,6 +77,30 @@ expectedProfileKeys.forEach(key => {
 });
 Object.keys(profiles).forEach(key => {
   if (!expectedProfileKeys.has(key)) problems.push(`存在未归属的二级来源档案：${key}`);
+  const profile = profiles[key];
+  ["offers", "howToUse"].forEach(field => {
+    if (profile[field] !== undefined && (!Array.isArray(profile[field]) || profile[field].length < 3)) {
+      problems.push(`二级来源档案 ${key} 的自定义 ${field} 至少需要 3 项`);
+    }
+  });
+  if (profile.caution !== undefined && (typeof profile.caution !== "string" || !profile.caution.trim())) {
+    problems.push(`二级来源档案 ${key} 的自定义 caution 不能为空`);
+  }
+});
+expectedClasses.forEach(classId => {
+  const guidance = profileGuidance[classId];
+  if (!guidance) {
+    problems.push(`一级来源 ${classId} 缺少平台介绍指南`);
+    return;
+  }
+  ["offers", "howToUse"].forEach(field => {
+    if (!Array.isArray(guidance[field]) || guidance[field].length < 3) {
+      problems.push(`一级来源 ${classId} 的平台介绍指南 ${field} 至少需要 3 项`);
+    }
+  });
+  if (typeof guidance.caution !== "string" || !guidance.caution.trim()) {
+    problems.push(`一级来源 ${classId} 的平台介绍指南缺少 caution`);
+  }
 });
 const itemIds = new Set();
 const counts = Object.fromEntries(expectedClasses.map(id => [id, 0]));
@@ -121,6 +146,7 @@ expectedClasses.forEach(id => {
 const subcategoryCount = L.sourceClasses.reduce((sum, source) => sum + source.subcategories.length, 0);
 console.log(`专业资料库 ${L.items.length} 条 · 一级来源 ${L.sourceClasses.length} 类 · 二级来源 ${subcategoryCount} 个`);
 console.log(`平台档案 ${Object.keys(profiles).length} 份`);
+console.log(`介绍指南 ${Object.keys(profileGuidance).length} 类`);
 console.log("来源分布：" + expectedClasses.map(id => `${id}=${counts[id]}`).join(" "));
 
 if (problems.length) {

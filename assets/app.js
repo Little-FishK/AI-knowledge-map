@@ -914,6 +914,7 @@
   const TUTORIALS = window.TUTORIALS;
   const LIBRARY = window.PRO_LIBRARY;
   const LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || {};
+  const LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || {};
   let mode = "graph";               // graph | software | library
   const swView = document.getElementById("software-view");
   const libraryView = document.getElementById("library-view");
@@ -1089,6 +1090,10 @@
     const subcategory = librarySubcategoryById(source, librarySubcategory);
     const profile = libraryPlatformProfile(source, subcategory);
     if (!subcategory || !profile) return "";
+    const guidance = LIBRARY_PROFILE_GUIDANCE[source.id] || {};
+    const offers = profile.offers || guidance.offers || [];
+    const howToUse = profile.howToUse || guidance.howToUse || [];
+    const caution = profile.caution || guidance.caution || "";
     const website = profile.website
       ? `<a class="lib-profile-link" href="${esc(profile.website)}" target="_blank" rel="noopener">访问官方网站 ↗</a>`
       : `<span class="lib-profile-no-link">集合型来源 · 无统一网址</span>`;
@@ -1097,12 +1102,16 @@
         <div><span>${profile.kind === "collection" ? "来源集合" : "平台档案"}</span><h3 id="lib-profile-title">${esc(subcategory.label)}</h3></div>
         ${website}
       </header>
-      <p class="lib-profile-position">${esc(profile.positioning)}</p>
-      <dl class="lib-profile-grid">
-        <div><dt>背景</dt><dd>${esc(profile.background)}</dd></div>
-        <div><dt>相关公司 / 组织</dt><dd>${esc(profile.organization)}</dd></div>
-        <div><dt>创始人 / 发起团队</dt><dd>${esc(profile.foundingTeam)}</dd></div>
-      </dl>
+      <div class="lib-profile-intro">
+        <p class="lib-profile-position">${esc(profile.positioning)}</p>
+        <p><b>发展背景</b>${esc(profile.background)}</p>
+        <p><b>运营与发起</b>${esc(profile.organization)} ${esc(profile.foundingTeam)}</p>
+      </div>
+      <div class="lib-profile-sections">
+        <section><h4>这个网站主要提供什么</h4><ul>${offers.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
+        <section><h4>在资料库中如何使用</h4><ul>${howToUse.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
+      </div>
+      ${caution ? `<aside class="lib-profile-caution"><b>使用边界</b><p>${esc(caution)}</p></aside>` : ""}
       <footer>资料复核日期：${esc(profile.reviewedAt)}</footer>
     </article>`;
   }
