@@ -394,6 +394,54 @@
     }
   }
 
+  const zoomUi = {
+    root: document.getElementById("map-zoom"),
+    out: document.getElementById("map-zoom-out"),
+    level: document.getElementById("map-zoom-level"),
+    in: document.getElementById("map-zoom-in")
+  };
+  const ZOOM_FACTOR = 1.2;
+
+  function updateZoomUi() {
+    const zoom = cy.zoom();
+    zoomUi.level.value = `${Math.round(zoom * 100)}%`;
+    zoomUi.level.textContent = zoomUi.level.value;
+    zoomUi.out.disabled = zoom <= cy.minZoom() + 0.001;
+    zoomUi.in.disabled = zoom >= cy.maxZoom() - 0.001;
+  }
+
+  function changeMapZoom(direction) {
+    const current = cy.zoom();
+    const target = Math.max(
+      cy.minZoom(),
+      Math.min(cy.maxZoom(), current * (direction > 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR))
+    );
+    if (Math.abs(target - current) < 0.001) return;
+    cy.stop(true, false);
+    cy.zoom({
+      level: target,
+      renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
+    });
+  }
+
+  zoomUi.out.addEventListener("click", () => changeMapZoom(-1));
+  zoomUi.in.addEventListener("click", () => changeMapZoom(1));
+  cy.on("zoom", updateZoomUi);
+  updateZoomUi();
+
+  document.addEventListener("keydown", e => {
+    const target = e.target;
+    const isEditing = target instanceof Element &&
+      !!target.closest("input, textarea, select, [contenteditable='true']");
+    const zoomOut = e.key === "<" || (e.code === "Comma" && e.shiftKey);
+    const zoomIn = e.key === ">" || (e.code === "Period" && e.shiftKey);
+    const deepDiveOpen = !document.getElementById("deepdive").classList.contains("hidden");
+    if (isEditing || mode !== "graph" || deepDiveOpen || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!zoomOut && !zoomIn) return;
+    e.preventDefault();
+    changeMapZoom(zoomIn ? 1 : -1);
+  });
+
   /* ───────────────────────── 过滤 ───────────────────────── */
 
   function applyFilters() {
@@ -1023,6 +1071,7 @@
     if (isSW) buildSoftware();
     document.getElementById("cy").classList.toggle("hidden", isSW);
     document.getElementById("legend").classList.toggle("hidden", isSW);
+    zoomUi.root.classList.toggle("hidden", isSW);
     document.getElementById("controls").classList.toggle("hidden", isSW);
     swView.classList.toggle("hidden", !isSW);
     document.getElementById("btn-reset").classList.toggle("hidden", isSW);

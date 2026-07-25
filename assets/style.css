@@ -213,6 +213,26 @@ html, body {
 #stage { flex: 1; position: relative; min-width: 0; }
 #cy { position: absolute; inset: 0; }
 
+.map-zoom {
+  position: absolute; top: 14px; right: 14px; z-index: 8;
+  display: grid; grid-template-columns: 38px 58px 38px; align-items: stretch;
+  overflow: hidden; border: 1px solid var(--line); border-radius: 8px;
+  background: rgba(26,29,35,.94); box-shadow: 0 6px 20px rgba(0,0,0,.28);
+}
+.map-zoom.hidden { display: none; }
+.map-zoom button {
+  min-height: 38px; padding: 0; border: 0; background: transparent;
+  color: var(--fg-dim); font: 600 21px/1 "Segoe UI", sans-serif; cursor: pointer;
+}
+.map-zoom button:hover:not(:disabled) { color: var(--fg); background: var(--bg-raise); }
+.map-zoom button:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--accent); outline-offset: -2px; }
+.map-zoom button:disabled { color: #4f5662; cursor: default; }
+.map-zoom output {
+  display: flex; align-items: center; justify-content: center;
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  color: var(--fg-faint); font-size: 11px; font-variant-numeric: tabular-nums;
+}
+
 #legend {
   position: absolute; left: 14px; bottom: 14px;
   background: rgba(26,29,35,.92); border: 1px solid var(--line);
