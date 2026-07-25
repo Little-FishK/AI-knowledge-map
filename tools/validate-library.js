@@ -8,12 +8,14 @@ try {
   require(path.join(__dirname, "..", "data", "graph.js"));
   require(path.join(__dirname, "..", "data", "software.js"));
   require(path.join(__dirname, "..", "data", "library.js"));
+  require(path.join(__dirname, "..", "data", "library-platform-profiles.js"));
 } catch (error) {
   console.error("✗ 专业资料库存在语法错误：\n  " + error.message);
   process.exit(1);
 }
 
 const L = global.window.PRO_LIBRARY;
+const profiles = global.window.LIBRARY_PLATFORM_PROFILES || {};
 const expectedClasses = [
   "academic", "standards", "official", "knowledge-base", "industry-analysis",
   "public-talks", "hackathon", "creator", "open-source"
@@ -36,6 +38,7 @@ if (actualClasses.join("|") !== expectedClasses.join("|")) {
 
 const classIds = new Set(actualClasses);
 const subcategoriesByClass = new Map();
+const expectedProfileKeys = new Set();
 L.sourceClasses.forEach(source => {
   if (!Array.isArray(source.subcategories) || source.subcategories.length < 5) {
     problems.push(`一级来源 ${source.id} 至少需要 5 个二级来源`);
@@ -44,6 +47,7 @@ L.sourceClasses.forEach(source => {
   const ids = source.subcategories.map(subcategory => subcategory.id);
   if (new Set(ids).size !== ids.length) problems.push(`一级来源 ${source.id} 存在重复的二级来源 id`);
   source.subcategories.forEach(subcategory => {
+    expectedProfileKeys.add(`${source.id}/${subcategory.id}`);
     ["id", "label", "short"].forEach(field => {
       if (typeof subcategory[field] !== "string" || !subcategory[field].trim()) {
         problems.push(`一级来源 ${source.id} 的二级来源缺少 ${field}`);
@@ -51,6 +55,27 @@ L.sourceClasses.forEach(source => {
     });
   });
   subcategoriesByClass.set(source.id, new Set(ids));
+});
+const profileFields = ["positioning", "background", "organization", "foundingTeam", "reviewedAt"];
+expectedProfileKeys.forEach(key => {
+  const profile = profiles[key];
+  if (!profile) {
+    problems.push(`二级来源 ${key} 缺少平台档案`);
+    return;
+  }
+  if (!["platform", "collection"].includes(profile.kind)) problems.push(`二级来源 ${key} 的档案 kind 无效`);
+  profileFields.forEach(field => {
+    if (typeof profile[field] !== "string" || !profile[field].trim()) problems.push(`二级来源 ${key} 的档案缺少 ${field}`);
+  });
+  if (profile.kind === "platform" && !/^https:\/\//.test(profile.website || "")) {
+    problems.push(`平台型二级来源 ${key} 必须提供 HTTPS 官网`);
+  }
+  if (profile.kind === "collection" && profile.website !== null) {
+    problems.push(`集合型二级来源 ${key} 的 website 应为 null，避免伪造统一官网`);
+  }
+});
+Object.keys(profiles).forEach(key => {
+  if (!expectedProfileKeys.has(key)) problems.push(`存在未归属的二级来源档案：${key}`);
 });
 const itemIds = new Set();
 const counts = Object.fromEntries(expectedClasses.map(id => [id, 0]));
@@ -95,6 +120,7 @@ expectedClasses.forEach(id => {
 
 const subcategoryCount = L.sourceClasses.reduce((sum, source) => sum + source.subcategories.length, 0);
 console.log(`专业资料库 ${L.items.length} 条 · 一级来源 ${L.sourceClasses.length} 类 · 二级来源 ${subcategoryCount} 个`);
+console.log(`平台档案 ${Object.keys(profiles).length} 份`);
 console.log("来源分布：" + expectedClasses.map(id => `${id}=${counts[id]}`).join(" "));
 
 if (problems.length) {

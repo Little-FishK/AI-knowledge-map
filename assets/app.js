@@ -913,6 +913,7 @@
   const SW = window.SOFTWARE;
   const TUTORIALS = window.TUTORIALS;
   const LIBRARY = window.PRO_LIBRARY;
+  const LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || {};
   let mode = "graph";               // graph | software | library
   const swView = document.getElementById("software-view");
   const libraryView = document.getElementById("library-view");
@@ -1079,6 +1080,33 @@
     return source && (source.subcategories || []).find(item => item.id === id);
   }
 
+  function libraryPlatformProfile(source, subcategory) {
+    return source && subcategory && LIBRARY_PROFILES[`${source.id}/${subcategory.id}`];
+  }
+
+  function libraryPlatformProfileHtml(source) {
+    if (!source || librarySubcategory === "all") return "";
+    const subcategory = librarySubcategoryById(source, librarySubcategory);
+    const profile = libraryPlatformProfile(source, subcategory);
+    if (!subcategory || !profile) return "";
+    const website = profile.website
+      ? `<a class="lib-profile-link" href="${esc(profile.website)}" target="_blank" rel="noopener">访问官方网站 ↗</a>`
+      : `<span class="lib-profile-no-link">集合型来源 · 无统一网址</span>`;
+    return `<article class="lib-platform-profile" aria-labelledby="lib-profile-title">
+      <header class="lib-profile-title">
+        <div><span>${profile.kind === "collection" ? "来源集合" : "平台档案"}</span><h3 id="lib-profile-title">${esc(subcategory.label)}</h3></div>
+        ${website}
+      </header>
+      <p class="lib-profile-position">${esc(profile.positioning)}</p>
+      <dl class="lib-profile-grid">
+        <div><dt>背景</dt><dd>${esc(profile.background)}</dd></div>
+        <div><dt>相关公司 / 组织</dt><dd>${esc(profile.organization)}</dd></div>
+        <div><dt>创始人 / 发起团队</dt><dd>${esc(profile.foundingTeam)}</dd></div>
+      </dl>
+      <footer>资料复核日期：${esc(profile.reviewedAt)}</footer>
+    </article>`;
+  }
+
   function renderLibrarySubcategories() {
     const container = libraryView && libraryView.querySelector(".lib-subnav");
     if (!container || !LIBRARY) return;
@@ -1108,7 +1136,7 @@
       <div class="lib-subchips">
         <button class="lib-subchip${librarySubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">全部 <span>${(LIBRARY.items || []).filter(item => item.sourceClass === source.id).length}</span></button>
         ${(source.subcategories || []).map(sub => `<button class="lib-subchip${librarySubcategory === sub.id ? " active" : ""}" type="button" data-library-subcategory="${esc(sub.id)}" title="${esc(sub.short)}">${esc(sub.label)} <span>${counts[sub.id] || 0}</span></button>`).join("")}
-      </div>`;
+      </div>${libraryPlatformProfileHtml(source)}`;
     container.querySelectorAll("[data-library-subcategory]").forEach(button => button.addEventListener("click", () => {
       librarySubcategory = button.getAttribute("data-library-subcategory");
       renderLibrarySubcategories();
