@@ -12,12 +12,16 @@
 
   <!-- 顶栏 -->
   <header id="topbar">
-    <div class="brand" id="mode-toggle" title="点击切换 概念地图 / 软件目录">
+    <div class="brand">
       <span class="brand-mark">◈</span>
       <span class="brand-name" id="brand-name">AI 知识地图</span>
       <span class="brand-ver" id="meta-ver"></span>
-      <span class="mode-hint" id="mode-hint">▸ 软件</span>
     </div>
+    <nav class="mode-nav" aria-label="主视图">
+      <button class="mode-nav-btn active" data-mode="graph" type="button">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button">专业资料库</button>
+    </nav>
     <div class="search-wrap">
       <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off">
       <div id="search-results"></div>
@@ -100,6 +104,7 @@
       <div id="legend"></div>
       <div id="empty-hint" class="hidden">没有符合当前筛选的节点</div>
       <div id="software-view" class="hidden"></div>
+      <div id="library-view" class="hidden"></div>
     </main>
 
     <!-- 右侧详情 -->
@@ -127,6 +132,7 @@
 <script src="assets/vendor/cytoscape-fcose.js"></script>
 <script src="data/graph.js"></script>
 <script src="data/software.js"></script>
+<script src="data/library.js"></script>
 <script src="data/tutorials.js"></script>
 <script src="data/tutorials-codex-youtube.js"></script>
 <script src="data/tutorials-claude-code.js"></script>

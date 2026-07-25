@@ -912,9 +912,14 @@
   /* ───────────────────────── 软件模式 ───────────────────────── */
   const SW = window.SOFTWARE;
   const TUTORIALS = window.TUTORIALS;
-  let mode = "graph";               // graph | software
+  const LIBRARY = window.PRO_LIBRARY;
+  let mode = "graph";               // graph | software | library
   const swView = document.getElementById("software-view");
+  const libraryView = document.getElementById("library-view");
   let swBuilt = false;
+  let libraryBuilt = false;
+  let libraryClass = "all";
+  let libraryQuery = "";
 
   function buildSoftware() {
     if (swBuilt || !SW) return;
@@ -1065,25 +1070,147 @@
     ddEl.querySelector(".dd-scroll").scrollTop = 0;
   }
 
+  function libraryClassById(id) {
+    return LIBRARY && (LIBRARY.sourceClasses || []).find(item => item.id === id);
+  }
+
+  function renderLibraryItems() {
+    if (!LIBRARY || !libraryView) return;
+    const grid = libraryView.querySelector(".lib-grid");
+    const note = libraryView.querySelector(".lib-filter-note");
+    if (!grid) return;
+    const query = libraryQuery.trim().toLocaleLowerCase("zh-CN");
+    const items = (LIBRARY.items || []).filter(item => {
+      if (libraryClass !== "all" && item.sourceClass !== libraryClass) return false;
+      if (!query) return true;
+      return [item.title, item.publisher, item.collection, item.contentKind, item.summary]
+        .concat(item.tags || []).join(" ").toLocaleLowerCase("zh-CN").includes(query);
+    });
+    if (note) note.textContent = `${items.length} 条资料`;
+    grid.innerHTML = items.length ? items.map(item => {
+      const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
+      return `<article class="lib-card" data-library-item="${esc(item.id)}" style="--source-color:${source.color}" tabindex="0">
+        <div class="lib-card-top">
+          <span class="lib-badge">${esc(source.label)}</span>
+          ${item.discoveryOnly ? `<span class="lib-discovery">仅作发现</span>` : ""}
+          <span class="lib-tier">${esc(item.authorityTier)}</span>
+        </div>
+        <h3 class="lib-title">${esc(item.title)}</h3>
+        <div class="lib-publisher">${esc(item.publisher)} · ${esc(item.contentKind)}</div>
+        <p class="lib-summary">${esc(item.summary)}</p>
+        <div class="lib-card-foot">${(item.tags || []).slice(0, 4).map(tag => `<span class="lib-tag">${esc(tag)}</span>`).join("")}</div>
+      </article>`;
+    }).join("") : `<div class="lib-empty">当前来源分类和搜索条件下没有资料。</div>`;
+    grid.querySelectorAll("[data-library-item]").forEach(card => {
+      const open = () => openLibraryItem(card.getAttribute("data-library-item"));
+      card.addEventListener("click", open);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); }
+      });
+    });
+  }
+
+  function buildLibrary() {
+    if (libraryBuilt || !LIBRARY || !libraryView) return;
+    const counts = {};
+    (LIBRARY.items || []).forEach(item => { counts[item.sourceClass] = (counts[item.sourceClass] || 0) + 1; });
+    libraryView.innerHTML = `<header class="lib-head">
+      <div><h2>专业资料库</h2><p>按信息来源分类，保留证据用途、适用边界和与知识地图的关联。</p></div>
+      <div class="lib-count">9 类来源 · ${(LIBRARY.items || []).length} 条种子资料</div>
+    </header>
+    <div class="lib-layout">
+      <nav class="lib-sources" aria-label="资料来源分类">
+        <button class="lib-source active" type="button" data-library-class="all" style="--source-color:var(--accent)">
+          <span class="lib-source-order">ALL</span><span class="lib-source-label">全部来源</span><span class="lib-source-count">${(LIBRARY.items || []).length}</span>
+        </button>
+        ${(LIBRARY.sourceClasses || []).map(source => `<button class="lib-source" type="button" data-library-class="${esc(source.id)}" style="--source-color:${source.color}">
+          <span class="lib-source-order">${source.order}</span><span class="lib-source-label">${esc(source.label)}</span><span class="lib-source-count">${counts[source.id] || 0}</span>
+        </button>`).join("")}
+      </nav>
+      <section class="lib-content">
+        <div class="lib-toolbar">
+          <input class="lib-search" type="search" placeholder="搜索标题、发布者、资料形式或标签" aria-label="搜索专业资料">
+          <span class="lib-filter-note"></span>
+        </div>
+        <div class="lib-grid"></div>
+      </section>
+    </div>`;
+    libraryView.querySelectorAll("[data-library-class]").forEach(button => button.addEventListener("click", () => {
+      libraryClass = button.getAttribute("data-library-class");
+      libraryView.querySelectorAll("[data-library-class]").forEach(item => item.classList.toggle("active", item === button));
+      renderLibraryItems();
+    }));
+    libraryView.querySelector(".lib-search").addEventListener("input", event => {
+      libraryQuery = event.target.value;
+      renderLibraryItems();
+    });
+    libraryBuilt = true;
+    renderLibraryItems();
+  }
+
+  function openLibraryItem(id) {
+    const item = LIBRARY && (LIBRARY.items || []).find(entry => entry.id === id);
+    if (!item) return;
+    const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
+    const linkedNodes = (item.linkedNodes || []).filter(nodeId => byId[nodeId]);
+    const linkedSoftware = (item.linkedSoftware || []).map(softwareId =>
+      SW && (SW.items || []).find(entry => entry.id === softwareId)).filter(Boolean);
+    let h = `<div class="d-domain" style="color:${source.color}">${source.order}. ${esc(source.label)}
+      <span style="color:var(--fg-faint)"> · ${esc(item.authorityTier)} · ${esc(item.contentKind)}</span></div>
+      <h2 class="d-title">${esc(item.title)}</h2>
+      <div class="d-summary">${esc(item.summary)}</div>
+      <div class="d-sec"><h4>来源记录</h4><dl class="lib-detail-meta">
+        <dt>发布者</dt><dd>${esc(item.publisher)}</dd>
+        <dt>资料集合</dt><dd>${esc(item.collection)}</dd>
+        <dt>发布状态</dt><dd>${esc(item.reviewStatus)}</dd>
+        <dt>一手来源</dt><dd>${item.primarySource ? "是" : "否"}</dd>
+        <dt>访问日期</dt><dd>${esc(item.accessedAt)}</dd>
+      </dl></div>
+      <div class="d-sec"><h4>可以支持什么</h4><div class="d-body"><p>${esc(item.evidenceUse)}</p></div></div>
+      <div class="d-sec"><h4>使用边界</h4><div class="d-body"><p>${(item.limitations || []).map(limit => `· ${esc(limit)}`).join("<br>")}</p></div></div>`;
+    if (linkedNodes.length) h += `<div class="d-sec"><h4>关联节点</h4>${linkedNodes.map(nodeId =>
+      `<div class="rel"><span class="rel-to" data-goto="${esc(nodeId)}">${esc(byId[nodeId].title)}</span><span class="rel-lbl">在地图中查看</span></div>`).join("")}</div>`;
+    if (linkedSoftware.length) h += `<div class="d-sec"><h4>关联软件</h4>${linkedSoftware.map(software =>
+      `<div class="rel"><span class="rel-to" data-library-software="${esc(software.id)}">${esc(software.name)}</span><span class="rel-lbl">在软件目录中查看</span></div>`).join("")}</div>`;
+    h += `<a class="lib-source-link" href="${esc(item.url)}" target="_blank" rel="noopener">打开原始资料 ↗</a>`;
+    detailBody.innerHTML = h;
+    detail.classList.remove("closed");
+    detailBody.scrollTop = 0;
+    detailBody.querySelectorAll("[data-goto]").forEach(link =>
+      link.addEventListener("click", () => { setMode("graph"); select(link.getAttribute("data-goto"), true); }));
+    detailBody.querySelectorAll("[data-library-software]").forEach(link =>
+      link.addEventListener("click", () => { setMode("software"); openSoftware(link.getAttribute("data-library-software")); }));
+  }
+
   function setMode(m) {
     mode = m;
     const isSW = m === "software";
+    const isLibrary = m === "library";
+    const isGraph = m === "graph";
     if (isSW) buildSoftware();
-    document.getElementById("cy").classList.toggle("hidden", isSW);
-    document.getElementById("legend").classList.toggle("hidden", isSW);
-    zoomUi.root.classList.toggle("hidden", isSW);
-    document.getElementById("controls").classList.toggle("hidden", isSW);
+    if (isLibrary) buildLibrary();
+    document.getElementById("cy").classList.toggle("hidden", !isGraph);
+    document.getElementById("legend").classList.toggle("hidden", !isGraph);
+    zoomUi.root.classList.toggle("hidden", !isGraph);
+    document.getElementById("controls").classList.toggle("hidden", !isGraph);
     swView.classList.toggle("hidden", !isSW);
-    document.getElementById("btn-reset").classList.toggle("hidden", isSW);
-    document.getElementById("brand-name").textContent = isSW ? "AI 软件目录" : "AI 知识地图";
-    document.getElementById("mode-hint").textContent = isSW ? "▸ 概念" : "▸ 软件";
-    document.getElementById("search").placeholder = isSW ? "（软件模式）" : "搜索概念…  （/ 聚焦）";
+    libraryView.classList.toggle("hidden", !isLibrary);
+    document.getElementById("btn-reset").classList.toggle("hidden", !isGraph);
+    document.getElementById("brand-name").textContent = isSW ? "AI 软件目录" : isLibrary ? "专业资料库" : "AI 知识地图";
+    const search = document.getElementById("search");
+    search.placeholder = isGraph ? "搜索概念…  （/ 聚焦）" : isSW ? "请在软件目录中浏览" : "请使用资料库内搜索";
+    search.disabled = !isGraph;
+    document.querySelectorAll(".mode-nav-btn").forEach(button => {
+      const active = button.getAttribute("data-mode") === m;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
     detail.classList.add("closed");
-    if (!isSW) setTimeout(() => cy.resize(), 30);
+    if (isGraph) setTimeout(() => cy.resize(), 30);
   }
 
-  document.getElementById("mode-toggle").addEventListener("click", () =>
-    setMode(mode === "graph" ? "software" : "graph"));
+  document.querySelectorAll(".mode-nav-btn").forEach(button =>
+    button.addEventListener("click", () => setMode(button.getAttribute("data-mode"))));
 
   // 暴露给调试用
   window.__cy = cy;
