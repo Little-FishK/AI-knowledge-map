@@ -90,6 +90,22 @@ html, body {
 .lib-source-order { font: 600 11px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; color: var(--source-color); }
 .lib-source-label { font-size: 12px; }
 .lib-source-count { color: var(--fg-faint); font-size: 10px; }
+.lib-subnav { margin-bottom: 13px; padding: 12px; border: 1px solid var(--line);
+              border-radius: 8px; background: var(--bg-panel); }
+.lib-subnav-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 9px; }
+.lib-subnav-head b { display: block; color: var(--fg); font-size: 12px; }
+.lib-subnav-head span { display: block; margin-top: 1px; color: var(--fg-faint); font-size: 10px; }
+.lib-subnav-head em { color: var(--fg-faint); font-style: normal; font-size: 10px; white-space: nowrap; }
+.lib-sub-overview { display: flex; align-items: center; gap: 12px; color: var(--fg-faint); font-size: 11px; }
+.lib-sub-select { flex: 1; min-width: 220px; padding: 6px 9px; border: 1px solid var(--line);
+                  border-radius: 5px; background: var(--bg-raise); color: var(--fg); font: inherit; font-size: 11px; }
+.lib-sub-select:focus { outline: none; border-color: var(--accent); }
+.lib-subchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lib-subchip { border: 1px solid var(--line); border-radius: 14px; padding: 3px 8px;
+               background: var(--bg-raise); color: var(--fg-dim); font: inherit; font-size: 10px; cursor: pointer; }
+.lib-subchip:hover { color: var(--fg); border-color: var(--source-color, var(--accent)); }
+.lib-subchip.active { color: #eaf2ff; border-color: var(--accent); background: #2a3b51; }
+.lib-subchip span { margin-left: 3px; color: var(--fg-faint); font-size: 9px; }
 .lib-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
 .lib-search { flex: 1; min-width: 160px; padding: 7px 10px; border: 1px solid var(--line);
               border-radius: 6px; background: var(--bg-raise); color: var(--fg); font: inherit; }
@@ -101,9 +117,10 @@ html, body {
             border-radius: 8px; background: var(--bg-raise); cursor: pointer;
             transition: transform .12s, border-color .12s, background .12s; }
 .lib-card:hover { transform: translateY(-2px); border-color: var(--source-color); background: #242932; }
-.lib-card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.lib-card-top { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .lib-badge { padding: 1px 7px; border: 1px solid color-mix(in srgb, var(--source-color) 55%, transparent);
              border-radius: 10px; color: var(--source-color); font-size: 10px; }
+.lib-subbadge { padding: 1px 6px; border-radius: 10px; background: #171a20; color: var(--fg-dim); font-size: 10px; }
 .lib-tier { margin-left: auto; color: var(--fg-faint); font: 600 10px ui-monospace, Consolas, monospace; }
 .lib-discovery { color: #d0b15c; font-size: 10px; }
 .lib-title { margin: 0 0 4px; font-size: 15px; line-height: 1.45; color: var(--fg); }
@@ -129,6 +146,8 @@ html, body {
   .lib-layout { grid-template-columns: 1fr; }
   .lib-sources { position: static; display: flex; overflow-x: auto; gap: 3px; }
   .lib-source { width: auto; min-width: max-content; grid-template-columns: 20px auto auto; }
+  .lib-sub-overview { align-items: stretch; flex-direction: column; gap: 7px; }
+  .lib-sub-select { width: 100%; min-width: 0; }
 }
 
 @media (max-width: 620px) {

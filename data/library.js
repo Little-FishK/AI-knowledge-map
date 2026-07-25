@@ -1,25 +1,135 @@
 /* 专业资料库 —— 一级分类严格按信息来源，而不是内容主题或文件形式。 */
 window.PRO_LIBRARY = {
   meta: {
-    version: "0.1",
-    updatedAt: "2026-07-24",
-    note: "首批种子用于验证来源分类、关联和展示；不代表完整白名单。"
+    version: "0.2",
+    updatedAt: "2026-07-25",
+    note: "九类一级来源已细分到平台、机构、集合或认证个人；目录不代表整个平台进入白名单。"
   },
   sourceClasses: [
-    { id: "academic", order: 1, label: "学术投稿", short: "论文、正式出版与预印本", color: "#7797c7", authority: "A2–R" },
-    { id: "standards", order: 2, label: "标准与监管", short: "标准、法规与监管框架", color: "#d19a66", authority: "A1" },
-    { id: "official", order: 3, label: "官方技术资料", short: "官方文档、模型卡、公告与仓库", color: "#68a889", authority: "A1–A2" },
-    { id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B" },
-    { id: "industry-analysis", order: 5, label: "专家与行业分析", short: "专业报告、趋势与跨对象分析", color: "#c58a72", authority: "B" },
-    { id: "public-talks", order: 6, label: "公开视频与讲座", short: "公开课、会议演讲与技术分享", color: "#5e9fb5", authority: "B–R" },
-    { id: "hackathon", order: 7, label: "黑客马拉松", short: "赛题、获奖项目与原型", color: "#d0b15c", authority: "R" },
-    { id: "creator", order: 8, label: "权威创作者", short: "经限定专业范围认证的个人来源", color: "#b67ba4", authority: "B" },
-    { id: "open-source", order: 9, label: "开源项目与代码仓库", short: "独立社区项目的主仓库与版本记录", color: "#84919f", authority: "B–R" }
+    {
+      id: "academic", order: 1, label: "学术投稿", short: "论文、正式出版与预印本", color: "#7797c7", authority: "A2–R",
+      subcategories: [
+        { id: "arxiv", label: "arXiv", short: "AI、计算机与相关学科预印本" },
+        { id: "openreview", label: "OpenReview", short: "开放投稿、评审与会议论坛" },
+        { id: "acl-anthology", label: "ACL Anthology", short: "计算语言学论文与会议论文集" },
+        { id: "neurips-proceedings", label: "NeurIPS Proceedings", short: "NeurIPS 正式论文集" },
+        { id: "pmlr", label: "PMLR", short: "ICML、AISTATS 等机器学习会议论文集" },
+        { id: "cvf-open-access", label: "CVF Open Access", short: "CVPR、ICCV、WACV 论文集" },
+        { id: "ieee-xplore", label: "IEEE Xplore", short: "IEEE 期刊、会议与技术出版物" },
+        { id: "acm-dl", label: "ACM Digital Library", short: "ACM 期刊与会议论文" },
+        { id: "springer-nature", label: "Springer Nature", short: "Nature 系列与 Springer 学术出版物" }
+      ]
+    },
+    {
+      id: "standards", order: 2, label: "标准与监管", short: "标准、法规与监管框架", color: "#d19a66", authority: "A1",
+      subcategories: [
+        { id: "nist", label: "NIST", short: "美国国家标准与技术研究院" },
+        { id: "iso-iec", label: "ISO / IEC", short: "国际标准化组织与国际电工委员会" },
+        { id: "ieee-standards", label: "IEEE Standards", short: "IEEE 技术标准与工作组" },
+        { id: "eu-institutions", label: "欧盟机构", short: "欧盟委员会、议会及监管机构" },
+        { id: "us-regulators", label: "美国监管机构", short: "FTC、FDA、EEOC 等正式文件" },
+        { id: "china-standards-regulators", label: "中国标准与监管机构", short: "网信办、国标委及相关技术委员会" },
+        { id: "oecd", label: "OECD", short: "AI 原则、政策观察与政府间框架" },
+        { id: "un-agencies", label: "联合国机构", short: "UNESCO、ITU 等规范与建议" }
+      ]
+    },
+    {
+      id: "official", order: 3, label: "官方技术资料", short: "官方文档、模型卡、公告与仓库", color: "#68a889", authority: "A1–A2",
+      subcategories: [
+        { id: "openai", label: "OpenAI", short: "文档、系统卡、研究与更新日志" },
+        { id: "anthropic", label: "Anthropic", short: "文档、模型卡、研究与安全资料" },
+        { id: "google-deepmind", label: "Google / DeepMind", short: "模型文档、研究与开发者资料" },
+        { id: "microsoft", label: "Microsoft", short: "Azure AI、研究与产品技术资料" },
+        { id: "meta-ai", label: "Meta AI", short: "模型卡、研究与官方项目资料" },
+        { id: "nvidia", label: "NVIDIA", short: "开发者文档、模型与硬件技术资料" },
+        { id: "hugging-face-official", label: "Hugging Face 官方", short: "官方文档、课程与平台公告" },
+        { id: "aws", label: "AWS", short: "Bedrock、SageMaker 与云端 AI 文档" },
+        { id: "vendor-docs-other", label: "其他厂商官方资料", short: "经单独登记的产品官方文档" }
+      ]
+    },
+    {
+      id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B",
+      subcategories: [
+        { id: "mitre-atlas", label: "MITRE ATLAS", short: "AI 对抗威胁知识库" },
+        { id: "mlcommons", label: "MLCommons", short: "训练、推理与安全公共基准" },
+        { id: "stanford-crfm", label: "Stanford CRFM / HELM", short: "基础模型透明度与评测" },
+        { id: "lmsys-arena", label: "LMSYS / Arena", short: "模型竞技场与开放评测" },
+        { id: "papers-with-code", label: "Papers with Code", short: "论文、代码与基准成绩索引" },
+        { id: "artificial-analysis", label: "Artificial Analysis", short: "模型性能、价格与速度评测" },
+        { id: "nvd-cve", label: "NVD / CVE", short: "漏洞与安全事件数据库" },
+        { id: "benchmark-other", label: "专项评测机构", short: "经登记的领域基准与测试组织" }
+      ]
+    },
+    {
+      id: "industry-analysis", order: 5, label: "专家与行业分析", short: "专业报告、趋势与跨对象分析", color: "#c58a72", authority: "B",
+      subcategories: [
+        { id: "stanford-ai-index", label: "Stanford AI Index", short: "年度 AI 数据与趋势报告" },
+        { id: "epoch-ai", label: "Epoch AI", short: "算力、模型规模与趋势研究" },
+        { id: "gartner", label: "Gartner", short: "企业技术市场研究" },
+        { id: "mckinsey", label: "McKinsey", short: "企业采用与产业调查" },
+        { id: "deloitte", label: "Deloitte", short: "行业应用与组织调研" },
+        { id: "rand", label: "RAND", short: "政策、安全与战略研究" },
+        { id: "semianalysis", label: "SemiAnalysis", short: "AI 基础设施与半导体分析" },
+        { id: "specialist-research-other", label: "其他专项研究机构", short: "经范围认证的行业与专家研究" }
+      ]
+    },
+    {
+      id: "public-talks", order: 6, label: "公开视频与讲座", short: "公开课、会议演讲与技术分享", color: "#5e9fb5", authority: "B–R",
+      subcategories: [
+        { id: "university-courses", label: "大学公开课", short: "高校正式课程与研讨课" },
+        { id: "conference-channels", label: "学术会议官方频道", short: "会议主办方发布的演讲与报告" },
+        { id: "research-seminars", label: "研究机构研讨会", short: "研究实验室与机构公开报告" },
+        { id: "standards-webinars", label: "标准组织网络研讨会", short: "标准、监管与治理机构讲解" },
+        { id: "technical-conferences", label: "厂商技术大会", short: "官方开发者大会与技术专场" },
+        { id: "professional-podcasts", label: "专业播客与访谈", short: "有完整嘉宾与主题记录的长篇内容" },
+        { id: "education-platforms", label: "开放教育平台", short: "经审核的课程平台与教学系列" }
+      ]
+    },
+    {
+      id: "hackathon", order: 7, label: "黑客马拉松", short: "赛题、获奖项目与原型", color: "#d0b15c", authority: "R",
+      subcategories: [
+        { id: "kaggle", label: "Kaggle", short: "数据科学竞赛、数据集与方案" },
+        { id: "devpost", label: "Devpost", short: "企业与社区黑客马拉松项目" },
+        { id: "lablab", label: "lablab.ai", short: "AI 专题黑客马拉松与项目" },
+        { id: "mlh", label: "Major League Hacking", short: "学生与社区黑客马拉松" },
+        { id: "hugging-face-events", label: "Hugging Face 活动", short: "社区冲刺、竞赛与 Spaces 项目" },
+        { id: "tianchi", label: "阿里云天池", short: "算法竞赛、数据集与获奖方案" },
+        { id: "datafountain", label: "DataFountain", short: "中文数据科学竞赛平台" },
+        { id: "zindi", label: "Zindi", short: "非洲与全球数据科学竞赛" }
+      ]
+    },
+    {
+      id: "creator", order: 8, label: "权威创作者", short: "经限定专业范围认证的个人来源", color: "#b67ba4", authority: "B",
+      subcategories: [
+        { id: "andrej-karpathy", label: "Andrej Karpathy", short: "神经网络、语言模型与工程教学" },
+        { id: "jeremy-howard", label: "Jeremy Howard", short: "深度学习实践与 fast.ai 教学" },
+        { id: "lilian-weng", label: "Lilian Weng", short: "深度学习与智能体研究综述" },
+        { id: "chip-huyen", label: "Chip Huyen", short: "机器学习系统与 AI 工程" },
+        { id: "sebastian-raschka", label: "Sebastian Raschka", short: "机器学习与大模型教学" },
+        { id: "simon-willison", label: "Simon Willison", short: "LLM 工具、应用与行业观察" },
+        { id: "threeblueonebrown", label: "3Blue1Brown", short: "数学与神经网络可视化解释" },
+        { id: "creator-other", label: "其他认证创作者", short: "按明确专业范围单独登记" }
+      ]
+    },
+    {
+      id: "open-source", order: 9, label: "开源项目与代码仓库", short: "独立社区项目的主仓库与版本记录", color: "#84919f", authority: "B–R",
+      subcategories: [
+        { id: "github-canonical", label: "GitHub 主仓库", short: "项目声明的 GitHub canonical repository" },
+        { id: "gitlab-canonical", label: "GitLab 主仓库", short: "项目声明的 GitLab canonical repository" },
+        { id: "hugging-face-community", label: "Hugging Face 社区仓库", short: "独立社区模型、数据集与 Spaces" },
+        { id: "apache-foundation", label: "Apache 基金会项目", short: "Apache 治理下的正式项目仓库" },
+        { id: "linux-foundation", label: "Linux Foundation / LF AI", short: "基金会治理的 AI 与基础设施项目" },
+        { id: "cncf", label: "CNCF 项目", short: "云原生基金会治理的项目" },
+        { id: "package-registries", label: "软件包注册表", short: "PyPI、npm、crates.io 等正式发行记录" },
+        { id: "self-hosted-repositories", label: "独立自托管仓库", short: "项目官方维护的非平台主仓库" }
+      ]
+    }
   ],
   items: [
     {
       id: "vall-e-paper",
       sourceClass: "academic",
+      sourceSubcategory: "arxiv",
       title: "Neural Codec Language Models are Zero-Shot TTS Synthesizers",
       publisher: "Microsoft Research",
       collection: "arXiv 预印本",
@@ -41,6 +151,7 @@ window.PRO_LIBRARY = {
     {
       id: "nist-ai-600-1",
       sourceClass: "standards",
+      sourceSubcategory: "nist",
       title: "AI RMF：Generative Artificial Intelligence Profile",
       publisher: "NIST",
       collection: "NIST AI 600-1",
@@ -62,6 +173,7 @@ window.PRO_LIBRARY = {
     {
       id: "elevenlabs-voice-cloning-docs",
       sourceClass: "official",
+      sourceSubcategory: "vendor-docs-other",
       title: "Voice cloning：how it works",
       publisher: "ElevenLabs",
       collection: "ElevenLabs Documentation",
@@ -82,6 +194,7 @@ window.PRO_LIBRARY = {
     {
       id: "mitre-atlas",
       sourceClass: "knowledge-base",
+      sourceSubcategory: "mitre-atlas",
       title: "MITRE ATLAS",
       publisher: "MITRE",
       collection: "Adversarial Threat Landscape for AI Systems",
@@ -102,6 +215,7 @@ window.PRO_LIBRARY = {
     {
       id: "stanford-ai-index-2026",
       sourceClass: "industry-analysis",
+      sourceSubcategory: "stanford-ai-index",
       title: "2026 AI Index Report",
       publisher: "Stanford Institute for Human-Centered AI",
       collection: "AI Index",
@@ -123,6 +237,7 @@ window.PRO_LIBRARY = {
     {
       id: "stanford-cs25",
       sourceClass: "public-talks",
+      sourceSubcategory: "university-courses",
       title: "CS25：Transformers United V6",
       publisher: "Stanford University",
       collection: "CS25 公开研讨课",
@@ -144,6 +259,7 @@ window.PRO_LIBRARY = {
     {
       id: "ibm-agentic-hackathon",
       sourceClass: "hackathon",
+      sourceSubcategory: "lablab",
       title: "Agentic AI Hackathon with IBM watsonx Orchestrate",
       publisher: "lablab.ai",
       collection: "官方比赛与获奖项目页",
@@ -164,6 +280,7 @@ window.PRO_LIBRARY = {
     {
       id: "karpathy-zero-to-hero",
       sourceClass: "creator",
+      sourceSubcategory: "andrej-karpathy",
       title: "Neural Networks：Zero to Hero",
       publisher: "Andrej Karpathy",
       collection: "创作者官方课程",
@@ -184,6 +301,7 @@ window.PRO_LIBRARY = {
     {
       id: "llama-cpp-repository",
       sourceClass: "open-source",
+      sourceSubcategory: "github-canonical",
       title: "llama.cpp",
       publisher: "ggml-org",
       collection: "项目主仓库",

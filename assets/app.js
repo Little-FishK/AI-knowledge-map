@@ -919,6 +919,7 @@
   let swBuilt = false;
   let libraryBuilt = false;
   let libraryClass = "all";
+  let librarySubcategory = "all";
   let libraryQuery = "";
 
   function buildSoftware() {
@@ -1074,6 +1075,47 @@
     return LIBRARY && (LIBRARY.sourceClasses || []).find(item => item.id === id);
   }
 
+  function librarySubcategoryById(source, id) {
+    return source && (source.subcategories || []).find(item => item.id === id);
+  }
+
+  function renderLibrarySubcategories() {
+    const container = libraryView && libraryView.querySelector(".lib-subnav");
+    if (!container || !LIBRARY) return;
+    const source = libraryClassById(libraryClass);
+    if (!source) {
+      const options = (LIBRARY.sourceClasses || []).map(group =>
+        `<optgroup label="${esc(group.order + ". " + group.label)}">${(group.subcategories || []).map(sub =>
+          `<option value="${esc(group.id + "::" + sub.id)}">${esc(sub.label)} — ${esc(sub.short)}</option>`).join("")}</optgroup>`).join("");
+      container.innerHTML = `<div class="lib-subnav-head"><div><b>二级来源</b><span>共 ${(LIBRARY.sourceClasses || []).reduce((sum, group) => sum + (group.subcategories || []).length, 0)} 个平台与来源集合</span></div></div>
+        <div class="lib-sub-overview"><span>选择一个具体平台，会同时定位到它所属的一级来源。</span>
+          <select class="lib-sub-select" aria-label="选择二级来源"><option value="">浏览全部二级来源…</option>${options}</select>
+        </div>`;
+      container.querySelector(".lib-sub-select").addEventListener("change", event => {
+        if (!event.target.value) return;
+        [libraryClass, librarySubcategory] = event.target.value.split("::");
+        libraryView.querySelectorAll("[data-library-class]").forEach(button =>
+          button.classList.toggle("active", button.getAttribute("data-library-class") === libraryClass));
+        renderLibrarySubcategories();
+        renderLibraryItems();
+      });
+      return;
+    }
+    const counts = {};
+    (LIBRARY.items || []).filter(item => item.sourceClass === source.id)
+      .forEach(item => { counts[item.sourceSubcategory] = (counts[item.sourceSubcategory] || 0) + 1; });
+    container.innerHTML = `<div class="lib-subnav-head"><div><b>${source.order}. ${esc(source.label)} · 二级来源</b><span>${esc(source.short)}</span></div><em>${(source.subcategories || []).length} 个</em></div>
+      <div class="lib-subchips">
+        <button class="lib-subchip${librarySubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">全部 <span>${(LIBRARY.items || []).filter(item => item.sourceClass === source.id).length}</span></button>
+        ${(source.subcategories || []).map(sub => `<button class="lib-subchip${librarySubcategory === sub.id ? " active" : ""}" type="button" data-library-subcategory="${esc(sub.id)}" title="${esc(sub.short)}">${esc(sub.label)} <span>${counts[sub.id] || 0}</span></button>`).join("")}
+      </div>`;
+    container.querySelectorAll("[data-library-subcategory]").forEach(button => button.addEventListener("click", () => {
+      librarySubcategory = button.getAttribute("data-library-subcategory");
+      renderLibrarySubcategories();
+      renderLibraryItems();
+    }));
+  }
+
   function renderLibraryItems() {
     if (!LIBRARY || !libraryView) return;
     const grid = libraryView.querySelector(".lib-grid");
@@ -1082,16 +1124,21 @@
     const query = libraryQuery.trim().toLocaleLowerCase("zh-CN");
     const items = (LIBRARY.items || []).filter(item => {
       if (libraryClass !== "all" && item.sourceClass !== libraryClass) return false;
+      if (librarySubcategory !== "all" && item.sourceSubcategory !== librarySubcategory) return false;
       if (!query) return true;
-      return [item.title, item.publisher, item.collection, item.contentKind, item.summary]
+      const source = libraryClassById(item.sourceClass);
+      const subcategory = librarySubcategoryById(source, item.sourceSubcategory);
+      return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label]
         .concat(item.tags || []).join(" ").toLocaleLowerCase("zh-CN").includes(query);
     });
     if (note) note.textContent = `${items.length} 条资料`;
     grid.innerHTML = items.length ? items.map(item => {
       const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
+      const subcategory = librarySubcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
       return `<article class="lib-card" data-library-item="${esc(item.id)}" style="--source-color:${source.color}" tabindex="0">
         <div class="lib-card-top">
           <span class="lib-badge">${esc(source.label)}</span>
+          <span class="lib-subbadge">${esc(subcategory.label)}</span>
           ${item.discoveryOnly ? `<span class="lib-discovery">仅作发现</span>` : ""}
           <span class="lib-tier">${esc(item.authorityTier)}</span>
         </div>
@@ -1116,7 +1163,7 @@
     (LIBRARY.items || []).forEach(item => { counts[item.sourceClass] = (counts[item.sourceClass] || 0) + 1; });
     libraryView.innerHTML = `<header class="lib-head">
       <div><h2>专业资料库</h2><p>按信息来源分类，保留证据用途、适用边界和与知识地图的关联。</p></div>
-      <div class="lib-count">9 类来源 · ${(LIBRARY.items || []).length} 条种子资料</div>
+      <div class="lib-count">9 类一级来源 · ${(LIBRARY.sourceClasses || []).reduce((sum, source) => sum + (source.subcategories || []).length, 0)} 个二级来源 · ${(LIBRARY.items || []).length} 条种子资料</div>
     </header>
     <div class="lib-layout">
       <nav class="lib-sources" aria-label="资料来源分类">
@@ -1128,6 +1175,7 @@
         </button>`).join("")}
       </nav>
       <section class="lib-content">
+        <div class="lib-subnav"></div>
         <div class="lib-toolbar">
           <input class="lib-search" type="search" placeholder="搜索标题、发布者、资料形式或标签" aria-label="搜索专业资料">
           <span class="lib-filter-note"></span>
@@ -1137,7 +1185,9 @@
     </div>`;
     libraryView.querySelectorAll("[data-library-class]").forEach(button => button.addEventListener("click", () => {
       libraryClass = button.getAttribute("data-library-class");
+      librarySubcategory = "all";
       libraryView.querySelectorAll("[data-library-class]").forEach(item => item.classList.toggle("active", item === button));
+      renderLibrarySubcategories();
       renderLibraryItems();
     }));
     libraryView.querySelector(".lib-search").addEventListener("input", event => {
@@ -1145,6 +1195,7 @@
       renderLibraryItems();
     });
     libraryBuilt = true;
+    renderLibrarySubcategories();
     renderLibraryItems();
   }
 
@@ -1152,6 +1203,7 @@
     const item = LIBRARY && (LIBRARY.items || []).find(entry => entry.id === id);
     if (!item) return;
     const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
+    const subcategory = librarySubcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
     const linkedNodes = (item.linkedNodes || []).filter(nodeId => byId[nodeId]);
     const linkedSoftware = (item.linkedSoftware || []).map(softwareId =>
       SW && (SW.items || []).find(entry => entry.id === softwareId)).filter(Boolean);
@@ -1160,6 +1212,8 @@
       <h2 class="d-title">${esc(item.title)}</h2>
       <div class="d-summary">${esc(item.summary)}</div>
       <div class="d-sec"><h4>来源记录</h4><dl class="lib-detail-meta">
+        <dt>一级来源</dt><dd>${esc(source.label)}</dd>
+        <dt>二级来源</dt><dd>${esc(subcategory.label)}</dd>
         <dt>发布者</dt><dd>${esc(item.publisher)}</dd>
         <dt>资料集合</dt><dd>${esc(item.collection)}</dd>
         <dt>发布状态</dt><dd>${esc(item.reviewStatus)}</dd>

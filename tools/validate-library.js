@@ -35,10 +35,27 @@ if (actualClasses.join("|") !== expectedClasses.join("|")) {
 }
 
 const classIds = new Set(actualClasses);
+const subcategoriesByClass = new Map();
+L.sourceClasses.forEach(source => {
+  if (!Array.isArray(source.subcategories) || source.subcategories.length < 5) {
+    problems.push(`一级来源 ${source.id} 至少需要 5 个二级来源`);
+    return;
+  }
+  const ids = source.subcategories.map(subcategory => subcategory.id);
+  if (new Set(ids).size !== ids.length) problems.push(`一级来源 ${source.id} 存在重复的二级来源 id`);
+  source.subcategories.forEach(subcategory => {
+    ["id", "label", "short"].forEach(field => {
+      if (typeof subcategory[field] !== "string" || !subcategory[field].trim()) {
+        problems.push(`一级来源 ${source.id} 的二级来源缺少 ${field}`);
+      }
+    });
+  });
+  subcategoriesByClass.set(source.id, new Set(ids));
+});
 const itemIds = new Set();
 const counts = Object.fromEntries(expectedClasses.map(id => [id, 0]));
 const requiredStrings = [
-  "id", "sourceClass", "title", "publisher", "collection", "contentKind",
+  "id", "sourceClass", "sourceSubcategory", "title", "publisher", "collection", "contentKind",
   "authorityTier", "reviewStatus", "url", "accessedAt", "summary", "evidenceUse"
 ];
 
@@ -52,6 +69,9 @@ L.items.forEach(item => {
   itemIds.add(item.id);
   if (!classIds.has(item.sourceClass)) problems.push(`资料 ${item.id} 使用未知来源类：${item.sourceClass}`);
   else counts[item.sourceClass]++;
+  if (classIds.has(item.sourceClass) && !subcategoriesByClass.get(item.sourceClass).has(item.sourceSubcategory)) {
+    problems.push(`资料 ${item.id} 使用无效二级来源：${item.sourceClass}/${item.sourceSubcategory}`);
+  }
   if (!authorityTiers.has(item.authorityTier)) problems.push(`资料 ${item.id} 的权威等级无效：${item.authorityTier}`);
   if (item.primarySource !== true && item.primarySource !== false) problems.push(`资料 ${item.id} 的 primarySource 必须是布尔值`);
   if (item.discoveryOnly !== true && item.discoveryOnly !== false) problems.push(`资料 ${item.id} 的 discoveryOnly 必须是布尔值`);
@@ -73,7 +93,8 @@ expectedClasses.forEach(id => {
   if (!counts[id]) problems.push(`来源分类 ${id} 还没有任何种子资料`);
 });
 
-console.log(`专业资料库 ${L.items.length} 条 · 来源分类 ${L.sourceClasses.length} 类`);
+const subcategoryCount = L.sourceClasses.reduce((sum, source) => sum + source.subcategories.length, 0);
+console.log(`专业资料库 ${L.items.length} 条 · 一级来源 ${L.sourceClasses.length} 类 · 二级来源 ${subcategoryCount} 个`);
 console.log("来源分布：" + expectedClasses.map(id => `${id}=${counts[id]}`).join(" "));
 
 if (problems.length) {
