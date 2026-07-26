@@ -3,6 +3,7 @@
 专业资料库用于保存重要但不一定适合成为节点或软件教程的高质量信息。一级导航严格按九类信息来源分类，二级导航细分到具体平台、机构、集合或经认证个人；内容形式与主题只作为筛选标签。
 
 正式数据位于 `data/library.js`，注册为 `window.PRO_LIBRARY`。
+官方技术资料精选包位于 `data/library-official-technical.js`，在基础资料之后追加到同一资料库。
 二级来源的平台档案位于 `data/library-platform-profiles.js`，注册为 `window.LIBRARY_PLATFORM_PROFILES`。
 
 每条资料至少包含：
@@ -12,6 +13,7 @@
 - 原始 HTTPS 地址和访问日期；
 - 原创摘要、允许支持的证据范围和局限；
 - 标签，以及关联节点和软件；
+- 官方技术资料还必须记录逐条 `selectionReason`，在详情页显示“为什么入选”；
 - `discoveryOnly`，明确该资料是否只能用于发现。
 
 修改后运行：
@@ -21,6 +23,8 @@ npm run validate
 ```
 
 资料进入库不表示它可以自动改变节点、教程或学习路径。晋升必须进入各自已有的门禁流程。
+
+官方技术资料采用额外数量门禁：`official` 下的九个二级分类必须各有至少 10 篇资料。当前选材清单与逐条理由见 [OFFICIAL_TECHNICAL_CURATED.md](OFFICIAL_TECHNICAL_CURATED.md)。
 
 ## 两级来源结构
 

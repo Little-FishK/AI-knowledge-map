@@ -1,9 +1,9 @@
 /* 专业资料库 —— 一级分类严格按信息来源，而不是内容主题或文件形式。 */
 window.PRO_LIBRARY = {
   meta: {
-    version: "0.5",
+    version: "0.6",
     updatedAt: "2026-07-25",
-    note: "二级来源档案包含不少于90字的正式介绍、平台优势与特征、主要内容、使用方法和证据边界。"
+    note: "二级来源档案包含正式介绍与证据边界；官方技术资料九个二级分类各有不少于10篇精选资料。"
   },
   sourceClasses: [
     {
@@ -185,6 +185,7 @@ window.PRO_LIBRARY = {
       url: "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
       accessedAt: "2026-07-24",
       summary: "说明 Instant Voice Cloning 与 Professional Voice Cloning 的产品机制、输入要求和适用边界。",
+      selectionReason: "声音克隆是专门化生成式 AI 能力；这份厂商原始文档能准确界定 ElevenLabs 两类克隆流程、输入要求与产品边界。",
       evidenceUse: "可直接支持 ElevenLabs 当前产品行为；跨产品机制仍需论文和独立资料。",
       limitations: ["厂商文档不构成跨平台性能比较", "界面、配额和能力会随版本变化"],
       tags: ["声音克隆", "官方文档", "音频"],

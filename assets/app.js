@@ -1264,6 +1264,7 @@
         <dt>一手来源</dt><dd>${item.primarySource ? "是" : "否"}</dd>
         <dt>访问日期</dt><dd>${esc(item.accessedAt)}</dd>
       </dl></div>
+      ${item.selectionReason ? `<div class="d-sec"><h4>为什么入选</h4><div class="d-body"><p>${esc(item.selectionReason)}</p></div></div>` : ""}
       <div class="d-sec"><h4>可以支持什么</h4><div class="d-body"><p>${esc(item.evidenceUse)}</p></div></div>
       <div class="d-sec"><h4>使用边界</h4><div class="d-body"><p>${(item.limitations || []).map(limit => `· ${esc(limit)}`).join("<br>")}</p></div></div>`;
     if (linkedNodes.length) h += `<div class="d-sec"><h4>关联节点</h4>${linkedNodes.map(nodeId =>

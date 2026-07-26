@@ -1,0 +1,383 @@
+/* 官方技术资料精选包：九个二级分类，每类至少 10 篇。 */
+(function () {
+  "use strict";
+
+  const library = window.PRO_LIBRARY;
+  if (!library || !Array.isArray(library.items)) {
+    throw new Error("加载官方技术资料前必须先加载 data/library.js");
+  }
+
+  const commonLimitations = [
+    "只直接支持该厂商当前公开产品、接口或方法的事实，不能替代跨平台独立比较",
+    "在线文档会持续更新，涉及版本、价格、限额和区域可用性时必须复核原页"
+  ];
+
+  function addGroup(config, entries) {
+    entries.forEach((entry) => {
+      library.items.push({
+        id: entry[0],
+        sourceClass: "official",
+        sourceSubcategory: config.id,
+        title: entry[1],
+        publisher: entry[5] || config.publisher,
+        collection: entry[6] || config.collection,
+        contentKind: entry[7] || "官方技术文档",
+        authorityTier: "A1",
+        reviewStatus: "current",
+        primarySource: true,
+        discoveryOnly: false,
+        url: entry[2],
+        accessedAt: "2026-07-25",
+        summary: entry[3],
+        selectionReason: entry[4],
+        evidenceUse: `可直接支持“${entry[3]}”所涉及的该厂商产品机制、接口和官方建议；超出该产品范围的结论需另找独立来源交叉验证。`,
+        limitations: entry[8] || commonLimitations,
+        tags: (entry[9] || []).concat(config.tags),
+        linkedNodes: [],
+        linkedSoftware: []
+      });
+    });
+  }
+
+  addGroup({
+    id: "openai",
+    publisher: "OpenAI",
+    collection: "OpenAI Developer Documentation",
+    tags: ["OpenAI", "官方文档"]
+  }, [
+    ["openai-responses-api", "Migrate to the Responses API", "https://developers.openai.com/api/docs/guides/migrate-to-responses",
+      "解释 Responses API 的统一输入输出、状态管理与多模态请求方式。",
+      "它是 OpenAI 当前应用开发的主入口，能建立后续工具、流式输出和 Agent 内容的共同接口基础。"],
+    ["openai-tools-guide", "Using tools", "https://developers.openai.com/api/docs/guides/tools",
+      "说明模型如何使用函数、网页搜索、文件搜索、计算机操作等工具。",
+      "工具调用是从聊天走向可执行 Agent 的关键机制，这篇文档覆盖面广且直接对应真实接口。"],
+    ["openai-structured-outputs", "Structured outputs", "https://developers.openai.com/api/docs/guides/structured-outputs",
+      "说明如何用 JSON Schema 约束模型输出并处理拒绝、解析与兼容性。",
+      "结构化输出是可靠自动化的基础，能把自然语言结果转换成可验证的数据契约。"],
+    ["openai-image-generation", "Image generation", "https://developers.openai.com/api/docs/guides/image-generation",
+      "介绍图像生成与编辑的输入形式、输出格式、质量和尺寸控制。",
+      "它代表官方多模态生成工作流，兼具机制说明和可直接执行的 API 范例。"],
+    ["openai-realtime-api", "Realtime API", "https://developers.openai.com/api/docs/guides/realtime",
+      "解释低延迟语音与多模态会话的连接方式、事件模型和会话控制。",
+      "实时系统和普通请求响应式 API 差异很大，这篇资料能提供不可替代的事件与延迟视角。"],
+    ["openai-agents-sdk-quickstart", "Agents SDK quickstart", "https://developers.openai.com/api/docs/guides/agents/quickstart",
+      "展示 Agent、工具、交接、运行循环与追踪的最小完整实现。",
+      "它把抽象 Agent 概念落到官方 SDK 的可运行结构，适合作为工程实现与术语的基准。"],
+    ["openai-evals-guide", "Working with evals", "https://developers.openai.com/api/docs/guides/evals",
+      "说明如何定义测试数据、评分器、评测运行与结果分析。",
+      "没有评测就无法判断提示词、模型或工作流是否真的改善，因此它是质量门禁的核心资料。"],
+    ["openai-safety-best-practices", "Safety best practices", "https://developers.openai.com/api/docs/guides/safety-best-practices",
+      "汇总内容审核、红队测试、人类复核、输入限制和安全标识等实践。",
+      "它给出应用层安全的官方最低基线，可与系统卡和外部治理资料互相补充。"],
+    ["openai-model-guidance", "Models: choosing the right model", "https://developers.openai.com/api/docs/guides/latest-model",
+      "提供按能力、延迟和成本选择 OpenAI 模型的官方决策入口。",
+      "模型命名与能力会变化，保留官方动态选择指南比写死某个型号更耐用。"],
+    ["openai-gpt-55-system-card", "GPT-5.5 System Card", "https://openai.com/index/gpt-5-5-system-card/",
+      "记录 GPT-5.5 的能力评估、安全测试、缓解措施与已知限制。",
+      "系统卡提供普通 API 文档缺少的评测和风险证据，是理解模型边界的一手资料。", null, null, "官方系统卡",
+      ["厂商自评需要结合独立基准和真实场景验证", "模型与缓解措施更新后应重新核对版本"], ["系统卡", "模型评测", "安全"]]
+  ]);
+
+  addGroup({
+    id: "anthropic",
+    publisher: "Anthropic",
+    collection: "Claude Developer Documentation",
+    tags: ["Anthropic", "Claude", "官方文档"]
+  }, [
+    ["anthropic-claude-overview", "Intro to Claude", "https://docs.anthropic.com/en/docs/welcome",
+      "概述 Claude 平台、API、模型能力与开发文档的整体结构。",
+      "这是建立 Anthropic 产品词汇和后续阅读路径的官方总入口。"],
+    ["anthropic-models-overview", "Models overview", "https://docs.anthropic.com/en/docs/about-claude/models/overview",
+      "说明 Claude 模型系列的能力定位、上下文、延迟与使用差异。",
+      "模型选择会影响质量与成本，这份动态总览比第三方型号表更可靠。"],
+    ["anthropic-tool-use", "Tool use with Claude", "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview",
+      "解释工具定义、工具请求、结果回传以及并行工具调用流程。",
+      "它是理解 Claude Agent 执行边界和工具协议的第一手规范。"],
+    ["anthropic-prompt-engineering", "Prompt engineering overview", "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+      "给出清晰指令、示例、角色、链式提示与评测驱动优化的方法。",
+      "该文档把提示技巧放进明确的成功标准和测试流程，而非零散技巧集合。"],
+    ["anthropic-prompt-caching", "Prompt caching", "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching",
+      "说明缓存长提示前缀的标记方式、命中条件、成本与延迟影响。",
+      "它直接解释大上下文应用的重要成本优化机制及其精确边界。"],
+    ["anthropic-message-batches", "Message Batches", "https://docs.anthropic.com/en/docs/build-with-claude/message-batches",
+      "介绍批量异步处理请求的创建、轮询、结果读取和限制。",
+      "批处理与在线交互有不同的成本和可靠性模型，适合补齐生产工作流。"],
+    ["anthropic-citations", "Citations", "https://docs.anthropic.com/en/docs/build-with-claude/citations",
+      "说明如何让 Claude 将回答片段关联到提供文档中的具体引文。",
+      "引用机制直接关系到证据可追溯性，是资料库和 RAG 应用的关键能力。"],
+    ["anthropic-pdf-support", "PDF support", "https://docs.anthropic.com/en/docs/build-with-claude/pdf-support",
+      "解释 PDF 文本与页面图像的处理、请求格式、令牌消耗和限制。",
+      "PDF 是专业资料的主要载体，该文档能界定模型到底读取了什么。"],
+    ["anthropic-mcp", "Model Context Protocol", "https://docs.anthropic.com/en/docs/mcp",
+      "介绍 MCP 的架构、客户端与服务器连接及资源、工具、提示等原语。",
+      "MCP 已成为连接模型与外部系统的重要开放协议，原始规范入口不可替代。"],
+    ["anthropic-claude-4-system-card", "Claude 4 System Card", "https://www-cdn.anthropic.com/6d8a8055020700718b0c49369f60816ba2a7c285/Claude%204%20System%20Card.pdf",
+      "披露 Claude 4 系列的能力、安全评估、对齐措施和部署判断。",
+      "它补足开发文档不覆盖的模型行为证据与安全边界。", null, null, "官方系统卡",
+      ["厂商自评不能替代第三方复现", "应按具体模型版本核对结论"], ["系统卡", "模型评测", "安全"]]
+  ]);
+
+  addGroup({
+    id: "google-deepmind",
+    publisher: "Google",
+    collection: "Google AI for Developers",
+    tags: ["Google", "Gemini", "官方文档"]
+  }, [
+    ["google-gemini-quickstart", "Gemini API quickstart", "https://ai.google.dev/gemini-api/docs/quickstart",
+      "展示获取 SDK、配置密钥并完成首个 Gemini 请求的最短路径。",
+      "它是验证环境、鉴权和基本请求结构的官方可运行起点。"],
+    ["google-gemini-models", "Gemini models", "https://ai.google.dev/gemini-api/docs/models",
+      "列出 Gemini 模型的能力、输入类型、上下文与版本策略。",
+      "模型目录持续变化，官方模型页是选型和确认版本状态的主依据。"],
+    ["google-gemini-text-generation", "Text generation", "https://ai.google.dev/gemini-api/docs/text-generation",
+      "说明单轮、多轮、系统指令、流式文本生成与生成配置。",
+      "文本生成是多数 Gemini 应用的共同底层流程，适合作为接口行为基线。"],
+    ["google-gemini-structured-output", "Structured outputs", "https://ai.google.dev/gemini-api/docs/structured-output",
+      "说明 Gemini 对 JSON Schema 子集的支持和结构化结果生成方式。",
+      "它明确区分结构化最终输出与函数调用，能减少常见的工程误用。"],
+    ["google-gemini-function-calling", "Function calling with the Gemini API", "https://ai.google.dev/gemini-api/docs/function-calling",
+      "解释函数声明、模型选择工具、应用执行及结果回传的完整循环。",
+      "这是构建 Gemini 工具型 Agent 的官方协议说明。"],
+    ["google-gemini-long-context", "Long context", "https://ai.google.dev/gemini-api/docs/long-context",
+      "介绍长上下文的使用场景、令牌计算、性能与提示组织建议。",
+      "长上下文不是无限记忆，该文档能校正容量、检索与成本之间的关系。"],
+    ["google-gemini-embeddings", "Embeddings", "https://ai.google.dev/gemini-api/docs/embeddings",
+      "说明嵌入生成、任务类型、批处理和相似度检索用法。",
+      "嵌入是语义搜索和 RAG 的基础，该资料能提供模型专属参数依据。"],
+    ["google-gemini-live-api", "Live API", "https://ai.google.dev/gemini-api/docs/live",
+      "描述实时双向流、多模态输入输出、会话与工具调用事件。",
+      "它覆盖普通生成接口没有的实时连接和会话状态机制。"],
+    ["google-gemini-safety", "Safety settings", "https://ai.google.dev/gemini-api/docs/safety-settings",
+      "说明安全类别、阻断阈值、反馈字段以及应用端调节方式。",
+      "它能明确平台安全过滤器做什么、又有哪些责任仍属于开发者。"],
+    ["deepmind-gemini-model-cards", "Gemini model cards", "https://deepmind.google/models/gemini/",
+      "集中介绍 Gemini 系列的技术定位、能力进展及相关模型资料。",
+      "DeepMind 官方模型入口把产品文档与模型研究背景连接起来，适合追溯模型层证据。", "Google DeepMind", "Google DeepMind Models", "官方模型资料",
+      ["产品能力陈述仍需结合模型卡和独立评测", "页面会随模型系列更新"], ["DeepMind", "模型卡", "多模态"]]
+  ]);
+
+  addGroup({
+    id: "microsoft",
+    publisher: "Microsoft",
+    collection: "Microsoft Learn",
+    tags: ["Microsoft", "官方文档"]
+  }, [
+    ["microsoft-foundry-overview", "What is Microsoft Foundry?", "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry",
+      "概述 Microsoft Foundry 的模型、Agent、评测、部署与治理能力。",
+      "它提供微软 AI 开发平台的整体架构图，便于定位其他专题文档。"],
+    ["microsoft-azure-openai-overview", "Azure OpenAI in Microsoft Foundry Models", "https://learn.microsoft.com/en-us/azure/ai-services/openai/overview",
+      "介绍 Azure 上的 OpenAI 模型访问、部署、网络、安全与企业特性。",
+      "它能区分 Azure 托管层能力与模型提供方本身的能力。"],
+    ["microsoft-foundry-model-catalog", "Model catalog and collections", "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-catalog-overview",
+      "说明模型目录、提供方、部署选项和模型卡信息。",
+      "这是理解多模型平台如何选型、比较和部署模型的官方入口。"],
+    ["microsoft-content-filtering", "Content filtering in Microsoft Foundry", "https://learn.microsoft.com/en-us/azure/ai-studio/concepts/content-filtering",
+      "解释输入输出分类器、风险等级、阻断阈值和可配置过滤器。",
+      "它提供生产环境内容安全栈的具体机制，而不只是原则说明。"],
+    ["microsoft-responsible-ai-openai", "Responsible AI practices for Azure OpenAI", "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview",
+      "按识别、测量、缓解与运营四阶段组织生成式 AI 风险治理。",
+      "它把微软责任 AI 标准转成可执行的应用生命周期检查框架。"],
+    ["microsoft-semantic-kernel-overview", "Semantic Kernel overview", "https://learn.microsoft.com/en-us/semantic-kernel/overview/",
+      "介绍 Semantic Kernel 的 Agent、插件、函数调用与流程编排抽象。",
+      "这是微软官方 Agent SDK 之一，能补充平台 API 之外的应用架构视角。"],
+    ["microsoft-autogen-docs", "AutoGen documentation", "https://microsoft.github.io/autogen/stable/",
+      "说明 AutoGen 的 AgentChat、核心运行时、扩展与多智能体模式。",
+      "AutoGen 是研究多智能体协作和事件驱动 Agent 设计的重要官方实现。"],
+    ["microsoft-onnx-runtime", "ONNX Runtime documentation", "https://onnxruntime.ai/docs/",
+      "覆盖跨平台模型推理、执行提供程序、量化与性能调优。",
+      "它代表模型从训练框架走向硬件优化部署的通用运行时层。"],
+    ["microsoft-presidio", "Microsoft Presidio documentation", "https://microsoft.github.io/presidio/",
+      "介绍文本与图像中的个人信息识别、匿名化和可扩展分析器。",
+      "隐私数据处理是 AI 系统常见前置门禁，Presidio 提供可落地的官方工具链。"],
+    ["microsoft-mlnet", "ML.NET documentation", "https://learn.microsoft.com/en-us/dotnet/machine-learning/",
+      "说明在 .NET 中进行数据准备、训练、评估、推理和模型生成。",
+      "它扩大资料库对传统机器学习与 .NET 生产生态的覆盖，避免只收录生成式 AI。"]
+  ]);
+
+  addGroup({
+    id: "meta-ai",
+    publisher: "Meta",
+    collection: "Meta AI Official Resources",
+    tags: ["Meta AI", "官方资料"]
+  }, [
+    ["meta-llama-docs", "Llama documentation", "https://www.llama.com/docs/",
+      "汇总 Llama 模型、下载、推理、微调、工具调用与安全资料。",
+      "它是 Llama 官方技术资料的主入口，能够统一版本与术语。"],
+    ["meta-llama-models", "Llama models", "https://www.llama.com/models/",
+      "展示 Llama 模型系列、能力定位、许可证与获取方式。",
+      "模型页适合核对官方发布范围，避免把社区衍生模型误当原版。"],
+    ["meta-llama-responsible-use", "Responsible use guide", "https://www.llama.com/docs/how-to-guides/responsible-use-guide/",
+      "说明 Llama 应用的风险评估、安全微调、红队测试和部署控制。",
+      "它把开放权重模型的使用责任落到应用开发者可执行的步骤。"],
+    ["meta-llama-stack", "Llama Stack documentation", "https://llama-stack.readthedocs.io/en/latest/",
+      "定义推理、Agent、工具、记忆、评测和安全的统一 API 层。",
+      "Llama Stack 展示了 Meta 对可移植生成式 AI 应用栈的官方工程抽象。"],
+    ["meta-sam2", "Segment Anything 2", "https://ai.meta.com/sam2/",
+      "介绍面向图像和视频的可提示分割模型、能力与官方资源。",
+      "SAM 2 是视觉基础模型的重要代表，扩展了资料库对视频时序理解的覆盖。"],
+    ["meta-dinov2", "DINOv2", "https://ai.meta.com/dinov2/",
+      "介绍无监督视觉特征学习模型及其通用表征能力。",
+      "它代表不依赖文本监督的视觉基础模型路线，能补足生成模型之外的表征学习。"],
+    ["meta-audiocraft", "AudioCraft", "https://github.com/facebookresearch/audiocraft",
+      "提供音乐与音频生成模型的官方代码、模型说明和推理示例。",
+      "这是 Meta 音频生成研究落地到可复现实现的一手入口。", null, "Meta Research GitHub", "官方代码与技术文档"],
+    ["meta-imagebind", "ImageBind", "https://github.com/facebookresearch/ImageBind",
+      "说明将图像、文本、音频、深度、热成像和惯性信号对齐到统一空间的方法与代码。",
+      "它是理解多模态共享嵌入空间的代表性官方实现。", null, "Meta Research GitHub", "官方代码与技术文档"],
+    ["meta-faiss", "Faiss documentation", "https://faiss.ai/",
+      "覆盖稠密向量相似度搜索、索引类型、GPU 支持与使用示例。",
+      "Faiss 是向量检索基础设施的经典实现，直接关系 RAG 和大规模相似度搜索。", null, "Meta Research", "官方技术文档"],
+    ["meta-executorch", "ExecuTorch documentation", "https://docs.pytorch.org/executorch/stable/",
+      "说明如何在移动端、嵌入式与边缘设备部署 PyTorch 模型。",
+      "它补齐云端之外的端侧推理、后端适配与资源约束视角。", "PyTorch / Meta", "ExecuTorch Documentation"]
+  ]);
+
+  addGroup({
+    id: "nvidia",
+    publisher: "NVIDIA",
+    collection: "NVIDIA Developer Documentation",
+    tags: ["NVIDIA", "官方文档"]
+  }, [
+    ["nvidia-cuda-guide", "CUDA C++ Programming Guide", "https://docs.nvidia.com/cuda/cuda-c-programming-guide/",
+      "系统说明 CUDA 编程模型、线程层级、内存、同步和硬件执行。",
+      "CUDA 是 NVIDIA AI 软件栈的底座，这份指南能解释上层框架性能从何而来。"],
+    ["nvidia-cudnn", "cuDNN documentation", "https://docs.nvidia.com/deeplearning/cudnn/",
+      "介绍深度神经网络基础算子库、后端 API、图优化和兼容性。",
+      "cuDNN 连接模型算子与 GPU 高性能实现，是训练和推理性能的重要一手资料。"],
+    ["nvidia-tensorrt", "TensorRT documentation", "https://docs.nvidia.com/deeplearning/tensorrt/",
+      "覆盖模型导入、图优化、精度选择、运行时与部署调优。",
+      "它是理解 NVIDIA 通用深度学习推理优化链路的核心文档。"],
+    ["nvidia-tensorrt-llm", "TensorRT-LLM documentation", "https://nvidia.github.io/TensorRT-LLM/",
+      "说明大语言模型构建、量化、并行、KV 缓存和高吞吐服务。",
+      "该资料把 LLM 推理优化细化到引擎和服务策略，技术密度高。"],
+    ["nvidia-triton-server", "Triton Inference Server documentation", "https://docs.nvidia.com/deeplearning/triton-inference-server/",
+      "介绍多框架模型服务、动态批处理、模型仓库、指标和扩缩容。",
+      "Triton 覆盖生产推理服务层，能把单模型优化连接到多模型运维。"],
+    ["nvidia-nemo-framework", "NeMo Framework user guide", "https://docs.nvidia.com/nemo-framework/user-guide/latest/overview.html",
+      "说明大模型训练、微调、并行策略、数据处理与部署。",
+      "它提供从训练到推理的 NVIDIA 大模型全栈工程路线。"],
+    ["nvidia-nim", "NVIDIA NIM documentation", "https://docs.nvidia.com/nim/",
+      "介绍模型推理微服务、容器部署、API、配置与支持矩阵。",
+      "NIM 代表封装后的生产交付层，有助于区分模型、引擎与微服务。"],
+    ["nvidia-nemo-guardrails", "NeMo Guardrails documentation", "https://docs.nvidia.com/nemo/guardrails/latest/home",
+      "介绍可编程输入输出护栏、对话流程、安全检查与评测。",
+      "它给出生成式 AI 安全控制的可执行中间件方案。"],
+    ["nvidia-rapids", "RAPIDS documentation", "https://docs.rapids.ai/",
+      "汇总 GPU 数据帧、机器学习、图分析和数据处理库。",
+      "AI 系统的瓶颈常在数据处理，RAPIDS 补足训练前后的 GPU 数据管线。"],
+    ["nvidia-nsight-systems", "Nsight Systems user guide", "https://docs.nvidia.com/nsight-systems/UserGuide/",
+      "说明跨 CPU、GPU、网络与进程的系统级性能追踪和分析。",
+      "它提供诊断端到端性能问题所需的可观测证据，而不仅是优化建议。"]
+  ]);
+
+  addGroup({
+    id: "hugging-face-official",
+    publisher: "Hugging Face",
+    collection: "Hugging Face Documentation",
+    tags: ["Hugging Face", "官方文档"]
+  }, [
+    ["hf-hub-docs", "Hugging Face Hub documentation", "https://huggingface.co/docs/hub/index",
+      "说明模型、数据集、Spaces、版本、权限与协作发布机制。",
+      "Hub 是 Hugging Face 生态的共同资产层，理解它才能正确追溯模型来源和版本。"],
+    ["hf-transformers", "Transformers documentation", "https://huggingface.co/docs/transformers/index",
+      "覆盖预训练模型加载、训练、推理、任务管线与模型扩展。",
+      "Transformers 是主流模型应用入口，文档兼具高层教程和 API 细节。"],
+    ["hf-datasets", "Datasets documentation", "https://huggingface.co/docs/datasets/index",
+      "介绍数据集加载、流式处理、变换、缓存和分布式使用。",
+      "数据管线决定训练与评测的可复现性，这份资料补足模型之外的关键层。"],
+    ["hf-tokenizers", "Tokenizers documentation", "https://huggingface.co/docs/tokenizers/index",
+      "说明高性能分词器的训练、规范化、预分词、编码与对齐。",
+      "分词会影响上下文、成本和文本边界，该文档能深入到完整处理流水线。"],
+    ["hf-diffusers", "Diffusers documentation", "https://huggingface.co/docs/diffusers/index",
+      "覆盖扩散模型管线、调度器、训练、优化和多种生成任务。",
+      "它是开源图像与视频生成工作流的官方技术主入口。"],
+    ["hf-accelerate", "Accelerate documentation", "https://huggingface.co/docs/accelerate/index",
+      "说明以较少代码实现多 GPU、TPU、混合精度和分布式训练。",
+      "Accelerate 把训练脚本与硬件编排连接起来，适合理解分布式工程抽象。"],
+    ["hf-peft", "PEFT documentation", "https://huggingface.co/docs/peft/index",
+      "介绍 LoRA 等参数高效微调方法、适配器管理与推理。",
+      "PEFT 是低成本适配大模型的代表工具，直接对应参数效率和模型组合问题。"],
+    ["hf-trl", "TRL documentation", "https://huggingface.co/docs/trl/index",
+      "覆盖监督微调、偏好优化、奖励建模和强化学习训练器。",
+      "TRL 把后训练算法变成可复现实装，适合作为理解对齐工作流的工程资料。"],
+    ["hf-evaluate", "Evaluate documentation", "https://huggingface.co/docs/evaluate/index",
+      "说明指标、比较、评测套件和模型评估工作流。",
+      "它为模型与数据集评测提供统一接口，能支撑自动质量门禁。"],
+    ["hf-tgi", "Text Generation Inference documentation", "https://huggingface.co/docs/text-generation-inference/index",
+      "介绍大语言模型高性能服务、连续批处理、量化、并行和流式输出。",
+      "TGI 连接模型仓库与生产推理服务，补齐部署和性能层。"]
+  ]);
+
+  addGroup({
+    id: "aws",
+    publisher: "Amazon Web Services",
+    collection: "AWS Documentation",
+    tags: ["AWS", "官方文档"]
+  }, [
+    ["aws-bedrock-guide", "Amazon Bedrock User Guide", "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
+      "概述 Bedrock 的基础模型访问、生成式 AI 能力、安全与应用构建。",
+      "它是 AWS 托管生成式 AI 服务的总入口，能建立产品组件之间的关系。"],
+    ["aws-bedrock-agents", "Automate tasks with Agents for Amazon Bedrock", "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html",
+      "说明 Agent 如何编排模型、操作组、知识库与执行轨迹。",
+      "该文档提供云端托管 Agent 的官方控制面和运行机制。"],
+    ["aws-bedrock-knowledge-bases", "Knowledge Bases for Amazon Bedrock", "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
+      "介绍数据摄取、向量存储、检索、生成与引用配置。",
+      "它覆盖企业 RAG 从数据源到检索结果的托管实现边界。"],
+    ["aws-bedrock-guardrails", "Guardrails for Amazon Bedrock", "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+      "说明内容过滤、拒答主题、敏感信息和词语策略。",
+      "Guardrails 是 AWS 生成式 AI 安全控制的核心官方机制。"],
+    ["aws-bedrock-model-evaluation", "Evaluate model performance in Amazon Bedrock", "https://docs.aws.amazon.com/bedrock/latest/userguide/model-evaluation.html",
+      "介绍自动与人工模型评测、任务类型、指标和评测作业。",
+      "它使模型选择从主观试用转向可记录的评测流程。"],
+    ["aws-bedrock-prompt-management", "Prompt management for Amazon Bedrock", "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html",
+      "说明提示模板、变量、版本、变体与测试管理。",
+      "提示词需要版本化和评测，这篇资料提供云端提示资产治理视角。"],
+    ["aws-sagemaker-ai", "Amazon SageMaker AI Developer Guide", "https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html",
+      "概述数据准备、训练、调优、部署、MLOps 与治理能力。",
+      "它补足 Bedrock 之外可控训练和传统机器学习的完整生命周期。"],
+    ["aws-sagemaker-jumpstart", "SageMaker JumpStart", "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-jumpstart.html",
+      "介绍预训练模型、解决方案模板、微调和快速部署。",
+      "JumpStart 展示模型目录如何连接到训练与端点部署。"],
+    ["aws-neuron", "AWS Neuron documentation", "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/",
+      "说明 Trainium 与 Inferentia 的编译、训练、推理和性能调优。",
+      "它提供 AWS 自研 AI 芯片的软件栈视角，避免资料只停留在云服务界面。"],
+    ["aws-ml-lens", "Machine Learning Lens", "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lens.html",
+      "按卓越运营、安全、可靠性、性能、成本和可持续性审查 ML 工作负载。",
+      "它把单项服务知识提升到系统架构评审层，适合作为生产门禁清单。"]
+  ]);
+
+  addGroup({
+    id: "vendor-docs-other",
+    publisher: "多家厂商",
+    collection: "其他厂商官方技术资料",
+    tags: ["厂商官方资料"]
+  }, [
+    ["mistral-ai-docs", "Mistral AI Documentation", "https://docs.mistral.ai/",
+      "覆盖 Mistral API、模型、工具调用、Agent、微调与部署。",
+      "Mistral 是重要的欧洲模型厂商，文档同时覆盖开放与商业模型生态。", "Mistral AI", "Mistral AI Documentation"],
+    ["cohere-docs", "Cohere Documentation", "https://docs.cohere.com/",
+      "介绍生成、嵌入、重排、工具使用与企业检索工作流。",
+      "Cohere 在企业 RAG 和重排方面具有代表性，能补充通用聊天模型视角。", "Cohere", "Cohere Documentation"],
+    ["stability-ai-api-docs", "Stability AI Developer Platform", "https://platform.stability.ai/docs",
+      "说明 Stability AI 图像生成与编辑 API、参数和调用方式。",
+      "它提供独立图像模型厂商的一手接口资料，扩大视觉生成覆盖。", "Stability AI", "Stability AI Documentation"],
+    ["runway-api-docs", "Runway API documentation", "https://docs.dev.runwayml.com/",
+      "介绍 Runway 视频与图像生成 API、任务状态、输入和输出。",
+      "视频生成具有异步任务和媒体约束，这份资料提供专业视频平台的工程视角。", "Runway", "Runway API Documentation"],
+    ["xai-api-docs", "xAI API documentation", "https://docs.x.ai/",
+      "说明 xAI 模型 API、鉴权、文本与工具等开发能力。",
+      "收录它可覆盖另一条主流模型服务路线，并以官方文档限制能力断言。", "xAI", "xAI Documentation"],
+    ["groqcloud-docs", "GroqCloud documentation", "https://console.groq.com/docs/overview",
+      "介绍 GroqCloud API、模型、流式输出、工具调用和速率限制。",
+      "Groq 代表强调低延迟推理的专用硬件与云服务组合。", "Groq", "GroqCloud Documentation"],
+    ["perplexity-api-docs", "Perplexity API documentation", "https://docs.perplexity.ai/",
+      "说明面向搜索与研究的 API、模型、引用和请求参数。",
+      "它能提供检索原生模型产品的官方实现和引用行为依据。", "Perplexity", "Perplexity API Documentation"],
+    ["adobe-firefly-api-docs", "Adobe Firefly Services documentation", "https://developer.adobe.com/firefly-services/docs/firefly-api/",
+      "介绍 Firefly 图像生成、编辑、鉴权和企业内容工作流。",
+      "Adobe 的内容生产生态与商业安全定位具有独特代表性。", "Adobe", "Adobe Developer Documentation"],
+    ["databricks-mosaic-ai-docs", "Mosaic AI documentation", "https://docs.databricks.com/en/generative-ai/index.html",
+      "覆盖模型服务、向量搜索、Agent、评测、治理与数据平台集成。",
+      "Databricks 将数据、模型和治理放在统一湖仓平台中，补充纯模型 API 的视角。", "Databricks", "Databricks Documentation"]
+  ]);
+})();
