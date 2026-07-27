@@ -226,8 +226,15 @@ function transformGraph(source, manifest) {
 function transformIndex(source, nodeId) {
   const registration = `<script src="data/deepdive/${nodeId}.js"></script>`;
   if (source.includes(registration)) return source;
-  const anchor = '<script src="data/deepdive/zz-deepdive-quality-completion.js"></script>';
-  const index = source.indexOf(anchor);
+  // 新页面必须在所有“注册后增强”脚本之前加载，否则目录审计与浏览器
+  // 最终内容会不一致。保留旧锚点作为向后兼容回退。
+  const anchors = [
+    '<script src="data/deepdive/zz-reviewed-teaching-contracts.js"></script>',
+    '<script src="data/deepdive/zzz-phase89-quality-migration.js"></script>',
+    '<script src="data/deepdive/zz-deepdive-quality-completion.js"></script>',
+  ];
+  const anchor = anchors.find((candidate) => source.includes(candidate));
+  const index = anchor ? source.indexOf(anchor) : -1;
   if (index === -1) throw new Error("index.html 缺少深读页注册锚点");
   return source.slice(0, index) + registration + "\n" + source.slice(index);
 }

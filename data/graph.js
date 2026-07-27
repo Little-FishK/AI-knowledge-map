@@ -10,12 +10,12 @@
  */
 window.GRAPH = {
   meta: {
-    version: "0.17",
-    updatedAt: "2026-07-22",
+    version: "0.18",
+    updatedAt: "2026-07-27",
     // 布局种子（仅在 positions 缺失、需要现算布局时使用）。
     // 由 tools/find-seed.js 搜出；数据变动后需重跑。
     layoutSeed: 109,
-    note: "第十轮：补现代模型训练、评测、推理时计算、Agent 权限与生成架构，112→129 节点"
+    note: "Beta 0.18：理解原理页统一通过新版质量门禁，补全第 130 个节点并加入官方学习顺序跳转"
   },
 
   /* 核心节点 —— 默认视图只显示这些。
