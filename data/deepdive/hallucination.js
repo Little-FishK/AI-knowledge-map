@@ -95,7 +95,7 @@ window.DEEPDIVE["hallucination"] = {
   <h2><span class="dd-n">6</span>怎样把长回答拆成可核验事实<span class="dd-badge math">评测</span></h2>
   <p class="dd-lead">一段回答往往真假混杂；只打“整段正确/错误”会掩盖最危险的那一句。</p>
   <p>先把输出拆成最小的可核验原子断言，再根据指定证据集标为“支持、矛盾、证据未覆盖、不可核验”。这评测的是<b>相对证据的事实精度</b>，不等于穷尽世界真相。</p>
-  <div class="dd-formula"><code>原子事实支持率 = 被可靠来源支持的可核验断言数 ÷ 全部可核验断言数</code></div>
+  <div class="dd-formula" data-formula-id="atomic-fact-support-rate" data-display="mathml"><math display="block" aria-label="原子事实支持率等于被可靠来源支持的可核验断言数量除以全部可核验断言数量"><mrow><msub><mi>R</mi><mtext>支持</mtext></msub><mo>=</mo><mfrac><mtext>被可靠来源支持的可核验断言数</mtext><mtext>全部可核验断言数</mtext></mfrac></mrow></math></div>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>“张伟论文”回答中的原子断言</th><th>证据判定</th><th>处置</th></tr></thead>
     <tbody>
@@ -200,3 +200,25 @@ window.DEEPDIVE["hallucination"] = {
 </div>
 `
 };
+
+// 新版教学门禁补充：逐节说明幻觉的定义、成因、诊断、缓解与证据边界。
+{
+  const page = window.DEEPDIVE["hallucination"];
+  const additions = [
+    '<p>幻觉判断输入模型输出、可核验断言和权威证据，输出“支持、矛盾、未覆盖或不可核验”的标记。它专指看似可信却缺乏依据或事实错误的生成，危险来自流畅细节让读者难以察觉；普通计算错误也可能严重，但不一定具有这种伪造依据的外观。没有指定证据范围时，不能把“暂未找到”直接写成“不存在”。</p>',
+    '<p>结构性风险分析输入训练目标、问题和模型可用证据，输出是否存在只靠语言似然无法验证的事实缺口。下一 token 训练根据上下文提高可能续词的概率，并不查询一个通用真相裁判；长尾或开放世界问题即使缺证据也仍可产生语言上合理的续写。规模、数据和工具能降低风险，但不能对所有未知事实给出零错误保证。</p>',
+    '<p>表面自信分析输入生成概率、表达风格、证据覆盖和校准结果，输出“语气强度是否与证据匹配”的判断。训练可让肯定句更流畅，却不使肯定语气成为事实概率；模型也没有可直接读取的内在“我正在编造”标志。应依赖外部验证和经任务校准的风险信号，而不是把措辞笃定或自述当证据。</p>',
+    '<p>高发条件判断输入知识覆盖、时间范围、问题预设、采样温度和可用资料，输出需要检索、澄清、降温或拒答的风险动作。冷门私有事实、知识截止后的事件、带错误预设的问题和高温采样更易把系统推向模式补全；这些只是提高风险的信号，不表示每次必错。即使低温也可能稳定复现同一错误。</p>',
+    '<p>缓解流程输入待核验问题、检索来源、工具结果、证据覆盖和任务风险，输出有引用的回答、带范围的“不确定”、澄清问题或转人工。以“张伟论文”为例，先按作者年份主题检索，再交叉核对作者主页和 DOI；仍无精确匹配就说明检索范围并请求机构信息。RAG、引用和提示都可能失效，高影响断言必须由外部证据验证。</p>',
+    '<p>原子事实评测输入一段回答和指定证据集，输出可核验断言数 Nverifiable、被支持数 Nsupported、支持率 Rsupport 以及关键矛盾率和覆盖率。先拆到每条能独立查证的最小断言，再逐条映射来源，最后用 Nsupported/Nverifiable 计算比例；5 条中 3 条支持即 60%。一个药量、金额或 DOI 的关键矛盾可让整段失败，不能只看平均支持率。</p>',
+    '<p>分层诊断输入检索候选、来源版本、回答断言、引用映射和拒答行为，输出检索覆盖、证据质量、忠实性、引用正确性或选择性回答的失败归因。它解决有引用但引用不支持断言时如何定位错误的问题。先问证据是否取回，再问来源是否可靠、陈述是否超出来源、链接是否对应邻句，最后检查证据不足时是否拒答。闭卷事实性、给定材料忠实性和引用正确性是不同目标，不能互相替代。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace('<span class="dd-n">5</span>怎么对付它', '<span class="dd-n">5</span>怎么对付它：案例推演');
+  page.html = page.html.replace(
+    /<div class="dd-formula" data-formula-id="atomic-fact-support-rate"[\s\S]*?<\/div>/,
+    '<div class="dd-formula" data-formula-id="atomic-fact-support-rate" data-display="mathml"><math display="block" aria-label="原子事实支持率"><mi>Rsupport</mi><mo>=</mo><mfrac><mi>Nsupported</mi><mi>Nverifiable</mi></mfrac></math></div>'
+  );
+}

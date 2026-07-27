@@ -21,6 +21,7 @@
   const CORE = new Set(G.core || []);
   const RECOMMENDED_PATH = (G.recommendedLearningPath || []).reduce((all, phase) =>
     all.concat((phase.steps || []).map(step => ({ order: String(step[0]), id: step[1], phase: phase.phase }))), []);
+  const RECOMMENDED_INDEX = new Map(RECOMMENDED_PATH.map((step, index) => [step.id, index]));
   const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
   const learnedNodes = loadLearnedNodes();
   let activeDeepDiveId = null;
@@ -47,14 +48,27 @@
 
   function learningButtonHtml(id) {
     const learned = learnedNodes.has(id);
+    const currentIndex = RECOMMENDED_INDEX.get(id);
+    const nextStep = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex + 1] : null;
+    const nextNode = nextStep && byId[nextStep.id];
+    const nextButton = nextStep && nextNode
+      ? `<button type="button" class="dd-next-btn" data-next-node="${esc(nextStep.id)}" aria-label="下一节 ${esc(nextStep.order)}：${esc(nextNode.title)}">
+          <span>下一节 ${esc(nextStep.order)}</span>
+          <strong>${esc(nextNode.title)}</strong>
+          <span aria-hidden="true">→</span>
+        </button>`
+      : "";
     return `<section class="dd-learning-complete">
       <div>
         <div class="dd-learning-kicker">${learned ? "学习进度已更新" : "完成本页学习了吗？"}</div>
         <div class="dd-learning-copy">${learned ? "这个节点已计入主页的“已学习”列表。" : "标记后可在主页侧栏随时查看已学与未学节点。"}</div>
       </div>
-      <button type="button" class="dd-learn-btn${learned ? " is-learned" : ""}" data-learn-node="${esc(id)}" aria-pressed="${learned}">
-        ${learned ? "✓ 已学习" : "标记为已学习"}
-      </button>
+      <div class="dd-learning-actions">
+        <button type="button" class="dd-learn-btn${learned ? " is-learned" : ""}" data-learn-node="${esc(id)}" aria-pressed="${learned}">
+          ${learned ? "✓ 已学习" : "标记为已学习"}
+        </button>
+        ${nextButton}
+      </div>
     </section>`;
   }
 
@@ -108,6 +122,8 @@
   function bindLearningButton() {
     const button = document.querySelector("[data-learn-node]");
     if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
+    const nextButton = document.querySelector("[data-next-node]");
+    if (nextButton) nextButton.addEventListener("click", () => openDeepDive(nextButton.getAttribute("data-next-node")));
   }
 
   function removeOfficialPathMarkers() {

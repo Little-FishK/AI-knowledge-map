@@ -32,3 +32,24 @@ window.DEEPDIVE["agent-loop"] = {
 
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理、行动与观察交错的经典框架。</li><li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>：语言模型学习何时调用外部工具。</li><li><a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">Wang et al., LLM-based Autonomous Agents Survey</a>：规划、记忆、行动与评测组件。</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">Ruan et al., ToolEmu</a>：工具型智能体风险与失败轨迹评测。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>`
 };
+
+// 新版教学门禁补充：逐节说明受保护状态、角色边界、进展指标、终止与诊断。
+{
+  const page = window.DEEPDIVE["agent-loop"];
+  const additions = [
+    '<p>Agent 循环输入目标、未知环境状态、可用动作和验收，输出逐轮观察、动作与验证状态。一次生成看不到动作后的真实结果，循环通过小动作取得新事实并缩小不确定性；只有新观察、候选减少或可验证状态变化才算进展。无信息增益的重复调用只是昂贵重采样。</p>',
+    '<p>角色架构输入受保护目标、候选动作、实际资源状态和验收规则，输出模型提议、控制决定、工具结果与验证结论。模型不直接写资源，控制器管理预算授权，执行器按 schema 操作，验证器用不可被候选改弱的标准裁决。模型自报完成只是预测。</p>',
+    '<p>状态转移输入受保护目标 G、观察 Ot、历史 Ht、预算 Bt、授权 At 和候选动作 at，输出下一状态 Snext。策略只从当前状态提出动作，执行前权限校验，执行结果经 update 更新观察和历史；工具内容不能覆盖 G、B 或 A。状态必须版本化，才能复现一次决策。</p>',
+    '<p>修复案例输入失败 100≠90、六轮预算、禁止改测试与发布另确认，输出定位、最小补丁、目标测试、全量回归和待发布状态。每轮用新事实降低未满足条件 Ut：目标测试、全量测试、diff 范围从 3 降到 0；技术验收全绿仍不能推导发布授权。无新条件减少就不算进展。</p>',
+    '<p>机制分工输入任务依赖、新观察和外部验收，输出计划方向、循环调整与验证裁决。计划说明大致顺序，循环让后续动作响应环境，验证器判断结果是否满足契约；任一缺失都会造成绕路、僵化或伪完成。验证标准必须在循环外受保护。</p>',
+    '<p>终止策略输入验收、步数时间 token 费用、进展历史、依赖状态和授权需求，输出成功、预算结束、无进展、依赖失败或授权暂停。控制器强制硬预算并检测等价动作循环；重试必须带新参数、退避、替代工具或证据。模型不能自行忽略出口。</p>',
+    '<p>失败诊断输入状态版本、候选动作、校验决定、工具状态码、结果来源和验证证据，输出动作振荡、观察污染、目标漂移、伪完成或权限升级归因。用状态去重、保留原错误、不可压缩目标、证据绑定终止和逐次授权分别修复。无需保存完整私有思维文本。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace(
+    /<div class="dd-formula">[\s\S]*?<\/div>/,
+    '<div class="dd-formula"><math display="block" aria-label="Agent 状态、候选动作与下一状态"><msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><mo>(</mo><mi>G</mi><mo>,</mo><msub><mi>O</mi><mi>t</mi></msub><mo>,</mo><msub><mi>H</mi><mi>t</mi></msub><mo>,</mo><msub><mi>B</mi><mi>t</mi></msub><mo>,</mo><msub><mi>A</mi><mi>t</mi></msub><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>policy</mi><mo>(</mo><msub><mi>S</mi><mi>t</mi></msub><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>S</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>update</mi><mo>(</mo><msub><mi>S</mi><mi>t</mi></msub><mo>,</mo><mi>execute</mi><mo>(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo><mo>)</mo></math></div>'
+  );
+}

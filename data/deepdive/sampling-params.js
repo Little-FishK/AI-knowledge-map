@@ -10,9 +10,9 @@ window.DEEPDIVE["sampling-params"] = {
 <section class="dd-sec"><h2><span class="dd-n">1</span>生成是一条反复闭环，不是一次分类<span class="dd-badge intuition">全景</span></h2><p class="dd-lead">第一个 token 的一次随机差异，为什么会改写后面整段回答？</p>
 <figure class="dd-fig"><svg viewBox="0 0 780 285" role="img" aria-label="自回归生成从 logits 变形、过滤、采样并反馈上下文的循环"><defs><marker id="sam-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2" marker-end="url(#sam-a)"><path d="M140 120H200M320 120H380M500 120H560M680 120H735"/><path d="M700 150C700 245 95 245 95 150"/></g><g stroke="currentColor" stroke-width="2"><rect x="20" y="80" width="120" height="80" rx="12" fill="#8b5cf6" opacity=".2"/><rect x="200" y="80" width="120" height="80" rx="12" fill="#0ea5e9" opacity=".2"/><rect x="380" y="80" width="120" height="80" rx="12" fill="#f59e0b" opacity=".2"/><rect x="560" y="80" width="120" height="80" rx="12" fill="#10b981" opacity=".2"/><rect x="735" y="80" width="35" height="80" rx="10" fill="#ef4444" opacity=".2"/></g><g class="svg-t" text-anchor="middle"><text x="80" y="112">模型输出</text><text x="80" y="140">全词表 logits</text><text x="260" y="112">温度/惩罚</text><text x="260" y="140">修改分数</text><text x="440" y="112">top-k/top-p</text><text x="440" y="140">过滤候选</text><text x="620" y="112">归一化并</text><text x="620" y="140">选择 token</text><text x="752" y="112">停?</text><text x="385" y="265">未停止：把 token 追加到上下文，重新计算下一步分布</text></g></svg><figcaption>每一步的选择都会成为下一步条件，因此序列概率是沿路径的条件概率乘积；局部“第二名”可能打开完全不同的后续分支。</figcaption></figure></section>
 
-<section class="dd-sec"><h2><span class="dd-n">2</span>logits 只是相对分数，softmax 才给概率<span class="dd-badge math">基础</span></h2><p class="dd-lead">给所有 logits 同时加 100，概率为什么不变？</p><div class="dd-formula">pᵢ=exp(zᵢ)/Σⱼexp(zⱼ)=exp(zᵢ−c)/Σⱼexp(zⱼ−c)</div><p>softmax 只依赖 logit 差。数值实现通常减去最大 logit 再指数化，避免溢出。概率是“在当前提示与已生成前缀下，模型相对偏好哪个 token”的度量，不是事实正确率，也不等于完整答案的置信度。</p><p>贪心解码选择最大 logit；随机采样按归一化概率抽取。若分布为 [0.7,0.2,0.1]，采样很多次的频率趋近该比例，但单次完全可能选择 0.1 的候选。</p></section>
+<section class="dd-sec"><h2><span class="dd-n">2</span>logits 只是相对分数，softmax 才给概率<span class="dd-badge math">基础</span></h2><p class="dd-lead">给所有 logits 同时加 100，概率为什么不变？</p><div class="dd-formula" data-formula-id="sampling-softmax"><math display="block" aria-label="候选 i 的概率 p i 等于 e 的 z i 次方除以所有候选 j 的 e 的 z j 次方之和，也等于所有 logit 同减常数 c 后的对应比值"><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mfrac><msup><mi>e</mi><msub><mi>z</mi><mi>i</mi></msub></msup><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><msub><mi>z</mi><mi>j</mi></msub></msup></mfrac><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><mi>c</mi></mrow></msup><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>j</mi></msub><mo>−</mo><mi>c</mi></mrow></msup></mfrac></mrow></math></div><p class="dd-formula-note"><code>zᵢ</code> 是候选 token i 的原始 logit，<code>pᵢ</code> 是 softmax 后抽到该候选的概率，<code>j</code> 遍历词表中的全部候选，<code>c</code> 是同时从所有 logits 减去的常数，通常取最大 logit 以避免指数溢出。分子分母同乘相同因子后比值不变，所以平移全部 logits 不改变概率。</p><p>softmax 只依赖 logit 差。数值实现通常减去最大 logit 再指数化，避免溢出。概率是“在当前提示与已生成前缀下，模型相对偏好哪个 token”的度量，不是事实正确率，也不等于完整答案的置信度。</p><p>贪心解码选择最大 logit；随机采样按归一化概率抽取。若分布为 [0.7,0.2,0.1]，采样很多次的频率趋近该比例，但单次完全可能选择 0.1 的候选。</p></section>
 
-<section class="dd-sec"><h2><span class="dd-n">3</span>手算温度：同一排名怎样变尖或变平<span class="dd-badge math">数值例子</span></h2><p class="dd-lead">对 logits [2,1,0]，温度从 0.5 调到 2 会发生什么？</p><div class="dd-formula">pᵢ(T)=softmax(zᵢ/T)</div>
+<section class="dd-sec"><h2><span class="dd-n">3</span>手算温度：同一排名怎样变尖或变平<span class="dd-badge math">数值例子</span></h2><p class="dd-lead">对 logits [2,1,0]，温度从 0.5 调到 2 会发生什么？</p><div class="dd-formula" data-formula-id="sampling-temperature"><math display="block" aria-label="温度 T 下候选 i 的概率 p i 等于 z i 除以 T 后的 softmax"><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>(</mo><mi>T</mi><mo>)</mo><mo>=</mo><mi>softmax</mi><mo>(</mo><mfrac><msub><mi>z</mi><mi>i</mi></msub><mi>T</mi></mfrac><mo>)</mo></mrow></math></div><p class="dd-formula-note"><code>T</code> 是大于 0 的温度，<code>zᵢ</code> 是候选 i 的 logit，<code>pᵢ(T)</code> 是缩放后候选 i 的抽样概率。小 T 放大 logit 差使分布变尖，大 T 缩小差异使分布变平；正温度不会改变候选排序。</p>
 <table class="dd-table"><thead><tr><th>温度 T</th><th>缩放后 logits</th><th>softmax 概率（约）</th><th>分布形状</th></tr></thead><tbody><tr><td>0.5</td><td>[4,2,0]</td><td>[0.867,0.117,0.016]</td><td>很尖，第一名占主导</td></tr><tr><td>1</td><td>[2,1,0]</td><td>[0.665,0.245,0.090]</td><td>原始相对差异</td></tr><tr><td>2</td><td>[1,0.5,0]</td><td>[0.506,0.307,0.186]</td><td>更平，尾部更容易被选</td></tr></tbody></table>
 <p>正温度除法不改变 logit 排名，所以纯 top-k 的成员不变；但概率累计速度改变，top-p 的集合可能改变。T→0 的数学表达不可直接除零，服务通常把 temperature=0 特判为贪心或采用自己的最小值。</p></section>
 
@@ -50,3 +50,65 @@ window.DEEPDIVE["sampling-params"] = {
 
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1904.09751" target="_blank" rel="noopener">The Curious Case of Neural Text Degeneration</a>：核采样与开放文本退化。</li><li><a href="https://aclanthology.org/P18-1107/" target="_blank" rel="noopener">Hierarchical Neural Story Generation</a>：top-k 采样在长文本生成中的使用。</li><li><a href="https://arxiv.org/abs/2210.15191" target="_blank" rel="noopener">Truncation Sampling as Language Model Desmoothing</a>：截断采样分析。</li><li><a href="https://aclanthology.org/2023.tacl-1.7/" target="_blank" rel="noopener">Locally Typical Sampling</a>：基于局部典型性的替代解码视角。</li></ul><p>生成闭环图、处理顺序图、logits 手算、停止/惩罚对照表和评测流程均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div>`
 };
+
+window.DEEPDIVE["sampling-params"].html = window.DEEPDIVE["sampling-params"].html
+  .replace(
+    '<p class="dd-lead">第一个 token 的一次随机差异，为什么会改写后面整段回答？</p>',
+    '<p class="dd-lead">第一个 token 的一次随机差异，为什么会改写后面整段回答？</p><p>自回归解码循环的输入是当前提示和已生成前缀，输出是一个新 token 或停止信号。模型先给全词表 logits，解码器变形、过滤并选择一个 token，再把它追加为下一步输入；因此某一步的微小分叉会改变之后每一步的条件分布。单条输出只是这条路径的结果，不代表其他采样路径相同。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">给所有 logits 同时加 100，概率为什么不变？</p>',
+    '<p class="dd-lead">给所有 logits 同时加 100，概率为什么不变？</p><p>softmax 接收整个词表的相对 logits，输出和为 1 的下一 token 概率分布。指数化放大分数差，再用总和归一化；所有 logits 同加常数只会让分子分母同乘一个因子。概率表示当前前缀下的模型偏好，不是事实正确率，也不能直接当整段答案置信度。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">对 logits [2,1,0]，温度从 0.5 调到 2 会发生什么？</p>',
+    '<p class="dd-lead">对 logits [2,1,0]，温度从 0.5 调到 2 会发生什么？</p><p>温度缩放输入原始 logits 和正数 T，输出尖锐度改变的新概率分布。先用每个 logit 除以 T，再做 softmax；T 小时高分候选占比上升，T 大时尾部占比上升。它不增加模型知识，且 T=0 通常是服务自定义的贪心特判而非公式中的合法除数。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">保留前 3 名，在模型极确定与极犹豫时为什么不是同一强度？</p>',
+    '<p class="dd-lead">保留前 3 名，在模型极确定与极犹豫时为什么不是同一强度？</p><p>top-k 接收候选分数和整数 k，输出只含排名前 k 的支持集及重归一化概率。它把其余候选分数置为负无穷后重新归一化；实际抽样概率必须读截断后的数值。固定候选数不感知概率间隔，因此在极尖或极平分布上都可能过松或过严。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">p=0.8 时，为什么低温只留一个候选，高温可能留下三个？</p>',
+    '<p class="dd-lead">p=0.8 时，为什么低温只留一个候选，高温可能留下三个？</p><p>top-p 接收已排序概率和累计阈值 p，输出累计质量首次达到阈值的最小候选前缀。分布尖时集合自动缩小，分布平时集合扩大；保留下来的概率还要再次归一化。阈值边界是否包含、并列顺序和最低候选数属于具体实现，不能只凭参数名假定。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">temperature、penalty、top-k、top-p 同时打开时，谁先执行？</p>',
+    '<p class="dd-lead">temperature、penalty、top-k、top-p 同时打开时，谁先执行？</p><p>解码管线的输入是原始 logits、生成历史和全部参数，输出是最终支持集与抽样分布。惩罚会改分数甚至排名，温度会改累计速度，截断再删除候选，所以交换步骤可能产生不同结果。参数组合只能按服务实现解释，实验时应从单一机制开始逐项加入。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">为什么减少“的的的”也可能破坏代码变量和固定术语？</p>',
+    '<p class="dd-lead">为什么减少“的的的”也可能破坏代码变量和固定术语？</p><p>重复惩罚接收已生成 token 历史和当前 logits，输出对出现过的 token 调整后的分数。presence 看是否出现，frequency 看次数，硬 n-gram 则直接禁用特定续写。较低重复率不等于语义更好；代码、引用和术语需要精确复用时，惩罚可能删除唯一正确候选。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">EOS、停止字符串和 max tokens 有什么本质区别？</p>',
+    '<p class="dd-lead">EOS、停止字符串和 max tokens 有什么本质区别？</p><p>终止器接收新 token、已解码文本、语法状态和剩余预算，输出继续生成或停止及结束原因。EOS 在 token 层触发，停止串在文本匹配层触发，max tokens 是硬预算，语法接受态只证明结构完成。停止成功不能解释为内容完整或语义正确，流式跨块与引用中误命中仍需处理。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">每步选最高概率，为什么不保证整条序列概率最高？</p>',
+    '<p class="dd-lead">每步选最高概率，为什么不保证整条序列概率最高？</p><p>序列策略接收每一步的候选分布，输出一条或多条完成序列。贪心只保留局部第一名，束搜索保留若干累计高分前缀，随机采样按分布保留多样路径；最终应按任务质量解释，而非把高模型概率等同正确。束宽、长度偏置和开放生成退化限制了束搜索的适用范围。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">“代码用 0、创作用 1”为什么仍只是粗略经验？</p>',
+    '<p class="dd-lead">“代码用 0、创作用 1”为什么仍只是粗略经验？</p><p>参数选择接收任务成功标准、风险、成本和模型服务实现，输出候选解码配置与外部验收方案。先建立低随机基线，再围绕目标指标扫描单个机制并复测组合；低温只让既有高分路径更稳定，无法修复知识错误、偏见或错误算法。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">随机数相同，分布或执行顺序稍变会发生什么？</p>',
+    '<p class="dd-lead">随机数相同，分布或执行顺序稍变会发生什么？</p><p>复现输入是 seed、完整请求、模型与 tokenizer 版本、解码实现和执行环境，输出是可比较的 token 路径。seed 只固定随机数序列；任一概率边界或抽取顺序变化都可能让同一随机数选中不同 token。托管服务的固定 seed 通常只能提供近似复现，不构成逐字一致保证。</p>'
+  )
+  .replace(
+    '<section class="dd-sec"><h2><span class="dd-n">12</span>随机系统应该怎样评测<span class="dd-badge eng">实验</span></h2><ol class="dd-steps">',
+    '<section class="dd-sec"><h2><span class="dd-n">12</span>随机系统应该怎样评测<span class="dd-badge eng">实验</span></h2><p class="dd-lead">一次生成的好坏为什么不能代表某组采样参数的总体质量？</p><p>随机解码评测接收固定输入集、系统版本和参数候选，输出多次独立采样的质量、多样性、方差、成本与失败分布。先固定其余条件逐项扫描，再重复采样并用解析器、测试或证据做外部验证；均值不能掩盖最坏失败，高字符串差异也不自动等于有价值的多样性。</p><ol class="dd-steps">'
+  )
+  .replace(
+    '<mfrac><msup><mi>e</mi><msub><mi>z</mi><mi>i</mi></msub></msup><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><msub><mi>z</mi><mi>j</mi></msub></msup></mfrac>',
+    '<mfrac><msup><mi>e</mi><msub><mi>z</mi><mi>i</mi></msub></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><msub><mi>z</mi><mi>j</mi></msub></msup></mrow></mfrac>'
+  )
+  .replace(
+    '<mfrac><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><mi>c</mi></mrow></msup><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>j</mi></msub><mo>−</mo><mi>c</mi></mrow></msup></mfrac>',
+    '<mfrac><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><mi>c</mi></mrow></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>j</mi></msub><mo>−</mo><mi>c</mi></mrow></msup></mrow></mfrac>'
+  )
+  .replace(
+    '<code>zᵢ</code> 是候选 token i 的原始 logit',
+    '<code>e</code> 是自然指数函数的底数，<code>i</code> 是当前候选编号，<code>zᵢ</code> 是候选 token i 的原始 logit'
+  );

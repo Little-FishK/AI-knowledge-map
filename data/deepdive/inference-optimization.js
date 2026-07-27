@@ -21,3 +21,30 @@ window.DEEPDIVE['inference-optimization'] = window.createDeepDive({
   quiz:[{q:'TTFT 与 TPOT 分别受什么影响？',a:'TTFT 含排队、上下文和 prefill；TPOT 主要反映逐 token decode 与调度。'},{q:'为什么激进连续批 p99 可能变差？',a:'等待组批、长 prefill 和调度竞争会增加尾部排队。'},{q:'32层示例单请求 8k KV 约多大？',a:'约 1.05GB，按给定 8 KV 头、128 维和 FP16。'},{q:'推测示例每轮理想产出多少？',a:'a=.8、k=4 的独立近似约 3.36 token。'},{q:'FlashAttention 解决什么？',a:'减少精确注意力计算的 HBM 中间读写，不解决所有排队/KV问题。'}],
   sources:[{title:'FlashAttention',url:'https://arxiv.org/abs/2205.14135',note:'IO 感知精确注意力'},{title:'vLLM',url:'https://arxiv.org/abs/2309.06180',note:'PagedAttention 与高吞吐服务'},{title:'Orca',url:'https://www.usenix.org/conference/osdi22/presentation/yu',note:'迭代级调度与连续批处理'},{title:'Fast Inference from Transformers via Speculative Decoding',url:'https://arxiv.org/abs/2211.17192',note:'保持目标分布的推测解码'}]
 });
+
+// 新版教学门禁补充：逐节说明优化对象、输入输出、解释口径与失败边界。
+{
+  const page = window.DEEPDIVE['inference-optimization'];
+  const additions = [
+    '<p>阶段拆分输入排队、输入长度、输出长度、工具与传输日志，输出 TTFT、TPOT 和端到端完成时间。TTFT 是请求到首 token 的时间，Q 是排队时间，Ccontext 是上下文准备时间，Tprefill 是输入预填充时间，Tfirst 是首步解码时间；TPOT 是首 token 后平均每个新 token 的时间，N 是输出 token 总数，Texternal 是工具与传输时间。指标指向不同瓶颈，不能用单一 tokens/s 代表用户体验。</p>',
+    '<p>硬件瓶颈分析输入每阶段 FLOPs、内存读写字节 BytesIO、峰值算力 ComputePeak 和内存带宽 Bandwidth，输出算术强度 AI 与 roofline 性能上限 Perfmax。AI 是每搬运一字节完成的浮点运算数；上限取算力峰值与 AI×带宽中的较小者。它是定位直觉，不是每个内核的精确耗时预测。</p>',
+    '<p>连续批处理输入等待请求、每步可用 token 容量和优先级，输出每个调度步的移除、插入、分块或抢占决定。完成序列立刻让位给新请求以减少空槽；吞吐提高不代表尾延迟更好。过载时必须有准入控制、背压和租户公平边界。</p>',
+    '<p>KV 容量估算输入层数 Nlayer、KV 头数 NKVhead、头维 d、token 数 Ntoken、并发 B 和元素字节 b，输出缓存内存 MKV。K 与 V 各保存一次所以乘二；估算解释 OOM 和并发上限，但 PagedAttention 只减少碎片，不会消除 KV 本体。量化或滑窗还需质量回归。</p>',
+    '<p>调度案例输入三种组批策略及吞吐、TTFT 和 TPOT，输出是否满足交互 SLO 的选择。先比较吞吐，再检查 p50 与 p99；激进连续批虽然平均更快，却因组批和长输入阻塞让 p99 失败。结论只适用于该负载分布，负载变化必须重测。</p>',
+    '<p>FlashAttention 输入同一 Q、K、V 注意力计算，输出数值精度范围内相同的注意力结果和更少 HBM 往返。它通过分块和在线 softmax 改变计算顺序而非近似目标；收益表示注意力 IO 降低，不代表 KV 容量、排队或工具延迟得到解决。短序列和非注意力瓶颈可能无收益。</p>',
+    '<p>量化选择输入权重、激活或 KV、目标位宽、硬件内核和任务切片，输出低精度模型及显存、速度和质量差异。低位宽减少存储和带宽，反量化与校准又增加开销；更快只在支持良好且瓶颈匹配时成立。必须按语言、长上下文、工具参数和高风险任务回归。</p>',
+    '<p>推测解码输入草稿模型、目标模型、草稿长度 k 和逐 token 接受率 a，输出经目标模型验证后的 token。草稿先并行提出，目标模型批量验证并按规则接受或校正；近似轮产出是 1+a+…+a^k。它不改变正确目标分布的前提是使用正确校正规则，低接受率或高验证成本会变慢。</p>',
+    '<p>生产基准输入真实长度分布、并发、突发、缓存命中、优先级和故障，输出延迟分位数、吞吐、资源、失败率、质量和每成功任务成本。固定负载做方案对照并覆盖稳态、过载和节点故障；只有平均 tokens/s 提升不能证明生产更好。任何算法或低精度变化都必须经过质量门禁。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="首 token 与完成时间分解"><mi>TTFT</mi><mo>≈</mo><mi>Q</mi><mo>+</mo><mi>Ccontext</mi><mo>+</mo><mi>Tprefill</mi><mo>+</mo><mi>Tfirst</mi><mo>;</mo><mi>Tcomplete</mi><mo>≈</mo><mi>TTFT</mi><mo>+</mo><mo>(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>×</mo><mi>TPOT</mi><mo>+</mo><mi>Texternal</mi></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="算术强度与 roofline 性能上限"><mi>AI</mi><mo>=</mo><mfrac><mi>FLOPs</mi><mi>BytesIO</mi></mfrac><mo>;</mo><mi>Perfmax</mi><mo>≈</mo><mi>min</mi><mo>(</mo><mi>ComputePeak</mi><mo>,</mo><mi>AI</mi><mo>×</mo><mi>Bandwidth</mi><mo>)</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="KV 缓存内存估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>B</mi><mo>×</mo><mi>b</mi></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="推测解码每轮近似产出"><mi>Edraft</mi><mo>≈</mo><mn>1</mn><mo>+</mo><mi>a</mi><mo>+</mo><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><mo>…</mo><mo>+</mo><msup><mi>a</mi><mi>k</mi></msup></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

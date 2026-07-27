@@ -4,15 +4,15 @@
 window.DEEPDIVE = window.DEEPDIVE || {};
 window.DEEPDIVE["supervised-learning"] = {
   title: "监督学习",
-  subtitle: "给足「题目 + 标准答案」，让模型学会自己答题",
+  subtitle: "从「输入 + 目标」样本中学习，并在未见数据上做出可靠预测",
   aliases: "Supervised Learning · 有监督学习",
   meta: "建议 25–35 分钟 · 基础 · 需要：函数、向量的基本概念",
-  thesis: "监督学习是机器学习最基本的范式：喂给模型大量「输入 + 正确答案（标签）」的样本，让它学出一个从输入到输出的函数，好在<b>没见过的新输入</b>上也能给对答案。今天从垃圾邮件识别，到大模型的指令微调，底子都是它。",
+  thesis: "监督学习从大量「输入 + 目标值（标签）」样本中学出一个从输入到输出的函数，真正目标不是背下训练集，而是在<b>来自目标场景的未见数据</b>上保持可靠。标签是训练时使用的监督信号，可能接近真实目标，也可能含有噪声、分歧或代理偏差。",
   html: `
 <div class="dd-goals">
   <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
   <ul>
-    <li><b>是什么</b>——「监督」到底监督了什么，标签是什么角色。</li>
+    <li><b>是什么</b>——「监督」到底来自哪里，标签为什么不一定等于绝对真相。</li>
     <li><b>两类任务</b>——分类和回归的区别，答案分别长什么样。</li>
     <li><b>学习在学什么</b>——抽象地说，训练就是在做一件什么事。</li>
     <li><b>成败标准</b>——为什么「训练集全做对」不算成功。</li>
@@ -25,30 +25,31 @@ window.DEEPDIVE["supervised-learning"] = {
   <b>贯穿全页的最小例子</b>　教模型识别<b>垃圾邮件</b>：每个样本是一封邮件（输入），配一个人工标好的答案（标签：垃圾 / 正常）。给它看几万封这样标好的邮件，它就该学会给<b>新来的</b>邮件判断是不是垃圾。全页围绕它展开。
 </div>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">1</span>什么是监督学习<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：想让机器「学」一件事，最直接的办法是什么？</p>
-  <p>最直接的办法，和教小孩做题一样：<b>给它一大叠「题目 + 标准答案」，让它做，做错了就纠正</b>。这里的「标准答案」，就是<b>标签（label）</b>；「监督」二字，指的正是<b>每个样本都有一个已知的正确答案在旁边盯着</b>，告诉模型对错。</p>
+  <p>最直接的办法，和拿例题教人总结规律有些相似：给模型许多<b>输入与对应目标</b>，让预测逐步贴近这些目标。这里记录的目标值叫<b>标签（label）</b>；「监督」指训练时每个输入都有一个可比较的目标信号，而不是有老师在旁边实时观看。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>要素</th><th>在垃圾邮件例子里</th></tr></thead>
     <tbody>
       <tr><td>输入 x（特征）</td><td>一封邮件的内容</td></tr>
-      <tr><td>标签 y（正确答案）</td><td>人工标注的「垃圾」或「正常」</td></tr>
+      <tr><td>标签 y（训练目标）</td><td>数据中记录的「垃圾」或「正常」</td></tr>
       <tr><td>训练集</td><td>几万条「邮件 → 标签」样本</td></tr>
       <tr><td>目标</td><td>学一个规则，对<b>没标注过的新邮件</b>也判得准</td></tr>
     </tbody>
   </table></div>
+  <div class="dd-note warn"><b>标签不等于真相</b>　邮件可能被误标，标注者可能意见不一，业务日志也可能只记录一个代理目标。模型会认真学习这些信号里的规律，也会认真学习其中的错误与偏差。</div>
   <div class="dd-note intuition"><b>关键在最后一行</b>　监督学习的价值不在于把见过的邮件背下来，而在于<b>推广到没见过的邮件</b>。这一点贯穿全页，第 4 节会专门讲。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">2</span>两种任务：分类与回归<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">上一节的标签是「垃圾/正常」。但答案不总是这种「几选一」。答案长什么样，把监督学习分成两大类。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>任务</th><th>答案是什么</th><th>例子</th></tr></thead>
     <tbody>
       <tr><td><b>分类</b></td><td>离散的类别（几选一）</td><td>垃圾/正常、猫/狗/鸟、好评/差评</td></tr>
-      <tr><td><b>回归</b></td><td>连续的数值</td><td>房价、明天气温、点击率</td></tr>
+      <tr><td><b>回归</b></td><td>连续的数值</td><td>房价、明天气温、商品销量</td></tr>
     </tbody>
   </table></div>
   <figure class="dd-fig">
@@ -72,20 +73,27 @@ window.DEEPDIVE["supervised-learning"] = {
   </figure>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">3</span>「学习」到底在学什么<span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">分类、回归看着不同，但抽象成数学，训练在做的是<b>同一件事</b>。是什么？</p>
-  <p>把要学的规则看成一个<b>带参数的函数</b> <code>f_θ</code>：喂进输入 x，吐出预测 <code>f_θ(x)</code>。学习，就是<b>调参数 θ，让预测尽量贴近标签</b>：</p>
-  <div class="dd-formula">找 θ，使 &nbsp; Σᵢ L( f_θ(xᵢ) , yᵢ ) &nbsp; 最小</div>
-  <p class="dd-formula-note"><code>L</code> 是损失函数，衡量「预测」离「标签」有多远；对全部样本求和再最小化，就是训练。</p>
+  <p>把要学的规则看成一个<b>带参数的函数</b> <code>f_θ</code>：喂进输入 <code>x</code>，吐出预测 <code>f_θ(x)</code>。其中 <code>θ</code> 是模型要学习的参数集合，<code>n</code> 是训练样本总数，<code>i</code> 是样本编号，<code>xᵢ</code> 和 <code>yᵢ</code> 分别是第 i 个样本的输入与标签。学习，就是寻找一组参数 <code>θ</code>，让模型在训练样本上的平均错误尽量小：</p>
+  <div class="dd-formula">找 θ，使 &nbsp; (1/n) Σᵢ L( f_θ(xᵢ) , yᵢ ) &nbsp; 尽量小</div>
+  <p class="dd-formula-note"><code>L</code> 是损失函数，把一次预测与标签之间的不一致变成数字；这里先理解它的作用，具体损失见 1.2，参数怎样更新见 1.3「梯度下降」。</p>
   <h3>3.1 手算一个二分类批次</h3>
-  <p>设“垃圾邮件”为标签 1。模型对第一封垃圾邮件给出 <code>p=0.80</code>，对第二封正常邮件给出“垃圾”概率 0.30，因此正确类别“正常”的概率是 0.70。二分类交叉熵只看正确类别概率：</p>
-  <table class="dd-table"><thead><tr><th>样本</th><th>正确类别概率</th><th>损失 −ln p</th></tr></thead><tbody><tr><td>垃圾邮件</td><td>0.80</td><td>0.223</td></tr><tr><td>正常邮件</td><td>1−0.30=0.70</td><td>0.357</td></tr><tr><td>批平均</td><td>—</td><td><code>(0.223+0.357)/2=0.290</code></td></tr></tbody></table>
-  <p>若更新后第一封的正确概率升到 0.90，它的损失降到 <code>−ln(0.90)=0.105</code>。损失把“更相信正确标签”变成连续可优化的方向；但错误标签也会产生同样强的错误方向。</p>
-  <div class="dd-note math"><b>这就把很多东西接上了</b>　「有标签 + 一个可微函数 + 一个损失 + 梯度下降」正是训练一个<b>神经网络</b>的标准配方（见「神经网络」深读页）。<b>神经网络是模型，监督学习是训练它的方式之一。</b>决策树、支持向量机（SVM）等经典模型同样用监督学习来训。</div>
+  <p>先统一符号：令 <code>y=1</code> 表示垃圾邮件、<code>y=0</code> 表示正常邮件；模型始终输出同一个量 <code>p=P(y=1|x)</code>，也就是「这封邮件是垃圾邮件」的概率。现在看一个只有两封邮件的小批次：</p>
+  <ul class="dd-steps">
+    <li>第一封实际是垃圾邮件（<code>y=1</code>），模型输出 <code>p=0.80</code>，所以它给真实类别的概率是 <code>q=0.80</code>。</li>
+    <li>第二封实际是正常邮件（<code>y=0</code>），模型输出 <code>p=0.30</code>；正常邮件的概率是 <code>1-p</code>，所以真实类别概率 <code>q=0.70</code>。</li>
+  </ul>
+  <p>二分类交叉熵写成完整形式是：</p>
+  <div class="dd-formula">L(y,p) = −[ y ln(p) + (1−y) ln(1−p) ]</div>
+  <p>当 <code>y=1</code> 时，第二项变成 0，损失是 <code>−ln(p)</code>；当 <code>y=0</code> 时，第一项变成 0，损失是 <code>−ln(1−p)</code>。换句话说，两种情况都可以统一写成 <code>−ln(q)</code>，其中 <code>q</code> 是模型分给<b>真实类别</b>的概率。</p>
+  <table class="dd-table"><thead><tr><th>样本</th><th>模型输出 p：垃圾概率</th><th>真实类别概率 q</th><th>损失 −ln(q)</th></tr></thead><tbody><tr><td>垃圾邮件，y=1</td><td>0.80</td><td>q=p=0.80</td><td>0.223</td></tr><tr><td>正常邮件，y=0</td><td>0.30</td><td>q=1−p=0.70</td><td>0.357</td></tr><tr><td>批平均</td><td>—</td><td>—</td><td><code>(0.223+0.357)/2=0.290</code></td></tr></tbody></table>
+  <div class="dd-note math"><b>为什么用负对数？</b>　因为 <code>q</code> 越接近 1，<code>−ln(q)</code> 越接近 0；给真实类别的概率越小，惩罚增长得越快。例如 <code>q=0.9</code> 时损失约为 0.105，<code>q=0.1</code> 时损失约为 2.303。它会特别惩罚「非常自信却判断错」的预测，同时又是连续、便于优化的函数。</div>
+  <div class="dd-note intuition"><b>先不用会算梯度</b>　本节只建立「概率 → 损失」的联系。到 1.2 会系统学习损失函数，到 1.3 再学习怎样利用损失调整参数。神经网络、决策树和支持向量机是模型；监督学习描述的是利用输入—目标样本训练模型的范式。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">4</span>成败标准：不是背，是泛化<span class="dd-badge intuition">直觉</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">既然训练是「让预测贴近标签」，那把训练集的标签全预测对，是不是就成功了？</p>
   <div class="dd-note warn"><b>恰恰不是</b>　模型参数一多，足以把训练集<b>死记硬背</b>下来——训练集 100 分，一遇到新邮件就抓瞎。真正要的是在<b>没见过的数据</b>上准，这叫<b>泛化</b>。</div>
@@ -99,55 +107,67 @@ window.DEEPDIVE["supervised-learning"] = {
       <text x="401" y="82" text-anchor="middle" class="svg-t">用来挑模型/超参</text>
       <text x="496" y="82" text-anchor="middle" class="svg-t">最后验收一次</text>
     </svg>
-    <figcaption>图 2　训练集调参数，验证集帮你在不同模型/超参之间挑，测试集是<b>只用一次</b>的期末考——它模拟「真实世界的新数据」。测试集一旦被反复用来调，就等于泄题，失去意义。</figcaption>
+    <figcaption>图 2　训练集调参数，验证集帮助选择模型与超参，测试集留到方案冻结后做最终验收。测试结果一旦反过来指导修改，它实际上就参与了开发，不能继续充当无偏的最终测试。</figcaption>
   </figure>
   <div class="dd-note intuition"><b>和过拟合是同一件事</b>　训练误差一直降、验证误差却开始升，就是<b>过拟合</b>的信号——模型在背而非学。对付它的一整套手段（正则化、早停、加数据）见「过拟合」「正则化」节点。</div>
+  <h3>4.1 指标必须对应错误代价</h3>
+  <p>假设 10,000 封邮件里只有 100 封垃圾邮件。一个把所有邮件都判成「正常」的模型，准确率仍有 99%，但它漏掉了全部垃圾邮件。因此验收不能只问「总体对了多少」，还要分别看：</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>指标</th><th>在垃圾邮件任务里回答什么</th><th>主要风险</th></tr></thead>
+    <tbody>
+      <tr><td>精确率 Precision</td><td>被拦下的邮件里，有多少真是垃圾邮件？</td><td>低精确率会误杀正常邮件</td></tr>
+      <tr><td>召回率 Recall</td><td>所有垃圾邮件里，有多少被成功拦下？</td><td>低召回率会漏掉垃圾邮件</td></tr>
+      <tr><td>分场景切片</td><td>新发件人、不同语言、钓鱼邮件是否都可靠？</td><td>总体均值会遮住关键子群失败</td></tr>
+    </tbody>
+  </table></div>
+  <p>模型输出的是概率，最终分成「垃圾/正常」还需要选择阈值。阈值越低，通常拦得更多、误杀也更多；真正合适的阈值取决于两类错误的业务代价。</p>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">5</span>监督的代价：标注瓶颈<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">这么直接有效的办法，短板在哪？答案就藏在「监督」这两个字里。</p>
-  <p>监督学习的燃料是<b>带标签的数据</b>，而标签几乎都要<b>人来标</b>：一封封邮件标垃圾/正常，一张张图圈出物体，一段段录音转成文字。这带来一个硬瓶颈：</p>
+  <p>监督学习的燃料是<b>带目标值的数据</b>。目标可能来自人工标注，也可能来自交易结果、传感器测量、用户行为或规则系统。真正困难的不是只把标签数量堆大，而是获得与真实目标一致、覆盖部署场景、质量可核验的数据：</p>
   <ul class="dd-steps">
     <li><b>贵、慢</b>：大规模标注是巨量人力，很多领域还得请专家（医学影像、法律）。</li>
-    <li><b>有限</b>：标注量决定了模型能力的天花板——标得起多少，就大概只能学到多少。</li>
-    <li><b>有歧义</b>：有些任务人自己都难标一致（这条评论算不算讽刺？）。</li>
+    <li><b>目标可能是代理</b>：点击不一定等于喜欢，历史审批结果也可能复制旧偏差。</li>
+    <li><b>有噪声和歧义</b>：有些任务人自己都难标一致，自动日志也可能记录错误。</li>
+    <li><b>分布会变化</b>：训练邮件来自过去，而攻击方式、用户和语言会持续变化。</li>
   </ul>
-  <div class="dd-note key"><b>这个瓶颈很重要</b>　正是「人工标注贵且有限」这件事，逼出了下一节的其它范式——尤其是<b>自监督</b>，它让数据<b>自己给自己当标签</b>，从而绕开人工标注、吃下海量数据。大模型的崛起，根子就在这里。</div>
+  <div class="dd-note key"><b>这个瓶颈很重要</b>　人工标注昂贵只是其中一部分；更一般的限制是可靠监督信号稀缺。自监督学习从数据自身构造训练目标，从而减少对人工标签的依赖，并让模型利用大规模未标注数据。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">6</span>它不是唯一范式：四种学法<span class="dd-badge intuition">直觉</span></h2>
-  <p class="dd-lead">如果没有现成的标准答案，机器还能怎么学？把监督学习放进更大的地图里看。</p>
+  <p class="dd-lead">如果没有外部提供的目标值，机器还能从什么信号中学习？把监督学习放进更大的地图里看。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>范式</th><th>靠什么学</th><th>典型任务</th></tr></thead>
     <tbody>
       <tr><td><b>监督学习</b></td><td>带标签的样本</td><td>分类、回归</td></tr>
-      <tr><td>无监督学习</td><td>无标签，自己找结构</td><td>聚类、降维</td></tr>
+      <tr><td>无监督学习</td><td>无标签，自己找结构</td><td>聚类（自动分组）、降维（用少数坐标概括多个特征，便于压缩或观察）</td></tr>
       <tr><td>自监督学习</td><td>无需人工标注，用数据本身构造答案</td><td>大模型预训练（预测下一个词）</td></tr>
       <tr><td>强化学习</td><td>在环境里试错，靠奖励信号</td><td>下棋、机器人、对齐里的 RLHF</td></tr>
     </tbody>
   </table></div>
-  <div class="dd-note intuition"><b>自监督是「监督学习的聪明变体」</b>　它照样是「给输入、给答案、算损失」的那套机制，妙在<b>答案不用人标</b>——比如把「预测下一个词」当任务，正确答案就是文本里真实的下一个词（见「大语言模型」深读页第 5 节）。于是数据近乎无限，能一路 scale。理解监督学习，是理解这一切的地基。</div>
+  <div class="dd-note intuition"><b>怎样理解自监督的归类</b>　从计算形式看，它也会构造「输入—目标—损失」；从数据来源看，它不依赖外部人工标签，因此很多教材把它归在无监督表示学习之下。无需纠结唯一归类，关键是看清<b>监督信号从哪里来</b>：例如语言模型用文本中真实的后续词元构造预测目标。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="core">
   <h2><span class="dd-n">7</span>大模型时代，它还重要吗<span class="dd-badge eng">工程</span><span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">既然大模型靠自监督预训练，那还学监督学习干嘛？</p>
   <p>因为它是整座大厦的<b>通用语言</b>，在今天依然处处都在：</p>
   <ul class="dd-steps">
     <li><b>把基座变助手</b>：指令微调（SFT）就是监督学习——「指令」是输入，「理想回答」是标签（见「微调」深读页）。</li>
     <li><b>大量下游任务</b>：垂直领域的分类、打分、抽取，很多仍是标好数据做监督学习最省最稳。</li>
-    <li><b>评测</b>：几乎所有带标准答案的评测集，本质都是监督学习的「测试集」。</li>
+    <li><b>评测思想</b>：带参考答案的评测集沿用了留出测试的思想；但用数据集评测模型，不等于模型在该数据集上做过监督训练。</li>
   </ul>
-  <div class="dd-note key"><b>一句话定位</b>　大模型改变了「大部分知识从哪来」（自监督预训练），但<b>没有取代</b>监督学习——它退到了更关键的位置：<b>校准行为、适配任务、衡量好坏</b>。</div>
+  <div class="dd-note key"><b>一句话定位</b>　大模型改变了大量表示与知识的获得方式，但<b>没有取代</b>监督学习：SFT 和许多下游适配仍直接使用输入—目标样本；评测则借鉴了留出数据检验泛化的原则。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="synthesis">
   <h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
   <p class="dd-lead">从人工标签到未知样本上的可靠预测，证据链怎样逐步建立？</p>
   <ol class="dd-chain">
-    <li>给「输入 + 正确答案」的样本，让模型学一个从输入到输出的规则——这就是监督学习。<span>（§1）</span></li>
+    <li>给模型「输入 + 目标值」样本，让它学习从输入到输出的规则——这就是监督学习。目标值可能有噪声，所以数据质量也是机制的一部分。<span>（§1）</span></li>
     <li>答案离散就是分类，连续就是回归。<span>（§2）</span></li>
     <li>抽象地看，训练 = 调参数让「预测」贴近「标签」，即最小化损失。<span>（§3）</span></li>
     <li>成功的标准不是背下训练集，而是在没见过的数据上准（泛化），故要分训练/验证/测试。<span>（§4）</span></li>
@@ -155,60 +175,71 @@ window.DEEPDIVE["supervised-learning"] = {
     <li>为绕开标注瓶颈，出现了无监督、自监督、强化学习；自监督让数据自造标签，撑起了大模型。<span>（§6）</span></li>
     <li>大模型时代它没被取代，而是转去校准行为（SFT）、适配下游、做评测。<span>（§7）</span></li>
   </ol>
-  <div class="dd-note key"><b>过关标准</b>　如果你能讲清「监督学习为什么追求泛化而不是背训练集」，并说出「自监督为什么被看作它的聪明变体、又为什么对大模型如此关键」，你就抓住了它的内核。</div>
+  <div class="dd-note key"><b>过关标准</b>　如果你能讲清「监督学习为什么追求泛化而不是背训练集」，并能比较外部标签与数据自身监督信号的来源和边界，你就抓住了它的内核。</div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="reference">
   <h2><span class="dd-n">9</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
+  <p class="dd-lead">本节只做消歧：哪些说法听起来合理，却会直接导致错误的数据、训练或验收决策？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
       <tr><td>监督学习 = 神经网络</td><td>它是一种<b>训练方式</b>；神经网络、决策树、SVM 都能用它来训</td></tr>
       <tr><td>训练集准了就成功了</td><td>目标是<b>泛化</b>到新数据；训练集满分可能只是过拟合</td></tr>
-      <tr><td>数据越多一定越好</td><td>标签<b>质量与代表性</b>常比数量更关键；标注还很贵</td></tr>
-      <tr><td>大模型时代它过时了</td><td>预训练是自监督，但 SFT、下游任务、评测仍是监督学习</td></tr>
-      <tr><td>自监督是另一回事</td><td>自监督是监督学习的变体，区别只在「标签不用人标」</td></tr>
+      <tr><td>标签就是客观真相</td><td>标签是训练目标，可能有噪声、分歧或只是业务代理</td></tr>
+      <tr><td>数据越多一定越好</td><td>数据的<b>质量、代表性和目标一致性</b>不能由数量替代</td></tr>
+      <tr><td>大模型时代它过时了</td><td>预训练大量使用自监督；SFT 和许多下游适配仍用监督学习，评测则借鉴留出测试原则</td></tr>
+      <tr><td>自监督只是把人工标签自动生成</td><td>它从数据结构构造监督信号；计算形式可能像监督训练，但范式归类与学习目标更复杂</td></tr>
     </tbody>
   </table></div>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="assessment">
   <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
+  <p class="dd-lead">题目从定义逐步走向真实验收；每道场景题都只使用本页已经建立的概念。</p>
   <ol class="dd-quiz">
-    <li>「监督」监督的是什么？标签在其中扮演什么角色？</li>
+    <li>「监督」来自哪里？为什么标签不一定等于客观真相？</li>
     <li>分类和回归的根本区别是什么？各举一例。</li>
     <li>用一句话说清：抽象地看，监督学习的训练在做什么？</li>
     <li>为什么「训练集全预测对」不代表模型成功？该怎么正确评估？</li>
-    <li>监督学习最大的现实瓶颈是什么？它催生了哪种范式？</li>
-    <li>为什么说自监督是监督学习的「聪明变体」？它对大模型为何关键？</li>
+    <li>监督学习的数据瓶颈不只是“人工标注贵”。还包括哪些问题？</li>
+    <li>自监督与监督学习在计算形式和监督信号来源上分别有什么联系与区别？</li>
     <li>大模型时代，监督学习还在哪些环节发挥作用？</li>
+    <li>10,000 封邮件中只有 100 封垃圾邮件。模型全部预测为正常，准确率是多少？为什么这个结果不能说明模型有效？</li>
+    <li>你发现同一封邮件的复制版本同时出现在训练集和测试集。测试分数为什么会虚高？应该怎样重新划分？</li>
+    <li>请为垃圾邮件模型设计三个验收切片，并为每个切片说明要观察的错误或指标。</li>
   </ol>
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
-      <li>监督的是「每个样本都有已知正确答案」；标签就是这个正确答案，训练时用它来判对错、算损失。</li>
+      <li>监督来自训练样本中与输入配对的目标值；标签用于计算损失和调整模型，但可能包含误标、主观分歧、测量误差或代理偏差，因此不天然等于客观真相。</li>
       <li>答案是离散类别就是分类（垃圾/正常），是连续数值就是回归（房价）。</li>
       <li>调整模型参数，使它对训练样本的预测尽量贴近标签，即最小化损失。</li>
-      <li>因为参数够多能背下训练集却不会泛化；要用独立的验证集选模型、只用一次的测试集验收，看它在没见过的数据上的表现。</li>
-      <li>人工标注贵、慢、有限；这个瓶颈催生了自监督（以及无监督、强化学习）。</li>
-      <li>因为它照用「输入-答案-损失」那套机制，只是答案由数据本身构造、不用人标；于是数据近乎无限，能撑起大模型预训练的规模。</li>
-      <li>把基座变助手的指令微调（SFT）、大量下游垂直任务、以及带标准答案的评测。</li>
+      <li>因为参数够多时可能背下训练集却不能泛化；应使用验证集选择模型与超参，在方案冻结后再用未参与选择的测试集验收。测试结果若用于继续修改，之后还需要新的独立测试数据。</li>
+      <li>还包括标签噪声与歧义、目标只是业务代理、数据覆盖不足，以及训练分布与部署分布随时间发生偏移。自监督、无监督、半监督和弱监督等方法都在不同角度减少对高质量人工标签的依赖。</li>
+      <li>计算形式上，两者都可能构造输入、目标并最小化损失；区别在于普通监督学习使用外部提供的目标，自监督从数据自身结构构造监督信号。它让大模型能利用海量未人工标注的数据进行预训练。</li>
+      <li>典型环节包括用示范数据做监督微调（SFT），用领域标签适配分类、抽取或打分任务。带参考答案的评测借鉴监督学习的留出测试原则，但评测本身不等于训练。</li>
+      <li>准确率是 99%，因为 9,900 封正常邮件都被预测正确；但 100 封垃圾邮件全部漏掉，垃圾邮件召回率为 0%。应同时报告垃圾邮件召回率、被拦邮件的精确率，并根据误杀与漏检的代价选择阈值。</li>
+      <li>复制样本让测试集不再代表未见数据，模型可能靠记忆得到虚高分数。应先按原始邮件或邮件线程去重，再以邮件来源、线程或时间为分组单位划分，确保同源变体只落在一个集合中。</li>
+      <li>可以设计：①按真实类别切片，分别看垃圾邮件召回率和正常邮件误杀率；②按来源与语言切片，检查新发件人、不同域名和不同语言上的精确率/召回率；③按时间切片，用较新的邮件检验攻击方式变化后的性能。高风险钓鱼邮件漏检率应设置独立上限，不能由普通邮件的高准确率抵消。</li>
     </ol>
   </details>
 </section>
 
-<section class="dd-sec">
+<section class="dd-sec" data-section-role="reference">
   <h2><span class="dd-n">11</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+  <p class="dd-lead">作为官方路径第 1 页，哪些内容现在必须掌握，哪些只需先见过、留到后续节点展开？</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
     <tbody>
-      <tr><td>先修</td><td>特征与标签、函数、向量、损失函数、梯度下降</td></tr>
+      <tr><td>进入本页前</td><td>只需要知道函数表示「输入经过规则得到输出」；向量可暂时理解为一组数字</td></tr>
       <tr><td><b>本页核心</b></td><td>标签、分类与回归、泛化、训练/验证/测试、四种学习范式</td></tr>
-      <tr><td>紧邻延伸</td><td>神经网络、过拟合、正则化、无监督学习、自监督学习、强化学习</td></tr>
+      <tr><td>下一步</td><td>信息论、损失函数、梯度下降；本页的交叉熵与参数更新将在这些节点正式展开</td></tr>
+      <tr><td>紧邻延伸</td><td>过拟合、正则化、无监督学习、强化学习；自监督学习将在模型架构阶段继续展开</td></tr>
       <tr><td>更远</td><td>预训练、微调与指令微调、大语言模型、评测</td></tr>
     </tbody>
   </table></div>
 </section>
 
-<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://www.deeplearningbook.org/contents/ml.html" target="_blank" rel="noopener">Deep Learning, Chapter 5: Machine Learning Basics</a>：监督学习、泛化与评测基础。</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>：分类、回归、模型选择与统计学习框架。</li><li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf" target="_blank" rel="noopener">Stanford CS229 Lecture Notes</a>：监督学习算法与数学推导。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://www.deeplearningbook.org/contents/ml.html" target="_blank" rel="noopener">Deep Learning, Chapter 5: Machine Learning Basics</a>：监督学习、经验风险、泛化以及训练/验证/测试边界。</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>：分类、回归、模型选择与统计学习框架。</li><li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf" target="_blank" rel="noopener">Stanford CS229 Lecture Notes</a>：输入—目标、假设函数、分类/回归与损失优化。</li><li><a href="https://arxiv.org/abs/2007.08199" target="_blank" rel="noopener">Learning from Noisy Labels with Deep Neural Networks: A Survey</a>：标签噪声如何影响泛化及其评测边界。</li><li><a href="https://arxiv.org/abs/2301.05712" target="_blank" rel="noopener">A Survey on Self-supervised Learning</a>：自监督信号来源及其与无监督学习的分类关系。</li><li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Training Language Models to Follow Instructions with Human Feedback</a>：大模型监督微调与后续强化学习阶段的实例。</li></ul><div class="dd-src-date">访问日期：2026-07-25</div></div>
 `
 };

@@ -17,3 +17,21 @@ window.DEEPDIVE['reranking'] = window.createDeepDive({
   quiz:[{q:'重排能找回未召回文档吗？',a:'不能。'},{q:'cross-encoder 为何更慢？',a:'查询与每个文档共同编码。'},{q:'k 增大的代价？',a:'重排计算和噪声增加。'},{q:'ColBERT 的折中？',a:'预计算 token 向量并在线 late interaction。'},{q:'为何还测最终答案？',a:'排序指标提升不保证证据被正确使用。'}],
   sources:[{title:'Sentence-BERT',url:'https://arxiv.org/abs/1908.10084',note:'双塔与交叉编码比较'},{title:'ColBERT',url:'https://arxiv.org/abs/2004.12832',note:'late interaction'},{title:'Is ChatGPT Good at Search? RankGPT',url:'https://arxiv.org/abs/2304.09542',note:'LLM 列表重排'}]
 });
+
+// 新版教学门禁补充：逐节明确重排的候选上限、排序含义和成本边界。
+{
+  const page = window.DEEPDIVE['reranking'];
+  const additions = [
+    '<p>两阶段检索输入查询、全库和延迟预算，输出首阶段高召回候选及重排后的前排片段。首阶段用便宜表示缩小集合，重排器只在该集合内做精细交互；正确证据不在候选中属于召回失败，不是重排失败。全库规模小且可承受精细比较时才可能省略首阶段。</p>',
+    '<p>架构选择输入查询、候选文档、交互粒度和计算预算，输出双塔相似分或交叉编码相关分。双塔分别编码便于预计算，交叉编码器共同读取查询与文档 token，能识别条件、数字和否定却需逐候选计算；高分只表示训练目标下相关，不证明来源真实。长文档被截断时低分不能代表全文无关。</p>',
+    '<p>候选深度输入首阶段 Recall 曲线、重排单条成本和上下文预算，输出需要重排的 k。增大 k 提高包含正确证据的机会并近似线性增加计算；若 RecallK 已饱和，继续扩大会主要增加噪声和延迟。若 RecallK 很低，应先修召回而不是换更强重排器。</p>',
+    '<p>Late interaction 输入查询与文档的 token 级向量，输出通过 MaxSim 聚合的相关分。文档 token 向量可离线预计算，在线仍保留查询 token 与文档 token 的局部匹配，因此介于双塔和交叉编码器之间；代价是索引更大。它仍只衡量相关性，不能替代时效、权限或事实核验。</p>',
+    '<p>LLM 重排输入候选及其顺序、评分提示和比较方式，输出点式、成对或列表排序。列表模型可能偏爱靠前、较长或措辞显眼的候选，置换与成对校准用于测偏差；排序变化稳定才是可信证据。调用昂贵且位置偏差未校准时，不适合作为高吞吐默认方案。</p>',
+    '<p>端到端评测输入重排前后候选、必要证据、引用和最终任务结果，输出 NDCG、MRR、证据覆盖、引用忠实、延迟、费用和任务成功。排序指标提高只说明相关标注下顺序改善，不说明生成器正确使用证据；错误但贴题的文档仍可能被排前。上线门禁必须包含版本、权限和答案切片。</p>',
+    '<p>排序案例输入四个候选的召回名次、人工相关等级和重排名次，输出 MRRbefore、MRRafter 与 top2 证据覆盖。MRR 是首个相关结果排名 rank 的倒数；从 rank=2 到 rank=1 得 0.5 到 1.0，只说明首个相关结果提前。旧版条款可信度和生成是否同时使用一般规则与例外仍需另测。</p><div class="dd-formula"><math display="block" aria-label="重排前后首个相关结果的倒数排名"><mi>MRRbefore</mi><mo>=</mo><mfrac><mn>1</mn><mi>rankbefore</mi></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>=</mo><mn>0.5</mn><mo>;</mo><mi>MRRafter</mi><mo>=</mo><mfrac><mn>1</mn><mi>rankafter</mi></mfrac><mo>=</mo><mn>1.0</mn></math></div>',
+    '<p>延迟预算案例输入固定编排开销 Tfixed、每批耗时 Tbatch、每批候选量 b 和候选数 k，输出重排延迟 Trerank。批次数是向上取整 k/b，故 Trerank=Tfixed+ceil(k/b)×Tbatch；20 条约 60ms，100 条约 200ms。估算只适用于给定硬件和批设置，额外 Recall 必须证明能改善最终任务。</p><div class="dd-formula"><math display="block" aria-label="分批交叉编码重排延迟"><mi>Trerank</mi><mo>=</mo><mi>Tfixed</mi><mo>+</mo><mo>⌈</mo><mfrac><mi>k</mi><mi>b</mi></mfrac><mo>⌉</mo><mo>×</mo><mi>Tbatch</mi></math></div>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+}

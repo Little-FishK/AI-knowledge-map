@@ -41,7 +41,7 @@ window.DEEPDIVE["neural-network"] = {
   <h3>1.1 线性模型的能力到哪里为止</h3>
   <p>一个线性模型学的是输入的一个<b>加权和</b>。以二分类为例，它能画出的分界只有一条直线、一个平面、或更高维里的一个「超平面」——本质上是一刀平的切分。</p>
   <div class="dd-formula">y′ = w₁x₁ + w₂x₂ + … + wₙxₙ + b</div>
-  <p class="dd-formula-note">权重 <code>w</code> 决定每个输入的影响方向与强弱，偏置 <code>b</code> 决定这条边界整体平移多少。</p>
+  <p class="dd-formula-note">预测分数 <code>y′</code> 是加权和的结果；权重 <code>w</code> 决定每个输入的影响方向与强弱，输入 <code>x</code> 是样本特征，偏置 <code>b</code> 决定这条边界整体平移多少。</p>
 
   <figure class="dd-fig">
     <svg viewBox="0 0 640 260" role="img" aria-label="线性边界无法分开同心环，曲线可以">
@@ -86,6 +86,7 @@ window.DEEPDIVE["neural-network"] = {
   <div class="dd-formula">h = W₁x + b₁　　y = W₂h + b₂</div>
   <p>把第一行代进第二行：</p>
   <div class="dd-formula">y = W₂(W₁x + b₁) + b₂ = (W₂W₁)x + (W₂b₁ + b₂)</div>
+  <p class="dd-formula-note">这里 <code>y</code> 是两层复合后的输出，<code>W₁、W₂</code> 是两层权重，<code>b₁、b₂</code> 是两层偏置，<code>x</code> 是原始输入。</p>
   <div class="dd-note math"><b>数学结论</b>　两个线性/仿射变换复合，结果<b>仍是一个线性/仿射变换</b>（记 <code>W = W₂W₁</code> 即可）。所以无论叠多少纯线性层，整体永远等价于<b>一层</b>——深度本身不产生任何新的表达能力。</div>
   <p>这就逼出了下一个问题：既然深度靠「叠线性」换不来能力，那能力到底从哪里来？答案是在层与层之间插入一个<b>非线性</b>函数。它是谁、怎么起作用——是第 4 节的主题。在那之前，我们得先把网络的结构讲清楚。</p>
 
@@ -262,6 +263,7 @@ window.DEEPDIVE["neural-network"] = {
   <h3>6.2 损失函数：把「错」变成一个可优化的数字</h3>
   <p>模型没法直接优化「看起来还行」。它需要一个<b>标量</b>目标 <code>L</code>，度量预测 <code>ŷ</code> 与真实 <code>y</code> 差多少。训练就是找一组参数 <code>θ</code>（网络里全部权重和偏置），让训练集上的平均损失尽量低、同时还能推广到新数据：</p>
   <div class="dd-formula">θ* = arg min_θ　(1/N) Σᵢ L(f(xᵢ; θ), yᵢ)</div>
+  <p class="dd-formula-note"><code>N</code> 是训练样本数，<code>i</code> 是样本编号，<code>f</code> 是网络，<code>xᵢ</code> 与 <code>yᵢ</code> 是该样本的输入和真实答案，<code>L</code> 是单样本损失，<code>θ*</code> 是使平均损失最小的参数。</p>
   <table class="dd-table">
     <thead><tr><th>损失</th><th>示例公式</th><th>直觉</th></tr></thead>
     <tbody>

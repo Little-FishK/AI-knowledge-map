@@ -17,3 +17,25 @@ window.DEEPDIVE['tree-of-thoughts'] = window.createDeepDive({
   quiz:[{q:'ToT 比 CoT 多什么？',a:'显式分支、评分、剪枝和回溯。'},{q:'完整树为何昂贵？',a:'节点随分支和深度指数增长。'},{q:'beam search 做什么？',a:'每层只保留固定数量高分候选。'},{q:'自评主要风险？',a:'与生成器共享偏差和盲点。'},{q:'想象状态能替代工具结果吗？',a:'不能。'}],
   sources:[{title:'Tree of Thoughts',url:'https://arxiv.org/abs/2305.10601',note:'显式思维搜索'},{title:'Graph of Thoughts',url:'https://arxiv.org/abs/2308.09687',note:'图结构推理'},{title:'Language Agent Tree Search',url:'https://arxiv.org/abs/2310.04406',note:'搜索与环境反馈'}]
 });
+
+// 新版教学门禁补充：逐节说明 ToT 状态搜索、评估、预算、回溯与验证边界。
+{
+  const page = window.DEEPDIVE['tree-of-thoughts'];
+  const additions = [
+    '<p>思维树输入当前问题状态、候选扩展、评估器和预算，输出带父子关系的搜索树、被保留或剪枝的状态及验证终态。它让系统在早期选择错误后回到分叉点，而不是沿同一前缀继续生成；解决线性 CoT 的路径锁定。若没有保存备选状态和真正回溯，只是写多段文字，不算 ToT。这表示真正搜索由外部状态控制，而不是由生成文字长度决定。</p>',
+    '<p>搜索建模输入任务事实、已验证产物、合法动作、评分维度和完成谓词，输出状态表示、扩展操作、价值评估与终止条件。状态只保留影响后续决策的事实，扩展产生可执行候选，评分区分硬可行性与软价值，终态由外部条件确认。粒度过细会爆炸，过粗会掩盖错误并妨碍去重。</p>',
+    '<p>搜索策略输入分支数 k、深度 d、beam 宽度 b、内存和验证成本，输出 BFS、DFS 或 beam 的访问顺序与候选上限。BFS 先铺同层，DFS 先深入，beam 每层只留 b 个高分状态；完整树节点随 k 和 d 指数增长。策略分数不能绕过高风险动作的权限和真实执行门。</p>',
+    '<p>评估器输入候选状态、硬约束、证据、预计收益、风险、剩余成本和真实验证结果，输出淘汰、保留、优先级或终态确认。违反权限语法的候选直接淘汰，证据不足但有潜力的状态保留不确定性，可执行任务优先用测试与规则。自评共享生成器盲点，不能把一个 0.73 分伪装成真值。</p>',
+    '<p>预算控制输入每次生成评分工具执行 token 与墙钟成本、边际成功增益和停止上限，输出继续扩展、剪枝、回溯或停止。记录被剪候选已经消耗的成本，只在困难切片启用搜索；若 beam 从 2 到 4 只提升一点却翻倍调用，应把预算用于验证或初始状态。搜索扩大探索空间，不保证收益。</p>',
+    '<p>Agent 边界输入文本内想象状态、真实工具观察、当前权限和动态环境，输出仅供规划的候选与可执行的受权动作。ToT 可以只搜索文字，Agent 还必须调用工具获得新事实并在环境变化后重规划；想象测试通过不能替代实际回执。搜索也不会创造模型上下文中缺失的知识。</p>',
+    '<p>缓存案例输入初始串值状态 S0、三个原因分支、最多四节点预算和测试证据，输出搜索轨迹、补丁终态与回溯点。先比较 A 缺 user_id、B 命名空间、C 对象复用，测试把 B 剪掉并优先扩展 A；A1 复合键通过 4/4 成为终态，失败则回溯 C。完整分支数 k=3、搜索深度 d=4 的节点总数 Nnodes=121，说明为何必须剪枝。</p>',
+    '<p>评估器失败分析输入各分支评分、被剪顺序、状态差异、真实测试和访问历史，输出过早剪枝、评分泄漏、同质分支、模拟当事实或循环回溯的归因。拆分硬可行性、证据、收益、风险与成本，并保留探索配额和访问集；终态必须由环境验证。真实执行不可逆且昂贵时不适合盲目扩展。</p>',
+    '<p>误区辨析输入“生成多条就是 ToT、分支越多越好、自评足够、高分即完成、ToT 等于 Agent”等主张，输出缺失的状态、评估、剪枝、回溯、终止、环境和权限条件。逐项映射到可观察证据和失败模式。该表用于纠正概念，不代替具体搜索策略的质量成本评测。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const renderedAgain = page.html.split("</section>");
+  renderedAgain[6] += '<div class="dd-formula"><math display="block" aria-label="完整 k 叉树的节点总数"><mi>Nnodes</mi><mo>=</mo><mfrac><mrow><msup><mi>k</mi><mrow><mi>d</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></mfrac></math></div>';
+  page.html = renderedAgain.join("</section>");
+}

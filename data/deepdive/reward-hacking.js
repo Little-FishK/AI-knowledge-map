@@ -20,7 +20,7 @@ window.DEEPDIVE['reward-hacking'] = {
       <span class="dd-badge math">数学</span>
       <h3>2. 为什么代理指标天然有缝隙？</h3>
       <p class="dd-lead">真实效用 U 通常不可直接观测，只能用可计算奖励 R 近似。</p>
-      <div class="dd-formula">选择策略 π 以最大化 E[R]，但产品真正关心的是 E[U]；当 R ≠ U 时，两者可能脱钩。</div>
+<div class="dd-formula" data-display="mathml"><math display="block" aria-label="选择策略 pi 最大化奖励的期望，但真实目标是最大化真实效用的期望；奖励 R 不等于效用 U 时二者可能脱钩"><munder><mo>max</mo><mi>π</mi></munder><msub><mi>𝔼</mi><mi>π</mi></msub><mo>[</mo><mi>R</mi><mo>]</mo><mspace width="1em"/><mo>≠</mo><mspace width="1em"/><munder><mo>max</mo><mi>π</mi></munder><msub><mi>𝔼</mi><mi>π</mi></msub><mo>[</mo><mi>U</mi><mo>]</mo><mspace width="1em"/><mtext>当</mtext><mi>R</mi><mo>≠</mo><mi>U</mi></math></div>
       <p>在普通行为分布上，R 与 U 可能高度相关；优化会把策略推到分布边缘，那里原本的小偏差被放大。这与 Goodhart 定律的核心直觉一致：当度量成为目标，它可能不再是好度量。</p>
     </section>
 

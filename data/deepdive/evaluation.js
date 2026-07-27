@@ -20,3 +20,25 @@ window.DEEPDIVE['evaluation'] = window.createDeepDive({
   quiz:[{q:'为什么总分提升不能自动上线？',a:'关键风险切片可能退化，硬约束不能被普通质量补偿。'},{q:'oracle 证据消融能诊断什么？',a:'在检索上限被消除后，剩余错误更可能来自生成、规则或后处理。'},{q:'LLM 裁判为何需要金标集？',a:'测出位置、长度、同源等偏差和各切片可靠性。'},{q:'挑战集为何不宜按原比例估总体成功率？',a:'它刻意过采样长尾风险，不代表真实流量权重。'},{q:'当前门禁集失败后为何不能删题？',a:'这会把测试反馈变成调参信号并夸大泛化，应在下一版本治理。'}],
   sources:[{title:'OpenAI Evals Design Guide',url:'https://platform.openai.com/docs/guides/evals-design',note:'目标驱动评测与持续改进'},{title:'RAGAS',url:'https://arxiv.org/abs/2309.15217',note:'RAG 组件与端到端评估'},{title:'FActScore',url:'https://arxiv.org/abs/2305.14251',note:'原子事实级评估'},{title:'NIST AI Risk Management Framework',url:'https://www.nist.gov/itl/ai-risk-management-framework',note:'风险测量、管理与治理'}]
 });
+
+// 新版教学门禁补充：逐节明确评测对象、指标含义、发布边界与回流机制。
+{
+  const page = window.DEEPDIVE['evaluation'];
+  const additions = [
+    '<p>评分契约输入样本、运行上下文、期望属性、评分器、严重度和系统版本，输出可复现的通过、失败及原因。先把业务成功拆成资格、金额、证据、权限、追问、结构、延迟和成本等原子属性；硬约束先判，软目标只在可行方案间排序。评审无法共享判定规则时，总分不能指导上线。</p>',
+    '<p>应用评测输入版本化的输入、检索、生成、工具策略和界面链路，输出组件诊断与端到端业务结果。端到端指标决定能否发布，组件指标定位第一次偏离；无引用可能来自召回、截断、提示或渲染。组件局部提高不代表完整任务提高，诊断也不能替代最终验收。</p>',
+    '<p>样本设计输入真实流量、高损失任务、历史事故、边界组合和对抗场景，输出带语言、群体、长度、工具和风险标签的数据集。开发集用于迭代，冻结集用于门禁，挑战集暴露长尾，线上抽样估计真实分布；四者不能混用同一权重解释。挑战集比例不等于生产发生率。</p>',
+    '<p>测量模型输入潜在质量 Qtrue、评分器系统偏差 Bjudge 和样本随机误差 Esample，输出观测分数 ScoreObserved。分数是三者叠加的结果，所以 LLM 裁判也需用人工金标测精确率、召回率、位置和文风偏差；它是测量仪器，不是真值。高风险确定属性应优先程序或状态检查。</p>',
+    '<p>门禁案例输入切片权重 wi、通过率 pi 和失败严重度 ci，输出加权通过率 PassWeighted 与风险损失 RiskLoss。前者求 Σwi×pi，后者求 Σwi×(1−pi)×ci；新版总通过率提高但 RiskLoss 从 0.682 升至 0.862，说明高风险退化不能被平均抵消。争议成本只用于排序，越权仍应用硬门槛。</p><div class="dd-formula"><math display="block" aria-label="切片加权通过率与风险损失"><mi>PassWeighted</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mi>wi</mi><mo>×</mo><mi>pi</mi><mo>;</mo><mi>RiskLoss</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mi>wi</mi><mo>×</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>pi</mi><mo>)</mo><mo>×</mo><mi>ci</mi></math></div>',
+    '<p>组件消融输入同一批样本、冻结的其他变量和一个待替换组件，输出检索、生成、工具或渲染对端到端差异的因果线索。oracle 证据消除召回限制，工具回放隔离外部波动，规则开关估计护栏作用；一次改变多个因素无法归因。消融只缩小原因候选，最终仍以业务任务验收。</p>',
+    '<p>发布流程输入离线门禁、影子结果、金丝雀指标和回滚阈值，输出继续扩大、停止或回滚决定。离线先证硬切片，影子测真实输入和容量但不执行不可逆动作，金丝雀才观察真实交互；每级保持观察窗口。越权、尾延迟或错误预算超线必须自动停止扩大。</p>',
+    '<p>评测治理输入样本来源、时间、政策版本、隐私状态、近邻簇和退役条件，输出发现池、审核、开发集、冻结集及下一版本的迁移记录。失败样本直接加入并反复调参会使门禁变成训练集；当前冻结集不能因候选失败而删改。开放世界低频不可逆风险仍需权限和人工控制。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace(
+    /<div class="dd-formula">观测分数[\s\S]*?<\/div>/,
+    '<div class="dd-formula"><math display="block" aria-label="观测分数的测量误差分解"><mi>ScoreObserved</mi><mo>=</mo><mi>Qtrue</mi><mo>+</mo><mi>Bjudge</mi><mo>+</mo><mi>Esample</mi></math></div>'
+  );
+}

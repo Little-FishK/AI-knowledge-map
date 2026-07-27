@@ -27,7 +27,8 @@ window.DEEPDIVE['lost-in-middle'] = {
       <span class="dd-badge math">数学</span>
       <h3>3. 怎样把位置效应测成一条曲线？</h3>
       <p class="dd-lead">固定证据和问题，只改变证据的相对位置，再重复足够多样本。</p>
-      <div class="dd-formula">A(p, L, d) = 在长度 L、位置 p、干扰强度 d 下的任务准确率</div>
+      <div class="dd-formula" data-formula-id="lost-in-middle-position-accuracy"><math display="block" aria-label="准确率 A 是证据位置 p、上下文长度 L 和干扰强度 d 的函数"><mrow><mi>A</mi><mo>(</mo><mi>p</mi><mo>,</mo><mi>L</mi><mo>,</mo><mi>d</mi><mo>)</mo></mrow></math></div>
+      <p class="dd-formula-note"><code>A</code> 是当前条件下测得的任务准确率；<code>p</code> 是证据在上下文中的归一化相对位置，0 靠近开头、1 靠近结尾；<code>L</code> 是上下文总 token 长度；<code>d</code> 是相似干扰项的数量或强度。这个写法表示准确率可能随三个变量共同变化，并不是预先假定它们之间存在某个固定代数公式。</p>
       <p>将 p 归一化到 0 至 1，并分别报告不同长度 L 与干扰强度 d。需要随机化无关文档顺序、控制总 token 数、记录模型版本和解码参数。只比较一个开头样本和一个中间样本，无法排除样本难度和偶然波动。</p>
     </section>
 
@@ -76,7 +77,7 @@ window.DEEPDIVE['lost-in-middle'] = {
 
     <section class="dd-sec">
       <span class="dd-badge math">案例推演</span>
-      <h3>9. 一条位置曲线怎样算出来？</h3>
+      <h3>9. 案例推演：一条位置曲线怎样算出来？</h3>
       <p class="dd-lead">把同一份退款例外证据放在 30 个等长文档的首部、中部和尾部，怎样区分真实位置效应与样本偶然？</p>
       <figure class="dd-fig"><svg viewBox="0 0 650 230" role="img" aria-label="答案证据在开头中间结尾时形成U形准确率曲线"><line x1="70" y1="180" x2="600" y2="180" stroke="#6b7484"/><line x1="70" y1="30" x2="70" y2="180" stroke="#6b7484"/><text x="335" y="214" text-anchor="middle" class="svg-t">关键证据的相对位置</text><text x="26" y="105" text-anchor="middle" class="svg-t" transform="rotate(-90 26 105)">准确率</text><polyline points="110,58 205,95 300,140 395,105 550,66" fill="none" stroke="#cf6f6f" stroke-width="3"/><circle cx="110" cy="58" r="5" fill="#cf6f6f"/><circle cx="300" cy="140" r="5" fill="#cf6f6f"/><circle cx="550" cy="66" r="5" fill="#cf6f6f"/><text x="110" y="46" text-anchor="middle" class="svg-t">85%</text><text x="300" y="158" text-anchor="middle" class="svg-t">57%</text><text x="550" y="54" text-anchor="middle" class="svg-t">80%</text><text x="110" y="198" text-anchor="middle" class="svg-t" font-size="10">开头</text><text x="300" y="198" text-anchor="middle" class="svg-t" font-size="10">中间</text><text x="550" y="198" text-anchor="middle" class="svg-t" font-size="10">结尾</text><polyline points="110,52 205,66 300,74 395,68 550,56" fill="none" stroke="#4f9d78" stroke-width="2" stroke-dasharray="7 4"/><text x="448" y="87" class="svg-t" fill="#4f9d78" font-size="10">重排并把证据放到任务附近后</text></svg><figcaption>图 1　示意性的 U 形位置曲线。红线是原始长上下文，绿虚线是检索重排后的结果；真实形状必须在具体模型、长度和任务上测量，不能把这张图当通用常数。</figcaption></figure>
       <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>证据位置</th><th>正确 / 60</th><th>准确率</th><th>95% 区间之外还要控制</th></tr></thead><tbody><tr><td>开头 0–10%</td><td>51</td><td>85%</td><td>文档顺序、总 token、问题措辞</td></tr><tr><td>中间 45–55%</td><td>34</td><td>57%</td><td>同一证据、相似干扰项与解码参数</td></tr><tr><td>结尾 90–100%</td><td>48</td><td>80%</td><td>模型版本、随机种子与重复次数</td></tr><tr><td>中间 + 重排</td><td>46</td><td>77%</td><td>成本、引用正确率和是否只适配模板</td></tr></tbody></table></div>
@@ -100,3 +101,37 @@ window.DEEPDIVE['lost-in-middle'] = {
     <div class="dd-src"><strong>来源与延伸阅读：</strong><ul><li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a></li><li><a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">Hsieh et al., RULER: What's the Real Context Size of Your Long-Context Language Models?</a></li><li><a href="https://aclanthology.org/2024.tacl-1.9/" target="_blank" rel="noopener">TACL publication: Lost in the Middle</a></li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>
   `
 };
+
+window.DEEPDIVE['lost-in-middle'].html = window.DEEPDIVE['lost-in-middle'].html
+  .replace(
+    '<p class="dd-lead">当相关信息位于长上下文不同位置时，模型表现可能明显变化，位于中段时常更差。</p>',
+    '<p class="dd-lead">当相关信息位于长上下文不同位置时，模型表现可能明显变化，位于中段时常更差。</p><p>中间迷失是一个需要实验确认的经验位置效应。实验输入是同一问题、证据和干扰文档的不同位置版本，输出是各位置桶的准确率或引用命中率；如果只移动证据就引起稳定变化，才支持位置敏感。U 形曲线表示首尾在该实验中优于中段，不表示每个模型、长度和任务都有同一形状。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">窗口长度说明最多能输入多少 token，不保证每个 token 都被稳定、等价地利用。</p>',
+    '<p class="dd-lead">窗口长度说明最多能输入多少 token，不保证每个 token 都被稳定、等价地利用。</p><p>容量指标的输入是请求 token 数，输出是接口是否接受；有效利用评测的输入还包括证据位置、干扰和任务，输出是正确率与引用。前者由服务上限判定，后者必须通过任务实验测得。因而“支持 128K”只能解释为可接收容量，不能解释为任意位置都能可靠取证。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">固定证据和问题，只改变证据的相对位置，再重复足够多样本。</p>',
+    '<p class="dd-lead">固定证据和问题，只改变证据的相对位置，再重复足够多样本。</p><p>曲线实验接收多个可配对的问题实例和位置、长度、干扰设置，输出每个条件的准确率、置信区间和样本量。每道题生成首、中、尾版本并随机化其他顺序，使题目自身成为对照；曲线差异若小于统计波动，不能宣称出现位置效应。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">研究观察到位置偏差，但其成因可能同时来自训练分布、模型机制与任务设计。</p>',
+    '<p class="dd-lead">研究观察到位置偏差，但其成因可能同时来自训练分布、模型机制与任务设计。</p><p>机制诊断的输入是已复现的位置曲线、注意力或检索轨迹和受控消融，输出是仍然成立的候选解释。通过分别改变训练长度、干扰相似度和提示结构观察曲线如何变化，可以缩小原因范围；注意力权重相关只能作为线索，不能被解释为唯一因果机制。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">核心策略是减少无关上下文，并让任务与关键证据更容易彼此定位。</p>',
+    '<p class="dd-lead">核心策略是减少无关上下文，并让任务与关键证据更容易彼此定位。</p><p>缓解流程输入原始候选、问题和 token 预算，输出去重、重排、带来源标记的紧凑上下文。它先筛掉无关内容，再把高价值证据放到任务附近并保留可追溯引用；效果应解释为证据更易定位，而不是模型窗口能力被永久改变。若召回阶段漏掉正确证据，后续重排和位置调整都无法补救。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">不能只测试“答案刚好在最前面”的理想布局，应覆盖位置、长度和干扰的组合。</p>',
+    '<p class="dd-lead">不能只测试“答案刚好在最前面”的理想布局，应覆盖位置、长度和干扰的组合。</p><p>验证输入是基线与候选方案在同一批位置、长度、干扰组合上的结果，输出是分桶质量、引用、延迟和成本差异。只允许缓解方案本身变化，并保存最终请求以检查证据集合；平均分上升但某个高风险位置桶下降时，方案仍不能通过。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">若证据未被检索、被截断、版本错误或问题本身含糊，根因不一定是位置。</p>',
+    '<p class="dd-lead">若证据未被检索、被截断、版本错误或问题本身含糊，根因不一定是位置。</p><p>归因排查的输入是失败请求、最终装配内容和检索解析日志，输出是数据管道故障或模型位置利用问题。只有确认正确证据确实存在且仅改变位置会改变结果，才把失败解释为中间迷失；无法构造这一对照时应保留“原因未定”。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">模型、提示和检索器更新都可能改变有效上下文，因此位置测试应进入持续评测。</p>',
+    '<p class="dd-lead">模型、提示和检索器更新都可能改变有效上下文，因此位置测试应进入持续评测。</p><p>持续回归接收固定的可置换任务集与每次系统版本，输出按位置、长度、任务和风险分桶的趋势及告警。升级后重复同一装配与评分流程并比较基线；总平均稳定但关键位置桶越过最低门槛时仍须阻断发布。测试集也要定期更新，避免只对固定模板过拟合。</p>'
+  );

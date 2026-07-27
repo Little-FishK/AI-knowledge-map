@@ -21,3 +21,29 @@ window.DEEPDIVE['model-selection'] = window.createDeepDive({
   quiz:[{q:'为什么先用强模型建立上界？',a:'帮助区分模型能力不足与数据、提示、工具或任务定义问题。'},{q:'每成功任务成本应包含什么？',a:'调用、检索工具、重试升级、人工、基础设施和失败补救。'},{q:'帕累托前沿代表自动最优吗？',a:'不代表，只说明没有候选在所有维度支配它，仍需业务权重。'},{q:'模型路由与静态选型差在哪？',a:'选型按项目/组件固定方案，路由按每个请求动态选择。'},{q:'哪些变化触发复评？',a:'模型/价格/供应商政策、流量分布、任务规则、风险或故障表现变化。'}],
   sources:[{title:'FrugalGPT',url:'https://arxiv.org/abs/2305.05176',note:'级联调用的成本与质量优化'},{title:'RouteLLM',url:'https://arxiv.org/abs/2406.18665',note:'偏好数据驱动的模型路由'},{title:'HELM',url:'https://arxiv.org/abs/2211.09110',note:'多场景、透明模型评测'},{title:'NIST AI RMF',url:'https://www.nist.gov/itl/ai-risk-management-framework',note:'风险约束与生命周期治理'}]
 });
+
+// 新版教学门禁补充：选型页逐节回答六问，并以结构化公式明确符号。
+{
+  const page = window.DEEPDIVE['model-selection'];
+  const additions = [
+    '<p>模型选型输入任务分布、成功定义、风险切片、SLO、数据边界和预算，输出满足全部硬约束的候选配置集合。先定义“成功”和不可补偿门槛，再比较候选；榜单分数只有在这些条件相同才可解释。任何硬约束失败都不能被价格或普通样本高分抵消。</p>',
+    '<p>强模型基线输入冻结评测集、充分证据和稳定工具，输出当前系统架构可达到的质量上界及逐样本错误。若强模型在 oracle 证据下仍失败，优先修任务、数据或工具；若它通过，再一次只替换一个变量做消融。上界是诊断参照，不是自动生产推荐。</p>',
+    '<p>约束优化输入候选 m、各质量 Qualityk、风险 Riskj、延迟 P95、隐私类别 Privacy 与门槛，输出可行域中总成本 TotalCost 最低的方案。Qk 是第 k 项质量下限，Rj 是第 j 项风险上限，L 是延迟上限，C 是允许的隐私类别集合。先执行硬门槛，再看帕累托和成本；进入帕累托前沿只表示未被全面支配，不代表自动胜出。</p>',
+    '<p>成本核算输入调用 Ccall、检索工具 Ctool、重试升级 Cretry、人工 Chuman、基础设施 Cinfra、失败损失 Closs 和独立确认的成功任务数 Nsuccess，输出每成功任务完整成本 CostPerSuccess。分子汇总任务全链路资源与损失，分母只计真实业务成功；低单次价格若带来更多人工和失败，最终可能更贵。无法定价的高风险应保留硬门槛。</p>',
+    '<p>案例输入 1000 笔退款及 S、M、L 三个候选的门槛、调用、成功、人工和补救数据，输出可行候选及每成功任务成本。先淘汰越权或延迟不合格者，再计算 M 的 151÷900≈0.168 元；它在当前假设胜出，但人工单价和流量变化后必须重做敏感性分析。</p>',
+    '<p>供应商评估输入模型行为、合同、地域、保留期、版本、容量、许可和退出演练，输出可治理的运行方案与替代路径。接口相同不保证格式、拒答和 tokenization 相同；实际切换恢复时间才是退出能力证据。自托管也必须计入运维、补丁和值班成本。</p>',
+    '<p>静态模型组合输入各组件的难度、风险、结构与工具需求，输出规则、小模型、中模型、强模型或人工的职责分工。按组件固定责任能让权限检查、抽取和高风险判断分别验收；动态路由是后续独立系统，不能把路由收益误记为底层模型能力。</p>',
+    '<p>回退设计输入超时、限流、低置信、非法输出与第 i 个依赖的可用率 Ai，输出重试、升级、确定性代码、询问、人工或失败分支以及系统可用率 Asystem。串行独立依赖的可用率近似各 Ai 的乘积；它解释组件各自很可靠时端到端仍会下降。真实相关故障、重复副作用和总延迟必须通过故障注入验证。</p>',
+    '<p>生命周期复评输入价格、模型版本、任务分布、政策、人工成本和错误预算变化，输出继续使用、重新比较、灰度切换或退出决定。触发器出现时重跑冻结集与真实抽样，并更新决策卡；历史最优只对当时数据和假设成立，不能永久继承。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="模型选型的受约束优化"><munder><mi>min</mi><mi>m</mi></munder><mi>TotalCost</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>,</mo><mi>s.t.</mi><msub><mi>Quality</mi><mi>k</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≥</mo><msub><mi>Q</mi><mi>k</mi></msub><mo>,</mo><msub><mi>Risk</mi><mi>j</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><msub><mi>R</mi><mi>j</mi></msub><mo>,</mo><mi>P95</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><mi>L</mi><mo>,</mo><mi>Privacy</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>∈</mo><mi>C</mi></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="每成功任务完整成本"><mi>CostPerSuccess</mi><mo>=</mo><mfrac><mrow><mi>Ccall</mi><mo>+</mo><mi>Ctool</mi><mo>+</mo><mi>Cretry</mi><mo>+</mo><mi>Chuman</mi><mo>+</mo><mi>Cinfra</mi><mo>+</mo><mi>Closs</mi></mrow><mi>Nsuccess</mi></mfrac></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="串行独立依赖的近似可用率"><mi>Asystem</mi><mo>≈</mo><munder><mo>∏</mo><mi>i</mi></munder><msub><mi>A</mi><mi>i</mi></msub></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

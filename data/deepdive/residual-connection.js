@@ -9,7 +9,7 @@ window.DEEPDIVE["residual-connection"] = {
 
 <section class="dd-sec"><h2><span class="dd-n">1</span>更深网络为什么可能连训练集都做得更差<span class="dd-badge intuition">动机</span></h2><p class="dd-lead">如果额外层理论上可以学成恒等映射，深网络至少不该比浅网络差，现实为什么会退化？</p><p>把一个训练好的浅网络后面加几层，新增层理论上可输出原输入，保留原性能。但普通非线性层要通过权重和激活精确合成恒等映射，优化器不一定容易找到；路径变长还加剧尺度与梯度问题。于是更深模型可能训练误差更高，这叫深度退化，和“训练很好、验证差”的过拟合不同。</p><p>残差连接把恒等映射直接写进架构，使新增分支只需学相对输入的修正。</p></section>
 
-<section class="dd-sec"><h2><span class="dd-n">2</span>完整映射怎样改写成增量<span class="dd-badge math">核心公式</span></h2><p class="dd-lead">目标映射是 <code>H(x)</code> 时，为什么学习 <code>F(x)=H(x)−x</code> 可能更容易？</p><div class="dd-formula">y = x + F(x)　　⇔　　F(x)=H(x)−x</div><p>若理想映射接近恒等，普通层仍要把 <code>x</code> 重新生成一遍；残差分支只需输出很小修正。令分支最后一层接近零时，块一开始就是近似恒等，训练再逐渐学会“在已有表示上改多少”。</p>
+<section class="dd-sec"><h2><span class="dd-n">2</span>完整映射怎样改写成增量<span class="dd-badge math">核心公式</span></h2><p class="dd-lead">目标映射是 <code>H(x)</code> 时，为什么学习 <code>F(x)=H(x)−x</code> 可能更容易？</p><div class="dd-formula">y = x + F(x)　　⇔　　F(x)=H(x)−x</div><p><code>x</code> 是块输入，<code>H(x)</code> 是希望得到的完整映射，<code>F(x)</code> 是残差分支学习的增量，<code>y</code> 是捷径与增量相加后的块输出。若理想映射接近恒等，普通层仍要把 <code>x</code> 重新生成一遍；残差分支只需输出很小修正。令分支最后一层接近零时，块一开始就是近似恒等，训练再逐渐学会“在已有表示上改多少”。</p>
 <table class="dd-table"><thead><tr><th>输入场景</th><th>理想 H(x)</th><th>残差 F(x)</th></tr></thead><tbody><tr><td>已有特征已经足够</td><td>约等于 x</td><td>约等于 0</td></tr><tr><td>需要轻微校正</td><td>x 加小变化</td><td>只学习小变化</td></tr><tr><td>需要彻底变换</td><td>远离 x</td><td>分支仍可学习大残差，但优势减弱</td></tr></tbody></table></section>
 
 <section class="dd-sec"><h2><span class="dd-n">3</span>前向为什么有一条不经过变换分支的通道<span class="dd-badge intuition">信息路径</span></h2><p class="dd-lead">即使 <code>F</code> 暂时学坏或接近零，输入信息怎样继续向后？</p>

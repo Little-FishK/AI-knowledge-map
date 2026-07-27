@@ -20,3 +20,27 @@ window.DEEPDIVE['data-drift-monitoring'] = window.createDeepDive({
   quiz:[{q:'P(y|x) 变化叫什么？',a:'概念漂移，它可在输入外观稳定时改变正确决策。'},{q:'PSI 高为什么不能直接触发重训？',a:'它只表明选定分桶分布不同，还可能来自埋点、政策、季节或无关变量。'},{q:'未成熟标签为何不能记为正确？',a:'结果尚未观察，会系统性低估延迟失败。'},{q:'总体稳定为何还要切片？',a:'小群体退化可被权重变化或其他切片提升抵消。'},{q:'生产回流为何需审核？',a:'避免选择偏差、错标、隐私泄漏和攻击者投毒。'}],
   sources:[{title:'Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift',url:'https://arxiv.org/abs/1810.11953',note:'无标签数据集漂移检测'},{title:'Learning under Concept Drift: A Review',url:'https://arxiv.org/abs/2004.05785',note:'概念漂移定义与方法'},{title:'Hidden Technical Debt in Machine Learning Systems',url:'https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems',note:'反馈环与监控债务'},{title:'NIST AI RMF Core',url:'https://airc.nist.gov/airmf-resources/airmf/5-sec-core/',note:'部署监测、测量与响应'}]
 });
+
+// 新版教学门禁补充：逐节交代漂移类型、统计量、延迟真值与响应闭环。
+{
+  const page = window.DEEPDIVE['data-drift-monitoring'];
+  const additions = [
+    '<p>漂移分类输入过去与当前的输入 x、标签 y、条件关系和任务指标，输出协变量、标签、概念或性能漂移的诊断。P(x) 变表示输入构成变，P(y) 变表示标签比例变，P(y|x) 变表示同样输入的正确答案规则变；最后还要直接观察性能。分类只定位变化发生在哪一层，不能单凭输入变化断言模型已经变差。</p>',
+    '<p>基线设计输入监控问题、应用与模型版本、季节性和时间窗口，输出训练集、最近稳定期、去年同期或控制组等带版本参照。快速窗口发现突变，慢速窗口观察趋势，季节同期减少周期误报；比较前先确认提示、索引、政策和埋点版本一致。会追随当前流量的滚动基线可能吞掉慢性漂移。</p>',
+    '<p>PSI 输入同一组离散桶在当前窗口的比例 ai 与基线比例 ei，输出各桶贡献和总漂移量 PSI。逐桶计算差值 ai−ei，再乘自然对数 ln(ai/ei)，最后对桶 i 求和；分布相同时结果为零。数值受分桶、平滑和样本量影响，只能作为需要调查的效应信号，不能作为自动重训结论。</p>',
+    '<p>手算案例输入“不想要、尺寸、质量”等桶的基线 e 与当前 a，输出每桶 PSI 贡献、总和及业务解释。计算规则仍是逐桶求 (a−e)×ln(a/e) 后相加：不想要贡献约 0.102，尺寸为 0，质量贡献约 0.139，三项和约 0.241；不同“其他”桶和平滑会改变总值。最大贡献提示质量问题占比翻倍，但仍需核对 45 天政策和 14 天成熟标签。</p>',
+    '<p>延迟标签监控输入检索空结果、重问、人工接管、置信等即时代理，以及稍后回填的真实业务结果，输出早期预警和成熟性能。预测时保存事件时间、切片与版本，标签成熟后再计算准确率、风险、校准和覆盖；代理只能提出待验证假设。尚未观察到最终失败的样本不能提前记为正确。</p>',
+    '<p>切片监控输入每个切片的流量权重 wk、切片表现 qk、样本量和风险等级，输出总体表现 Qoverall 与各切片区间。总体是各切片表现的加权和，所以权重变化能掩盖少数群体退化；同时比较构成变化与切片内变化。小样本需报告分子分母和区间，高损失切片可使用事件门槛而非等待总体显著。</p>',
+    '<p>调查树输入一次漂移告警、版本与切片证据，输出经验证的根因候选和修复选择。它解决检测到漂移后是否应该自动重训的问题。先排除埋点时区采样等信号错误，再定位贡献切片、检查政策产品攻击等外因，并在新旧系统和冻结工具响应上回放；之后才选规则、检索、提示或训练修复。异常生产输入必须审核，不能自动回流训练。</p>',
+    '<p>告警运行手册输入基线、窗口、最小样本、效应阈值、错误预算、负责人和允许动作，输出观察、呼叫、阻断、回滚或转人工处置。连续窗口或快速消耗错误预算才处理普通噪声，安全事件可立即阻断；恢复后记录真阳性和处置收益。未检测到漂移只表示已监控特征未越线，不证明系统没有退化。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="总体稳定性指数"><mi>PSI</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mrow><mo>(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>−</mo><msub><mi>e</mi><mi>i</mi></msub><mo>)</mo></mrow><mo>×</mo><mi>ln</mi><mo>(</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><msub><mi>e</mi><mi>i</mi></msub></mfrac><mo>)</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="总体表现是各切片表现的加权和"><mi>Qoverall</mi><mo>=</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>w</mi><mi>k</mi></msub><mo>×</mo><msub><mi>q</mi><mi>k</mi></msub></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

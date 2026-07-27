@@ -49,8 +49,8 @@ window.DEEPDIVE["attention"] = {
     <li><b>归一化成权重</b>：把这排匹配度过一个 softmax，变成一组相加为 1 的权重（谁匹配高，谁权重大）。</li>
     <li><b>加权求和</b>：按这组权重，把所有词的 Value 加权平均，作为当前词「看完全场后」得到的新表示。</li>
   </ol>
-  <div class="dd-formula">Attention(Q, K, V) = softmax( Q·Kᵀ / √d ) · V</div>
-  <p class="dd-formula-note">中间 <code>Q·Kᵀ</code> 是所有词两两之间的匹配度；<code>√d</code> 只是防止数值过大的缩放；softmax 归一化后乘 V 完成加权求和。</p>
+  <div class="dd-formula">Attention(Q, K, V) = softmax( Q·Kᵀ / <span class="dd-radical" role="math" aria-label="d 的平方根"><span class="dd-radicand">d</span></span> ) · V</div>
+  <p class="dd-formula-note"><b>符号逐个解释：</b>Attention 表示这整套注意力计算的输出。Q、K、V 分别是所有可见 token 的查询、键、值向量排成的矩阵；上标 T 表示转置，使每个查询能与每个键做点积；d 是每个键/查询向量的维数，除以它的平方根是为防止维数增加时点积过大；softmax 把每个查询对应的一排分数变为和为 1 的权重，最后乘 V 完成加权求和。掩码和位置偏置若存在，会在 softmax 前共同修改分数。</p>
 
   <figure class="dd-fig">
     <svg viewBox="0 0 560 180" role="img" aria-label="处理「她」时，注意力权重偏向「小红」">
@@ -71,14 +71,14 @@ window.DEEPDIVE["attention"] = {
     <figcaption>图 1　处理「她」时，它的 Query 和每个词的 Key 匹配，softmax 后「小红」拿到最高权重，于是「她」主要汇总了「小红」的信息。粗细即权重大小。</figcaption>
   </figure>
 
-  <div class="dd-note math"><b>抓住这一句</b>　权重是<b>由内容（Query 和 Key 匹配）算出来的，不由位置远近决定</b>。「她」看向「小红」，不是因为它们挨得近，而是因为它们「对味」。这正是注意力和按顺序传递的 RNN 的根本分野。</div>
+  <div class="dd-note math"><b>抓住这一句</b>　权重不是按“离得近就固定更大”的规则分配，而是由 <b>Query–Key 内容匹配、位置机制和掩码</b>共同算出。「她」看向「小红」，主要因为它们在这个头里“对味”，而不是仅仅因为相邻；如果模型使用 RoPE、相对位置偏置或局部窗口，距离和可见性也会影响最终分数。</div>
 </section>
 
 <section class="dd-sec">
   <h2><span class="dd-n">3</span>手算一次缩放点积注意力<span class="dd-badge math">数值例子</span></h2>
   <p class="dd-lead">从两组匹配分数到最终输出，softmax 和 Value 各改变了什么？</p>
   <p>设单个查询 <code>q=[1,0]</code>，两个键 <code>k₁=[1,0]</code>、<code>k₂=[0,1]</code>，键维度 <code>d=2</code>；对应值为 <code>v₁=[2,0]</code>、<code>v₂=[0,4]</code>：</p>
-  <table class="dd-table"><thead><tr><th>步骤</th><th>计算</th><th>结果（约）</th></tr></thead><tbody><tr><td>点积</td><td><code>[q·k₁,q·k₂]</code></td><td><code>[1,0]</code></td></tr><tr><td>缩放</td><td><code>[1,0]/√2</code></td><td><code>[0.707,0]</code></td></tr><tr><td>softmax</td><td><code>exp(s)/Σexp(s)</code></td><td><code>[0.670,0.330]</code></td></tr><tr><td>加权和</td><td><code>0.670v₁+0.330v₂</code></td><td><code>[1.340,1.320]</code></td></tr></tbody></table>
+  <table class="dd-table"><thead><tr><th>步骤</th><th>计算</th><th>结果（约）</th></tr></thead><tbody><tr><td>点积</td><td><code>[q·k₁,q·k₂]</code></td><td><code>[1,0]</code></td></tr><tr><td>缩放</td><td><code>[1,0]/<span class="dd-radical" role="math" aria-label="2 的平方根"><span class="dd-radicand">2</span></span></code></td><td><code>[0.707,0]</code></td></tr><tr><td>softmax</td><td><code>exp(s)/Σexp(s)</code></td><td><code>[0.670,0.330]</code></td></tr><tr><td>加权和</td><td><code>0.670v₁+0.330v₂</code></td><td><code>[1.340,1.320]</code></td></tr></tbody></table>
   <p>第一把键更匹配，所以它的 Value 权重更大；输出却不是复制 <code>v₁</code>，而是两个 Value 的混合。Key 决定“取多少”，Value 决定“取什么”，二者不能混为一谈。</p>
   <div class="dd-note warn"><b>注意力权重不是解释概率。</b>它只描述当前头、当前层的一次信息混合系数；残差、其他头和后续层仍会改写表示。高权重不证明某 token 是模型结论的唯一原因。</div>
 </section>
@@ -94,6 +94,7 @@ window.DEEPDIVE["attention"] = {
   <h2><span class="dd-n">5</span>为什么它是转折点<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">最关键的一节：注意力到底比之前的 RNN 强在哪，值得取而代之？</p>
   <p>相较于按时间步串行传递的经典 RNN，它改善了两个关键瓶颈：</p>
+  <p>从输入输出看，它接收整段序列中所有 token 的表示，并同时输出每个位置融合可见上下文后的新表示；“并行”指这些位置不必像 RNN 那样等待前一个时间步完成。</p>
 
   <figure class="dd-fig">
     <svg viewBox="0 0 560 200" role="img" aria-label="RNN 逐步传递路径长，注意力任意两词直连">
@@ -132,7 +133,7 @@ window.DEEPDIVE["attention"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">7</span>它的代价：平方级开销<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">这么强，代价是什么？答案藏在「每个词都要看所有词」这句话里。</p>
-  <p>在<b>标准全局自注意力</b>中，每个位置都要和所有位置算一次匹配，因此注意力分数矩阵有 n² 个元素；该部分的计算量与朴素显存占用随长度平方增长。实际总成本还包含投影与前馈层，FlashAttention、滑窗或稀疏注意力也会改变显存常数或复杂度。</p>
+  <p>在<b>标准全局自注意力</b>中，设 <code>n</code> 是序列的 token 数；每个位置都要和所有位置算一次匹配，因此注意力分数矩阵有 <code>n²</code> 个元素。该部分的计算量与朴素显存占用随长度平方增长。实际总成本还包含投影与前馈层，FlashAttention、滑窗或稀疏注意力也会改变显存常数或复杂度。</p>
   <div class="dd-note math"><b>算一笔账</b>　1 千个 token 的输入，注意力要算约 100 万对；10 万个 token 就是约 <b>100 亿</b>对。这就是长上下文推理又慢又贵的原因——不是厂商不愿意给，而是每一档长度都要付超线性的代价。</div>
   <p>这条平方开销直接约束了两件事：</p>
   <ul class="dd-steps">
@@ -164,7 +165,7 @@ window.DEEPDIVE["attention"] = {
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
     <tbody>
-      <tr><td>注意力靠「位置远近」决定看谁</td><td>由<b>内容匹配</b>（Query·Key）决定，与远近无关</td></tr>
+      <tr><td>注意力只靠「位置远近」决定看谁</td><td>基础项来自 Query·Key 内容匹配；位置编码、相对偏置与掩码也可共同改变分数，并非固定按距离分配</td></tr>
       <tr><td>注意力就是 Transformer</td><td>注意力是一种机制；Transformer 是用它搭起的可堆叠架构（见其深读页）</td></tr>
       <tr><td>多头是为了算得更快</td><td>是为了从<b>多个不同视角</b>看相关，分工是学出来的</td></tr>
       <tr><td>上下文窗口不够是厂商小气</td><td>是注意力平方级开销的硬约束，每加长一档都超线性变贵</td></tr>
@@ -178,7 +179,7 @@ window.DEEPDIVE["attention"] = {
   <h2><span class="dd-n">10</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
   <ol class="dd-quiz">
     <li>Query、Key、Value 各自扮演什么角色？三步流程是怎样的？</li>
-    <li>为什么说注意力的权重「由内容决定，不由位置远近决定」？</li>
+    <li>为什么不能说注意力权重只由位置远近决定？位置机制和掩码又会怎样参与？</li>
     <li>自注意力和交叉注意力的区别是什么？</li>
     <li>注意力靠哪两点取代了 RNN？其中「可并行」为什么对大模型如此关键？</li>
     <li>多头注意力为什么要跑好几组？各组的分工是怎么来的？</li>
@@ -188,10 +189,10 @@ window.DEEPDIVE["attention"] = {
   <details class="dd-answers"><summary>参考答案</summary>
     <ol>
       <li>Query=我在找什么，Key=我能提供什么，Value=我的实际内容；用 Query 和所有 Key 点积算匹配、softmax 成权重、再对所有 Value 加权求和。</li>
-      <li>因为权重来自 Query 与 Key 的内容匹配（点积），谁匹配高就看谁，与它们相隔多远无关。</li>
+      <li>基础匹配来自 Query 与 Key 的点积，而不是固定的“越近越大”规则；但 RoPE、相对位置偏置和掩码会把位置或可见性写进 softmax 前分数，所以最终权重由这些因素共同决定。</li>
       <li>自注意力的 Q/K/V 来自同一序列（句内互看）；交叉注意力的 Q 来自一个序列、K/V 来自另一个（如译文看原文）。</li>
       <li>其一，全局注意力让任意两词在一层内直接交互，缩短长距离信息路径；其二，训练时所有位置可并行计算。短路径有利于远距离依赖，但不是必然正确关注的保证。</li>
-      <li>一组只能按一种方式衡量相关，多头让模型从多个视角同时看；不同头盯语法、指代、句首尾等，分工是训练中自发形成的。</li>
+      <li>一组投影只提供一个表示子空间，多头提供多种并行路由机会；语法、指代或位置分工可能在训练中出现，也可能冗余，并不是每个头都有固定职责。</li>
       <li>标准全局注意力让每个位置与所有位置匹配，分数矩阵有 n² 项；它约束窗口成本。中间迷失还受训练分布、位置表示与注意模式影响。</li>
       <li>因为不带位置表示的自注意力对输入排列等变：输入怎样重排，输出就怎样重排，无法识别先后；词序要靠额外的位置表示注入。</li>
     </ol>

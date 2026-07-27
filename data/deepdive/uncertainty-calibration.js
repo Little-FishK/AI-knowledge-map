@@ -20,3 +20,27 @@ window.DEEPDIVE['uncertainty-calibration'] = window.createDeepDive({
   quiz:[{q:'准确率与校准有什么区别？',a:'准确率是总体答对比例；校准要求某置信组的分数匹配该组经验正确率。'},{q:'为什么平均 token logprob 不等于事实正确率？',a:'它受长度和语言常见度影响，没有直接定义任务正确事件。'},{q:'温度缩放通常改变 top-1 准确率吗？',a:'不改变类别排序，所以通常不改变，只调整概率尖锐度。'},{q:'选择性风险是什么？',a:'超过阈值、被系统自动处理的样本中的错误率。'},{q:'总体 ECE 低为何仍需切片？',a:'不同群体的过度与不足自信可在总体中互相抵消。'}],
   sources:[{title:'On Calibration of Modern Neural Networks',url:'https://arxiv.org/abs/1706.04599',note:'温度缩放与现代网络校准'},{title:'Semantic Uncertainty',url:'https://arxiv.org/abs/2302.09664',note:'生成任务的语义不确定性'},{title:'Selective Classification for Deep Neural Networks',url:'https://arxiv.org/abs/1705.08500',note:'风险—覆盖与选择性预测'},{title:'Uncertainty Estimation for Language Models',url:'https://arxiv.org/abs/2207.05221',note:'语言生成置信与校准综述'}]
 });
+
+// 新版教学门禁补充：逐节说明分数来源、校准计算、阈值决策与上线失效边界。
+{
+  const page = window.DEEPDIVE['uncertainty-calibration'];
+  const additions = [
+    '<p>校准评估输入一组任务答案、模型分数和最终正确标签，输出“相同分数组的经验正确率是否匹配声称概率”的判断。准确率回答总体答对多少，区分度回答能否把对错排序，校准回答 0.8 是否长期约对应 80% 正确；三者不是一回事。永远报基准正确率可能校准却没有分流价值。</p>',
+    '<p>原始置信信号输入 token 概率、多次采样、模型自评、检索覆盖、外部验证器和模型分歧，输出一个尚未具备概率含义的风险分数。再用独立校准集学习该分数到任务正确频率的映射；任务事件可以是“退款资格正确且引用支持”。平均 token 概率和“我很确定”的措辞都不能直接解释为答案正确概率。</p>',
+    '<p>可靠性评估输入 n 个预测、分桶 Bm、每桶平均置信 conf(Bm) 和实际准确率 acc(Bm)，输出可靠性图与期望校准误差 ECE。对每桶取置信与准确的绝对差，再乘该桶样本占比 |Bm|/n 并求和；ECE 越小表示当前分桶下平均差距越小。结果依赖桶边界且可能掩盖切片失准，不能跨不同分桶机械比较。</p>',
+    '<p>ECE 案例输入十笔退款的分数和正确标签，输出低中高三桶贡献与总 ECE。计算规则是每桶的 |准确率−平均置信| 乘该桶样本占比，再把各桶贡献相加。低桶贡献 0.010，中桶 0.040，高桶 0.070，相加约 0.120；高桶平均置信 0.90 却只正确 2/3，说明原阈值会放行大量高成本错误。十个样本只用于演示计算，不能把 0.120 当精确生产估计。</p>',
+    '<p>温度缩放输入分类 logits z、独立校准标签和温度 T，输出 softmax(z/T) 的重标度概率。选择使校准集负对数似然最小的 T；T 大于 1 会软化过度尖锐分布，且因类别排序不变通常不改 top1 预测。它只修分数尺度，不创造缺失知识；事件定义或分布改变后必须重新验证。</p>',
+    '<p>选择性决策输入校准分数、阈值 τ、错误成本 Cerror、人工成本 Cmanual、拒绝成本 Creject、审核容量和 SLA，输出自动、转人工或拒绝以及期望成本 Cost(τ)。只有分数达到阈值才自动，阈值升高通常降低覆盖也降低选择性风险；按三类结果的概率乘成本并求和选可行点。队列满时不能绕过高风险门槛。</p>',
+    '<p>序列置信分析输入 token 条件概率、文本长度、语义采样、任务事件和外部证据，输出经过任务定义的风险分数。序列概率会随长度相乘缩小，平均 logprob 偏好常见短措辞，多次采样也可能共享同一盲点；因此分别校准资格、引用、工具和业务状态。分布外输入或对抗提示会使旧映射失效，高置信不是安全证明。</p>',
+    '<p>生产监控输入原始分数、校准版本、阈值、决策、切片和延迟成熟标签，输出滚动 ECE、Brier、风险覆盖曲线及收紧、回滚或暂停动作。发布前冻结阈值证据，金丝雀抽查自动通过案例，标签成熟后按语言政策和长度重算；代理信号只做早期预警。没有新的代表性标签时，单纯调大温度不能恢复校准。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="期望校准误差"><mi>ECE</mi><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mfrac><mrow><mo>|</mo><msub><mi>B</mi><mi>m</mi></msub><mo>|</mo></mrow><mi>n</mi></mfrac><mo>×</mo><mo>|</mo><mi>acc</mi><mo>(</mo><msub><mi>B</mi><mi>m</mi></msub><mo>)</mo><mo>−</mo><mi>conf</mi><mo>(</mo><msub><mi>B</mi><mi>m</mi></msub><mo>)</mo><mo>|</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="阈值策略的期望成本"><mi>Cost</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mi>Cerror</mi><mo>×</mo><mi>PerrorAuto</mi><mo>+</mo><mi>Cmanual</mi><mo>×</mo><mi>Pmanual</mi><mo>+</mo><mi>Creject</mi><mo>×</mo><mi>Preject</mi></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

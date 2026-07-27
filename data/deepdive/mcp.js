@@ -240,3 +240,20 @@ window.DEEPDIVE["mcp"] = {
 </div>
 `
 };
+
+// 新版教学门禁补充：基础页每个核心章节独立回答六问。
+{
+  const page = window.DEEPDIVE["mcp"];
+  const additions = [
+    '<p>MCP 解决的是不同 AI 应用与工具提供方重复编写连接适配器的问题。输入是 M 个应用和 N 个能力源，输出是双方各实现一次公共协议的连接结构。理想集成数由 M×N 变为 M+N；这表示连接代码可复用，不表示每个组合无需认证、授权、版本和语义适配。</p>',
+    '<p>MCP 是规定能力怎样暴露、发现和调用的开放协议。输入是实现 MCP 的应用端与服务端，输出是能够互通的结构化消息和生命周期。它像 USB-C 统一接口而不替设备完成工作；兼容协议只说明能交换消息，不保证工具真实、安全或适合当前任务。</p>',
+    '<p>分工辨析输入模型提出的工具意图和外部能力连接，输出工具调用层与 MCP 连接层。模型用工具调用表达“想做什么”，Host 通过 MCP 发现并请求“由谁怎样做”。两层配合才能执行；MCP 不替模型选择工具，工具调用也不解决跨提供方接入复用。</p>',
+    '<p>角色模型输入用户会话、单个 Server 连接和服务能力，输出 Host、Client、Server 责任及 tools、resources、prompts 目录。Host 管用户与策略，每个 Client 维护一个 Server 会话，Server 暴露聚焦能力。角色关系说明通信边界，不表示 Server 已获全部会话、资源或执行权限。</p>',
+    '<p>天气示例输入双方版本能力和城市参数，输出协商会话、工具目录与带来源结果。Client 依次 initialize、确认 initialized、tools/list，再由 Host 校验和授权 tools/call。返回天气只表示 Server 给出结果；能力协商不等于用户授权，错误或外部文本仍按不可信数据处理。</p>',
+    '<p>生态标准化输入多个兼容 Host 与 Server，输出可复用、可扩展和可组合的能力网络。新增一方只实现公共接口即可被兼容方发现，跨系统任务由 Host 编排。M+N 是理想复用直觉；扩展差异、协议版本、认证和业务语义仍会限制实际互通。</p>',
+    '<p>MCP 安全治理输入 Server 身份、所需资源、工具风险和返回内容，输出连接允许、最小权限、逐次授权或拒绝。Host 在模型之外校验主体、参数和副作用，外部结果保留来源并隔离提示注入。可信 Server 也可能被攻陷；协议兼容和一次批准都不能替代持续授权与审计。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+}

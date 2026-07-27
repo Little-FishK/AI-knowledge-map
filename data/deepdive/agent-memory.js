@@ -23,3 +23,36 @@ window.DEEPDIVE['agent-memory'].html = window.DEEPDIVE['agent-memory'].html.repl
 <section class="dd-sec"><h2><span class="dd-n">12</span>评测要覆盖写、找、用、改、忘五个阶段<span class="dd-badge eng">实验设计</span></h2><p class="dd-lead">检索 Recall@10 很高，为什么 Agent 仍可能被旧记忆带偏？</p><p>离线构造跨轮任务：在长对话中埋入稳定偏好、临时约束、相互冲突更新、敏感信息和恶意外部文本；随后测试是否正确写入、能否在适当任务取回、是否引用最新有效值、能否执行纠正和删除。每阶段都记录错误归因，避免把生成器失败误算成检索失败。</p><div class="dd-formula">净贡献 = 成功率(memory) − 成功率(no-memory) − λ·隐私/陈旧引用成本</div><p>报告端到端任务成功、错误记忆使用率、跨用户泄漏率、纠正生效延迟、删除残留率、token与P95延迟；并与“仅最近历史”“滚动摘要”“检索记忆”做消融。安全测试必须包含持久化提示注入：恶意网页即使语义高度相关，也不能升级为程序性规则。</p></section>
 <section class="dd-sec"><h2><span class="dd-n">13</span>常见误区与学习路线<span class="dd-badge intuition">误区与依赖</span></h2><p class="dd-lead">最危险的记忆系统，往往不是忘得快，而是错得持久且没有来源。</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>误区</th><th>更准确的理解</th></tr></thead><tbody><tr><td>存得越多记性越好</td><td>噪声、冲突和攻击面会同步增加</td></tr><tr><td>向量相似就是相关</td><td>还要权限、时间、作用域和任务价值</td></tr><tr><td>新记录直接覆盖旧记录</td><td>当前视图与历史事件应分离</td></tr><tr><td>模型总结可当事实</td><td>摘要有损且必须保留来源</td></tr><tr><td>删掉数据库行就完成遗忘</td><td>派生摘要、索引、缓存也要处理</td></tr></tbody></table></div><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>层级</th><th>依赖与延伸</th></tr></thead><tbody><tr><td>先修</td><td>上下文工程、RAG、数据库与权限</td></tr><tr><td><b>本页核心</b></td><td>写入门控、时态检索、整合、纠正、遗忘</td></tr><tr><td>相邻</td><td>上下文压缩、知识图谱、可观测性</td></tr><tr><td>治理</td><td>隐私、数据保留、提示注入、审计</td></tr></tbody></table></div><div class="dd-note warn"><b>权限过滤必须发生在内容进入模型之前。</b>让模型看到后再要求它忽略，已经构成泄露。</div></section>
 <div class="dd-src">`);
+
+// 新版教学门禁补充：每个核心章节独立回答六问，并统一公式符号说明。
+{
+  const page = window.DEEPDIVE['agent-memory'];
+  const additions = {
+    0: '<p>外部记忆是 Agent 可持久写入、按需检索并可纠正的状态系统。输入是超出当前窗口仍可能有用的事件、事实和偏好，输出是当前任务获准使用的记忆证据。它通过写入、检索和更新维持跨会话连续性；命中只表示找到了记录，不表示记录最新、真实或有权使用。</p>',
+    1: '<p>分层输入一条候选信息及其用途和有效期，输出上下文历史、工作状态、情景、语义或程序性记忆类别。当前工具结果服务眼前任务，具体事件保留时间来源，多次证据才可整合为稳定偏好。分类帮助选择写入和淘汰策略，但现实信息可能跨层，不能仅凭名称自动升级为长期规则。</p>',
+    2: '<p>写入门控输入候选内容、来源、置信度、未来效用、敏感度、作用域和保留期，输出拒绝、待确认或版本化记录。它解决每句话都保存造成的噪声、冲突和隐私问题；重要事实经确认或多证据后再提升。写入成功只表示符合保存策略，不证明内容为真或未来一定有用。</p>',
+    3: '<p>记忆检索输入任务、主体权限、时间、候选记忆及五类评分信号，输出过滤并重排后的带来源记录。先按用户和项目作用域过滤，再综合相关性、时效性、重要度和来源置信；总分用于排序而非真值概率。权重依任务校准，权限不得用负分软惩罚代替硬过滤。</p>',
+    4: '<p>整合管理输入新旧记录、时间、来源和用户纠正，输出当前视图、历史轨迹、冲突状态或删除结果。它通过版本失效而非物理覆盖保留审计，并让摘要链接原证据。当前值只是在明确规则下最适用的记录；无法裁决的冲突应并存或询问，模型总结不能充当事实验证。</p>',
+    5: '<p>记忆安全输入外部候选、来源、敏感度和目标作用域，输出允许写入的数据记录或拒绝决定。它阻断网页提示注入被持久化为未来规则：外部内容始终标为数据，系统策略和秘密不可被普通记忆覆盖。过滤通过只覆盖已测攻击，跨用户泄漏和间接注入仍须专门评测。</p>',
+    8: '<p>偏好变化案例输入用户级中文偏好与项目级英文约束，输出按项目作用域选择并带来源的当前语言。系统先过滤权限，再按作用域、时效和显式程度重排，纠正时写新事件并使旧记录失效。m42 胜出表示它对项目 P 更具体，不表示用户的全局中文偏好被删除。</p>',
+    9: '<p>生命周期图输入候选事件和任务请求，输出经过写入闸门、版本化存储、权限检索与反馈纠正的记忆。每个箭头都是可记录的状态变化，用来定位错误发生在写、存、找、用还是改。图描述治理流程而非某种数据库实现；仅向量化写库不会自动获得权限、版本和删除能力。</p>',
+    10: '<p>冲突推理输入实体、属性、事实类型、作用域、有效时间和来源，输出并存、失效、当前选择或澄清请求。只有同一属性且时间作用域重叠时才构成直接冲突；规则按确认、权威和时效裁决。当前视图不是永恒真相，计划与现状、不同项目偏好不能被相似度分数强行覆盖。</p>',
+    11: '<p>五阶段评测输入含稳定、临时、冲突、敏感和恶意记录的跨轮任务，输出写入、检索、使用、纠正、遗忘及端到端指标。与无记忆基线比较任务增益，再扣除陈旧引用和隐私代价。净贡献依赖指标尺度与系数 λ，不能跨项目直接比较，也不能用高召回抵消跨用户泄漏。</p>'
+  };
+  const renderedSections = page.html.split("</section>");
+  Object.entries(additions).forEach(([index, html]) => { renderedSections[Number(index)] += html; });
+  page.html = renderedSections.join("</section>")
+    .replace(
+      '<div class="dd-formula">score(m) = α·相关性 + β·时效性 + γ·重要度 + δ·来源置信 − 冲突/权限惩罚</div>',
+      '<div class="dd-formula" data-formula-id="agent-memory-retrieval-score" data-display="mathml"><math display="block" aria-label="记忆 m 的排序分数等于相关性、时效性、重要度和来源置信的加权和减去冲突惩罚"><mi>score</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>=</mo><mi>α</mi><mi>Rel</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>+</mo><mi>β</mi><mi>Rec</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>+</mo><mi>γ</mi><mi>Imp</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>+</mo><mi>δ</mi><mi>Src</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>−</mo><mi>Penalty</mi><mo>(</mo><mi>m</mi><mo>)</mo></math></div><p class="dd-formula-note"><code>m</code> 是一条候选记忆；<code>score</code> 是排序分数；<code>Rel</code>、<code>Rec</code>、<code>Imp</code>、<code>Src</code> 分别是相关性、时效性、重要度和来源置信，<code>α</code>、<code>β</code>、<code>γ</code>、<code>δ</code> 是对应权重；<code>Penalty</code> 是冲突惩罚。权限必须在评分前硬过滤，不能只是惩罚项。</p>'
+    )
+    .replace(
+      '<div class="dd-formula">净贡献 = 成功率(memory) − 成功率(no-memory) − λ·隐私/陈旧引用成本</div>',
+      '<div class="dd-formula" data-formula-id="agent-memory-net-value" data-display="mathml"><math display="block" aria-label="记忆净贡献 V 等于使用记忆的成功率减去无记忆成功率，再减去拉姆达乘隐私和陈旧引用成本"><mi>V</mi><mo>=</mo><mi>Success</mi><mo>(</mo><mi>memory</mi><mo>)</mo><mo>−</mo><mi>Success</mi><mo>(</mo><mi>noMemory</mi><mo>)</mo><mo>−</mo><mi>λ</mi><mi>Cost</mi><mo>(</mo><mi>privacyStale</mi><mo>)</mo></math></div><p class="dd-formula-note"><code>V</code> 是记忆相对基线的净贡献；<code>Success(memory)</code> 和 <code>Success(noMemory)</code> 分别是使用记忆与不使用记忆的任务成功率；<code>Cost(privacyStale)</code> 是隐私越界和陈旧引用成本；<code>λ</code> 把风险成本换算到与成功率可比较的权重。</p>'
+    );
+}
+
+window.DEEPDIVE['agent-memory'].html = window.DEEPDIVE['agent-memory'].html.replace(
+  '<section class="dd-sec"><h2><span class="dd-n">7</span>完整记忆链',
+  '<section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">7</span>完整记忆链'
+);

@@ -21,3 +21,28 @@ window.DEEPDIVE['prefilling'] = window.createDeepDive({
   quiz:[{q:'响应预填充改模型权重吗？',a:'不改，只把前缀加入当前条件上下文。'},{q:'为什么图中 .25 和 .60 不能直接比较成概率提升？',a:'它们对应不同预测位置和事件空间。'},{q:'响应预填充与提示缓存差什么？',a:'前者引导输出内容，后者复用相同输入前缀的 KV 计算。'},{q:'哪些内容不应预填？',a:'未经验证的结论、身份、金额、引用和工具状态。'},{q:'怎样检测锚定？',a:'对同一输入用空、正反结论前缀做配对，看是否无证据翻转。'}],
   sources:[{title:'Language Models as Programmable Systems',url:'https://arxiv.org/abs/2212.06094',note:'LMQL 与受控生成'},{title:'Guidance',url:'https://arxiv.org/abs/2307.09702',note:'交错控制与生成'},{title:'PICARD',url:'https://arxiv.org/abs/2109.05093',note:'与硬约束解码对照'},{title:'Anchoring Effects in Large Language Models',url:'https://arxiv.org/abs/2305.11627',note:'输入锚点对模型判断的影响'}]
 });
+
+// 新版教学门禁补充：逐节明确输入输出、工作机制、结果含义与适用边界。
+{
+  const page = window.DEEPDIVE['prefilling'];
+  const additions = [
+    '<p>响应预填充输入用户/系统上下文和一段已确认的 assistant 前缀，输出从该前缀之后继续的 token 序列。前缀被放进条件上下文，模型不是重新选择它；结果只表示续写与前缀连贯，不证明前缀中的事实正确。只应预填可独立保证正确的最小骨架。</p>',
+    '<p>条件生成输入上下文 x、前缀 p 和先前续写，输出下一 token 的概率分布与最终续写。模型权重不变，注意力每步都读取 p，因此事件空间和概率改变；更具体的前缀会减少可选路径，但冲突或错误前缀会把续写锚在错误区域。</p>',
+    '<p>概念消歧输入一个名为 prefill 或 cache 的功能及其作用对象，输出“响应前缀、输入计算、缓存复用或硬约束”中的一种分类。先看它处理 assistant 文本、输入 token、KV 结果还是合法 token 集，再判断它改变内容条件还是只减少计算。名称相似不能推出语义或接口兼容，实际行为仍以服务文档和契约测试为准。</p>',
+    '<p>这个案例输入空前缀或“{”两种条件以及各自的首步候选，输出两个不同位置的概率分布和完整结构指标。“{”的 .25 与“action”的 .60 不是同一事件，不能说概率从 .25 提升到 .60；要解释的是完整输出的结构、事实与失败类型。</p>',
+    '<p>前缀选择输入拟固定文本、证据状态和任务风险，输出中性骨架或“不使用预填”的决定。只固定 JSON 开括号、标题或已验证代码；结论、身份、金额、引文和工具状态必须由权威系统确认。前缀越长，越可能锚定未知事实。</p>',
+    '<p>API 接入输入服务能力、assistant 前缀、流式事件和停止规则，输出正确拼接的一份完整结果。服务决定前缀是续写条件、历史答案还是非法消息，客户端再按契约拼接、解码和停止；回显或重复开头说明契约理解有误。半个转义、不完整 Unicode 和未经实测的接口都不适合直接上线。</p>',
+    '<p>锚定测试输入同一问题的空前缀、“是”和“否”三个版本，输出结论变化和证据变化。模型按连贯性续写已有开头，所以理由随前缀翻转表示格式正在替代证据，而不是答案更可靠。高风险任务只能使用中性骨架，并需单独红队。</p>',
+    '<p>业务验证输入完整模型输出、schema、权威数据与当前权限，输出可接受、拒绝或重新询问。系统依次检查完整性、结构、字段事实、实体权限和幂等提交；通过 JSON 解析只说明形式正确，不说明事实或动作获准。硬结构应优先使用约束解码，预填只作兼容或体验优化。</p>',
+    '<p>配对评测输入相同样本的空前缀与候选前缀结果，输出格式、事实、拒答、安全、延迟和成本差异。按相同切片逐项比较并注入断流、回显和接口升级故障；只有格式改善且内容与风险不退化才可采用。模型、API 或模板版本变化后必须重新评测。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => {
+    if (html) renderedSections[index] += html;
+  });
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace(
+    /<div class="dd-formula">[\s\S]*?<\/div>/,
+    '<div class="dd-formula"><math display="block" aria-label="给定上下文和前缀时完整续写的条件概率"><mi>P</mi><mo>(</mo><mi>y</mi><mo>|</mo><mi>x</mi><mo>,</mo><mi>p</mi><mo>)</mo><mo>=</mo><munder><mo>∏</mo><mi>t</mi></munder><mi>P</mi><mo>(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>|</mo><mi>x</mi><mo>,</mo><mi>p</mi><mo>,</mo><msub><mi>y</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></math></div>'
+  );
+}

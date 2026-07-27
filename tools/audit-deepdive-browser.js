@@ -268,8 +268,62 @@ async function audit() {
             if (!name) add("WCAG-4.1.2", "存在无可访问名称的按钮");
             if (button.tabIndex < 0) add("WCAG-2.1.1", `按钮不可键盘聚焦：${name}`);
           });
+          const recommended = (window.GRAPH.recommendedLearningPath || [])
+            .flatMap((phase) => (phase.steps || []).map((step) => ({
+              order: String(step[0]),
+              id: step[1],
+            })));
+          const pathIndex = recommended.findIndex((step) => step.id === pageId);
+          const expectedNext = pathIndex >= 0 ? recommended[pathIndex + 1] : null;
+          const learnButton = article.querySelector("[data-learn-node]");
+          const nextButton = article.querySelector("[data-next-node]");
+          if (!learnButton) add("learning-navigation", "缺少标记为已学习按钮");
+          if (expectedNext) {
+            const nextNode = window.GRAPH.nodes.find((node) => node.id === expectedNext.id);
+            if (!nextButton) {
+              add("learning-navigation", `缺少下一节 ${expectedNext.order} 跳转按钮`);
+            } else {
+              if (nextButton.getAttribute("data-next-node") !== expectedNext.id) {
+                add("learning-navigation", `下一节目标错误，应为 ${expectedNext.id}`);
+              }
+              const accessibleName = nextButton.getAttribute("aria-label") || "";
+              if (!accessibleName.includes(expectedNext.order) || !accessibleName.includes(nextNode?.title || "")) {
+                add("learning-navigation", "下一节按钮没有完整说明序号与标题");
+              }
+              if (learnButton) {
+                const learnRect = learnButton.getBoundingClientRect();
+                const nextRect = nextButton.getBoundingClientRect();
+                if (nextRect.left + 1 < learnRect.right) {
+                  add("learning-navigation", "下一节按钮没有显示在学习按钮右侧");
+                }
+              }
+            }
+          } else if (nextButton) {
+            add("learning-navigation", "推荐路径最后一页不应显示下一节按钮");
+          }
           article.querySelectorAll("details").forEach((details, index) => {
             if (!details.querySelector(":scope > summary")) add("WCAG-4.1.2", `details ${index + 1} 缺 summary`);
+          });
+          if (article.textContent.includes("√")) {
+            add("math-radical", "仍存在没有声明被开方范围的裸文本根号");
+          }
+          article.querySelectorAll(".dd-radical").forEach((radical, index) => {
+            const radicand = radical.querySelector(":scope > .dd-radicand");
+            const name = (radical.getAttribute("aria-label") || "").trim();
+            if (!radicand || !radicand.textContent.trim()) {
+              add("math-radical", `根式 ${index + 1} 缺少被开方内容`);
+              return;
+            }
+            if (radical.getAttribute("role") !== "math" || !name) {
+              add("WCAG-1.3.1", `根式 ${index + 1} 缺 role=math 或可访问名称`);
+            }
+            const style = getComputedStyle(radicand);
+            if (style.borderTopStyle === "none" || parseFloat(style.borderTopWidth) < 1) {
+              add("math-radical", `根式 ${index + 1} 的横线没有覆盖被开方容器`);
+            }
+            if (radicand.getBoundingClientRect().width + 0.5 < radicand.scrollWidth) {
+              add("math-radical", `根式 ${index + 1} 的被开方内容溢出横线`);
+            }
           });
 
           function parseRgb(value) {
@@ -328,6 +382,22 @@ async function audit() {
       }
 
       if (ids.length) {
+        const navigationProbe = await page.evaluate(() => {
+          const steps = (window.GRAPH.recommendedLearningPath || []).flatMap((phase) => phase.steps || []);
+          const first = steps[0];
+          const second = steps[1];
+          window.__DEEPDIVE_QUALITY_AUDIT__.open(first[1]);
+          return { expectedId: second[1], expectedTitle: window.DEEPDIVE[second[1]]?.title || "" };
+        });
+        await page.locator("[data-next-node]").click();
+        const navigationResult = await page.evaluate(() => ({
+          activeTitle: document.querySelector("#dd-article h1")?.textContent?.trim() || "",
+          activeTarget: document.querySelector("[data-learn-node]")?.getAttribute("data-learn-node") || "",
+        }));
+        if (navigationResult.activeTarget !== navigationProbe.expectedId
+          || navigationResult.activeTitle !== navigationProbe.expectedTitle) {
+          failures.push(`${ids[0]} [${viewport.name}] learning-navigation 点击下一节按钮没有打开官方顺序中的下一页`);
+        }
         await page.evaluate((id) => window.__DEEPDIVE_QUALITY_AUDIT__.open(id), ids[0]);
         await page.locator("#dd-back").focus();
         if (!(await page.locator("#dd-back").evaluate((button) => button === document.activeElement))) {

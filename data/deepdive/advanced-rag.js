@@ -17,3 +17,21 @@ window.DEEPDIVE['advanced-rag'] = window.createDeepDive({
   quiz:[{q:'答案错先做什么？',a:'定位失败层并查看中间证据。'},{q:'HyDE 做什么？',a:'生成假设文档作为检索表示。'},{q:'混合召回为何有用？',a:'稠密语义与稀疏精确匹配互补。'},{q:'多跳主要风险？',a:'早期错误滚雪球和循环。'},{q:'如何证明组件有用？',a:'固定集消融并看证据、答案、延迟成本。'}],
   sources:[{title:'Retrieval-Augmented Generation for Large Language Models: A Survey',url:'https://arxiv.org/abs/2312.10997',note:'RAG 技术谱系'},{title:'Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)',url:'https://arxiv.org/abs/2212.10496',note:'假设文档检索'},{title:'Corrective Retrieval Augmented Generation',url:'https://arxiv.org/abs/2401.15884',note:'检索质量判断与纠错'},{title:'Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods',url:'https://dl.acm.org/doi/10.1145/1571941.1572114',note:'RRF 排名融合'}]
 });
+
+// 新版教学门禁补充：逐节说明新增组件针对哪一层失败及何时停止。
+{
+  const page = window.DEEPDIVE['advanced-rag'];
+  const additions = [
+    '<p>分层诊断输入查询、解析块、召回候选、重排结果、最终上下文和回答，输出首次偏离预期的层及可证伪修复假设。一次只改变该层并复跑同一数据，才能解释收益来源；答案变好但延迟超预算时只应把复杂链路路由给困难查询。未定位失败前不能直接堆组件。</p>',
+    '<p>查询改写输入原问题、实体、日期、否定和歧义，输出保留约束的结构化改写或多个子查询。改写补搜索表达而不替换用户意图，原问题仍用于最终验收；HyDE 的假设文档只构造搜索表示。新增实体或丢失否定会把检索带向错误前提，必须保留差异与来源。</p>',
+    '<p>混合融合输入 J 路检索器各自的候选名次 rj(d) 和平滑常数 k，输出文档 d 的 RRF 分数 RRF(d)。j 是检索器编号；每一路按 1/(k+rj(d)) 贡献，名次靠前贡献更大，避免直接相加不同量纲分数；融合只扩大和排序候选，不判断时效、权限或真实性。</p><div class="dd-formula"><math display="block" aria-label="倒数排名融合分数"><mi>RRF</mi><mo>(</mo><mi>d</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mo>+</mo><mi>rj</mi><mo>(</mo><mi>d</mi><mo>)</mo></mrow></mfrac></math></div>',
+    '<p>上下文装配输入融合候选、重排分、来源、邻接、版本和权限，输出去重且保留必要冲突与引用的上下文。交叉编码器精排后按来源合并邻接块，并过滤过期和无权内容；前排相关只说明适合回答，不等于可信。相互冲突的权威证据必须显式保留和解释。</p>',
+    '<p>多跳检索输入问题、已知证据槽位和当前缺口，输出下一子查询、中间实体及更新后的槽位状态。每一跳只在填补缺口或解决冲突时继续，并验证实体和来源；错误实体会让后续检索滚雪球。最大步数、预算和无进展终止是必需边界。</p>',
+    '<p>升级评测输入固定查询集、基础 RAG 与单组件变体，输出 Recall、NDCG、证据忠实、答案成功、延迟和成本差异。通过组件消融确认新增环节是否改善端到端任务，而非只改善自己的局部指标；排序提高但答案不变说明瓶颈已在后续。没有稳定净收益的组件应删除。</p>',
+    '<p>退款案例输入原问题、BM25 与向量名次、RRF、重排、时效和权限规则，输出可共同支撑结论的 A+B 证据。A 和 C 的融合分几乎相同说明 RRF 不是最终裁判；重排识别退款资格，版本过滤删除旧政策。最终回答只能引用真实取回、通过治理检查的材料。</p>',
+    '<p>纠错循环输入已知槽位、缺失槽位、新证据、跳数和资源预算，输出继续检索、解决冲突或透明停止。只有填补缺口、提升来源等级或解决版本冲突才算进展；连续两轮无新槽位就停止。HyDE 假设文本和 Agent 自写内容不能升级为回答证据。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+}

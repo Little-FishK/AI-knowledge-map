@@ -1,19 +1,238 @@
 window.DEEPDIVE['information-theory'] = window.createDeepDive({
-  title:'信息论与熵：用概率衡量不确定性与编码代价', subtitle:'从自信息、熵、交叉熵、KL 散度到困惑度，建立语言模型损失与压缩之间的统一直觉。',
-  thesis:'信息论把低概率事件解释为更高信息量，把分布平均不确定性解释为熵；交叉熵和 KL 衡量用错误分布编码真实数据的额外代价，但<b>统计匹配不等同于语义真实或价值正确</b>。',
-  goals:['计算自信息与熵','推导交叉熵和 KL 关系','解释困惑度','避免把熵当知识或质量'],
-  sections:[
-    {title:'罕见事件信息更多',kind:'math',badge:'数学',lead:'为什么确定会发生的事几乎不提供信息？',body:'<div class="dd-formula">I(x)=−log₂ p(x)</div><p>p=1 时信息为 0；概率越小，自信息越大。对数使独立事件的联合信息相加，单位取决于对数底，底 2 为 bit。</p>'},
-    {title:'熵是平均不确定性',kind:'math',badge:'熵',lead:'一个概率分布总体有多难预测？',body:'<div class="dd-formula">H(P)=−Σₓ P(x)log P(x)</div><p>均匀分布熵高，集中分布熵低。熵是按 P 对每个事件自信息取期望，描述抽样前的平均不确定性；某次抽到罕见事件的信息量很大，并不意味着整个分布熵一定高。熵也不直接描述某条具体回答的质量。</p><p>在 n 个可能结果上，熵最大值是 log n，且仅在均匀分布达到；确定分布的熵为 0。比较熵时必须统一事件划分，同一文本按字符、词或 token 定义会得到不同数值。</p>'},
-    {title:'交叉熵是错误编码代价',kind:'math',badge:'交叉熵',lead:'用模型 Q 编码真实分布 P 会多付多少？',body:'<div class="dd-formula">H(P,Q)=H(P)+D<sub>KL</sub>(P||Q)</div><p>训练语言模型最小化经验交叉熵；真实熵固定时，等价于减少从 P 到 Q 的 KL。</p>'},
-    {title:'KL 不是普通距离',badge:'消歧',lead:'为什么 DKL(P||Q) 与 DKL(Q||P) 不同？',body:'<p>KL 非对称且不满足三角不等式。若 Q 给 P 可能发生的事件零概率，正向 KL 可发散；方向决定惩罚漏覆盖还是其他行为，不能把它当欧氏距离。</p>'},
-    {title:'困惑度与 tokenization',kind:'eng',badge:'语言模型',lead:'困惑度 20 应怎样理解？',body:'<p>困惑度是平均 token 交叉熵的指数，可直觉为每步有效候选规模。不同 tokenizer 改变序列单位，跨分词器直接比较困惑度可能不公平。</p>'},
-    {title:'信息量不等于意义',badge:'边界',lead:'高熵输出是否更有创意、更聪明？',body:'<p>高熵只表示分布更分散，可能是多样性，也可能是不确定或噪声；低交叉熵可能来自背诵。事实性、安全与用户价值需要独立评测。</p><div class="dd-note warn"><b>KL=0 只说明分布相同。</b>　不说明该分布本身符合现实或目标。</div>'},
-    {title:'一次三符号预测怎样把概念连起来',kind:'math',badge:'运行示例',lead:'真实天气分布 P=(1/2,1/4,1/4)，模型 Q=(1/2,3/8,1/8) 时，自信息、熵、交叉熵和 KL 分别是多少？',body:'<figure class="dd-fig"><svg viewBox="0 0 680 245" role="img" aria-label="真实分布 P 与模型分布 Q 的编码长度、交叉熵和 KL 额外代价"><defs><marker id="it1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="35" width="170" height="152" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="103" y="59" text-anchor="middle" class="svg-t">真实分布 P</text><text x="38" y="88" class="svg-t" font-size="10">晴：p=1/2 → 1 bit</text><text x="38" y="113" class="svg-t" font-size="10">雨：p=1/4 → 2 bit</text><text x="38" y="138" class="svg-t" font-size="10">雪：p=1/4 → 2 bit</text><text x="38" y="167" class="svg-t" font-size="10">H(P)=1/2×1+1/4×2+1/4×2</text><text x="103" y="181" text-anchor="middle" class="svg-t" font-size="10">= 1.5 bit</text><path d="M188,110 L248,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="250" y="35" width="190" height="152" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="345" y="59" text-anchor="middle" class="svg-t">模型编码 Q</text><text x="270" y="88" class="svg-t" font-size="10">晴：q=1/2 → 1 bit</text><text x="270" y="113" class="svg-t" font-size="10">雨：q=3/8 → 1.415 bit</text><text x="270" y="138" class="svg-t" font-size="10">雪：q=1/8 → 3 bit</text><text x="270" y="163" class="svg-t" font-size="10">H(P,Q)=0.5+0.3538+0.75</text><text x="345" y="181" text-anchor="middle" class="svg-t" font-size="10">≈ 1.6038 bit</text><path d="M440,110 L500,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="502" y="57" width="160" height="108" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="582" y="82" text-anchor="middle" class="svg-t">额外编码代价</text><text x="582" y="108" text-anchor="middle" class="svg-t" font-size="10">Dₖₗ(P||Q)</text><text x="582" y="131" text-anchor="middle" class="svg-t" font-size="10">= H(P,Q)−H(P)</text><text x="582" y="151" text-anchor="middle" class="svg-t" font-size="10">≈ 0.1038 bit / 符号</text><text x="340" y="224" text-anchor="middle" class="svg-t" font-size="10">P 决定事件出现频率；Q 决定模型给它分配的码长。对雪低估得越严重，真实雪事件付出的码长越大。</text></svg><figcaption>图 1　交叉熵是按真实频率 P 平均模型码长 −log₂Q；它比最佳熵多出的部分恰好是正向 KL。</figcaption></figure><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>事件</th><th>P(x)</th><th>−log₂P</th><th>Q(x)</th><th>−log₂Q</th><th>P 加权 Q 码长</th></tr></thead><tbody><tr><td>晴</td><td>0.5</td><td>1</td><td>0.5</td><td>1</td><td>0.5000</td></tr><tr><td>雨</td><td>0.25</td><td>2</td><td>0.375</td><td>1.415</td><td>0.3538</td></tr><tr><td>雪</td><td>0.25</td><td>2</td><td>0.125</td><td>3</td><td>0.7500</td></tr></tbody></table></div><p>因此 <code>H(P)=1.5</code> bit，<code>H(P,Q)≈1.6038</code> bit，<code>KL≈0.1038</code> bit。Q 对雨分得过多、对雪分得过少；二者总概率仍为 1，但错误分配使按 P 产生的数据平均多花编码。若 Q(雪)=0，雪一旦发生需无限码长，正向 KL 发散。</p><div class="dd-note key"><b>方向含义：</b><code>KL(P||Q)</code> 按真实 P 加权，严厉惩罚 Q 漏掉真实会发生的事件；反向 <code>KL(Q||P)</code> 按 Q 加权，行为和零概率边界不同，不能交换。</div>'},
-    {title:'交叉熵怎样变成语言模型损失和困惑度',kind:'math',badge:'语言模型',lead:'一句话的 token 损失为什么可以解释成压缩长度？',body:'<p>对序列 x₁…xₙ，负对数似然为 <code>−Σₜ log Q(xₜ|x&lt;t)</code>；除以 n 得平均 token 交叉熵。用自然对数时单位是 nat，困惑度 <code>PPL=exp(loss)</code>；用 log₂ 时 <code>PPL=2^(bits/token)</code>。例如平均 1.6038 bit/token 的困惑度约 <code>2^1.6038≈3.04</code>，可理解为模型每步面对约 3.04 个等概率候选的同等不确定性，而不是“真实词表只有三个”。</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>模型</th><th>平均 bits/token</th><th>PPL</th><th>1000 token 理想码长</th></tr></thead><tbody><tr><td>A</td><td>1.5</td><td>2.83</td><td>1500 bit</td></tr><tr><td>B</td><td>1.6</td><td>3.03</td><td>1600 bit</td></tr><tr><td>差值</td><td>0.1</td><td>不可直接相减解释</td><td>多约 100 bit</td></tr></tbody></table></div><p>损失差 0.1 bit/token 在长语料上会累积成实质压缩差，但 PPL 是指数尺度。比较时必须统一 tokenizer、字节规范、上下文截断和加权方式：一个 tokenizer 把同一句切成更多易预测 token，token 级 PPL 可能更低，却不代表每字符编码更好。跨 tokenizer 可报告 bits-per-byte/character 或在共同文本概率框架下谨慎比较。</p><div class="dd-note warn"><b>低困惑度边界：</b>模型可能靠训练数据记忆、模板频率或领域偏置获得低损失；它仍可能在罕见事实、推理、安全和用户任务上失败。困惑度衡量预测分布，不是通用智力分数。</div>'},
-    {title:'常见误区与学习路线',badge:'误区与路线',lead:'信息论提供概率与编码的尺子，不替你定义语义、因果、真实性或价值。',body:'<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>常见误解</th><th>更准确的理解</th></tr></thead><tbody><tr><td>罕见事件信息大，所以更重要</td><td>自信息只由概率决定，重要性需要任务损失定义</td></tr><tr><td>熵高说明模型更有创造力</td><td>只说明分布更散，也可能是不确定或噪声</td></tr><tr><td>KL 是两个分布的普通距离</td><td>它非对称、不满足三角不等式，方向决定惩罚</td></tr><tr><td>PPL 下降说明事实性提高</td><td>它测 token 预测，事实、安全和推理需独立评测</td></tr><tr><td>不同模型的 PPL 可直接比较</td><td>需统一 tokenizer、文本、截断和单位</td></tr></tbody></table></div><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>层级</th><th>概念依赖与延伸</th></tr></thead><tbody><tr><td>先修</td><td>概率、对数、期望、token 与分词</td></tr><tr><td><b>本页核心</b></td><td>自信息、熵、交叉熵、KL、负对数似然与困惑度</td></tr><tr><td>紧邻</td><td>损失函数、预训练、采样参数、不确定性校准</td></tr><tr><td>工程延伸</td><td>压缩、蒸馏、分布漂移、强化学习与模型评测</td></tr></tbody></table></div>'}
+  title: '信息论与熵：从概率到编码代价',
+  subtitle: '先分清真实分布 P 与模型分布 Q，再从自信息、熵逐步推出交叉熵、KL 散度和困惑度。',
+  thesis: '信息论把“模型给真实事件多大概率”转换成可累加的编码代价：熵是知道真实分布时的最低平均代价，交叉熵是改用模型分布后的平均代价，两者之差是 KL；但这些量只衡量概率匹配，<b>不直接代表事实性、语义价值或通用智能</b>。',
+  goals: [
+    '区分事件、概率分布 P 与模型分布 Q',
+    '从自信息和熵推导交叉熵与 KL',
+    '比较 KL 与欧氏距离的用途',
+    '解释困惑度及其比较边界',
   ],
-  chain:['概率定义事件意外程度','对数得到可加自信息','对分布取期望得到熵','用模型分布编码得到交叉熵','额外代价由 KL 表示','任务指标判断统计拟合之外的价值'],
-  quiz:[{q:'p=1 的自信息是多少？',a:'0。'},{q:'均匀分布熵通常为何更高？',a:'结果最不确定。'},{q:'交叉熵与 KL 什么关系？',a:'H(P,Q)=H(P)+KL(P||Q)。'},{q:'KL 是对称距离吗？',a:'不是。'},{q:'为何困惑度跨 tokenizer 难比？',a:'预测单位和序列长度不同。'}],
-  sources:[{title:'A Mathematical Theory of Communication',url:'https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf',note:'Shannon 信息论'},{title:'Elements of Information Theory',url:'https://www.cs-114.org/wp-content/uploads/2015/01/Elements_of_Information_Theory_Elements.pdf',note:'熵与 KL'},{title:'Deep Learning — Probability and Information Theory',url:'https://www.deeplearningbook.org/contents/prob.html',note:'机器学习中的信息论'}]
+  sections: [
+    {
+      title: '先把 P、Q、对数和期望说清楚',
+      kind: 'math',
+      badge: '起点',
+      lead: '后面所有公式究竟在对什么对象做计算？',
+      body: `
+        <p>设一次试验可能产生有限个事件，例如天气集合 <code>Ω={晴, 雨, 雪}</code>。概率分布会给每个事件分配一个不小于 0 的数，而且所有概率之和为 1。</p>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>符号</th><th>本页含义</th><th>天气例子</th></tr></thead><tbody>
+        <tr><td><code>x</code></td><td>实际发生的一个事件</td><td>今天实际下雪</td></tr>
+        <tr><td><code>P(x)</code></td><td>数据真正按什么频率产生；称为真实分布或数据分布</td><td>长期有 25% 的天会下雪</td></tr>
+        <tr><td><code>Q(x)</code></td><td>模型认为事件会发生的概率；称为模型分布或预测分布</td><td>模型只给下雪 12.5% 概率</td></tr>
+        </tbody></table></div>
+        <p>教学例子会直接给出 P，现实中 P 通常未知，只能用样本频率近似。Q 则由模型给出。我们关心的是：数据仍按 P 出现时，如果根据 Q 做预测或设计编码，平均要付出多大代价。</p>
+<p><b>为什么信息量要用对数？</b>我们希望越罕见的事件带来的信息越多；同时，两个独立事件一起发生时，概率相乘，而它们带来的信息应当相加。对数正好把乘法变成加法：<code>log₂(ab)=log₂a+log₂b</code>。由于概率不超过 1，<code>log₂P(x)</code> 不大于 0，所以再加一个负号，得到非负的信息量 <code>I(x)=-log₂P(x)</code>。</p>
+<p><b>为什么选 <code>log₂</code>？</b>底数 2 能把信息量解释成“需要多少次理想的二选一判断”。若一个事件的概率是 <code>1/2</code>，区分它相当于回答 1 个答案各占一半的是非问题，因此信息量是 <code>-log₂(1/2)=1 bit</code>；概率是 <code>1/4</code> 时，需要 2 次这样的判断，信息量是 <code>2 bits</code>；概率是 <code>1/8</code> 时则是 <code>3 bits</code>。</p>
+<div class="dd-note key"><b>bit 是什么：</b>bit 是信息量的单位，表示一次理想且均衡的二元区分所提供的信息。这里说“2 bits”是在描述理想信息量或理想编码长度，不等于现实文件一定恰好占 2 个物理存储位。若改用自然对数 <code>ln</code>，单位会变成 nat；数值只按固定比例缩放，不会改变事件之间的信息量大小关系。本页采用 <code>log₂</code>，是因为二元判断和二进制编码更直观。</div>
+<p>所谓“按 P 取期望”，就是用事件真实出现的概率作权重求加权平均：<code>E<sub>P</sub>[f(x)]=ΣₓP(x)f(x)</code>。</p>
+        <div class="dd-note key"><b>阅读约定：</b>看到下标 P，先问“事件实际按谁出现”；看到公式里的 Q，先问“模型给这个真实事件多少概率”。</div>`,
+    },
+    {
+      title: '自信息：一次结果有多意外',
+      kind: 'math',
+      badge: '自信息',
+      lead: '为什么概率越小的事件一旦发生，带来的信息越多？',
+      body: `
+        <div class="dd-formula">I<sub>P</sub>(x)=−log₂P(x)</div>
+        <p>如果某事件必然发生，<code>P(x)=1</code>，那么 <code>I(x)=0</code> bit：观察到它没有消除任何不确定性。若概率减半，自信息增加 1 bit；概率从 <code>1/2</code>、<code>1/4</code> 到 <code>1/8</code>，自信息依次是 1、2、3 bit。</p>
+        <p>这里的信息量只表示“意外程度”，不表示事件的重要性。罕见的传感器噪声可以有很高自信息，却未必对任务有价值。</p>`,
+    },
+    {
+      title: '熵：真实分布自身的平均不确定性',
+      kind: 'math',
+      badge: '熵',
+      lead: '单次事件的信息量不同，怎样概括整个分布平均有多难预测？',
+      body: `
+        <div class="dd-formula">H(P)=E<sub>x∼P</sub>[−log₂P(x)]=−ΣₓP(x)log₂P(x)</div>
+        <p>熵就是按真实频率 P 对每个事件的自信息求平均。对于 <code>P=(1/2,1/4,1/4)</code>，三个事件的信息量是 1、2、2 bit，所以 <code>H(P)=1/2×1+1/4×2+1/4×2=1.5</code> bit/次。</p>
+        <p>在 n 个可能结果上，均匀分布的熵最大，为 <code>log₂n</code>；确定分布的熵为 0。这里的“最低平均编码代价”是理想化、长期平均的无损编码结论：单个符号的实际码字通常受整数长度、编码器和头部开销影响。</p>
+        <div class="dd-note warn"><b>不要混淆：</b>某次罕见事件自信息很大，不代表整个分布的熵一定高；熵也不评价某条回答是否正确。</div>`,
+    },
+    {
+      title: '交叉熵：用 Q 为按 P 出现的数据付费',
+      kind: 'math',
+      badge: '交叉熵',
+      lead: '真实事件按 P 出现，模型却按 Q 分配概率时，平均损失究竟怎样计算？',
+      body: `
+        <p>模型事先不知道下一次会出现什么，只能提交一整组预测概率 Q。事件 x 真正发生后，我们只检查模型给这个事件的概率 <code>Q(x)</code>，并把它转换为对数损失或理想码长：</p>
+        <div class="dd-formula">模型对事件 x 的损失 = −log₂Q(x)</div>
+        <p>Q 给真实事件的概率越大，损失越小；如果 Q 很自信地漏掉真实事件，损失会非常大。由于事件实际仍按 P 出现，长期平均时必须用 P 作权重：</p>
+        <div class="dd-formula">H(P,Q)=E<sub>x∼P</sub>[−log₂Q(x)]=−ΣₓP(x)log₂Q(x)</div>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>步骤</th><th>谁决定</th><th>要做的事</th></tr></thead><tbody>
+        <tr><td>1. 事件出现</td><td>真实分布 P</td><td>决定晴、雨、雪各出现多频繁</td></tr>
+        <tr><td>2. 模型报概率</td><td>模型分布 Q</td><td>给每个可能事件分配预测概率</td></tr>
+        <tr><td>3. 计算单次损失</td><td>实际事件对应的 Q(x)</td><td>计算 <code>−log₂Q(x)</code></td></tr>
+        <tr><td>4. 求长期平均</td><td>P 作权重</td><td>得到交叉熵 <code>H(P,Q)</code></td></tr>
+        </tbody></table></div>
+        <p>名称里的“交叉”来自两个分布各司其职：P 决定哪些事件多常出现，Q 决定模型为这些事件付出多少损失。若恰好 <code>Q=P</code>，交叉熵就退化为熵。</p>`,
+    },
+    {
+      title: 'KL 散度：交叉熵比熵多出的代价',
+      kind: 'math',
+      badge: 'KL',
+      lead: 'KL 不需要凭空记忆，它可以从“用了错误的 Q 多花多少”直接推出。',
+      body: `
+        <p>知道真实分布 P 时，平均理想码长是 <code>H(P)</code>；改用模型分布 Q 后，平均代价是 <code>H(P,Q)</code>。把前者从后者中减掉：</p>
+        <div class="dd-formula">H(P,Q)−H(P)=ΣₓP(x)log₂[P(x)/Q(x)]=D<sub>KL</sub>(P∥Q)</div>
+        <p>所以 <code>D<sub>KL</sub>(P∥Q)</code> 可以理解为：数据按 P 产生，却使用 Q 预测或编码时，每次事件平均多付出的 bit 数。由此得到：</p>
+        <div class="dd-formula">H(P,Q)=H(P)+D<sub>KL</sub>(P∥Q)</div>
+        <ul>
+          <li>KL 总是不小于 0；当 Q 与 P 在 P 可能出现的事件上完全一致时为 0。</li>
+          <li>方向不能交换：<code>KL(P∥Q)</code> 用 P 加权，重点惩罚 Q 漏掉真实会发生的事件。</li>
+          <li>若 <code>P(x)&gt;0</code> 而 <code>Q(x)=0</code>，该项为正无穷，正向 KL 也为正无穷。</li>
+        </ul>
+        <p>等式中的“最小化交叉熵等价于最小化 KL”针对同一个固定真实分布 P 的总体量成立。训练集上的平均损失只是总体交叉熵的经验估计；训练损失下降不保证未知数据上的真实 KL 一定下降。</p>`,
+    },
+    {
+      title: 'KL 与欧氏距离回答不同问题',
+      kind: 'math',
+      badge: '距离比较',
+      lead: '既然 P 和 Q 都能写成概率向量，为什么不直接计算两点之间的直线距离？',
+      body: `
+        <p>欧氏距离把两个概率分布当作普通向量：</p>
+        <div class="dd-formula" data-formula-id="euclidean-distance" data-display="mathml"><math display="block" aria-label="P 与 Q 的欧氏距离等于各事件概率之差的平方和再开平方"><mrow><msub><mi>d</mi><mn>2</mn></msub><mo>(</mo><mi>P</mi><mo>,</mo><mi>Q</mi><mo>)</mo><mo>=</mo><msqrt><mrow><munder><mo>∑</mo><mi>x</mi></munder><msup><mrow><mo>(</mo><mi>P</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>−</mo><mi>Q</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></math></div>
+        <p>它衡量坐标差的几何长度，具有对称性：<code>d₂(P,Q)=d₂(Q,P)</code>，并满足三角不等式。KL 衡量的则是概率比例造成的平均对数代价，通常不对称，也不满足三角不等式，因此严格说它是“散度”而不是数学上的距离。</p>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>问题</th><th>欧氏距离</th><th>KL(P∥Q)</th></tr></thead><tbody>
+        <tr><td>关注什么</td><td>概率坐标相差多远</td><td>Q 预测 P 时多付多少对数代价</td></tr>
+        <tr><td>是否对称</td><td>是</td><td>否</td></tr>
+        <tr><td>Q 漏掉 P 的可能事件</td><td>仍是有限数</td><td>若 Q(x)=0，则为正无穷</td></tr>
+        <tr><td>单位</td><td>概率向量的几何尺度</td><td>本页使用 bit/事件</td></tr>
+        </tbody></table></div>
+        <p>例如 <code>P=(0.5,0.25,0.25)</code>、<code>Q=(0.5,0.375,0.125)</code> 的欧氏距离约为 0.177，而正向 KL 约为 0.104 bit。两个数不能互相换算：它们回答的不是同一个问题。欧氏距离并非“错误”，只是不表达编码后悔或对数预测损失。</p>`,
+    },
+    {
+      title: '困惑度：把平均对数损失还原到概率尺度',
+      kind: 'math',
+      badge: '困惑度',
+      lead: '平均损失是 1.6 bit/token 很抽象，怎样换成较直观的等效选择数？',
+      body: `
+        <div class="dd-formula">PPL=2<sup>H(P,Q)</sup>　（损失单位为 bit/token）</div>
+        <p>如果平均交叉熵是 2 bit/token，那么 <code>PPL=2²=4</code>。它表示模型的平均不确定性，与“每一步面对 4 个等概率候选”的情形相当，因此更准确的名称是<b>熵等效分支数</b>。</p>
+        <p>困惑度不是词表大小，也不表示模型真的每一步只考虑固定数量的词。PPL 越低只说明模型给实际 token 的平均概率更高；它不自动证明事实性、推理能力或安全性更好。</p>
+        <p>这里提前用到 token：可以暂时把 token 理解为模型逐步预测的文本单位，正式分词机制将在 2.8 学习。不同 tokenizer 会改变预测单位和序列长度，所以 token 级 PPL 通常不能跨 tokenizer 直接比较。跨分词器时可考虑统一语料上的 bits-per-byte 或 bits-per-character。</p>
+        <div class="dd-note key"><b>底数必须匹配：</b>若训练损失使用自然对数，单位是 nat/token，应使用 <code>PPL=exp(loss)</code>；若使用 <code>log₂</code>，才使用 <code>2<sup>loss</sup></code>。</div>`,
+    },
+    {
+      title: '三符号例子：从 P、Q 一直算到困惑度',
+      kind: 'math',
+      badge: '完整手算',
+      lead: '真实天气分布 P=(1/2,1/4,1/4)，模型 Q=(1/2,3/8,1/8) 时，每一步怎样对应前面的定义？',
+      body: `
+        <figure class="dd-fig"><svg viewBox="0 0 680 245" role="img" aria-label="真实分布 P 与模型分布 Q 的编码长度、交叉熵和 KL 额外代价"><defs><marker id="it1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="35" width="170" height="152" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="103" y="59" text-anchor="middle" class="svg-t">真实分布 P</text><text x="38" y="88" class="svg-t" font-size="10">晴：p=1/2 → 1 bit</text><text x="38" y="113" class="svg-t" font-size="10">雨：p=1/4 → 2 bit</text><text x="38" y="138" class="svg-t" font-size="10">雪：p=1/4 → 2 bit</text><text x="38" y="167" class="svg-t" font-size="10">H(P)=1/2×1+1/4×2+1/4×2</text><text x="103" y="181" text-anchor="middle" class="svg-t" font-size="10">= 1.5 bit</text><path d="M188,110 L248,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="250" y="35" width="190" height="152" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="345" y="59" text-anchor="middle" class="svg-t">模型编码 Q</text><text x="270" y="88" class="svg-t" font-size="10">晴：q=1/2 → 1 bit</text><text x="270" y="113" class="svg-t" font-size="10">雨：q=3/8 → 1.415 bit</text><text x="270" y="138" class="svg-t" font-size="10">雪：q=1/8 → 3 bit</text><text x="270" y="163" class="svg-t" font-size="10">H(P,Q)=0.5+0.3538+0.75</text><text x="345" y="181" text-anchor="middle" class="svg-t" font-size="10">≈ 1.6038 bit</text><path d="M440,110 L500,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="502" y="57" width="160" height="108" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="582" y="82" text-anchor="middle" class="svg-t">额外编码代价</text><text x="582" y="108" text-anchor="middle" class="svg-t" font-size="10">Dₖₗ(P||Q)</text><text x="582" y="131" text-anchor="middle" class="svg-t" font-size="10">= H(P,Q)−H(P)</text><text x="582" y="151" text-anchor="middle" class="svg-t" font-size="10">≈ 0.1038 bit / 符号</text><text x="340" y="224" text-anchor="middle" class="svg-t" font-size="10">P 决定事件出现频率；Q 决定模型给它分配的理想码长。Q 越低估真实事件，事件发生时损失越大。</text></svg><figcaption>图 1　P 决定“哪些事件多常进入平均”；Q 决定“模型为已发生事件付出多少损失”。</figcaption></figure>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>事件 x</th><th>真实频率 P(x)</th><th>最优码长 −log₂P(x)</th><th>模型概率 Q(x)</th><th>模型码长 −log₂Q(x)</th><th>交叉熵中的贡献 P(x)[−log₂Q(x)]</th></tr></thead><tbody>
+        <tr><td>晴</td><td>0.5</td><td>1</td><td>0.5</td><td>1</td><td>0.5000</td></tr>
+        <tr><td>雨</td><td>0.25</td><td>2</td><td>0.375</td><td>1.415</td><td>0.3538</td></tr>
+        <tr><td>雪</td><td>0.25</td><td>2</td><td>0.125</td><td>3</td><td>0.7500</td></tr>
+        </tbody></table></div>
+        <ol class="dd-steps">
+          <li>先用 P 自己的码长求平均：<code>H(P)=0.5×1+0.25×2+0.25×2=1.5</code> bit。</li>
+          <li>再看 Q 为实际事件分配的码长。以雪为例，Q 只给 0.125，所以雪发生时损失是 <code>−log₂0.125=3</code> bit。</li>
+          <li>事件仍按 P 出现，所以把 Q 码长按 P 加权相加：<code>H(P,Q)=0.5000+0.3538+0.7500≈1.6038</code> bit。</li>
+          <li>多付出的代价是 <code>KL(P∥Q)=1.6038−1.5≈0.1038</code> bit/次。</li>
+          <li>把平均损失指数化：<code>PPL=2<sup>1.6038</sup>≈3.04</code>，即约 3.04 个等概率候选的同等不确定性。</li>
+        </ol>
+        <p>Q 对雨分得过多、对雪分得过少。总概率虽然仍是 1，但概率放错位置就会增加平均损失。若 Q 把雪设为 0，雪一旦发生便得到无限对数损失，交叉熵和正向 KL 都变为正无穷。</p>`,
+    },
+    {
+      title: '语言模型损失：样本平均不等于真实分布',
+      kind: 'eng',
+      badge: '语言模型',
+      lead: '现实中不知道 P，训练程序又是怎样得到交叉熵损失的？',
+      body: `
+        <p>语言模型把一句话分成 <code>x₁,…,xₙ</code>，并在每一步给真实下一个 token 概率 <code>Q(xₜ|x&lt;t)</code>。<b>似然</b>在这里表示模型给整句真实 token 序列分配了多大概率，用来比较模型对已观察文本的解释程度。<b>对数似然</b>把逐步概率的乘法变成对数之和，便于稳定计算；再取负号，就把“概率越大越好”改写成“损失越小越好”。整句负对数似然为：</p>
+        <div class="dd-formula">NLL=−Σₜlog Q(xₜ|x&lt;t)</div>
+        <p>除以 token 数 n，得到这条序列的平均 token 损失；再对训练批次求平均，就是常见的经验交叉熵。它用有限样本近似未知的真实分布 P，而不是直接知道 P。</p>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>量</th><th>怎样得到</th><th>能否直接观察</th></tr></thead><tbody>
+        <tr><td>总体交叉熵 H(P,Q)</td><td>对未知真实分布 P 取期望</td><td>通常不能精确观察</td></tr>
+        <tr><td>训练损失</td><td>训练样本上的平均负对数概率</td><td>可以计算，但可能过拟合</td></tr>
+        <tr><td>验证/测试损失</td><td>未参与参数更新的样本平均</td><td>用于估计新数据表现，仍有抽样误差</td></tr>
+        </tbody></table></div>
+        <p>因此“训练损失下降”只说明模型更适合当前训练样本。要判断真实预测是否改善，还需独立验证集、分布切片以及事实性、推理、安全等任务指标。</p>`,
+    },
+    {
+      title: '常见误区与学习路线',
+      role: 'reference',
+      badge: '边界',
+      lead: '信息论提供概率与编码的尺子，但不会替你定义语义、真实性和价值。',
+      body: `
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>常见误解</th><th>更准确的理解</th></tr></thead><tbody>
+        <tr><td>P 是训练集里直接可见的真理</td><td>P 是未知的数据生成分布；样本频率只是估计，还可能受采样偏差影响</td></tr>
+        <tr><td>交叉熵就是两个分布各算一次熵</td><td>事件频率来自 P，单次损失来自 Q，公式是 <code>−ΣPlog₂Q</code></td></tr>
+        <tr><td>KL 是两个概率向量的普通距离</td><td>KL 是有方向的平均对数代价，不对称且不满足三角不等式</td></tr>
+        <tr><td>PPL=20 表示模型只考虑 20 个 token</td><td>它只表示与 20 个等概率候选相当的平均不确定性</td></tr>
+        <tr><td>PPL 下降说明回答更真实、更聪明</td><td>它只测实际 token 的平均预测概率，其他能力需要独立评测</td></tr>
+        </tbody></table></div>
+        <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>学习位置</th><th>怎样处理</th></tr></thead><tbody>
+        <tr><td>进入本页前</td><td>只需会读概率和加权平均；本页已补充对数、期望、P 与 Q</td></tr>
+        <tr><td><b>本页核心</b></td><td>自信息 → 熵 → 交叉熵 → KL → 困惑度</td></tr>
+        <tr><td>后续正式展开</td><td>1.2 损失函数、1.3 梯度下降、2.8 Token 与分词</td></tr>
+        <tr><td>工程延伸</td><td>预训练、概率校准、采样参数、模型评测与分布漂移</td></tr>
+        </tbody></table></div>`,
+    },
+  ],
+  chainTitle: '把五个量连成一条推导链',
+  chainLead: '不要孤立背公式：每一个新量都在回答上一步尚未回答的问题。',
+  chain: [
+    '事件 x 按真实分布 P 出现，模型用分布 Q 给出预测',
+    '−log₂P(x) 衡量事件在真实分布下的自信息',
+    '按 P 平均 −log₂P(x)，得到真实分布自身的熵 H(P)',
+    '按 P 平均模型损失 −log₂Q(x)，得到交叉熵 H(P,Q)',
+    '交叉熵减去熵，得到模型失配的额外代价 KL(P∥Q)',
+    '把平均 token 交叉熵指数化，得到熵等效分支数 PPL',
+    '最后用独立任务指标检查概率拟合之外的事实性、推理、安全与价值',
+  ],
+  quizLead: '这些问题从符号辨认、数值计算逐步走向边界判断；答案必须说明推理过程。',
+  quiz: [
+    {
+      q: '给定 P(雨)=0.25，计算“今天下雨”的自信息，并说明单位。',
+      a: 'I(雨)=−log₂0.25=2 bit。因为本页使用以 2 为底的对数，所以单位是 bit。',
+    },
+    {
+      q: '给定 P=(0.5,0.5)，计算 H(P)；如果改成 P=(1,0)，熵怎样变化，为什么？',
+      a: '前者 H(P)=−0.5log₂0.5−0.5log₂0.5=1 bit；后者 H(P)=0，因为结果已经确定。按约定 0log0 的极限值记为 0。',
+    },
+    {
+      q: '在交叉熵 H(P,Q)=−ΣP(x)log₂Q(x) 中，为什么外面的权重是 P(x)，对数里面却是 Q(x)？',
+      a: 'P 决定真实事件出现的长期频率，所以负责平均权重；Q 决定模型给已发生事件多少概率，所以 −log₂Q(x) 是模型的单次损失或理想码长。',
+    },
+    {
+      q: '怎样从 H(P,Q) 和 H(P) 推出 KL(P∥Q)？这个差值表示什么？',
+      a: '相减可得 ΣP(x)[log₂P(x)−log₂Q(x)]=ΣP(x)log₂[P(x)/Q(x)]。它表示数据按 P 产生却使用 Q 预测或编码时，相比使用 P 平均多付出的 bit 数。',
+    },
+    {
+      q: '为什么欧氏距离不能替代 KL 来表达编码代价？',
+      a: '欧氏距离只测概率坐标的几何差且是对称的；KL 测按 P 加权的概率比例和额外对数损失。尤其当 P(x)>0、Q(x)=0 时，欧氏距离仍有限而正向 KL 为正无穷。',
+    },
+    {
+      q: '假设平均损失为 3 bit/token，计算困惑度，并解释它不代表什么。',
+      a: 'PPL=2³=8。它表示与每步 8 个等概率候选相当的平均不确定性，不表示词表只有 8 个 token，也不证明模型事实性、推理或安全表现良好。',
+    },
+    {
+      q: '训练交叉熵持续下降，但验证交叉熵开始上升。能否断言真实分布上的 KL 仍在下降？为什么？',
+      a: '不能。训练损失是训练样本上的经验平均，可能因过拟合继续下降；验证损失上升反而提示对未见数据的概率预测变差。真实 P 未知，只能通过独立样本近似评估。',
+    },
+    {
+      q: '两个语言模型使用不同 tokenizer，模型 A 的 PPL=12、模型 B 的 PPL=15。能否直接断言 A 更好？应怎样比较？',
+      a: '不能。token 单位和序列长度不同会改变 token 级交叉熵与 PPL。应统一 tokenizer、文本、上下文截断和加权口径，或报告共同语料上的 bits-per-byte/character，再结合任务指标比较。',
+    },
+  ],
+  sources: [
+    {
+      title: 'A Mathematical Theory of Communication',
+      url: 'https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf',
+      note: '用于核对自信息、熵、对数底数与无损编码的基本解释',
+    },
+    {
+      title: 'Deep Learning — Probability and Information Theory',
+      url: 'https://www.deeplearningbook.org/contents/prob.html',
+      note: '用于核对交叉熵、KL、非对称性及机器学习中的概率解释',
+    },
+    {
+      title: 'Stanford STATS 311: Information Theory and Statistics',
+      url: 'https://web.stanford.edu/class/stats311/OldSyllabi/full_notes.pdf',
+      note: '用于核对熵、KL 和编码观点的正式定义与性质',
+    },
+  ],
+  accessed: '2026-07-25',
 });

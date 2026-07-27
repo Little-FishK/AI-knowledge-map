@@ -21,3 +21,32 @@ window.DEEPDIVE['prompt-caching'] = window.createDeepDive({
   quiz:[{q:'12k 示例平均避免多少 input token？',a:'命中率 70% 且命中 10k，平均约 7k token/请求。'},{q:'为何时间戳放前面会破坏命中？',a:'从分叉 token 起后续所有位置与 KV 都不同。'},{q:'10k 示例 KV 粗略多大？',a:'给定 32 层、8 KV 头、128 维、FP16 时约 1.31GB。'},{q:'换 LoRA 后为何要失效？',a:'权重改变，同一 token 前缀产生不同隐藏/KV 状态。'},{q:'为何不能只看命中率？',a:'短命中、搬运、驻留和排队可能让净收益为零或负。'}],
   sources:[{title:'vLLM: Easy, Fast, and Cheap LLM Serving with PagedAttention',url:'https://arxiv.org/abs/2309.06180',note:'KV cache 分页与服务'},{title:'SGLang',url:'https://arxiv.org/abs/2312.07104',note:'RadixAttention 与共享前缀复用'},{title:'Preble',url:'https://arxiv.org/abs/2407.00023',note:'前缀感知分布式调度'},{title:'Prompt Cache',url:'https://arxiv.org/abs/2311.04934',note:'长提示模块复用'}]
 });
+
+// 新版教学门禁补充：每个核心章节都给出六问摘要，并以 MathML 保留公式结构。
+{
+  const page = window.DEEPDIVE['prompt-caching'];
+  const additions = [
+    '<p>提示缓存输入模型配置和多个请求共享的精确 token 前缀，输出可供后续请求复用的中间 KV 状态。服务先查找最长可用前缀，再只计算新后缀；命中表示省去了部分输入计算，不表示答案被缓存或输出一定正确。它只适用于模型、tokenizer、位置配置和安全域一致的请求。</p>',
+    '<p>缓存分类输入“被保存的对象、复用范围和跳过的阶段”，输出请求内 KV、跨请求前缀、回答或应用数据缓存之一。看它复用当前生成历史、共同输入状态、最终答案还是工具结果，就能解释收益与正确性风险；这些机制不能共享一个命中率口径。</p>',
+    '<p>最长共同前缀计算输入两条 token 序列 A、B，输出从首 token 起连续相同的长度 ℓ。系统逐 token 比较，第一次分叉就停止复用；LCP 较长只说明计算状态可复用，不代表两份提示语义更相近。任何影响 token、位置或模型状态的变化都会终止命中。</p>',
+    '<p>案例输入 12k token 的稳定与动态片段、70% 命中率和预填充延迟，输出 10k 命中长度、平均节省 7k token 及粗略延迟收益。h 是命中率，L 是命中的 token 长度；先按稳定性排布，再用 h×L 求平均避免量并扣除查找搬运。440ms 和 308ms 是给定假设下的估算，真实注意力成本必须实测。</p>',
+    '<p>提示布局输入各片段的稳定性、权限域和语义顺序，输出稳定公共内容在前、动态私有内容在后的序列。确定性序列化提高精确前缀复用，但结果必须同时保持安全规则含义和租户隔离。不能为提高命中率移动或共享本应私有的内容。</p>',
+    '<p>容量规划输入层数 Nlayer、KV 头数 NKVhead、头维 d、token 数 Ntoken、每元素字节 b 和并发，输出 KV 字节数 MKV 与存储层级选择。K 与 V 各保存一份，所以乘二；估算占用用于比较 GPU 驻留、搬运与重算，但架构、并行和量化不同会改变实际值。</p>',
+    '<p>失效设计输入模型快照、适配器、tokenizer、位置配置、模板和租户域，输出缓存命名空间、键和失效动作。只要其中一项改变，同一文本也可能产生不同 KV；命中后抽样重算可发现污染。版本字段不完整时必须拒绝复用，而不是冒险读旧状态。</p>',
+    '<p>安全治理输入前缀的数据分类、租户、保留期和访问权，输出隔离域、加密、审计与删除策略。KV 虽不是可读原文，仍是输入的派生数据，且命中时间可能泄露前缀是否存在。跨租户共享只限真正公共且权限一致的版本化内容。</p>',
+    '<p>缓存评测输入请求级命中长度、计算与搬运时间、显存、延迟、吞吐和质量，输出按租户、长度、并发切片的净收益。A/B 固定提示语义与路由负载，并测试错版本、冷启动和雪崩；命中率升高但 TTFT 不降，通常说明命中太短或查找、搬运、排队抵消了收益。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="两条序列的最长共同前缀"><mi>LCP</mi><mo>(</mo><mi>A</mi><mo>,</mo><mi>B</mi><mo>)</mo><mo>=</mo><munder><mi>max</mi><mi>ℓ</mi></munder><mo>{</mo><msub><mi>A</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>=</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>}</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="期望避免处理的输入 token 数"><mi>E[Nsaved]</mi><mo>≈</mo><mi>h</mi><mo>×</mo><mi>L</mi><mo>=</mo><mn>0.7</mn><mo>×</mo><mn>10000</mn><mo>=</mo><mn>7000</mn></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="KV 缓存字节数估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>b</mi><mo>≈</mo><mn>1.31</mn><mi>GB</mi></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(
+    /<div class="dd-formula">[\s\S]*?<\/div>/g,
+    () => formulas[formulaIndex++]
+  );
+}

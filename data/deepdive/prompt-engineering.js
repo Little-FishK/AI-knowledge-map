@@ -42,7 +42,7 @@ window.DEEPDIVE["prompt-engineering"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>几招通用套路<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">3</span>运行示例：把含糊愿望改成任务契约<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">怎样把一句含糊愿望，改写成模型和评测器都能执行的任务契约？</p>
   <figure class="dd-fig"><svg viewBox="0 0 620 180" role="img" aria-label="提示从目标、上下文、约束到输出契约的分层结构"><defs><marker id="pe1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="55" width="115" height="62" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="77" y="80" text-anchor="middle" class="svg-t">目标</text><text x="77" y="100" text-anchor="middle" class="svg-t" font-size="10">回答退款政策</text><path d="M135,86 L172,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="174" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="236" y="80" text-anchor="middle" class="svg-t">上下文</text><text x="236" y="100" text-anchor="middle" class="svg-t" font-size="10">用户订单 + 资料</text><path d="M299,86 L336,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="338" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="400" y="80" text-anchor="middle" class="svg-t">边界</text><text x="400" y="100" text-anchor="middle" class="svg-t" font-size="10">无依据就澄清</text><path d="M463,86 L500,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="502" y="55" width="98" height="62" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="551" y="80" text-anchor="middle" class="svg-t">输出契约</text><text x="551" y="100" text-anchor="middle" class="svg-t" font-size="10">结论 + 引用</text><text x="310" y="148" text-anchor="middle" class="svg-t" font-size="10">每一层都应能用测试样例检查，而不是靠“更专业一点”等主观咒语</text></svg><figcaption>图 1　有效提示像接口契约：先定义目标，再提供必要上下文，写清禁止越过的边界，最后规定可验证输出。角色描述只是辅助，不应代替权限或事实来源。</figcaption></figure>
   <div class="dd-table-wrap"><table class="dd-table">
@@ -159,3 +159,11 @@ window.DEEPDIVE["prompt-engineering"] = {
 </div>
 `
 };
+
+window.DEEPDIVE["prompt-engineering"].html = window.DEEPDIVE["prompt-engineering"].html
+  .replace('<p class="dd-lead">本节回答：不训练、不改模型，怎么让它稳定产出我想要的结果？</p>', '<p class="dd-lead">本节回答：不训练、不改模型，怎么让它稳定产出我想要的结果？</p><p>提示工程的输入是任务目标、受众、上下文、边界和输出要求，输出是可直接提交给模型并能被测试的提示。它通过改变当前请求的条件来收窄可接受输出，不更新模型权重；效果只对已测模型和任务切片成立，换模型或分布后需要回归。</p>')
+  .replace('<p class="dd-lead">最关键的疑问：模型没变，只是问法变了，凭什么结果差这么多？</p>', '<p class="dd-lead">最关键的疑问：模型没变，只是问法变了，凭什么结果差这么多？</p><p>条件生成的输入是提示和已有前缀，输出是下一 token 分布及最终续写。提示改变模型可见的任务、格式和证据条件，从而重新分配候选概率；输出更符合要求表示约束命中率提高，不表示模型获得了新知识或真实权限。</p>')
+  .replace('<p class="dd-lead">怎样把一句含糊愿望，改写成模型和评测器都能执行的任务契约？</p>', '<p class="dd-lead">怎样把一句含糊愿望，改写成模型和评测器都能执行的任务契约？</p><p>任务契约接收原始需求和失败样本，输出明确的目标、必要上下文、禁止边界、回退规则与可验证结构。一次只修改一个因素并在固定测试集复测；分数改善应能对应某类失败减少，否则只是不可归因的提示堆叠。</p>')
+  .replace('<p class="dd-lead">为什么「给几个示例、给个格式」模型就照做了？这背后有个更基础的机制。</p>', '<p class="dd-lead">为什么「给几个示例、给个格式」模型就照做了？这背后有个更基础的机制。</p><p>上下文学习接收提示中的示例和新查询，输出按示例模式生成的回答。模型在前向计算中定位输入输出规律，因此角色、格式和 few-shot 示例能临时塑造行为；这种解释不保证每个提示都被忠实遵循，也不把临时模式写入权重。</p>')
+  .replace('<p class="dd-lead">提示工程这么好用，那它的天花板在哪？什么时候该换招？</p>', '<p class="dd-lead">提示工程这么好用，那它的天花板在哪？什么时候该换招？</p><p>边界诊断输入失败类型、知识来源、稳定性、调用规模和成本，输出继续改提示、接入 RAG、采用约束工具或微调的决策。缺事实时补证据，缺硬格式时用约束和验证，跨大量请求仍不稳定时再评估训练；提示不能创造知识、权限或确定性保证。</p>')
+  .replace('<p class="dd-lead">既然模型这么听「提示」的话，那恶意的提示能不能劫持它？</p>', '<p class="dd-lead">既然模型这么听「提示」的话，那恶意的提示能不能劫持它？</p><p>提示注入的输入是混有可信指令与不可信外部文本的上下文，输出可能是偏离原任务的模型行为。攻击利用模型同样以 token 读取指令和数据的事实；检测到攻击语句不等于建立安全边界，真实防护必须依靠权限隔离、工具白名单、最小授权和人工确认。</p>');

@@ -544,11 +544,38 @@ html, body {
 .dd-lead { font-size: 13.5px !important; color: var(--fg-faint) !important; font-style: italic;
            border-left: 2px solid var(--line); padding-left: 12px; margin: 4px 0 18px !important; }
 
-/* 公式 */
-.dd-formula { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace; text-align: center;
+/* 教材式数学公式：代码表达式使用 .dd-code，不与展示公式混排。 */
+.dd-formula { font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", "Times New Roman", serif; text-align: center;
               background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px;
-              padding: 14px 12px; margin: 6px 0 8px; font-size: 15px; color: var(--fg);
+              padding: 14px 12px; margin: 6px 0 8px; font-size: 17px; color: var(--fg);
               line-height: 1.9; overflow-x: auto; }
+.dd-formula math[display="block"] { display: block; width: max-content; min-width: min-content;
+                                    max-width: 100%; margin: 0 auto; font-size: 1.08em; }
+.dd-radical {
+  display: inline-flex;
+  align-items: flex-start;
+  vertical-align: -0.16em;
+  white-space: nowrap;
+  font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
+}
+.dd-radical::before {
+  content: "√";
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.18em;
+  line-height: 1;
+  transform: scaleY(1.08);
+  transform-origin: right center;
+}
+.dd-radicand {
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 0.55em;
+  border-top: 1px solid currentColor;
+  padding: 0.03em 0.08em 0;
+  line-height: 1.18;
+}
 .dd-formula-note { font-size: 12.5px !important; color: var(--fg-faint) !important; text-align: center;
                    margin: 0 0 16px !important; }
 
@@ -556,7 +583,8 @@ html, body {
 #dd-article code { font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
                    background: var(--bg-raise); border: 1px solid var(--line-soft);
                    border-radius: 4px; padding: 1px 5px; font-size: 13px; color: #cdd6e4; }
-.dd-formula code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+.dd-formula code { font-family: inherit; background: none; border: none; padding: 0;
+                   color: inherit; font-size: inherit; }
 .dd-code {
   box-sizing: border-box; max-width: 100%; overflow-x: auto;
   margin: 8px 0 18px; padding: 14px 16px;
@@ -623,6 +651,7 @@ html, body {
 }
 .dd-learning-kicker { color: var(--fg); font-size: 15px; font-weight: 650; }
 .dd-learning-copy { margin-top: 3px; color: var(--fg-faint); font-size: 12.5px; line-height: 1.7; }
+.dd-learning-actions { flex: 0 0 auto; display: flex; align-items: stretch; gap: 10px; }
 .dd-learn-btn {
   flex: 0 0 auto; min-width: 126px; padding: 9px 16px;
   border: 1px solid var(--accent); border-radius: 7px;
@@ -630,7 +659,17 @@ html, body {
 }
 .dd-learn-btn:hover { filter: brightness(1.08); }
 .dd-learn-btn.is-learned { background: rgba(122,162,216,.1); color: var(--accent); }
-.dd-learn-btn:focus-visible, .learning-node:focus-visible {
+.dd-next-btn {
+  flex: 0 1 auto; min-width: 180px; max-width: 290px; display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 7px;
+  padding: 8px 12px; border: 1px solid var(--line); border-radius: 7px;
+  background: var(--bg-raise); color: var(--fg); font: inherit; cursor: pointer; text-align: left;
+}
+.dd-next-btn > span:first-child { color: var(--fg-faint); font-size: 10.5px; white-space: nowrap; }
+.dd-next-btn strong { overflow: hidden; color: var(--accent); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.dd-next-btn > span:last-child { color: var(--accent); font-size: 16px; }
+.dd-next-btn:hover { border-color: var(--accent); background: rgba(122,162,216,.08); }
+.dd-learn-btn:focus-visible, .dd-next-btn:focus-visible, .learning-node:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
 
@@ -715,5 +754,7 @@ html, body {
   .tutorial-platform-head { align-items: flex-start; }
   .tutorial-card-body { padding: 2px 14px 16px; }
   .dd-learning-complete { align-items: stretch; flex-direction: column; gap: 14px; padding: 16px; }
-  .dd-learn-btn { width: 100%; }
+  .dd-learning-actions { width: 100%; }
+  .dd-learning-actions > button { flex: 1 1 0; min-width: 0; }
+  .dd-next-btn { max-width: none; }
 }

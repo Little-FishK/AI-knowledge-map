@@ -32,3 +32,27 @@ window.DEEPDIVE["react"] = {
 
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：交错生成推理轨迹与任务行动的原始工作。</li><li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>：语言模型学习何时与如何调用工具。</li><li><a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener">Shinn et al., Reflexion</a>：用语言反馈支持后续试次修正。</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">Ruan et al., ToolEmu</a>：工具型语言模型的风险与失败轨迹评估。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>`
 };
+
+// 新版教学门禁补充：逐节说明假设—行动—观察、信任边界、行动价值和评测。
+{
+  const page = window.DEEPDIVE["react"];
+  const additions = [
+    '<p>ReAct 输入问题、当前假设、工具、历史和外部环境，输出交错的取证动作、带来源观察与更新后的答案。它连接纯文本推理缺新事实和固定脚本遇变化不会改道的缺陷；观察必须实际改变假设、计划或停止判断。若工具结果只用来装饰原先猜测，就没有形成闭环。</p>',
+    '<p>最小机制输入问题 q、历史 Ht 和工具集合，输出假设 ht、候选动作 at、环境观察 ot 与更新历史 Hnext。先根据缺口形成最小假设，再选择取证动作，环境返回来源与错误状态，最后把动作观察加入下一轮；顺序保证行动针对缺口、观察约束后续。观察不能修改用户目标或授权。</p>',
+    '<p>年报案例输入官方报告目标、主体年份币种口径、2025/2024 数值和同比公式，输出有页码证据的 20% 增长。依次定位官网 PDF、确认 Acme plc 与百万美元、读取同一合并表 120/100，再算 (120−100)/100；新闻 130 因不同口径被排除。更多数据只有通过口径检查才成为证据。</p>',
+    '<p>观察治理输入工具名、来源 URL、时间、状态码、解析方式、信任等级和内容，输出可用事实、待交叉验证数据、可重试错误或注入警报。控制器把网页文本视为数据，不让其成为授权指令；超时也不能改写成不存在。闭环会放大错误观察，因此关键事实需独立验证。</p>',
+    '<p>概念区分输入是否有内部步骤、结构化动作、多轮环境反馈、生产状态控制或失败诊断，输出 CoT、工具调用、ReAct、Agent 循环或反思。ReAct 强调反馈改变后续轨迹，完整 Agent 还加预算权限恢复终止，反思聚焦失败后修改；可组合但不互相等同。生产无需展示完整 Thought。</p>',
+    '<p>行动选择输入候选动作 a、预期不确定性下降 ΔU、成本 cost、风险 risk 及权重 λ、μ，输出行动分数 Score(a) 与执行或停止决定。优先能消除关键缺口且风险成本可接受的动作，重复搜索因信息增益近零应停止；发送邮件与问题无关且风险高。该分数是设计框架，不要求伪造精确概率。</p>',
+    '<p>失败控制输入动作与结果去重、上下文预算、工具错误、实体时间单位口径和证据覆盖，输出继续、换源、澄清、停止或失败。打转、观察淹没、状态码误读、跨口径拼接和伪完成分别需要去重、最小事实、错误结构、四项一致检查与证据映射。一步可答任务不值得 ReAct 成本。</p>',
+    '<p>ReAct 评测输入同预算的无工具、一次检索、固定工作流和 ReAct 轨迹，输出任务成功、证据覆盖、无效动作、错误恢复、步数、延迟、费用和超时。年报题还逐项检查官网、主体币种、同口径两数、公式页码；只猜中 20% 不算闭环成功。按计划参数观察综合终止错误分层归因。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="ReAct 假设行动观察历史更新"><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>reason</mi><mo>(</mo><mi>q</mi><mo>,</mo><msub><mi>H</mi><mi>t</mi></msub><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>choose</mi><mo>(</mo><msub><mi>h</mi><mi>t</mi></msub><mo>,</mo><mi>tools</mi><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>o</mi><mi>t</mi></msub><mo>=</mo><mi>environment</mi><mo>(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="候选行动的信息收益成本风险分数"><mi>Score</mi><mo>(</mo><mi>a</mi><mo>)</mo><mo>=</mo><mi>ΔU</mi><mo>(</mo><mi>a</mi><mo>)</mo><mo>−</mo><mi>λ</mi><mo>×</mo><mi>cost</mi><mo>(</mo><mi>a</mi><mo>)</mo><mo>−</mo><mi>μ</mi><mo>×</mo><mi>risk</mi><mo>(</mo><mi>a</mi><mo>)</mo></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

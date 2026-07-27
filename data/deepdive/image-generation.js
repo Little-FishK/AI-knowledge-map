@@ -53,12 +53,14 @@ window.DEEPDIVE["image-generation"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">4</span>怎么让它更听话<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">4</span>完整示例：怎么让它更听话<span class="dd-badge eng">案例推演</span></h2>
   <p class="dd-lead">只给一句话，控制太粗——想要精确的构图、姿势、局部修改，怎么办？</p>
   <ul class="dd-steps">
     <li><b>可控生成</b>：在文字之外再加<b>额外条件</b>——一张线稿、一个人体姿势、一张深度图，让生成严格贴着它来（如 ControlNet）；或只重绘图里<b>指定的一块</b>（局部重绘），其余保持不动（见「可控生成」）。</li>
     <li><b>图像编辑</b>：不是从零生成，而是<b>在已有图上按指令改</b>（换背景、去除某物、扩图），实用场景的主力（见「图像编辑」）。</li>
   </ul>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>步骤</th><th>输入</th><th>本步要检查的输出</th></tr></thead><tbody><tr><td>1　确定目标</td><td>“红外套人物站在桥左侧，背景是雨夜城市”</td><td>对象、位置、服装和场景被拆成可检查条件</td></tr><tr><td>2　约束构图</td><td>人物姿态骨架与桥面深度图</td><td>人物位置和透视遵循控制图</td></tr><tr><td>3　生成候选</td><td>同一条件下固定 4 个随机种子</td><td>分别检查贴题、自然度和候选间多样性</td></tr><tr><td>4　局部修订</td><td>只遮罩错误的手部区域</td><td>手部改善且脸、衣服、桥面未被意外改写</td></tr></tbody></table></div>
+  <p>这个案例不是教模型“一次猜中”，而是把模糊愿望变成条件、采样和局部验收。若姿态图与文字要求冲突，应先明确优先级；若四个候选都在同一位置失败，应回查条件表示或模型覆盖，而不是只继续抽卡。</p>
   <div class="dd-note intuition"><b>一句话</b>　纯文生图是「说什么画什么」，可控生成和编辑则给了你<b>更细的方向盘</b>——从「碰运气」走向「可精确调」。</div>
 </section>
 

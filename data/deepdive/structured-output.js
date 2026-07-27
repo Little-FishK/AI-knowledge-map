@@ -21,3 +21,22 @@ window.DEEPDIVE['structured-output'] = window.createDeepDive({
   quiz:[{q:'JSON 语法通过与 schema 通过差什么？',a:'前者只保证可解析，后者还检查字段、类型、枚举和范围。'},{q:'amount=120 为什么示例中不能执行？',a:'虽在通用范围内，但订单剩余可退额只有 80，且当前角色无批准权限。'},{q:'为什么约束生成后仍要校验？',a:'防实现/版本错配，并处理业务、事实和权限等文法无法表达的条件。'},{q:'新增枚举为何可能破坏旧消费者？',a:'旧 switch 可能没有安全 unknown 分支。'},{q:'失败重试如何避免重复退款？',a:'校验全部通过前不执行，执行与重试使用同一幂等键。'}],
   sources:[{title:'JSON Schema Specification',url:'https://json-schema.org/specification',note:'JSON 数据契约与验证语义'},{title:'PICARD',url:'https://arxiv.org/abs/2109.05093',note:'生成过程中拒绝非法 token'},{title:'JSONSchemaBench',url:'https://arxiv.org/abs/2501.10868',note:'约束解码覆盖与效率评测'},{title:'OWASP API Security Top 10',url:'https://owasp.org/API-Security/',note:'对象授权、资源与接口安全边界'}]
 });
+
+window.DEEPDIVE['structured-output'].html = window.DEEPDIVE['structured-output'].html
+  .replace(
+    '<div class="dd-formula">可退金额 = min(实付金额−已退款，政策上限) = min(80−0,100)=80</div>',
+    '<div class="dd-formula" data-formula-id="structured-output-refundable"><math display="block" aria-label="可退金额 R 等于实付金额 P 减已退款金额 D 与政策上限 L 两者中的最小值，本例为八十"><mrow><mi>R</mi><mo>=</mo><mi>min</mi><mo>(</mo><mi>P</mi><mo>−</mo><mi>D</mi><mo>,</mo><mi>L</mi><mo>)</mo><mo>=</mo><mi>min</mi><mo>(</mo><mn>80</mn><mo>−</mo><mn>0</mn><mo>,</mo><mn>100</mn><mo>)</mo><mo>=</mo><mn>80</mn></mrow></math></div><p class="dd-formula-note"><code>R</code> 是本订单当前最多可退金额，<code>P</code> 是订单实付金额，<code>D</code> 是此前已退款金额，<code>L</code> 是政策允许的金额上限，<code>min</code> 表示取两个候选上限中较小者。该业务不变量依赖权威订单和政策数据，不能只靠 schema 的通用范围判断。</p>'
+  )
+  .replace(
+    '<div class="dd-formula">P′(t|s) ∝ P(t|s)·1[t∈合法集合 M(s)]</div>',
+    '<div class="dd-formula" data-formula-id="structured-output-constrained-proportional"><math display="block" aria-label="状态 s 下 token t 的受限概率 P prime 与原概率 P 乘合法集合指示函数成正比"><mrow><msup><mi>P</mi><mo>′</mo></msup><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mo>∝</mo><mi>P</mi><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mn>1</mn><mo>[</mo><mi>t</mi><mo>∈</mo><mi>M</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow></math></div><p class="dd-formula-note"><code>P(t|s)</code> 是状态 s 下原始 token t 的概率，<code>P′(t|s)</code> 是应用约束后的概率，<code>M(s)</code> 是当前仍合法的 token 集，<code>1[·]</code> 是合法取 1、非法取 0 的指示函数，符号 ∝ 表示右侧还需除以全部合法候选的概率总和才能归一化。</p>'
+  )
+  .replace('多一句“好的”或少一个引号，为什么人能理解而程序会崩？</p>', '多一句“好的”或少一个引号，为什么人能理解而程序会崩？</p><p>结构化输出输入任务语义和版本化数据契约，输出可解析、可校验并可被程序拒绝的对象。生成约束与解析器把自然语言容错转成明确字段和状态；格式有效只表示机器能读取，不表示对象内容可信或允许执行。</p>')
+  .replace('一个对象能被 JSON.parse 解析，离执行退款还差多远？</p>', '一个对象能被 JSON.parse 解析，离执行退款还差多远？</p><p>分层验证输入模型对象、schema、权威业务数据与当前主体，输出通过、字段错误、补信息、拒绝或升级。依次检查完整语法、schema、业务事实和权限副作用；前一层通过不能替代后一层，任何失败都禁止下游猜测执行。</p>')
+  .replace('把所有可能字段都塞进一个嵌套对象，为什么会提高错误率和耦合？</p>', '把所有可能字段都塞进一个嵌套对象，为什么会提高错误率和耦合？</p><p>最小 schema 设计输入业务决策字段、服务器已有事实和兼容要求，输出只含模型必须判断的字段与显式分支。服务器填身份、时间和派生值，枚举和 discriminated union 缩小状态空间；过度嵌套会增加无效路径、版本耦合和迁移成本。</p>')
+  .replace('模型输出 action=refund、amount=120，语法和 schema 都正确，为什么仍不能执行？</p>', '模型输出 action=refund、amount=120，语法和 schema 都正确，为什么仍不能执行？</p><p>案例输入结构合法对象、订单实付与退款记录、政策上限和当前角色，输出业务错误码或安全动作。公式算得最多可退 80，因此 120 违反订单不变量且角色无批准权；不能静默截成 80 执行，因为那会改变模型意图并掩盖上游错误。</p>')
+  .replace('如果服务端最终都会校验，为什么还要生成时约束？</p>', '如果服务端最终都会校验，为什么还要生成时约束？</p><p>双层机制输入模型分布、schema 和服务端业务规则，输出格式受约束且经后验验证的对象。生成时掩码减少无效重试，生成后校验捕获实现错配与语义错误；格式成功但业务质量下降时不能只庆祝结构通过率。</p>')
+  .replace('校验失败后，把整个错误对象原样塞回模型无限重试会发生什么？</p>', '校验失败后，把整个错误对象原样塞回模型无限重试会发生什么？</p><p>失败恢复输入机器生成的字段路径、错误代码、允许范围与请求幂等键，输出局部修复、澄清、重取事实、拒绝或人工升级。重试次数必须有限，校验前不产生副作用；同类连续失败应降级到更简单 schema 或确定性表单。</p>')
+  .replace('生产者升级 schema 后，旧消费者为什么可能静默误读？</p>', '生产者升级 schema 后，旧消费者为什么可能静默误读？</p><p>契约迁移输入旧新 schema、生产者消费者版本和历史 trace，输出兼容矩阵与 expand/contract 发布计划。先让消费者接受新旧，再让生产者发送新，最后退役旧；新增枚举和严格额外字段都可能破坏旧逻辑，不能仅按“新增”判断兼容。</p>')
+  .replace('schema 已把 action 限定为 refund，为什么提示注入仍可能造成伤害？</p>', 'schema 已把 action 限定为 refund，为什么提示注入仍可能造成伤害？</p><p>安全执行输入合法参数、认证主体、工具白名单、策略与审批状态，输出以最小权限执行或拒绝。模型提供的身份、工具名和自由文本都不可信，服务器重新鉴权并限制金额与对象；结构化字符串仍可携带注入载荷，消费者必须按目标上下文转义。</p>')
+  .replace('“结构化输出成功率 99.9%”还缺哪些能决定上线的数字？</p>', '“结构化输出成功率 99.9%”还缺哪些能决定上线的数字？</p><p>端到端评测输入模型输出、验证日志、工具结果和业务后果，输出语法、schema、字段、事实、权限、幂等、任务质量、延迟与成本指标。错误预算按最终损失分级，单次越权不能被大量无害格式成功平均掉。</p>');

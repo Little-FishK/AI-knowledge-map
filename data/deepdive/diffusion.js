@@ -57,12 +57,12 @@ window.DEEPDIVE["diffusion"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">2.5</span>训练目标：随机抽一步就能学整条链<span class="dd-badge math">数学</span></h2>
+  <h2><span class="dd-n">2.5</span>数值例子：随机抽一步就能学整条链<span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">既然完整链有很多步，训练时是否每次都要从头走到尾？</p>
   <p>不需要。给定干净样本 <code>x₀</code>，可以直接采样任意时刻 <code>t</code> 的带噪样本：</p>
-  <div class="dd-formula">xₜ = √ᾱₜ · x₀ + √(1−ᾱₜ) · ε，　ε ~ N(0, I)</div>
+  <div class="dd-formula" data-display="mathml"><math display="block" aria-label="带噪样本 x t 等于 alpha bar t 的平方根乘干净样本 x zero，加上一减 alpha bar t 的平方根乘随机噪声 epsilon"><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></msqrt><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></mrow></msqrt><mi>ε</mi><mo>,</mo><mspace width="1em"/><mi>ε</mi><mo>∼</mo><mi>𝒩</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>I</mi><mo>)</mo></math></div>
   <p class="dd-formula-note"><code>ᾱₜ</code>由噪声日程决定。训练常让网络 <code>εθ(xₜ,t,c)</code> 预测加入的噪声，并最小化 <code>||ε−εθ||²</code>；条件 <code>c</code> 可以是文本。一次随机 t 的样本就能为整条时间轴提供无偏训练信号。</p>
-  <div class="dd-note key"><b>数值例子：一维加噪与去噪估计</b>　取干净值 <code>x₀=2</code>、<code>ᾱₜ=0.64</code>，则 <code>√ᾱₜ=0.8</code>、<code>√(1−ᾱₜ)=0.6</code>。这次随机噪声若为 <code>ε=−1</code>，带噪值就是 <code>xₜ=0.8×2+0.6×(−1)=1.0</code>。若网络预测 <code>εθ=−0.8</code>，本样本噪声损失是 <code>(−1+0.8)²=0.04</code>，反推出的干净值约为 <code>(1−0.6×(−0.8))/0.8=1.85</code>。一次预测并未完美还原 2，多步采样会沿模型估计的反向方向逐步修正。</div>
+  <div class="dd-note key"><b>数值例子：一维加噪与去噪估计</b>　取干净值 <code>x₀=2</code>、<code>ᾱₜ=0.64</code>，则 <code><span class="dd-radical" role="math" aria-label="ᾱₜ 的平方根"><span class="dd-radicand">ᾱₜ</span></span>=0.8</code>、<code><span class="dd-radical" role="math" aria-label="1−ᾱₜ 的平方根"><span class="dd-radicand">1−ᾱₜ</span></span>=0.6</code>。这次随机噪声若为 <code>ε=−1</code>，带噪值就是 <code>xₜ=0.8×2+0.6×(−1)=1.0</code>。若网络预测 <code>εθ=−0.8</code>，本样本噪声损失是 <code>(−1+0.8)²=0.04</code>，反推出的干净值约为 <code>(1−0.6×(−0.8))/0.8=1.85</code>。一次预测并未完美还原 2，多步采样会沿模型估计的反向方向逐步修正。</div>
   <div class="dd-note warn"><b>“去掉一点噪声”是直觉，不是唯一参数化。</b>　模型也可预测干净样本、速度变量或数据分布的分数；不同采样器还能用更少步骤近似反向轨迹。核心是学习反向更新方向，而非必须逐像素擦除固定噪点。</div>
 </section>
 

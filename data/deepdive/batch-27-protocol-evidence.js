@@ -17,7 +17,7 @@
       {title:'失败恢复要覆盖超时、取消、重连与幂等',kind:'eng',badge:'可靠性',lead:'工具已执行但响应丢了，重试会发生什么？',body:'<p>读操作通常可安全重试；写操作必须携带幂等键或先查询状态。每个请求设置可配置超时，收到进度通知也保留最大时限；取消后 Server 应尽力终止，但 Host 仍要处理“动作完成、响应晚到”的不确定状态。</p><p>重连后重新协商版本和能力，不沿用旧会话假设。日志至少关联 Host 请求、Client 会话、Server 身份、工具、参数摘要、用户批准、结果和副作用 ID，才能定位错误发生在模型、Host、传输还是 Server。</p>'},
       {title:'何时用 MCP，何时直接 API 或内部函数',kind:'eng',badge:'选型',lead:'把每个函数都包装成 MCP Server 会更标准吗？',body:'<p>跨多个 Host 复用、需要动态发现或第三方生态时，MCP 的契约价值最大；单进程内部稳定函数、极低延迟热路径或已有成熟服务 SDK 时，直接调用可能更简单。MCP 也不替代业务 API：Server 往往只是把已有 API 映射成面向 AI 应用的能力。</p><p>选型比较连接复用、版本治理、认证、可观测性、延迟和攻击面，不以“是否流行”决定。先做只读最小 Server，再逐步开放写工具。</p>'},
       {title:'常见误区与学习路线',badge:'误区与依赖',lead:'MCP 是协议边界，不是自动获得的安全边界。',body:'<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>误区</th><th>更准确的理解</th></tr></thead><tbody><tr><td>MCP 等于工具调用</td><td>前者连接生态，后者产生调用意图</td></tr><tr><td>连上 Server 就可信</td><td>连接、认证、授权与内容信任是不同判断</td></tr><tr><td>stdio 天然安全</td><td>本地进程可能拥有更大的文件与环境权限</td></tr><tr><td>能力协商就是权限</td><td>能力说明协议支持，权限约束具体主体与资源</td></tr><tr><td>协议会替我做重试</td><td>副作用幂等与业务恢复仍由应用设计</td></tr></tbody></table></div><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>层级</th><th>依赖与延伸</th></tr></thead><tbody><tr><td>先修</td><td>JSON-RPC、工具调用、认证与授权</td></tr><tr><td><b>本页核心</b></td><td>角色、分层、生命周期、能力协商、隔离</td></tr><tr><td>相邻</td><td>Agent循环、代码执行、提示注入</td></tr><tr><td>工程</td><td>幂等、取消、审计、版本兼容测试</td></tr></tbody></table></div>'}
-      ,{title:'先澄清：协议、SDK、Server 与 Agent 不是同一层',badge:'概念消歧',lead:'“装了一个 MCP”究竟可能指什么？',body:'<p>MCP 是消息与生命周期规范；SDK 是实现规范的代码库；Server 是暴露能力的运行程序；Agent 是决定是否以及怎样使用能力的应用逻辑。一个 Server 可以完全不含模型，一个 Agent 也可以不用 MCP 直接调用内部函数。把这些层混在一起，会把 SDK bug、协议不兼容、工具语义错误和模型决策错误统称为“MCP失败”，无法定位责任。</p><div class="dd-note warn"><b>初学者最易混淆：</b>MCP 标准化“怎样连接与交换”，不保证工具真实、安全、获准或适合当前任务。</div>'}
+      ,{title:'先澄清：协议、SDK、Server 与 Agent 不是同一层',role:'reference',badge:'概念消歧',lead:'“装了一个 MCP”究竟可能指什么？',body:'<p>MCP 是消息与生命周期规范；SDK 是实现规范的代码库；Server 是暴露能力的运行程序；Agent 是决定是否以及怎样使用能力的应用逻辑。一个 Server 可以完全不含模型，一个 Agent 也可以不用 MCP 直接调用内部函数。把这些层混在一起，会把 SDK bug、协议不兼容、工具语义错误和模型决策错误统称为“MCP失败”，无法定位责任。</p><div class="dd-note warn"><b>初学者最易混淆：</b>MCP 标准化“怎样连接与交换”，不保证工具真实、安全、获准或适合当前任务。</div>'}
     ],
     chain:['Host选择并信任一个Server','为Server创建隔离Client','协商版本与双向能力','发现原语并建立本地目录','模型提出或应用选择操作','Host授权后发送最小请求','验证结果并记录副作用','取消、重连或关闭会话'],
     quiz:[{q:'Client 与 Server 的关系是什么？',a:'每个Client维护与一个特定Server的一对一会话，由Host统一管理。'},{q:'能力协商为何不等于授权？',a:'它只声明协议功能可用，不决定具体用户能访问的资源。'},{q:'Tools 与 Resources 的控制差别？',a:'工具通常由模型提出调用，资源由应用选择进入上下文。'},{q:'写工具超时后为何不能盲重试？',a:'动作可能已完成，只是响应丢失，需要幂等键或状态查询。'},{q:'Server 返回文本为什么仍是不可信数据？',a:'协议保证消息结构，不保证内容真实或没有提示注入。'}],
@@ -27,6 +27,29 @@
       {title:'MCP Architecture Overview',url:'https://modelcontextprotocol.io/docs/learn/architecture',note:'数据层、传输层与原语'}
     ]
   });
+
+  // 新版教学门禁补充：每个核心章节独立回答六问，并把延迟关系改为可访问的数学公式。
+  {
+    const page = window.DEEPDIVE['mcp-architecture'];
+    const additions = [
+      '<p>MCP 是 Host 与外部能力之间的公共连接协议，输入是不同 AI 应用和工具提供方，输出是统一的发现、调用、错误与生命周期消息。它把专用适配器数量从近似 M×N 降到 M+N，解决重复集成；协议只统一交换契约，不保证 schema 永久兼容，也不决定模型是否应调用或用户是否授权。</p>',
+      '<p>角色划分输入用户会话、单个连接和服务能力，输出 Host、Client、Server 三层责任：Host 持有用户目标与策略，Client 只维护一个 Server 会话，Server 只接收完成请求所需的最少参数。这样工作可隔离跨源上下文；一对一会话表示通信边界，不表示 Server 已可信或可以读取完整对话。</p>',
+      '<p>分层输入同一条协议消息和具体连接方式，输出数据层语义与传输层风险。数据层规定 JSON-RPC 方法、生命周期和原语，传输层负责 stdio 或 HTTP 的连接、分帧和认证；上层方法相同不代表风险相同。本地进程与远端服务都必须另做身份、权限和内容信任判断。</p>',
+      '<p>初始化案例输入 Client/Server 版本、能力和天气工具 schema，输出协商后的会话与带来源的天气结果。双方先 initialize，再确认 initialized、发现工具、由 Host 审批后调用。总延迟由连接协商、发现、策略决策、工具执行和模型消费相加；缓存可省发现时间，但版本变化、超时或晚到结果会使旧缓存和盲目重试不安全。</p>',
+      '<p>架构图输入多个 Server 及各自所需上下文，输出由 Host 协调的隔离 Client 会话。Host 只向每个 Server 传最少信息并在本地汇合结果，避免 Server 彼此直连获得跨源数据。图中的隔离表示设计责任；若 Host 主动复制完整会话或共用凭据，协议本身不会阻止泄漏。</p>',
+      '<p>三类原语输入工具动作、上下文资源或可复用提示，输出由不同主体控制的操作：模型提出 Tool，应用选择 Resource，用户选择 Prompt，Host 负责最终策略检查。它解决把所有 Server 内容都当成同一种模型输入的混淆；反向能力会反转信任方向，任何原语仍可能越权、过期或包含提示注入。</p>',
+      '<p>能力协商输入双方支持的协议特性，输出本次会话可使用的方法集合；授权输入主体、资源、动作和作用域，输出某次请求是否允许。Host 先验身份再逐工具限制参数，Server 仍做权威资源授权。声明 tools 只表示协议支持工具，不能解释为任意用户可以调用所有工具。</p>',
+      '<p>恢复机制输入请求 ID、超时、动作类型、幂等键和已知副作用，输出重试、查询状态、取消或停止决定。读操作通常可重试，写操作先用幂等键或查询结果；重连后重新协商。取消只表示 Host 不再等待，不能证明远端动作没有完成，缺少状态查询时必须报告不确定。</p>',
+      '<p>选型输入复用范围、发现需求、延迟、认证、治理成本和攻击面，输出 MCP、直接 API 或内部函数方案。跨 Host 生态复用最适合 MCP，单进程稳定热路径常适合直接调用；先开放只读最小 Server，再按证据扩展写能力。采用 MCP 表示连接契约更统一，不表示业务 API、SDK 或安全治理可以省略。</p>'
+    ];
+    const renderedSections = page.html.split("</section>");
+    additions.forEach((html, index) => { renderedSections[index] += html; });
+    page.html = renderedSections.join("</section>");
+    page.html = page.html.replace(
+      '<div class="dd-formula">总延迟 ≈ 连接/协商 + 发现 + 用户/策略决策 + 工具执行 + 模型消费</div>',
+      '<div class="dd-formula" data-formula-id="mcp-total-latency" data-display="mathml"><math display="block" aria-label="MCP 总延迟约等于连接协商、能力发现、策略决策、工具执行与模型消费时间之和"><msub><mi>T</mi><mtext>总</mtext></msub><mo>≈</mo><msub><mi>T</mi><mtext>连接协商</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>发现</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>策略</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>工具</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>模型</mtext></msub></math></div>'
+    );
+  }
 
   window.DEEPDIVE['knowledge-graph'] = window.createDeepDive({
     title:'知识图谱：把身份、关系、时间与证据组织成可查询事实',
@@ -51,6 +74,33 @@
     sources:[{title:'Knowledge Graphs Survey',url:'https://arxiv.org/abs/2003.02320',note:'知识图谱表示、构建与应用综述'},{title:'From Local to Global: GraphRAG',url:'https://arxiv.org/abs/2404.16130',note:'图索引与社区摘要'},{title:'HippoRAG',url:'https://arxiv.org/abs/2405.14831',note:'知识图上的长期检索'}]
   });
 
+  // 新版教学门禁补充：逐节说明图结构的输入输出、证据含义和适用边界。
+  {
+    const page = window.DEEPDIVE['knowledge-graph'];
+    const additions = [
+      '<p>知识图谱输入有稳定身份的实体、受控关系、时间和原文证据，输出可按关系和约束查询的事实图。它擅长唯一身份、多跳、时间版本与全局结构，不只是找语义相近文本；路径存在表示图中有连接，不表示连接真实。单段即可回答或维护成本高于收益时不必建图。</p>',
+      '<p>事实建模输入主体 subject、关系 predicate、客体 object、有效时间 validTime、来源 source、置信度 confidence 和状态 status，输出一条可追踪、可撤回的限定边 Fact。稳定 ID 区分同名实体，本体限制关系含义，时间和来源限定事实何时及为何成立；缺少这些字段的三元组不能支持可靠历史与冲突查询。</p>',
+      '<p>多跳案例输入实体解析正确率 pEntity、每条边正确率 pEdge 和路径边数 h，输出 cook 到 dre 的可追踪路径及独立近似置信度 Ppath。Ppath=pEntity×pEdge^h；0.9×0.95^3≈0.772 说明每跳误差会累积。独立假设只是粗略直觉，真实实体和关系错误常相关，最终必须回查三段原文。</p>',
+      '<p>本体设计输入真实问题、实体类型、关系方向、基数、时间规则和身份证据，输出能支持目标查询的最小 schema。过宽 relatedTo 无法精确推理，过细关系又难标注和维护；本体质量看能否稳定回答业务问题，不看类型数量。schema 变化必须迁移旧边并保持语义兼容。</p>',
+      '<p>证据闭环输入原始文档与版本，输出实体解析、关系时间来源绑定后的图，再由查询路径回取原文。图用于寻路和聚合，原文跨度负责事实核验与纠错；只把边列表交给模型会丢失限定条件和抽取不确定性。每条回答路径都必须能回到可访问的原文证据。</p>',
+      '<p>时态建模输入事实有效区间 validFrom/validTo、系统获知时间 observedAt、来源权威和冲突状态，输出可按时间点查询的并存边。新任 CEO 出现时关闭旧边有效期而不删除历史证据；observedAt 不等于事实生效时间。来源冲突未解决时必须展示或按明确用途规则选择，不能静默覆盖。</p>',
+      '<p>GraphRAG 检索输入问题类型、锚点实体和跳数节点预算，输出受约束路径、有限邻域或社区摘要及对应原文。实体题扩邻域，多跳题搜类型路径，全局主题题用社区；社区摘要是有损索引，不能作为最终证据。枢纽节点和无限扩展会淹没相关内容，必须限制规模。</p>',
+      '<p>图向量混合输入自然语言问题、向量候选实体、图结构和文本证据，输出经过实体解析、路径约束和文本重排的候选证据。向量负责没有精确实体名时找锚点，图负责关系约束，文本负责回查；各路贡献必须可观测。图与向量只能在同一质量、延迟和成本预算下比较。</p>',
+      '<p>图评测输入金标实体、关系、时间、来源、查询路径和最终答案，输出构建层、查询层和应用层指标。问答偶然答对不能证明所有边正确；高连接实体误合并会污染大量路径，平均边准确率会掩盖非线性伤害。必须按路径长度、实体热度、时间更新和冲突切片。</p>',
+      '',
+      '<p>概念辨析输入一个图存储、网络可视化或 GraphRAG 系统，输出“图数据库、可视化、知识图谱或图辅助检索”的层级分类。图数据库负责存储查询，网络图负责展示，知识图谱还要求身份关系时间来源治理，GraphRAG 使用图帮助检索生成；能沿边查询不证明边是真实知识。小图也可存在关系表中，不强制使用专用图数据库。</p>'
+    ];
+    const renderedSections = page.html.split("</section>");
+    additions.forEach((html, index) => { renderedSections[index] += html; });
+    page.html = renderedSections.join("</section>");
+    const formulas = [
+      '<div class="dd-formula"><math display="block" aria-label="带限定条件的知识图谱事实"><mi>Fact</mi><mo>=</mo><mo>(</mo><mi>subject</mi><mo>,</mo><mi>predicate</mi><mo>,</mo><mi>object</mi><mo>,</mo><mi>validTime</mi><mo>,</mo><mi>source</mi><mo>,</mo><mi>confidence</mi><mo>,</mo><mi>status</mi><mo>)</mo></math></div>',
+      '<div class="dd-formula"><math display="block" aria-label="多跳路径的独立近似置信度"><mi>Ppath</mi><mo>≈</mo><mi>pEntity</mi><mo>×</mo><msup><mi>pEdge</mi><mi>h</mi></msup><mo>=</mo><mn>0.9</mn><mo>×</mo><msup><mn>0.95</mn><mn>3</mn></msup><mo>≈</mo><mn>0.772</mn></math></div>'
+    ];
+    let formulaIndex = 0;
+    page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+  }
+
   window.DEEPDIVE['citations'] = window.createDeepDive({
     title:'引用与证据对齐：把每个可核查主张连接到最小充分原文',
     subtitle:'从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。',
@@ -73,6 +123,31 @@
     quiz:[{q:'引用正确性与完整性有什么不同？',a:'正确性看已给引用是否支持，完整性看所有应引主张是否获得正确支持。'},{q:'为什么不能用 chunk ID 作永久锚点？',a:'重新切块会改变ID，需要映射到文档版本和原始跨度。'},{q:'主题相关为何不等于证据支持？',a:'段落可能谈同一主题，却没有蕴含具体数字、比较或因果。'},{q:'来源蕴含主张是否证明事实为真？',a:'不一定，还要判断来源质量、时效与独立证据。'},{q:'没有充分证据时系统应怎样做？',a:'删除主张、明确降格为推断或拒答，不能编造引用。'}],
     sources:[{title:'ALCE',url:'https://arxiv.org/abs/2305.14627',note:'带引用长文本生成与评测'},{title:'FActScore',url:'https://arxiv.org/abs/2305.14251',note:'原子事实层面的细粒度评估'},{title:'Retrieval-Augmented Generation',url:'https://arxiv.org/abs/2005.11401',note:'检索增强生成基础'}]
   });
+
+  // 新版教学门禁补充：逐节回答引用系统的对象、判断层次和失败边界。
+  {
+    const page = window.DEEPDIVE['citations'];
+    const additions = [
+      '<p>引用对齐输入原子主张、证据白名单和稳定文档跨度，输出主张到版本化原文的可点击映射。链接存在只证明文档可定位，跨度在语义上蕴含主张才算支持；模型不能凭记忆编 URL。没有白名单证据时应删除、降格或拒答，而不是补一个主题相关链接。</p>',
+      '<p>主张拆分输入回答中的复合句，输出可分别判断真假的原子主张及“需引用、推断或建议”类型。速度、准确率和成本是三条独立主张，“因为”还引入因果主张；每条只绑定最小充分证据。主观建议可以不引，但支撑建议的事实前提仍需引用。</p>',
+      '<p>指标案例输入应引用主张数 Nclaim、全部已给引用数 Ncitation、正确支持引用数 NsupportedCitation 和被正确支持主张数 NcoveredClaim，输出 CitationPrecision 与 Coverage。这里的蕴含是“证据内容足以推出该主张”，而不只是主题相近；前者等于 NsupportedCitation/Ncitation，后者等于 NcoveredClaim/Nclaim。66.7% 与 50% 分别说明已给链接质量和应引主张覆盖，不能互相替代。</p>',
+      '<p>稳定锚点输入规范文档 ID、内容版本或哈希、页章节、字符或版面跨度和摘录，输出跨切块更新仍可定位的引用。chunk ID 只是索引产物，重新切块后会改变；引用必须映射回原始版本坐标。旧版本无法定位时要明确标记漂移，不能悄悄跳到新文档首页。</p>',
+      '<p>证据闭环输入问题、白名单证据和原子主张，输出主张—证据二部图、蕴含完整性检查及定位链接。先选证据再生成能限制模型只用可用材料，生成后逐主张核验能发现缺证和错配；先写答案再补链接容易按主题凑引用。验证失败的主张必须删除、降格或补查。</p>',
+      '<p>三层验证输入主张、支持跨度、来源属性和独立事实证据，输出蕴含判断、来源适用性和事实可信度三个结果。文章确实声称 X 只证明归因忠实，不能证明 X 为真；一手资料也可能只适用于特定样本和时间。自动蕴含模型只能筛查，否定、范围、表格和跨句推断需人工抽检。</p>',
+      '<p>冲突处理输入多个来源的数字、口径、时间、版本、群体和权威信息，输出可裁决选择或并列展示的冲突说明。先检查是否其实描述不同范围，仍冲突则保留双方及适用条件；检索名次不能代替来源裁决。综合推断必须标明由哪些来源推得，不能伪装成某一来源原话。</p>',
+      '<p>引用界面输入主张、最小摘录、来源日期、定位锚点和访问权限，输出紧邻标记、悬停摘要及点击高亮原句。用户能回到支持跨度才算可核验，跳到首页不够；移动端也必须可展开。摘录受最小充分和版权边界约束，受限来源应明确访问限制。</p>',
+      '<p>引用评测输入人工拆分主张、金标证据、蕴含和来源质量，输出正确性、完整性、错位率、来源层级、冲突覆盖及任务质量。URL 返回 200 只证明资源可访问，不证明定位或支持正确；还要测试无足够证据时是否拒绝。数字、日期、因果、表格和多跳推断需分别切片。</p>',
+      '',
+      '<p>概念辨析输入检索结果、引用跨度、归因表述和事实核查证据，输出四道关分别通过或失败的状态。检索负责找材料，引用负责连接跨度，归因负责忠实表达谁说什么，事实核查判断说法是否可信；一个 grounded 标签不能覆盖四层。解释是基于证据的综合，必须显式给出推断步骤和不确定性。</p>'
+    ];
+    const renderedSections = page.html.split("</section>");
+    additions.forEach((html, index) => { if (html) renderedSections[index] += html; });
+    page.html = renderedSections.join("</section>");
+    page.html = page.html.replace(
+      /<div class="dd-formula">Citation Precision[\s\S]*?<\/div>/,
+      '<div class="dd-formula"><math display="block" aria-label="引用正确性与应引主张覆盖率"><mi>CitationPrecision</mi><mo>=</mo><mfrac><mi>NsupportedCitation</mi><mi>Ncitation</mi></mfrac><mo>;</mo><mi>Coverage</mi><mo>=</mo><mfrac><mi>NcoveredClaim</mi><mi>Nclaim</mi></mfrac></math></div>'
+    );
+  }
 
   window.DEEPDIVE['human-in-the-loop'] = window.createDeepDive({
     title:'人在回路：把稀缺的人类判断放到能改变风险的节点',
@@ -97,4 +172,33 @@
     quiz:[{q:'为什么确认按钮不等于有效人工控制？',a:'若人没有证据、资格、时间或拒绝权，点击无法降低风险。'},{q:'只升级低置信样本会漏什么？',a:'高置信系统性错误和未知新模式，需要红线规则与随机抽检。'},{q:'审核容量不足时高风险动作怎么办？',a:'延迟、拒绝或停服，不能绕过既定红线自动放行。'},{q:'人工反馈为什么有选择偏差？',a:'旧模型和路由规则决定了哪些样本被送审。'},{q:'怎样证明人机闭环有效？',a:'比较最终伤害、漏审、误升级、队列、成本与无人工/不同路由基线。'}],
     sources:[{title:'NIST AI Risk Management Framework',url:'https://www.nist.gov/itl/ai-risk-management-framework',note:'风险治理与人类监督'},{title:'Guidelines for Human-AI Interaction',url:'https://doi.org/10.1145/3290605.3300233',note:'人机交互设计准则'},{title:'Concrete Problems in AI Safety',url:'https://arxiv.org/abs/1606.06565',note:'人类监督、可扩展控制与安全问题'}]
   });
+
+  // 新版教学门禁补充：逐节说明人工控制的输入、输出、机制、解释与边界。
+  {
+    const page = window.DEEPDIVE['human-in-the-loop'];
+    const additions = {
+      0: '<p>人在回路是在特定决策点把有资格的人、原始证据和拒绝权接入自动系统。输入是风险动作、审核者资格、证据和可用决定，输出是批准、修改、拒绝或升级。它用人的判断改变风险结果；只增加确认点击而不给证据和权力，会增加延迟并形成自动化依赖。</p>',
+      1: '<p>介入点选择输入动作可逆性、伤害时机和改进目标，输出事前批准、同步复核、事后抽检或离线纠错。四种方式分别保护当前副作用、交付结果、未知错误和未来模型。它们可以组合但不能互相替代，事后标注无法撤销已经发生的伤害。</p>',
+      2: '<p>退款案例输入校准正确概率、错误退款损失、自动收益、复核成本和延迟损失，输出期望成本最低的自动、复核或禁止动作。逐动作计算错误概率乘损失并加人工与延迟成本；本例 22 元复核成本低于 92 元自动成本。结论依赖校准和业务成本，不可把模型语气或 token 概率当任务正确率。</p>',
+      3: '<p>风险路由输入红线规则、校准不确定性、审核容量和生产流量，输出自动、人工、禁止以及随机抽检分配。红线无条件阻断，已知高风险按规则升级，不确定样本按分数升级，自动流量保留抽检。队列拥堵可以延迟低风险服务，但不能静默取消高风险红线。</p>',
+      4: '<p>决策门图输入 AI 建议、证据、错误成本、可逆性、校准和容量，输出低风险自动、合格复核或禁止延迟路径。风险路由器在副作用前选择动作，结果与伤害反馈更新策略。路由到人工只表示需要判断，不表示审核者必然正确或当前容量足够。</p>',
+      5: '<p>审核界面输入原始材料、模型建议、证据、现状差异、后果和替代方案，输出审核者可独立作出的批准修改或拒绝。高风险时先形成初判再显示模型建议，拒绝与批准同样容易。记录理由支持审计，但界面不能用默认焦点或追责压力诱导机械同意。</p>',
+      6: '<p>人因评测输入盲审样本、含已知错误建议的对照、案例难度、轮班和审核速度，输出基线正确率、自动化偏见、分歧和疲劳指标。先测不看模型的判断，再比较模型建议造成的改判。专家分歧可能来自任务含糊，不能只用一致率断言人不可靠。</p>',
+      7: '<p>审核队列容量输入到达率、审核人数、单人服务率、风险等级和 SLA，输出利用率、队龄、所需人员和降级动作。利用率接近一时等待非线性增长，因此八人只达到理论满载而无峰值余量。公式是平均容量近似，不替代复杂度分布、休息和故障演练。</p>',
+      8: '<p>反馈治理输入升级样本、路由原因、采样概率、自动流量随机标签和审核分歧，输出可校正选择偏差的训练集。升级集不是生产分布，训练前需去标识、质检并用独立近生产测试集评估。保存采样概率支持重加权，但不能消除未被抽样的未知偏差。</p>',
+      9: '<p>闭环评测输入全自动、规则路由、不确定性路由和人机组合方案，输出漏审、误升级、改判、最终伤害、队列、申诉和成本。按风险切片并抽查自动通过流量估计沉在水下的高置信错误。自动化率高只表示人处理更少，不能证明最终风险更低。</p>'
+    };
+    const renderedSections = page.html.split("</section>");
+    Object.entries(additions).forEach(([index, html]) => { renderedSections[Number(index)] += html; });
+    page.html = renderedSections.join("</section>")
+      .replace(
+        '<div class="dd-formula">选择动作 a* = argminₐ [P(error|x,a)·C<sub>error</sub> + C<sub>review</sub> + C<sub>delay</sub>]</div>',
+        '<div class="dd-formula" data-formula-id="hitl-expected-cost" data-display="mathml"><math display="block" aria-label="最优动作 a 星是在所有动作中选择错误期望损失、复核成本与延迟成本之和最小者"><msup><mi>a</mi><mo>*</mo></msup><mo>=</mo><munder><mi>argmin</mi><mi>a</mi></munder><mo>[</mo><mi>P</mi><mo>(</mo><mi>error</mi><mo>|</mo><mi>x</mi><mo>,</mo><mi>a</mi><mo>)</mo><msub><mi>C</mi><mtext>error</mtext></msub><mo>+</mo><msub><mi>C</mi><mtext>review</mtext></msub><mo>+</mo><msub><mi>C</mi><mtext>delay</mtext></msub><mo>]</mo></math></div><p class="dd-formula-note"><code>a*</code> 是期望成本最低的动作，<code>a</code> 是候选动作，<code>x</code> 是当前案例，<code>P(error|x,a)</code> 是采取动作后的错误概率；三个 <code>C</code> 分别是错误损失、复核成本和延迟成本。</p>'
+      )
+      .replace(
+        '<div class="dd-formula">utilization ρ = arrival rate / (reviewers × service rate)</div>',
+        '<div class="dd-formula" data-formula-id="hitl-queue-utilization" data-display="mathml"><math display="block" aria-label="审核队列利用率 rho 等于到达率 lambda 除以审核者数量 c 乘单人服务率 mu"><mi>ρ</mi><mo>=</mo><mfrac><mi>λ</mi><mrow><mi>c</mi><mi>μ</mi></mrow></mfrac></math></div><p class="dd-formula-note"><code>ρ</code> 是审核容量利用率，<code>λ</code> 是每小时到达任务数，<code>c</code> 是审核者人数，<code>μ</code> 是单人每小时处理数；ρ 接近 1 表示平均需求接近理论满载。</p>'
+      )
+      .replace(/(<section class="dd-sec" data-section-role=")core("[^>]*><h2><span class="dd-n">12<\/span>先澄清)/, '$1reference$2');
+  }
 })();

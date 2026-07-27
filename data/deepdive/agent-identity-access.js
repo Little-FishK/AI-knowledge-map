@@ -32,3 +32,26 @@ window.DEEPDIVE["agent-identity-access"] = {
 
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener">NIST SP 800-207: Zero Trust Architecture</a>：逐请求验证、资源保护与最小权限原则。</li><li><a href="https://www.rfc-editor.org/rfc/rfc9700" target="_blank" rel="noopener">RFC 9700: OAuth 2.0 Security Best Current Practice</a>：令牌受众、客户端与授权安全。</li><li><a href="https://www.rfc-editor.org/rfc/rfc8693" target="_blank" rel="noopener">RFC 8693: OAuth 2.0 Token Exchange</a>：跨主体/服务委托与令牌交换语义。</li><li><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization" target="_blank" rel="noopener">MCP Specification 2025-11-25: Authorization</a>：MCP HTTP 授权要求与令牌受众约束。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div>`
 };
+
+// 新版教学门禁补充：逐节明确身份、授权、委托与执行边界。
+{
+  const page = window.DEEPDIVE["agent-identity-access"];
+  const additions = [
+    '<p>身份与访问控制把模型意图和现实执行权限分开。输入是用户目标、可验证主体、候选动作、资源和上下文，输出是允许、拒绝或暂停。系统分别认证谁、授权能做什么，再求本次委托交集；自然语言只能提出候选，不能成为门禁凭证。</p>',
+    '<p>主体链输入用户、Agent 会话、执行工作负载和资源服务，输出可追踪的委托链与审计链。用户委托会话，执行网关交换窄凭证，资源服务最终裁决，并记录主体到结果。共享机器人账号只表示一个技术身份，无法解释谁代表谁或精准撤销。</p>',
+    '<p>认证、授权、委托、审计分别回答是谁、能做什么、代表谁为何能做、实际发生什么。输入是主体证据、策略、任务委托和事件，输出认证结果、授权决定、委托范围与审计记录。四者互补但不能替代；认证成功不等于通行全部资源，事后审计也不能代替事前阻断。</p>',
+    '<p>有效权限计算输入用户委托、Agent 策略、工具策略、资源策略和当前上下文，输出它们交集内的动作集合。每一层只能缩小上游范围，参数或资源变化必须重新求交。交集为空或对象无法唯一解析时默认拒绝，不能让模型猜合理值。</p>',
+    '<p>令牌案例输入仓库 A 的任务委托、结构化建分支动作和会话风险，输出仅面向目标 API、仓库和动作的五分钟令牌及审计结果。网关校验后交换凭证，执行时最后一跳注入，资源服务再次检查。短期窄令牌缩小损失半径，不把泄露风险降为零，也不授权发布。</p>',
+    '<p>令牌验证输入签名、签发方、受众、scope、资源、时间和发送者绑定，输出接受或拒绝。签名只证明内容未被未知方篡改，资源服务还须逐项核对当前请求。任一上下文不匹配都拒绝；上游令牌不能原样透传给未知下游。</p>',
+    '<p>秘密管理输入密钥标识、工作负载身份、目标工具和最小动作权限，输出在受信执行器最后一跳注入的凭证。模型只看 schema 与脱敏结果，日志只记指纹和版本。秘密不进入上下文降低复制泄漏，但过宽执行网关仍可能被模型借用越权。</p>',
+    '<p>提示注入防线输入被操纵的候选动作、委托、策略交集和资源侧检查，输出越权拒绝、需确认暂停或窄权限执行。目标不是保证模型永不受骗，而是让执行层即使面对错误意图也不能越过资源、动作、受众、时间和确认边界。边界只覆盖已配置策略，错误策略仍需测试和审计。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>")
+    .replace(
+      '<div class="dd-formula">Effective = UserDelegation ∩ AgentPolicy ∩ ToolPolicy ∩ ResourcePolicy ∩ Context</div>',
+      '<div class="dd-formula" data-formula-id="agent-access-effective" data-display="mathml"><math display="block" aria-label="有效权限 E 等于用户委托、Agent 策略、工具策略、资源策略和上下文允许集合的交集"><mi>E</mi><mo>=</mo><mi>UserDelegation</mi><mo>∩</mo><mi>AgentPolicy</mi><mo>∩</mo><mi>ToolPolicy</mi><mo>∩</mo><mi>ResourcePolicy</mi><mo>∩</mo><mi>Context</mi></math></div>'
+    )
+    .replace(/(<section class="dd-sec")(><h2><span class="dd-n">3<\/span>认证、授权、委托与审计)/, '$1 data-section-role="core"$2');
+}

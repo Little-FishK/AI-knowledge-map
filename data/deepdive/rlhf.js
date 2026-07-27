@@ -34,7 +34,7 @@ window.DEEPDIVE['rlhf'] = {
       <h3>3. 奖励模型怎样从“二选一”学到分数？</h3>
       <p class="dd-lead">它学习的是两个回答的相对胜率，而不是回答的绝对价值。</p>
       <p>若标注者更喜欢回答 y<sub>w</sub> 而不是 y<sub>l</sub>，Bradley–Terry 形式可写成：</p>
-      <div class="dd-formula">P(y<sub>w</sub> ≻ y<sub>l</sub> | x) = σ(r(x,y<sub>w</sub>) − r(x,y<sub>l</sub>))</div>
+<div class="dd-formula" data-display="mathml"><math display="block" aria-label="给定提示 x，回答 y w 胜过回答 y l 的概率，等于二者奖励差经过 sigmoid"><mi>P</mi><mo>(</mo><msub><mi>y</mi><mi>w</mi></msub><mo>≻</mo><msub><mi>y</mi><mi>l</mi></msub><mo>|</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>σ</mi><mo>(</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>w</mi></msub><mo>)</mo><mo>−</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>l</mi></msub><mo>)</mo><mo>)</mo></math></div>
       <p>训练会增大优选回答与落选回答的分差。奖励分数只在当前数据、标注准则和候选分布中有意义；不能把 8 分解释成现实世界中固定的“质量 8 分”。</p>
     </section>
 
@@ -42,7 +42,7 @@ window.DEEPDIVE['rlhf'] = {
       <span class="dd-badge math">数学</span>
       <h3>4. 为什么策略优化需要 KL 约束？</h3>
       <p class="dd-lead">只追奖励模型的高分，策略可能钻代理指标的空子并远离原本会说人话的模型。</p>
-      <div class="dd-formula">max E[r(x,y)] − β · KL(π<sub>θ</sub>(·|x) || π<sub>ref</sub>(·|x))</div>
+<div class="dd-formula" data-display="mathml"><math display="block" aria-label="最大化回答奖励的期望，减去 beta 乘当前策略与参考策略的 KL 散度"><munder><mo>max</mo><msub><mi>π</mi><mi>θ</mi></msub></munder><mrow><mi>𝔼</mi><mo>[</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>]</mo></mrow><mo>−</mo><mi>β</mi><mo>·</mo><mi>KL</mi><mo>(</mo><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>∥</mo><msub><mi>π</mi><mtext>ref</mtext></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>)</mo></math></div>
       <p>第一项鼓励高奖励回答，第二项惩罚相对参考策略的剧烈漂移，β 控制两者权衡。KL 不是安全证明；它只是让更新更保守，降低语言崩坏、模式坍缩和奖励过度优化的风险。</p>
       <div class="dd-note warn"><strong>易错点：</strong>“奖励上升”只说明更符合奖励模型，不自动说明更真实、更安全或更符合所有用户。</div>
     </section>

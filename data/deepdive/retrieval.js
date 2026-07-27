@@ -32,7 +32,7 @@ window.DEEPDIVE["retrieval"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">2</span>两条路：对字面 vs 对意思<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
+  <h2><span class="dd-n">2</span>运行示例：对字面 vs 对意思<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
   <p class="dd-lead">「找相关文档」怎么找？有两种根本不同的思路。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th></th><th>关键词检索</th><th>语义检索</th></tr></thead>
@@ -45,7 +45,7 @@ window.DEEPDIVE["retrieval"] = {
   </table></div>
   <div class="dd-note math"><b>语义检索靠嵌入</b>　把每篇文档和查询都变成向量（意思近则向量近，见「嵌入」深读页），再算查询向量和各文档向量的<b>相似度</b>（余弦距离），取最近的几个。这就是「退货」能召回「商品返还流程」的原因——它们没有共同词，但向量靠得近。</div>
   <div class="dd-formula">cos(q,d) = (q·d) ÷ (‖q‖‖d‖)</div>
-  <p>用二维玩具向量演算：查询 <code>q=(1,1)</code>，片段 A 为 <code>(1,0)</code>，片段 B 为 <code>(2,2)</code>。则 <code>cos(q,A)=1/√2≈0.707</code>，<code>cos(q,B)=4/(√2·√8)=1</code>，所以 B 在这个表示空间里方向更接近查询。真实嵌入有数百到数千维，分数只表示该模型学到的几何相似，不等于事实正确或足以回答。</p>
+  <p>用二维玩具向量演算：查询 <code>q=(1,1)</code>，片段 A 为 <code>(1,0)</code>，片段 B 为 <code>(2,2)</code>。则 <code>cos(q,A)=1/<span class="dd-radical" role="math" aria-label="2 的平方根"><span class="dd-radicand">2</span></span>≈0.707</code>，<code>cos(q,B)=4/(<span class="dd-radical" role="math" aria-label="2 的平方根"><span class="dd-radicand">2</span></span>·<span class="dd-radical" role="math" aria-label="8 的平方根"><span class="dd-radicand">8</span></span>)=1</code>，所以 B 在这个表示空间里方向更接近查询。真实嵌入有数百到数千维，分数只表示该模型学到的几何相似，不等于事实正确或足以回答。</p>
   <div class="dd-note eng"><b>实践常用「混合检索」</b>　关键词和语义各有盲区，把两者结果<b>融合</b>，往往比单用一种更稳——既不漏精确的编号词，也不错过换了说法的表达。</div>
   <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>运行示例：查询“退款期限”</th><th>关键词分</th><th>语义分</th><th>融合后</th></tr></thead><tbody><tr><td>A《退款与返还：30 天》</td><td>0.90</td><td>0.82</td><td><b>第 1</b></td></tr><tr><td>B《商品返还流程：签收后 30 天》</td><td>0.10</td><td>0.94</td><td><b>第 2</b></td></tr><tr><td>C《退款到账时间：3–5 天》</td><td>0.88</td><td>0.70</td><td>第 3</td></tr></tbody></table></div>
   <div class="dd-note key"><b>分数不能只看“高不高”</b>　A 和 B 都能回答“可申请多久”，C 说的是批准后多久到账，字面相似却回答了不同问题。若 Top-2 取 A、B，则本例两个相关片段都召回，<code>Recall@2=2/2=100%</code>；只按关键词取 A、C，<code>Recall@2=1/2=50%</code>。检索评测需要先标注“什么算相关”，不是盯着相似度自我感觉良好。</div>
@@ -191,3 +191,25 @@ window.DEEPDIVE["retrieval"] = {
 </div>
 `
 };
+
+// 新版教学门禁补充：逐节说明检索对象、机制、指标含义和适用边界。
+{
+  const page = window.DEEPDIVE["retrieval"];
+  const additions = [
+    '<p>检索输入用户查询、可访问知识库和上下文预算，输出少量候选片段及其来源。它在有限窗口前先缩小材料范围，以减少成本和噪声；被召回只表示候选与查询相关，不表示片段足以回答或内容正确。知识库很小且可完整、安全装入时，才可能不需要检索。</p>',
+    '<p>混合检索输入查询 q、文档向量 d、关键词分和语义分，输出融合后的候选排序。余弦相似度 CosineSim 是 q 与 d 的点积除以二者范数，衡量方向接近程度；示例中 B 得 1 只表示嵌入几何更相似，不证明事实正确。精确编号优先关键词，换说法优先语义，生产通常融合并重排。</p>',
+    '<p>检索流水线输入原始文档和在线查询，输出带片段 ID、版本、权限与相似度的 TopK 候选。离线先切块、嵌入并建索引，在线用同一表示规则编码查询并搜索最近邻；返回顺序是检索器判断，不是最终事实排序。嵌入模型、切块或权限变化后必须重建或更新索引。</p>',
+    '<p>瓶颈诊断输入目标问题、必要证据和召回结果，输出“证据已召回、被噪声挤出或库中不存在”的状态。生成模型只能利用进入上下文的材料，所以必要证据未召回时再强的模型也无法可靠恢复；但检索合格也不保证装配和生成正确。应先定位证据链断在哪一层。</p>',
+    '<p>检索改进输入初始候选、查询、切块、权限与时效信息，输出经过查询改写、混合召回和重排的更小候选集。粗召回追求不漏，精排追求把真正可回答片段放前；结果要同时解释召回、噪声、版本和权限。TopK 过大可能增加中间迷失，重排器也必须独立评测。</p>',
+    '<p>检索评测输入 N 个查询、每题相关集合、排序位置 ranki 和截断 K，输出 RecallK、PrecisionK、MRR 与 nDCG。MRR 是每题第一个相关结果排名倒数的平均；HitK 是前 K 中命中的相关项数，Relevant 是全部相关项数，RecallK 等于 HitK 除以 Relevant。MRR 高只说明第一个证据靠前，不代表一般规则和例外都已召回。指标必须按任务证据需求选择。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="查询与文档向量的余弦相似度"><mi>CosineSim</mi><mo>(</mo><mi>q</mi><mo>,</mo><mi>d</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>q</mi><mo>·</mo><mi>d</mi></mrow><mrow><mo>‖</mo><mi>q</mi><mo>‖</mo><mo>×</mo><mo>‖</mo><mi>d</mi><mo>‖</mo></mrow></mfrac></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="平均倒数排名和前 K 召回率"><mi>MRR</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mn>1</mn><mi>ranki</mi></mfrac><mo>;</mo><mi>RecallK</mi><mo>=</mo><mfrac><mi>HitK</mi><mi>Relevant</mi></mfrac></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

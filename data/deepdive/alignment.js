@@ -38,7 +38,7 @@ window.DEEPDIVE["alignment"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>怎么做<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">3</span>完整示例：对齐工程怎么做<span class="dd-badge eng">案例推演</span></h2>
   <p class="dd-lead">具体用什么手段，把模型掰到符合人类期望？</p>
   <ul class="dd-steps">
     <li><b>指令微调（SFT）</b>：先用「指令 → 理想回答」的示范数据，教它「被问就好好答」的基本盘（见「微调」）。</li>

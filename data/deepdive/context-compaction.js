@@ -21,3 +21,33 @@ window.DEEPDIVE['context-compaction'] = window.createDeepDive({
   quiz:[{q:'最近截断的主要风险？',a:'丢失早期目标和关键约束。'},{q:'摘要为何有损？',a:'会遗漏、合并分歧或产生错误概括。'},{q:'哪些内容应结构化？',a:'目标、约束、状态、未决和来源。'},{q:'怎样发现递归漂移？',a:'从原始日志重建并做恢复性测试。'},{q:'压缩率高是否足够？',a:'不够，还要任务成功和关键信息保持。'}],
   sources:[{title:'MemGPT',url:'https://arxiv.org/abs/2310.08560',note:'分层上下文管理'},{title:'LLMLingua',url:'https://arxiv.org/abs/2310.05736',note:'提示压缩'},{title:'Lost in the Middle',url:'https://arxiv.org/abs/2307.03172',note:'长上下文利用边界'}]
 });
+
+// 新版教学门禁补充：压缩页逐节回答六个基础问题，并把公式改为结构化 MathML。
+{
+  const page = window.DEEPDIVE['context-compaction'];
+  const additions = [
+    '<p>上下文压缩输入完整历史、当前任务和 token 预算，输出仍足以支持下一步决策的精简上下文。它按任务价值而非消息时间选择信息；结果变短只代表装入更少 token，不代表关键事实都保住。目标、权限和验收条件无法确认时不得直接丢弃原文。</p>',
+    '<p>方法选择输入信息类型、预算和可接受损失，输出截断、摘要、字段抽取或外存检索方案。截断按位置删除，摘要重新表述，抽取保指定字段，检索保原文但按需取回；应根据最不能承受的失败选择或组合，而不是把四者当成等价压缩。</p>',
+    '<p>结构化状态输入目标、约束、权限、进度、未决项和来源，输出可版本化字段；叙事摘要输入其余对话，输出可重建概述。字段更新受权限和事件规则控制，摘要不能覆盖状态。来源引用仍可回查时，压缩内容才不是唯一且不可验证的事实源。</p>',
+    '<p>压缩效用输入后续任务收益、token 成本、关键信息损失及权重 λ、μ，输出一个用于比较方案的综合效用。λ 表示每单位 token 成本的惩罚，μ 表示关键信息丢失的惩罚；效用更高只在同一任务和权重口径下更好，不能跨风险场景直接比较。</p>',
+    '<p>递归摘要输入上一代摘要和新事件，输出更短的新摘要；每次重写都可能累积遗漏和措辞偏差。与原始日志重建结果出现分歧说明摘要漂移，而不是原始事实改变。高风险字段必须无损保存，并允许从原始事件定期重建和人工纠正。</p>',
+    '<p>安全治理输入原文与摘要的数据分类、来源、作用域和删除请求，输出保留、隔离、审计与删除动作。摘要可能继续保存敏感数据，也可能把外部恶意指令固化成长期规则；更短不等于更安全。没有可信来源的文本只能作为候选证据，不能升级为系统权限。</p>',
+    '<p>预算案例输入 18k 历史、4k 总窗口、系统与回答预留，输出 1500 token 历史预算及状态、摘要、原文各 500 token 的分配。Bhistory 是历史预算，压缩率是装入历史与原历史之比；8.3% 只描述长度，不证明任务信息保真。任务改变时摘要和检索必须围绕新问题重建。</p>',
+    '<p>三通道设计输入原始消息、工具和决策事件，输出受保护状态、任务摘要和带权限的原文索引，随后按当前任务合流。状态保硬约束，摘要保叙事，索引负责证据回查；一段流畅摘要无法替代三者。预算不足时必须明确哪些证据未装入。</p>',
+    '<p>状态契约输入不可丢事项及来源事件，输出带类型、值、写入者、时间、作用域、版本和状态的记录。更新通过显式事件替换并保留审计历史，因此“未决”不会被润色成“已通过”。只有授权主体能改写目标、权限和硬约束。</p>',
+    '<p>差异化压缩输入代码、讨论、工具输出或长文档，输出与类型匹配的补丁记录、决定摘要、执行证据或检索索引。先判断哪些字段必须逐字无损，再对叙事有损摘要；退出码、权限和测试结果不能只保“中心思想”。无法容纳的证据要显式报告缺失。</p>',
+    '<p>压缩回归输入同一原始历史的全量版与压缩版以及一组后续任务，输出任务成功差 Δtask、约束违例、无源断言和引用命中。success(full context) 是全量上下文成功率，success(compacted context) 是压缩上下文成功率；差值越大表示压缩损失越严重。模型、提示或预算变化后必须重跑。</p>',
+    '',
+    '<p>触发与并发控制输入 token 水位、任务阶段、高价值事件和分支版本，输出压缩快照、分支增量及冲突合并结果。里程碑先形成稳定快照，各分支从同一版本派生并按来源合并；最后完成不等于有权覆盖。基础版本变化后旧分支必须重放或标记过期。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { if (html) renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="上下文压缩综合效用"><mi>U</mi><mo>=</mo><mi>Gtask</mi><mo>−</mo><mi>λ</mi><mo>×</mo><mi>Ctoken</mi><mo>−</mo><mi>μ</mi><mo>×</mo><mi>Lcritical</mi></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="历史预算与压缩率"><mi>Bhistory</mi><mo>=</mo><mn>4000</mn><mo>−</mo><mn>1200</mn><mo>−</mo><mn>1300</mn><mo>=</mo><mn>1500</mn><mi>token</mi><mo>;</mo><mi>R</mi><mo>=</mo><mfrac><mn>1500</mn><mn>18000</mn></mfrac><mo>≈</mo><mn>8.3</mn><mo>%</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="压缩造成的任务成功率差"><mi>Δtask</mi><mo>=</mo><mi>success(full context)</mi><mo>−</mo><mi>success(compacted context)</mi></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

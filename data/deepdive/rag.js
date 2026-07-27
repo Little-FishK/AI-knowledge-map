@@ -40,7 +40,7 @@ window.DEEPDIVE["rag"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">2</span>它怎么运作：检索 → 增强 → 生成<span class="dd-badge eng">工程</span></h2>
+  <h2><span class="dd-n">2</span>端到端示例：检索 → 增强 → 生成<span class="dd-badge eng">工程</span></h2>
   <p class="dd-lead">RAG 这个名字就是它的三步：Retrieval（检索）、Augmented（增强）、Generation（生成）。</p>
   <figure class="dd-fig">
     <svg viewBox="0 0 560 150" role="img" aria-label="RAG 三步：检索、增强、生成">
@@ -193,3 +193,27 @@ window.DEEPDIVE["rag"] = {
 </div>
 `
 };
+
+// 新版教学门禁补充：为六个核心章节补齐教学合同所需的局部证据。
+{
+  const page = window.DEEPDIVE["rag"];
+  const additions = [
+    '<p>RAG 输入用户问题和有权限访问的外部知识库，输出带相关证据的回答任务。这里的似然是“某段文字在上下文中有多可能出现”，模型优化似然并不等于核验现实真相；RAG 的作用是把可检查证据加入当前上下文。它在生成前补充模型训练中缺失、过期或私有的信息；结果更可核验，不代表材料或回答自动正确。无权访问、无可靠来源或任务不需要外部事实时，不应为使用 RAG 而强行检索。</p>',
+    '<p>RAG 流程输入问题、知识库片段及其 ID、版本和权限，输出检索结果、增强后的提示和带逐断言引用的答案。检索找候选，增强保留证据边界，生成只据材料作答；引用只有真正支持对应断言才有意义。找不到证据时应明确无答案或追问，而不是补写不存在的事实。</p>',
+    '<p>RAG 的效果输入外部可更新知识和当前问题，输出更少无依据断言、可更新答案及可回查来源。它通过把事实从模型权重移到运行时证据来实现；因此“有出处”意味着可检查，不等于出处可信或推理忠实。它缓解而不能消灭幻觉。</p>',
+    '<p>方案选择输入要注入的是变化事实还是稳定行为，输出 RAG、微调或二者组合。RAG 在运行时提供可更新、可引用的事实，微调改变权重中的风格、格式和行为倾向；知识更新频繁且需溯源时优先 RAG。检索不能替代行为训练，微调也不能可靠充当实时数据库。</p>',
+    '<p>失败边界分析输入检索片段、上下文装配和最终回答，输出检索遗漏、上下文噪声、证据错误或生成不忠实等原因。RAG 上限先受可用证据和检索限制，再受上下文利用与生成限制；出现引用只说明系统附了来源，不证明来源支持断言。知识治理、权限和版本错误不能靠换更强模型修复。</p>',
+    '<p>分层诊断输入目标断言、必要证据、最终上下文和生成断言，输出证据覆盖、上下文精度、断言支持率和任务成功。断言支持率的分子是有充分证据支持的可核验断言数 Ssupported，分母是全部可核验断言数 Sverifiable；指标下降只能定位生成忠实性，不能单独证明检索或最终业务任务合格。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  renderedSections[1] = renderedSections[1].replace(
+    '<section class="dd-sec">',
+    '<section class="dd-sec" data-worked-example="true">'
+  );
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace(
+    /<div class="dd-formula">断言支持率[\s\S]*?<\/div>/,
+    '<div class="dd-formula"><math display="block" aria-label="可核验断言的证据支持率"><mi>SupportRate</mi><mo>=</mo><mfrac><mi>Ssupported</mi><mi>Sverifiable</mi></mfrac></math></div>'
+  );
+}

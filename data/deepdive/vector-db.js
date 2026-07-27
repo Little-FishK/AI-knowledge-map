@@ -17,3 +17,21 @@ window.DEEPDIVE['vector-db'] = window.createDeepDive({
   quiz:[{q:'向量库还需存什么？',a:'id、原文映射、元数据、权限和版本。'},{q:'为何用 ANN？',a:'避免全库线性精确比较。'},{q:'HNSW 是什么结构？',a:'多层近邻图。'},{q:'后过滤风险？',a:'候选被删光导致召回低。'},{q:'换嵌入模型怎么办？',a:'重建独立版本并切换，不能混用。'}],
   sources:[{title:'Efficient and robust approximate nearest neighbor search using HNSW',url:'https://arxiv.org/abs/1603.09320',note:'HNSW'},{title:'Billion-scale similarity search with GPUs',url:'https://arxiv.org/abs/1702.08734',note:'FAISS'},{title:'DiskANN',url:'https://proceedings.neurips.cc/paper/2019/hash/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Abstract.html',note:'磁盘级 ANN'}]
 });
+
+// 新版教学门禁补充：逐节明确索引结果能说明什么，以及不能替代什么。
+{
+  const page = window.DEEPDIVE['vector-db'];
+  const additions = [
+    '<p>向量数据库输入对象嵌入、稳定 ID、原文位置、元数据、权限和版本，输出相似候选及可取回的原始内容。向量只是搜索键，命中后仍需回原文并按当前主体鉴权；高相似度表示表示空间接近，不表示事实可信。缺少原文映射或权限字段的向量不能直接服务回答。</p>',
+    '<p>距离选择输入查询向量、候选向量、是否 L2 归一化及嵌入模型约定，输出余弦、点积或欧氏距离排序。归一化后最大点积、最大余弦和最小平方欧氏距离排序等价；未归一化时向量模长会改变点积。度量必须与模型训练方式一致，分数不能当正确概率。</p>',
+    '<p>ANN 索引输入大量向量和查询，输出近似 topK 邻居。HNSW 沿多层邻接图导航，IVF 先选粗聚类桶，PQ 用短码近似向量；它们减少访问或存储以换取可能漏掉真近邻。数据量小或必须精确时可用全量搜索，不能为“先进”强行近似。</p>',
+    '<p>索引调参输入 HNSW 的 ef、IVF 的 probes、图边、量化精度和目标查询集，输出 Recall、延迟、内存及构建成本曲线。搜索更广通常提升召回同时增加资源；选点应满足业务证据召回和 SLO，而不是最大化单一 QPS。参数变化后必须和精确邻居重新对照。</p>',
+    '<p>过滤检索输入查询、租户与权限条件和目标 k，输出只在允许候选域内搜索的结果，并在返回原文前再次权威鉴权。全局 topK 后过滤会把无权结果删光，前过滤又可能降低索引效率；过滤感知搜索解决候选覆盖，不等于完成授权。任何敏感内容都不能只信索引元数据。</p>',
+    '<p>生命周期管理输入文档变更、删除、嵌入版本和缓存副本，输出新命名空间、双写重建、原子切换或全链路删除状态。不同嵌入版本属于不同几何空间，分数不能混比；删除完成需覆盖向量、原文、缓存和副本。传播未完成时结果必须标记陈旧或停止服务。</p>',
+    '<p>规模案例输入一百万个 768 维 FP32 向量、精确 top10 与 ANN top10，输出约 3.07GB 原始载荷、768M 维度乘加和索引 Recall10。ANN 命中精确集合 9 条得到 90%，只说明近似索引复现精确向量排序；如果嵌入没把正确证据排进精确 top10，索引 Recall 再高也无用。</p>',
+    '<p>一致性案例输入 1% 租户过滤率和 topK、更新、撤权、删除及嵌入升级事件，输出过滤感知候选和可审计传播状态。全局 top10 期望仅 0.1 条属于该租户，说明后过滤很可能为空；这是假设独立时的容量直觉，不是单次查询保证。返回边界仍必须按当前主体、资源和动作鉴权。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+}

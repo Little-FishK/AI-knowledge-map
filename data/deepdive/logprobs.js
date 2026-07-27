@@ -20,3 +20,61 @@ window.DEEPDIVE['logprobs'] = window.createDeepDive({
   quiz:[{q:'logprob 为何通常是负数？',a:'概率在 0 到 1，对数不大于 0。'},{q:'总序列分数为何偏短？',a:'每个负 logprob 相加会随长度降低。'},{q:'高 logprob 证明事实正确吗？',a:'不能，只表示模型更偏好。'},{q:'校准 0.8 的含义？',a:'该分桶长期约 80% 正确。'},{q:'阈值提高的代价？',a:'拒答/升级增加，覆盖率下降。'}],
   sources:[{title:'On Calibration of Modern Neural Networks',url:'https://arxiv.org/abs/1706.04599',note:'温度缩放与校准'},{title:'Selective Classification for Deep Neural Networks',url:'https://arxiv.org/abs/1705.08500',note:'覆盖-风险权衡'},{title:'Semantic Uncertainty',url:'https://arxiv.org/abs/2302.09664',note:'语义等价答案下的不确定性'}]
 });
+
+window.DEEPDIVE['logprobs'].html = window.DEEPDIVE['logprobs'].html
+  .replace(
+    '<div class="dd-formula">log P(x₁…xₙ)=Σₜ log P(xₜ|x&lt;t)</div>',
+    '<div class="dd-formula" data-formula-id="logprobs-sequence"><math display="block" aria-label="序列 x 一到 x n 的对数概率等于各位置 t 的条件对数概率之和"><mrow><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>…</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>t</mi></munder><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>x</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div><p class="dd-formula-note"><code>P</code> 表示模型给事件分配的概率，<code>log</code> 是自然对数，<code>xₜ</code> 是位置 t 的 token，<code>x&lt;t</code> 是它之前的前缀，<code>n</code> 是序列 token 总数，<code>t</code> 是求和位置索引。每项都不大于 0，所以总 logprob 越接近 0，模型对整段序列的相对偏好越高。</p>'
+  )
+  .replace(
+    '<div class="dd-formula">score(c)=Σ<sub>t=1…|c|</sub>log p(cₜ|prompt,c&lt;ₜ)</div>',
+    '<div class="dd-formula" data-formula-id="logprobs-candidate-score"><math display="block" aria-label="候选 c 的分数等于从 t 等于一到候选长度的每个 token 条件对数概率之和"><mrow><mi>score</mi><mo>(</mo><mi>c</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mrow><mo>|</mo><mi>c</mi><mo>|</mo></mrow></munderover><mi>log</mi><mi>p</mi><mo>(</mo><msub><mi>c</mi><mi>t</mi></msub><mo>∣</mo><mi>prompt</mi><mo>,</mo><msub><mi>c</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div><p class="dd-formula-note"><code>c</code> 是一个完整候选标签，<code>|c|</code> 是它的 token 数，<code>cₜ</code> 是第 t 个候选 token，<code>c&lt;t</code> 是候选已给出的前缀，<code>prompt</code> 是所有候选共用的提示，<code>p</code> 是当前条件下的 token 概率，<code>score(c)</code> 是整段候选的总 logprob。</p>'
+  )
+  .replace(
+    '<div class="dd-formula">E[cost(τ)] = C<sub>err</sub>·P(错误且接收) + C<sub>abstain</sub>·P(拒答) + C<sub>verify</sub>·P(升级验证)</div>',
+    '<div class="dd-formula" data-formula-id="logprobs-expected-cost"><math display="block" aria-label="阈值 tau 下的期望成本等于错误接收成本乘错误且接收概率，加拒答成本乘拒答概率，加升级验证成本乘升级验证概率"><mrow><mi>E</mi><mo>[</mo><mi>cost</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>]</mo><mo>=</mo><msub><mi>C</mi><mi>err</mi></msub><mi>P</mi><mo>(</mo><mtext>错误且接收</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>abstain</mi></msub><mi>P</mi><mo>(</mo><mtext>拒答</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>verify</mi></msub><mi>P</mi><mo>(</mo><mtext>升级验证</mtext><mo>)</mo></mrow></math></div><p class="dd-formula-note"><code>E[cost(τ)]</code> 是阈值 τ 下的平均业务成本；<code>τ</code> 是自动接收阈值；<code>Cerr</code>、<code>Cabstain</code>、<code>Cverify</code> 分别是错误接收、拒答和升级验证一次的代价；<code>P</code> 是验证集上对应动作事件的经验概率。各项必须使用同一评测周期与任务切片。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">连乘很多小概率为何要改成求和？</p>',
+    '<p class="dd-lead">连乘很多小概率为何要改成求和？</p><p>序列 logprob 的输入是每个位置在既定前缀下的 token 概率，输出是整段候选可相加比较的对数分数。对数把条件概率连乘变成求和并缓解下溢；分数越高只表示模型越偏好该 token 序列，不能推出事实更正确。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">一句答案的置信度如何从多个 token 得到？</p>',
+    '<p class="dd-lead">一句答案的置信度如何从多个 token 得到？</p><p>答案聚合接收多个 token logprob，输出总和、平均值、最弱位置或任务自定义分数。总和随长度下降，平均值可能掩盖关键低概率 token；因此先定义任务单位和候选规范，再用验证集选择聚合方式。自由文本存在同义表达时，单一字符串分数边界尤其明显。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">模型熟练复述错误信息时 logprob 会怎样？</p>',
+    '<p class="dd-lead">模型熟练复述错误信息时 logprob 会怎样？</p><p>事实诊断输入是模型高分回答与独立证据，输出是语言偏好和事实正确性的分别判断。训练频率、提示暗示和流畅模式都能提高 logprob，即使命题错误；罕见但正确的名字又可能低分。因此必须用检索、工具或人工证据验证世界事实。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">“置信 0.8”应满足什么经验含义？</p>',
+    '<p class="dd-lead">“置信 0.8”应满足什么经验含义？</p><p>校准接收原始分数和独立数据上的真实标签，输出分数到经验正确率的映射。把相近分数分桶后，标为 0.8 的桶应长期约八成正确；这只在目标任务和分布上成立，模型、提示或输入分布变化后必须重新校准。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">低置信时系统应该做什么？</p>',
+    '<p class="dd-lead">低置信时系统应该做什么？</p><p>选择性预测输入校准分数、错误代价和覆盖要求，输出自动回答、补检索、升级、澄清或拒答动作。阈值把更多低分样本交给安全回退，通常降低覆盖；是否值得必须用风险—覆盖曲线和业务成本判断，而非只看准确率。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">为什么比较“是”和“否”不能只读一个 token？</p>',
+    '<p class="dd-lead">为什么比较“是”和“否”不能只读一个 token？</p><p>接口核验输入实际 tokenizer、候选完整文本和 API 返回位置，输出每个规范标签的完整序列分数。空格、共享前缀与多 token 切分都会改变可比范围；top-k 未返回不等于概率为零，跨模型原始 logprob 也没有共同刻度。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">两个token概率0.8和0.25组成的答案有多大联合概率？</p>',
+    '<p class="dd-lead">两个token概率0.8和0.25组成的答案有多大联合概率？</p><p>手算输入两个条件概率，输出联合概率、总 logprob、平均 logprob 和几何平均概率。先相乘得 0.20，再分别取对数相加得 −1.609；这些数值描述同一序列偏好，但不同聚合偏好不同长度，不能混作答案正确率。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">API返回的局部概率怎样变成可用的系统决策？</p>',
+    '<p class="dd-lead">API返回的局部概率怎样变成可用的系统决策？</p><p>决策链输入 token logprobs、任务单位、校准数据与业务代价，输出可审计的自动回答或回退动作。它依次做序列或语义聚合、独立校准和风险阈值决策；任何一层变化都要重放全链，不能把原始局部概率直接展示成可信度。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">“Yes”是一个token，“No answer”是两个token，怎样公平比较？</p>',
+    '<p class="dd-lead">“Yes”是一个token，“No answer”是两个token，怎样公平比较？</p><p>候选比较输入共同提示和多个完整标签，输出各标签整段条件 logprob。用 teacher forcing 逐 token 累加，并按预先规定的标签与长度规则比较；tokenizer 改变后需重新计算，跨模型应先分别校准再比较预期风险。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">“巴黎”“Paris”“法国首都巴黎”该算三种答案吗？</p>',
+    '<p class="dd-lead">“巴黎”“Paris”“法国首都巴黎”该算三种答案吗？</p><p>语义聚合输入多次生成的字符串与任务等价判定器，输出意义簇及每簇累计概率。规则、执行结果或语义蕴含把等价表达合并后，簇间分布才更接近任务不确定性；聚类器会误合并或误拆分，必须用人工标注验证。</p>'
+  )
+  .replace(
+    '<p class="dd-lead">把阈值从−1.2提高到−0.5，系统究竟会变安全还是只是更少回答？</p>',
+    '<p class="dd-lead">把阈值从−1.2提高到−0.5，系统究竟会变安全还是只是更少回答？</p><p>覆盖率—风险分析输入验证集校准分数、真实标签与动作成本，输出每个阈值的覆盖率、已接收错误率和期望成本。按分数排序逐步扩大自动集合即可画曲线；阈值升高若只降低覆盖却不降低风险，说明分数排序或校准在该切片失效。</p>'
+  );

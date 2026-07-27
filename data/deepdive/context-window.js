@@ -25,7 +25,7 @@ window.DEEPDIVE["context-window"] = {
 </div>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">1</span>什么是上下文窗口<span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">1</span>什么是上下文窗口：16K 数值例子<span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">本节回答：模型一次到底能「看进去」多少东西？</p>
   <p>上下文窗口是模型单次处理时能容纳的 <b>token 总量上限</b>。要注意，这个窗口里装的<b>不只是你这句提问</b>，而是这一次要一起喂给模型的<b>全部内容</b>：</p>
   <div class="dd-table-wrap"><table class="dd-table">
@@ -68,7 +68,8 @@ window.DEEPDIVE["context-window"] = {
       <tr><td>应用装配</td><td>关键证据是否进入且摆在可用位置</td><td>换顺序或去噪后答案改变</td><td>换更长窗口不修复错误证据</td></tr>
     </tbody>
   </table></div>
-  <div class="dd-formula">KV bytes ≈ 2 × 层数 × KV 头数 × 头维度 × 已缓存 token × 每元素字节</div>
+  <div class="dd-formula" data-formula-id="context-window-kv-bytes"><math display="block" aria-label="KV 缓存字节数 B 下标 K V 约等于二乘层数 L、KV 头数 H 下标 K V、头维度 d 下标 h、已缓存 token 数 n 和每元素字节数 b"><mrow><msub><mi>B</mi><mrow><mi>K</mi><mi>V</mi></mrow></msub><mo>≈</mo><mn>2</mn><mi>L</mi><msub><mi>H</mi><mrow><mi>K</mi><mi>V</mi></mrow></msub><msub><mi>d</mi><mi>h</mi></msub><mi>n</mi><mi>b</mi></mrow></math></div>
+  <p class="dd-formula-note"><code>B<sub>KV</sub></code> 是单个请求的 KV 缓存字节数；系数 2 表示每层同时保存 Key 和 Value。<code>L</code> 是层数，<code>H<sub>KV</sub></code> 是每层 KV 头数，<code>d<sub>h</sub></code> 是每个头的维度，<code>n</code> 是已经缓存的 token 数，<code>b</code> 是每个数值元素占用的字节数。这个近似式用于估算容量，不包含模型权重、临时工作区和内存碎片。</p>
   <p>例如 32 层、8 个 KV 头、头维度 128、FP16、16K token：<code>2×32×8×128×16000×2</code> ≈ 2.10×10⁹ 字节，约 1.95 GiB/请求，还没算模型权重、激活工作区和碎片。采用分组查询注意力、KV 量化或分页管理会改变数字，但“上下文长度同时消耗并发容量”这条关系仍在。</p>
   <div class="dd-note warn"><b>声明窗口 ≠ 有效窗口。</b>　接口能接收某个长度，只证明输入没有被立即拒绝；要按长度、证据位置、任务类型和语言画准确率曲线，并同时记录首 token 延迟、KV 占用和失败率。</div>
 </section>
@@ -166,3 +167,29 @@ window.DEEPDIVE["context-window"] = {
 </div>
 `
 };
+
+window.DEEPDIVE["context-window"].html = window.DEEPDIVE["context-window"].html
+  .replace(
+    '<p>这些加起来一旦超过上限',
+    '<p>它解决的是一次调用里“哪些信息能够直接影响下一 token”的容量问题。输入是系统规则、用户内容、历史、检索证据、工具结果和输出预留，输出是一个不超过模型与服务限制的 token 布局。服务先按 tokenizer 计数，再按产品策略接受、拒绝、裁剪或压缩；窗口大小只表示容量上限，不表示每个位置的信息都能被同样准确地使用。</p><p>这些加起来一旦超过上限'
+  )
+  .replace(
+    '<div class="dd-note eng"><b>这解释了两件事</b>',
+    '<p>无状态调用的输入是本次显式提交的消息与外部取回内容，输出是只以这些 token 为条件生成的回答。应用通过重发历史、摘要或检索结果制造连续体验；回答能提到旧信息，只能解释为该信息本轮仍可见。若服务另外保存用户资料或模型参数被更新，那属于外部记忆或训练，不是上下文窗口本身。</p><div class="dd-note eng"><b>这解释了两件事</b>'
+  )
+  .replace(
+    '<div class="dd-note math"><b>一笔账</b>',
+    '<p>这里的输入变量是序列长度 <code>n</code>，输出是需要计算或存储的位置关系数量及资源开销。标准全局自注意力让每个位置与全部位置比较，因此形成 <code>n²</code> 个分数；长度扩大十倍，位置对扩大约一百倍。这个结论解释的是标准全局注意力的主要瓶颈，不代表所有长上下文实现都严格按同一常数增长。</p><div class="dd-note math"><b>一笔账</b>'
+  )
+  .replace(
+    '<p class="dd-lead">同样宣称支持 16K，为什么有的请求慢、有的并发一高就 OOM，还有的虽然跑完却答错？</p>',
+    '<p class="dd-lead">同样宣称支持 16K，为什么有的请求慢、有的并发一高就 OOM，还有的虽然跑完却答错？</p><p>本节把“能否接收、是否放得下、运行是否够快、任务是否答对”拆成不同输出。诊断输入是请求长度、并发、硬件配置、证据位置和任务结果，输出是计算、KV 容量、训练长度或装配中的真正瓶颈；四类指标必须分别解释，不能用接口返回成功替代准确率，也不能用单请求显存替代并发容量。</p>'
+  )
+  .replace(
+    '<div class="dd-note key"><b>一句话</b>　长上下文是一种',
+    '<p>有效上下文是模型在当前任务中实际能够取用并正确运用的信息，而不只是被接口接收的 token。输入是候选材料及其顺序，输出是带证据的任务答案；模型通过注意力从大量 token 中选择线索，但位置偏差和无关噪声会改变选择。结果应按证据位置、长度和任务切片解释，不能由一次成功回答推出整段窗口都被可靠使用。</p><div class="dd-note key"><b>一句话</b>　长上下文是一种'
+  )
+  .replace(
+    '<ul class="dd-steps">',
+    '<p>窗口治理接收超预算内容、任务目标和失败代价，输出是保留、检索、压缩、排序及输出预留方案。它先保护不可丢失的规则与当前任务，再检索高价值证据、压缩可恢复历史，并给工具往返和回答留下余量；验收要比较答案质量、证据覆盖、成本和延迟。摘要可能漏掉细节，检索可能漏召回，外部记忆也可能过期，因此任何策略都需要原文回查与失败回退。</p><ul class="dd-steps">'
+  );

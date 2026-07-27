@@ -20,3 +20,27 @@ window.DEEPDIVE['deployment'] = window.createDeepDive({
   quiz:[{q:'利用率接近 1 时为什么危险？',a:'随机到达会使排队和尾延迟非线性上升，平均服务时间仍可很低。'},{q:'影子与金丝雀最关键差别？',a:'影子结果不影响用户且不应执行真实副作用；金丝雀会真实生效。'},{q:'为什么模型回滚可能不完整？',a:'提示、索引、工具 schema、缓存和状态可能仍属于新版本。'},{q:'无条件重试为何会雪崩？',a:'超时工作可能仍占资源，重试增加负载并可能重复副作用。'},{q:'量化上线要回归什么？',a:'不仅吞吐显存，还要关键切片质量、长上下文和校准。'}],
   sources:[{title:'Hidden Technical Debt in Machine Learning Systems',url:'https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems',note:'ML 系统组合依赖与运维债务'},{title:'Google SRE Book: Handling Overload',url:'https://sre.google/sre-book/handling-overload/',note:'容量、背压、降级与负载保护'},{title:'AWS MLOps Continuous Deployment',url:'https://docs.aws.amazon.com/prescriptive-guidance/latest/mlops-checklist/continuous-deployment.html',note:'影子、金丝雀、蓝绿与回滚'},{title:'NIST AI RMF Core',url:'https://airc.nist.gov/airmf-resources/airmf/5-sec-core/',note:'部署监测、事件响应和变更管理'}]
 });
+
+// 新版教学门禁补充：逐节说明部署选择、容量、发布、回滚与降级的输入输出和边界。
+{
+  const page = window.DEEPDIVE['deployment'];
+  const additions = [
+    '<p>运行位置选择输入流量、数据地域、隐私、延迟、可用性、硬件和团队运维能力，输出托管 API、自托管、端侧或混合方案。每种位置交换的是控制权、弹性、成本和责任；端侧不自动低延迟，自托管也不自动便宜。没有能力承担补丁、值班和灾备时，不能只因偏好数据控制就自托管。</p>',
+    '<p>服务路径输入一次请求及其认证、排队、检索、预填充、解码、工具和传输阶段，输出端到端延迟、状态与副作用。模型耗时 600ms 只是其中一段，关键路径上的排队或工具可以主导 2s；发布单元必须覆盖全部依赖。外部副作用需要权限、幂等与补偿，不能只回滚模型。</p>',
+    '<p>容量估算输入到达率 λ、平均服务时间 S、并行槽位 c 和端到端平均时间 W，输出利用率 ρ 与系统内平均请求数 Lsystem。ρ=λ×S/c，Lsystem=λ×W；ρ=0.8 已会排队，接近 1 时尾延迟非线性恶化。公式只提供初步容量直觉，LLM 长度、批处理、工具和突发仍需压力测试。</p>',
+    '<p>发布案例输入 v41 与 v42 的任务通过率、越权率、p95、吞吐和单位成功成本，输出是否满足全部门槛及所需实例数 nInstance。先检查任务≥87%、越权≤0.5%、p95≤1.8s、容量≥16 req/s，再用峰值到达率 λpeak 除以单实例额定吞吐 qinstance 并向上取整；24/17 得至少 2 个实例。冗余和单实例故障会把实际需求提高到 3，不能按平均利用率裸配。</p>',
+    '<p>优化选择输入当前瓶颈、批处理参数、缓存键、量化位宽、上下文和路由策略，输出吞吐、首 token 延迟、显存、质量与隔离差异。批处理改变排队，缓存复用计算，量化改变数值表示，裁剪改变可见证据，路由改变请求模型；它们的风险并不相同。一次只改少量变量并记录逐请求版本，才能归因和回归。</p>',
+    '<p>发布策略输入候选版本、真实流量、副作用风险、观察窗口和回滚能力，输出影子、金丝雀、蓝绿及分级流量动作。影子结果不影响用户且禁止不可逆动作，金丝雀产生真实结果，蓝绿保留两套完整环境；策略选择取决于要观察的风险。按用户或会话稳定分流，任何副作用都需要幂等和补偿。</p>',
+    '<p>原子发布输入模型、提示、解码、索引、工具 schema、策略、代码和基础设施配置，输出一个 releaseId 与兼容矩阵。回滚按 releaseId 同步恢复可逆组件，数据库工具使用幂等键和 expand/contract schema，索引用蓝绿别名；单退模型会留下新提示、缓存或状态。不可逆副作用只能补偿，不能假装已经回滚。</p>',
+    '<p>安全降级输入容量、风险等级、任务价值、可逆性和当前依赖状态，输出排队、拒绝、延迟、小模型、截短或停服动作。低风险任务可延迟或切换模型，高权限退款不得因拥塞绕过验证；每个降级结果都要显式标记并监控。超时不证明上游停止或工具未执行，重试必须有可恢复条件、总预算和同一幂等键。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="利用率与 Little 定律"><mi>ρ</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>×</mo><mi>S</mi></mrow><mi>c</mi></mfrac><mo>;</mo><mspace width="1em"/><mi>Lsystem</mi><mo>=</mo><mi>λ</mi><mo>×</mo><mi>W</mi></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="发布单元的组成"><mi>ReleaseUnit</mi><mo>=</mo><mo>{</mo><mi>Model</mi><mo>,</mo><mi>Prompt</mi><mo>,</mo><mi>Decode</mi><mo>,</mo><mi>Index</mi><mo>,</mo><mi>ToolSchema</mi><mo>,</mo><mi>Policy</mi><mo>,</mo><mi>Code</mi><mo>,</mo><mi>Infra</mi><mo>}</mo></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

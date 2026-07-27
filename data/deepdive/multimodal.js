@@ -39,7 +39,7 @@ window.DEEPDIVE["multimodal"] = {
 </section>
 
 <section class="dd-sec">
-  <h2><span class="dd-n">3</span>第二块基石：把不同模态对齐到同一个语义空间<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
+  <h2><span class="dd-n">3</span>第二块基石：用数值例子理解跨模态对齐<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
   <p class="dd-lead">核心的一节：怎么让「猫的图」和「猫」这个词，在模型眼里对应上？</p>
   <p>一种重要方法是学习<b>可比较的跨模态表示</b>：让配对的图文向量靠近、不配对的推远，这正是 CLIP 的路线。但多模态系统不一定把所有 token 永久压进单一共享空间；也可以保留视觉特征，再通过投影器或交叉注意力把它们接入语言模型。共同目标是<b>建立可学习的模态对齐与信息通道</b>。</p>
   <figure class="dd-fig">
@@ -189,3 +189,30 @@ window.DEEPDIVE["multimodal"] = {
 </div>
 `
 };
+
+// 新版教学门禁要求每个核心章节都能独立回答六个基础问题；下列补充分别落在原章节内。
+window.DEEPDIVE["multimodal"].html = window.DEEPDIVE["multimodal"].html
+  .replace(
+    '<div class="dd-note intuition"><b>一句话</b>',
+    '<p><b>本页所说的多模态系统</b>，输入是一种或多种模态的数据与任务指令，输出是文本、图像、声音、动作或跨模态判断。它先把各模态编码成可计算表示，再建立跨模态信息通道。结果应按具体任务解释，例如“猫趴在键盘上”是一次图文问答结果，不代表模型所有视觉能力都可靠；若任务不需要跨模态联系，专用模型通常更简单、更便宜。</p><div class="dd-note intuition"><b>一句话</b>'
+  )
+  .replace(
+    '<div class="dd-note warn"><b>但「能一起算」不等于「懂它们是一回事」</b>',
+    '<p>这一层的输入是图像块、音频帧或文字经过编码后得到的向量序列，输出是 Transformer 更新后的 token 表示。自注意力让 token 彼此交换信息，因此同一计算骨架可以处理不同来源的序列。输出表示只能说明模型完成了数值变换；没有配对训练或其他对齐信号时，不能把两个模态中距离相近的 token 解释为同一概念。</p><div class="dd-note warn"><b>但「能一起算」不等于「懂它们是一回事」</b>'
+  )
+  .replace(
+    '<div class="dd-note key"><b>对齐是多模态的灵魂</b>',
+    '<p>对齐训练的输入是成对或带对应关系的图文样本，输出是可比较的表示或可跨模态查询的特征。训练目标提高正确配对的相似度、降低错误配对的相似度；检索时，相对分数越高表示“在当前候选中更匹配”，不是事实概率。若配对数据含偏差、候选集改变，或任务要求计数和空间推理，单靠全局对齐并不够。</p><div class="dd-note key"><b>对齐是多模态的灵魂</b>'
+  )
+  .replace(
+    '</figure>\n</section>\n\n<section class="dd-sec">\n  <h2><span class="dd-n">5</span>',
+    '</figure><p>这条接入链的输入是一张图和文字问题，输出是语言模型生成的答案。视觉编码器提取图像特征，投影层把特征变成语言模型可接收的视觉 token，语言模型再结合文字 token 逐步生成回答。答案中的词是条件生成结果，不是视觉传感器的直接读数；细小文字、空间定位和超高分辨率图像可能因编码压缩而丢失，必须用对应切片验证。</p>\n</section>\n\n<section class="dd-sec">\n  <h2><span class="dd-n">5</span>'
+  )
+  .replace(
+    '<div class="dd-note intuition"><b>它是 LLM 的自然扩展</b>',
+    '<p>这张能力表的输入是一个跨模态业务任务，输出是应该采用的转换方向与验收结果：图文问答输出答案，文生图输出图像，屏幕 Agent 输出受控动作。选择能力时先判断哪些模态提供条件、哪种模态承载结果，再沿对齐与生成链验证。结果只能解释为该任务切片上的能力；“支持图像”不能推出 OCR、图表推理、定位和视频理解全部达标。</p><div class="dd-note intuition"><b>它是 LLM 的自然扩展</b>'
+  )
+  .replace(
+    '<ul class="dd-steps">',
+    '<p>本节把多模态系统新增的失败来源分成对齐、计算与生成三类。诊断输入是失败样本、模态原件和中间表示，输出是首次出错的环节及相应处置。按“原始输入是否清楚—编码是否保留关键信息—跨模态对应是否正确—生成是否忠于证据”逐层检查；单看最终回答无法区分模型没看清、没对齐还是语言模型脑补。</p><ul class="dd-steps">'
+  );

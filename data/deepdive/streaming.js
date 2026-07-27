@@ -21,3 +21,18 @@ window.DEEPDIVE['streaming'] = window.createDeepDive({
   quiz:[{q:'40-token 示例的 TTFT 和完成时间约多少？',a:'TTFT 约 400ms，完整约 2.35–2.4s。'},{q:'为什么网络 chunk 不能直接 JSON.parse？',a:'它可能拆开 UTF-8、转义或结构，必须按事件增量解码。'},{q:'EOF 为什么不是完成？',a:'可能是断网、崩溃、取消或代理关闭，需显式 done。'},{q:'背压应如何处理？',a:'批量渲染、有界缓冲、暂停/合并读取并向上游传播或取消。'},{q:'工具参数何时可执行？',a:'完整接受态后通过 schema、事实、业务和权限校验时。'}],
   sources:[{title:'HTML Living Standard: Server-Sent Events',url:'https://html.spec.whatwg.org/multipage/server-sent-events.html',note:'SSE 事件与重连语义'},{title:'WHATWG Streams Standard',url:'https://streams.spec.whatwg.org/',note:'流、背压与取消'},{title:'Encoding Standard',url:'https://encoding.spec.whatwg.org/',note:'UTF-8 增量解码'},{title:'Speculative Decoding',url:'https://arxiv.org/abs/2211.17192',note:'生成延迟优化与流式阶段关系'}]
 });
+
+window.DEEPDIVE['streaming'].html = window.DEEPDIVE['streaming'].html
+  .replace(
+    '<div class="dd-formula">TTFT≈排队+预填充+首步解码；完成时间≈TTFT+(N−1)·TPOT+传输/渲染</div>',
+    '<div class="dd-formula" data-formula-id="streaming-latency"><math display="block" aria-label="首 token 时间 TTFT 约等于排队 Q 加预填充 P 加首步解码 D；完成时间 E 约等于 TTFT 加 N 减一乘每 token 时间 TPOT，再加传输渲染 X"><mtable><mtr><mtd><mi>TTFT</mi><mo>≈</mo><mi>Q</mi><mo>+</mo><mi>P</mi><mo>+</mo><mi>D</mi></mtd></mtr><mtr><mtd><mi>E</mi><mo>≈</mo><mi>TTFT</mi><mo>+</mo><mo>(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo>)</mo><mi>TPOT</mi><mo>+</mo><mi>X</mi></mtd></mtr></mtable></math></div><p class="dd-formula-note"><code>TTFT</code> 是从请求发出到首 token 可见的时间，<code>Q</code> 是排队时间，<code>P</code> 是处理输入前缀的预填充时间，<code>D</code> 是首步解码时间；<code>E</code> 是完整完成时间，<code>N</code> 是输出 token 总数，<code>TPOT</code> 是首 token 之后每个 token 的平均解码间隔，<code>X</code> 是网络传输与前端渲染耗时。它是容量规划近似，真实服务还会受批处理和事件抖动影响。</p>'
+  )
+  .replace('用户 400ms 看见第一个字，为什么服务器仍可能计算 8 秒？</p>', '用户 400ms 看见第一个字，为什么服务器仍可能计算 8 秒？</p><p>流式输出输入正在生成的 token 和请求生命周期，输出逐步可见的增量事件及最终状态。它提前传送已产生内容，改善首字和取消体验，却不减少生成完整序列所需的模型工作；前缀可见不能解释为请求已经完成或通过校验。</p>')
+  .replace('为什么一个网络 chunk 不能直接当成一个字符或一个模型 token？</p>', '为什么一个网络 chunk 不能直接当成一个字符或一个模型 token？</p><p>增量解码输入模型 token、UTF-8 字节块和协议帧，输出完整字符与类型化事件。tokenizer、字符编码、网络切块和应用协议各自决定边界，客户端必须跨块保留解码状态；TCP chunk 只表示一次传输分片，不能作为 JSON 或业务提交边界。</p>')
+  .replace('连接中途失败时，客户端怎样区分正常结束、取消和错误？</p>', '连接中途失败时，客户端怎样区分正常结束、取消和错误？</p><p>事件协议输入请求状态与文本、工具、使用量和错误增量，输出带 request id、sequence、版本和终态的事件流。客户端按序去重和状态机处理，只有显式 done 且最终校验通过才完成；EOF 只表示连接关闭，不能推断正常结束。</p>')
+  .replace('排队 120ms、预填充 280ms、每 token 50ms，用户何时看见、何时完成？</p>', '排队 120ms、预填充 280ms、每 token 50ms，用户何时看见、何时完成？</p><p>案例输入排队、预填充、token 数和 TPOT，输出 TTFT、完整时间与取消后浪费。首字约 400ms，四十 token 完整约 2.35 到 2.4 秒；一秒取消时约显示十二个 token。只有取消信号传播到模型服务，剩余二十八个 token 的计算才会停止。</p>')
+  .replace('浏览器每秒只能渲染 20 次，服务器每秒发 100 个 delta，会发生什么？</p>', '浏览器每秒只能渲染 20 次，服务器每秒发 100 个 delta，会发生什么？</p><p>背压控制输入生产速率、消费速率和缓冲水位，输出批量渲染、暂停、合并或取消决策。慢消费者必须把压力逐层传回网关和上游；若上游不能暂停，就用有界队列并超限取消。文本可合并，工具事件则必须保持顺序与语义。</p>')
+  .replace('用户点停止后，为什么工具仍可能完成退款？</p>', '用户点停止后，为什么工具仍可能完成退款？</p><p>取消与重连输入 request id、sequence、取消信号、幂等键和动作日志，输出已取消、已完成、未知或可重放状态。取消须传播到模型与工具，超时后先查询动作状态再重试；前端停止显示不等于事务撤销，已提交副作用需要补偿或人工处理。</p>')
+  .replace('工具参数已经流出 {"amount":12，为什么不能提前执行？</p>', '工具参数已经流出 {"amount":12，为什么不能提前执行？</p><p>结构缓冲输入 tool_call_delta，输出完整接受态并经 schema、事实和权限校验的参数。数字、字符串和对象前缀都可能继续变化，客户端只能组装和预览；半截回答必须标记 interrupted，不能混入完整答案的训练或评测。</p>')
+  .replace('单个 delta 看起来无害，拼接后为什么可能形成脚本、链接或敏感信息？</p>', '单个 delta 看起来无害，拼接后为什么可能形成脚本、链接或敏感信息？</p><p>增量安全渲染输入跨块文本和内容风险策略，输出纯文本累积、安全 Markdown/HTML 和审核后的展示单元。扫描器维护跨块窗口，前端不能逐块 innerHTML；高风险领域可延迟到句段或全文审核，流式并非所有场景默认更好。</p>')
+  .replace('平均 TTFT 很漂亮，还缺哪些指标才能证明流式可靠？</p>', '平均 TTFT 很漂亮，还缺哪些指标才能证明流式可靠？</p><p>流式评测输入端到端事件日志、网络设备并发切片和故障注入，输出 TTFT、TPOT、完成、取消传播、浪费 token、恢复、缓冲、帧率和最终质量。成功必须同时证明安全增量及时、取消节省工作、done 后提交且故障不伪装完成。</p>');

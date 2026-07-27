@@ -1,12 +1,13 @@
 /*
- * L3 神经网络级自动基准。
+ * L3 教学一致性自动门禁。
  *
  * 报告：node tools/audit-deepdive-benchmark.js
  * 严格：node tools/audit-deepdive-benchmark.js --require-benchmark neural-network
  * 增量：node tools/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-baseline.json
  * 基线模板：node tools/audit-deepdive-benchmark.js --write-baseline docs/deepdive-l3-baseline.json
  *
- * L3 只认证可自动验证的教学工程，不替代 L4 人工事实与教学效果审校。
+ * 结构代理分只作诊断；已知教学完整性缺陷是不可补偿的阻断项。
+ * L3 不替代 L4 人工事实、推导与真实教学效果审校。
  */
 "use strict";
 
@@ -99,6 +100,38 @@ function sectionsOf(html) {
     .map((match) => match[1]);
 }
 
+function sectionRecordsOf(html) {
+  return [...html.matchAll(/<section\b([^>]*)class="([^"]*\bdd-sec\b[^"]*)"([^>]*)>([\s\S]*?)<\/section>/gi)]
+    .map((match, index) => ({
+      index: index + 1,
+      attributes: `${match[1]} class="${match[2]}" ${match[3]}`,
+      html: match[4],
+    }));
+}
+
+function attribute(source, name) {
+  const match = String(source || "").match(new RegExp(`\\b${name}="([^"]*)"`, "i"));
+  return match ? match[1].trim() : "";
+}
+
+function contractTokens(value) {
+  return [...new Set(String(value || "").split(/[\s,，;；]+/).map((item) => item.trim()).filter(Boolean))];
+}
+
+function normalizeMathText(value) {
+  const subscripts = { "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9", "ᵢ": "i", "ⱼ": "j", "ₜ": "t", "ₙ": "n" };
+  return String(value || "").replace(/[₀-₉ᵢⱼₜₙ]/g, (character) => subscripts[character] || character);
+}
+
+function hasNonEmptyDataPart(section, part) {
+  const pattern = new RegExp(
+    `<([a-z][\\w-]*)\\b[^>]*data-example-part="${part}"[^>]*>([\\s\\S]*?)<\\/\\1>`,
+    "i",
+  );
+  const match = section.match(pattern);
+  return Boolean(match && text(match[2]).length >= 8);
+}
+
 function domains(urls) {
   return new Set(urls.map((url) => {
     try {
@@ -112,9 +145,32 @@ function domains(urls) {
 function inspect(id, page) {
   const html = page.html || "";
   const plain = text(html);
-  const sections = sectionsOf(html);
+  const sectionRecords = sectionRecordsOf(html);
+  const sections = sectionRecords.map((section) => section.html);
+  const contractVersion = Number(page.quality?.contractVersion || 0);
+  const formulaContracts = Array.isArray(page.quality?.formulas) ? page.quality.formulas : [];
+  const formulaContractById = new Map(formulaContracts.map((formula) => [formula.id, formula]));
+  const exampleContracts = Array.isArray(page.quality?.examples) ? page.quality.examples : [];
+  const exampleContractBySection = new Map(exampleContracts.map((example) => [Number(example.section), example]));
+  const termReviews = Array.isArray(page.quality?.termReviews) ? page.quality.termReviews : [];
+  const termReviewBySection = new Map(termReviews.map((review) => [Number(review.section), review]));
+  const sectionContracts = Array.isArray(page.quality?.sectionContracts) ? page.quality.sectionContracts : [];
+  const sectionContractBySection = new Map(sectionContracts.map((contract) => [Number(contract.section), contract]));
   const goals = goalCount(html);
   const leads = count(html, /class="dd-lead"/g);
+  const leadBlocks = [...html.matchAll(/<p\b[^>]*class="[^"]*\bdd-lead\b[^"]*"[^>]*>([\s\S]*?)<\/p>/gi)];
+  const leadAnomalies = [];
+  sections.forEach((section, index) => {
+    const sectionText = text(section);
+    const sectionLeads = [...section.matchAll(/<p\b[^>]*class="[^"]*\bdd-lead\b[^"]*"[^>]*>([\s\S]*?)<\/p>/gi)];
+    sectionLeads.forEach((match) => {
+      const leadText = text(match[1]);
+      if (leadText.length > 240 || (sectionText.length >= 300 && leadText.length / sectionText.length > 0.45)) {
+        leadAnomalies.push(index + 1);
+      }
+    });
+  });
+  const leadContainsBlock = leadBlocks.some((match) => /<(?:section|table|figure|h[1-6]|ol|ul|pre)\b/i.test(match[1]));
   const explicitChainItems = listItems(blockWithClass(html, "dd-chain")).length
     || count(blockWithClass(html, "dd-chain"), /(?:→|⇒|->)/g) + 1;
   const figures = [...html.matchAll(/<figure\b[^>]*>([\s\S]*?)<\/figure>/gi)].map((match) => match[1]);
@@ -134,6 +190,86 @@ function inspect(id, page) {
   const validTables = [...html.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)]
     .filter((match) => /<th\b/i.test(match[1]) && text(match[1]).length >= 40).length;
   const formulas = count(html, /class="dd-formula/g);
+  const formulaBlocks = [...html.matchAll(/<div\b[^>]*class="[^"]*\bdd-formula\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi)];
+  const formulaUsesCodeWrapper = formulaBlocks.some((match) => /<code\b/i.test(match[1]));
+  const programmingFormulaPattern = /\b(?:theta|lambda)\b|sum_|sqrt\s*\(|Math\.|np\.|==|!=|<=|>=|->|\*\*/i;
+  const formulaUsesProgrammingNotation = formulaBlocks.some((match) => programmingFormulaPattern.test(text(match[1])));
+  const usesPlainTextRadical = /√/.test(html);
+  const invalidMathMl = [...html.matchAll(/<div\b[^>]*class="[^"]*\bdd-formula\b[^"]*"[^>]*(?:data-display|data-math)="mathml"[^>]*>([\s\S]*?)<\/div>/gi)]
+    .some((match) => !/<math\b/i.test(match[1]) || !/<math\b[^>]*aria-label="[^"]+"/i.test(match[1]));
+  const formulaContractGaps = [];
+  const formulaIds = new Set();
+  const formulaIdsSeen = new Set();
+  let uncontractedFormulaCount = 0;
+  sectionRecords.forEach((section) => {
+    const sectionText = text(section.html);
+    const defined = new Set(
+      [...section.html.matchAll(/\bdata-defines="([^"]+)"/gi)]
+        .flatMap((match) => contractTokens(match[1])),
+    );
+    const records = [...section.html.matchAll(/<div\b([^>]*)class="([^"]*\bdd-formula\b[^"]*)"([^>]*)>([\s\S]*?)<\/div>/gi)]
+      .map((match) => ({
+        attributes: `${match[1]} class="${match[2]}" ${match[3]}`,
+        body: match[4],
+      }));
+    records.forEach((formula, formulaIndex) => {
+      const declaredFormulaId = attribute(formula.attributes, "data-formula-id");
+      const positionalMetadata = formulaContracts.find((item) => (
+        Number(item?.section) === section.index
+        && Number(item?.formulaIndex) === formulaIndex + 1
+      ));
+      const formulaId = declaredFormulaId || positionalMetadata?.id || "";
+      const metadata = formulaContractById.get(formulaId) || positionalMetadata;
+      const metadataSymbols = Array.isArray(metadata?.symbols) ? metadata.symbols : [];
+      const symbols = contractTokens(attribute(formula.attributes, "data-symbols"));
+      const contractedSymbols = symbols.length ? symbols : metadataSymbols.map((item) => item.name).filter(Boolean);
+      if (!formulaId || contractedSymbols.length === 0) uncontractedFormulaCount += 1;
+      if (contractVersion < 1) return;
+      if (!formulaId) {
+        formulaContractGaps.push(`notation.formula-missing-id.section-${section.index}.${formulaIndex + 1}`);
+        return;
+      }
+      formulaIdsSeen.add(formulaId);
+      if (formulaIds.has(formulaId)) {
+        formulaContractGaps.push(`notation.duplicate-formula-id.${formulaId}`);
+      }
+      formulaIds.add(formulaId);
+      if (contractedSymbols.length === 0) {
+        formulaContractGaps.push(`notation.formula-missing-symbol-contract.${formulaId}`);
+        return;
+      }
+      if (metadata && Number(metadata.section) !== section.index) {
+        formulaContractGaps.push(`notation.formula-section-mismatch.${formulaId}`);
+      }
+      const formulaText = normalizeMathText(text(formula.body));
+      const absentFromFormula = contractedSymbols.filter((symbol) => !formulaText.includes(normalizeMathText(symbol)));
+      if (absentFromFormula.length) {
+        formulaContractGaps.push(`notation.symbol-not-in-formula.${formulaId}.${absentFromFormula.join(",")}`);
+      }
+      const missing = contractedSymbols.filter((symbol) => {
+        if (defined.has(symbol)) return false;
+        const declaration = metadataSymbols.find((item) => item.name === symbol);
+        const definitionSection = Number(declaration?.section || section.index);
+        const definitionRecord = sectionRecords.find((item) => item.index === definitionSection);
+        const definitionText = definitionRecord ? text(definitionRecord.html) : "";
+        return !declaration
+          || typeof declaration.meaning !== "string"
+          || declaration.meaning.trim().length < 4
+          || typeof declaration.evidence !== "string"
+          || declaration.evidence.trim().length < 4
+          || definitionSection > section.index
+          || !definitionText.includes(declaration.evidence.trim());
+      });
+      if (missing.length) {
+        formulaContractGaps.push(`notation.undefined-symbol.${formulaId}.${missing.join(",")}`);
+      }
+    });
+  });
+  if (contractVersion >= 1) {
+    formulaContracts
+      .filter((formula) => formula?.id && !formulaIdsSeen.has(formula.id))
+      .forEach((formula) => formulaContractGaps.push(`notation.formula-contract-without-formula.${formula.id}`));
+  }
   const codeBlocks = count(html, /<pre\b/g);
   const artifactTypes = [
     validFigures > 0,
@@ -180,6 +316,142 @@ function inspect(id, page) {
   const uniqueParagraphRatio = paragraphs.length
     ? new Set(paragraphs.map((item) => item.replace(/\s+/g, ""))).size / paragraphs.length
     : 0;
+  const authorshipChecks = {
+    "authorship.generic-assessment": !/总体均值不变，但高难度样本的核心结果突然下降|设计最小对照实验，使观察到的差异能归因于核心机制|请设计至少三个切片，并给出不可被平均值抵消的失败边界/.test(plain),
+    "authorship.generic-diagnostic": !/先冻结版本、输入、随机性、权限与预算，保存可重放的失败样本/.test(plain),
+    "authorship.generic-worked-example": !/从失败日志固定 120 个样本，按普通、长尾和边界输入各 40 个分层/.test(plain),
+    "authorship.generic-mechanism": !/接收的不只是用户表面文本，还包括已选上下文、模型状态、可用预算、工具或权限边界以及停止条件/.test(plain),
+  };
+  const exampleContractGaps = [];
+  const terminologyContractGaps = [];
+  const sectionContractGaps = [];
+  const reviewRequired = [];
+  const exampleParts = ["setup", "rule", "steps", "interpretation"];
+  const criticalTerminology = [
+    "线性子空间", "重建误差", "局部邻域", "高维", "协方差矩阵", "特征向量",
+    "正交", "单位矩阵", "似然", "典型集合", "密度比", "归纳偏置", "投影方差",
+    "降维", "PCA", "t-SNE", "UMAP", "密度估计", "概率密度", "对数似然",
+    "内部指标", "轮廓系数", "稳定性检查",
+  ];
+  const firstTerminologySection = new Map();
+  sectionRecords.forEach((section) => {
+    const sectionText = text(section.html);
+    criticalTerminology.forEach((term) => {
+      if (sectionText.includes(term) && !firstTerminologySection.has(term)) {
+        firstTerminologySection.set(term, section.index);
+      }
+    });
+  });
+  let declaredExampleCount = 0;
+  sectionRecords.forEach((section) => {
+    const sectionText = text(section.html);
+    const exampleHeadings = [...section.html.matchAll(/<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/gi)]
+      .map((match) => text(match[1]))
+      .join(" ");
+    const looksLikeWorkedExample = examplePattern.test(exampleHeadings)
+      && (/\d/.test(sectionText) || /class="dd-formula|class="dd-steps"|<table\b/i.test(section.html));
+    if (looksLikeWorkedExample) {
+      const metadata = exampleContractBySection.get(section.index);
+      const declared = /data-worked-example="true"/i.test(section.attributes) || Boolean(metadata);
+      if (declared) declaredExampleCount += 1;
+      if (contractVersion >= 1 && !declared) {
+        exampleContractGaps.push(`example.uncontracted.section-${section.index}`);
+      } else if (contractVersion < 1 && !declared) {
+        reviewRequired.push(`example.uncontracted.section-${section.index}`);
+      }
+      if (declared) {
+        const missing = exampleParts.filter((part) => {
+          if (hasNonEmptyDataPart(section.html, part)) return false;
+          const evidence = metadata?.evidence?.[part];
+          return typeof evidence !== "string" || evidence.trim().length < 4 || !sectionText.includes(evidence.trim());
+        });
+        if (missing.length) {
+          exampleContractGaps.push(`example.missing-local-${missing.join("-")}.section-${section.index}`);
+        }
+      }
+    }
+
+    const terminology = criticalTerminology
+      .filter((term) => firstTerminologySection.get(term) === section.index);
+    const termReview = termReviewBySection.get(section.index);
+    const reviewedTerms = Array.isArray(termReview?.terms) ? termReview.terms : [];
+    const validTermReview = termReview
+      && /^\d{4}-\d{2}-\d{2}$/.test(termReview.reviewedAt || "")
+      && terminology.every((term) => {
+        const review = reviewedTerms.find((item) => item?.name === term);
+        return review
+          && typeof review.meaning === "string"
+          && review.meaning.trim().length >= 4
+          && typeof review.purpose === "string"
+          && review.purpose.trim().length >= 4
+          && typeof review.definitionEvidence === "string"
+          && review.definitionEvidence.trim().length >= 4
+          && typeof review.purposeEvidence === "string"
+          && review.purposeEvidence.trim().length >= 4
+          && review.definitionEvidence.trim() !== review.purposeEvidence.trim()
+          && sectionText.includes(review.definitionEvidence.trim())
+          && sectionText.includes(review.purposeEvidence.trim());
+      });
+    const reviewThreshold = contractVersion >= 1 ? 1 : 4;
+    const inlineTermsReviewed = /data-terms-reviewed="true"/i.test(section.attributes);
+    const terminologyReviewSatisfied = contractVersion >= 1
+      ? validTermReview
+      : inlineTermsReviewed || validTermReview;
+    if (new Set(terminology).size >= reviewThreshold
+      && !terminologyReviewSatisfied) {
+      const gap = contractVersion >= 1
+        ? `terminology.missing-first-use-contract.section-${section.index}.${terminology.join(",")}`
+        : `terminology.high-density.section-${section.index}`;
+      if (contractVersion >= 1) terminologyContractGaps.push(gap);
+      else reviewRequired.push(gap);
+    }
+  });
+  if (contractVersion >= 1 && declaredExampleCount === 0) {
+    exampleContractGaps.push("example.page-missing-contract");
+  }
+  if (contractVersion >= 2) {
+    const requiredParts = ["definition", "problem", "inputOutput", "mechanism", "interpretation", "boundary"];
+    const coreSections = sectionRecords.filter((section) => {
+      const role = attribute(section.attributes, "data-section-role");
+      if (role) return role === "core";
+      const headingHtml = (section.html.match(/<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) || [])[1] || "";
+      const heading = text(headingHtml.replace(/<span\b[^>]*class="[^"]*\bdd-badge\b[^"]*"[^>]*>[\s\S]*?<\/span>/gi, ""));
+      return !/因果链|误区|误解|消歧|检查.*理解|自测|概念依赖|延伸学习|学习路线/.test(heading);
+    });
+    coreSections.forEach((section) => {
+      const contract = sectionContractBySection.get(section.index);
+      if (!contract) {
+        sectionContractGaps.push(`section.missing-contract.section-${section.index}`);
+        return;
+      }
+      const sectionText = text(section.html);
+      const missing = requiredParts.filter((part) => {
+        const item = contract[part];
+        return !item
+          || typeof item.answer !== "string"
+          || item.answer.trim().length < 8
+          || typeof item.evidence !== "string"
+          || item.evidence.trim().length < 6
+          || !sectionText.includes(item.evidence.trim());
+      });
+      if (missing.length) {
+        sectionContractGaps.push(`section.missing-${missing.join("-")}.section-${section.index}`);
+      }
+      const evidence = requiredParts
+        .map((part) => contract[part]?.evidence?.trim())
+        .filter(Boolean);
+      if (new Set(evidence).size !== evidence.length) {
+        sectionContractGaps.push(`section.reused-evidence.section-${section.index}`);
+      }
+    });
+    const coreIndexes = new Set(coreSections.map((section) => section.index));
+    sectionContracts
+      .filter((contract) => !coreIndexes.has(Number(contract?.section)))
+      .forEach((contract) => sectionContractGaps.push(`section.contract-outside-core.section-${contract?.section}`));
+  }
+  if (contractVersion < 1 && uncontractedFormulaCount > 0) {
+    reviewRequired.push(`notation.uncontracted-formulas.${uncontractedFormulaCount}`);
+  }
 
   const checks = {
     continuity: [
@@ -224,28 +496,8 @@ function inspect(id, page) {
   const floors = benchmark.dimensionFloors;
   const dimensions = {};
   const missingChecks = [];
+  const proxyGaps = [];
   const gaps = [];
-  const hardChecks = new Set([
-    "continuity.goals",
-    "continuity.leads",
-    "continuity.chain",
-    "mechanism.input",
-    "mechanism.transformation",
-    "mechanism.output",
-    "mechanism.feedback",
-    "mechanism.boundary",
-    "teaching.worked-example",
-    "teaching.misconceptions",
-    "diagnostics.warning",
-    "assessment.count",
-    "assessment.answers",
-    "assessment.higher-order",
-    "assessment.scenario",
-    "assessment.unique",
-    "sources.count",
-    "sources.date",
-    "sources.route",
-  ]);
   let total = 0;
   for (const [dimension, items] of Object.entries(checks)) {
     const score = items.reduce((sum, [, ok, points]) => sum + (ok ? points : 0), 0);
@@ -253,12 +505,25 @@ function inspect(id, page) {
     total += score;
     items.filter(([, ok]) => !ok).forEach(([code]) => {
       missingChecks.push(code);
-      if (hardChecks.has(code)) gaps.push(code);
+      proxyGaps.push(code);
     });
-    if (score < floors[dimension]) gaps.push(`floor.${dimension}`);
+    if (score < floors[dimension]) proxyGaps.push(`floor.${dimension}`);
   }
-  if (total < benchmark.minimumScore) gaps.push("floor.total");
+  if (total < benchmark.minimumScore) proxyGaps.push("floor.total");
   if (uniqueParagraphRatio < 0.85) gaps.push("integrity.repeated-paragraphs");
+  if (leadAnomalies.length) gaps.push("integrity.overlong-lead");
+  if (leadContainsBlock) gaps.push("integrity.lead-contains-block");
+  if (formulaUsesCodeWrapper) gaps.push("notation.formula-code-wrapper");
+  if (formulaUsesProgrammingNotation) gaps.push("notation.programming-display");
+  if (usesPlainTextRadical) gaps.push("notation.plain-text-radical");
+  if (invalidMathMl) gaps.push("notation.invalid-mathml");
+  formulaContractGaps.forEach((gap) => gaps.push(gap));
+  exampleContractGaps.forEach((gap) => gaps.push(gap));
+  terminologyContractGaps.forEach((gap) => gaps.push(gap));
+  sectionContractGaps.forEach((gap) => gaps.push(gap));
+  Object.entries(authorshipChecks)
+    .filter(([, ok]) => !ok)
+    .forEach(([code]) => gaps.push(code));
 
   return {
     id,
@@ -266,6 +531,8 @@ function inspect(id, page) {
     score: total,
     dimensions,
     gaps: [...new Set(gaps)],
+    proxyGaps: [...new Set(proxyGaps)],
+    reviewRequired: [...new Set(reviewRequired)],
     missingChecks,
     metrics: {
       length: plain.length,
@@ -279,6 +546,15 @@ function inspect(id, page) {
       scenario: scenario.length,
       sources: new Set(sourceUrls).size,
       uniqueParagraphRatio: Number(uniqueParagraphRatio.toFixed(3)),
+      leadAnomalies: leadAnomalies.length,
+      authorshipGaps: Object.values(authorshipChecks).filter((ok) => !ok).length,
+      notationGaps: [formulaUsesCodeWrapper, formulaUsesProgrammingNotation, invalidMathMl].filter(Boolean).length,
+      contractVersion,
+      formulaContractGaps: formulaContractGaps.length,
+      exampleContractGaps: exampleContractGaps.length,
+      terminologyContractGaps: terminologyContractGaps.length,
+      sectionContractGaps: sectionContractGaps.length,
+      reviewRequired: new Set(reviewRequired).size,
     },
   };
 }
@@ -324,8 +600,18 @@ function changedIds() {
 function loadBaseline(filename) {
   if (!filename) return {};
   const data = JSON.parse(fs.readFileSync(path.resolve(root, filename), "utf8"));
+  if (data.schemaVersion !== 2) {
+    throw new Error("L3 债务基线 schemaVersion 必须为 2");
+  }
   if (data.referencePageHash !== benchmark.reference.pageHash) {
     throw new Error("L3 债务基线绑定的参照页哈希已过期");
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.reviewBy || "")) {
+    throw new Error("L3 债务基线缺 reviewBy 日期");
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  if (data.reviewBy < today) {
+    throw new Error(`L3 债务基线已于 ${data.reviewBy} 到期，必须复审而不是继续静默豁免`);
   }
   return data.allowedGaps || {};
 }
@@ -346,6 +632,12 @@ const results = Object.entries(pages).map(([id, page]) => inspect(id, page))
   .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
 const passed = results.filter((item) => item.gaps.length === 0);
 const failed = results.filter((item) => item.gaps.length > 0);
+const proxyDebt = results.filter((item) => item.proxyGaps.length > 0);
+const manualReviewDebt = results.filter((item) => item.reviewRequired.length > 0);
+const contractedResults = results.filter((item) => item.metrics.contractVersion >= 1);
+const newGatePassed = contractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
+const sectionContractedResults = results.filter((item) => item.metrics.contractVersion >= 2);
+const sectionGatePassed = sectionContractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
 const writeBaselineAt = process.argv.indexOf("--write-baseline");
 if (writeBaselineAt >= 0) {
   const requested = process.argv[writeBaselineAt + 1];
@@ -359,9 +651,14 @@ if (writeBaselineAt >= 0) {
     failed.sort((a, b) => a.id.localeCompare(b.id)).map((item) => [item.id, item.gaps]),
   );
   fs.mkdirSync(path.dirname(output), { recursive: true });
+  const createdAt = new Date().toISOString().slice(0, 10);
+  const reviewBy = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
   fs.writeFileSync(output, JSON.stringify({
-    schemaVersion: 1,
-    description: "L3 启用时的历史自动质量债务；新页面必须零缺口，已有页面不得新增缺口。",
+    schemaVersion: 2,
+    description: "L3 v2 启用时的历史教学一致性债务；新页面必须零缺口，已有页面不得新增缺口。",
+    createdAt,
+    reviewBy,
+    owner: "deepdive-editorial",
     referencePageHash: benchmark.reference.pageHash,
     allowedGaps,
   }, null, 2));
@@ -374,6 +671,7 @@ const changedOnly = process.argv.includes("--changed");
 const baselineAt = process.argv.indexOf("--baseline");
 const baselineFile = baselineAt >= 0 ? process.argv[baselineAt + 1] : "";
 const summaryOnly = process.argv.includes("--summary");
+const listMigrationCandidates = process.argv.includes("--list-migration-candidates");
 const explainAt = process.argv.indexOf("--explain");
 const explainId = explainAt >= 0 ? process.argv[explainAt + 1] : "";
 const enforcementFailures = [];
@@ -392,19 +690,43 @@ if (requireId) {
   });
 }
 
-console.log(`L3 神经网络级自动基准 · 页面 ${results.length} · 通过 ${passed.length} · 待提升 ${failed.length}`);
-console.log(`参照 ${benchmark.reference.id} · 最低总分 ${benchmark.minimumScore} · 分维度不可补偿`);
+console.log(`L3 教学一致性自动门禁 · 页面 ${results.length} · 通过 ${passed.length} · 有债务 ${failed.length}`);
+console.log(`参照 ${benchmark.reference.id} · 结构代理分最低 ${benchmark.minimumScore} · 完整性阻断项不可由分数补偿`);
+console.log(`结构代理提示 · ${proxyDebt.length} 页存在部件或关键词线索缺口（只供编辑审查，不作为L3阻断）`);
+console.log(`强制人工复核 · ${manualReviewDebt.length} 页存在未迁移公式合同、案例合同或高术语密度提示（不冒充自动通过）`);
+console.log(`新合同门禁 · 已迁移 ${contractedResults.length}/${results.length} · 完整通过 ${newGatePassed.length}/${results.length}`);
+console.log(`章节六问门禁 · 已迁移 ${sectionContractedResults.length}/${results.length} · 完整通过 ${sectionGatePassed.length}/${results.length}`);
+if (listMigrationCandidates) {
+  const noReviewCandidates = results
+    .filter((item) => item.metrics.contractVersion < 1 && item.reviewRequired.length === 0)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  console.log(`迁移候选 · ${noReviewCandidates.length} 页未触发当前公式、案例或术语密度复核：`);
+  noReviewCandidates.forEach((item) => console.log(`  ? ${item.id} · ${item.score}/100`));
+  const structurallyReady = results
+    .filter((item) => (
+      item.metrics.contractVersion < 1
+      && item.score >= benchmark.minimumScore
+      && item.proxyGaps.length === 0
+    ))
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  console.log(`结构完整待合同复核 · ${structurallyReady.length} 页达到代理分且无结构提示：`);
+  structurallyReady.forEach((item) => {
+    console.log(`  ? ${item.id} · ${item.score}/100 · ${item.reviewRequired.join("；") || "无合同提示"}`);
+  });
+}
 if (explainId) {
   const item = results.find((result) => result.id === explainId);
   if (!item) {
     console.error(`\n✗ 找不到页面：${explainId}`);
     process.exit(1);
   }
-  console.log(`\n单页解释：${item.id} · ${item.score}/100`);
+    console.log(`\n单页解释：${item.id} · 结构代理分 ${item.score}/100`);
   console.log(`  维度：${Object.entries(item.dimensions).map(([key, value]) => `${key}=${value}`).join("；")}`);
   console.log(`  指标：${Object.entries(item.metrics).map(([key, value]) => `${key}=${value}`).join("；")}`);
-  console.log(`  未得分项：${item.missingChecks.length ? item.missingChecks.join("；") : "无"}`);
-  console.log(`  阻断项：${item.gaps.length ? item.gaps.join("；") : "无"}`);
+    console.log(`  未得分项：${item.missingChecks.length ? item.missingChecks.join("；") : "无"}`);
+    console.log(`  代理提示：${item.proxyGaps.length ? item.proxyGaps.join("；") : "无"}`);
+    console.log(`  人工复核：${item.reviewRequired.length ? item.reviewRequired.join("；") : "无"}`);
+    console.log(`  阻断项：${item.gaps.length ? item.gaps.join("；") : "无"}`);
   process.exit(0);
 }
 if (!summaryOnly) {
@@ -421,9 +743,9 @@ if (failed.length && !summaryOnly) {
   console.log(`主要历史缺口：${common.map(([gap, total]) => `${gap}(${total})`).join("；")}`);
 }
 if (enforcementFailures.length) {
-  console.error(`\n✗ L3 合并阻断发现 ${enforcementFailures.length} 个问题：`);
+  console.error(`\n✗ L3 教学一致性门禁发现 ${enforcementFailures.length} 个问题：`);
   enforcementFailures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-if (requireId) console.log(`\n✓ ${requireId} 达到 L3 神经网络级自动基准`);
+if (requireId) console.log(`\n✓ ${requireId} 通过 L3 教学一致性自动门禁`);
 if (changedOnly) console.log("\n✓ 变更页面没有超出 L3 已知基线的新缺口");

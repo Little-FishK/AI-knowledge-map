@@ -8,8 +8,17 @@
   }
 
   window.createDeepDive = function createDeepDive(config) {
+    const inferredSectionRole = (section) => {
+      if (section.role) return section.role;
+      const label = section.title || "";
+      if (/^验收问题$/.test(label)) return "reference";
+      if (/误区|误解|消歧|学习路线|概念依赖|延伸学习/.test(label)) return "reference";
+      if (/检查.*理解|自测|练习/.test(label)) return "assessment";
+      if (/因果链|总结|综合/.test(label)) return "synthesis";
+      return "core";
+    };
     const sections = config.sections.map((section, index) => `
-      <section class="dd-sec"><h2><span class="dd-n">${index + 1}</span>${section.title}<span class="dd-badge ${section.kind || "intuition"}">${section.badge || "原理"}</span></h2><p class="dd-lead">${section.lead}</p>${section.body}</section>`).join("");
+      <section class="dd-sec" data-section-role="${inferredSectionRole(section)}"${section.workedExample ? ' data-worked-example="true"' : ""}${section.termsReviewed ? ' data-terms-reviewed="true"' : ""}><h2><span class="dd-n">${index + 1}</span>${section.title}<span class="dd-badge ${section.kind || "intuition"}">${section.badge || "原理"}</span></h2><p class="dd-lead">${section.lead}</p>${section.body}</section>`).join("");
     const artifactCount = (sections.match(/<(?:figure|table|pre)\b|class="dd-formula/g) || []).length;
     const verificationArtifact = artifactCount >= 5 ? "" : `
       <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>验证层</th><th>在“${config.title}”中固定什么</th><th>观察什么证据</th></tr></thead><tbody>
@@ -49,11 +58,12 @@
       title: config.title,
       subtitle: config.subtitle,
       thesis: config.thesis,
+      quality: config.quality || null,
       html: `
         <div class="dd-goals"><b>读完你应该能：</b>${config.goals.join("；")}。</div>
         ${sections}
-        <section class="dd-sec"><h2><span class="dd-n">${chainNumber}</span>${config.chainTitle || "把因果链连起来"}<span class="dd-badge intuition">综合</span></h2><p class="dd-lead">${config.chainLead || "这个概念怎样从问题一路连接到可验证的实践？"}</p>${list(config.chain, true, "dd-chain")}${verificationArtifact}</section>
-        <section class="dd-sec"><h2><span class="dd-n">${quizNumber}</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">${config.quizLead || "你能否不用背术语，解释它的机制、边界与验证方法？"}</p><div class="dd-quiz"><ol>${questions}</ol></div><details class="dd-answers"><summary>参考答案</summary><ol>${answers}</ol></details></section>
+        <section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">${chainNumber}</span>${config.chainTitle || "把因果链连起来"}<span class="dd-badge intuition">综合</span></h2><p class="dd-lead">${config.chainLead || "这个概念怎样从问题一路连接到可验证的实践？"}</p>${list(config.chain, true, "dd-chain")}${verificationArtifact}</section>
+        <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">${quizNumber}</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">${config.quizLead || "你能否不用背术语，解释它的机制、边界与验证方法？"}</p><div class="dd-quiz"><ol>${questions}</ol></div><details class="dd-answers"><summary>参考答案</summary><ol>${answers}</ol></details></section>
         <div class="dd-src"><b>资料来源与改编说明</b><ul>${sourceItems}</ul><div class="dd-src-date">访问日期：${config.accessed || "2026-07-22"}</div></div>`
     };
   };

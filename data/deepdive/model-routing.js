@@ -20,3 +20,27 @@ window.DEEPDIVE['model-routing'] = window.createDeepDive({
   quiz:[{q:'模型路由与 MoE 有何区别？',a:'路由在应用层选择完整模型/服务；MoE 在单个模型内部为 token 选择专家。'},{q:'级联平均模型成本公式是什么？',a:'所有请求先跑 S 时为 C_S+rC_L，另加判定、工具和失败成本。'},{q:'为什么应预测强模型相对增益？',a:'绝对困难不等于升级有用；两模型同对或同错都不值得因增益而升级。'},{q:'为何要随机双跑下放样本？',a:'取得反事实强模型结果，发现被路由器隐藏的错误下放。'},{q:'何时强制绕过概率路由？',a:'高影响、权限写操作或明确合规场景可直接强模型、验证或人工。'}],
   sources:[{title:'FrugalGPT',url:'https://arxiv.org/abs/2305.05176',note:'模型级联与预算优化'},{title:'RouteLLM',url:'https://arxiv.org/abs/2406.18665',note:'偏好数据驱动的强弱模型路由'},{title:'Learning to Route LLMs with Confidence Tokens',url:'https://arxiv.org/abs/2410.13284',note:'基于置信信号的路由'},{title:'Selective Classification for Deep Neural Networks',url:'https://arxiv.org/abs/1705.08500',note:'风险—覆盖与选择性决策'}]
 });
+
+// 新版教学门禁补充：逐节明确路由决策、反事实证据和安全边界。
+{
+  const page = window.DEEPDIVE['model-routing'];
+  const additions = [
+    '<p>模型路由输入当前请求、风险规则、候选模型能力和运行证据，输出小模型、强模型、人工或拒绝路径。它逐请求选择已有能力，不会创造候选都没有的能力；下放表示证据显示小模型足够，不表示请求天然简单。高风险硬规则优先于概率分数。</p>',
+    '<p>架构选择输入决策时点、可用信号、错误成本和延迟 SLO，输出规则路由、直接路由、级联或并行选择。调用前信号适合直接选择，首答和验证信号适合级联，并行用成本换墙钟时间；没有一种形态适合所有请求。首阶段可能产生副作用时不得无审查级联。</p>',
+    '<p>路由优化输入请求 x、所选模型 m(x)、成本 c、质量 q、质量下限 Q0、关键切片风险 Riskk 和上限 Rk，输出满足逐切片硬约束的最低期望成本策略。平均质量不能抵消少数切片错放；训练应预测强模型相对收益，并用随机双跑补足下放样本的反事实。</p>',
+    '<p>级联核算输入小模型成本 Cs、强模型成本 Cl、升级率 r、小模型延迟 Ts、判定延迟 Tjudge 和强模型延迟 Tl，输出期望成本 ECost 与期望延迟 ETime。所有请求先付 Cs，升级请求再付 Cl 和串行延迟；0.045 元成立于给定调用假设，不含评分器、失败和人工。</p>',
+    '<p>阈值案例输入 1000 笔请求、升级分数 g(x)、阈值 τ 和三组质量成本结果，输出满足质量与错放门槛的最低成本阈值。τ 降低会增加升级、成本并减少错放；τ=.5 只在全局与所有关键切片同时通过时可选。高风险切片失败需强制升级，不能靠全局平均掩盖。</p>',
+    '<p>路由特征输入决策时已经可得的领域、长度、语言、风险、检索、首答或验证信号，输出经独立集校准的“升级可修复概率”。训练时使用未来标签或强模型后验信息会数据泄漏；分数可靠性必须按切片检查。模型自报置信度不能未经校准直接当阈值。</p>',
+    '<p>公平评测输入语言、领域、用户群和风险切片，输出各切片下放率、强对小错率、错放率、升级收益与置信区间。平均合格可能隐藏长尾用户持续收到弱模型；公平目标是限制不可接受的质量与错误差距，不是强求相同升级比例。高影响任务可直接绕过学习路由。</p>',
+    '<p>在线治理输入模型版本、价格、流量、路由分数、选择原因和延迟质量反馈，输出探索审计、重校准、金丝雀或保守回退动作。随机双跑让系统看见下放反事实，漂移则触发重新收集数据；错放超预算时先禁用危险动作或全量升级，不能只移动阈值掩盖根因。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="带逐切片约束的模型路由目标"><munder><mi>min</mi><mi>m</mi></munder><mi>Ecost</mi><mo>[</mo><mi>c</mi><mo>(</mo><mi>m</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo><mo>]</mo><mo>,</mo><mtext>subject to</mtext><mi>Equality</mi><mo>[</mo><mi>q</mi><mo>(</mo><mi>m</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>,</mo><mi>x</mi><mo>)</mo><mo>]</mo><mo>≥</mo><mi>Q0</mi><mo>,</mo><msub><mi>Risk</mi><mi>k</mi></msub><mo>≤</mo><msub><mi>R</mi><mi>k</mi></msub></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="级联期望成本与延迟"><mi>ECost</mi><mo>=</mo><mi>Cs</mi><mo>+</mo><mi>r</mi><mo>×</mo><mi>Cl</mi><mo>;</mo><mi>ETime</mi><mo>≈</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>r</mi><mo>)</mo><mo>×</mo><mi>Ts</mi><mo>+</mo><mi>r</mi><mo>×</mo><mo>(</mo><mi>Ts</mi><mo>+</mo><mi>Tjudge</mi><mo>+</mo><mi>Tl</mi><mo>)</mo></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

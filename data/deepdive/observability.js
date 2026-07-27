@@ -21,3 +21,28 @@ window.DEEPDIVE['observability'] = window.createDeepDive({
   quiz:[{q:'HTTP 200 为什么不能代表 AI 任务成功？',a:'传输成功时语义、证据、权限、工具副作用仍可失败。'},{q:'根 trace 时长为何不能总由子 span 相加？',a:'并行 span 会重叠，端到端由关键路径决定。'},{q:'为什么只采失败样本不能估失败率？',a:'纳入概率依赖结果，样本分布不代表总体；需概率和加权。'},{q:'哪些版本最值得记录？',a:'应用、模型、提示、索引/重排、工具 schema、策略和数据版本。'},{q:'可观测闭环的最后一步是什么？',a:'先处置/回滚，再将经审核的失败转成回归评测并验证修复。'}],
   sources:[{title:'OpenTelemetry Specification',url:'https://opentelemetry.io/docs/specs/otel/',note:'trace、metric、log 与 context 语义'},{title:'Hidden Technical Debt in Machine Learning Systems',url:'https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems',note:'ML 系统依赖、反馈和监控债务'},{title:'Google SRE Workbook: Alerting on SLOs',url:'https://sre.google/workbook/alerting-on-slos/',note:'错误预算与多窗口告警'},{title:'NIST Privacy Framework',url:'https://www.nist.gov/privacy-framework',note:'数据处理与隐私风险治理'}]
 });
+
+// 新版教学门禁补充：逐节明确观测信号、因果时间线、采样与响应边界。
+{
+  const page = window.DEEPDIVE['observability'];
+  const additions = [
+    '<p>AI 可观测性输入版本化请求、检索、模型、工具、策略和副作用事件，输出可定位、回放和验证的因果时间线。HTTP 200 只表示传输成功，不表示语义、证据、权限或业务动作正确；trace 记录实际输入动作和状态，不声称读取模型真实思维。敏感原文并非默认必存。</p>',
+    '<p>信号分类输入离散事件、聚合趋势、跨组件路径和样本质量判断，输出 log、metric、trace 或评测标签。日志解释某步发生什么，指标发现规模趋势，trace 串联一次请求，标签判断结果好坏；四者通过 trace ID 和版本连接。只有其中一种都会留下诊断盲区。</p>',
+    '<p>追踪结构输入用户任务和跨 HTTP、队列、后台任务的调用，输出一个根 trace 与有父子关系的 span 树。每个 span 记录时间、父级、版本、状态和实际副作用，context 跨边界传播；工具 span 与业务状态才是调用证据。模型事后声称做过什么不能替代系统记录。</p>',
+    '<p>复现字段输入应用、模型、提示、参数、索引、候选、工具、策略和验收版本，输出最小可比较的版本证据与受控内容引用。哈希和稳定 ID 支持差异定位，同时避免原文复制到每个日志系统；记录太少无法复现，记录全部又扩大隐私面。自由思维链不作为事实证据。</p>',
+    '<p>延迟案例输入 span 开始结束、依赖关系、排队计算网络和重试耗时，输出关键路径墙钟延迟 Tcritical。串行阶段相加，并行阶段取决定完成的最长依赖路径；所有 span 时长之和是工作量，不等于端到端时间。1420ms 的主因是工具重试，而不是模型平均生成。</p>',
+    '<p>语义监控输入异步回写的资格、引用、越权、工具完成和人工改判标签，输出按任务语言风险模型提示索引和群体切片的质量趋势。代理指标只提供根因线索，点赞、转人工和重问都可能有替代解释；必须下钻到脱敏 trace，并用人工或最终业务状态校验。</p>',
+    '<p>采样估计输入每条 trace 的结果 yi 和保留概率 pii，输出 HorvitzThompson 风格加权率 RateWeighted。分子求 Σ(yi/pii)，分母求 Σ(1/pii)；尾部采样可多保错误和高风险，但必须记录纳入概率。只保存失败样本不能直接估生产失败率，极低频灾难另走安全事件通道。</p>',
+    '<p>隐私治理输入每个观测字段的诊断目的、敏感等级、访问者、地域和保留期，输出脱敏、哈希、加密原文隔离或不采集决定。能用类型范围和稳定代号诊断就不复制姓名凭证；需要内容审查时使用短期授权受控存储。删除必须覆盖派生索引和备用日志。</p>',
+    '<p>响应闭环输入 SLO、错误预算、告警窗口、负责人、诊断查询和回滚版本，输出止损、回滚、根因实验与经审核的回归样本。告警先恢复安全服务，再研究长期修复；发布标记和受影响 trace 用于验证假设。可观测性不能替代权限、幂等和事故演练。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  const formulas = [
+    '<div class="dd-formula"><math display="block" aria-label="关键路径端到端延迟"><mi>Tcritical</mi><mo>=</mo><mi>CriticalPath</mi><mo>(</mo><mi>Tqueue</mi><mo>,</mo><mi>Tcompute</mi><mo>,</mo><mi>Tnetwork</mi><mo>,</mo><mi>Tretry</mi><mo>)</mo></math></div>',
+    '<div class="dd-formula"><math display="block" aria-label="按采样纳入概率加权的率估计"><mi>RateWeighted</mi><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mi>yi</mi><mi>pii</mi></mfrac></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mn>1</mn><mi>pii</mi></mfrac></mrow></mfrac></math></div>'
+  ];
+  let formulaIndex = 0;
+  page.html = page.html.replace(/<div class="dd-formula">[\s\S]*?<\/div>/g, () => formulas[formulaIndex++]);
+}

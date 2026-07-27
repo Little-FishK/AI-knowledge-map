@@ -74,7 +74,7 @@ window.DEEPDIVE["reasoning-models"] = {
 <section class="dd-sec">
   <h2><span class="dd-n">4</span>预算怎样分配才值得<span class="dd-badge math">推导</span></h2>
   <p class="dd-lead">多想一次带来多少新增成功，是否值得额外延迟与费用？</p>
-  <div class="dd-formula"><code>期望效用(b) = 成功概率(b) × 任务价值 − 计算成本(b) − 延迟损失(b)</code></div>
+  <div class="dd-formula" data-formula-id="reasoning-expected-utility" data-display="mathml"><math display="block" aria-label="预算 b 的期望效用等于成功概率乘任务价值，减去计算成本和延迟损失"><mrow><mi>U</mi><mo>(</mo><mi>b</mi><mo>)</mo><mo>=</mo><msub><mi>P</mi><mtext>成功</mtext></msub><mo>(</mo><mi>b</mi><mo>)</mo><mo>·</mo><mi>V</mi><mo>−</mo><msub><mi>C</mi><mtext>计算</mtext></msub><mo>(</mo><mi>b</mi><mo>)</mo><mo>−</mo><msub><mi>C</mi><mtext>延迟</mtext></msub><mo>(</mo><mi>b</mi><mo>)</mo></mrow></math></div>
   <p><code>b</code> 是候选数、搜索步数或推理努力等级。下面是教学用的同一批 100 道题，不代表任何特定模型：预算从 1 增至 4，正确数由 48 增至 67，额外 300 单位计算换来 19 道题；再增至 8，只多 3 道题却再花 400 单位。收益递减意味着系统应按题目难度、可验证性和错误代价路由，而不是给所有请求同一最高预算。</p>
   <div class="dd-table-wrap"><table class="dd-table">
     <thead><tr><th>任务</th><th>建议预算</th><th>理由</th><th>主要验收</th></tr></thead>
@@ -197,3 +197,26 @@ window.DEEPDIVE["reasoning-models"] = {
 </div>
 `
 };
+
+// 新版教学门禁补充：逐节说明推理预算、测试时缩放、效用计算和失败诊断。
+{
+  const page = window.DEEPDIVE["reasoning-models"];
+  const additions = [
+    '<p>推理模型识别输入任务、可用推理预算、候选与验证工具，输出经过拆解、搜索、检查和修正后的答案。专门后训练让模型更会把额外计算用于难题，而不是单纯把可见解释写长；原始轨迹也可能不展示。额外预算在数学代码等任务上常有收益，但不能保证时间越长越正确。</p>',
+    '<p>概念区分输入触发方式、能力来源、计算策略和轨迹可见性，输出提示式思维链或经过后训练的推理模型。思维链提示引出已有能力的一条中间步骤，推理模型学习怎样分配预算，并可使用多候选搜索验证或工具；二者可以组合。长解释既不是推理模型的充分条件也不是必要条件。</p>',
+    '<p>测试时缩放输入单条正确概率 p、候选数 k、候选相关性和验证器选中正确候选的概率 q，输出额外计算下的端到端成功估计。它解决同一模型怎样用更多回答时计算提高难题成功机会的问题。独立假设下至少一个正确候选为 1−(1−p)^k；p=0.35、k=4 得约 82%，再乘 q=0.80 上限约 66%。真实候选常相关，因此该数值只是预算直觉而非性能保证。</p>',
+    '<p>预算效用输入推理预算 b、成功概率 Psuccess(b)、成功任务价值 V、计算成本 Ccompute(b) 和延迟成本 Clatency(b)，输出期望效用 U(b)。用成功收益减两类成本，并比较增加一档预算带来的边际效用；100 题从预算 1 到 4 多对 19 题，而 4 到 8 只多 3 题，显示收益递减。没有外部验证的事实题不能靠加预算创造证据。</p>',
+    '<p>工程代价分析输入轨迹长度、候选数量、验证次数、工具调用、延迟 SLO 和任务难度，输出费用、响应时间、资源占用及路由选择。简单格式化用单次生成，难数学题可多候选验证，高影响任务增加独立检查而非只拉长文字。服务对隐藏推理 token 的计费和上下文处理不同，必须按实际接口测量。</p>',
+    '<p>局限判断输入搜索前提、候选覆盖、验证器独立性、外部证据和最终测试，输出可接受答案、继续搜索、检索或拒答。模型可能沿错误前提搜索更深，验证器也可能被同源错误欺骗；可见解释不保证忠实，隐藏轨迹又无法直接审计。数学代码事实分别需要代回、执行测试和来源核对。</p>',
+    '<p>失败诊断输入全部候选、候选间差异、验证器排序、停止时点、预算曲线和外部证据，输出候选覆盖、相关性、验证器、停止规则或证据缺失的归因。先查正确候选是否出现，再查是否被选中；无候选优先改模型分解工具，有候选未选中则改验证器。证据缺失应检索或拒答，不应继续内省。</p>'
+  ];
+  const renderedSections = page.html.split("</section>");
+  additions.forEach((html, index) => { renderedSections[index] += html; });
+  page.html = renderedSections.join("</section>");
+  page.html = page.html.replace('<span class="dd-n">3</span>一条新的扩展轴：测试时缩放', '<span class="dd-n">3</span>测试时缩放：数值例子');
+  page.html = page.html.replace('<span class="dd-n">4</span>预算怎样分配才值得', '<span class="dd-n">4</span>预算怎样分配才值得：逐步演算');
+  page.html = page.html.replace(
+    /<div class="dd-formula" data-formula-id="reasoning-expected-utility"[\s\S]*?<\/div>/,
+    '<div class="dd-formula" data-formula-id="reasoning-expected-utility" data-display="mathml"><math display="block" aria-label="推理预算的期望效用"><mi>U</mi><mo>(</mo><mi>b</mi><mo>)</mo><mo>=</mo><mi>Psuccess</mi><mo>(</mo><mi>b</mi><mo>)</mo><mo>×</mo><mi>V</mi><mo>−</mo><mi>Ccompute</mi><mo>(</mo><mi>b</mi><mo>)</mo><mo>−</mo><mi>Clatency</mi><mo>(</mo><mi>b</mi><mo>)</mo></math></div>'
+  );
+}
