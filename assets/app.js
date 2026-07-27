@@ -22,11 +22,49 @@
   const RECOMMENDED_PATH = (G.recommendedLearningPath || []).reduce((all, phase) =>
     all.concat((phase.steps || []).map(step => ({ order: String(step[0]), id: step[1], phase: phase.phase }))), []);
   const RECOMMENDED_INDEX = new Map(RECOMMENDED_PATH.map((step, index) => [step.id, index]));
+  const DEEPDIVE_RUNTIME = window.DEEPDIVE_RUNTIME || { base: "data/deepdive-runtime", ids: [] };
+  const DEEPDIVE_IDS = new Set(DEEPDIVE_RUNTIME.ids || []);
+  const deepDiveLoads = new Map();
   const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
   const learnedNodes = loadLearnedNodes();
   let activeDeepDiveId = null;
   let officialPathActive = false;
   let officialPathRestore = null;
+
+  window.DEEPDIVE = window.DEEPDIVE || {};
+
+  function ensureDeepDive(id) {
+    if (window.DEEPDIVE[id]) return Promise.resolve(window.DEEPDIVE[id]);
+    if (!DEEPDIVE_IDS.has(id)) return Promise.reject(new Error(`不存在理解原理页：${id}`));
+    if (deepDiveLoads.has(id)) return deepDiveLoads.get(id);
+
+    const load = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = `${DEEPDIVE_RUNTIME.base}/${encodeURIComponent(id)}.js`;
+      script.async = true;
+      script.onload = () => {
+        script.remove();
+        if (window.DEEPDIVE[id]) resolve(window.DEEPDIVE[id]);
+        else reject(new Error(`理解原理页加载后未注册：${id}`));
+      };
+      script.onerror = () => {
+        script.remove();
+        deepDiveLoads.delete(id);
+        reject(new Error(`理解原理页加载失败：${id}`));
+      };
+      document.head.appendChild(script);
+    });
+    deepDiveLoads.set(id, load);
+    return load;
+  }
+
+  function preloadRecommendedNeighbors(id) {
+    const currentIndex = RECOMMENDED_INDEX.get(id);
+    const previous = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex - 1] : null;
+    const next = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex + 1] : null;
+    if (previous) ensureDeepDive(previous.id).catch(error => console.warn(error.message));
+    if (next) ensureDeepDive(next.id).catch(error => console.warn(error.message));
+  }
 
   function loadLearnedNodes() {
     try {
@@ -49,12 +87,19 @@
   function learningButtonHtml(id) {
     const learned = learnedNodes.has(id);
     const currentIndex = RECOMMENDED_INDEX.get(id);
+    const previousStep = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex - 1] : null;
     const nextStep = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex + 1] : null;
+    const previousNode = previousStep && byId[previousStep.id];
     const nextNode = nextStep && byId[nextStep.id];
+    const previousButton = previousStep && previousNode
+      ? `<button type="button" class="dd-path-btn dd-prev-btn" data-prev-node="${esc(previousStep.id)}" aria-label="上一节 ${esc(previousStep.order)}：${esc(previousNode.title)}">
+          <span aria-hidden="true">←</span>
+          <span class="dd-path-copy"><small>上一节 ${esc(previousStep.order)}</small><strong>${esc(previousNode.title)}</strong></span>
+        </button>`
+      : "";
     const nextButton = nextStep && nextNode
-      ? `<button type="button" class="dd-next-btn" data-next-node="${esc(nextStep.id)}" aria-label="下一节 ${esc(nextStep.order)}：${esc(nextNode.title)}">
-          <span>下一节 ${esc(nextStep.order)}</span>
-          <strong>${esc(nextNode.title)}</strong>
+      ? `<button type="button" class="dd-path-btn dd-next-btn" data-next-node="${esc(nextStep.id)}" aria-label="下一节 ${esc(nextStep.order)}：${esc(nextNode.title)}">
+          <span class="dd-path-copy"><small>下一节 ${esc(nextStep.order)}</small><strong>${esc(nextNode.title)}</strong></span>
           <span aria-hidden="true">→</span>
         </button>`
       : "";
@@ -64,6 +109,7 @@
         <div class="dd-learning-copy">${learned ? "这个节点已计入主页的“已学习”列表。" : "标记后可在主页侧栏随时查看已学与未学节点。"}</div>
       </div>
       <div class="dd-learning-actions">
+        ${previousButton}
         <button type="button" class="dd-learn-btn${learned ? " is-learned" : ""}" data-learn-node="${esc(id)}" aria-pressed="${learned}">
           ${learned ? "✓ 已学习" : "标记为已学习"}
         </button>
@@ -122,6 +168,8 @@
   function bindLearningButton() {
     const button = document.querySelector("[data-learn-node]");
     if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
+    const previousButton = document.querySelector("[data-prev-node]");
+    if (previousButton) previousButton.addEventListener("click", () => openDeepDive(previousButton.getAttribute("data-prev-node")));
     const nextButton = document.querySelector("[data-next-node]");
     if (nextButton) nextButton.addEventListener("click", () => openDeepDive(nextButton.getAttribute("data-next-node")));
   }
@@ -238,6 +286,8 @@
     container: document.getElementById("cy"),
     elements: elements,
     minZoom: 0.2, maxZoom: 3,
+    // Cap high-DPI canvas growth: 2x DPR means four times as many pixels.
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
     style: [
       {
         selector: "node",
@@ -324,26 +374,6 @@
     layout: { name: "preset" }
   });
 
-  /* fcose 内部直接用 Math.random，没有 seed 选项。
-   * 不加干预的话每次打开布局都不一样，质量随机波动——密集簇有时糊成一团。
-   * 这里在布局期间把 Math.random 换成定种子的 PRNG，布局结束再还原，
-   * 使同一份数据每次都得到完全相同、且已经挑过的那一版布局。
-   * LAYOUT_SEED 是离线搜出来的：见 tools/find-seed.js。 */
-  const LAYOUT_SEED = (G.meta && G.meta.layoutSeed) || 1;
-
-  function withSeededRandom(seed, fn) {
-    const orig = Math.random;
-    let s = seed >>> 0;
-    Math.random = function () {              // mulberry32
-      s = (s + 0x6D2B79F5) >>> 0;
-      let t = s;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-    try { return fn(); } finally { Math.random = orig; }
-  }
-
   function enforceLayoutQuality() {
     if (!window.LAYOUT_QUALITY) return;
     const input = {};
@@ -362,38 +392,16 @@
     }
   }
 
-  function runLayout(force) {
-    // display:none 的节点不会可靠参与 fCoSE。排布期间临时让全图参与，
-    // 在同一事件循环内恢复过滤，因此用户看不到中间状态。
+  function restorePresetLayout() {
     cy.elements().removeClass("hidden");
-    if (ALL_PINNED && !force) {
-      cy.nodes().forEach(n => n.position({ x: POS[n.id()][0], y: POS[n.id()][1] }));
-    } else {
-      const l = cy.layout({
-        name: "fcose",
-        quality: "proof",
-        // 必须同步：animate:true 时 fcose 的计算是异步的，withSeededRandom 的
-        // finally 会在计算跑完前还原 Math.random，fcose 拿到半截被替换的随机流，
-        // 算出退化布局（整张图塌成 89x74，fit 后 zoom 顶到 maxZoom）。
-        // 节点量级下同步布局是瞬时的，动画本来也只是装饰。
-        animate: false,
-        // 必须 randomize：初始位置共线时 fcose 会卡在退化的局部最优里，
-        // 表现为整张图塌成一条对角线（2026-07-19 实测踩到）
-        randomize: true,
-        // 中文标签又长又宽，不把标签计入尺寸的话密集簇里的字会互相压
-        nodeDimensionsIncludeLabels: true,
-        nodeSeparation: 175,
-        idealEdgeLength: 185,
-        nodeRepulsion: 34000,
-        gravity: 0.06,
-        numIter: 4000,
-        padding: 45,
-        // fcose 自己的 fit 会在动画结束后再跑一次，把下面的缩放上限覆盖掉
-        // （表现为 zoom 顶到 maxZoom=3，节点巨大、只看得见一角）。这里自己接管。
-        fit: false
-      });
-      withSeededRandom(LAYOUT_SEED, () => l.run());
+    if (!ALL_PINNED) {
+      const missing = G.nodes.filter(node => !POS[node.id]).map(node => node.id);
+      console.error("生产地图缺少预计算坐标，已跳过运行时自动排版：", missing);
     }
+    cy.nodes().forEach(node => {
+      const position = POS[node.id()];
+      if (position) node.position({ x: position[0], y: position[1] });
+    });
     enforceLayoutQuality();
     applyFilters();
     fitView();
@@ -593,7 +601,7 @@
     const evolving = n.maturity === "evolving";
 
     let h = "";
-    const hasDeep = !!(window.DEEPDIVE && window.DEEPDIVE[id]);
+    const hasDeep = DEEPDIVE_IDS.has(id);
     h += `<div class="d-domain" style="color:${dom.color}">${dom.emoji} ${esc(dom.label)}`
        + (evolving ? `<span class="mat-tag" title="较新、仍在演进的概念">演进中</span>` : "")
        + (hasDeep ? `<button class="dd-open" data-dd="${esc(id)}" title="打开理解原理深读页">📖 理解原理</button>` : "")
@@ -658,16 +666,35 @@
     detailBody.querySelectorAll("[data-dd]").forEach(el => {
       el.addEventListener("click", () => openDeepDive(el.getAttribute("data-dd")));
     });
+    if (hasDeep) ensureDeepDive(id).catch(error => console.warn(error.message));
   }
 
   /* ───────────────────── 理解原理（深读页） ───────────────────── */
 
   const ddEl = document.getElementById("deepdive");
 
-  function openDeepDive(id) {
-    const dd = window.DEEPDIVE && window.DEEPDIVE[id];
-    if (!dd || !ddEl) return;
+  let deepDiveRequestToken = 0;
+
+  async function openDeepDive(id) {
+    if (!ddEl || !DEEPDIVE_IDS.has(id)) return;
+    const token = ++deepDiveRequestToken;
     activeDeepDiveId = id;
+    document.getElementById("dd-top-name").textContent = byId[id] ? byId[id].title : id;
+    document.getElementById("dd-article").innerHTML =
+      '<div class="dd-loading" role="status">正在加载理解原理页…</div>';
+    ddEl.classList.remove("hidden");
+    ddEl.querySelector(".dd-scroll").scrollTop = 0;
+
+    let dd;
+    try {
+      dd = await ensureDeepDive(id);
+    } catch (error) {
+      if (token !== deepDiveRequestToken) return;
+      document.getElementById("dd-article").innerHTML =
+        `<div class="dd-loading dd-loading-error" role="alert">${esc(error.message)}，请返回后重试。</div>`;
+      return;
+    }
+    if (token !== deepDiveRequestToken || activeDeepDiveId !== id) return;
     const hero = `<div class="dd-hero">
         <div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>
         <h1 class="dd-h1">${esc(dd.title)}</h1>
@@ -679,11 +706,12 @@
     document.getElementById("dd-top-name").textContent = dd.title;
     document.getElementById("dd-article").innerHTML = hero + (dd.html || "") + learningButtonHtml(id);
     bindLearningButton();
-    ddEl.classList.remove("hidden");
     ddEl.querySelector(".dd-scroll").scrollTop = 0;
+    preloadRecommendedNeighbors(id);
   }
 
   function closeDeepDive() {
+    deepDiveRequestToken++;
     if (ddEl) ddEl.classList.add("hidden");
     activeDeepDiveId = null;
   }
@@ -778,12 +806,45 @@
   // 大区
   const domList = document.getElementById("domain-list");
   Object.entries(DOMAINS).forEach(([key, d]) => {
-    const count = G.nodes.filter(n => n.domain === key).length;
-    const lab = document.createElement("label");
-    lab.className = "chk";
-    lab.innerHTML = `<input type="checkbox" data-domain="${key}" checked>
-                     <span class="dot" style="background:${d.color}"></span>${d.label}<em>${count || ""}</em>`;
-    domList.appendChild(lab);
+    const domainNodes = G.nodes.filter(n => n.domain === key).sort((a, b) => {
+      const aIndex = RECOMMENDED_INDEX.has(a.id) ? RECOMMENDED_INDEX.get(a.id) : Number.MAX_SAFE_INTEGER;
+      const bIndex = RECOMMENDED_INDEX.has(b.id) ? RECOMMENDED_INDEX.get(b.id) : Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex || a.title.localeCompare(b.title, "zh-CN");
+    });
+    const listId = `domain-nodes-${key}`;
+    const group = document.createElement("div");
+    group.className = "domain-group";
+    group.innerHTML = `<div class="domain-row">
+        <label class="chk domain-filter">
+          <input type="checkbox" data-domain="${esc(key)}" checked>
+          <span class="dot" style="background:${d.color}"></span>
+          <span class="domain-label">${esc(d.label)}</span><em>${domainNodes.length || ""}</em>
+        </label>
+        <button type="button" class="domain-expand" data-domain-toggle="${esc(key)}"
+          aria-expanded="false" aria-controls="${esc(listId)}" aria-label="展开${esc(d.label)}节点">
+          <span aria-hidden="true">⌄</span>
+        </button>
+      </div>
+      <div id="${esc(listId)}" class="domain-node-list" hidden>
+        ${domainNodes.map(node => `<button type="button" class="domain-node" data-domain-node="${esc(node.id)}">
+          <span class="dot" style="background:${d.color}"></span><span>${esc(node.title)}</span>
+        </button>`).join("")}
+      </div>`;
+    domList.appendChild(group);
+  });
+  domList.addEventListener("click", event => {
+    const toggle = event.target.closest("[data-domain-toggle]");
+    if (toggle) {
+      const list = document.getElementById(toggle.getAttribute("aria-controls"));
+      const expanded = toggle.getAttribute("aria-expanded") !== "true";
+      toggle.setAttribute("aria-expanded", String(expanded));
+      toggle.setAttribute("aria-label",
+        `${expanded ? "收起" : "展开"}${DOMAINS[toggle.dataset.domainToggle].label}节点`);
+      if (list) list.hidden = !expanded;
+      return;
+    }
+    const nodeButton = event.target.closest("[data-domain-node]");
+    if (nodeButton) select(nodeButton.dataset.domainNode, true);
   });
   renderLearningPanel();
   document.querySelector("#official-path-toggle em").textContent =
@@ -800,6 +861,13 @@
     lab.innerHTML = `<input type="checkbox" data-edge="${key}" checked>
                      <span class="dash" style="border-color:${t.color}"></span>${t.label}<em>${count || ""}</em>`;
     edgeList.appendChild(lab);
+  });
+  const edgeSectionToggle = document.getElementById("edge-section-toggle");
+  const edgeSectionContent = document.getElementById("edge-section-content");
+  edgeSectionToggle.addEventListener("click", () => {
+    const expanded = edgeSectionToggle.getAttribute("aria-expanded") !== "true";
+    edgeSectionToggle.setAttribute("aria-expanded", String(expanded));
+    edgeSectionContent.hidden = !expanded;
   });
 
   document.addEventListener("change", e => {
@@ -860,7 +928,7 @@
     detail.classList.add("closed");
     syncControls();
     applyFilters();
-    runLayout(true);   // 「重置」强制重算，用于数据变动后导出新坐标
+    restorePresetLayout();
   });
 
   document.getElementById("btn-panel").addEventListener("click", () => {
@@ -923,7 +991,7 @@
     `${G.meta.version} · ${G.meta.updatedAt}`;
 
   applyFilters();
-  runLayout();
+  restorePresetLayout();
 
   /* ───────────────────────── 软件模式 ───────────────────────── */
   const SW = window.SOFTWARE;

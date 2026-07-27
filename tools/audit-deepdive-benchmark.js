@@ -16,24 +16,14 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
+const { loadDeepDivePages } = require("./deepdive-loader");
 
 const root = process.env.DEEPDIVE_ROOT
   ? path.resolve(process.env.DEEPDIVE_ROOT)
   : path.join(__dirname, "..");
 const benchmarkFile = path.join(root, "docs", "deepdive-l3-benchmark.json");
 const benchmark = JSON.parse(fs.readFileSync(benchmarkFile, "utf8"));
-const context = { window: {} };
-vm.createContext(context);
-
-const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const scripts = [...indexHtml.matchAll(/<script src="([^"]+\.js)"><\/script>/g)]
-  .map((match) => match[1])
-  .filter((src) => src.startsWith("data/deepdive/"));
-scripts.forEach((src) => {
-  const file = path.join(root, ...src.split("/"));
-  vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-});
-const pages = context.window.DEEPDIVE || {};
+const pages = loadDeepDivePages(root);
 
 function count(source, pattern) {
   return (String(source || "").match(pattern) || []).length;
@@ -112,6 +102,65 @@ function sectionRecordsOf(html) {
 function attribute(source, name) {
   const match = String(source || "").match(new RegExp(`\\b${name}="([^"]*)"`, "i"));
   return match ? match[1].trim() : "";
+}
+
+function evidenceContext(sectionHtml, evidence) {
+  const needle = text(evidence);
+  if (!needle) return "";
+  const blocks = [
+    ...String(sectionHtml || "").matchAll(
+      /<(p|li|td|th|figcaption|summary|h[2-4]|div)\b[^>]*>([\s\S]*?)<\/\1>/gi,
+    ),
+  ]
+    .map((match) => text(match[2]))
+    .filter((block) => block.includes(needle))
+    .sort((left, right) => left.length - right.length);
+  if (blocks.length) return blocks[0];
+
+  const sectionText = text(sectionHtml);
+  const sentences = sectionText
+    .split(/(?<=[。！？；])/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return sentences.find((sentence) => sentence.includes(needle)) || "";
+}
+
+function semanticSectionPart(part, answer, context) {
+  const answerText = text(answer);
+  const contextText = text(context);
+  if (answerText.length < 16 || contextText.length < 10) return false;
+
+  const rules = {
+    definition: {
+      answer: /是|指|表示|定义|描述|展示|记录|比较|衡量|过程|方法|机制|关系|任务|指标|模型/,
+      context: /是一种|是一个|是指|是由|是把|是用来|是用于|指的是|表示|称为|定义为|可以理解为|描述|展示|记录|衡量|比较的是/,
+    },
+    problem: {
+      answer: /解决|识别|判断|发现|避免|防止|区分|诊断|选择|回答|目标|问题|需要|用于|帮助/,
+      context: /解决|用于|用来|为了|帮助|避免|防止|识别|判断|检测|诊断|区分|目标是|需要|使.{0,20}能够/,
+    },
+    inputOutput: {
+      answer: /输入|给定|接收|读取|观察|训练集|样本|数据/,
+      context: /输入.{0,100}输出|输出.{0,100}输入|(?:给定|接收|读取|观察).{2,100}(?:得到|产生|返回|输出|选出)/,
+      answerAlso: /输出|得到|产生|返回|选出|结果|停止点|模型|预测|分数/,
+    },
+    mechanism: {
+      answer: /通过|根据|先|再|然后|计算|比较|更新|转换|重复|逐步|当|因为|从而|所以/,
+      context: /先.{1,100}(?:再|然后)|通过.{1,100}(?:从而|使|得到)|根据.{1,80}(?:计算|比较|选择|更新|判断)|当.{1,80}(?:时|就|则)|因为.{1,80}(?:所以|因此)|重复|逐步|依次|流程|步骤/,
+    },
+    interpretation: {
+      answer: /表示|说明|意味着|解释|判断|应看作|不能理解为|越|高|低|接近|差异/,
+      context: /表示|说明|意味着|应解释为|可以判断|若.{1,80}则|如果.{1,80}(?:说明|表示|意味着)|越.{1,50}越|接近.{1,50}表示|才是|更像|先怀疑|不能.{0,20}(?:解读|理解|说明|证明)/,
+    },
+    boundary: {
+      answer: /但|仅|只有|前提|边界|限制|不适用|不能|不是|未必|可能|风险|失败|噪声|随机|依赖|代表|独立|泄漏/,
+      context: /但|仅|只有|前提|边界|限制|不适用|不能|不是|未必|可能|风险|失败|失效|噪声|随机|依赖|除非|代表性|独立|泄漏/,
+    },
+  };
+  const rule = rules[part];
+  if (!rule || !rule.answer.test(answerText) || !rule.context.test(contextText)) return false;
+  if (rule.answerAlso && !rule.answerAlso.test(answerText)) return false;
+  return true;
 }
 
 function contractTokens(value) {
@@ -325,6 +374,9 @@ function inspect(id, page) {
   const exampleContractGaps = [];
   const terminologyContractGaps = [];
   const sectionContractGaps = [];
+  let requiredSectionCount = 0;
+  let passedSectionCount = 0;
+  let passedSectionIndexes = [];
   const reviewRequired = [];
   const exampleParts = ["setup", "rule", "steps", "interpretation"];
   const criticalTerminology = [
@@ -437,6 +489,18 @@ function inspect(id, page) {
       if (missing.length) {
         sectionContractGaps.push(`section.missing-${missing.join("-")}.section-${section.index}`);
       }
+      const insufficient = requiredParts.filter((part) => {
+        const item = contract[part];
+        if (!item || typeof item.answer !== "string" || typeof item.evidence !== "string") return false;
+        const localContext = evidenceContext(section.html, item.evidence);
+        const semanticContext = ["definition", "mechanism"].includes(part)
+          ? localContext
+          : sectionText;
+        return !localContext || !semanticSectionPart(part, item.answer, semanticContext);
+      });
+      if (insufficient.length) {
+        sectionContractGaps.push(`section.insufficient-${insufficient.join("-")}.section-${section.index}`);
+      }
       const evidence = requiredParts
         .map((part) => contract[part]?.evidence?.trim())
         .filter(Boolean);
@@ -448,6 +512,14 @@ function inspect(id, page) {
     sectionContracts
       .filter((contract) => !coreIndexes.has(Number(contract?.section)))
       .forEach((contract) => sectionContractGaps.push(`section.contract-outside-core.section-${contract?.section}`));
+    requiredSectionCount = coreSections.length;
+    const failedSectionIndexes = new Set(sectionContractGaps
+      .map((gap) => Number((gap.match(/section-(\d+)/) || [])[1]))
+      .filter(Number.isFinite));
+    passedSectionIndexes = coreSections
+      .filter((section) => !failedSectionIndexes.has(section.index))
+      .map((section) => section.index);
+    passedSectionCount = passedSectionIndexes.length;
   }
   if (contractVersion < 1 && uncontractedFormulaCount > 0) {
     reviewRequired.push(`notation.uncontracted-formulas.${uncontractedFormulaCount}`);
@@ -554,6 +626,9 @@ function inspect(id, page) {
       exampleContractGaps: exampleContractGaps.length,
       terminologyContractGaps: terminologyContractGaps.length,
       sectionContractGaps: sectionContractGaps.length,
+      requiredSectionCount,
+      passedSectionCount,
+      passedSectionIndexes,
       reviewRequired: new Set(reviewRequired).size,
     },
   };
@@ -638,6 +713,10 @@ const contractedResults = results.filter((item) => item.metrics.contractVersion 
 const newGatePassed = contractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
 const sectionContractedResults = results.filter((item) => item.metrics.contractVersion >= 2);
 const sectionGatePassed = sectionContractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
+const requiredSectionTotal = sectionContractedResults
+  .reduce((sum, item) => sum + item.metrics.requiredSectionCount, 0);
+const passedSectionTotal = sectionContractedResults
+  .reduce((sum, item) => sum + item.metrics.passedSectionCount, 0);
 const writeBaselineAt = process.argv.indexOf("--write-baseline");
 if (writeBaselineAt >= 0) {
   const requested = process.argv[writeBaselineAt + 1];
@@ -696,6 +775,18 @@ console.log(`结构代理提示 · ${proxyDebt.length} 页存在部件或关键�
 console.log(`强制人工复核 · ${manualReviewDebt.length} 页存在未迁移公式合同、案例合同或高术语密度提示（不冒充自动通过）`);
 console.log(`新合同门禁 · 已迁移 ${contractedResults.length}/${results.length} · 完整通过 ${newGatePassed.length}/${results.length}`);
 console.log(`章节六问门禁 · 已迁移 ${sectionContractedResults.length}/${results.length} · 完整通过 ${sectionGatePassed.length}/${results.length}`);
+console.log(`章节六问实质证据 · 通过 ${passedSectionTotal}/${requiredSectionTotal} 个 core 章节`);
+if (process.argv.includes("--list-passed-sections")) {
+  console.log("通过六问实质证据的章节：");
+  results
+    .filter((item) => item.metrics.passedSectionIndexes.length)
+    .sort((left, right) => left.id.localeCompare(right.id))
+    .forEach((item) => {
+      item.metrics.passedSectionIndexes.forEach((section) => {
+        console.log(`  ✓ ${item.id} · section-${section}`);
+      });
+    });
+}
 if (listMigrationCandidates) {
   const noReviewCandidates = results
     .filter((item) => item.metrics.contractVersion < 1 && item.reviewRequired.length === 0)

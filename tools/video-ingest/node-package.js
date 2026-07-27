@@ -255,6 +255,7 @@ function runDeepDiveGates(pkg) {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "video-node-package-"));
   try {
     fs.mkdirSync(path.join(fixture, "data", "deepdive"), { recursive: true });
+    fs.mkdirSync(path.join(fixture, "data", "deepdive-runtime"), { recursive: true });
     fs.mkdirSync(path.join(fixture, "docs"), { recursive: true });
     fs.writeFileSync(
       path.join(fixture, "data", "graph.js"),
@@ -267,8 +268,21 @@ function runDeepDiveGates(pkg) {
       "utf8"
     );
     fs.writeFileSync(
+      path.join(fixture, "data", "deepdive-runtime", `${pkg.node.id}.js`),
+      renderDeepDiveRegistration(pkg.node.id, pkg.deepDive),
+      "utf8"
+    );
+    fs.writeFileSync(
+      path.join(fixture, "data", "deepdive-runtime", "manifest.js"),
+      `window.DEEPDIVE_RUNTIME=${JSON.stringify({
+        base: "data/deepdive-runtime",
+        ids: [pkg.node.id]
+      })};\n`,
+      "utf8"
+    );
+    fs.writeFileSync(
       path.join(fixture, "index.html"),
-      `<script src="data/graph.js"></script><script src="data/deepdive/${pkg.node.id}.js"></script>`,
+      '<script src="data/graph.js"></script><script src="data/deepdive-runtime/manifest.js"></script>',
       "utf8"
     );
     fs.writeFileSync(

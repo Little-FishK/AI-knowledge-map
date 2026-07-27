@@ -17,6 +17,7 @@ const os = require("os");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
+const { loadDeepDivePages } = require("./deepdive-loader");
 
 const root = process.env.DEEPDIVE_ROOT
   ? path.resolve(process.env.DEEPDIVE_ROOT)
@@ -40,17 +41,7 @@ function loadPlaywright() {
 }
 
 function loadPages() {
-  const context = { window: {} };
-  vm.createContext(context);
-  const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  const scripts = [...index.matchAll(/<script src="([^"]+\.js)"><\/script>/g)]
-    .map((match) => match[1])
-    .filter((src) => src.startsWith("data/deepdive/"));
-  scripts.forEach((src) => {
-    const file = path.join(root, ...src.split("/"));
-    vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-  });
-  return context.window.DEEPDIVE || {};
+  return loadDeepDivePages(root);
 }
 
 function pageHash(page) {
@@ -200,9 +191,64 @@ async function audit() {
       const hook = await page.evaluate(() => Boolean(window.__DEEPDIVE_QUALITY_AUDIT__));
       if (!hook) throw new Error("页面没有暴露 quality-audit 测试入口");
 
+      const sidebarStructure = await page.evaluate(() => {
+        const domainCount = Object.keys(window.GRAPH.domains || {}).length;
+        const groups = [...document.querySelectorAll(".domain-group")];
+        const malformedGroups = groups.filter((group) => {
+          const toggle = group.querySelector("[data-domain-toggle]");
+          const list = toggle && document.getElementById(toggle.getAttribute("aria-controls"));
+          return !toggle || !list || toggle.getAttribute("aria-expanded") !== "false" || !list.hidden
+            || !list.querySelector("[data-domain-node]");
+        }).length;
+        const edgeToggle = document.getElementById("edge-section-toggle");
+        const edgeContent = document.getElementById("edge-section-content");
+        return {
+          domainCount,
+          groupCount: groups.length,
+          malformedGroups,
+          edgeValid: Boolean(edgeToggle && edgeContent
+            && edgeToggle.getAttribute("aria-controls") === edgeContent.id
+            && edgeToggle.getAttribute("aria-expanded") === "true"
+            && !edgeContent.hidden),
+        };
+      });
+      if (sidebarStructure.groupCount !== sidebarStructure.domainCount || sidebarStructure.malformedGroups) {
+        failures.push(`[${viewport.name}] sidebar 大区展开控件结构或初始状态错误`);
+      }
+      if (!sidebarStructure.edgeValid) {
+        failures.push(`[${viewport.name}] sidebar 关系类型折叠控件结构或初始状态错误`);
+      }
+
+      const firstDomainToggle = page.locator("[data-domain-toggle]").first();
+      await firstDomainToggle.click();
+      const expandedDomainValid = await firstDomainToggle.evaluate((toggle) => {
+        const list = document.getElementById(toggle.getAttribute("aria-controls"));
+        return toggle.getAttribute("aria-expanded") === "true" && list && !list.hidden;
+      });
+      if (!expandedDomainValid) failures.push(`[${viewport.name}] sidebar 点击大区展开按钮后没有显示节点`);
+      const firstDomainNode = page.locator(".domain-group").first().locator("[data-domain-node]").first();
+      const expectedDomainNode = await firstDomainNode.getAttribute("data-domain-node");
+      await firstDomainNode.click();
+      const selectedDomainNode = await page.locator("#detail .d-title").textContent();
+      const expectedDomainTitle = await page.evaluate((id) =>
+        window.GRAPH.nodes.find((node) => node.id === id)?.title || "", expectedDomainNode);
+      if ((selectedDomainNode || "").trim() !== expectedDomainTitle) {
+        failures.push(`[${viewport.name}] sidebar 点击大区节点后没有打开对应详情`);
+      }
+      await page.locator("#detail-close").click();
+
+      const edgeToggle = page.locator("#edge-section-toggle");
+      await edgeToggle.click();
+      const collapsedEdgesValid = await edgeToggle.evaluate((toggle) => {
+        const content = document.getElementById(toggle.getAttribute("aria-controls"));
+        return toggle.getAttribute("aria-expanded") === "false" && content && content.hidden;
+      });
+      if (!collapsedEdgesValid) failures.push(`[${viewport.name}] sidebar 点击关系类型后没有折叠内容`);
+      await edgeToggle.click();
+
       for (const id of ids) {
-        const result = await page.evaluate((pageId) => {
-          window.__DEEPDIVE_QUALITY_AUDIT__.open(pageId);
+        const result = await page.evaluate(async (pageId) => {
+          await window.__DEEPDIVE_QUALITY_AUDIT__.open(pageId);
           const article = document.querySelector("#dd-article");
           const deepdive = document.querySelector("#deepdive");
           const violations = [];
@@ -272,12 +318,37 @@ async function audit() {
             .flatMap((phase) => (phase.steps || []).map((step) => ({
               order: String(step[0]),
               id: step[1],
-            })));
+          })));
           const pathIndex = recommended.findIndex((step) => step.id === pageId);
+          const expectedPrevious = pathIndex > 0 ? recommended[pathIndex - 1] : null;
           const expectedNext = pathIndex >= 0 ? recommended[pathIndex + 1] : null;
           const learnButton = article.querySelector("[data-learn-node]");
+          const previousButton = article.querySelector("[data-prev-node]");
           const nextButton = article.querySelector("[data-next-node]");
           if (!learnButton) add("learning-navigation", "缺少标记为已学习按钮");
+          if (expectedPrevious) {
+            const previousNode = window.GRAPH.nodes.find((node) => node.id === expectedPrevious.id);
+            if (!previousButton) {
+              add("learning-navigation", `缺少上一节 ${expectedPrevious.order} 跳转按钮`);
+            } else {
+              if (previousButton.getAttribute("data-prev-node") !== expectedPrevious.id) {
+                add("learning-navigation", `上一节目标错误，应为 ${expectedPrevious.id}`);
+              }
+              const accessibleName = previousButton.getAttribute("aria-label") || "";
+              if (!accessibleName.includes(expectedPrevious.order) || !accessibleName.includes(previousNode?.title || "")) {
+                add("learning-navigation", "上一节按钮没有完整说明序号与标题");
+              }
+              if (learnButton) {
+                const previousRect = previousButton.getBoundingClientRect();
+                const learnRect = learnButton.getBoundingClientRect();
+                if (previousRect.right > learnRect.left + 1) {
+                  add("learning-navigation", "上一节按钮没有显示在学习按钮左侧");
+                }
+              }
+            }
+          } else if (previousButton) {
+            add("learning-navigation", "推荐路径第一页不应显示上一节按钮");
+          }
           if (expectedNext) {
             const nextNode = window.GRAPH.nodes.find((node) => node.id === expectedNext.id);
             if (!nextButton) {
@@ -382,21 +453,32 @@ async function audit() {
       }
 
       if (ids.length) {
-        const navigationProbe = await page.evaluate(() => {
+        const navigationProbe = await page.evaluate(async () => {
           const steps = (window.GRAPH.recommendedLearningPath || []).flatMap((phase) => phase.steps || []);
           const first = steps[0];
           const second = steps[1];
-          window.__DEEPDIVE_QUALITY_AUDIT__.open(first[1]);
-          return { expectedId: second[1], expectedTitle: window.DEEPDIVE[second[1]]?.title || "" };
+          await window.__DEEPDIVE_QUALITY_AUDIT__.open(first[1]);
+          return { previousId: first[1], expectedId: second[1] };
         });
         await page.locator("[data-next-node]").click();
+        await page.locator(`[data-learn-node="${navigationProbe.expectedId}"]`).waitFor();
         const navigationResult = await page.evaluate(() => ({
           activeTitle: document.querySelector("#dd-article h1")?.textContent?.trim() || "",
           activeTarget: document.querySelector("[data-learn-node]")?.getAttribute("data-learn-node") || "",
         }));
         if (navigationResult.activeTarget !== navigationProbe.expectedId
-          || navigationResult.activeTitle !== navigationProbe.expectedTitle) {
+          || !navigationResult.activeTitle) {
           failures.push(`${ids[0]} [${viewport.name}] learning-navigation 点击下一节按钮没有打开官方顺序中的下一页`);
+        }
+        await page.locator("[data-prev-node]").click();
+        await page.locator(`[data-learn-node="${navigationProbe.previousId}"]`).waitFor();
+        const previousNavigationResult = await page.evaluate(() => ({
+          activeTitle: document.querySelector("#dd-article h1")?.textContent?.trim() || "",
+          activeTarget: document.querySelector("[data-learn-node]")?.getAttribute("data-learn-node") || "",
+        }));
+        if (previousNavigationResult.activeTarget !== navigationProbe.previousId
+          || !previousNavigationResult.activeTitle) {
+          failures.push(`${ids[0]} [${viewport.name}] learning-navigation 点击上一节按钮没有返回官方顺序中的上一页`);
         }
         await page.evaluate((id) => window.__DEEPDIVE_QUALITY_AUDIT__.open(id), ids[0]);
         await page.locator("#dd-back").focus();

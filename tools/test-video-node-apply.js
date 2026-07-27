@@ -57,6 +57,15 @@ try {
     "utf8"
   );
   fs.rmSync(path.join(fixture, "data/deepdive/voice-cloning.js"), { force: true });
+  fs.rmSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js"), { force: true });
+  const runtimeManifestFile = path.join(fixture, "data/deepdive-runtime/manifest.js");
+  fs.writeFileSync(
+    runtimeManifestFile,
+    fs.readFileSync(runtimeManifestFile, "utf8")
+      .replace(/"voice-cloning",?/, "")
+      .replace(/,\]/, "]"),
+    "utf8"
+  );
 
   const before = graphAt(fixture);
   assert.strictEqual(before.nodes.length, 129);
@@ -64,7 +73,7 @@ try {
   const plan = buildNodeApplyPlan(packageDir, { root: fixture });
   assert.strictEqual(plan.status, "ready", JSON.stringify(plan.blockers));
   assert.strictEqual(plan.idempotent, false);
-  assert.strictEqual(plan.targets.length, 3);
+  assert.strictEqual(plan.targets.length, 4);
 
   const receipt = applyNodePlan(plan, { root: fixture });
   assert.strictEqual(receipt.status, "applied");
@@ -78,7 +87,9 @@ try {
   assert(pathSteps.some(step => step[0] === "8.11" && step[1] === "audio-generation"));
   assert(pathSteps.some(step => step[0] === "8.13" && step[1] === "content-detection"));
   assert(fs.existsSync(path.join(fixture, "data/deepdive/voice-cloning.js")));
-  assert(fs.readFileSync(path.join(fixture, "index.html"), "utf8")
+  assert(fs.existsSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js")));
+  assert(fs.readFileSync(runtimeManifestFile, "utf8").includes('"voice-cloning"'));
+  assert(!fs.readFileSync(path.join(fixture, "index.html"), "utf8")
     .includes('data/deepdive/voice-cloning.js'));
 
   const noOpPlan = buildNodeApplyPlan(packageDir, { root: fixture });
@@ -90,6 +101,7 @@ try {
   assert.strictEqual(rollback.status, "rolled-back");
   assert.strictEqual(graphAt(fixture).nodes.length, 129);
   assert(!fs.existsSync(path.join(fixture, "data/deepdive/voice-cloning.js")));
+  assert(!fs.existsSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js")));
 
   const tampered = path.join(fixture, "tampered-package");
   fs.cpSync(packageDir, tampered, { recursive: true });

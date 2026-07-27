@@ -141,20 +141,28 @@ for (const [id, page] of Object.entries(pages)) {
   }
 }
 
-// 按浏览器入口中的真实顺序重新执行，防止遗漏脚本或后加载脚本覆盖精修内容。
+// 生产入口只加载小型清单；每个最终页面在用户需要时单独注册。
 const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const indexContext = { window: {} };
 vm.createContext(indexContext);
-const indexScripts = [...indexHtml.matchAll(/<script src="([^"]+\.js)"><\/script>/g)]
-  .map((match) => match[1])
-  .filter((src) => src === "data/graph.js" || src.startsWith("data/deepdive/"));
-indexScripts.forEach((src) => {
-  const file = path.join(root, ...src.split("/"));
-  if (!fs.existsSync(file)) {
-    problems.push(`index.html 引用了不存在的脚本：${src}`);
-    return;
-  }
-  load(file, indexContext);
+const manifestSrc = "data/deepdive-runtime/manifest.js";
+if (!indexHtml.includes(`<script src="${manifestSrc}"></script>`)) {
+  problems.push("index.html 缺按需理解原理页清单");
+}
+if (/<script src="data\/deepdive\/[^"]+\.js"><\/script>/.test(indexHtml)) {
+  problems.push("index.html 仍在首屏加载理解原理页源文件");
+}
+const manifestFile = path.join(root, ...manifestSrc.split("/"));
+if (fs.existsSync(manifestFile)) load(manifestFile, indexContext);
+else problems.push("缺少按需理解原理页清单文件");
+
+const runtime = indexContext.window.DEEPDIVE_RUNTIME || { ids: [] };
+const runtimeIds = new Set(runtime.ids || []);
+nodeIds.forEach(id => {
+  if (!runtimeIds.has(id)) problems.push(`${id}: 运行时清单缺页面`);
+  const file = path.join(root, "data", "deepdive-runtime", `${id}.js`);
+  if (!fs.existsSync(file)) problems.push(`${id}: 缺按需运行时页面文件`);
+  else load(file, indexContext);
 });
 
 const indexPages = indexContext.window.DEEPDIVE || {};

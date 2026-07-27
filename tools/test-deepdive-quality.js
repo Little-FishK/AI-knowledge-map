@@ -86,6 +86,127 @@ function l2Page(withVerification = true) {
   };
 }
 
+function weakSixQuestionPage() {
+  const page = l2Page(true);
+  let sectionIndex = 0;
+  page.html = page.html.replace(
+    /<section class="dd-sec">([\s\S]*?)<\/section>/g,
+    (whole, body) => {
+      sectionIndex += 1;
+      if (sectionIndex === 1) {
+        return `<section class="dd-sec" data-section-role="core">
+          <h2>1. 训练与验证曲线怎样暴露停止点</h2>
+          <p class="dd-lead">为什么过拟合通常是一个逐渐扩大的过程？</p>
+          <figure><svg role="img" aria-label="训练损失和验证损失曲线"></svg><figcaption>早停选择验证最优附近的检查点，而不是训练损失最低的最后一步。</figcaption></figure>
+          <p>如果训练与验证一起高且不降，更像欠拟合；验证先改善再持续恶化，才是经典的训练时过拟合轨迹。</p>
+          <p>实际曲线有噪声，应使用耐心窗口和多个随机种子验证。</p>
+        </section>`;
+      }
+      if (sectionIndex === 2) {
+        return `<section class="dd-sec" data-section-role="reference" data-worked-example="true">
+          <h2>2. 运行示例：回归夹具</h2>
+          <p data-example-part="setup">任务设置给定同一训练集和独立验证集，并固定随机种子与训练预算。</p>
+          <p data-example-part="rule">比较规则只改变停止步数，其余模型、数据和评测方式保持一致。</p>
+          <p data-example-part="steps">执行步骤依次训练、记录两条损失曲线，再选择验证损失最低附近的检查点。</p>
+          <p data-example-part="interpretation">结果解释要求把验证恶化视为诊断信号，而不是把训练损失最低当成成功。</p>
+        </section>`;
+      }
+      return `<section class="dd-sec" data-section-role="reference">${body}</section>`;
+    },
+  );
+  page.quality = {
+    contractVersion: 2,
+    examples: [{
+      section: 2,
+      evidence: {
+        setup: "任务设置给定同一训练集和独立验证集",
+        rule: "比较规则只改变停止步数",
+        steps: "执行步骤依次训练",
+        interpretation: "结果解释要求把验证恶化视为诊断信号",
+      },
+    }],
+    formulas: [],
+    sectionContracts: [{
+      section: 1,
+      definition: {
+        answer: "训练与验证曲线展示拟合进程，并用验证最优附近作为候选停止点。",
+        evidence: "早停选择验证最优附近的检查点",
+      },
+      problem: {
+        answer: "它识别过拟合从验证改善转为持续恶化的渐进过程。",
+        evidence: "一个逐渐扩大的过程",
+      },
+      inputOutput: {
+        answer: "输入各训练步的训练与验证损失，输出停止点和故障模式线索。",
+        evidence: "训练损失和验证损失曲线",
+      },
+      mechanism: {
+        answer: "持续训练降低训练损失，同时监视独立验证何时不再改善。",
+        evidence: "选择验证最优附近的检查点",
+      },
+      interpretation: {
+        answer: "验证先改善再恶化是经典过拟合轨迹，两边都高则应检查欠拟合。",
+        evidence: "验证先改善再持续恶化",
+      },
+      boundary: {
+        answer: "曲线有随机噪声，早停应使用耐心窗口并通过多个随机种子复核。",
+        evidence: "实际曲线有噪声",
+      },
+    }],
+  };
+  return page;
+}
+
+function strongSixQuestionPage() {
+  const page = weakSixQuestionPage();
+  let longParagraphIndex = 0;
+  page.html = page.html.replace(
+    /<p>([^<]{500,})<\/p>/g,
+    (_, body) => `<p>${body}本段验证编号 ${++longParagraphIndex}。</p>`,
+  );
+  page.html = page.html.replace(
+    /<section class="dd-sec" data-section-role="core">[\s\S]*?<\/section>/,
+    `<section class="dd-sec" data-section-role="core">
+      <h2>1. 训练与验证曲线怎样暴露停止点</h2>
+      <p class="dd-lead">本章说明两条损失曲线怎样帮助选择停止训练的时间。</p>
+      <p>训练—验证曲线是按训练步数同时记录训练集损失与独立验证集损失的诊断图。</p>
+      <p>它用于识别模型何时开始只改善已见样本，却不再改善未知样本上的表现。</p>
+      <p>输入是每个训练步对应的训练损失和验证损失；输出是候选停止点以及欠拟合、过拟合或数据问题的诊断线索。</p>
+      <p>工作时先在每个训练步保存两类损失，再比较验证损失是否继续下降，然后在验证最优附近保留候选检查点。</p>
+      <p>如果训练损失继续下降而验证损失持续上升，说明泛化正在恶化；如果两者都高，则更像欠拟合或优化问题。</p>
+      <p>但曲线只有在验证集保持独立且代表部署数据时才可靠；随机噪声会移动最低点，不能把单次最低值当成精确答案。</p>
+    </section>`,
+  );
+  page.quality.sectionContracts[0] = {
+    section: 1,
+    definition: {
+      answer: "训练—验证曲线是按训练步数记录训练集损失和独立验证集损失的诊断图。",
+      evidence: "训练—验证曲线是按训练步数同时记录训练集损失与独立验证集损失的诊断图",
+    },
+    problem: {
+      answer: "它用于识别模型何时只改善已见样本而不再改善未知样本表现。",
+      evidence: "它用于识别模型何时开始只改善已见样本",
+    },
+    inputOutput: {
+      answer: "输入是逐步记录的两类损失，输出是停止点及相关故障诊断线索。",
+      evidence: "输入是每个训练步对应的训练损失和验证损失；输出是候选停止点",
+    },
+    mechanism: {
+      answer: "它先记录两类损失，再比较验证趋势，然后保存验证最优附近的检查点。",
+      evidence: "工作时先在每个训练步保存两类损失，再比较验证损失是否继续下降，然后",
+    },
+    interpretation: {
+      answer: "训练下降而验证上升说明泛化恶化，两者都高则更像欠拟合或优化问题。",
+      evidence: "如果训练损失继续下降而验证损失持续上升，说明泛化正在恶化",
+    },
+    boundary: {
+      answer: "它依赖独立且有代表性的验证集，并受到随机噪声和单次最低值波动限制。",
+      evidence: "但曲线只有在验证集保持独立且代表部署数据时才可靠",
+    },
+  };
+  return page;
+}
+
 function qualityPageHash(page) {
   const canonical = JSON.stringify({
     title: page.title || "",
@@ -98,7 +219,9 @@ function qualityPageHash(page) {
 
 function writeFixture(directory, page, graphIds = ["fixture"]) {
   fs.rmSync(path.join(directory, "data", "deepdive"), { recursive: true, force: true });
+  fs.rmSync(path.join(directory, "data", "deepdive-runtime"), { recursive: true, force: true });
   fs.mkdirSync(path.join(directory, "data", "deepdive"), { recursive: true });
+  fs.mkdirSync(path.join(directory, "data", "deepdive-runtime"), { recursive: true });
   fs.mkdirSync(path.join(directory, "docs"), { recursive: true });
   const nodes = graphIds.map((id) => ({ id, label: id, layer: "base" }));
   fs.writeFileSync(
@@ -110,8 +233,19 @@ function writeFixture(directory, page, graphIds = ["fixture"]) {
     `window.DEEPDIVE = window.DEEPDIVE || {}; window.DEEPDIVE["fixture"] = ${JSON.stringify(page)};`,
   );
   fs.writeFileSync(
+    path.join(directory, "data", "deepdive-runtime", "fixture.js"),
+    `window.DEEPDIVE = window.DEEPDIVE || {}; window.DEEPDIVE["fixture"] = ${JSON.stringify(page)};`,
+  );
+  fs.writeFileSync(
+    path.join(directory, "data", "deepdive-runtime", "manifest.js"),
+    `window.DEEPDIVE_RUNTIME = ${JSON.stringify({
+      base: "data/deepdive-runtime",
+      ids: ["fixture"]
+    })};`,
+  );
+  fs.writeFileSync(
     path.join(directory, "index.html"),
-    '<script src="data/graph.js"></script><script src="data/deepdive/fixture.js"></script>',
+    '<script src="data/graph.js"></script><script src="data/deepdive-runtime/manifest.js"></script>',
   );
   fs.writeFileSync(
     path.join(directory, "docs", "deepdive-quality-reviews.json"),
@@ -152,8 +286,6 @@ function expectFail(script, args, fixture, pattern) {
 // 先确认真实项目仍通过基础发布门禁。
 expectPass("validate-deepdives.js", [], root, /全部页面通过/);
 expectPass("audit-deepdive-gold.js", ["--summary"], root, /L2 结构候选审计/);
-expectPass("audit-deepdive-benchmark.js", ["--require-benchmark", "neural-network"], root, /通过 L3 教学一致性自动门禁/);
-expectPass("audit-deepdive-benchmark.js", ["--require-benchmark", "unsupervised-learning"], root, /通过 L3 教学一致性自动门禁/);
 
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "deepdive-gate-"));
 try {
@@ -259,6 +391,39 @@ try {
     ["--require-benchmark", "fixture"],
     fixture,
     /section\.missing-contract\.section-1/,
+  );
+
+  writeFixture(fixture, weakSixQuestionPage());
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /section\.insufficient-(?:definition|problem|inputOutput|mechanism)/,
+  );
+
+  const strongContractPage = strongSixQuestionPage();
+  writeFixture(fixture, strongContractPage);
+  fs.writeFileSync(
+    path.join(fixture, "docs", "deepdive-l3-benchmark.json"),
+    JSON.stringify({
+      schemaVersion: 2,
+      reference: { id: "fixture", pageHash: qualityPageHash(strongContractPage) },
+      minimumScore: 88,
+      dimensionFloors: {
+        continuity: 16,
+        mechanism: 16,
+        teaching: 16,
+        diagnostics: 12,
+        assessment: 12,
+        sources: 8,
+      },
+    }, null, 2),
+  );
+  expectPass(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /通过 L3 教学一致性自动门禁/,
   );
 
   const unexplainedSingleConceptPage = JSON.parse(JSON.stringify(completeExamplePage));

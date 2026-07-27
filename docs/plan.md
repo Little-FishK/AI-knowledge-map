@@ -33,7 +33,7 @@ ai_knowledge_map/
 │  ├─ app.js             # Cytoscape 初始化、图谱/软件模式与深读页交互
 │  ├─ layout-quality.js  # 浏览器与 Node 共用的防重叠、遮挡门禁
 │  ├─ style.css          # 视觉：分区配色、边类型配色、卡片/详情面板
-│  └─ vendor/            # Cytoscape 与 fcose 本地依赖
+│  └─ vendor/            # Cytoscape 生产依赖；fcose 仅供离线布局工具使用
 ├─ data/
 │  ├─ graph.js           # 概念、边、核心列表与固定坐标
 │  ├─ software.js        # 软件目录
@@ -70,7 +70,7 @@ ai_knowledge_map/
 | M0-2 ✅ | 调研 aiknowledgemap、llm-course、roadmap.sh 并形成映射/来源笔记 | `tools/import-notes.md`、`tools/source-survey.md` |
 | M0-3 ✅ | 建立用途分区的网状知识结构 | `data/graph.js`：129 节点、411 条边、11 种关系 |
 | M0-4 ✅ | 取消三层结构，改用 stable/evolving 轻量成熟度标签 | 107 stable、22 evolving |
-| M0-5 ✅ | Cytoscape + fcose 布局、按大区和关系着色、坐标固化 | 可离线打开的静态网页 |
+| M0-5 ✅ | Cytoscape 渲染、离线 fcose 布局、按大区和关系着色、坐标固化 | 可离线打开的静态网页 |
 | M0-6 ✅ | 节点详情、正文内链、案例、来源与动态条目 | `assets/app.js` |
 | M0-7 ✅ | 核心/全部视图、搜索、大区/关系过滤、1–3 跳聚焦 | `assets/app.js` |
 | M0-8 ✅ | 数据校验、理解原理页桌面/移动端浏览器与 WCAG 自动审计已完成 | 见 §5 |

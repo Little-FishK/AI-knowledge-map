@@ -10,21 +10,12 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
+const { loadDeepDivePages } = require("./deepdive-loader");
 
 const root = process.env.DEEPDIVE_ROOT
   ? path.resolve(process.env.DEEPDIVE_ROOT)
   : path.join(__dirname, "..");
-const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const context = { window: {} };
-vm.createContext(context);
-
-const scripts = [...indexHtml.matchAll(/<script src="([^"]+\.js)"><\/script>/g)]
-  .map((match) => match[1])
-  .filter((src) => src.startsWith("data/deepdive/"));
-scripts.forEach((src) => {
-  const file = path.join(root, ...src.split("/"));
-  vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-});
+const context = { window: { DEEPDIVE: loadDeepDivePages(root) } };
 
 function count(html, pattern) {
   return (html.match(pattern) || []).length;
