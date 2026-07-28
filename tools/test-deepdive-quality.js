@@ -341,6 +341,26 @@ try {
   writeFixture(fixture, repeatedDefinitionPage);
   expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.repeated-definition-template/);
 
+  // 收束段：六问证据不得全部挤在节尾 500 字符内（§4.2 追加收束段禁止项）。
+  const appendagePage = JSON.parse(JSON.stringify(strongSixQuestionPage()));
+  // 删掉 strong page 替换的旧段落，换成：自然正文 + 收束尾段
+  appendagePage.html = appendagePage.html.replace(
+    /(data-section-role="core">[\s\S]*?)(<\/section>)/,
+    `$1<p>this is natural body text before the appendage, it contains none of the six question contract evidence and serves only to make the section long enough for the detection threshold check.</p><p>本条是收束段：training validation curve is a diagnostic chart, it helps identify when model stops improving on unseen data, input is per step training loss output is a stopping point, it works by saving losses then comparing validation drops, if training drops while validation rises that signals deterioration, but the curve is only reliable when validation is independent.</p>$2`,
+  );
+  // 更新合同证据指向收束段中的英文证据
+  appendagePage.quality.sectionContracts[0] = {
+    section: 1,
+    definition: { answer: "a", evidence: "training validation curve is a diagnostic chart" },
+    problem: { answer: "b", evidence: "it helps identify when model stops improving on unseen data" },
+    inputOutput: { answer: "c", evidence: "input is per step training loss output is a stopping point" },
+    mechanism: { answer: "d", evidence: "it works by saving losses then comparing validation drops" },
+    interpretation: { answer: "e", evidence: "if training drops while validation rises that signals deterioration" },
+    boundary: { answer: "f", evidence: "but the curve is only reliable when validation is independent" },
+  };
+  writeFixture(fixture, appendagePage);
+  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.appendage-paragraph/);
+
   const programmingFormulaPage = basePage();
   programmingFormulaPage.html = programmingFormulaPage.html.replace(
     "</section>",
@@ -429,8 +449,9 @@ try {
     "audit-deepdive-benchmark.js",
     ["--require-benchmark", "fixture"],
     fixture,
-    /通过 L3 教学一致性自动门禁/,
+    /未侦测到自动可验证缺口/,
   );
+  // L4 夹具 
 
   const unexplainedSingleConceptPage = JSON.parse(JSON.stringify(completeExamplePage));
   unexplainedSingleConceptPage.html = unexplainedSingleConceptPage.html.replace(

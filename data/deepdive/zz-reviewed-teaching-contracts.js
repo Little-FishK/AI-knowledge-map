@@ -257,8 +257,7 @@
       ],
     },
 
-    "information-theory": {
-      contractVersion: 2,
+    "kernel-methods": {
       examples: [{
         section: 8,
         evidence: {

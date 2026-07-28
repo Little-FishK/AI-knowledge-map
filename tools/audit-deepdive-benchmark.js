@@ -515,6 +515,34 @@ function inspect(id, page) {
       if (new Set(evidence).size !== evidence.length) {
         sectionContractGaps.push(`section.reused-evidence.section-${section.index}`);
       }
+      const evidenceParts = requiredParts
+        .map((part) => contract[part]?.evidence?.trim())
+        .filter((s) => typeof s === "string" && s.length >= 6);
+      if (evidenceParts.length >= 5) {
+        const positions = evidenceParts.map((s) => section.html.indexOf(s)).filter((p) => p >= 0);
+        if (positions.length >= 5) {
+          const paraBreaks = [];
+          const re = /<\/p>/gi;
+          let m;
+          while ((m = re.exec(section.html)) !== null) paraBreaks.push(m.index + 4);
+          const paraOf = {};
+          evidenceParts.forEach((s) => {
+            const pos = section.html.indexOf(s);
+            if (pos < 0) return;
+            let para = 0;
+            for (const br of paraBreaks) {
+              if (pos > br) para++;
+              else break;
+            }
+            paraOf[s] = para;
+          });
+          const paraCounts = {};
+          Object.values(paraOf).forEach((p) => { paraCounts[p] = (paraCounts[p] || 0) + 1; });
+          if (Object.values(paraCounts).some((c) => c >= 5)) {
+            sectionContractGaps.push(`authorship.appendage-paragraph.section-${section.index}`);
+          }
+        }
+      }
     });
     const coreIndexes = new Set(coreSections.map((section) => section.index));
     sectionContracts
@@ -787,13 +815,14 @@ if (requireId) {
   });
 }
 
-console.log(`L3 教学一致性自动门禁 · 页面 ${results.length} · 通过 ${passed.length} · 有债务 ${failed.length}`);
+console.log(`L3 教学一致性自动门禁 · 页面 ${results.length} · 自动检查未发现可验证缺口 ${passed.length}（不代表通过，工具无法检测收束段和内容正确性）`);
 console.log(`参照 ${benchmark.reference.id} · 结构代理分最低 ${benchmark.minimumScore} · 完整性阻断项不可由分数补偿`);
 console.log(`结构代理提示 · ${proxyDebt.length} 页存在部件或关键词线索缺口（只供编辑审查，不作为L3阻断）`);
 console.log(`强制人工复核 · ${manualReviewDebt.length} 页存在未迁移公式合同、案例合同或高术语密度提示（不冒充自动通过）`);
-console.log(`新合同门禁 · 已迁移 ${contractedResults.length}/${results.length} · 完整通过 ${newGatePassed.length}/${results.length}`);
-console.log(`章节六问门禁 · 已迁移 ${sectionContractedResults.length}/${results.length} · 完整通过 ${sectionGatePassed.length}/${results.length}`);
+console.log(`新合同门禁 · 已迁移 ${contractedResults.length}/${results.length} · 零缺口 ${newGatePassed.length}/${results.length}`);
+console.log(`章节六问门禁 · 已迁移 ${sectionContractedResults.length}/${results.length} · 零缺口 ${sectionGatePassed.length}/${results.length}`);
 console.log(`章节六问实质证据 · 通过 ${passedSectionTotal}/${requiredSectionTotal} 个 core 章节`);
+console.log("注意：自动门禁无法检测收束段、内容正确性、推导逻辑和教学有效性。零缺口不代表页面教学达标，仅代表可自动验证的结构性条件满足。");
 if (process.argv.includes("--list-passed-sections")) {
   console.log("通过六问实质证据的章节：");
   results
@@ -839,22 +868,27 @@ if (explainId) {
   process.exit(0);
 }
 if (!summaryOnly) {
-  console.log("\nL3 通过：");
-  passed.forEach((item) => console.log(`  ✓ ${item.id} · ${item.score}/100`));
-}
-if (failed.length && !summaryOnly) {
-  console.log("\nL3 待提升：");
-  failed.forEach((item) => console.log(`  - ${item.id} · ${item.score}/100 · ${item.gaps.join("；")}`));
-} else if (failed.length) {
+  const allGaps = results.filter((item) => item.gaps.length > 0);
+  if (allGaps.length) {
+    console.log(`\nL3 可验证缺口（${allGaps.length} 页有自动侦测到的问题；无缺口的页面不代表教学达标）：`);
+    results.forEach((item) => {
+      if (item.gaps.length > 0) {
+        console.log(`  - ${item.id} · ${item.score}/100 · ${item.gaps.join("；")}`);
+      } else {
+        console.log(`  ? ${item.id} · ${item.score}/100 · 未侦测到自动可验证缺口（不代表教学达标）`);
+      }
+    });
+  }
+} else {
   const frequencies = new Map();
-  failed.forEach((item) => item.gaps.forEach((gap) => frequencies.set(gap, (frequencies.get(gap) || 0) + 1)));
+  results.filter((item) => item.gaps.length > 0).forEach((item) => item.gaps.forEach((gap) => frequencies.set(gap, (frequencies.get(gap) || 0) + 1)));
   const common = [...frequencies.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  console.log(`主要历史缺口：${common.map(([gap, total]) => `${gap}(${total})`).join("；")}`);
+  if (common.length) console.log(`主要缺口：${common.map(([gap, total]) => `${gap}(${total})`).join("；")}`);
 }
 if (enforcementFailures.length) {
   console.error(`\n✗ L3 教学一致性门禁发现 ${enforcementFailures.length} 个问题：`);
   enforcementFailures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-if (requireId) console.log(`\n✓ ${requireId} 通过 L3 教学一致性自动门禁`);
+if (requireId) console.log(`\n? ${requireId} 未侦测到自动可验证缺口（不代表教学达标）`);
 if (changedOnly) console.log("\n✓ 变更页面没有超出 L3 已知基线的新缺口");
