@@ -167,6 +167,19 @@ function contractTokens(value) {
   return [...new Set(String(value || "").split(/[\s,，;；]+/).map((item) => item.trim()).filter(Boolean))];
 }
 
+// 定义句式（“开头模板”）。用于文风去重：相邻核心章节不得连续套用同一种定义句式，
+// 免得每节都写“XXX 可以理解为 YYY”这类千篇一律的开头（见 docs/DEEPDIVE.md §4.1）。
+// 顺序按“更具体的先匹配”，避免 “是” 抢在 “是一种” 前面。
+const DEFINITION_TEMPLATES = [
+  "可以理解为", "比较的是", "是一种", "是一个", "是用来", "是用于",
+  "指的是", "定义为", "称为", "是指", "是由", "是把",
+  "描述", "衡量", "记录", "展示", "表示",
+];
+function definitionTemplateKey(evidence) {
+  const value = String(evidence || "");
+  return DEFINITION_TEMPLATES.find((marker) => value.includes(marker)) || "";
+}
+
 function normalizeMathText(value) {
   const subscripts = { "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9", "ᵢ": "i", "ⱼ": "j", "ₜ": "t", "ₙ": "n" };
   return String(value || "").replace(/[₀-₉ᵢⱼₜₙ]/g, (character) => subscripts[character] || character);
@@ -365,12 +378,7 @@ function inspect(id, page) {
   const uniqueParagraphRatio = paragraphs.length
     ? new Set(paragraphs.map((item) => item.replace(/\s+/g, ""))).size / paragraphs.length
     : 0;
-  const authorshipChecks = {
-    "authorship.generic-assessment": !/总体均值不变，但高难度样本的核心结果突然下降|设计最小对照实验，使观察到的差异能归因于核心机制|请设计至少三个切片，并给出不可被平均值抵消的失败边界/.test(plain),
-    "authorship.generic-diagnostic": !/先冻结版本、输入、随机性、权限与预算，保存可重放的失败样本/.test(plain),
-    "authorship.generic-worked-example": !/从失败日志固定 120 个样本，按普通、长尾和边界输入各 40 个分层/.test(plain),
-    "authorship.generic-mechanism": !/接收的不只是用户表面文本，还包括已选上下文、模型状态、可用预算、工具或权限边界以及停止条件/.test(plain),
-  };
+  const definitionTemplateGaps = [];
   const exampleContractGaps = [];
   const terminologyContractGaps = [];
   const sectionContractGaps = [];
@@ -512,6 +520,18 @@ function inspect(id, page) {
     sectionContracts
       .filter((contract) => !coreIndexes.has(Number(contract?.section)))
       .forEach((contract) => sectionContractGaps.push(`section.contract-outside-core.section-${contract?.section}`));
+    // 文风去重：相邻核心章节的定义句不得用同一种开头模板（可以理解为 / 是一种 / 描述…）。
+    const definitionTemplates = coreSections.map((section) => {
+      const contract = sectionContractBySection.get(section.index);
+      return definitionTemplateKey(text(contract?.definition?.evidence || ""));
+    });
+    for (let i = 1; i < definitionTemplates.length; i += 1) {
+      if (definitionTemplates[i] && definitionTemplates[i] === definitionTemplates[i - 1]) {
+        definitionTemplateGaps.push(
+          `authorship.repeated-definition-template.section-${coreSections[i].index}.${definitionTemplates[i]}`,
+        );
+      }
+    }
     requiredSectionCount = coreSections.length;
     const failedSectionIndexes = new Set(sectionContractGaps
       .map((gap) => Number((gap.match(/section-(\d+)/) || [])[1]))
@@ -593,9 +613,7 @@ function inspect(id, page) {
   exampleContractGaps.forEach((gap) => gaps.push(gap));
   terminologyContractGaps.forEach((gap) => gaps.push(gap));
   sectionContractGaps.forEach((gap) => gaps.push(gap));
-  Object.entries(authorshipChecks)
-    .filter(([, ok]) => !ok)
-    .forEach(([code]) => gaps.push(code));
+  definitionTemplateGaps.forEach((gap) => gaps.push(gap));
 
   return {
     id,
@@ -619,7 +637,7 @@ function inspect(id, page) {
       sources: new Set(sourceUrls).size,
       uniqueParagraphRatio: Number(uniqueParagraphRatio.toFixed(3)),
       leadAnomalies: leadAnomalies.length,
-      authorshipGaps: Object.values(authorshipChecks).filter((ok) => !ok).length,
+      authorshipGaps: definitionTemplateGaps.length,
       notationGaps: [formulaUsesCodeWrapper, formulaUsesProgrammingNotation, invalidMathMl].filter(Boolean).length,
       contractVersion,
       formulaContractGaps: formulaContractGaps.length,

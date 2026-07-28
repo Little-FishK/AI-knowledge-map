@@ -327,13 +327,19 @@ try {
   writeFixture(fixture, overlongLeadPage);
   expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /integrity\.overlong-lead/);
 
-  const generatedAssessmentPage = basePage();
-  generatedAssessmentPage.html = generatedAssessmentPage.html.replace(
-    /(<ol class="dd-quiz">[\s\S]*?)(<\/ol>)/,
-    "$1<li>为什么只看一个平均分不足？请设计至少三个切片，并给出不可被平均值抵消的失败边界。</li>$2",
-  );
-  writeFixture(fixture, generatedAssessmentPage);
-  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.generic-assessment/);
+  // 文风去重：相邻核心章节不得连续套用同一种定义开头模板（可以理解为 / 是一种 / 描述…）。
+  const repeatedDefinitionPage = basePage();
+  repeatedDefinitionPage.quality = {
+    contractVersion: 2,
+    examples: [],
+    formulas: [],
+    sectionContracts: [
+      { section: 1, definition: { answer: "甲是一段用于测试的概念定义。", evidence: "甲可以理解为一段测试内容" } },
+      { section: 2, definition: { answer: "乙是另一段用于测试的概念定义。", evidence: "乙可以理解为另一段测试内容" } },
+    ],
+  };
+  writeFixture(fixture, repeatedDefinitionPage);
+  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.repeated-definition-template/);
 
   const programmingFormulaPage = basePage();
   programmingFormulaPage.html = programmingFormulaPage.html.replace(
