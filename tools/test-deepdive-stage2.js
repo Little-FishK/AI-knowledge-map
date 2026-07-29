@@ -11,7 +11,9 @@ const {
   gateDefects,
   initialize,
   loadState,
+  readAuditProjectFile,
   releaseLease,
+  searchAuditProject,
   setPaused,
   status,
   submitResult,
@@ -108,6 +110,31 @@ try {
   const first = claimTask(fixture, "test-auditor");
   assert.strictEqual(first.status, "claimed");
   assert.strictEqual(first.task.role, "audit");
+  assert.deepStrictEqual(first.task.projectReadOnly.tools, [
+    "stage2_search_project",
+    "stage2_read_project_file",
+  ]);
+  const readPage = readAuditProjectFile(fixture, {
+    taskId: first.task.taskId,
+    leaseToken: first.task.leaseToken,
+    path: "data/deepdive/alpha.js",
+  });
+  assert(readPage.content.includes("window.DEEPDIVE.alpha"));
+  const searched = searchAuditProject(fixture, {
+    taskId: first.task.taskId,
+    leaseToken: first.task.leaseToken,
+    query: "A subtitle",
+    pathPrefix: "data",
+  });
+  assert.strictEqual(searched.matches[0].path, "data/deepdive/alpha.js");
+  assert.throws(
+    () => readAuditProjectFile(fixture, {
+      taskId: first.task.taskId,
+      leaseToken: first.task.leaseToken,
+      path: ".stage2/state.json",
+    }),
+    /禁止访问/,
+  );
   assert.strictEqual(claimTask(fixture, "other").status, "busy");
 
   const badAudit = completeAudit("alpha", first.task.contentHash);
@@ -174,6 +201,14 @@ try {
   const update = claimTask(supplementFixture, "supplement-writer");
   assert.strictEqual(update.task.role, "update");
   assert.strictEqual(update.task.supplements[0].id, "video-alpha-supplement");
+  assert.throws(
+    () => readAuditProjectFile(supplementFixture, {
+      taskId: update.task.taskId,
+      leaseToken: update.task.leaseToken,
+      path: "data/deepdive/alpha.js",
+    }),
+    /只有 audit 角色/,
+  );
 } finally {
   fs.rmSync(supplementFixture, { recursive: true, force: true });
 }

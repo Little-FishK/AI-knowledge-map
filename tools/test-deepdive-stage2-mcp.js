@@ -63,7 +63,13 @@ server.stdout.on("data", chunk => {
     assert.strictEqual(messages[0].result.serverInfo.name, "ai-knowledge-map-stage2");
     assert.deepStrictEqual(
       messages[1].result.tools.map(tool => tool.name),
-      ["stage2_status", "stage2_claim_task", "stage2_submit_result"],
+      [
+        "stage2_status",
+        "stage2_claim_task",
+        "stage2_search_project",
+        "stage2_read_project_file",
+        "stage2_submit_result",
+      ],
     );
     const claimTool = messages[1].result.tools.find(tool => tool.name === "stage2_claim_task");
     assert.strictEqual(claimTool.inputSchema.properties.pageId.pattern, "^[a-z0-9][a-z0-9-]*$");

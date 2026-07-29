@@ -4,6 +4,8 @@ const path = require("path");
 const {
   ROOT,
   claimTask,
+  readAuditProjectFile,
+  searchAuditProject,
   status,
   submitResult,
 } = require("./core");
@@ -25,6 +27,38 @@ const tools = [
       properties: {
         workerId: { type: "string", maxLength: 120 },
         pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_search_project",
+    description: "仅供活动 audit 租约在项目文本中只读搜索。硬性屏蔽私有审计、状态、Git、依赖、敏感文件和二进制文件。",
+    inputSchema: {
+      type: "object",
+      required: ["taskId", "leaseToken", "query"],
+      properties: {
+        taskId: { type: "string" },
+        leaseToken: { type: "string" },
+        query: { type: "string", minLength: 2, maxLength: 160 },
+        pathPrefix: { type: "string", maxLength: 300 },
+        maxResults: { type: "integer", minimum: 1, maximum: 50 },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_read_project_file",
+    description: "仅供活动 audit 租约分段读取项目文本文件。一次最多返回 400 行，接口不具备任何写入能力。",
+    inputSchema: {
+      type: "object",
+      required: ["taskId", "leaseToken", "path"],
+      properties: {
+        taskId: { type: "string" },
+        leaseToken: { type: "string" },
+        path: { type: "string", maxLength: 300 },
+        startLine: { type: "integer", minimum: 1 },
+        endLine: { type: "integer", minimum: 1 },
       },
       additionalProperties: false,
     },
@@ -88,6 +122,12 @@ function handle(message) {
           args.workerId || "codex-scheduled",
           args.pageId || null,
         )));
+      }
+      if (name === "stage2_search_project") {
+        return response(id, toolResult(searchAuditProject(root, args)));
+      }
+      if (name === "stage2_read_project_file") {
+        return response(id, toolResult(readAuditProjectFile(root, args)));
       }
       if (name === "stage2_submit_result") {
         return response(id, toolResult(submitResult(root, args)));
