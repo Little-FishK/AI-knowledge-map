@@ -65,6 +65,8 @@ server.stdout.on("data", chunk => {
       messages[1].result.tools.map(tool => tool.name),
       ["stage2_status", "stage2_claim_task", "stage2_submit_result"],
     );
+    const claimTool = messages[1].result.tools.find(tool => tool.name === "stage2_claim_task");
+    assert.strictEqual(claimTool.inputSchema.properties.pageId.pattern, "^[a-z0-9][a-z0-9-]*$");
     console.log("✓ 第二阶段 MCP：初始化、工具清单和 JSONL stdio 协议测试通过");
     cleanup(0);
   } catch (error) {

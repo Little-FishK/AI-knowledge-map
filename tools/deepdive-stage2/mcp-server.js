@@ -19,18 +19,19 @@ const tools = [
   },
   {
     name: "stage2_claim_task",
-    description: "领取唯一一个单页任务。返回值就是本次允许使用的完整材料包；一次运行只能调用一次。",
+    description: "领取唯一一个单页任务。返回值就是本次允许使用的完整材料包；一次运行只能调用一次。人工试点可用 pageId 指定已入队页面。",
     inputSchema: {
       type: "object",
       properties: {
         workerId: { type: "string", maxLength: 120 },
+        pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
       },
       additionalProperties: false,
     },
   },
   {
     name: "stage2_submit_result",
-    description: "提交当前租约对应的单页写作或独立审计结果。控制器验证后决定下一状态和是否发布。",
+    description: "提交当前租约对应的结果。audit 角色把 auditContract.outputShape 直接作为 result；其他角色把任务包 outputShape 直接作为 result。控制器验证后决定下一状态和是否发布。",
     inputSchema: {
       type: "object",
       required: ["taskId", "leaseToken", "result"],
@@ -82,7 +83,11 @@ function handle(message) {
     try {
       if (name === "stage2_status") return response(id, toolResult(status(root)));
       if (name === "stage2_claim_task") {
-        return response(id, toolResult(claimTask(root, args.workerId || "codex-scheduled")));
+        return response(id, toolResult(claimTask(
+          root,
+          args.workerId || "codex-scheduled",
+          args.pageId || null,
+        )));
       }
       if (name === "stage2_submit_result") {
         return response(id, toolResult(submitResult(root, args)));

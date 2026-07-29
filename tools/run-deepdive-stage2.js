@@ -7,6 +7,8 @@ const {
   claimTask,
   enqueueNewNode,
   initialize,
+  refreshBlockers,
+  releaseLease,
   retry,
   setPaused,
   status,
@@ -56,6 +58,16 @@ function main() {
   if (command === "status") return print(status(root));
   if (command === "pause") return print(setPaused(root, true));
   if (command === "resume") return print(setPaused(root, false));
+  if (command === "refresh-blockers") {
+    return print(refreshBlockers(root, positionals[0] || options.id));
+  }
+  if (command === "release") {
+    return print(releaseLease(
+      root,
+      positionals[0] || options.id,
+      options.reason || "manual-recovery",
+    ));
+  }
   if (command === "retry") return print(retry(root, positionals[0] || options.id));
   if (command === "claim") return print(claimTask(root, options.worker || "manual-cli"));
   if (command === "submit") {

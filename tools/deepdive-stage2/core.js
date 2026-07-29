@@ -391,7 +391,7 @@ function buildPacket(root, record, role) {
   };
 }
 
-function claimTask(root = ROOT, workerId = "codex-scheduled") {
+function claimTask(root = ROOT, workerId = "codex-scheduled", requestedPageId = null) {
   const resolvedRoot = path.resolve(root);
   const release = acquireLock(resolvedRoot);
   try {
@@ -408,13 +408,24 @@ function claimTask(root = ROOT, workerId = "codex-scheduled") {
     }
     let selected = null;
     let role = null;
-    for (const candidateRole of ROLE_PRIORITY) {
-      selected = Object.values(state.pages)
-        .filter(record => roleForRecord(record) === candidateRole)
-        .sort((left, right) => left.id.localeCompare(right.id))[0];
-      if (selected) {
-        role = candidateRole;
-        break;
+    const requestedId = String(requestedPageId || "").trim();
+    if (requestedId) {
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(requestedId)) {
+        throw new Error("指定页面 ID 格式无效");
+      }
+      selected = state.pages[requestedId];
+      if (!selected) throw new Error(`指定页面不在第二阶段队列：${requestedId}`);
+      role = roleForRecord(selected);
+      if (!role) throw new Error(`指定页面当前不可领取：${requestedId} (${selected.state})`);
+    } else {
+      for (const candidateRole of ROLE_PRIORITY) {
+        selected = Object.values(state.pages)
+          .filter(record => roleForRecord(record) === candidateRole)
+          .sort((left, right) => left.id.localeCompare(right.id))[0];
+        if (selected) {
+          role = candidateRole;
+          break;
+        }
       }
     }
     if (!selected) return { status: "idle", task: null };
@@ -438,6 +449,7 @@ function claimTask(root = ROOT, workerId = "codex-scheduled") {
       taskId,
       role,
       workerId: selected.lease.workerId,
+      requested: Boolean(requestedId),
     });
     return { status: "claimed", task: buildPacket(resolvedRoot, selected, role) };
   } finally {
@@ -654,6 +666,51 @@ function runGate(root, fixture, script, args = []) {
   };
 }
 
+function gateDefects(result, id) {
+  const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const issuePattern = new RegExp(`^\\s*-\\s+${escapedId}:\\s+([A-Za-z0-9._-]+)\\s*$`, "gm");
+  const issues = [...result.output.matchAll(issuePattern)].map(match => match[1]);
+  if (!issues.length) {
+    return [{
+      type: "gate",
+      gate: result.script,
+      message: `${result.script} 未通过；读者可见缺口必须融入原有教学过程。`,
+    }];
+  }
+  const labels = {
+    definition: "定义",
+    problem: "解决的问题",
+    inputOutput: "输入与输出",
+    mechanism: "工作机制",
+    interpretation: "结果解释",
+    boundary: "适用边界",
+  };
+  const bySection = new Map();
+  issues.forEach(code => {
+    const sectionMatch = code.match(/section-(\d+)$/);
+    const section = sectionMatch ? Number(sectionMatch[1]) : null;
+    const key = section || 0;
+    if (!bySection.has(key)) bySection.set(key, { codes: [], missing: new Set() });
+    const group = bySection.get(key);
+    group.codes.push(code);
+    Object.keys(labels).forEach(part => {
+      if (code.includes(part)) group.missing.add(part);
+    });
+  });
+  return [...bySection.entries()].map(([section, group]) => {
+    const missing = [...group.missing];
+    const names = missing.map(part => labels[part]).join("、") || "教学证据";
+    return {
+      type: "coverage",
+      gate: result.script,
+      section: section || null,
+      missing,
+      codes: group.codes,
+      message: `${section ? `第 ${section} 节` : "当前页面"}：自动门禁无法从正文中的审计证据验证${names}；请在原有教学过程内澄清，不要追加合同式答案。`,
+    };
+  });
+}
+
 function evaluateCandidate(root, record, page, audit) {
   const fixture = copyFixture(root);
   try {
@@ -666,14 +723,44 @@ function evaluateCandidate(root, record, page, audit) {
     return {
       passed: results.every(result => result.passed),
       results,
-      blockers: results.filter(result => !result.passed).map(result => ({
-        type: "gate",
-        gate: result.script,
-        message: `${result.script} 未通过；读者可见缺口必须融入原有教学过程。`,
-      })),
+      blockers: results.filter(result => !result.passed)
+        .flatMap(result => gateDefects(result, record.id)),
     };
   } finally {
     fs.rmSync(fixture, { recursive: true, force: true });
+  }
+}
+
+function refreshBlockers(root = ROOT, id) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能刷新缺陷`);
+    if (!record.auditFile) throw new Error(`页面 ${id} 没有可复用的独立审计`);
+    const auditPath = withinRoot(resolvedRoot, record.auditFile);
+    if (!fs.existsSync(auditPath)) throw new Error(`独立审计文件不存在：${record.auditFile}`);
+    const audit = readJson(auditPath);
+    const page = currentPage(resolvedRoot, record);
+    const gate = evaluateCandidate(resolvedRoot, record, page, audit);
+    record.blockers = clone(gate.blockers || []);
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "blockers-refreshed", {
+      id,
+      blockerCount: record.blockers.length,
+      passed: gate.passed,
+    });
+    return {
+      status: "refreshed",
+      pageId: id,
+      passed: gate.passed,
+      blockers: clone(record.blockers),
+    };
+  } finally {
+    release();
   }
 }
 
@@ -856,7 +943,8 @@ function submitResult(root = ROOT, input = {}, options = {}) {
   }
 
   const page = currentPage(resolvedRoot, record);
-  const audit = clone(result.audit);
+  const auditInput = result.audit || (Array.isArray(result.sections) ? result : null);
+  const audit = clone(auditInput);
   const gaps = auditGaps(record.id, page, audit);
   const privateRelative = privateAuditRelativePath(record.id);
   writeJson(withinRoot(resolvedRoot, privateRelative), audit || {});
@@ -981,6 +1069,36 @@ function retry(root = ROOT, id) {
   }
 }
 
+function releaseLease(root = ROOT, id, reason = "manual-recovery") {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (!record.lease) throw new Error(`页面 ${id} 当前没有活动租约`);
+    const previousLease = clone(record.lease);
+    record.state = QUEUE_BY_ROLE[previousLease.role] || "manual-review";
+    record.lease = null;
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "task-released", {
+      id,
+      taskId: previousLease.taskId,
+      role: previousLease.role,
+      reason: String(reason || "manual-recovery").slice(0, 500),
+    });
+    return {
+      status: "released",
+      pageId: id,
+      releasedTaskId: previousLease.taskId,
+      nextState: record.state,
+    };
+  } finally {
+    release();
+  }
+}
+
 function enqueueNewNode(root = ROOT, integration, material) {
   const resolvedRoot = path.resolve(root);
   const release = acquireLock(resolvedRoot);
@@ -1026,12 +1144,15 @@ module.exports = {
   claimTask,
   enqueueNewNode,
   evaluateCandidate,
+  gateDefects,
   initialize,
   loadState,
   mergePendingSupplements,
   pageOverrideSource,
   pageRegistrationSource,
   publishCandidate,
+  refreshBlockers,
+  releaseLease,
   retry,
   setPaused,
   sha256,

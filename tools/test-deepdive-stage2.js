@@ -8,8 +8,10 @@ const {
   auditGaps,
   claimTask,
   enqueueNewNode,
+  gateDefects,
   initialize,
   loadState,
+  releaseLease,
   setPaused,
   status,
   submitResult,
@@ -86,6 +88,18 @@ function completeAudit(pageId, pageHash) {
   };
 }
 
+const parsedDefects = gateDefects({
+  script: "audit-deepdive-benchmark.js",
+  output: [
+    "  - image-generation: section.missing-inputOutput.section-2",
+    "  - image-generation: section.insufficient-inputOutput-boundary.section-2",
+    "  - other-page: section.missing-definition.section-1",
+  ].join("\n"),
+}, "image-generation");
+assert.strictEqual(parsedDefects.length, 1);
+assert.strictEqual(parsedDefects[0].section, 2);
+assert.deepStrictEqual(parsedDefects[0].missing, ["inputOutput", "boundary"]);
+
 const { fixture } = copyFixture();
 try {
   const initialized = initialize(fixture);
@@ -102,7 +116,7 @@ try {
   const failed = submitResult(fixture, {
     taskId: first.task.taskId,
     leaseToken: first.task.leaseToken,
-    result: { audit: badAudit },
+    result: badAudit,
   }, {
     evaluateCandidate: () => ({ passed: true, blockers: [] }),
   });
@@ -178,6 +192,11 @@ try {
     proposedNode: { id: "beta", title: "Beta" },
     evidence: { source: { title: "fixture" } },
   });
+  const targetedAudit = claimTask(newNodeFixture, "pilot-auditor", "alpha");
+  assert.strictEqual(targetedAudit.task.pageId, "alpha");
+  assert.strictEqual(targetedAudit.task.role, "audit");
+  const released = releaseLease(newNodeFixture, "alpha", "fixture-recovery");
+  assert.strictEqual(released.nextState, "audit-queued");
   const write = claimTask(newNodeFixture, "new-node-writer");
   assert.strictEqual(write.task.role, "write");
   assert.strictEqual(write.task.material.proposedNode.id, "beta");

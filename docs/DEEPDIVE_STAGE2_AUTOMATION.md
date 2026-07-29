@@ -90,6 +90,8 @@ Codex 定时任务使用 MCP 接口：
 4. 调用一次 `stage2_submit_result`。
 5. 不再领取第二项任务，结束本次 Codex 任务。
 
+正常定时运行不传页面 ID，控制器按优先级领取。人工单页试点可以在 `stage2_claim_task` 中传入 `pageId`，但仍必须满足“全局无活动租约、页面处于可领取状态、一次运行只领取一项”。
+
 人工诊断命令：
 
 ```powershell
@@ -183,6 +185,8 @@ Agent 提交的内容只进入 `.stage2/results/`，不是正式页面。控制�
 - 紧急停止：`npm run stage2:pause`
 - 恢复领取：`npm run stage2:resume`
 - 人工重试某页：`node tools/run-deepdive-stage2.js retry <page-id>`
+- 释放异常租约：`node tools/run-deepdive-stage2.js release <page-id> --reason <reason>`
+- 用现有私有审计重新生成净化缺陷：`node tools/run-deepdive-stage2.js refresh-blockers <page-id>`
 - 全量回归：`npm run quality:all`
 
-不要手改租约、状态或私有结果。若某页进入 `manual-review`，先查看事件日志和该页的 completion/audit 证据，人工决定修正文、材料还是门禁，再用 `retry` 重新排队。
+不要手改租约、状态或私有结果。`release` 只用于工具故障等没有产生有效提交的异常恢复；`refresh-blockers` 只由可信控制器读取私有审计并生成不含答案的返修缺陷。若某页进入 `manual-review`，先查看事件日志和该页的 completion/audit 证据，人工决定修正文、材料还是门禁，再用 `retry` 重新排队。
