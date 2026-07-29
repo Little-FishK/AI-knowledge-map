@@ -11,12 +11,18 @@
  */
 "use strict";
 
-const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
-const { loadDeepDivePages } = require("./deepdive-loader");
+const {
+  loadDeepDivePages,
+  loadDeepDivePagesFromGit,
+} = require("./deepdive-loader");
+const {
+  loadSectionAudit,
+  pageContentHash,
+} = require("./deepdive-audit-contracts");
 
 const root = process.env.DEEPDIVE_ROOT
   ? path.resolve(process.env.DEEPDIVE_ROOT)
@@ -24,6 +30,7 @@ const root = process.env.DEEPDIVE_ROOT
 const benchmarkFile = path.join(root, "docs", "deepdive-l3-benchmark.json");
 const benchmark = JSON.parse(fs.readFileSync(benchmarkFile, "utf8"));
 const pages = loadDeepDivePages(root);
+const basePages = loadDeepDivePagesFromGit(root);
 
 function count(source, pattern) {
   return (String(source || "").match(pattern) || []).length;
@@ -76,13 +83,7 @@ function goalCount(html) {
 }
 
 function pageHash(page) {
-  const canonical = JSON.stringify({
-    title: page.title || "",
-    subtitle: page.subtitle || "",
-    thesis: page.thesis || "",
-    html: page.html || "",
-  });
-  return `sha256:${crypto.createHash("sha256").update(canonical).digest("hex")}`;
+  return pageContentHash(page);
 }
 
 function sectionsOf(html) {
@@ -180,6 +181,67 @@ function definitionTemplateKey(evidence) {
   return DEFINITION_TEMPLATES.find((marker) => value.includes(marker)) || "";
 }
 
+function evidenceDistribution(sectionText, evidenceParts) {
+  const locations = evidenceParts.map((value, partIndex) => {
+    const needle = text(value);
+    const start = needle ? sectionText.indexOf(needle) : -1;
+    return {
+      partIndex,
+      start,
+      end: start >= 0 ? start + needle.length : -1,
+    };
+  }).filter((location) => location.start >= 0)
+    .sort((left, right) => left.start - right.start);
+  const minimumEvidence = Math.min(5, locations.length);
+  let shortest = null;
+  if (minimumEvidence >= 5) {
+    for (let index = 0; index <= locations.length - minimumEvidence; index += 1) {
+      const group = locations.slice(index, index + minimumEvidence);
+      const start = group[0].start;
+      const end = Math.max(...group.map((location) => location.end));
+      if (!shortest || end - start < shortest.end - shortest.start) {
+        shortest = { start, end, locations: group };
+      }
+    }
+  }
+  const length = Math.max(sectionText.length, 1);
+  const canonicalOrder = locations.length >= 5
+    && locations.every((location, index) => (
+      index === 0 || location.partIndex > locations[index - 1].partIndex
+    ));
+  return {
+    locations,
+    shortest,
+    canonicalOrder,
+    shortestRatio: shortest ? (shortest.end - shortest.start) / length : 1,
+    shortestStartRatio: shortest ? shortest.start / length : 0,
+    shortestEndRatio: shortest ? shortest.end / length : 0,
+  };
+}
+
+function longestCommonPrefix(left, right) {
+  const length = Math.min(left.length, right.length);
+  let index = 0;
+  while (index < length && left[index] === right[index]) index += 1;
+  return index;
+}
+
+function isAppendOnlyContractFix(baseSectionHtml, currentSectionText, evidenceParts) {
+  if (!baseSectionHtml) return false;
+  const baseText = text(baseSectionHtml);
+  if (baseText.length < 120 || currentSectionText.length <= baseText.length) return false;
+  const prefixLength = longestCommonPrefix(baseText, currentSectionText);
+  if (prefixLength / baseText.length < 0.8) return false;
+  const appendedText = currentSectionText.slice(prefixLength).trim();
+  if (appendedText.length < 80) return false;
+  const newlyAppendedEvidence = evidenceParts.filter((value) => {
+    const needle = text(value);
+    if (!needle || baseText.includes(needle)) return false;
+    return currentSectionText.indexOf(needle) >= prefixLength;
+  });
+  return newlyAppendedEvidence.length >= 4;
+}
+
 function normalizeMathText(value) {
   const subscripts = { "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9", "ᵢ": "i", "ⱼ": "j", "ₜ": "t", "ₙ": "n" };
   return String(value || "").replace(/[₀-₉ᵢⱼₜₙ]/g, (character) => subscripts[character] || character);
@@ -204,10 +266,11 @@ function domains(urls) {
   }).filter(Boolean));
 }
 
-function inspect(id, page) {
+function inspect(id, page, basePage) {
   const html = page.html || "";
   const plain = text(html);
   const sectionRecords = sectionRecordsOf(html);
+  const baseSectionRecords = basePage ? sectionRecordsOf(basePage.html || "") : [];
   const sections = sectionRecords.map((section) => section.html);
   const contractVersion = Number(page.quality?.contractVersion || 0);
   const formulaContracts = Array.isArray(page.quality?.formulas) ? page.quality.formulas : [];
@@ -216,7 +279,8 @@ function inspect(id, page) {
   const exampleContractBySection = new Map(exampleContracts.map((example) => [Number(example.section), example]));
   const termReviews = Array.isArray(page.quality?.termReviews) ? page.quality.termReviews : [];
   const termReviewBySection = new Map(termReviews.map((review) => [Number(review.section), review]));
-  const sectionContracts = Array.isArray(page.quality?.sectionContracts) ? page.quality.sectionContracts : [];
+  const sectionAudit = loadSectionAudit(root, id, page);
+  const sectionContracts = sectionAudit.sectionContracts;
   const sectionContractBySection = new Map(sectionContracts.map((contract) => [Number(contract.section), contract]));
   const goals = goalCount(html);
   const leads = count(html, /class="dd-lead"/g);
@@ -385,7 +449,7 @@ function inspect(id, page) {
   let requiredSectionCount = 0;
   let passedSectionCount = 0;
   let passedSectionIndexes = [];
-  const reviewRequired = [];
+  const reviewRequired = [...sectionAudit.reviewRequired];
   const exampleParts = ["setup", "rule", "steps", "interpretation"];
   const criticalTerminology = [
     "线性子空间", "重建误差", "局部邻域", "高维", "协方差矩阵", "特征向量",
@@ -519,28 +583,21 @@ function inspect(id, page) {
         .map((part) => contract[part]?.evidence?.trim())
         .filter((s) => typeof s === "string" && s.length >= 6);
       if (evidenceParts.length >= 5) {
-        const positions = evidenceParts.map((s) => section.html.indexOf(s)).filter((p) => p >= 0);
-        if (positions.length >= 5) {
-          const paraBreaks = [];
-          const re = /<\/p>/gi;
-          let m;
-          while ((m = re.exec(section.html)) !== null) paraBreaks.push(m.index + 4);
-          const paraOf = {};
-          evidenceParts.forEach((s) => {
-            const pos = section.html.indexOf(s);
-            if (pos < 0) return;
-            let para = 0;
-            for (const br of paraBreaks) {
-              if (pos > br) para++;
-              else break;
-            }
-            paraOf[s] = para;
-          });
-          const paraCounts = {};
-          Object.values(paraOf).forEach((p) => { paraCounts[p] = (paraCounts[p] || 0) + 1; });
-          if (Object.values(paraCounts).some((c) => c >= 5)) {
-            sectionContractGaps.push(`authorship.appendage-paragraph.section-${section.index}`);
-          }
+        const distribution = evidenceDistribution(sectionText, evidenceParts);
+        const tailCluster = sectionText.length >= 360
+          && distribution.shortest
+          && distribution.shortestRatio <= 0.38
+          && distribution.shortestStartRatio >= 0.5;
+        if (tailCluster) {
+          sectionContractGaps.push(`integration.tail-evidence-cluster.section-${section.index}`);
+        } else if (distribution.shortest
+          && distribution.shortestRatio <= 0.38
+          && distribution.canonicalOrder) {
+          reviewRequired.push(`editorial.contract-like-evidence-cluster.section-${section.index}`);
+        }
+        const baseSection = baseSectionRecords.find((candidate) => candidate.index === section.index);
+        if (isAppendOnlyContractFix(baseSection?.html, sectionText, evidenceParts)) {
+          sectionContractGaps.push(`integration.append-only-contract-fix.section-${section.index}`);
         }
       }
     });
@@ -556,7 +613,7 @@ function inspect(id, page) {
     for (let i = 1; i < definitionTemplates.length; i += 1) {
       if (definitionTemplates[i] && definitionTemplates[i] === definitionTemplates[i - 1]) {
         definitionTemplateGaps.push(
-          `authorship.repeated-definition-template.section-${coreSections[i].index}.${definitionTemplates[i]}`,
+          `editorial.repeated-definition-template.section-${coreSections[i].index}.${definitionTemplates[i]}`,
         );
       }
     }
@@ -641,7 +698,8 @@ function inspect(id, page) {
   exampleContractGaps.forEach((gap) => gaps.push(gap));
   terminologyContractGaps.forEach((gap) => gaps.push(gap));
   sectionContractGaps.forEach((gap) => gaps.push(gap));
-  definitionTemplateGaps.forEach((gap) => gaps.push(gap));
+  sectionAudit.gaps.forEach((gap) => gaps.push(gap));
+  definitionTemplateGaps.forEach((gap) => reviewRequired.push(gap));
 
   return {
     id,
@@ -666,6 +724,7 @@ function inspect(id, page) {
       uniqueParagraphRatio: Number(uniqueParagraphRatio.toFixed(3)),
       leadAnomalies: leadAnomalies.length,
       authorshipGaps: definitionTemplateGaps.length,
+      sectionAuditSource: sectionAudit.source,
       notationGaps: [formulaUsesCodeWrapper, formulaUsesProgrammingNotation, invalidMathMl].filter(Boolean).length,
       contractVersion,
       formulaContractGaps: formulaContractGaps.length,
@@ -706,11 +765,17 @@ function changedIds() {
     "data/deepdive/00-deepdive-factory.js",
     "data/deepdive/zz-deepdive-quality-completion.js",
     "tools/audit-deepdive-benchmark.js",
+    "tools/deepdive-loader.js",
+    "tools/deepdive-audit-contracts.js",
     "docs/deepdive-l3-benchmark.json",
   ]);
   for (const line of git.stdout.split(/\r?\n/).filter(Boolean)) {
     const rawPath = (baseRef ? line : line.slice(3).split(" -> ").pop()).replace(/\\/g, "/");
     if (globalFiles.has(rawPath)) return all;
+    if (rawPath.startsWith("docs/deepdive-audits/") && rawPath.endsWith(".json")) {
+      changed.add(path.basename(rawPath, ".json"));
+      continue;
+    }
     if (!rawPath.startsWith("data/deepdive/") || !rawPath.endsWith(".js")) continue;
     const file = path.join(root, ...rawPath.split("/"));
     if (fs.existsSync(file)) idsFromSource(fs.readFileSync(file, "utf8")).forEach((id) => changed.add(id));
@@ -749,16 +814,18 @@ if (actualReferenceHash !== benchmark.reference.pageHash) {
   process.exit(1);
 }
 
-const results = Object.entries(pages).map(([id, page]) => inspect(id, page))
+const results = Object.entries(pages).map(([id, page]) => inspect(id, page, basePages[id]))
   .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
 const passed = results.filter((item) => item.gaps.length === 0);
 const failed = results.filter((item) => item.gaps.length > 0);
 const proxyDebt = results.filter((item) => item.proxyGaps.length > 0);
 const manualReviewDebt = results.filter((item) => item.reviewRequired.length > 0);
 const contractedResults = results.filter((item) => item.metrics.contractVersion >= 1);
-const newGatePassed = contractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
 const sectionContractedResults = results.filter((item) => item.metrics.contractVersion >= 2);
-const sectionGatePassed = sectionContractedResults.filter((item) => item.gaps.length === 0 && item.reviewRequired.length === 0);
+const externalSectionAudits = results.filter((item) => item.metrics.sectionAuditSource === "external");
+const integrationDebt = results.filter((item) => (
+  item.gaps.some((gap) => gap.startsWith("integration."))
+));
 const requiredSectionTotal = sectionContractedResults
   .reduce((sum, item) => sum + item.metrics.requiredSectionCount, 0);
 const passedSectionTotal = sectionContractedResults
@@ -804,7 +871,12 @@ const enforcementFailures = [];
 if (requireId) {
   const item = results.find((result) => result.id === requireId);
   if (!item) enforcementFailures.push(`${requireId}: 页面不存在`);
-  else item.gaps.forEach((gap) => enforcementFailures.push(`${requireId}: ${gap}`));
+  else {
+    item.gaps.forEach((gap) => enforcementFailures.push(`${requireId}: ${gap}`));
+    if (item.metrics.contractVersion >= 2 && item.metrics.sectionAuditSource !== "external") {
+      enforcementFailures.push(`${requireId}: audit.independent-review-required`);
+    }
+  }
 } else if (changedOnly) {
   const changed = changedIds();
   const allowed = loadBaseline(baselineFile);
@@ -812,17 +884,21 @@ if (requireId) {
     const old = new Set(allowed[item.id] || []);
     item.gaps.filter((gap) => !old.has(gap))
       .forEach((gap) => enforcementFailures.push(`${item.id}: 新增 L3 缺口：${gap}`));
+    if (item.metrics.contractVersion >= 2 && item.metrics.sectionAuditSource !== "external") {
+      enforcementFailures.push(`${item.id}: 新增 L3 缺口：audit.independent-review-required`);
+    }
   });
 }
 
-console.log(`L3 教学一致性自动门禁 · 页面 ${results.length} · 自动检查未发现可验证缺口 ${passed.length}（不代表通过，工具无法检测收束段和内容正确性）`);
+console.log(`L3 教学一致性自动门禁 · 页面 ${results.length} · 自动检查零阻断 ${passed.length}（不等于页面通过）`);
 console.log(`参照 ${benchmark.reference.id} · 结构代理分最低 ${benchmark.minimumScore} · 完整性阻断项不可由分数补偿`);
 console.log(`结构代理提示 · ${proxyDebt.length} 页存在部件或关键词线索缺口（只供编辑审查，不作为L3阻断）`);
-console.log(`强制人工复核 · ${manualReviewDebt.length} 页存在未迁移公式合同、案例合同或高术语密度提示（不冒充自动通过）`);
-console.log(`新合同门禁 · 已迁移 ${contractedResults.length}/${results.length} · 零缺口 ${newGatePassed.length}/${results.length}`);
-console.log(`章节六问门禁 · 已迁移 ${sectionContractedResults.length}/${results.length} · 零缺口 ${sectionGatePassed.length}/${results.length}`);
-console.log(`章节六问实质证据 · 通过 ${passedSectionTotal}/${requiredSectionTotal} 个 core 章节`);
-console.log("注意：自动门禁无法检测收束段、内容正确性、推导逻辑和教学有效性。零缺口不代表页面教学达标，仅代表可自动验证的结构性条件满足。");
+console.log(`Coverage · 六问最低语义证据满足 ${passedSectionTotal}/${requiredSectionTotal} 个 core 章节`);
+console.log(`Integration · ${integrationDebt.length} 页出现节尾证据集中或纯追加合同答案`);
+console.log(`Audit independence · 外置且哈希有效 ${externalSectionAudits.length}/${sectionContractedResults.length} 页；其余仍使用正文内联旧合同`);
+console.log(`Editorial review · ${manualReviewDebt.length} 页有迁移或文风提示；提示不作为自动阻断`);
+console.log(`合同版本 · v1+ ${contractedResults.length}/${results.length}；v2 ${sectionContractedResults.length}/${results.length}`);
+console.log("注意：自动门禁只能发现已编码的高置信缺陷，不能证明不存在更隐蔽的收束写法，也不能判断内容正确性、推导逻辑和教学有效性。");
 if (process.argv.includes("--list-passed-sections")) {
   console.log("通过六问实质证据的章节：");
   results

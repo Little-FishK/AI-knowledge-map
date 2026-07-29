@@ -220,6 +220,7 @@ function qualityPageHash(page) {
 function writeFixture(directory, page, graphIds = ["fixture"]) {
   fs.rmSync(path.join(directory, "data", "deepdive"), { recursive: true, force: true });
   fs.rmSync(path.join(directory, "data", "deepdive-runtime"), { recursive: true, force: true });
+  fs.rmSync(path.join(directory, "docs", "deepdive-audits"), { recursive: true, force: true });
   fs.mkdirSync(path.join(directory, "data", "deepdive"), { recursive: true });
   fs.mkdirSync(path.join(directory, "data", "deepdive-runtime"), { recursive: true });
   fs.mkdirSync(path.join(directory, "docs"), { recursive: true });
@@ -267,6 +268,28 @@ function writeFixture(directory, page, graphIds = ["fixture"]) {
       },
     }, null, 2),
   );
+}
+
+function writeExternalSectionAudit(directory, page) {
+  const auditDirectory = path.join(directory, "docs", "deepdive-audits");
+  fs.mkdirSync(auditDirectory, { recursive: true });
+  fs.writeFileSync(
+    path.join(auditDirectory, "fixture.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      pageId: "fixture",
+      pageHash: qualityPageHash(page),
+      reviewedAt: today,
+      sections: page.quality.sectionContracts,
+    }, null, 2),
+  );
+}
+
+function git(directory, args) {
+  return spawnSync("git", args, {
+    cwd: directory,
+    encoding: "utf8",
+  });
 }
 
 function expectPass(script, args, fixture, pattern) {
@@ -327,7 +350,7 @@ try {
   writeFixture(fixture, overlongLeadPage);
   expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /integrity\.overlong-lead/);
 
-  // 文风去重：相邻核心章节不得连续套用同一种定义开头模板（可以理解为 / 是一种 / 描述…）。
+  // 文风只给编辑提示：句式重复不应与事实缺失一样阻断发布。
   const repeatedDefinitionPage = basePage();
   repeatedDefinitionPage.quality = {
     contractVersion: 2,
@@ -339,9 +362,14 @@ try {
     ],
   };
   writeFixture(fixture, repeatedDefinitionPage);
-  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.repeated-definition-template/);
+  expectPass(
+    "audit-deepdive-benchmark.js",
+    ["--explain", "fixture"],
+    fixture,
+    /editorial\.repeated-definition-template/,
+  );
 
-  // 收束段：六问证据不得全部挤在节尾 500 字符内（§4.2 追加收束段禁止项）。
+  // 收束段：按可见文本的位置分布识别，不依赖证据是否恰好装在同一个 <p> 中。
   const appendagePage = JSON.parse(JSON.stringify(strongSixQuestionPage()));
   // 删掉 strong page 替换的旧段落，换成：自然正文 + 收束尾段
   appendagePage.html = appendagePage.html.replace(
@@ -359,7 +387,56 @@ try {
     boundary: { answer: "f", evidence: "but the curve is only reliable when validation is independent" },
   };
   writeFixture(fixture, appendagePage);
-  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /authorship\.appendage-paragraph/);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /integration\.tail-evidence-cluster/,
+  );
+
+  // 把同样的六问答案拆成六段，不能绕过融合检查。
+  const splitAppendagePage = JSON.parse(JSON.stringify(strongSixQuestionPage()));
+  splitAppendagePage.html = splitAppendagePage.html.replace(
+    /(data-section-role="core">[\s\S]*?)(<\/section>)/,
+    `$1<p>${"自然教学过程继续展开，并故意不承载合同证据。".repeat(18)}</p>`
+      + "<p>training validation curve is a diagnostic chart</p>"
+      + "<p>it helps identify when model stops improving on unseen data</p>"
+      + "<p>input is per step training loss output is a stopping point</p>"
+      + "<p>it works by saving losses then comparing validation drops</p>"
+      + "<p>if training drops while validation rises that signals deterioration</p>"
+      + "<p>but the curve is only reliable when validation is independent</p>$2",
+  );
+  splitAppendagePage.quality.sectionContracts[0] = appendagePage.quality.sectionContracts[0];
+  writeFixture(fixture, splitAppendagePage);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /integration\.tail-evidence-cluster/,
+  );
+
+  // 换成列表或提示框也不能改变“证据集中在节尾”这一事实。
+  const listAppendagePage = JSON.parse(JSON.stringify(strongSixQuestionPage()));
+  listAppendagePage.html = listAppendagePage.html.replace(
+    /(data-section-role="core">[\s\S]*?)(<\/section>)/,
+    `$1<p>${"自然教学过程继续展开，并故意不承载合同证据。".repeat(18)}</p>`
+      + '<div class="dd-note"><ul>'
+      + "<li>training validation curve is a diagnostic chart</li>"
+      + "<li>it helps identify when model stops improving on unseen data</li>"
+      + "<li>input is per step training loss output is a stopping point</li>"
+      + "<li>it works by saving losses then comparing validation drops</li>"
+      + "<li>if training drops while validation rises that signals deterioration</li>"
+      + "<li>but the curve is only reliable when validation is independent</li>"
+      + "</ul></div>$2",
+  );
+  listAppendagePage.quality.sectionContracts[0] = appendagePage.quality.sectionContracts[0];
+  writeFixture(fixture, listAppendagePage);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /integration\.tail-evidence-cluster/,
+  );
 
   const programmingFormulaPage = basePage();
   programmingFormulaPage.html = programmingFormulaPage.html.replace(
@@ -445,11 +522,74 @@ try {
       },
     }, null, 2),
   );
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /audit\.independent-review-required/,
+  );
+  writeExternalSectionAudit(fixture, strongContractPage);
   expectPass(
     "audit-deepdive-benchmark.js",
     ["--require-benchmark", "fixture"],
     fixture,
     /未侦测到自动可验证缺口/,
+  );
+
+  // 六问审计应独立于正文；正文一改，旧审计立即过期。
+  expectPass(
+    "audit-deepdive-benchmark.js",
+    ["--explain", "fixture"],
+    fixture,
+    /sectionAuditSource=external/,
+  );
+  const changedAfterAuditPage = JSON.parse(JSON.stringify(strongContractPage));
+  changedAfterAuditPage.html = changedAfterAuditPage.html.replace(
+    "本章说明两条损失曲线",
+    "本章具体说明两条损失曲线",
+  );
+  writeFixture(fixture, changedAfterAuditPage);
+  writeExternalSectionAudit(fixture, strongContractPage);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /audit\.page-hash-mismatch/,
+  );
+
+  // 即使重新排版避开位置阈值，若本次改动只是给旧正文追加合同答案，仍然阻断。
+  const appendOnlyBasePage = weakSixQuestionPage();
+  writeFixture(fixture, appendOnlyBasePage);
+  assert.strictEqual(git(fixture, ["init"]).status, 0);
+  assert.strictEqual(git(fixture, ["config", "user.email", "fixture@example.com"]).status, 0);
+  assert.strictEqual(git(fixture, ["config", "user.name", "DeepDive Fixture"]).status, 0);
+  assert.strictEqual(git(fixture, ["add", "."]).status, 0);
+  assert.strictEqual(git(fixture, ["commit", "-m", "baseline"]).status, 0);
+  const appendOnlyCurrentPage = JSON.parse(JSON.stringify(appendOnlyBasePage));
+  appendOnlyCurrentPage.html = appendOnlyCurrentPage.html.replace(
+    /(data-section-role="core">[\s\S]*?)(<\/section>)/,
+    "$1<p>training validation curve is a diagnostic chart</p>"
+      + "<p>it helps identify when model stops improving on unseen data</p>"
+      + "<p>input is per step training loss output is a stopping point</p>"
+      + "<p>it works by saving losses then comparing validation drops</p>"
+      + "<p>if training drops while validation rises that signals deterioration</p>"
+      + "<p>but the curve is only reliable when validation is independent</p>$2",
+  );
+  appendOnlyCurrentPage.quality.sectionContracts[0] = appendagePage.quality.sectionContracts[0];
+  assert.match(appendOnlyCurrentPage.html, /training validation curve is a diagnostic chart/);
+  const appendOnlyCore = (appendOnlyCurrentPage.html.match(
+    /<section\b[^>]*class="[^"]*\bdd-sec\b[^"]*"[^>]*data-section-role="core"[^>]*>([\s\S]*?)<\/section>/i,
+  ) || [])[1] || "";
+  appendOnlyCurrentPage.quality.sectionContracts[0]
+    && Object.values(appendOnlyCurrentPage.quality.sectionContracts[0])
+      .filter((item) => item && item.evidence)
+      .forEach((item) => assert.ok(appendOnlyCore.includes(item.evidence), item.evidence));
+  writeFixture(fixture, appendOnlyCurrentPage);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /integration\.append-only-contract-fix/,
   );
   // L4 夹具 
 
