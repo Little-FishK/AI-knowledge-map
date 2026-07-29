@@ -136,7 +136,12 @@ const writingPacket = createContentPacket(
 );
 assert.strictEqual(writingPacket.mode, "node-content-writing-packet");
 assert.strictEqual(writingPacket.task.formalWrite, false);
-assert.strictEqual(writingPacket.outputTemplate.deepDive.title, candidate.proposedNode.title);
+assert.strictEqual(writingPacket.outputTemplate.deepDive, undefined);
+assert.strictEqual(writingPacket.stage2Material.proposedNode.title, candidate.proposedNode.title);
+assert.strictEqual(
+  writingPacket.stage2Material.bindings.assessmentHash,
+  sha256(assessment)
+);
 assert.strictEqual(writingPacket.bindings.assessmentHash, sha256(assessment));
 
 const pkg = buildNodePackage(fixtureProposal, evidence, assessment, content, {

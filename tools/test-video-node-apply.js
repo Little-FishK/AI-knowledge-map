@@ -9,11 +9,13 @@ const {
   applyNodePlan,
   buildNodeApplyPlan,
   inspectPackage,
+  packageSeal,
   rollbackNodeReceipt
 } = require("./video-ingest/node-application");
+const { sha256 } = require("./video-ingest/core");
 
 const ROOT = path.resolve(__dirname, "..");
-const packageDir = path.join(
+const legacyPackageDir = path.join(
   ROOT,
   "tools/proposals/video/elevenlabs-official-voice-clone/node-package-preview"
 );
@@ -26,11 +28,23 @@ function graphAt(root) {
   return context.window.GRAPH;
 }
 
-const inspected = inspectPackage(packageDir);
-assert.deepStrictEqual(inspected.errors, []);
-
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "video-node-apply-"));
 try {
+  const packageDir = path.join(fixture, "stage2-stamped-package");
+  fs.cpSync(legacyPackageDir, packageDir, { recursive: true });
+  const manifestFile = path.join(packageDir, "manifest.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
+  manifest.stage2Completion = {
+    status: "l3-auto-passed",
+    pageId: manifest.node.id,
+    pageHash: sha256(manifest.deepDive),
+    auditHash: sha256({ pageId: manifest.node.id })
+  };
+  manifest.packageHash = packageSeal(manifest);
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + "\n", "utf8");
+  const inspected = inspectPackage(packageDir);
+  assert.deepStrictEqual(inspected.errors, []);
+
   fs.cpSync(path.join(ROOT, "data"), path.join(fixture, "data"), { recursive: true });
   fs.copyFileSync(path.join(ROOT, "index.html"), path.join(fixture, "index.html"));
   const installed = graphAt(fixture);

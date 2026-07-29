@@ -3,6 +3,12 @@
   "private": true,
   "scripts": {
     "build:deepdives": "node tools/build-deepdive-runtime.js",
+    "stage2:init": "node tools/run-deepdive-stage2.js init",
+    "stage2:status": "node tools/run-deepdive-stage2.js status",
+    "stage2:pause": "node tools/run-deepdive-stage2.js pause",
+    "stage2:resume": "node tools/run-deepdive-stage2.js resume",
+    "stage2:claim": "node tools/run-deepdive-stage2.js claim",
+    "stage2:mcp": "node tools/deepdive-stage2/mcp-server.js",
     "validate": "node tools/validate.js && node tools/validate-deepdives.js && node tools/validate-software.js && node tools/validate-tutorials.js && node tools/validate-video-applications.js && node tools/validate-library.js",
     "validate:library": "node tools/validate-library.js",
     "validate:tutorials": "node tools/validate-tutorials.js",
@@ -19,6 +25,7 @@
     "video:shadow-review": "node tools/video-ingest/review-proposal-shadow.js",
     "video:shadow-batch": "node tools/video-ingest/review-shadow-batch.js",
     "video:node-content-packet": "node tools/video-ingest/create-node-content-packet.js",
+    "video:stage2-enqueue-new": "node tools/video-ingest/enqueue-stage2-node.js",
     "video:node-package": "node tools/video-ingest/create-node-package.js",
     "video:node-apply": "node tools/video-ingest/apply-node-package.js",
     "video:node-rollback": "node tools/video-ingest/rollback-node-application.js",
@@ -27,8 +34,9 @@
     "quality:l3": "node tools/audit-deepdive-benchmark.js",
     "quality:browser": "node tools/audit-deepdive-browser.js --changed",
     "test:quality-gates": "node tools/test-deepdive-quality.js",
+    "test:stage2": "node tools/test-deepdive-stage2.js && node tools/test-deepdive-stage2-mcp.js",
     "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-node-apply.js && node tools/test-video-calibration.js",
-    "quality:all": "npm run validate && npm run test:quality-gates && npm run test:video-ingest && npm run quality:deepdives"
+    "quality:all": "npm run validate && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },
   "devDependencies": {
     "playwright": "1.61.1"

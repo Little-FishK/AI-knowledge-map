@@ -162,7 +162,7 @@ function proposeLearningPathReindex(graph, learningPath) {
   }));
 }
 
-function buildNodePackage(proposal, evidence, assessment, content, options = {}) {
+function buildNodeIntegration(proposal, evidence, assessment, content, options = {}) {
   const projectData = options.projectData || loadProjectData();
   const graph = projectData.graph;
   const review = reviewProposal(proposal, evidence, assessment, {
@@ -196,10 +196,9 @@ function buildNodePackage(proposal, evidence, assessment, content, options = {})
     updatedAt: content.createdAt
   };
   const layout = proposePosition(graph, node, assessmentItem.proposedEdges);
-  const pkg = {
+  return {
     schemaVersion: 1,
-    mode: "node-atomic-package-preview",
-    status: "draft",
+    mode: "stage2-new-node-integration",
     generatedAt: options.generatedAt || new Date().toISOString(),
     bindings: {
       proposalHash: review.proposalHash,
@@ -215,7 +214,6 @@ function buildNodePackage(proposal, evidence, assessment, content, options = {})
       ...assessmentItem.proposedLearningPath,
       reindex: proposeLearningPathReindex(graph, assessmentItem.proposedLearningPath)
     },
-    deepDive: content.deepDive,
     layout,
     core: {
       requested: Boolean(shadowCandidate.shadowEligibility.coreNode),
@@ -223,11 +221,29 @@ function buildNodePackage(proposal, evidence, assessment, content, options = {})
     },
     shadowEligibility: {
       newNode: true,
-      coreNode: Boolean(shadowCandidate.shadowEligibility.coreNode),
-      formalWrite: false
-    }
+      coreNode: Boolean(shadowCandidate.shadowEligibility.coreNode)
+    },
   };
-  const errors = packageErrors(pkg, graph);
+}
+
+function buildNodePackage(proposal, evidence, assessment, content, options = {}) {
+  const projectData = options.projectData || loadProjectData();
+  const integration = buildNodeIntegration(proposal, evidence, assessment, content, {
+    ...options,
+    projectData,
+  });
+  const pkg = {
+    ...integration,
+    mode: "node-atomic-package-preview",
+    status: "draft",
+    deepDive: content.deepDive,
+    shadowEligibility: {
+      ...integration.shadowEligibility,
+      formalWrite: false,
+    },
+    stage2Completion: options.stage2Completion || null,
+  };
+  const errors = packageErrors(pkg, projectData.graph);
   pkg.validation = {
     structuralErrors: errors,
     l1: "not-run",
@@ -358,6 +374,7 @@ function writeNodePackage(directory, pkg) {
 }
 
 module.exports = {
+  buildNodeIntegration,
   buildNodePackage,
   deepDiveHash,
   packageErrors,

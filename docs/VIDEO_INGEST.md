@@ -614,3 +614,35 @@ npm run video:node-rollback -- `
 - `tools/video-ingest/apply-node-package.js`
 - `tools/video-ingest/rollback-node-application.js`
 - `tools/test-video-node-apply.js`
+
+## 13. 第二阶段接管理解原理页（当前有效边界）
+
+本节取代 10–12 节中“视频原子包直接生成并应用理解原理页”的旧设计；旧命令只保留兼容、测试和历史回滚用途。
+
+当前职责边界：
+
+| 视频系统输出 | 后续去向 |
+|---|---|
+| 软件使用教程 | 仍由教程轨发布，不经过 Stage 2 |
+| 已有节点 `supplement` | 初始化或刷新时导入目标页的 `update-queued` |
+| 新节点批准结果 | 组装节点、关系、路径、来源和证据事实包，进入 `write-queued` |
+| `merge` / `reject` | 保持概念判断结果，不触发理解原理页写作 |
+
+`create-node-content-packet` 现在要求模型只填写节点详情正文，并同时生成 `stage2Material`。它不再要求模型在视频流程内生成 `deepDive`。
+
+批准的新节点通过以下入口交给 Stage 2：
+
+```powershell
+npm run video:stage2-enqueue-new -- `
+  --proposal "<proposal.json>" `
+  --evidence "<evidence.json>" `
+  --assessment "<assessment.json>" `
+  --packet "<content-packet.json>" `
+  --content "<node-detail-content.json>"
+```
+
+之后依次执行 `write → audit → 必要时 repair → L1/L3 → 原子发布`。节点、关系、学习路径、核心身份与理解原理页只在最后一步一起进入正式图谱。
+
+旧 `video:node-apply` 现在额外要求包内存在与候选页哈希绑定的 `stage2Completion`。没有该回执时会直接拒绝，因而旧系统不能绕过独立审计和 Stage 2 唯一发布入口。
+
+完整运行合同见 [DEEPDIVE_STAGE2_AUTOMATION.md](DEEPDIVE_STAGE2_AUTOMATION.md)。

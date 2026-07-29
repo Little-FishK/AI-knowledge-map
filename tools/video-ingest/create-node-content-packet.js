@@ -46,18 +46,15 @@ function createContentPacket(proposal, evidence, assessment, term, options = {})
       graphHash: review.graphHash
     },
     task: {
-      objective: "为已通过双阶段影子门禁的新节点撰写完整详情正文和神经网络级理解原理页。",
+      objective: "为已通过双阶段影子门禁的新节点撰写地图详情正文；理解原理页交给第二阶段隔离状态机。",
       rules: [
         "只使用 assessment 中已通过的节点身份、关系、断言和来源，不擅自扩大概念边界。",
         "详情正文按是什么→机制→约束/影响→怎么应对组织，并包含至少一个可验证案例。",
-        "理解原理页必须形成输入→变换→输出→反馈→边界的机制闭环。",
-        "至少9节、4个学习目标、一个可复现贯穿示例、原创教学制品、误区、失败诊断和延伸路线。",
-        "至少5道非背诵型自测并提供完整答案。",
-        "来源至少3个，优先一手或权威来源，标注访问日期与版本边界。",
+        "节点详情来源至少两个，优先一手或权威来源。",
         "正文原创表达；不得复制视频字幕或外部来源的大段文字。",
         "只返回 outputTemplate 形状的 JSON，不返回Markdown前后缀。"
       ],
-      automaticGates: ["L1", "L2", "L3", "关系", "学习路径", "布局", "哈希绑定"],
+      automaticGates: ["节点结构", "关系", "学习路径", "布局", "哈希绑定"],
       formalWrite: false
     },
     candidate,
@@ -82,13 +79,26 @@ function createContentPacket(proposal, evidence, assessment, term, options = {})
         cases: [],
         sources: []
       },
-      deepDive: {
-        title: candidate.proposedNode.title,
-        subtitle: "",
-        aliases: "",
-        meta: "",
-        thesis: "",
-        html: ""
+    },
+    stage2Material: {
+      objective: "为新节点生成独立理解原理页，随后由全新审计任务检查。",
+      candidateTerm: term,
+      proposedNode: candidate.proposedNode,
+      proposedEdges: candidate.proposedEdges,
+      proposedLearningPath: candidate.proposedLearningPath,
+      claims: candidate.claims || [],
+      externalSources: candidate.externalSources || [],
+      relatedNodes,
+      evidence: {
+        source: evidence.source,
+        transcript: evidence.transcript || [],
+        frames: evidence.frames || []
+      },
+      bindings: {
+        proposalHash: sha256(proposal),
+        evidenceHash: evidence.contentHash,
+        assessmentHash: sha256(assessment),
+        graphHash: review.graphHash
       }
     }
   };
@@ -96,9 +106,9 @@ function createContentPacket(proposal, evidence, assessment, term, options = {})
 
 function renderPrompt(packet) {
   return [
-    "# 新节点完整内容写作任务",
+    "# 新节点地图详情写作任务",
     "",
-    "这是已通过双阶段影子复核的新节点内容任务。严格遵守 `task.rules`，只返回填好的 `outputTemplate` JSON。",
+    "这是已通过双阶段影子复核的新节点详情任务。严格遵守 `task.rules`，只返回填好的 `outputTemplate` JSON。理解原理页由第二阶段状态机另行生成。",
     "",
     "```json",
     JSON.stringify(packet, null, 2),

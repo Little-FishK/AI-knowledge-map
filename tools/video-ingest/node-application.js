@@ -82,6 +82,15 @@ function inspectPackage(packageDir) {
   if (manifest.shadowEligibility && manifest.shadowEligibility.formalWrite !== false) {
     errors.push("输入必须是零写入预览包");
   }
+  if (
+    !manifest.stage2Completion
+    || manifest.stage2Completion.status !== "l3-auto-passed"
+    || manifest.stage2Completion.pageId !== (manifest.node && manifest.node.id)
+    || !/^sha256:[a-f0-9]{64}$/.test(manifest.stage2Completion.pageHash || "")
+    || !/^sha256:[a-f0-9]{64}$/.test(manifest.stage2Completion.auditHash || "")
+  ) {
+    errors.push("旧原子包缺少第二阶段独立审计通过凭据；请改用 stage2 新节点队列");
+  }
   const parts = {
     node: readJson(path.join(directory, "node.json")),
     edges: readJson(path.join(directory, "edges.json")),
