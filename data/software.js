@@ -14,8 +14,7 @@ window.SOFTWARE = {
   categories: [
     { id: "chat",        label: "对话助手",         emoji: "💬", color: "#6b8cbe" },
     { id: "search",      label: "AI 搜索与研究",     emoji: "🔎", color: "#4f9d78" },
-    { id: "coding",      label: "AI 编程",           emoji: "💻", color: "#c08a4a" },
-    { id: "agent",       label: "Agent 与自动化",    emoji: "🤖", color: "#c9803f" },
+    { id: "coding",      label: "AI 编程与 Agent",   emoji: "💻", color: "#c08a4a" },
     { id: "image",       label: "图像生成",          emoji: "🎨", color: "#a86fa8" },
     { id: "video",       label: "视频生成",          emoji: "🎬", color: "#c25f8f" },
     { id: "audio",       label: "音频·语音·音乐",    emoji: "🎵", color: "#8a6fb0" },
@@ -129,20 +128,20 @@ window.SOFTWARE = {
       summary: "浏览器里从零搭 App 的云端编程环境 + Agent。",
       body: "老牌云端 IDE，如今核心是 Replit Agent：在浏览器里用自然语言描述需求，它自己 [[planning]]、写代码、装依赖、[[code-execution]] 跑起来、还能一键部署，全程不用配本地环境。和 [[v0]] 偏前端不同，它主打「从想法到能上线的完整 App」，是 [[agent-loop]] 在「零基础也能做产品」方向的代表。" },
 
-    // 🤖 Agent 与自动化
-    { id: "manus", name: "Manus / 通用 Agent", cat: "agent", by: "多家", concept: "agent",
+    // 🤖 Agent 与自动化（并入 AI 编程）
+    { id: "manus", name: "Manus / 通用 Agent", cat: "coding", by: "多家", concept: "agent",
       summary: "能自主完成多步任务的通用 Agent 产品。",
       body: "面向「给个目标、它自己一路做完」的通用 [[agent]] 产品。会 [[planning]] 拆解任务、调工具、[[computer-use]] 操作界面。是自主 Agent 从概念走向消费级的尝试，能力边界仍在快速演进。" },
-    { id: "dify", name: "Dify / Coze / FastGPT", cat: "agent", by: "多家", concept: "workflow-orchestration",
+    { id: "dify", name: "Dify / Coze / FastGPT", cat: "coding", by: "多家", concept: "workflow-orchestration",
       summary: "低代码搭建 AI 应用和 Agent 的平台。",
       body: "可视化拖拽搭建 LLM 应用：把 [[rag]]、[[tool-calling]]、[[workflow-orchestration]] 编成流程，不用写太多代码就能上线一个客服/助手。是「让业务人员也能做 AI 应用」的编排平台。" },
-    { id: "n8n", name: "n8n / Zapier", cat: "agent", by: "n8n/Zapier", concept: "workflow-orchestration",
+    { id: "n8n", name: "n8n / Zapier", cat: "coding", by: "n8n/Zapier", concept: "workflow-orchestration",
       summary: "把 AI 接进自动化工作流，连通几百个应用。",
       body: "自动化平台（本身不是 AI），但都加了 AI 节点：能把 LLM 调用嵌进「触发→处理→动作」的 [[workflow-orchestration]] 里，连通邮件、表格、数据库等几百个服务。适合把 AI 缝进现有业务流程。" },
-    { id: "devin", name: "Devin", cat: "agent", by: "Cognition", concept: "agent-loop",
+    { id: "devin", name: "Devin", cat: "coding", by: "Cognition", concept: "agent-loop",
       summary: "主打「自主软件工程师」的编程 Agent。",
       body: "Cognition 推出、以「AI 软件工程师」为卖点的自主 [[agent]]：给一个工单，它自己 [[planning]]、写代码、跑、调试、提交，目标是端到端接下整个开发任务。是把 [[agent-loop]] 推向「最少人工介入」的高调尝试，也把「Agent 到底能自主到什么程度」的讨论摆上了台面。" },
-    { id: "ai-browser", name: "AI 浏览器（Comet / Dia / Atlas）", cat: "agent", by: "Perplexity/Browser Company/OpenAI", concept: "agent",
+    { id: "ai-browser", name: "AI 浏览器（Comet / Dia / Atlas）", cat: "coding", by: "Perplexity/Browser Company/OpenAI", concept: "agent",
       summary: "把 Agent 装进浏览器，让它替你读网页、点按钮、跨站办事。",
       body: "一类正在成形的产品：把 [[agent]] 和浏览器合一，AI 能看你当前页面、跨标签页总结、甚至替你 [[computer-use]] 式地点选填表办事。Perplexity 的 Comet、The Browser Company 的 Dia、OpenAI 的 ChatGPT Atlas 是代表。它把「AI 助手」从对话框搬进了你日常上网的地方，也放大了 [[prompt-injection]] 经由网页劫持 Agent 的风险。" },
 

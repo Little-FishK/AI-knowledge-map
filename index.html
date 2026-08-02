@@ -132,20 +132,14 @@
   </div>
 </div>
 
-<script src="assets/vendor/cytoscape.min.js"></script>
-<script src="data/graph.js"></script>
-<script src="data/software.js"></script>
-<script src="data/library.js"></script>
-<script src="data/library-official-technical.js"></script>
-<script src="data/library-platform-profiles.js"></script>
-<script src="data/tutorials.js"></script>
-<script src="data/tutorials-codex-youtube.js"></script>
-<script src="data/tutorials-claude-code.js"></script>
-<script src="data/tutorials-video-generated.js"></script>
+<!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
+<script defer src="assets/vendor/cytoscape.min.js"></script>
+<script defer src="data/graph.js"></script>
 <!-- 理解原理深读页：每个概念一个文件，注册到 window.DEEPDIVE[nodeId] -->
-<!-- 共享补全包先注册兜底页；后续独立文件可用更高质量版本覆盖同 id。 -->
-<script src="data/deepdive-runtime/manifest.js"></script>
-<script src="assets/layout-quality.js"></script>
-<script src="assets/app.js"></script>
+<!-- 只加载清单；具体页面按需动态注入。 -->
+<script defer src="data/deepdive-runtime/manifest.js"></script>
+<script defer src="assets/layout-quality.js"></script>
+<!-- 软件目录 / 专业资料库 / 使用教程数据不在首屏加载，切到对应视图时按需注入。 -->
+<script defer src="assets/app.js"></script>
 </body>
 </html>

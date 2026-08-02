@@ -23,6 +23,10 @@
     all.concat((phase.steps || []).map(step => ({ order: String(step[0]), id: step[1], phase: phase.phase }))), []);
   const RECOMMENDED_INDEX = new Map(RECOMMENDED_PATH.map((step, index) => [step.id, index]));
   const DEEPDIVE_RUNTIME = window.DEEPDIVE_RUNTIME || { base: "data/deepdive-runtime", ids: [] };
+  // Stage 2 can replace a published page without changing its path. Give every
+  // app session a fresh runtime revision so a previously cached page script
+  // cannot hide the controller's newly published candidate.
+  const DEEPDIVE_RUNTIME_REVISION = DEEPDIVE_RUNTIME.revision || String(Date.now());
   const DEEPDIVE_IDS = new Set(DEEPDIVE_RUNTIME.ids || []);
   const deepDiveLoads = new Map();
   const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
@@ -33,6 +37,36 @@
 
   window.DEEPDIVE = window.DEEPDIVE || {};
 
+  /* ── 通用工具：顺序脚本加载器 + 防抖 ── */
+  const scriptLoads = new Map();
+  function loadScriptOnce(src) {
+    if (scriptLoads.has(src)) return scriptLoads.get(src);
+    const load = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve();
+      script.onerror = () => { scriptLoads.delete(src); reject(new Error(`资源加载失败：${src}`)); };
+      document.head.appendChild(script);
+    });
+    scriptLoads.set(src, load);
+    return load;
+  }
+  async function loadScriptsInOrder(srcs) {
+    for (const src of srcs) await loadScriptOnce(src);
+  }
+  function debounce(fn, wait) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), wait);
+    };
+  }
+
+  /* ── 学习面板：固定元素引用、按钮索引、节点顺序（用于局部更新） ── */
+  const learningEls = {};
+  const learningButtons = new Map();          // nodeId -> <button>
+  const nodeIndex = new Map(G.nodes.map((n, i) => [n.id, i]));
+
   function ensureDeepDive(id) {
     if (window.DEEPDIVE[id]) return Promise.resolve(window.DEEPDIVE[id]);
     if (!DEEPDIVE_IDS.has(id)) return Promise.reject(new Error(`不存在理解原理页：${id}`));
@@ -40,7 +74,7 @@
 
     const load = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = `${DEEPDIVE_RUNTIME.base}/${encodeURIComponent(id)}.js`;
+      script.src = `${DEEPDIVE_RUNTIME.base}/${encodeURIComponent(id)}.js?v=${encodeURIComponent(DEEPDIVE_RUNTIME_REVISION)}`;
       script.async = true;
       script.onload = () => {
         script.remove();
@@ -118,43 +152,107 @@
     </section>`;
   }
 
-  function renderLearningPanel() {
-    const done = G.nodes.filter(n => learnedNodes.has(n.id));
-    const todo = G.nodes.filter(n => !learnedNodes.has(n.id));
-    const total = G.nodes.length;
-    const percent = total ? Math.round(done.length / total * 100) : 0;
-    const doneCount = document.getElementById("learning-done-count");
-    if (!doneCount) return;
+  // 一次性缓存固定元素与两个列表的委托监听（只在初始化时调用）
+  function initLearningPanel() {
+    [
+      "learning-done-count", "learning-total-count", "learning-percent", "learning-progress-bar",
+      "learning-done-label", "learning-todo-label", "learning-done-list", "learning-todo-list"
+    ].forEach(id => { learningEls[id] = document.getElementById(id); });
 
-    doneCount.textContent = done.length;
-    document.getElementById("learning-total-count").textContent = ` / ${total} 个节点`;
-    document.getElementById("learning-percent").textContent = `${percent}%`;
-    document.getElementById("learning-progress-bar").style.width = `${percent}%`;
-    document.getElementById("learning-done-label").textContent = done.length;
-    document.getElementById("learning-todo-label").textContent = todo.length;
-
-    const nodeButtons = nodes => nodes.length
-      ? nodes.map(n => {
-          const domain = DOMAINS[n.domain] || { color: "#888", label: n.domain };
-          return `<button type="button" class="learning-node" data-learning-goto="${esc(n.id)}" title="${esc(domain.label)}">
-            <span class="dot" style="background:${domain.color}"></span><span>${esc(n.title)}</span>
-          </button>`;
-        }).join("")
-      : `<div class="learning-empty">${nodes === done ? "还没有标记已学习的节点" : "所有节点都已学习"}</div>`;
-
-    document.getElementById("learning-done-list").innerHTML = nodeButtons(done);
-    document.getElementById("learning-todo-list").innerHTML = nodeButtons(todo);
-    document.querySelectorAll("[data-learning-goto]").forEach(button => {
-      button.addEventListener("click", () => select(button.getAttribute("data-learning-goto"), true));
+    [learningEls["learning-done-list"], learningEls["learning-todo-list"]].forEach(list => {
+      if (!list) return;
+      list.addEventListener("click", event => {
+        const button = event.target.closest("[data-learning-goto]");
+        if (button) select(button.getAttribute("data-learning-goto"), true);
+      });
     });
+    renderLearningPanel();
+  }
+
+  function makeLearningButton(n) {
+    const domain = DOMAINS[n.domain] || { color: "#888", label: n.domain };
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "learning-node";
+    button.setAttribute("data-learning-goto", n.id);
+    button.title = domain.label;
+    button.innerHTML = `<span class="dot" style="background:${domain.color}"></span><span>${esc(n.title)}</span>`;
+    return button;
+  }
+
+  function setLearningEmptyState(list, isDone) {
+    if (!list) return;
+    const hasNodes = !!list.querySelector(".learning-node");
+    let empty = list.querySelector(".learning-empty");
+    if (hasNodes) { if (empty) empty.remove(); return; }
+    if (!empty) {
+      empty = document.createElement("div");
+      empty.className = "learning-empty";
+      empty.textContent = isDone ? "还没有标记已学习的节点" : "所有节点都已学习";
+      list.appendChild(empty);
+    }
+  }
+
+  function updateLearningCounts() {
+    const total = G.nodes.length;
+    const doneCount = learnedNodes.size;
+    const percent = total ? Math.round(doneCount / total * 100) : 0;
+    if (!learningEls["learning-done-count"]) return;
+    learningEls["learning-done-count"].textContent = doneCount;
+    learningEls["learning-total-count"].textContent = ` / ${total} 个节点`;
+    learningEls["learning-percent"].textContent = `${percent}%`;
+    learningEls["learning-progress-bar"].style.width = `${percent}%`;
+    learningEls["learning-done-label"].textContent = doneCount;
+    learningEls["learning-todo-label"].textContent = total - doneCount;
+  }
+
+  // 全量构建两个列表（仅初始化或批量变更时用）
+  function renderLearningPanel() {
+    const doneList = learningEls["learning-done-list"];
+    const todoList = learningEls["learning-todo-list"];
+    if (!doneList || !todoList) return;
+    doneList.innerHTML = "";
+    todoList.innerHTML = "";
+    learningButtons.clear();
+    G.nodes.forEach(n => {
+      const button = makeLearningButton(n);
+      learningButtons.set(n.id, button);
+      (learnedNodes.has(n.id) ? doneList : todoList).appendChild(button);
+    });
+    setLearningEmptyState(doneList, true);
+    setLearningEmptyState(todoList, false);
+    updateLearningCounts();
+  }
+
+  // 保持 G.nodes 顺序把按钮插入目标列表
+  function insertLearningButtonInOrder(list, id) {
+    const button = learningButtons.get(id);
+    if (!button) return;
+    const start = (nodeIndex.get(id) ?? -1) + 1;
+    for (let i = start; i < G.nodes.length; i++) {
+      const other = learningButtons.get(G.nodes[i].id);
+      if (other && other.parentNode === list) { list.insertBefore(button, other); return; }
+    }
+    list.appendChild(button);
   }
 
   function toggleLearnedNode(id) {
     if (!byId[id]) return;
-    if (learnedNodes.has(id)) learnedNodes.delete(id);
-    else learnedNodes.add(id);
+    const nowLearned = !learnedNodes.has(id);
+    if (nowLearned) learnedNodes.add(id);
+    else learnedNodes.delete(id);
     saveLearnedNodes();
-    renderLearningPanel();
+
+    const doneList = learningEls["learning-done-list"];
+    const todoList = learningEls["learning-todo-list"];
+    if (learningButtons.has(id) && doneList && todoList) {
+      insertLearningButtonInOrder(nowLearned ? doneList : todoList, id);
+      setLearningEmptyState(doneList, true);
+      setLearningEmptyState(todoList, false);
+      updateLearningCounts();
+    } else {
+      renderLearningPanel();
+    }
 
     if (activeDeepDiveId === id) {
       const current = document.querySelector(".dd-learning-complete");
@@ -546,6 +644,22 @@
   const detail = document.getElementById("detail");
   const detailBody = document.getElementById("detail-body");
 
+  // 详情面板里的所有内联链接统一委托：概念跳转 / 深读页 / 软件教程 / 关联软件
+  detailBody.addEventListener("click", async event => {
+    const swLink = event.target.closest("[data-library-software]");
+    if (swLink) { await setMode("software"); openSoftware(swLink.getAttribute("data-library-software")); return; }
+    const goto = event.target.closest("[data-goto]");
+    if (goto) {
+      if (mode !== "graph") await setMode("graph");
+      select(goto.getAttribute("data-goto"), true);
+      return;
+    }
+    const dd = event.target.closest("[data-dd]");
+    if (dd) { openDeepDive(dd.getAttribute("data-dd")); return; }
+    const tutorial = event.target.closest("[data-tutorial]");
+    if (tutorial) { openTutorial(tutorial.getAttribute("data-tutorial")); return; }
+  });
+
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
@@ -659,13 +773,7 @@
     detailBody.innerHTML = h;
     detail.classList.remove("closed");
     detailBody.scrollTop = 0;
-
-    detailBody.querySelectorAll("[data-goto]").forEach(el => {
-      el.addEventListener("click", () => select(el.getAttribute("data-goto"), true));
-    });
-    detailBody.querySelectorAll("[data-dd]").forEach(el => {
-      el.addEventListener("click", () => openDeepDive(el.getAttribute("data-dd")));
-    });
+    // 内联链接由 detailBody 的委托监听统一处理
     if (hasDeep) ensureDeepDive(id).catch(error => console.warn(error.message));
   }
 
@@ -682,6 +790,7 @@
     document.getElementById("dd-top-name").textContent = byId[id] ? byId[id].title : id;
     document.getElementById("dd-article").innerHTML =
       '<div class="dd-loading" role="status">正在加载理解原理页…</div>';
+    ddEl.classList.remove("dd-provisional");
     ddEl.classList.remove("hidden");
     ddEl.querySelector(".dd-scroll").scrollTop = 0;
 
@@ -695,9 +804,21 @@
       return;
     }
     if (token !== deepDiveRequestToken || activeDeepDiveId !== id) return;
+    const provisionalPublication = dd.publication
+      && dd.publication.status === "published-provisional"
+      ? dd.publication
+      : null;
+    ddEl.classList.toggle("dd-provisional", Boolean(provisionalPublication));
+    const provisionalNotice = provisionalPublication
+      ? `<div class="dd-provisional-notice" role="status">
+          <strong>${esc(provisionalPublication.label || "未通过审计 · 暂行版本")}</strong>
+          <span>该页面已覆盖旧正式页，但尚未通过质量审计${Number.isInteger(provisionalPublication.blockerCount) ? `，当前记录 ${provisionalPublication.blockerCount} 个阻断项` : ""}。</span>
+        </div>`
+      : "";
     const hero = `<div class="dd-hero">
         <div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>
-        <h1 class="dd-h1">${esc(dd.title)}</h1>
+        <h1 class="dd-h1${provisionalPublication ? " dd-h1-provisional" : ""}">${esc(dd.title)}</h1>
+        ${provisionalNotice}
         ${dd.subtitle ? `<div class="dd-sub">${esc(dd.subtitle)}</div>` : ""}
         ${dd.aliases ? `<div class="dd-ali">${esc(dd.aliases)}</div>` : ""}
         ${dd.meta ? `<div class="dd-metabar">${esc(dd.meta)}</div>` : ""}
@@ -712,7 +833,10 @@
 
   function closeDeepDive() {
     deepDiveRequestToken++;
-    if (ddEl) ddEl.classList.add("hidden");
+    if (ddEl) {
+      ddEl.classList.add("hidden");
+      ddEl.classList.remove("dd-provisional");
+    }
     activeDeepDiveId = null;
   }
 
@@ -846,7 +970,7 @@
     const nodeButton = event.target.closest("[data-domain-node]");
     if (nodeButton) select(nodeButton.dataset.domainNode, true);
   });
-  renderLearningPanel();
+  initLearningPanel();
   document.querySelector("#official-path-toggle em").textContent =
     `${RECOMMENDED_PATH.length} 节点 · ${(G.recommendedLearningPath || []).length} 层`;
   document.getElementById("official-path-toggle").addEventListener("click", () =>
@@ -956,17 +1080,18 @@
             <div class="sr-sum">${esc(n.summary || "")}</div></div>`).join("")
       : `<div class="sr-none">没有匹配的概念</div>`;
     results.classList.add("open");
-
-    results.querySelectorAll(".sr-item").forEach(el => {
-      el.addEventListener("click", () => {
-        select(el.dataset.id, true);
-        results.classList.remove("open");
-        search.value = "";
-      });
-    });
   }
 
-  search.addEventListener("input", doSearch);
+  // 搜索结果点击统一委托到结果容器
+  results.addEventListener("click", event => {
+    const item = event.target.closest(".sr-item");
+    if (!item) return;
+    select(item.dataset.id, true);
+    results.classList.remove("open");
+    search.value = "";
+  });
+
+  search.addEventListener("input", debounce(doSearch, 120));
   search.addEventListener("keydown", e => {
     if (e.key === "Escape") { results.classList.remove("open"); search.blur(); }
     if (e.key === "Enter") {
@@ -994,11 +1119,12 @@
   restorePresetLayout();
 
   /* ───────────────────────── 软件模式 ───────────────────────── */
-  const SW = window.SOFTWARE;
-  const TUTORIALS = window.TUTORIALS;
-  const LIBRARY = window.PRO_LIBRARY;
-  const LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || {};
-  const LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || {};
+  // 软件目录、教程与资料库数据不在首屏加载，切到对应视图时按需注入。
+  let SW = window.SOFTWARE || null;
+  let TUTORIALS = window.TUTORIALS || null;
+  let LIBRARY = window.PRO_LIBRARY || null;
+  let LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || {};
+  let LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || {};
   let mode = "graph";               // graph | software | library
   const swView = document.getElementById("software-view");
   const libraryView = document.getElementById("library-view");
@@ -1007,6 +1133,84 @@
   let libraryClass = "all";
   let librarySubcategory = "all";
   let libraryQuery = "";
+
+  const DATA_BUNDLES = {
+    software: [
+      "data/software.js",
+      "data/tutorials.js",
+      "data/tutorials-codex-youtube.js",
+      "data/tutorials-claude-code.js",
+      "data/tutorials-video-generated.js"
+    ],
+    library: [
+      "data/library.js",
+      "data/library-official-technical.js",
+      "data/library-platform-profiles.js",
+      "data/software.js"
+    ]
+  };
+
+  // 顺序加载某个视图的数据包（幂等：脚本只会真正加载一次），再刷新对应全局引用。
+  async function ensureBundle(name) {
+    await loadScriptsInOrder(DATA_BUNDLES[name] || []);
+    if (name === "software") {
+      SW = window.SOFTWARE || SW;
+      TUTORIALS = window.TUTORIALS || TUTORIALS;
+    } else if (name === "library") {
+      LIBRARY = window.PRO_LIBRARY || LIBRARY;
+      LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || LIBRARY_PROFILES;
+      LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || LIBRARY_PROFILE_GUIDANCE;
+      SW = window.SOFTWARE || SW;   // 资料条目里的关联软件需要软件数据
+    }
+  }
+
+  // 软件卡片点击统一委托到软件视图容器
+  swView.addEventListener("click", event => {
+    const card = event.target.closest("[data-sw]");
+    if (card) openSoftware(card.getAttribute("data-sw"));
+  });
+
+  const scheduleLibraryRender = debounce(() => renderLibraryItems(), 120);
+
+  // 资料库内所有交互统一委托到资料库视图容器
+  libraryView.addEventListener("click", event => {
+    const item = event.target.closest("[data-library-item]");
+    if (item) { openLibraryItem(item.getAttribute("data-library-item")); return; }
+    const cls = event.target.closest("[data-library-class]");
+    if (cls) {
+      libraryClass = cls.getAttribute("data-library-class");
+      librarySubcategory = "all";
+      libraryView.querySelectorAll("[data-library-class]").forEach(button => button.classList.toggle("active", button === cls));
+      renderLibrarySubcategories();
+      renderLibraryItems();
+      return;
+    }
+    const sub = event.target.closest("[data-library-subcategory]");
+    if (sub) {
+      librarySubcategory = sub.getAttribute("data-library-subcategory");
+      renderLibrarySubcategories();
+      renderLibraryItems();
+    }
+  });
+  libraryView.addEventListener("keydown", event => {
+    const item = event.target.closest("[data-library-item]");
+    if (item && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); openLibraryItem(item.getAttribute("data-library-item")); }
+  });
+  libraryView.addEventListener("change", event => {
+    const dropdown = event.target.closest(".lib-sub-select");
+    if (!dropdown || !dropdown.value) return;
+    [libraryClass, librarySubcategory] = dropdown.value.split("::");
+    libraryView.querySelectorAll("[data-library-class]").forEach(button =>
+      button.classList.toggle("active", button.getAttribute("data-library-class") === libraryClass));
+    renderLibrarySubcategories();
+    renderLibraryItems();
+  });
+  libraryView.addEventListener("input", event => {
+    const searchInput = event.target.closest(".lib-search");
+    if (!searchInput) return;
+    libraryQuery = searchInput.value;
+    scheduleLibraryRender();
+  });
 
   function buildSoftware() {
     if (swBuilt || !SW) return;
@@ -1028,8 +1232,7 @@
       h += `</div></section>`;
     });
     swView.innerHTML = h;
-    swView.querySelectorAll("[data-sw]").forEach(el =>
-      el.addEventListener("click", () => openSoftware(el.getAttribute("data-sw"))));
+    // 卡片点击由 swView 的委托监听统一处理
     swBuilt = true;
   }
 
@@ -1058,11 +1261,7 @@
     detailBody.innerHTML = h;
     detail.classList.remove("closed");
     detailBody.scrollTop = 0;
-    // 正文/概念链接 → 切回地图并选中该节点
-    detailBody.querySelectorAll("[data-goto]").forEach(el =>
-      el.addEventListener("click", () => { setMode("graph"); select(el.getAttribute("data-goto"), true); }));
-    detailBody.querySelectorAll("[data-tutorial]").forEach(el =>
-      el.addEventListener("click", () => openTutorial(el.getAttribute("data-tutorial"))));
+    // 正文/概念链接、使用教程按钮由 detailBody 的委托监听统一处理
   }
 
   function openTutorial(id) {
@@ -1219,14 +1418,7 @@
         <div class="lib-sub-overview"><span>选择一个具体平台，会同时定位到它所属的一级来源。</span>
           <select class="lib-sub-select" aria-label="选择二级来源"><option value="">浏览全部二级来源…</option>${options}</select>
         </div>`;
-      container.querySelector(".lib-sub-select").addEventListener("change", event => {
-        if (!event.target.value) return;
-        [libraryClass, librarySubcategory] = event.target.value.split("::");
-        libraryView.querySelectorAll("[data-library-class]").forEach(button =>
-          button.classList.toggle("active", button.getAttribute("data-library-class") === libraryClass));
-        renderLibrarySubcategories();
-        renderLibraryItems();
-      });
+      // change 事件由 libraryView 的委托监听统一处理
       return;
     }
     const counts = {};
@@ -1237,11 +1429,7 @@
         <button class="lib-subchip${librarySubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">全部 <span>${(LIBRARY.items || []).filter(item => item.sourceClass === source.id).length}</span></button>
         ${(source.subcategories || []).map(sub => `<button class="lib-subchip${librarySubcategory === sub.id ? " active" : ""}" type="button" data-library-subcategory="${esc(sub.id)}" title="${esc(sub.short)}">${esc(sub.label)} <span>${counts[sub.id] || 0}</span></button>`).join("")}
       </div>${libraryPlatformProfileHtml(source)}`;
-    container.querySelectorAll("[data-library-subcategory]").forEach(button => button.addEventListener("click", () => {
-      librarySubcategory = button.getAttribute("data-library-subcategory");
-      renderLibrarySubcategories();
-      renderLibraryItems();
-    }));
+    // 二级来源筛选点击由 libraryView 的委托监听统一处理
   }
 
   function renderLibraryItems() {
@@ -1276,13 +1464,7 @@
         <div class="lib-card-foot">${(item.tags || []).slice(0, 4).map(tag => `<span class="lib-tag">${esc(tag)}</span>`).join("")}</div>
       </article>`;
     }).join("") : `<div class="lib-empty">当前来源分类和搜索条件下没有资料。</div>`;
-    grid.querySelectorAll("[data-library-item]").forEach(card => {
-      const open = () => openLibraryItem(card.getAttribute("data-library-item"));
-      card.addEventListener("click", open);
-      card.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); }
-      });
-    });
+    // 卡片点击 / 键盘由 libraryView 的委托监听统一处理
   }
 
   function buildLibrary() {
@@ -1311,17 +1493,7 @@
         <div class="lib-grid"></div>
       </section>
     </div>`;
-    libraryView.querySelectorAll("[data-library-class]").forEach(button => button.addEventListener("click", () => {
-      libraryClass = button.getAttribute("data-library-class");
-      librarySubcategory = "all";
-      libraryView.querySelectorAll("[data-library-class]").forEach(item => item.classList.toggle("active", item === button));
-      renderLibrarySubcategories();
-      renderLibraryItems();
-    }));
-    libraryView.querySelector(".lib-search").addEventListener("input", event => {
-      libraryQuery = event.target.value;
-      renderLibraryItems();
-    });
+    // 一级来源点击与搜索输入由 libraryView 的委托监听统一处理
     libraryBuilt = true;
     renderLibrarySubcategories();
     renderLibraryItems();
@@ -1359,19 +1531,14 @@
     detailBody.innerHTML = h;
     detail.classList.remove("closed");
     detailBody.scrollTop = 0;
-    detailBody.querySelectorAll("[data-goto]").forEach(link =>
-      link.addEventListener("click", () => { setMode("graph"); select(link.getAttribute("data-goto"), true); }));
-    detailBody.querySelectorAll("[data-library-software]").forEach(link =>
-      link.addEventListener("click", () => { setMode("software"); openSoftware(link.getAttribute("data-library-software")); }));
+    // 关联节点 / 关联软件链接由 detailBody 的委托监听统一处理
   }
 
-  function setMode(m) {
+  async function setMode(m) {
     mode = m;
     const isSW = m === "software";
     const isLibrary = m === "library";
     const isGraph = m === "graph";
-    if (isSW) buildSoftware();
-    if (isLibrary) buildLibrary();
     document.getElementById("cy").classList.toggle("hidden", !isGraph);
     document.getElementById("legend").classList.toggle("hidden", !isGraph);
     zoomUi.root.classList.toggle("hidden", !isGraph);
@@ -1390,6 +1557,18 @@
     });
     detail.classList.add("closed");
     if (isGraph) setTimeout(() => cy.resize(), 30);
+
+    // 数据按需加载：首次进入软件/资料库视图时注入对应数据包，加载期间显示占位。
+    if (isSW) {
+      if (!swBuilt) swView.innerHTML = `<div class="view-loading" role="status">正在加载软件目录…</div>`;
+      await ensureBundle("software");
+      buildSoftware();
+    }
+    if (isLibrary) {
+      if (!libraryBuilt) libraryView.innerHTML = `<div class="view-loading" role="status">正在加载专业资料库…</div>`;
+      await ensureBundle("library");
+      buildLibrary();
+    }
   }
 
   document.querySelectorAll(".mode-nav-btn").forEach(button =>
