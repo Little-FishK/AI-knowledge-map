@@ -40,7 +40,7 @@ function loadSectionAudit(root, id, page) {
     };
   }
   const gaps = [];
-  if (audit.schemaVersion !== 1) gaps.push("audit.unsupported-schema");
+  if (![1, 2].includes(audit.schemaVersion)) gaps.push("audit.unsupported-schema");
   if (audit.pageId !== id) gaps.push("audit.page-id-mismatch");
   if (audit.pageHash !== pageContentHash(page)) gaps.push("audit.page-hash-mismatch");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(audit.reviewedAt || "")) {
@@ -49,9 +49,16 @@ function loadSectionAudit(root, id, page) {
     gaps.push("audit.future-review-date");
   }
   if (!Array.isArray(audit.sections)) gaps.push("audit.missing-sections");
+  const schemaV2 = audit.schemaVersion === 2;
   return {
-    source: "external",
-    sectionContracts: Array.isArray(audit.sections) ? audit.sections : [],
+    // schema v2 审计与当前候选哈希绑定，优先使用它对“新正文”的逐节定位；
+    // 页面内合同可能因返修重写而陈旧。schema v1 保持旧兼容路径。
+    source: schemaV2
+      ? "external-v2"
+      : (inline.length ? "external+inline" : "external"),
+    sectionContracts: schemaV2
+      ? (Array.isArray(audit.sections) ? audit.sections : [])
+      : (inline.length ? inline : (Array.isArray(audit.sections) ? audit.sections : [])),
     gaps,
     reviewRequired: [],
   };

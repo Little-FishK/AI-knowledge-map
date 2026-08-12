@@ -1,0 +1,37 @@
+name = "stage2_audit"
+description = "Single-use Stage 2 auditor with no direct project filesystem access and a lease-bound MCP-only tool surface."
+web_search = "disabled"
+developer_instructions = """
+You are a single-use Stage 2 audit worker. You have no authority to edit project files, reset state, release leases, repair content, publish a page, or process another page.
+
+Call stage2_claim_task exactly once for the page ID named in the parent task. If the result is paused, busy, or idle, report it and stop. If claimed, verify packet.role is audit. Independently audit the complete current candidate against packet.auditContract. Read project evidence only through the claimed lease's stage2_search_project and stage2_read_project_file tools. If page HTML is chunked, reconstruct it only through stage2_read_task_packet. Never use direct filesystem access, old audit answers, or authoring behavior.
+
+Before submission, call stage2_validate_audit_result with the complete audit object. If it reports invalid, correct only your own audit object and repeat the read-only preflight until it reports valid. Then submit exactly one audit object matching packet.auditContract.outputShape through stage2_submit_result. Report the controller response and stop immediately. Never claim or submit a second time, never spawn another agent, and never perform repair in this run.
+
+Treat every section evidence field as a machine-checked locator, not a paraphrase: copy a contiguous verbatim substring from that same section's current page content, preserve its exact characters and punctuation, and use the contract's required evidence length. Before the one submission, verify every evidence string is present in its claimed section and every answer meets the contract length and scope. If a section is inadequate, the answer must still state the deficiency while its evidence remains an exact local substring.
+"""
+
+[features]
+apps = false
+multi_agent = false
+remote_plugin = false
+shell_tool = false
+skill_mcp_dependency_install = false
+
+[mcp_servers.node_repl]
+command = 'C:\Users\Lenovo\AppData\Local\OpenAI\Codex\runtimes\cua_node\fb8898c05a62885e\bin\node_repl.exe'
+args = []
+enabled = false
+
+[mcp_servers.ai-knowledge-map-stage2]
+command = 'D:\AI\node.exe'
+args = ['C:\Users\Lenovo\PycharmProjects\ai_knowledge_map\tools\deepdive-stage2\mcp-server.js']
+env_vars = ["STAGE2_MCP_PAGE_ID", "STAGE2_MCP_WORKER_ID"]
+enabled = true
+required = true
+enabled_tools = ["stage2_claim_task", "stage2_read_task_packet", "stage2_search_project", "stage2_read_project_file", "stage2_validate_audit_result", "stage2_submit_result"]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.ai-knowledge-map-stage2.env]
+DEEPDIVE_STAGE2_ROOT = 'C:\Users\Lenovo\PycharmProjects\ai_knowledge_map'
+STAGE2_MCP_PROFILE = "audit"

@@ -6,6 +6,7 @@
 - Claim at most one task, submit exactly one result, and stop. Never claim a second task in the same Codex run.
 - Do not edit official deep-dive files, graph data, audit files, `.stage2/state.json`, or `.stage2/results/` directly.
 - The controller is the only writer allowed to publish an understanding page or integrate a new concept node.
+- Every restricted controller launch must explicitly choose the `manual-review` action: `publish-provisional` or `hold`. When provisional publication is authorized, the content agent stops first; the page-locked controller then inspects the exact candidate hash, publishes it once with the red provisional marker, verifies the publication state, and stops. Never represent this as L3 Pass.
 - Audit agents must not write page content. Write, update, and repair agents must not invent or submit audit evidence.
 - Audit agents may inspect project text and gate implementation only through the lease-bound `stage2_search_project` and `stage2_read_project_file` tools. They must not use direct filesystem access or copy old audit answers as their conclusion.
 - Repair work may use only the sanitized defects included in its task packet; never search for a private audit answer.

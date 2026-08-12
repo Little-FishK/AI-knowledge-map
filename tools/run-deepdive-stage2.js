@@ -7,9 +7,12 @@ const {
   claimTask,
   enqueueNewNode,
   initialize,
+  inspectPublicationCandidate,
+  publishProvisionalPage,
   refreshBlockers,
   releaseLease,
   retry,
+  rollbackProvisionalPage,
   setPaused,
   status,
   submitResult,
@@ -60,6 +63,25 @@ function main() {
   if (command === "resume") return print(setPaused(root, false));
   if (command === "refresh-blockers") {
     return print(refreshBlockers(root, positionals[0] || options.id));
+  }
+  if (command === "inspect-publication") {
+    return print(inspectPublicationCandidate(root, positionals[0] || options.id));
+  }
+  if (command === "publish-provisional") {
+    return print(publishProvisionalPage(
+      root,
+      positionals[0] || options.id,
+      options.hash,
+      options.reason,
+    ));
+  }
+  if (command === "rollback-provisional") {
+    return print(rollbackProvisionalPage(
+      root,
+      positionals[0] || options.id,
+      options.hash,
+      options.reason,
+    ));
   }
   if (command === "release") {
     return print(releaseLease(

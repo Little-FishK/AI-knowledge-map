@@ -10,6 +10,8 @@ flowchart LR
   B -->|通过| P["控制器运行门禁并发布"]
   B -->|缺陷| R["repair 按净化缺陷返修"]
   R --> B
+  B -->|两次返修后仍有阻断| M["manual-review"]
+  M -->|本次启动明确授权| PP["控制器暂行覆盖并写红色标记"]
   N["新节点材料"] --> W["write 从零写"]
   W --> B
   S["现有节点补充材料"] --> U["update 融合更新"]
@@ -47,12 +49,16 @@ flowchart LR
 | `writing` | write | 新页面写作中 |
 | `repair-queued` | repair | 审计发现缺陷，等待返修 |
 | `repairing` | repair | 返修执行中 |
-| `manual-review` | 人工 | 两次返修仍失败或发生不可自动处理的问题 |
+| `manual-review` | 控制器收尾 / 人工 | 两次返修仍失败或发生不可自动处理的问题；按本次启动的必选策略暂行发布或保持待人工 |
 | `l3-auto-passed` | 无 | 内容哈希绑定的自动门禁已通过并正式发布 |
+
+工作流状态与发布状态彼此独立。控制器启动器要求每次显式选择 `manual-review` 的处理策略：`publish-provisional` 或 `hold`，没有默认值。选择前者表示本次页面已获得用户授权；MCP 才会临时开放绑定到该页的暂行发布工具。控制器以 `published-provisional` 暂行覆盖正式页后，工作流仍保持 `manual-review`，不产生 L3 Pass；界面使用红色标题和“未通过审计 · 暂行版本”文字标记。选择 `hold` 时发布工具不会暴露，控制器只报告候选和阻断项。真正通过门禁后，控制器发布无暂行标记的正文，并把发布状态改为 `published-approved`。
 
 领取优先级是 `repair > update > write > audit`。这样新材料和返修不会长期被 126 个存量审计淹没。
 
 全局同时最多只有一个租约。租约默认 45 分钟；任务异常退出后，过期租约自动回队。每页最多自动返修两次，避免无限循环。
+
+审计提交先验证审计合同。合同、证据定位或 schema 无效时，本次审计以 `rejected` 结束，页面回到 `audit-queued` 交给新的独立审计；这不计入正文返修次数，也不会把审计格式问题下发给 repair。只有合同有效的正文阻断项和控制器直接检出的正文阻断项才进入 `repair-queued`。
 
 ## 4. 三种内容 Agent 与一个控制器
 
@@ -88,10 +94,23 @@ Codex 定时任务使用 MCP 接口：
 2. 若返回 `paused`、`busy` 或 `idle`，立即结束。
 3. 若返回任务包，只完成其中指定的 `role`。
 4. 调用一次 `stage2_submit_result`。
-5. 控制器确认提交被接收后，调用 Codex 任务归档工具归档当前任务。
-6. 不再领取第二项任务，结束本次 Codex 任务。
+5. 内容 Agent 收到控制器结果后停止，不领取第二项任务。
+6. 控制器只读检查该页提交后的工作流与发布状态；若进入 `manual-review`，执行启动时必选的 `publish-provisional` 或 `hold` 策略。
+7. `publish-provisional` 策略必须使用检查接口刚返回的候选哈希，最多调用一次暂行发布，再复查发布状态为 `published-provisional`；不得改写为 L3 Pass。
+8. 控制器确认收尾完成后，调用 Codex 任务归档工具归档当前任务并结束。
 
 正常定时运行不传页面 ID，控制器按优先级领取。人工单页试点可以在 `stage2_claim_task` 中传入 `pageId`，但仍必须满足“全局无活动租约、页面处于可领取状态、一次运行只领取一项”。
+
+受限 Codex 控制器的单阶段启动必须明确选择人工复核策略，例如：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/run-stage2-codex-controller.ps1 `
+  -PageId rnn -StartOrder 2.7 `
+  -ManualReviewAction publish-provisional `
+  -ProvisionalReason "用户授权：最终受阻候选优于旧正式页，以红色暂行版本覆盖"
+```
+
+若该页不允许覆盖，必须显式传入 `-ManualReviewAction hold`。启动器没有默认策略，避免协调 Agent 忘记执行收尾步骤。若页面已经处于 `manual-review`，用 `publish-provisional` 再运行同一启动器时，控制器会直接检查并暂行发布，不会启动新的 audit/repair Agent。
 
 audit 任务包还会提供 `stage2_search_project` 和 `stage2_read_project_file`：
 
@@ -170,6 +189,29 @@ Agent 提交的内容只进入 `.stage2/results/`，不是正式页面。控制�
 
 现有页面以末位覆盖文件发布，避免自动修改承载多个页面的共享批次源文件；新节点以原子集成包发布。
 
+### 8.1 不合格候选的暂行发布
+
+当两次返修后的页面仍有阻断项时，暂行发布是受限控制器流程中的正式收尾分支，而不是内容 Agent 的额外任务：
+
+1. 最终 audit 提交后，状态机把页面置为 `manual-review`，审计 Agent 随即停止；
+2. 启动器必须已经明确选择 `publish-provisional`，该选择作为本页发布授权，只临时开放控制器的暂行发布能力；
+3. 控制器先只读检查候选，确认无活动租约、取得当前候选哈希、阻断项和 `canPublishProvisional=true`；
+4. 控制器使用刚取得的精确候选哈希，最多调用一次暂行发布；哈希已变化时发布会拒绝，必须重新检查；
+5. 控制器以原子覆盖方式发布带 `published-provisional` 元数据的候选，并再次检查发布状态；
+6. 控制器保留被覆盖目标的私有快照，并运行结构、深读页与视频集成检查，但不会跳过状态记录去伪造 L3 Pass；
+7. 页面继续保持 `manual-review`，标题显示红色，并同时显示文字警告和阻断项数量；
+8. 目标文件若在发布后发生变化，回滚会拒绝覆盖，避免抹掉其他人的更新。
+
+权限仍是硬隔离：controller profile 始终可做只读发布检查；只有启动器显式选择 `publish-provisional` 时，MCP 才暴露发布工具，而且服务端把检查和发布都锁定到本次 `STAGE2_MCP_PAGE_ID`。audit/repair profile 永远看不到该工具。
+
+暂行发布只适用于已有理解原理页。尚未集成的新概念节点必须先通过正式门禁，不能借暂行发布写入图数据、学习路径或核心节点集合。
+
+```powershell
+node tools/run-deepdive-stage2.js inspect-publication <page-id>
+node tools/run-deepdive-stage2.js publish-provisional <page-id> --hash <sha256:...> --reason "<人工授权原因>"
+node tools/run-deepdive-stage2.js rollback-provisional <page-id> --hash <sha256:...> --reason "<回滚原因>"
+```
+
 ## 9. 三页试点与正式启用
 
 正式定时任务初始保持暂停。建议试点依次覆盖三种真实路径：
@@ -199,4 +241,4 @@ Agent 提交的内容只进入 `.stage2/results/`，不是正式页面。控制�
 - 用现有私有审计重新生成净化缺陷：`node tools/run-deepdive-stage2.js refresh-blockers <page-id>`
 - 全量回归：`npm run quality:all`
 
-不要手改租约、状态或私有结果。`release` 只用于工具故障等没有产生有效提交的异常恢复；`refresh-blockers` 只由可信控制器读取私有审计并生成不含答案的返修缺陷。若某页进入 `manual-review`，先查看事件日志和该页的 completion/audit 证据，人工决定修正文、材料还是门禁，再用 `retry` 重新排队。
+不要手改租约、状态或私有结果。`release` 只用于工具故障等没有产生有效提交的异常恢复；`refresh-blockers` 只由可信控制器读取私有审计并生成不含答案的返修缺陷。若某页进入 `manual-review`，控制器先按启动时的必选策略完成“暂行发布或保持待人工”的收尾；之后人工再决定修正文、材料还是门禁，需要复审时用 `retry` 重新排队。暂行发布不会妨碍后续复审，也不会改变失败结论。

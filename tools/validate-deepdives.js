@@ -146,7 +146,7 @@ const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const indexContext = { window: {} };
 vm.createContext(indexContext);
 const manifestSrc = "data/deepdive-runtime/manifest.js";
-if (!indexHtml.includes(`<script src="${manifestSrc}"></script>`)) {
+if (!new RegExp(`<script[^>]*\\ssrc="${manifestSrc.replace(/[/.]/g, "\\$&")}"`).test(indexHtml)) {
   problems.push("index.html 缺按需理解原理页清单");
 }
 if (/<script src="data\/deepdive\/[^"]+\.js"><\/script>/.test(indexHtml)) {

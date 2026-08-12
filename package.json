@@ -10,6 +10,9 @@
     "stage2:claim": "node tools/run-deepdive-stage2.js claim",
     "stage2:release": "node tools/run-deepdive-stage2.js release",
     "stage2:refresh-blockers": "node tools/run-deepdive-stage2.js refresh-blockers",
+    "stage2:inspect-publication": "node tools/run-deepdive-stage2.js inspect-publication",
+    "stage2:publish-provisional": "node tools/run-deepdive-stage2.js publish-provisional",
+    "stage2:rollback-provisional": "node tools/run-deepdive-stage2.js rollback-provisional",
     "stage2:mcp": "node tools/deepdive-stage2/mcp-server.js",
     "validate": "node tools/validate.js && node tools/validate-deepdives.js && node tools/validate-software.js && node tools/validate-tutorials.js && node tools/validate-video-applications.js && node tools/validate-library.js",
     "validate:library": "node tools/validate-library.js",
@@ -36,7 +39,7 @@
     "quality:l3": "node tools/audit-deepdive-benchmark.js",
     "quality:browser": "node tools/audit-deepdive-browser.js --changed",
     "test:quality-gates": "node tools/test-deepdive-quality.js",
-    "test:stage2": "node tools/test-deepdive-stage2.js && node tools/test-deepdive-stage2-mcp.js",
+    "test:stage2": "node tools/test-deepdive-stage2.js && node tools/test-deepdive-stage2-mcp.js && node tools/test-deepdive-stage2-mcp-capabilities.js",
     "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-node-apply.js && node tools/test-video-calibration.js",
     "quality:all": "npm run validate && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },

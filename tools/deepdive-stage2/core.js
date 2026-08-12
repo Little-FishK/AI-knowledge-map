@@ -8,11 +8,18 @@ const vm = require("vm");
 const { spawnSync } = require("child_process");
 const { loadDeepDivePages } = require("../deepdive-loader");
 const { pageContentHash } = require("../deepdive-audit-contracts");
+const {
+  TEMPLATE_FAMILIES,
+  narrativeTemplateBlockers,
+  plainText,
+  scanNarrativeTemplates,
+} = require("../deepdive-narrative-audit");
 const { transformGraph } = require("../video-ingest/node-application");
 const { graphFingerprint } = require("../video-ingest/shadow-review");
 
 const ROOT = path.join(__dirname, "..", "..");
 const STATE_SCHEMA_VERSION = 1;
+const AUDIT_SCHEMA_VERSION = 2;
 const SIX_QUESTIONS = [
   "definition",
   "problem",
@@ -21,6 +28,29 @@ const SIX_QUESTIONS = [
   "interpretation",
   "boundary",
 ];
+const L3_BLOCKING_CRITERIA = [
+  { code: "critical-factual-error", label: "关键事实错误" },
+  { code: "task-mechanism-causality-confusion", label: "任务、机制或因果关系混淆" },
+  { code: "core-mechanism-chain-break", label: "核心机制链断裂" },
+  { code: "example-mechanism-mismatch", label: "案例无法支持所解释的机制" },
+  { code: "unsupported-or-overbroad-conclusion", label: "结论超出证据或适用边界，可能误导读者" },
+  { code: "tail-appended-contract", label: "内容主要依靠节尾追加段满足合同" },
+  { code: "harmful-template-expression", label: "大量模板化表达明显损害教学叙事" },
+  { code: "section-six-question-incomplete", label: "单个章节没有独立包含全部六问" },
+  { code: "insufficient-core-explanation", label: "核心章节只有名称、结论或片段，没有形成足够解释" },
+  { code: "undefined-critical-term", label: "关键新术语首次出现时没有解释含义与用途" },
+  { code: "title-body-scope-mismatch", label: "标题承诺讲解的核心概念没有在正文展开" },
+  { code: "core-source-unsupported", label: "来源不能支持核心命题" },
+];
+const L3_NON_BLOCKING_SIGNALS = [
+  { code: "missing-real-run-log", label: "没有真实运行日志" },
+  { code: "missing-full-reproduction", label: "没有完整复现实验" },
+  { code: "missing-quantitative-threshold", label: "没有量化通过阈值" },
+  { code: "extension-source-coverage", label: "来源没有覆盖每个扩展话题" },
+  { code: "missing-latest-model-test", label: "没有使用最新模型做能力测试" },
+  { code: "missing-l4-artifact", label: "没有 L4 级人工证据或 artifact" },
+];
+const L3_BLOCKER_CODES = new Set(L3_BLOCKING_CRITERIA.map(item => item.code));
 const QUEUE_BY_ROLE = {
   audit: "audit-queued",
   write: "write-queued",
@@ -40,9 +70,34 @@ const AUDIT_READABLE_EXTENSIONS = new Set([
 ]);
 const AUDIT_READ_MAX_BYTES = 512 * 1024;
 const AUDIT_SEARCH_MAX_FILES = 6000;
+const WRITING_NARRATIVE_POLICY = [
+  "【大量模板化表达硬约束】不得把原文中多样化的章节开场统一改写成定义句。",
+  "“是在 / 是一类 / 是一种 / 是…… / 指的是 / 可以理解为”等都属于同一个 definition-copula 句式家族，替换连接词不算句式多样化。",
+  "只修改任务要求的事实、机制、案例、证据或边界；不要为了补齐六问而让每一节采用相同的定义—问题—机制模板。",
+  "提交前逐节检查第一个实质句：同一句式家族不得覆盖至少 3 节且不少于全部教学章节一半。",
+  "优先保留原文已有的提问、案例、冲突、现象、因果和责任场景开场；若不影响本次缺陷修复，不得将其改成“X 是 X”。",
+].join("\n");
+const CODEX_TASK_ARCHIVE_TOOL = "set_thread_archived";
+const CODEX_TASK_ARCHIVE_STATUSES = [
+  "accepted",
+  "needs-repair",
+  "l3-auto-passed",
+  "rejected",
+];
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function archiveCurrentTaskDirective(reason) {
+  return {
+    required: true,
+    tool: CODEX_TASK_ARCHIVE_TOOL,
+    arguments: { archived: true },
+    target: "current-task",
+    reason,
+    instruction: "调用 Codex 任务归档工具归档当前任务；省略 threadId，使工具作用于调用任务本身。归档后立即结束，不再领取任务。",
+  };
 }
 
 function sha256(value) {
@@ -154,6 +209,17 @@ function authorizeAuditProjectRead(root, taskId, leaseToken) {
   if (record.lease.token !== leaseToken) throw new Error("只读项目访问的租约令牌无效");
   if (record.lease.role !== "audit") throw new Error("只有 audit 角色可以读取项目");
   if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("审计租约已经过期");
+  return record;
+}
+
+function authorizeTaskLease(root, taskId, leaseToken) {
+  const state = loadState(root);
+  const record = Object.values(state.pages).find(page =>
+    page.lease && page.lease.taskId === taskId
+  );
+  if (!record) throw new Error("任务包续读对应的活动租约不存在");
+  if (record.lease.token !== leaseToken) throw new Error("任务包续读的租约令牌无效");
+  if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("任务包续读的租约已经过期");
   return record;
 }
 
@@ -468,25 +534,67 @@ function currentPage(root, record) {
 
 function writingPolicy(root) {
   const file = path.join(stageDirectory(root), "policies", "writing-policy.md");
-  if (fs.existsSync(file)) return fs.readFileSync(file, "utf8");
-  return [
+  const base = fs.existsSync(file)
+    ? fs.readFileSync(file, "utf8")
+    : [
     "一次只处理一个页面。",
     "将解释自然融入原有教学过程，不在章节末尾追加六问答案。",
     "保留正确且有效的原内容，不为了统一模板而机械改写。",
     "不得声称页面已经通过 L3；质量状态由控制器决定。",
-  ].join("\n");
+    ].join("\n");
+  return `${base.trim()}\n\n${WRITING_NARRATIVE_POLICY}`;
+}
+
+function writingNarrativeGuard(page, blockers = []) {
+  const baseline = page ? scanNarrativeTemplates(page) : null;
+  return {
+    blockingCode: "harmful-template-expression",
+    threshold: "同一句式家族覆盖至少 3 节且不少于全部教学章节一半",
+    definitionFamilyExamples: ["是在", "是一类", "是一种", "是……", "指的是", "可以理解为"],
+    instruction: "保留原文已有句式多样性；提交前逐节检查第一个实质句。命中阈值的候选会被控制器拒绝并重新排队，不会进入审计。",
+    baseline: baseline ? {
+      pervasive: baseline.pervasive,
+      sectionOpenings: baseline.sections.map(section => ({
+        section: section.section,
+        evidence: section.opening,
+        patternFamily: section.patternFamily,
+      })),
+    } : null,
+    previousSubmissionDefects: clone(blockers || []),
+  };
 }
 
 function auditContract() {
   return {
-    schemaVersion: 1,
+    schemaVersion: AUDIT_SCHEMA_VERSION,
     requiredQuestions: clone(SIX_QUESTIONS),
-    instruction: "逐节回答六问并引用当前正文证据；正文没有答案时保留空 answer/evidence，不替作者补写。",
+    decisionPolicy: {
+      type: "binary",
+      pass: "不存在任何高置信阻断项",
+      fail: "至少存在一项有正文证据支持的高置信阻断项",
+    },
+    blockingCriteria: clone(L3_BLOCKING_CRITERIA),
+    nonBlockingSignals: clone(L3_NON_BLOCKING_SIGNALS),
+    instruction: "逐个核心教学章节回答六问并引用当前正文证据；还必须逐个核心教学章节摘录开场句并完成 narrativeAudit。带 data-section-role=\"core\" 的章节构成核心教学章节；参考资料、自测等补充章节不要求单独提交六问或开场证据。关键新术语首次出现时必须在本节正文分别说明它是什么、为何在这里使用；只有名称、表格条目、代码标识符或用另一个未定义术语改写，不算解释。标题承诺讲解的核心概念必须在正文展开。正文只有结论、标签或零散片段，无法形成定义、机制或结果解释时，必须用 insufficient-core-explanation、undefined-critical-term 或 title-body-scope-mismatch 判定 fail。把“是在 / 是一类 / 是一种 / 是…… / 指的是 / 可以理解为”等视为同一个 definition-copula 家族；同一家族覆盖至少 3 节且不少于核心章节一半时，必须以 harmful-template-expression 判定 fail。最终只能给出 pass 或 fail。只有 blockingCriteria 中的高置信问题可以阻断。nonBlockingSignals 中的不足可以写入说明，但不得放入 blockingFindings，也不得单独导致 fail。",
     outputShape: {
-      schemaVersion: 1,
+      schemaVersion: AUDIT_SCHEMA_VERSION,
       pageId: "<page-id>",
       pageHash: "sha256:...",
       reviewedAt: "YYYY-MM-DD",
+      decision: "pass",
+      blockingFindings: [],
+      narrativeAudit: {
+        reviewedSections: [1],
+        sectionOpenings: [
+          {
+            section: 1,
+            evidence: "",
+            patternFamily: "other",
+          },
+        ],
+        pervasiveTemplateExpression: false,
+        rationale: "",
+      },
       sections: [
         {
           section: 1,
@@ -502,6 +610,71 @@ function auditContract() {
   };
 }
 
+function pageSubmissionShape(page) {
+  const requiredKeys = Object.keys(page || {});
+  return {
+    page: {
+      type: "object",
+      source: "packet.page",
+      requiredKeys,
+      fieldTypes: Object.fromEntries(requiredKeys.map(key => {
+        const value = page[key];
+        const type = Array.isArray(value) ? "array" : (value === null ? "null" : typeof value);
+        return [key, type];
+      })),
+      instruction: "提交以 packet.page 为底稿完成修改后的完整页面对象；保留所有未修改字段及其真实值，不要提交本结构说明。",
+    },
+    summary: {
+      type: "string",
+      maxLength: 120,
+      instruction: "概括本次实际修改。",
+    },
+  };
+}
+
+function readTaskPacketPart(root = ROOT, input = {}) {
+  const resolvedRoot = path.resolve(root);
+  const record = authorizeTaskLease(resolvedRoot, input.taskId, input.leaseToken);
+  const page = currentPage(resolvedRoot, record);
+  const part = String(input.part || "contract");
+  if (part === "contract") {
+    const packet = buildPacket(resolvedRoot, record, record.lease.role);
+    delete packet.page;
+    const pageMetadata = clone(page);
+    delete pageMetadata.html;
+    return {
+      status: "ok",
+      pageId: record.id,
+      role: record.lease.role,
+      packet,
+      pageMetadata,
+      pageDelivery: {
+        tool: "stage2_read_task_packet",
+        part: "page-html",
+        totalChars: String(page.html || "").length,
+        maxCharsPerCall: 12000,
+        instruction: "从 offset=0 开始续读，按 nextOffset 顺序拼接 content，直到 done=true；拼接结果就是 result.page.html 的完整底稿。",
+      },
+    };
+  }
+  if (part !== "page-html") throw new Error(`不支持的任务包续读部分：${part}`);
+  const html = String(page.html || "");
+  const offset = Math.max(0, Math.min(html.length, Number(input.offset) || 0));
+  const maxChars = Math.max(1000, Math.min(12000, Number(input.maxChars) || 12000));
+  const nextOffset = Math.min(html.length, offset + maxChars);
+  return {
+    status: "ok",
+    pageId: record.id,
+    role: record.lease.role,
+    part,
+    offset,
+    nextOffset,
+    totalChars: html.length,
+    done: nextOffset >= html.length,
+    content: html.slice(offset, nextOffset),
+  };
+}
+
 function buildPacket(root, record, role) {
   const page = currentPage(root, record);
   const common = {
@@ -512,7 +685,12 @@ function buildPacket(root, record, role) {
     leaseToken: record.lease.token,
     contentHash: page ? pageContentHash(page) : null,
     submitTool: "stage2_submit_result",
-    instruction: "只使用本任务包。完成后调用提交工具一次，然后结束本次任务。",
+    uiCleanup: {
+      ...archiveCurrentTaskDirective("Stage 2 单次工作已终止"),
+      afterSubmitStatuses: clone(CODEX_TASK_ARCHIVE_STATUSES),
+      onSubmitError: "保留当前任务，不归档，以便用户查看并处理异常。",
+    },
+    instruction: "只使用本任务包。write、update、repair 的 outputShape 是提交结构合同，不是可直接提交的示例值；result.page 必须是以 packet.page 为底稿完成修改后的完整真实页面对象。完成后调用提交工具一次；若返回 accepted、needs-repair、l3-auto-passed 或 rejected，必须调用 set_thread_archived({ archived: true }) 归档当前 Codex 任务，然后立即结束。提交抛错时不要归档，以便用户处理。",
   };
   if (role === "audit") {
     return {
@@ -554,6 +732,7 @@ function buildPacket(root, record, role) {
       ...common,
       material: clone(record.integration && record.integration.material),
       writingPolicy: writingPolicy(root),
+      narrativeGuard: writingNarrativeGuard(null, record.blockers),
       outputShape: { page: { title: "", subtitle: "", aliases: "", meta: "", thesis: "", html: "" }, summary: "" },
       forbidden: ["读取其他页面", "读取审计答案", "修改正式文件", "自行授予 L3"],
     };
@@ -564,7 +743,8 @@ function buildPacket(root, record, role) {
       page: clone(page),
       supplements: clone((record.origin && record.origin.supplements) || []),
       writingPolicy: writingPolicy(root),
-      outputShape: { page: clone(page), summary: "" },
+      narrativeGuard: writingNarrativeGuard(page, record.blockers),
+      outputShape: pageSubmissionShape(page),
       forbidden: ["读取其他页面", "读取审计答案", "只在末尾追加材料", "修改正式文件"],
     };
   }
@@ -573,7 +753,8 @@ function buildPacket(root, record, role) {
     page: clone(page),
     defects: clone(record.blockers || []),
     writingPolicy: writingPolicy(root),
-    outputShape: { page: clone(page), summary: "" },
+    narrativeGuard: writingNarrativeGuard(page, record.blockers),
+    outputShape: pageSubmissionShape(page),
     forbidden: ["读取独立审计答案", "读取门禁实现", "在章节末尾追加六问收束段", "修改正式文件"],
   };
 }
@@ -584,13 +765,20 @@ function claimTask(root = ROOT, workerId = "codex-scheduled", requestedPageId = 
   try {
     const state = loadState(resolvedRoot);
     expireLease(resolvedRoot, state);
-    if (state.paused) return { status: "paused", task: null };
+    if (state.paused) {
+      return {
+        status: "paused",
+        task: null,
+        uiCleanup: archiveCurrentTaskDirective("Stage 2 已暂停，本次定时任务无需保留"),
+      };
+    }
     const active = activeRecord(state);
     if (active) {
       return {
         status: "busy",
         task: null,
         active: { id: active.id, role: active.lease.role, expiresAt: active.lease.expiresAt },
+        uiCleanup: archiveCurrentTaskDirective("已有活动租约，本次定时任务正常结束"),
       };
     }
     let selected = null;
@@ -615,7 +803,13 @@ function claimTask(root = ROOT, workerId = "codex-scheduled", requestedPageId = 
         }
       }
     }
-    if (!selected) return { status: "idle", task: null };
+    if (!selected) {
+      return {
+        status: "idle",
+        task: null,
+        uiCleanup: archiveCurrentTaskDirective("Stage 2 当前无可领取任务"),
+      };
+    }
     const now = new Date();
     const token = crypto.randomBytes(24).toString("hex");
     const taskId = `${selected.id}:${role}:${selected.attempt + 1}:${token.slice(0, 8)}`;
@@ -655,27 +849,214 @@ function validatePage(id, page) {
   return errors;
 }
 
+function ensureReviewHistory(record) {
+  if (!Array.isArray(record.reviewHistory)) record.reviewHistory = [];
+  return record.reviewHistory;
+}
+
+function compactBlocker(blocker) {
+  return {
+    code: String(blocker && (blocker.code || blocker.type || blocker.gate) || "blocker").slice(0, 160),
+    section: Number.isInteger(blocker && blocker.section) ? blocker.section : null,
+    message: String(blocker && (blocker.message || blocker.evidence) || JSON.stringify(blocker || {})).slice(0, 1000),
+  };
+}
+
 function auditGaps(id, page, audit) {
   const gaps = [];
+  const narrativeScan = scanNarrativeTemplates(page);
+  const visiblePageText = [page.title, page.subtitle, page.thesis, page.html]
+    .map(value => String(value || "").replace(/<[^>]+>/g, " "))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sectionCount = (String(page.html || "").match(/<section\b/gi) || []).length;
   if (!audit || typeof audit !== "object") return ["独立审计结果缺失"];
-  if (audit.schemaVersion !== 1) gaps.push("独立审计 schemaVersion 必须为 1");
+  if (audit.schemaVersion !== AUDIT_SCHEMA_VERSION) {
+    gaps.push(`独立审计 schemaVersion 必须为 ${AUDIT_SCHEMA_VERSION}`);
+  }
   if (audit.pageId !== id) gaps.push("独立审计 pageId 不匹配");
   if (audit.pageHash !== pageContentHash(page)) gaps.push("独立审计 pageHash 与当前正文不匹配");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(audit.reviewedAt || "")) gaps.push("独立审计日期无效");
+  if (!["pass", "fail"].includes(audit.decision)) {
+    gaps.push("独立审计 decision 必须是 pass 或 fail");
+  }
+  if (!Array.isArray(audit.blockingFindings)) {
+    gaps.push("独立审计 blockingFindings 必须是数组");
+  } else {
+    audit.blockingFindings.forEach((finding, index) => {
+      if (!finding || typeof finding !== "object") {
+        gaps.push(`blockingFindings[${index}] 必须是对象`);
+        return;
+      }
+      if (!L3_BLOCKER_CODES.has(finding.code)) {
+        gaps.push(`blockingFindings[${index}] 使用了非阻断代码：${finding.code || "<missing>"}`);
+      }
+      if (!String(finding.claim || "").trim()) {
+        gaps.push(`blockingFindings[${index}].claim 缺失`);
+      }
+      if (!String(finding.evidence || "").trim()) {
+        gaps.push(`blockingFindings[${index}].evidence 缺失`);
+      } else {
+        const evidence = String(finding.evidence).replace(/\s+/g, " ").trim();
+        if (!visiblePageText.includes(evidence)) {
+          gaps.push(`blockingFindings[${index}].evidence 不是当前正文中的可见证据`);
+        }
+      }
+      if (!String(finding.rationale || "").trim()) {
+        gaps.push(`blockingFindings[${index}].rationale 缺失`);
+      }
+      if (finding.section !== null && !Number.isInteger(finding.section)) {
+        gaps.push(`blockingFindings[${index}].section 必须是章节序号或 null`);
+      } else if (Number.isInteger(finding.section)
+        && (finding.section < 1 || finding.section > sectionCount)) {
+        gaps.push(`blockingFindings[${index}].section 超出当前正文章节范围`);
+      }
+    });
+    if (audit.decision === "pass" && audit.blockingFindings.length) {
+      gaps.push("decision=pass 时 blockingFindings 必须为空");
+    }
+    if (audit.decision === "fail" && !audit.blockingFindings.length) {
+      gaps.push("decision=fail 时必须提供至少一个高置信阻断项");
+    }
+  }
+  const narrativeAudit = audit.narrativeAudit;
+  if (!narrativeAudit || typeof narrativeAudit !== "object") {
+    gaps.push("独立审计缺少 narrativeAudit 模板化叙事检查");
+  } else {
+    const expectedSections = narrativeScan.sections.map(section => section.section);
+    const reviewedSections = Array.isArray(narrativeAudit.reviewedSections)
+      ? narrativeAudit.reviewedSections
+      : [];
+    const normalizedReviewed = [...new Set(reviewedSections.filter(Number.isInteger))].sort((a, b) => a - b);
+    if (JSON.stringify(normalizedReviewed) !== JSON.stringify(expectedSections)) {
+      gaps.push("narrativeAudit.reviewedSections 必须覆盖全部核心教学章节且不得重复");
+    }
+    if (!Array.isArray(narrativeAudit.sectionOpenings)
+      || narrativeAudit.sectionOpenings.length !== narrativeScan.sectionCount) {
+      gaps.push("narrativeAudit.sectionOpenings 必须逐个核心教学章节提供开场证据");
+    } else {
+      const openingSections = new Set();
+      narrativeAudit.sectionOpenings.forEach((opening, index) => {
+        const sectionNumber = Number.isInteger(opening && opening.section)
+          ? opening.section
+          : index + 1;
+        const section = narrativeScan.sections.find(item => item.section === sectionNumber);
+        if (openingSections.has(sectionNumber)) {
+          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节重复`);
+        }
+        openingSections.add(sectionNumber);
+        if (!section) {
+          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节超出正文范围`);
+          return;
+        }
+        const evidence = String(opening && opening.evidence || "").replace(/\s+/g, " ").trim();
+        if (!evidence || !section.text.includes(evidence)) {
+          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节缺少当前正文中的开场证据`);
+        }
+        if (!TEMPLATE_FAMILIES.has(opening && opening.patternFamily)) {
+          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节 patternFamily 非法`);
+        }
+      });
+    }
+    if (typeof narrativeAudit.pervasiveTemplateExpression !== "boolean") {
+      gaps.push("narrativeAudit.pervasiveTemplateExpression 必须是布尔值");
+    }
+    if (!String(narrativeAudit.rationale || "").trim()) {
+      gaps.push("narrativeAudit.rationale 缺失");
+    }
+    if (narrativeAudit.pervasiveTemplateExpression === true) {
+      const hasTemplateBlocker = Array.isArray(audit.blockingFindings)
+        && audit.blockingFindings.some(finding => finding && finding.code === "harmful-template-expression");
+      if (audit.decision !== "fail" || !hasTemplateBlocker) {
+        gaps.push("narrativeAudit 判定存在普遍模板化表达时，必须以 harmful-template-expression 判定 fail");
+      }
+    }
+  }
   if (!Array.isArray(audit.sections) || !audit.sections.length) {
     gaps.push("独立审计缺少逐节结果");
     return gaps;
   }
+  const expectedAuditSections = narrativeScan.sections.map(section => section.section);
+  const submittedAuditSections = audit.sections
+    .map(section => section && section.section)
+    .filter(Number.isInteger);
+  const uniqueSubmittedSections = [...new Set(submittedAuditSections)].sort((a, b) => a - b);
+  if (JSON.stringify(uniqueSubmittedSections) !== JSON.stringify(expectedAuditSections)
+    || submittedAuditSections.length !== uniqueSubmittedSections.length) {
+    gaps.push("独立审计 sections 必须恰好覆盖全部核心教学章节且不得重复");
+  }
   audit.sections.forEach((section, index) => {
     const sectionNumber = Number.isInteger(section && section.section) ? section.section : index + 1;
+    const pageSection = narrativeScan.sections.find(item => item.section === sectionNumber);
     SIX_QUESTIONS.forEach(question => {
       const answer = section && section[question];
       if (!answer || !String(answer.answer || "").trim() || !String(answer.evidence || "").trim()) {
         gaps.push(`第 ${sectionNumber} 节：读者无法从正文确定 ${question}`);
+        return;
+      }
+      if (audit.decision === "pass" && String(answer.answer).trim().length < 16) {
+        gaps.push(`第 ${sectionNumber} 节：${question} 的审计答案少于 16 字`);
+      }
+      const evidence = plainText(answer.evidence);
+      if (!pageSection || !evidence || !pageSection.text.includes(evidence)) {
+        gaps.push(`第 ${sectionNumber} 节：${question} 的 evidence 不是本节正文中的可见证据`);
       }
     });
   });
   return gaps;
+}
+
+function auditBlockers(audit) {
+  if (!audit || audit.decision !== "fail" || !Array.isArray(audit.blockingFindings)) return [];
+  return audit.blockingFindings.map(finding => ({
+    type: "content-audit",
+    code: finding.code,
+    section: finding.section,
+    message: `${finding.claim}：${finding.rationale}`,
+    evidence: finding.evidence,
+  }));
+}
+
+function validateAuditResult(root = ROOT, input = {}) {
+  const resolvedRoot = path.resolve(root);
+  const record = authorizeTaskLease(resolvedRoot, input.taskId, input.leaseToken);
+  if (!record.lease || record.lease.role !== "audit") {
+    throw new Error("Audit preflight is available only to an active audit lease");
+  }
+  const page = currentPage(resolvedRoot, record);
+  const gaps = auditGaps(record.id, page, input.result);
+  return {
+    status: gaps.length ? "invalid" : "valid",
+    pageId: record.id,
+    gapCount: gaps.length,
+    gaps,
+  };
+}
+
+function validatePageResult(root = ROOT, input = {}) {
+  const resolvedRoot = path.resolve(root);
+  const record = authorizeTaskLease(resolvedRoot, input.taskId, input.leaseToken);
+  if (!record.lease || record.lease.role === "audit") {
+    throw new Error("Page-result preflight is available only to an active write, update, or repair lease");
+  }
+  const result = input.result || {};
+  const page = result.page;
+  const originalPage = currentPage(resolvedRoot, record);
+  const gaps = validatePage(record.id, page);
+  if (page && typeof page === "object" && !Array.isArray(page)) {
+    for (const key of Object.keys(originalPage || {})) {
+      if (!Object.hasOwn(page, key)) gaps.push(`result.page.${key} is missing from the complete page object`);
+    }
+  }
+  if (!String(result.summary || "").trim()) gaps.push("result.summary is missing");
+  return {
+    status: gaps.length ? "invalid" : "valid",
+    pageId: record.id,
+    role: record.lease.role,
+    gapCount: gaps.length,
+    gaps,
+  };
 }
 
 function candidateRelativePath(id) {
@@ -684,6 +1065,10 @@ function candidateRelativePath(id) {
 
 function privateAuditRelativePath(id) {
   return `.stage2/results/${id}/audit.private.json`;
+}
+
+function provisionalPublicationRelativePath(id) {
+  return `.stage2/results/${id}/provisional-publication.json`;
 }
 
 function pageOverrideSource(id, page) {
@@ -951,6 +1336,102 @@ function refreshBlockers(root = ROOT, id) {
   }
 }
 
+function finalizeManualReview(root = ROOT, id, reason, options = {}) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.state !== "manual-review") {
+      throw new Error(`页面 ${id} 当前不是 manual-review：${record.state}`);
+    }
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能复核发布`);
+    if (String(reason || "").trim().length < 3) throw new Error("复核发布原因至少需要 3 个字符");
+    if (!record.auditFile) throw new Error(`页面 ${id} 没有可复用的最终独立审计`);
+    const auditPath = withinRoot(resolvedRoot, record.auditFile);
+    if (!fs.existsSync(auditPath)) throw new Error(`独立审计文件不存在：${record.auditFile}`);
+    const audit = readJson(auditPath);
+    const page = currentPage(resolvedRoot, record);
+    const gaps = auditGaps(record.id, page, audit);
+    const explicitBlockers = gaps.length ? [] : auditBlockers(audit);
+    const automaticNarrativeBlockers = narrativeTemplateBlockers(page, audit);
+    const policyBlockers = [
+      ...automaticNarrativeBlockers,
+      ...gaps.map(message => ({ type: "coverage", message })),
+      ...explicitBlockers,
+    ];
+    const evaluator = options.evaluateCandidate || evaluateCandidate;
+    const gate = policyBlockers.length
+      ? { passed: false, results: [], blockers: policyBlockers }
+      : evaluator(resolvedRoot, record, page, audit);
+    record.blockers = clone(gate.blockers || []);
+    record.updatedAt = new Date().toISOString();
+    if (!gate.passed) {
+      saveState(resolvedRoot, state);
+      appendEvent(resolvedRoot, "manual-review-recheck-blocked", {
+        id,
+        reason: String(reason).slice(0, 500),
+        blockerCount: record.blockers.length,
+      });
+      return {
+        status: "still-blocked",
+        pageId: id,
+        state: record.state,
+        blockerCount: record.blockers.length,
+        blockers: clone(record.blockers),
+      };
+    }
+
+    const publisher = options.publishCandidate || publishCandidate;
+    const approvedPage = clone(page);
+    delete approvedPage.publication;
+    const receipt = publisher(resolvedRoot, record, approvedPage, audit);
+    const completionFile = path.join(resultDirectory(resolvedRoot, record.id), "completion.json");
+    writeJson(completionFile, receipt);
+    record.auditHash = sha256(audit);
+    record.auditFile = `docs/deepdive-audits/${record.id}.json`;
+    record.contentHash = pageContentHash(page);
+    record.blockers = [];
+    record.editorialWarnings = clone(gate.editorialWarnings || []);
+    record.state = "l3-auto-passed";
+    record.published = true;
+    record.publication = {
+      schemaVersion: 1,
+      status: "published-approved",
+      reviewStatus: "l3-auto-passed",
+      pageHash: pageContentHash(approvedPage),
+      publishedAt: new Date().toISOString(),
+    };
+    record.provisionalReceipt = null;
+    record.finalReview = {
+      status: "l3-auto-passed",
+      completedAt: new Date().toISOString(),
+      blockerCount: 0,
+      reusedAudit: true,
+      reason: String(reason).slice(0, 500),
+    };
+    record.completionReceipt = path.relative(resolvedRoot, completionFile).replace(/\\/g, "/");
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "manual-review-finalized", {
+      id,
+      reason: String(reason).slice(0, 500),
+      pageHash: record.contentHash,
+      auditHash: record.auditHash,
+    });
+    return {
+      status: "l3-auto-passed",
+      pageId: record.id,
+      pageHash: record.contentHash,
+      auditHash: record.auditHash,
+      reusedAudit: true,
+    };
+  } finally {
+    release();
+  }
+}
+
 function targetRecord(root, relativePath, afterContent) {
   const file = withinRoot(root, relativePath);
   const beforeExists = fs.existsSync(file);
@@ -1077,6 +1558,319 @@ function publishCandidate(root, record, page, audit) {
   }
 }
 
+function provisionalPageMetadata(record, page, blockers, reason, publishedAt) {
+  return {
+    schemaVersion: 1,
+    status: "published-provisional",
+    reviewStatus: "manual-review",
+    label: "未通过审计 · 暂行版本",
+    blockerCount: blockers.length,
+    candidateHash: pageContentHash(page),
+    publishedAt,
+    reason: String(reason).trim().slice(0, 500),
+  };
+}
+
+function provisionalPublishedTargets(root, record, page, audit) {
+  if (record.integration) {
+    throw new Error("新概念节点不能以不合格暂行版本发布；必须先通过正式门禁");
+  }
+  const targets = [
+    targetRecord(
+      root,
+      `data/deepdive/zzzzz-stage2-${record.id}.js`,
+      pageOverrideSource(record.id, page),
+    ),
+    targetRecord(root, `data/deepdive-runtime/${record.id}.js`, runtimeSource(record.id, page)),
+    targetRecord(
+      root,
+      "data/deepdive-runtime/manifest.js",
+      runtimeManifestSource([...loadRuntimeIds(root), record.id]),
+    ),
+  ];
+  if (audit) {
+    targets.push(targetRecord(
+      root,
+      `docs/deepdive-audits/${record.id}.json`,
+      `${JSON.stringify(audit, null, 2)}\n`,
+    ));
+  }
+  return targets;
+}
+
+function writePublicationTargets(root, record, targets, options = {}) {
+  const written = [];
+  try {
+    targets.forEach(target => {
+      const file = withinRoot(root, target.relativePath);
+      const current = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+      if (sha256(current) !== target.beforeHash) {
+        throw new Error(`正式目标在暂行发布前变化：${target.relativePath}`);
+      }
+      atomicWrite(file, target.afterContent);
+      written.push(target);
+    });
+    const validatorFactory = options.validators || (() => [
+      runGate(root, root, "validate.js"),
+      runGate(root, root, "validate-deepdives.js"),
+      runGate(root, root, "validate-video-applications.js"),
+    ]);
+    const validators = validatorFactory();
+    const failed = validators.find(result => !result.passed);
+    if (failed) throw new Error(`暂行发布后集成检查失败：${failed.script}\n${failed.output}`);
+    return {
+      targets,
+      validators,
+    };
+  } catch (error) {
+    written.reverse().forEach(target => restoreTarget(root, target));
+    error.message += "\n已恢复本次暂行发布写入。";
+    throw error;
+  }
+}
+
+function inspectPublicationCandidate(root = ROOT, id) {
+  const resolvedRoot = path.resolve(root);
+  const state = loadState(resolvedRoot);
+  const record = state.pages[id];
+  if (!record) throw new Error(`不存在页面状态：${id}`);
+  const candidate = currentPage(resolvedRoot, record);
+  const published = loadDeepDivePages(resolvedRoot)[id] || null;
+  return {
+    status: "ready",
+    pageId: id,
+    workflowState: record.state,
+    publicationState: record.publication && record.publication.status
+      ? record.publication.status
+      : (record.published ? "published-current" : "unpublished"),
+    active: Boolean(record.lease),
+    candidateHash: candidate ? pageContentHash(candidate) : null,
+    publishedHash: published ? pageContentHash(published) : null,
+    blockerCount: (record.blockers || []).length,
+    blockers: clone(record.blockers || []),
+    canPublishProvisional: Boolean(
+      candidate
+      && !record.lease
+      && !record.integration
+      && ["manual-review", "l3-auto-passed"].includes(record.state)
+      && !(record.publication && record.publication.status === "published-provisional")
+    ),
+    publication: clone(record.publication || null),
+  };
+}
+
+function publishProvisionalPage(root = ROOT, id, expectedCandidateHash, reason, options = {}) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能暂行发布`);
+    if (!["manual-review", "l3-auto-passed"].includes(record.state)) {
+      throw new Error(`页面 ${id} 当前状态为 ${record.state}，不能暂行发布`);
+    }
+    if (record.integration) {
+      throw new Error("新概念节点不能以不合格暂行版本发布；必须先通过正式门禁");
+    }
+    if (record.publication && record.publication.status === "published-provisional") {
+      throw new Error(`页面 ${id} 已是暂行版本；请先回滚或完成新的审计流程`);
+    }
+    const publishReason = String(reason || "").trim();
+    if (publishReason.length < 3) throw new Error("暂行发布原因至少需要 3 个字符");
+    const candidate = currentPage(resolvedRoot, record);
+    if (!candidate) throw new Error(`页面 ${id} 没有可发布正文`);
+    const candidateHash = pageContentHash(candidate);
+    if (expectedCandidateHash !== candidateHash) {
+      throw new Error(`候选哈希不匹配：期望 ${expectedCandidateHash || "（缺失）"}，当前 ${candidateHash}`);
+    }
+    let audit = null;
+    if (record.auditFile) {
+      const auditPath = withinRoot(resolvedRoot, record.auditFile);
+      if (fs.existsSync(auditPath)) audit = readJson(auditPath);
+    }
+    const effectiveBlockers = (record.blockers || []).length
+      ? clone(record.blockers)
+      : [{
+        type: "human-review-rejected",
+        code: "human-review-rejected",
+        message: publishReason.slice(0, 1000),
+      }];
+    const publishedAt = new Date().toISOString();
+    const publication = provisionalPageMetadata(
+      record,
+      candidate,
+      effectiveBlockers,
+      publishReason,
+      publishedAt,
+    );
+    const page = { ...clone(candidate), publication };
+    const previousRecord = {
+      state: record.state,
+      contentHash: record.contentHash,
+      blockers: clone(record.blockers || []),
+      editorialWarnings: clone(record.editorialWarnings || []),
+      finalReview: clone(record.finalReview || null),
+      published: Boolean(record.published),
+      publication: clone(record.publication || null),
+      provisionalReceipt: record.provisionalReceipt || null,
+    };
+    const publisher = options.publishCandidate || ((targetRoot, targetRecordValue, targetPage, targetAudit) => {
+      const targets = provisionalPublishedTargets(targetRoot, targetRecordValue, targetPage, targetAudit);
+      return writePublicationTargets(targetRoot, targetRecordValue, targets, options);
+    });
+    const publicationResult = publisher(resolvedRoot, record, page, audit);
+    const receipt = {
+      schemaVersion: 1,
+      status: "published-provisional",
+      pageId: id,
+      pageHash: candidateHash,
+      previousState: previousRecord.state,
+      workflowState: "manual-review",
+      blockerCount: effectiveBlockers.length,
+      reason: publishReason.slice(0, 500),
+      publishedAt,
+      targets: (publicationResult.targets || []).map(target => ({
+        relativePath: target.relativePath,
+        beforeExists: target.beforeExists,
+        beforeContent: target.beforeContent,
+        beforeHash: target.beforeHash,
+        afterContent: target.afterContent,
+        afterHash: target.afterHash,
+      })),
+      validators: (publicationResult.validators || []).map(result => ({
+        script: result.script,
+        passed: result.passed,
+      })),
+      previousRecord,
+    };
+    receipt.receiptHash = sha256(receipt);
+    const receiptRelative = provisionalPublicationRelativePath(id);
+    const receiptPath = withinRoot(resolvedRoot, receiptRelative);
+    try {
+      writeJson(receiptPath, receipt);
+      record.state = "manual-review";
+      record.contentHash = candidateHash;
+      record.blockers = effectiveBlockers;
+      record.published = true;
+      record.publication = publication;
+      record.provisionalReceipt = receiptRelative;
+      record.finalReview = {
+        status: "manual-review",
+        completedAt: publishedAt,
+        blockerCount: effectiveBlockers.length,
+        provisionalPublished: true,
+        reason: publishReason.slice(0, 500),
+      };
+      record.updatedAt = publishedAt;
+      saveState(resolvedRoot, state);
+    } catch (error) {
+      const targets = publicationResult.targets || [];
+      try {
+        targets.forEach(target => {
+          const file = withinRoot(resolvedRoot, target.relativePath);
+          const current = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+          if (sha256(current) !== target.afterHash) {
+            throw new Error(`正式目标在状态提交失败后变化：${target.relativePath}`);
+          }
+        });
+        [...targets].reverse().forEach(target => restoreTarget(resolvedRoot, target));
+        if (fs.existsSync(receiptPath)) fs.unlinkSync(receiptPath);
+        error.message += "\n已恢复暂行发布目标与私有回执。";
+      } catch (rollbackError) {
+        error.message += `\n暂行发布自动回滚失败：${rollbackError.message}`;
+      }
+      throw error;
+    }
+    appendEvent(resolvedRoot, "manual-candidate-published-provisional", {
+      id,
+      previousState: previousRecord.state,
+      pageHash: candidateHash,
+      blockerCount: effectiveBlockers.length,
+      reason: publishReason.slice(0, 500),
+      receiptHash: receipt.receiptHash,
+    });
+    return {
+      status: "published-provisional",
+      pageId: id,
+      workflowState: record.state,
+      publicationState: record.publication.status,
+      pageHash: candidateHash,
+      blockerCount: effectiveBlockers.length,
+      receiptPath: receiptRelative,
+      receiptHash: receipt.receiptHash,
+    };
+  } finally {
+    release();
+  }
+}
+
+function rollbackProvisionalPage(root = ROOT, id, expectedCandidateHash, reason, options = {}) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能回滚暂行版本`);
+    if (!record.publication || record.publication.status !== "published-provisional") {
+      throw new Error(`页面 ${id} 当前不是暂行发布版本`);
+    }
+    if (record.publication.candidateHash !== expectedCandidateHash) {
+      throw new Error("暂行版本候选哈希不匹配，拒绝回滚");
+    }
+    const rollbackReason = String(reason || "").trim();
+    if (rollbackReason.length < 3) throw new Error("回滚原因至少需要 3 个字符");
+    const receiptRelative = record.provisionalReceipt || provisionalPublicationRelativePath(id);
+    const receiptPath = withinRoot(resolvedRoot, receiptRelative);
+    if (!fs.existsSync(receiptPath)) throw new Error(`暂行发布回执不存在：${receiptRelative}`);
+    const receipt = readJson(receiptPath);
+    if (receipt.pageId !== id || receipt.pageHash !== expectedCandidateHash) {
+      throw new Error("暂行发布回执与当前页面不匹配");
+    }
+    const restore = options.restorePublication || ((targetRoot, targets) => {
+      targets.forEach(target => {
+        const file = withinRoot(targetRoot, target.relativePath);
+        const current = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+        if (sha256(current) !== target.afterHash) {
+          throw new Error(`正式目标在暂行发布后变化，拒绝覆盖：${target.relativePath}`);
+        }
+      });
+      [...targets].reverse().forEach(target => restoreTarget(targetRoot, target));
+    });
+    restore(resolvedRoot, receipt.targets || []);
+    const previous = receipt.previousRecord || {};
+    record.state = previous.state || "manual-review";
+    record.contentHash = previous.contentHash || record.contentHash;
+    record.blockers = clone(previous.blockers || []);
+    record.editorialWarnings = clone(previous.editorialWarnings || []);
+    record.finalReview = clone(previous.finalReview || null);
+    record.published = Boolean(previous.published);
+    record.publication = clone(previous.publication || null);
+    record.provisionalReceipt = previous.provisionalReceipt || null;
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "manual-candidate-provisional-rolled-back", {
+      id,
+      pageHash: expectedCandidateHash,
+      restoredState: record.state,
+      reason: rollbackReason.slice(0, 500),
+      receiptHash: receipt.receiptHash || null,
+    });
+    return {
+      status: "rolled-back",
+      pageId: id,
+      workflowState: record.state,
+      publicationState: record.publication && record.publication.status
+        ? record.publication.status
+        : (record.published ? "published-current" : "unpublished"),
+      restoredTargetCount: (receipt.targets || []).length,
+    };
+  } finally {
+    release();
+  }
+}
+
 function submitResult(root = ROOT, input = {}, options = {}) {
   const resolvedRoot = path.resolve(root);
   const release = acquireLock(resolvedRoot);
@@ -1093,6 +1887,29 @@ function submitResult(root = ROOT, input = {}, options = {}) {
   if (role !== "audit") {
     const pageErrors = validatePage(record.id, result.page);
     if (pageErrors.length) throw new Error(pageErrors.join("\n"));
+    const narrativeBlockers = narrativeTemplateBlockers(result.page, null);
+    if (narrativeBlockers.length) {
+      record.blockers = clone(narrativeBlockers);
+      record.state = QUEUE_BY_ROLE[role];
+      record.lease = null;
+      record.updatedAt = new Date().toISOString();
+      saveState(resolvedRoot, state);
+      appendEvent(resolvedRoot, "candidate-rejected", {
+        id: record.id,
+        taskId: input.taskId,
+        role,
+        reason: "harmful-template-expression",
+        blockerCount: narrativeBlockers.length,
+      });
+      return {
+        status: "rejected",
+        pageId: record.id,
+        nextState: record.state,
+        blockerCount: narrativeBlockers.length,
+        reason: "harmful-template-expression",
+        uiCleanup: archiveCurrentTaskDirective("本次候选已拒绝并重新排队，当前工作任务已终止"),
+      };
+    }
     const candidate = {
       schemaVersion: 1,
       pageId: record.id,
@@ -1110,7 +1927,18 @@ function submitResult(root = ROOT, input = {}, options = {}) {
     record.auditHash = null;
     record.auditFile = null;
     record.blockers = [];
-    if (role === "repair") record.repairAttempts += 1;
+    if (role === "repair") {
+      record.repairAttempts += 1;
+      const history = ensureReviewHistory(record);
+      const openRound = [...history].reverse().find(round => !round.improvement);
+      if (openRound) {
+        openRound.improvement = {
+          summary: candidate.summary,
+          pageHash: candidate.pageHash,
+          submittedAt: candidate.createdAt,
+        };
+      }
+    }
     record.state = "audit-queued";
     record.lease = null;
     record.updatedAt = new Date().toISOString();
@@ -1126,6 +1954,7 @@ function submitResult(root = ROOT, input = {}, options = {}) {
       pageId: record.id,
       nextState: record.state,
       pageHash: candidate.pageHash,
+      uiCleanup: archiveCurrentTaskDirective("本次候选已接收，当前工作任务已终止"),
     };
   }
 
@@ -1133,11 +1962,44 @@ function submitResult(root = ROOT, input = {}, options = {}) {
   const auditInput = result.audit || (Array.isArray(result.sections) ? result : null);
   const audit = clone(auditInput);
   const gaps = auditGaps(record.id, page, audit);
+  if (gaps.length) {
+    record.auditHash = null;
+    record.auditFile = null;
+    record.blockers = [];
+    record.lease = null;
+    record.state = "audit-queued";
+    record.finalReview = null;
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "audit-rejected", {
+      id: record.id,
+      taskId: input.taskId,
+      nextState: record.state,
+      reason: "invalid-audit-contract",
+      issueCount: gaps.length,
+      issues: clone(gaps),
+    });
+    return {
+      status: "rejected",
+      reason: "invalid-audit-contract",
+      pageId: record.id,
+      nextState: record.state,
+      issueCount: gaps.length,
+      issues: clone(gaps),
+      uiCleanup: archiveCurrentTaskDirective("本次审计不符合提交合同，页面已重新排队等待新的独立审计"),
+    };
+  }
   const privateRelative = privateAuditRelativePath(record.id);
   writeJson(withinRoot(resolvedRoot, privateRelative), audit || {});
   const evaluator = options.evaluateCandidate || evaluateCandidate;
-  const gate = gaps.length
-    ? { passed: false, results: [], blockers: gaps.map(message => ({ type: "coverage", message })) }
+  const explicitBlockers = auditBlockers(audit);
+  const automaticNarrativeBlockers = narrativeTemplateBlockers(page, audit);
+  const policyBlockers = [
+    ...automaticNarrativeBlockers,
+    ...explicitBlockers,
+  ];
+  const gate = policyBlockers.length
+    ? { passed: false, results: [], blockers: policyBlockers }
     : evaluator(resolvedRoot, record, page, audit);
   if (!gate.passed) {
     record.auditHash = null;
@@ -1149,6 +2011,23 @@ function submitResult(root = ROOT, input = {}, options = {}) {
     } else {
       record.state = "repair-queued";
     }
+    ensureReviewHistory(record).push({
+      round: ensureReviewHistory(record).length + 1,
+      auditedAt: new Date().toISOString(),
+      pageHash: pageContentHash(page),
+      auditDecision: "fail",
+      reportedAuditDecision: audit && audit.decision || "invalid",
+      defects: clone(gate.blockers || []).map(compactBlocker),
+      improvement: null,
+      nextState: record.state,
+    });
+    record.finalReview = record.state === "manual-review"
+      ? {
+        status: "manual-review",
+        completedAt: new Date().toISOString(),
+        blockerCount: record.blockers.length,
+      }
+      : null;
     record.updatedAt = new Date().toISOString();
     saveState(resolvedRoot, state);
     appendEvent(resolvedRoot, "audit-failed", {
@@ -1162,11 +2041,14 @@ function submitResult(root = ROOT, input = {}, options = {}) {
       pageId: record.id,
       nextState: record.state,
       blockerCount: record.blockers.length,
+      uiCleanup: archiveCurrentTaskDirective("本次审计已接收，后续由新的返修任务处理"),
     };
   }
 
   const publisher = options.publishCandidate || publishCandidate;
-  const receipt = publisher(resolvedRoot, record, page, audit);
+  const approvedPage = clone(page);
+  delete approvedPage.publication;
+  const receipt = publisher(resolvedRoot, record, approvedPage, audit);
   const completionFile = path.join(resultDirectory(resolvedRoot, record.id), "completion.json");
   writeJson(completionFile, receipt);
   record.auditHash = sha256(audit);
@@ -1177,6 +2059,19 @@ function submitResult(root = ROOT, input = {}, options = {}) {
   record.state = "l3-auto-passed";
   record.lease = null;
   record.published = true;
+  record.publication = {
+    schemaVersion: 1,
+    status: "published-approved",
+    reviewStatus: "l3-auto-passed",
+    pageHash: pageContentHash(approvedPage),
+    publishedAt: new Date().toISOString(),
+  };
+  record.provisionalReceipt = null;
+  record.finalReview = {
+    status: "l3-auto-passed",
+    completedAt: new Date().toISOString(),
+    blockerCount: 0,
+  };
   record.completionReceipt = path.relative(resolvedRoot, completionFile).replace(/\\/g, "/");
   record.updatedAt = new Date().toISOString();
   saveState(resolvedRoot, state);
@@ -1191,6 +2086,7 @@ function submitResult(root = ROOT, input = {}, options = {}) {
     pageId: record.id,
     pageHash: record.contentHash,
     auditHash: record.auditHash,
+    uiCleanup: archiveCurrentTaskDirective("本次审计与发布已完成"),
   };
   } finally {
     release();
@@ -1222,6 +2118,49 @@ function status(root = ROOT) {
   };
 }
 
+function nextRecommendedPage(root = ROOT, startOrder = "1.3") {
+  const resolvedRoot = path.resolve(root);
+  const state = loadState(resolvedRoot);
+  const graphSource = fs.readFileSync(path.join(resolvedRoot, "data", "graph.js"), "utf8");
+  const graphContext = { window: {} };
+  vm.createContext(graphContext);
+  vm.runInContext(graphSource, graphContext);
+  const phases = graphContext.window.GRAPH
+    && Array.isArray(graphContext.window.GRAPH.recommendedLearningPath)
+    ? graphContext.window.GRAPH.recommendedLearningPath
+    : [];
+  const ordered = phases.flatMap(phase => (phase.steps || []).map(step => ({
+    order: String(step[0]),
+    pageId: String(step[1]),
+    phase: String(phase.phase || ""),
+  })));
+  const startIndex = ordered.findIndex(item => item.order === String(startOrder));
+  if (startIndex < 0) throw new Error(`官方推荐学习路径中不存在起点：${startOrder}`);
+  const terminalStates = new Set(["l3-auto-passed", "manual-review"]);
+  const next = ordered.slice(startIndex).find(item => {
+    const record = state.pages[item.pageId];
+    return record && !terminalStates.has(record.state);
+  });
+  if (!next) {
+    return {
+      status: "complete",
+      startOrder: String(startOrder),
+      remaining: 0,
+    };
+  }
+  const record = state.pages[next.pageId];
+  return {
+    status: "next",
+    startOrder: String(startOrder),
+    order: next.order,
+    pageId: next.pageId,
+    phase: next.phase,
+    pageState: record.state,
+    active: Boolean(record.lease),
+    activeRole: record.lease ? record.lease.role : null,
+  };
+}
+
 function setPaused(root = ROOT, paused) {
   const resolvedRoot = path.resolve(root);
   const release = acquireLock(resolvedRoot);
@@ -1247,6 +2186,8 @@ function retry(root = ROOT, id) {
     record.repairAttempts = 0;
     record.state = "audit-queued";
     record.blockers = [];
+    record.reviewHistory = [];
+    record.finalReview = null;
     record.updatedAt = new Date().toISOString();
     saveState(resolvedRoot, state);
     appendEvent(resolvedRoot, "page-retried", { id });
@@ -1256,7 +2197,272 @@ function retry(root = ROOT, id) {
   }
 }
 
-function releaseLease(root = ROOT, id, reason = "manual-recovery") {
+function resetManualReview(root = ROOT, id, reason) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能重置`);
+    if (record.state !== "manual-review") {
+      throw new Error(`页面 ${id} 当前状态为 ${record.state}，只有 manual-review 可以重置`);
+    }
+    const resetReason = String(reason || "").trim();
+    if (resetReason.length < 3) throw new Error("重置原因至少需要 3 个字符");
+    const previousState = record.state;
+    record.repairAttempts = 0;
+    record.state = "audit-queued";
+    record.blockers = [];
+    record.reviewHistory = [];
+    record.finalReview = null;
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "manual-review-reset", {
+      id,
+      previousState,
+      nextState: record.state,
+      reason: resetReason.slice(0, 500),
+    });
+    return {
+      status: "reset",
+      pageId: id,
+      previousState,
+      nextState: record.state,
+      repairAttempts: record.repairAttempts,
+      blockerCount: record.blockers.length,
+    };
+  } finally {
+    release();
+  }
+}
+
+function resetPassedPage(root = ROOT, id, reason) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能重置`);
+    if (record.state !== "l3-auto-passed") {
+      throw new Error(`页面 ${id} 当前状态为 ${record.state}，只有 l3-auto-passed 可以重置复审`);
+    }
+    const resetReason = String(reason || "").trim();
+    if (resetReason.length < 3) throw new Error("重置原因至少需要 3 个字符");
+    const previousState = record.state;
+    const previousAuditHash = record.auditHash || null;
+    const previousAuditFile = record.auditFile || null;
+    const previousCompletionReceipt = record.completionReceipt || null;
+    record.repairAttempts = 0;
+    record.state = "audit-queued";
+    record.auditHash = null;
+    record.auditFile = null;
+    record.blockers = [];
+    record.editorialWarnings = [];
+    record.reviewHistory = [];
+    record.finalReview = null;
+    record.completionReceipt = null;
+    record.updatedAt = new Date().toISOString();
+    saveState(resolvedRoot, state);
+    appendEvent(resolvedRoot, "passed-page-reset", {
+      id,
+      previousState,
+      nextState: record.state,
+      reason: resetReason.slice(0, 500),
+      previousAuditHash,
+      previousAuditFile,
+      previousCompletionReceipt,
+    });
+    return {
+      status: "reset",
+      pageId: id,
+      previousState,
+      nextState: record.state,
+      repairAttempts: record.repairAttempts,
+      blockerCount: record.blockers.length,
+      published: record.published,
+    };
+  } finally {
+    release();
+  }
+}
+
+function escapePreviewHtml(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function sanitizePreviewHtml(value) {
+  return String(value || "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, "")
+    .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, "")
+    .replace(/\s(?:href|src)\s*=\s*"javascript:[^"]*"/gi, "")
+    .replace(/\s(?:href|src)\s*=\s*'javascript:[^']*'/gi, "");
+}
+
+function previewSections(html) {
+  return [...String(html || "").matchAll(/<section\b[^>]*>[\s\S]*?<\/section>/gi)]
+    .map((match, index) => {
+      const sectionHtml = match[0];
+      const headingHtml = (sectionHtml.match(/<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) || [])[1] || "";
+      const heading = headingHtml
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return { index: index + 1, heading, html: sectionHtml };
+    });
+}
+
+function createManualReviewPreview(root = ROOT, id, input = {}) {
+  const resolvedRoot = path.resolve(root);
+  const release = acquireLock(resolvedRoot);
+  try {
+    const state = loadState(resolvedRoot);
+    const record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (record.lease) throw new Error(`页面 ${id} 正在执行，不能生成复核预览`);
+    if (record.state !== "manual-review") {
+      throw new Error(`页面 ${id} 当前状态为 ${record.state}，只有 manual-review 可以生成复核预览`);
+    }
+    const candidateRecord = readCandidate(resolvedRoot, record);
+    if (!candidateRecord || !candidateRecord.page) {
+      throw new Error(`页面 ${id} 没有可预览的候选正文`);
+    }
+    const publishedPage = loadDeepDivePages(resolvedRoot)[id];
+    if (!publishedPage) throw new Error(`页面 ${id} 没有正式正文可供比较`);
+    const candidatePage = candidateRecord.page;
+    const publishedSections = previewSections(publishedPage.html);
+    const candidateSections = previewSections(candidatePage.html);
+    const sectionCount = Math.max(publishedSections.length, candidateSections.length);
+    const sectionDiffs = [];
+    for (let index = 0; index < sectionCount; index += 1) {
+      const before = publishedSections[index] || { index: index + 1, heading: "（正式页缺失）", html: "" };
+      const after = candidateSections[index] || { index: index + 1, heading: "（候选页缺失）", html: "" };
+      if (before.html !== after.html) {
+        sectionDiffs.push({
+          section: index + 1,
+          beforeHeading: before.heading,
+          afterHeading: after.heading,
+          beforeHtml: before.html,
+          afterHtml: after.html,
+        });
+      }
+    }
+    const comparedFields = ["title", "subtitle", "aliases", "meta", "thesis"];
+    const changedFields = comparedFields.filter(field =>
+      String(publishedPage[field] || "") !== String(candidatePage[field] || "")
+    );
+    const overrideRounds = Array.isArray(input.rounds) ? input.rounds.slice(0, 2) : [];
+    const storedRounds = ensureReviewHistory(record).slice(0, 2).map(round => ({
+      defects: (round.defects || []).map(defect => defect.message || defect.code || JSON.stringify(defect)),
+      improvements: round.improvement && round.improvement.summary
+        ? [round.improvement.summary]
+        : [],
+    }));
+    const processRounds = (overrideRounds.length ? overrideRounds : storedRounds).map((round, index) => ({
+      round: index + 1,
+      defects: (Array.isArray(round.defects) ? round.defects : [])
+        .map(item => String(item || "").trim().slice(0, 1000))
+        .filter(Boolean),
+      improvements: (Array.isArray(round.improvements) ? round.improvements : [])
+        .map(item => String(item || "").trim().slice(0, 1000))
+        .filter(Boolean),
+    }));
+    const finalStatus = String(
+      input.finalStatus
+      || record.finalReview && record.finalReview.status
+      || record.state
+    ).slice(0, 200);
+    const listMarkup = items => items.length
+      ? `<ul>${items.map(item => `<li>${escapePreviewHtml(item)}</li>`).join("")}</ul>`
+      : "<span class=\"muted\">未记录</span>";
+    const processRows = [0, 1].map(index => {
+      const round = processRounds[index] || { defects: [], improvements: [] };
+      return `<tr><th>第 ${index + 1} 轮</th><td>${listMarkup(round.defects)}</td><td>${listMarkup(round.improvements)}</td></tr>`;
+    }).join("");
+    const processMarkup = `<div class="table-scroll"><table class="process-table"><thead><tr><th>轮次</th><th>审查缺陷</th><th>改动内容</th></tr></thead>`
+      + `<tbody>${processRows}<tr class="final-row"><th>最终状态</th><td colspan="2">${escapePreviewHtml(finalStatus)}</td></tr></tbody></table></div>`;
+    const blockerMarkup = (record.blockers || []).length
+      ? `<ol>${record.blockers.map(blocker => (
+        `<li><code>${escapePreviewHtml(blocker.code || blocker.type || "blocker")}</code>`
+        + `<div>${escapePreviewHtml(blocker.message || JSON.stringify(blocker))}</div></li>`
+      )).join("")}</ol>`
+      : "<p>控制器没有保存可展示的阻断项。</p>";
+    const fieldMarkup = changedFields.length
+      ? changedFields.map(field => (
+        `<details><summary>${escapePreviewHtml(field)}</summary>`
+        + `<div class="compare"><article><h4>正式页</h4><pre>${escapePreviewHtml(publishedPage[field] || "")}</pre></article>`
+        + `<article><h4>最终候选</h4><pre>${escapePreviewHtml(candidatePage[field] || "")}</pre></article></div></details>`
+      )).join("")
+      : "<p>标题、摘要等页面字段没有变化。</p>";
+    const sectionMarkup = sectionDiffs.length
+      ? sectionDiffs.map(diff => (
+        `<details><summary>第 ${diff.section} 节：${escapePreviewHtml(diff.beforeHeading)} → ${escapePreviewHtml(diff.afterHeading)}</summary>`
+        + `<div class="compare"><article><h4>正式页</h4>${sanitizePreviewHtml(diff.beforeHtml) || "<p>缺失</p>"}</article>`
+        + `<article><h4>最终候选</h4>${sanitizePreviewHtml(diff.afterHtml) || "<p>缺失</p>"}</article></div></details>`
+      )).join("")
+      : "<p>没有章节正文差异。</p>";
+    const preview = `<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stage 2 人工复核预览 · ${escapePreviewHtml(candidatePage.title || id)}</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0f16;color:#e7edf6;font:15px/1.7 system-ui,"Microsoft YaHei",sans-serif}
+.warning{position:sticky;top:0;z-index:9;padding:11px 24px;background:#9a3412;color:white;font-weight:800}
+main{max-width:1180px;margin:auto;padding:32px 24px 96px}nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+nav a{color:#bfdbfe;background:#172033;border:1px solid #334155;border-radius:999px;padding:7px 12px;text-decoration:none}
+.hero,.panel,.dd-sec,.dd-goals,.dd-note,.dd-src{border:1px solid #334155;background:#111827;border-radius:15px;padding:22px;margin:18px 0}
+.hero h1{font-size:36px;margin:0}.muted{color:#94a3b8}.hash{word-break:break-all;font-family:ui-monospace,monospace}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.compare article{min-width:0;border:1px solid #334155;border-radius:12px;padding:16px;background:#0f172a}
+details{border:1px solid #334155;border-radius:12px;margin:10px 0;background:#101722}summary{cursor:pointer;padding:13px 16px;font-weight:750}
+details>.compare{padding:0 14px 14px}pre{white-space:pre-wrap;word-break:break-word}.candidate{max-width:980px;margin:auto}
+.dd-sec h2{font-size:24px}.dd-n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#2563eb;margin-right:8px}
+.dd-badge{float:right;color:#93c5fd;font-size:12px}.dd-lead{font-size:17px;color:#bfdbfe}.dd-note.key{border-color:#059669}.dd-note.warn{border-color:#d97706}
+.dd-table-wrap{overflow:auto}.dd-table{width:100%;border-collapse:collapse}.dd-table th,.dd-table td{border:1px solid #3b4758;padding:9px;text-align:left}.dd-table th{background:#1f2937}
+.table-scroll{overflow:auto}.process-table{width:100%;border-collapse:collapse}.process-table th,.process-table td{border:1px solid #3b4758;padding:12px;vertical-align:top;text-align:left}.process-table thead th{background:#1e293b}.process-table tbody th{white-space:nowrap;background:#172033}.process-table ul{margin:0;padding-left:20px}.final-row td{font-weight:800;color:#fbbf24}
+a{color:#60a5fa}code{color:#fbbf24}@media(max-width:800px){.compare{grid-template-columns:1fr}}
+</style></head><body>
+<div class="warning">未发布候选 · 仅供 Stage 2 人工复核 · 不代表正式页面</div>
+<main><header class="hero"><h1>${escapePreviewHtml(candidatePage.title || id)}</h1>
+<div>${escapePreviewHtml(candidatePage.subtitle || "")}</div>
+<p class="muted">状态：manual-review · 候选哈希</p><div class="hash">${escapePreviewHtml(pageContentHash(candidatePage))}</div></header>
+<nav><a href="#process">流程展示表</a><a href="#candidate">最终候选</a><a href="#blockers">当前阻断项</a><a href="#fields">字段差异</a><a href="#sections">章节差异</a></nav>
+<section id="process" class="panel"><h2>两轮审查与改进</h2>${processMarkup}</section>
+<section id="candidate" class="panel"><h2>最终候选页面</h2><div class="candidate"><p>${sanitizePreviewHtml(candidatePage.thesis || "")}</p>${sanitizePreviewHtml(candidatePage.html)}</div></section>
+<section id="blockers" class="panel"><h2>当前控制器阻断项（${(record.blockers || []).length}）</h2>${blockerMarkup}</section>
+<section id="fields" class="panel"><h2>字段差异</h2>${fieldMarkup}</section>
+<section id="sections" class="panel"><h2>章节差异（${sectionDiffs.length}）</h2>${sectionMarkup}</section>
+</main></body></html>`;
+    const relativePath = `.stage2/previews/${id}.html`;
+    atomicWrite(withinRoot(resolvedRoot, relativePath), preview);
+    return {
+      status: "ready",
+      pageId: id,
+      state: record.state,
+      previewPath: relativePath,
+      candidateHash: pageContentHash(candidatePage),
+      publishedHash: pageContentHash(publishedPage),
+      changedFields,
+      changedSections: sectionDiffs.map(diff => ({
+        section: diff.section,
+        beforeHeading: diff.beforeHeading,
+        afterHeading: diff.afterHeading,
+      })),
+      processRounds,
+      finalStatus,
+      blockers: clone(record.blockers || []),
+    };
+  } finally {
+    release();
+  }
+}
+
+function releaseLease(root = ROOT, id, reason = "manual-recovery", expectedTaskId = null) {
   const resolvedRoot = path.resolve(root);
   const release = acquireLock(resolvedRoot);
   try {
@@ -1265,6 +2471,9 @@ function releaseLease(root = ROOT, id, reason = "manual-recovery") {
     if (!record) throw new Error(`不存在页面状态：${id}`);
     if (!record.lease) throw new Error(`页面 ${id} 当前没有活动租约`);
     const previousLease = clone(record.lease);
+    if (expectedTaskId && previousLease.taskId !== expectedTaskId) {
+      throw new Error(`页面 ${id} 的活动 taskId 不匹配，拒绝释放租约`);
+    }
     record.state = QUEUE_BY_ROLE[previousLease.role] || "manual-review";
     record.lease = null;
     record.updatedAt = new Date().toISOString();
@@ -1326,26 +2535,40 @@ function enqueueNewNode(root = ROOT, integration, material) {
 module.exports = {
   ROOT,
   SIX_QUESTIONS,
+  L3_BLOCKING_CRITERIA,
+  L3_NON_BLOCKING_SIGNALS,
   applyCoreMembership,
+  auditBlockers,
   auditGaps,
   claimTask,
+  createManualReviewPreview,
   enqueueNewNode,
   evaluateCandidate,
+  finalizeManualReview,
   gateDefects,
   initialize,
+  inspectPublicationCandidate,
   loadState,
   mergePendingSupplements,
+  nextRecommendedPage,
   pageOverrideSource,
   pageRegistrationSource,
   publishCandidate,
+  publishProvisionalPage,
   readAuditProjectFile,
+  readTaskPacketPart,
   refreshBlockers,
   releaseLease,
+  resetManualReview,
+  resetPassedPage,
+  rollbackProvisionalPage,
   retry,
   searchAuditProject,
   setPaused,
   sha256,
   status,
   submitResult,
+  validateAuditResult,
+  validatePageResult,
   validatePage,
 };

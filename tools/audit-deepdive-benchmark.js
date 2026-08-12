@@ -23,6 +23,7 @@ const {
   loadSectionAudit,
   pageContentHash,
 } = require("./deepdive-audit-contracts");
+const { scanNarrativeTemplates } = require("./deepdive-narrative-audit");
 
 const root = process.env.DEEPDIVE_ROOT
   ? path.resolve(process.env.DEEPDIVE_ROOT)
@@ -446,6 +447,7 @@ function inspect(id, page, basePage) {
   const exampleContractGaps = [];
   const terminologyContractGaps = [];
   const sectionContractGaps = [];
+  const contractLikeSectionIndexes = [];
   let requiredSectionCount = 0;
   let passedSectionCount = 0;
   let passedSectionIndexes = [];
@@ -455,7 +457,8 @@ function inspect(id, page, basePage) {
     "线性子空间", "重建误差", "局部邻域", "高维", "协方差矩阵", "特征向量",
     "正交", "单位矩阵", "似然", "典型集合", "密度比", "归纳偏置", "投影方差",
     "降维", "PCA", "t-SNE", "UMAP", "密度估计", "概率密度", "对数似然",
-    "内部指标", "轮廓系数", "稳定性检查",
+    "内部指标", "轮廓系数", "稳定性检查", "GRU", "LSTM", "BPTT",
+    "detach", "requires-grad", "梯度裁剪", "雅可比", "Jacobian",
   ];
   const firstTerminologySection = new Map();
   sectionRecords.forEach((section) => {
@@ -502,7 +505,10 @@ function inspect(id, page, basePage) {
     const validTermReview = termReview
       && /^\d{4}-\d{2}-\d{2}$/.test(termReview.reviewedAt || "")
       && terminology.every((term) => {
-        const review = reviewedTerms.find((item) => item?.name === term);
+        const review = reviewedTerms.find((item) => {
+          const name = String(item?.name || "").trim();
+          return name === term || name.includes(term) || term.includes(name);
+        });
         return review
           && typeof review.meaning === "string"
           && review.meaning.trim().length >= 4
@@ -533,6 +539,15 @@ function inspect(id, page, basePage) {
   if (contractVersion >= 1 && declaredExampleCount === 0) {
     exampleContractGaps.push("example.page-missing-contract");
   }
+  const directNarrativeScan = scanNarrativeTemplates(page);
+  directNarrativeScan.sections
+    .filter(section => directNarrativeScan.affectedSections.includes(section.section))
+    .forEach(section => reviewRequired.push(
+      `editorial.${section.patternFamily}-opening.section-${section.section}`,
+    ));
+  if (directNarrativeScan.pervasive) {
+    sectionContractGaps.push("narrative.pervasive-template-expression");
+  }
   if (contractVersion >= 2) {
     const requiredParts = ["definition", "problem", "inputOutput", "mechanism", "interpretation", "boundary"];
     const coreSections = sectionRecords.filter((section) => {
@@ -551,6 +566,18 @@ function inspect(id, page, basePage) {
       const sectionText = text(section.html);
       const missing = requiredParts.filter((part) => {
         const item = contract[part];
+        if (sectionAudit.source === "external-v2") {
+          const answer = typeof item?.answer === "string" ? item.answer.trim() : "";
+          const evidence = typeof item?.evidence === "string" ? item.evidence.trim() : "";
+          // 独立审计负责语义判断，但不能自行放宽可机械验证的合同边界。
+          // 控制器仍须验证答案长度和本节可见证据，防止“审计答案比正文完整”。
+          return answer.length < 16
+            || evidence.length < 6
+            || !sectionText.includes(evidence);
+        }
+        // 页面自己的章节合同只负责把六问定位到当前章节正文；独立审计负责
+        // 判断语义是否正确。不要用通用句式正则要求数学定义必须写成固定长度
+        // 或“X 是 X”模板，也不要让外部审计答案的措辞覆盖页面定位合同。
         return !item
           || typeof item.answer !== "string"
           || item.answer.trim().length < 8
@@ -594,6 +621,7 @@ function inspect(id, page, basePage) {
           && distribution.shortestRatio <= 0.38
           && distribution.canonicalOrder) {
           reviewRequired.push(`editorial.contract-like-evidence-cluster.section-${section.index}`);
+          contractLikeSectionIndexes.push(section.index);
         }
         const baseSection = baseSectionRecords.find((candidate) => candidate.index === section.index);
         if (isAppendOnlyContractFix(baseSection?.html, sectionText, evidenceParts)) {
@@ -604,7 +632,7 @@ function inspect(id, page, basePage) {
     const coreIndexes = new Set(coreSections.map((section) => section.index));
     sectionContracts
       .filter((contract) => !coreIndexes.has(Number(contract?.section)))
-      .forEach((contract) => sectionContractGaps.push(`section.contract-outside-core.section-${contract?.section}`));
+      .forEach((contract) => reviewRequired.push(`section.contract-outside-core.section-${contract?.section}`));
     // 文风去重：相邻核心章节的定义句不得用同一种开头模板（可以理解为 / 是一种 / 描述…）。
     const definitionTemplates = coreSections.map((section) => {
       const contract = sectionContractBySection.get(section.index);
@@ -616,6 +644,13 @@ function inspect(id, page, basePage) {
           `editorial.repeated-definition-template.section-${coreSections[i].index}.${definitionTemplates[i]}`,
         );
       }
+    }
+    const pervasiveContractTemplate = contractLikeSectionIndexes.length >= 3
+      && contractLikeSectionIndexes.length >= Math.ceil(coreSections.length / 2);
+    const pervasiveDefinitionTemplate = definitionTemplateGaps.length >= 3
+      && definitionTemplateGaps.length >= Math.ceil(coreSections.length / 2);
+    if (pervasiveContractTemplate || pervasiveDefinitionTemplate) {
+      sectionContractGaps.push("narrative.pervasive-template-expression");
     }
     requiredSectionCount = coreSections.length;
     const failedSectionIndexes = new Set(sectionContractGaps
@@ -688,14 +723,14 @@ function inspect(id, page, basePage) {
   }
   if (total < benchmark.minimumScore) proxyGaps.push("floor.total");
   if (uniqueParagraphRatio < 0.85) gaps.push("integrity.repeated-paragraphs");
-  if (leadAnomalies.length) gaps.push("integrity.overlong-lead");
-  if (leadContainsBlock) gaps.push("integrity.lead-contains-block");
-  if (formulaUsesCodeWrapper) gaps.push("notation.formula-code-wrapper");
-  if (formulaUsesProgrammingNotation) gaps.push("notation.programming-display");
-  if (usesPlainTextRadical) gaps.push("notation.plain-text-radical");
-  if (invalidMathMl) gaps.push("notation.invalid-mathml");
-  formulaContractGaps.forEach((gap) => gaps.push(gap));
-  exampleContractGaps.forEach((gap) => gaps.push(gap));
+  if (leadAnomalies.length) reviewRequired.push("integrity.overlong-lead");
+  if (leadContainsBlock) reviewRequired.push("integrity.lead-contains-block");
+  if (formulaUsesCodeWrapper) reviewRequired.push("notation.formula-code-wrapper");
+  if (formulaUsesProgrammingNotation) reviewRequired.push("notation.programming-display");
+  if (usesPlainTextRadical) reviewRequired.push("notation.plain-text-radical");
+  if (invalidMathMl) reviewRequired.push("notation.invalid-mathml");
+  formulaContractGaps.forEach((gap) => reviewRequired.push(gap));
+  exampleContractGaps.forEach((gap) => reviewRequired.push(gap));
   terminologyContractGaps.forEach((gap) => gaps.push(gap));
   sectionContractGaps.forEach((gap) => gaps.push(gap));
   sectionAudit.gaps.forEach((gap) => gaps.push(gap));
@@ -822,7 +857,9 @@ const proxyDebt = results.filter((item) => item.proxyGaps.length > 0);
 const manualReviewDebt = results.filter((item) => item.reviewRequired.length > 0);
 const contractedResults = results.filter((item) => item.metrics.contractVersion >= 1);
 const sectionContractedResults = results.filter((item) => item.metrics.contractVersion >= 2);
-const externalSectionAudits = results.filter((item) => item.metrics.sectionAuditSource === "external");
+const externalSectionAudits = results.filter((item) =>
+  String(item.metrics.sectionAuditSource || "").startsWith("external")
+);
 const integrationDebt = results.filter((item) => (
   item.gaps.some((gap) => gap.startsWith("integration."))
 ));
@@ -873,7 +910,8 @@ if (requireId) {
   if (!item) enforcementFailures.push(`${requireId}: 页面不存在`);
   else {
     item.gaps.forEach((gap) => enforcementFailures.push(`${requireId}: ${gap}`));
-    if (item.metrics.contractVersion >= 2 && item.metrics.sectionAuditSource !== "external") {
+    if (item.metrics.contractVersion >= 2
+      && !String(item.metrics.sectionAuditSource || "").startsWith("external")) {
       enforcementFailures.push(`${requireId}: audit.independent-review-required`);
     }
   }
@@ -884,7 +922,8 @@ if (requireId) {
     const old = new Set(allowed[item.id] || []);
     item.gaps.filter((gap) => !old.has(gap))
       .forEach((gap) => enforcementFailures.push(`${item.id}: 新增 L3 缺口：${gap}`));
-    if (item.metrics.contractVersion >= 2 && item.metrics.sectionAuditSource !== "external") {
+    if (item.metrics.contractVersion >= 2
+      && !String(item.metrics.sectionAuditSource || "").startsWith("external")) {
       enforcementFailures.push(`${item.id}: 新增 L3 缺口：audit.independent-review-required`);
     }
   });

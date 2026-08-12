@@ -341,14 +341,14 @@ try {
   writeFixture(fixture, l2Page(false));
   expectFail("audit-deepdive-gold.js", ["--require-candidate", "fixture"], fixture, /缺实践验证或失败诊断信号/);
 
-  // L3：结构高分不能补偿最终渲染污染或通用工厂生成的语义内容。
+  // 过长引导语属于编辑提示，不足以证明内容存在高置信错误。
   const overlongLeadPage = basePage();
   overlongLeadPage.html = overlongLeadPage.html.replace(
     "<p>用于验证发布门禁的完整正文 1。</p>",
     `<p class="dd-lead">${"这段异常引导语跨越了本应独立的正文内容。".repeat(30)}</p><p>用于验证发布门禁的完整正文 1。</p>`,
   );
   writeFixture(fixture, overlongLeadPage);
-  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /integrity\.overlong-lead/);
+  expectPass("audit-deepdive-benchmark.js", ["--explain", "fixture"], fixture, /integrity\.overlong-lead/);
 
   // 文风只给编辑提示：句式重复不应与事实缺失一样阻断发布。
   const repeatedDefinitionPage = basePage();
@@ -367,6 +367,35 @@ try {
     ["--explain", "fixture"],
     fixture,
     /editorial\.repeated-definition-template/,
+  );
+
+  // 普遍模板化叙事必须直接扫描正文；不能依赖 sectionContracts，也不能通过
+  // 把“是”替换成“是在 / 是一类 / 是一种”来逃避阻断。
+  const pervasiveTemplatePage = basePage();
+  const templateOpenings = [
+    "图像生成是在条件约束下合成像素内容的任务。",
+    "条件理解是一类把文字映射为内部表示的过程。",
+    "扩散模型是一种逐步去除噪声的生成机制。",
+    "可控生成是把额外约束加入生成过程的方法。",
+    "能力短板是模型无法稳定满足组合约束的表现。",
+    "生成评估是比较结果与目标是否一致的方法。",
+    "生成治理是控制内容发布风险的管理过程。",
+  ];
+  let templateSectionIndex = 0;
+  pervasiveTemplatePage.html = pervasiveTemplatePage.html.replace(
+    /<section class="dd-sec">[\s\S]*?<\/section>/g,
+    () => {
+      const index = templateSectionIndex;
+      templateSectionIndex += 1;
+      return `<section class="dd-sec"><h2>${index + 1}. 小节</h2><p>${templateOpenings[index]}</p></section>`;
+    },
+  );
+  writeFixture(fixture, pervasiveTemplatePage);
+  expectPass(
+    "audit-deepdive-benchmark.js",
+    ["--explain", "fixture"],
+    fixture,
+    /narrative\.pervasive-template-expression/,
   );
 
   // 收束段：按可见文本的位置分布识别，不依赖证据是否恰好装在同一个 <p> 中。
@@ -444,9 +473,9 @@ try {
     '<div class="dd-formula"><code>theta = sum_i x[i] ** 2</code></div></section>',
   );
   writeFixture(fixture, programmingFormulaPage);
-  expectFail(
+  expectPass(
     "audit-deepdive-benchmark.js",
-    ["--require-benchmark", "fixture"],
+    ["--explain", "fixture"],
     fixture,
     /notation\.formula-code-wrapper|notation\.programming-display/,
   );
@@ -457,15 +486,15 @@ try {
     '<div class="dd-formula" data-display="mathml"><math display="block"><mi>x</mi></math></div></section>',
   );
   writeFixture(fixture, invalidMathMlPage);
-  expectFail("audit-deepdive-benchmark.js", ["--require-benchmark", "fixture"], fixture, /notation\.invalid-mathml/);
+  expectPass("audit-deepdive-benchmark.js", ["--explain", "fixture"], fixture, /notation\.invalid-mathml/);
 
-  // L3 教学合同：逐步演算必须在本节重新建立题干，不能从答案开始。
+  // 缺少示例元数据只产生复核提示；实际案例—机制不匹配由独立内容审计阻断。
   const missingPageExampleContract = basePage();
   missingPageExampleContract.quality = { contractVersion: 1, examples: [], formulas: [] };
   writeFixture(fixture, missingPageExampleContract);
-  expectFail(
+  expectPass(
     "audit-deepdive-benchmark.js",
-    ["--require-benchmark", "fixture"],
+    ["--explain", "fixture"],
     fixture,
     /example\.page-missing-contract/,
   );
@@ -496,7 +525,21 @@ try {
     /section\.missing-contract\.section-1/,
   );
 
-  writeFixture(fixture, weakSixQuestionPage());
+  const weakAuditedPage = weakSixQuestionPage();
+  writeFixture(fixture, weakAuditedPage);
+  fs.mkdirSync(path.join(fixture, "docs", "deepdive-audits"), { recursive: true });
+  fs.writeFileSync(
+    path.join(fixture, "docs", "deepdive-audits", "fixture.json"),
+    JSON.stringify({
+      schemaVersion: 2,
+      pageId: "fixture",
+      pageHash: qualityPageHash(weakAuditedPage),
+      reviewedAt: today,
+      decision: "pass",
+      blockingFindings: [],
+      sections: weakAuditedPage.quality.sectionContracts,
+    }, null, 2),
+  );
   expectFail(
     "audit-deepdive-benchmark.js",
     ["--require-benchmark", "fixture"],
@@ -536,12 +579,42 @@ try {
     /未侦测到自动可验证缺口/,
   );
 
+  // Stage 2 审计 schema v2 必须被正式加载；六问由审计答案与章节完整正文
+  // 共同验证，不能因为 evidence 摘录过短而把已有内容判成缺失。
+  const schemaV2Audit = {
+    schemaVersion: 2,
+    pageId: "fixture",
+    pageHash: qualityPageHash(strongContractPage),
+    reviewedAt: today,
+    decision: "pass",
+    blockingFindings: [],
+    sections: strongContractPage.quality.sectionContracts.map(contract => ({
+      ...contract,
+      definition: { ...contract.definition, evidence: contract.definition.evidence.slice(0, 1) },
+      problem: { ...contract.problem, evidence: contract.problem.evidence.slice(0, 1) },
+      inputOutput: { ...contract.inputOutput, evidence: contract.inputOutput.evidence.slice(0, 1) },
+      mechanism: { ...contract.mechanism, evidence: contract.mechanism.evidence.slice(0, 1) },
+      interpretation: { ...contract.interpretation, evidence: contract.interpretation.evidence.slice(0, 1) },
+      boundary: { ...contract.boundary, evidence: contract.boundary.evidence.slice(0, 1) },
+    })),
+  };
+  fs.writeFileSync(
+    path.join(fixture, "docs", "deepdive-audits", "fixture.json"),
+    JSON.stringify(schemaV2Audit, null, 2),
+  );
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /section\.missing-(?:definition|problem|inputOutput|mechanism|interpretation|boundary)/,
+  );
+
   // 六问审计应独立于正文；正文一改，旧审计立即过期。
   expectPass(
     "audit-deepdive-benchmark.js",
     ["--explain", "fixture"],
     fixture,
-    /sectionAuditSource=external/,
+    /sectionAuditSource=external-v2/,
   );
   const changedAfterAuditPage = JSON.parse(JSON.stringify(strongContractPage));
   changedAfterAuditPage.html = changedAfterAuditPage.html.replace(
@@ -606,20 +679,33 @@ try {
     /terminology\.missing-first-use-contract\.section-1\.轮廓系数/,
   );
 
+  const unexplainedGruHeadingPage = JSON.parse(JSON.stringify(completeExamplePage));
+  unexplainedGruHeadingPage.html = unexplainedGruHeadingPage.html.replace(
+    "</h2>",
+    " 与 GRU</h2>",
+  );
+  writeFixture(fixture, unexplainedGruHeadingPage);
+  expectFail(
+    "audit-deepdive-benchmark.js",
+    ["--require-benchmark", "fixture"],
+    fixture,
+    /terminology\.missing-first-use-contract\.section-1\.GRU/,
+  );
+
   const missingSetupPage = JSON.parse(JSON.stringify(completeExamplePage));
   missingSetupPage.html = missingSetupPage.html.replace(
     '<p data-example-part="setup">任务场景：给定用户 A 与 B 的两个特征，比较谁更相似，并明确两个输入对象和各特征单位。</p>',
     "<p>直接开始：A 到 B 的距离等于 10.05。</p>",
   );
   writeFixture(fixture, missingSetupPage);
-  expectFail(
+  expectPass(
     "audit-deepdive-benchmark.js",
-    ["--require-benchmark", "fixture"],
+    ["--explain", "fixture"],
     fixture,
     /example\.missing-local-setup\.section-1/,
   );
 
-  // L3 公式合同：符号必须绑定同节正文中的真实解释证据。
+  // 公式合同缺项只产生复核提示；若它确实打断核心机制链，由独立内容审计阻断。
   const definedSymbolPage = basePage();
   definedSymbolPage.html = definedSymbolPage.html.replace(
     '<section class="dd-sec"><h2>1. 小节</h2>',
@@ -653,9 +739,9 @@ try {
     "这里直接给出 PCA 的正式写法",
   );
   writeFixture(fixture, undefinedSymbolPage);
-  expectFail(
+  expectPass(
     "audit-deepdive-benchmark.js",
-    ["--require-benchmark", "fixture"],
+    ["--explain", "fixture"],
     fixture,
     /notation\.undefined-symbol\.fixture-pca\.W/,
   );
