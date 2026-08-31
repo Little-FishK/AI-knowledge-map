@@ -43,7 +43,8 @@
     "test:stage2": "node tools/test-deepdive-stage2.js && node tools/test-deepdive-stage2-mcp.js && node tools/test-deepdive-stage2-mcp-capabilities.js",
     "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-node-apply.js && node tools/test-video-calibration.js",
     "test:routing": "node tools/test-routing.js",
-    "quality:all": "npm run validate && npm run test:routing && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
+    "test:app": "node tools/test-app-smoke.js",
+    "quality:all": "npm run validate && npm run test:routing && npm run test:app && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },
   "devDependencies": {
     "playwright": "1.61.1"

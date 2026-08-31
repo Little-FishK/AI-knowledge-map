@@ -6,7 +6,9 @@
 
   const G = window.GRAPH;
   const ROUTER = window.APP_ROUTER;
+  const APP = window.AIMap;
   if (!ROUTER) throw new Error("URL 路由模块未加载");
+  if (!APP || !APP.shared || !APP.createDeepDiveLoader) throw new Error("前端公共模块未加载");
   const SITE_TITLE = "AI 知识地图";
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
@@ -20,6 +22,11 @@
 
   const byId = {};
   G.nodes.forEach(n => { byId[n.id] = n; });
+  const esc = APP.shared.escapeHtml;
+  const mdLite = APP.shared.createMarkdownRenderer(byId);
+  const resourceLoader = APP.shared.createScriptLoader();
+  const loadScriptsInOrder = resourceLoader.loadInOrder;
+  const debounce = APP.shared.debounce;
 
   const CORE = new Set(G.core || []);
   const RECOMMENDED_PATH = (G.recommendedLearningPath || []).reduce((all, phase) =>
@@ -31,7 +38,14 @@
   // cannot hide the controller's newly published candidate.
   const DEEPDIVE_RUNTIME_REVISION = DEEPDIVE_RUNTIME.revision || String(Date.now());
   const DEEPDIVE_IDS = new Set(DEEPDIVE_RUNTIME.ids || []);
-  const deepDiveLoads = new Map();
+  window.DEEPDIVE = window.DEEPDIVE || {};
+  const deepDiveLoader = APP.createDeepDiveLoader({
+    runtime: DEEPDIVE_RUNTIME,
+    ids: DEEPDIVE_IDS,
+    registry: window.DEEPDIVE,
+    revision: DEEPDIVE_RUNTIME_REVISION,
+  });
+  const ensureDeepDive = deepDiveLoader.ensure;
   const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
   const learnedNodes = loadLearnedNodes();
   let activeDeepDiveId = null;
@@ -51,62 +65,10 @@
   }
   let officialPathRestore = null;
 
-  window.DEEPDIVE = window.DEEPDIVE || {};
-
-  /* ── 通用工具：顺序脚本加载器 + 防抖 ── */
-  const scriptLoads = new Map();
-  function loadScriptOnce(src) {
-    if (scriptLoads.has(src)) return scriptLoads.get(src);
-    const load = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => resolve();
-      script.onerror = () => { scriptLoads.delete(src); reject(new Error(`资源加载失败：${src}`)); };
-      document.head.appendChild(script);
-    });
-    scriptLoads.set(src, load);
-    return load;
-  }
-  async function loadScriptsInOrder(srcs) {
-    for (const src of srcs) await loadScriptOnce(src);
-  }
-  function debounce(fn, wait) {
-    let timer;
-    return function (...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), wait);
-    };
-  }
-
   /* ── 学习面板：固定元素引用、按钮索引、节点顺序（用于局部更新） ── */
   const learningEls = {};
   const learningButtons = new Map();          // nodeId -> <button>
   const nodeIndex = new Map(G.nodes.map((n, i) => [n.id, i]));
-
-  function ensureDeepDive(id) {
-    if (window.DEEPDIVE[id]) return Promise.resolve(window.DEEPDIVE[id]);
-    if (!DEEPDIVE_IDS.has(id)) return Promise.reject(new Error(`不存在理解原理页：${id}`));
-    if (deepDiveLoads.has(id)) return deepDiveLoads.get(id);
-
-    const load = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = `${DEEPDIVE_RUNTIME.base}/${encodeURIComponent(id)}.js?v=${encodeURIComponent(DEEPDIVE_RUNTIME_REVISION)}`;
-      script.async = true;
-      script.onload = () => {
-        script.remove();
-        if (window.DEEPDIVE[id]) resolve(window.DEEPDIVE[id]);
-        else reject(new Error(`理解原理页加载后未注册：${id}`));
-      };
-      script.onerror = () => {
-        script.remove();
-        deepDiveLoads.delete(id);
-        reject(new Error(`理解原理页加载失败：${id}`));
-      };
-      document.head.appendChild(script);
-    });
-    deepDiveLoads.set(id, load);
-    return load;
-  }
 
   function preloadRecommendedNeighbors(id) {
     const currentIndex = RECOMMENDED_INDEX.get(id);
@@ -676,43 +638,6 @@
     const tutorial = event.target.closest("[data-tutorial]");
     if (tutorial) { goToRoute({ name: "tutorial", id: tutorial.getAttribute("data-tutorial") }); return; }
   });
-
-  function esc(s) {
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
-  // 极简 markdown：**粗体**、`代码`、> 引用、- 列表、空行分段
-  // 以及 [[node-id]] —— 内联跳转到另一个概念。知识地图里正文提到的概念
-  // 应该能直接点过去，而不是只在侧边的「相关知识」列表里出现。
-  function mdLite(text) {
-    if (!text) return "";
-    const inline = s => esc(s)
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/\[\[([a-z0-9-]+)\]\]/g, (m, id) => byId[id]
-        ? `<span class="xref" data-goto="${id}">${esc(byId[id].title)}</span>`
-        : `<span class="xref-bad" title="没有这个节点">${id}?</span>`);
-
-    return text.split(/\n\n+/).map(block => {
-      const lines = block.split("\n");
-
-      // 表格：| a | b |  第二行是 |---|---| 分隔线
-      if (lines.length >= 3 && lines[0].trim().startsWith("|") && /^\|[\s:|-]+\|$/.test(lines[1].trim())) {
-        const row = (l, tag) => "<tr>" + l.trim().replace(/^\||\|$/g, "").split("|")
-          .map(c => `<${tag}>${inline(c.trim())}</${tag}>`).join("") + "</tr>";
-        return `<table class="d-table"><thead>${row(lines[0], "th")}</thead><tbody>`
-             + lines.slice(2).map(l => row(l, "td")).join("") + "</tbody></table>";
-      }
-
-      if (lines.every(l => l.trim().startsWith("- "))) {
-        return "<p>" + lines.map(l => inline(l.replace(/^\s*- /, "· "))).join("<br>") + "</p>";
-      }
-      if (lines[0].trim().startsWith("> ")) {
-        return '<p class="quote">' + inline(block.replace(/^\s*> ?/gm, "")) + "</p>";
-      }
-      return "<p>" + lines.map(inline).join("<br>") + "</p>";
-    }).join("");
-  }
 
   function relationsOf(id) {
     const out = [];
