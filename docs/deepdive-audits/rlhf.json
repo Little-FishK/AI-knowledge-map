@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "rlhf",
+  "pageHash": "sha256:e332b762434db89b4c595e7f6a570484bdf3b85f02355051cdbafe8124a25776",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:378c3cdfd2f1a79bc",
+      "resolved": true,
+      "evidence": "假设模型针对同一个退款请求生成了三个候选回答：A 直接保证退款，B 核验订单后说明质量例外，C 一律拒绝",
+      "rationale": "第 9 节正文已将三个候选统一为 A 直接保证退款、B 核验订单后说明质量例外、C 一律拒绝，与图 1 的标签 A：保证退款、B：核验后说明例外、C：一律拒绝 完全一致，不再存在 A/C 所指互相矛盾的问题；且与奖励分数 r(A)=−0.6（无核验直接退款为负面）、r(C)=−0.1（一律拒绝为轻微负面）的语义一致。正文与图表现保持一致，验收标准已满足。"
+    }
+  ]
+}

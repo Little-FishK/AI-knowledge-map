@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 3,
+  "pageId": "vanishing-gradient",
+  "pageHash": "sha256:1070a8164f4d62ce844d9d54ca6265f3f30e920f2000ea13ec057cdad3445d7a",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "code": "source-support-blocked",
+      "findingId": "sha256:fae637d5b289ee021",
+      "section": 8,
+      "sections": [
+        8
+      ],
+      "claim": "第8节仍保留现有来源无法直接支持的归一化关键机制陈述。",
+      "evidence": "归一化在这里用于调节中间激活的数值尺度；标准化后的值还可通过可学习参数",
+      "rationale": "当前资料来源仍只有 Xavier、He、LSTM 与残差网络四项。残差网络论文虽提到使用中间归一化层，却不直接界定这里保留的标准化、可学习缩放平移及改善局部条件机制；首轮要求的直接来源支持仍未满足。",
+      "acceptanceCriteria": "在来源列表保持不变的约束下，当前页面必须只保留能由既有来源直接支持的归一化关键陈述；若既有来源仍不能支撑该核心事实，则该页不得通过。",
+      "sourceUrls": [
+        "https://arxiv.org/abs/1607.06450"
+      ]
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:85ac794a4ec1ede2e",
+      "resolved": true,
+      "evidence": "∂L/∂h₀ = ∂L/∂h<sub>K</sub> · J<sub>K</sub>J<sub>K−1</sub>…J₁，　Jₖ=∂hₖ/∂h<sub>k−1</sub>",
+      "rationale": "第2节已用页面支持的数学标记显示链式法则，偏导使用 ∂；标量示例也已显示为 8.88×10^{-16}，不再出现制表空白、残缺 times 或普通文本 partial。"
+    },
+    {
+      "findingId": "sha256:fae637d5b289ee021",
+      "resolved": false,
+      "evidence": "归一化在这里用于调节中间激活的数值尺度；标准化后的值还可通过可学习参数",
+      "rationale": "LayerNorm 统计范围句虽已删除，但第8节仍保留标准化、γ/β 与局部条件等归一化关键机制陈述；当前四项来源没有直接覆盖这些陈述，因此未达到首轮的来源支持验收条件。"
+    }
+  ]
+}

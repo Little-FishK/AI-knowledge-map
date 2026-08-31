@@ -1,0 +1,25 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [],
+  "decision": "pass",
+  "mode": "verification",
+  "pageHash": "sha256:56a5dc3a24de3a4009ee2ba50068337a7ed8c22e1921b62a3045499ecb9e9642",
+  "pageId": "structured-output",
+  "reviewedAt": "2026-08-19",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "先用 kind 字段在 refund 和 ask 之间做选择",
+      "findingId": "sha256:cd5bbcff4bdc6f731",
+      "rationale": "第 2、3、6 节的澄清/动作枚举值已统一为 refund/ask 风格：§2 action 只允许 refund 和 ask（表格 action∈refund/ask），§3 kind 字段改为在 refund 和 ask 之间做选择，§6 恢复动作改为返回 ask。三处示例 schema 含义未变，写法已一致。",
+      "resolved": true
+    },
+    {
+      "evidence": "<span class=\"dd-n\">10</span>把因果链连起来",
+      "findingId": "sha256:7f402fb99f762032d",
+      "rationale": "候选页可见章节编号已重排为从 1 到 10 连续：§1 自然语言和程序接口的容错方式不同 至 §9 评测应沿整条契约定位失败，第 10 节为综合章「把因果链连起来」，dd-n 编号依次为 1..10，不再存在 9 跳 11 的缺口。",
+      "resolved": true
+    }
+  ],
+  "warnings": []
+}

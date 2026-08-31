@@ -1,0 +1,58 @@
+{
+  "blockingFindings": [
+    {
+      "acceptanceCriteria": "图中中桶标注与正文、表格完全一致：正确率 0.75，即标注改为 .65/.75（圆点位置相应调整）；或若正文数字有误则修正正文与表格为 0.67。三处必须一致。",
+      "claim": "第 4 节图 1 把中置信桶标注为“中桶 .65/.67”且圆点与高桶同高（cy=98），与正文和表格的中桶准确率 0.75 矛盾，属于正文与图表引用错位。",
+      "code": "image-text-mismatch",
+      "concept": null,
+      "evidence": "中置信桶有 4 个样本，平均置信 0.65，其中 3 个正确，准确率 0.75",
+      "findingId": "sha256:32b93f1381832b464",
+      "message": "第 4 节图 1 的可靠性图把中置信桶标注为“中桶 .65/.67”，但同节正文与表格一致写明中桶 4 个样本正确 3 个、准确率 0.75；图上的 0.67 与正文的 0.75 互相矛盾，属于正文与图表引用错位。：3/4 = 0.75，不是 0.67。表格中桶加权差 4/10×0.10=0.040 正是由 0.75−0.65=0.10 推出，正文与表格内部自洽，唯独图中标注为 .67，且中桶圆点与高桶圆点的 y 坐标相同（均为 cy=98），显示绘图也按 0.67 处理了中桶正确率。读者无法确定中桶真实准确率，图文矛盾。",
+      "rationale": "本轮候选图中标注仍为“中桶 .65/.67”、圆点 cy=98 未调整，正文仍写“其中 3 个正确，准确率 0.75”，表格行仍为 中|4|0.65|3|0.75|4/10×.10=.040；图、正文、表格三处仍不一致，验收标准未达成，问题未解决。",
+      "section": 4,
+      "sections": [
+        4
+      ],
+      "sourceUrls": [],
+      "type": "content-audit"
+    },
+    {
+      "acceptanceCriteria": "来源条目与链接内容一致：由人工编辑把该条目标题改为链接所指论文的真实标题，或把链接替换为标题对应的真实论文地址；返修 Agent 不得自行增删来源条目。",
+      "claim": "资料来源把 https://arxiv.org/abs/2207.05221 标注为《Uncertainty Estimation for Language Models》并称其为语言生成置信与校准综述，但该编号实为 Kadavath 等人的《Language Models (Mostly) Know What They Know》(2022)，条目标题与链接内容不符。",
+      "code": "factual-error",
+      "concept": null,
+      "evidence": "Uncertainty Estimation for Language Models",
+      "findingId": "sha256:510ef6dbdfc20b9fa",
+      "message": "资料来源列表把 https://arxiv.org/abs/2207.05221 标注为《Uncertainty Estimation for Language Models》并称其为语言生成置信与校准综述，但该 arXiv 编号实际对应 Kadavath 等人的《Language Models (Mostly) Know What They Know》(2022)，是语言模型自评估校准研究而非综述；条目标题与链接内容不符。：经 arXiv 联网核验，2207.05221 的论文标题为 Language Models (Mostly) Know What They Know，页面所写标题与链接指向的论文不一致，读者循链接无法找到页面声称的综述来源，属于来源列表中的事实错误。",
+      "rationale": "本轮候选该条目标题与描述未变，仍为“Uncertainty Estimation for Language Models：语言生成置信与校准综述”；经 arXiv 联网核验，链接论文标题仍为 Language Models (Mostly) Know What They Know，条目与链接内容仍不一致，验收标准未达成，问题未解决。",
+      "section": 9,
+      "sections": [
+        9
+      ],
+      "sourceUrls": [],
+      "type": "content-audit"
+    }
+  ],
+  "coreConcepts": [],
+  "decision": "fail",
+  "mode": "verification",
+  "pageHash": "sha256:2147d60dd56332e3d84c890462c9981f9fd8a891d68f53e4c94ca6022b52e801",
+  "pageId": "uncertainty-calibration",
+  "reviewedAt": "2026-08-17",
+  "verificationResults": [
+    {
+      "evidence": "中置信桶有 4 个样本，平均置信 0.65，其中 3 个正确，准确率 0.75",
+      "findingId": "sha256:32b93f1381832b464",
+      "rationale": "图 1 的可靠性图中置信桶仍标注为“中桶 .65/.67”，圆点 cy=98 与高桶圆点同高，即绘图仍按 0.67 处理中桶正确率；而正文仍写明中置信桶 4 个样本正确 3 个、准确率 0.75（3/4=0.75），表格行仍为 中|4|0.65|3|0.75|4/10×.10=.040。图、正文、表格三处仍不一致，验收标准未达成，问题未解决。",
+      "resolved": false
+    },
+    {
+      "evidence": "Uncertainty Estimation for Language Models",
+      "findingId": "sha256:510ef6dbdfc20b9fa",
+      "rationale": "资料来源列表仍把 https://arxiv.org/abs/2207.05221 标注为“Uncertainty Estimation for Language Models”并描述为语言生成置信与校准综述。经 arXiv 联网核验，2207.05221 的真实标题为 Language Models (Mostly) Know What They Know（Kadavath 等，2022），是模型自评估校准研究而非综述；条目标题与链接内容仍不一致，验收标准未达成，问题未解决。",
+      "resolved": false
+    }
+  ],
+  "schemaVersion": 3,
+  "warnings": []
+}

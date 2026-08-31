@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 3,
+  "pageId": "self-supervised-learning",
+  "pageHash": "sha256:9c25ad0ec56dca82055920c260b9488219ae8be42dcbbbc0bb0fa540137cdef5",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:a881c4af52362f997",
+      "resolved": true,
+      "evidence": "<div class=\"dd-formula\">L<sub>AR</sub>=−Σ<sub>t=2…T</sub> log pθ(xₜ|x&lt;ₜ)</div>",
+      "rationale": "第2节现已明确从 t=2 求和到 T，与正文“不预测无前文起始位置”及长度为 T 时产生 T−1 个普通 token 目标的约定严格一致。"
+    },
+    {
+      "findingId": "sha256:66ad654eeb6b84779",
+      "resolved": true,
+      "evidence": "<div class=\"dd-formula\">L<sub>mask</sub>=−Σ<sub>i∈M</sub> log pθ(xᵢ|x<sub>¬M</sub>)</div>",
+      "rationale": "第3节展示公式的条件变量已改为 x¬M，明确以遮盖集合之外的可见上下文预测 xᵢ，与同节定义和机制说明一致，不再把 M 内目标内容作为条件。"
+    },
+    {
+      "findingId": "sha256:e8ae2700baad88186",
+      "resolved": true,
+      "evidence": "BYOL、DINO 等方法通过停止梯度、教师的动量更新、中心化或锐化、预测头等设计制造不对称，使两条分支不再以完全相同的方式同时追逐一个平凡解。",
+      "rationale": "第7节已删除首轮指出的 VICReg 三项损失、方差/协方差约束及 λ、μ 系数等无现有来源直接支持的专属内容；当前保留的关键教学陈述限定于页面来源列表已有原始论文承载的 BYOL 与 DINO。"
+    }
+  ]
+}

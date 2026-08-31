@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 3,
+  "pageId": "rag",
+  "pageHash": "sha256:82740f5e5151ff0ca09ee1dfb16bf33336747686d5fc12a0b46328adc5204860",
+  "reviewedAt": "2026-08-17",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-repetition",
+      "category": "whole-page",
+      "label": "第 1 节结尾再次逐字解释「似然」定义",
+      "sections": [
+        1
+      ],
+      "evidence": "这里反复出现的「似然」指的是某段文字在上下文中出现的可能性",
+      "rationale": "与本节开头的定义「某段文字在给定上下文中出现的可能性」几乎重复，属节内轻微重复，不影响理解。"
+    },
+    {
+      "code": "minor-repetition",
+      "category": "whole-page",
+      "label": "图 1 图注与图前段落内容几乎逐字重复",
+      "sections": [
+        2
+      ],
+      "evidence": "拿问题去知识库捞相关材料（见「检索」深读页）",
+      "rationale": "图注对检索、增强、生成三步的说明与紧邻正文段落几乎相同，属轻微重复；图文本身一致，无矛盾。"
+    },
+    {
+      "code": "minor-terminology-style",
+      "category": "whole-page",
+      "label": "因果链与第 7 节用「上下文噪声」，第 6 节指标名为「上下文精度」",
+      "sections": [
+        6,
+        7
+      ],
+      "evidence": "上下文噪声、断言支持和最终任务",
+      "rationale": "第 6 节指标名是「上下文精度」，链式总结与第 7 节用「上下文噪声」指代同一维度（表格中也用「噪声」描述无用片段），含义相近但指称不完全一致。"
+    },
+    {
+      "code": "minor-readability",
+      "category": "whole-page",
+      "label": "第 3、5、6 节结尾重复「输入/输出/边界」概括句式",
+      "sections": [
+        3,
+        5,
+        6
+      ],
+      "evidence": "整条失败因果链可以概括为：输入检索片段、上下文装配和最终回答",
+      "rationale": "三个章节以「它输入……先……再……输出……边界……」的固定句式收尾，模板感明显但各句内容具体、无语义残缺，仅影响叙述流畅度。"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "RAG（检索增强生成）",
+      "sections": [
+        1,
+        2,
+        3,
+        5,
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "先把相关资料从知识库中找出来、摆在它面前，再让它照着材料回答",
+        "rationale": "第 1 节明确说明 RAG 是回答前先检索知识库材料、摆到模型面前再照材料作答的方法，并用「闭卷改开卷」的比喻点明含义。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "直接提问会暴露三个绕不过的硬伤",
+        "rationale": "第 1 节点明直接提问暴露幻觉、知识截止、私有数据三个硬伤，第 3 节进一步说明 RAG 如何分别缓解。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "若没有可靠来源，或者任务根本不需要外部事实，就不必强行检索",
+        "rationale": "第 1 节明确可核验不等于自动正确，无可靠来源或不需要外部事实时不必检索；第 5 节继续展开检索瓶颈等四个失效点。"
+      }
+    },
+    {
+      "name": "RAG 与微调的选型",
+      "sections": [
+        4
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "两条路线给模型的东西本质不同，选择取决于你要注入的是什么",
+        "rationale": "第 4 节定义两条路线的本质区别：RAG 注入事实、微调注入行为，选择取决于要注入的内容。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "「让模型用上我的知识」不止 RAG 一条路",
+        "rationale": "第 4 节先提出「让模型用上我的知识」有不止一条路线，再给出按知识是否常变、是否需溯源决定选型的判断方法。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "检索不能替代行为训练，微调也不能可靠地充当实时数据库",
+        "rationale": "第 4 节明确边界：检索不能替代行为训练，微调也不能可靠充当实时数据库，两者可配合使用。"
+      }
+    },
+    {
+      "name": "分层诊断（把失败定位到检索、上下文或生成）",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "只有沿链路归因，才知道该修哪里",
+        "rationale": "第 6 节定义分层诊断：沿链路归因，用必要证据覆盖、上下文精度、断言支持率三个指标分别衡量检索、装配、生成三层。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "端到端准确率把这三层混在了一起",
+        "rationale": "第 6 节说明端到端准确率把三层独立失败混在一起，不足以指导修复。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "指标下降只能定位生成忠实性，不能单独证明检索或业务任务合格",
+        "rationale": "第 6 节明确边界：指标下降只能定位生成忠实性，不能单独证明检索或业务任务合格，且口径为便于教学的人工标注。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

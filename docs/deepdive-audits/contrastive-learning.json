@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "pageId": "contrastive-learning",
+  "pageHash": "sha256:2dce71f948eeb986579eb609e43b8855b758b347131f46f60d137c8b588d77cd",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:57b5ec36c0dc50ab7",
+      "resolved": true,
+      "evidence": "ℓᵢ = −log[exp(sim(zᵢ, zᵢ⁺) / τ) / Σⱼ∈candidates exp(sim(zᵢ, zⱼ) / τ)]",
+      "rationale": "第 2 节正文公式用方括号把完整的 softmax 分子/分母比值置于负对数内部，独立展示公式也写为 −log(完整比值)，两处作用域一致且与逐步解释一致。"
+    },
+    {
+      "findingId": "sha256:fd5a05b5597070b0c",
+      "resolved": true,
+      "evidence": "没有显式负样本的方法因此仍然需要额外机制排除常数解。VICReg 把防坍缩要求直接写入损失：",
+      "rationale": "第 9 节已删除 BYOL、SimSiam 及其具体结构作用陈述；当前关键机制仅围绕 VICReg 的不变性、方差与协方差约束展开，页面固定来源中包含 VICReg 原始论文并可直接支持这些陈述。"
+    }
+  ]
+}

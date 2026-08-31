@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 2,
+  "pageId": "decision-tree",
+  "pageHash": "sha256:b91faf262c15b33eaa1033a0285d13e8eebd58cda6676605b33d9b71198c46d9",
+  "reviewedAt": "2026-07-29",
+  "decision": "pass",
+  "blockingFindings": [],
+  "narrativeAudit": {
+    "reviewedSections": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14
+    ],
+    "sectionOpenings": [
+      {
+        "section": 1,
+        "evidence": "树怎样把复杂边界变成一串 if/else？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 2,
+        "evidence": "怎样比较候选分裂？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 3,
+        "evidence": "树一直长到每片叶一个样本会怎样？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 4,
+        "evidence": "很多高方差树平均为何更稳？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 5,
+        "evidence": "后面的树在学什么？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 6,
+        "evidence": "树不需要标准化是否意味着数据准备不重要？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 7,
+        "evidence": "六个样本标签 [退,退,留,留,留,退]，按金额阈值切分是否值得？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 8,
+        "evidence": "每个节点只有一个阈值，整棵树为何能表示非线性？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 9,
+        "evidence": "为什么长满后再剪有时比一开始限制深度更好？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 10,
+        "evidence": "树不需要标准化，为什么数据管道仍可能毁掉模型？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 12,
+        "evidence": "只是多训练几棵相同树，为什么未必有效？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 13,
+        "evidence": "为什么回归平方损失下“拟合残差”只是一个特例？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 14,
+        "evidence": "“因为金额大于500所以拒绝”是完整原因吗？",
+        "patternFamily": "other"
+      }
+    ],
+    "pervasiveTemplateExpression": false,
+    "rationale": "逐一检查 13 个核心教学章节的首个实质句，均以各自机制或边界问题切入，全部归为 other；没有 definition-copula、understand-first 或 judge-by 家族达到 7 节阈值，也没有大量模板化表达损害教学叙事。"
+  },
+  "sections": [
+    {
+      "section": 1,
+      "definition": {
+        "answer": "决策树由条件节点与叶子组成，把一行特征沿规则路径路由到预测。",
+        "evidence": "决策树是由条件节点和叶子组成的预测模型。"
+      },
+      "problem": {
+        "answer": "它把复杂非线性边界表示成可读的 if/else 条件组合。",
+        "evidence": "树怎样把复杂边界变成一串 if/else？"
+      },
+      "inputOutput": {
+        "answer": "输入一行特征；分类叶输出类别或概率，回归叶输出数值均值。",
+        "evidence": "输入是一行特征；从根节点开始，每个节点检查一条规则"
+      },
+      "mechanism": {
+        "answer": "每个节点贪心选择改善目标的特征阈值，再对子节点递归切分直至停止。",
+        "evidence": "选择能最好改善目标的一刀，然后对子节点重复同一过程"
+      },
+      "interpretation": {
+        "answer": "路径说明模型执行过的规则，而不是现实中的因果理由。",
+        "evidence": "一条路径可以解释模型这次执行了哪些规则，但不等于因果理由"
+      },
+      "boundary": {
+        "answer": "轴对齐树近似旋转或平滑边界可能需要很多层，且路径可随训练扰动改变。",
+        "evidence": "旋转或平滑边界也可能需要很多层，树并非对所有结构都紧凑。"
+      }
+    },
+    {
+      "section": 2,
+      "definition": {
+        "answer": "不纯度刻画节点目标混杂程度，增益是切分前后加权不纯度的下降。",
+        "evidence": "不纯度 I衡量一个节点中的目标有多混杂"
+      },
+      "problem": {
+        "answer": "它提供比较不同特征和阈值候选分裂的统一标准。",
+        "evidence": "怎样比较候选分裂？"
+      },
+      "inputOutput": {
+        "answer": "输入父节点及候选左右子节点的样本数与不纯度，输出 Gain。",
+        "evidence": "候选切分把父节点分成左、右子节点；应按两边样本数加权"
+      },
+      "mechanism": {
+        "answer": "用父节点不纯度减去左右子节点按样本比例加权的不纯度。",
+        "evidence": "Gain=I(parent)−(nL/n)I(L)−(nR/n)I(R)"
+      },
+      "interpretation": {
+        "answer": "增益越大表示该候选使子节点总体更同质。",
+        "evidence": "增益越大，表示该切分让加权子节点更同质。"
+      },
+      "boundary": {
+        "answer": "节点级贪心不保证全局最优，高基数特征还会因候选多产生虚高增益。",
+        "evidence": "贪心算法只选当前节点最优切分，不保证整棵树全局最优；高基数特征还可能因候选机会多得到虚高增益。"
+      }
+    },
+    {
+      "section": 3,
+      "definition": {
+        "answer": "单树过拟合是深树用极小叶记住噪声、ID、缺失模式等偶然细节。",
+        "evidence": "它不仅拟合稳定规律，也能利用噪声、ID、缺失模式等偶然细节把训练误差压到很低。"
+      },
+      "problem": {
+        "answer": "它解释树长到每叶一个样本时为何训练误差低但泛化和结构稳定性差。",
+        "evidence": "树一直长到每片叶一个样本会怎样？"
+      },
+      "inputOutput": {
+        "answer": "输入训练样本，输出切分规则与叶预测；过深时叶由极少样本决定。",
+        "evidence": "单树的输入仍是训练样本，输出是一组切分规则和叶子预测。"
+      },
+      "mechanism": {
+        "answer": "持续分裂扩大自由度，使偶然细节进入早期阈值并重排后续子树。",
+        "evidence": "训练数据轻微变化就可能改变早期阈值，后续整棵子树随之重排。"
+      },
+      "interpretation": {
+        "answer": "训练近满分、验证差、叶概率极端和重采样结构不稳都是高方差信号。",
+        "evidence": "表现上常见训练近满分、验证明显较差，叶子概率大量接近 0 或 1，跨重采样结构不稳定。"
+      },
+      "boundary": {
+        "answer": "约束过强会欠拟合，剪枝也不能修复泄漏造成的证据污染。",
+        "evidence": "限制过强会欠拟合；若问题来自数据泄漏，正则与剪枝也不能修复污染的证据。"
+      }
+    },
+    {
+      "section": 4,
+      "definition": {
+        "answer": "随机森林是在 bootstrap 样本和随机特征子集上并行训练多树并聚合的 bagging。",
+        "evidence": "随机森林是并行训练许多决策树再聚合输出的 bagging 方法。"
+      },
+      "problem": {
+        "answer": "它针对单树受训练样本扰动影响大的高方差问题。",
+        "evidence": "很多高方差树平均为何更稳？"
+      },
+      "inputOutput": {
+        "answer": "输入同一训练集，输出分类投票或回归平均的集成预测。",
+        "evidence": "输入是同一训练集；每棵树从样本中有放回抽取 bootstrap 子集"
+      },
+      "mechanism": {
+        "answer": "样本与特征随机化降低树间相关，聚合抵消不相关随机误差。",
+        "evidence": "bootstrap 改变所见样本，随机特征让树探索替代切分，两者共同降低相关性"
+      },
+      "interpretation": {
+        "answer": "应结合独立验证、袋外估计、树间相关、内存和延迟评估收益。",
+        "evidence": "结果应看独立验证、袋外估计、树间相关、内存和延迟。"
+      },
+      "boundary": {
+        "answer": "共同泄漏会让所有树同错；模型更大、解释更间接，时间或实体分组数据也不能随意 bootstrap。",
+        "evidence": "如果每棵树都依赖同一个泄漏强特征，多加树也不会解决问题。"
+      }
+    },
+    {
+      "section": 5,
+      "definition": {
+        "answer": "梯度提升按序增加弱树，每轮拟合当前损失对预测的负梯度。",
+        "evidence": "梯度提升按顺序增加弱树。"
+      },
+      "problem": {
+        "answer": "它让后续树专门纠正当前集成仍未解决的错误。",
+        "evidence": "后面的树在学什么？"
+      },
+      "inputOutput": {
+        "answer": "输入样本、当前预测与损失，输出加入学习率缩放新树后的更新预测。",
+        "evidence": "输入是样本、当前集成预测与损失函数"
+      },
+      "mechanism": {
+        "answer": "计算负梯度为纠错目标，新树拟合后乘学习率加入已有模型。",
+        "evidence": "让新树拟合这组纠错目标，再乘学习率加入已有模型"
+      },
+      "interpretation": {
+        "answer": "平方损失的负梯度是普通残差，其他损失下不一定。",
+        "evidence": "其他损失下目标是相应的负梯度，不一定是普通数值残差。"
+      },
+      "boundary": {
+        "answer": "轮数、树深或学习率过大都会追噪声，早停验证必须隔离实体和时间。",
+        "evidence": "轮数过多、树太深或学习率过大都会追逐噪声。"
+      }
+    },
+    {
+      "section": 6,
+      "definition": {
+        "answer": "本节把特征可用时点、稳定语义、切分独立性与重要度口径界定为树模型的数据治理问题。",
+        "evidence": "输入仍必须满足预测时可获得、含义稳定和切分独立。"
+      },
+      "problem": {
+        "answer": "它纠正“树无需标准化等于无需数据准备”的误解。",
+        "evidence": "树不需要标准化是否意味着数据准备不重要？"
+      },
+      "inputOutput": {
+        "answer": "输入是预测时可得且语义稳定的表格特征，输出包含模型预测与不同口径的重要度解释。",
+        "evidence": "训练输出的特征重要度也有口径"
+      },
+      "mechanism": {
+        "answer": "树会用阈值迅速利用泄漏、ID、缺失模式和高基数字段。",
+        "evidence": "时间泄漏、全数据目标编码、事后字段、重复实体、缺失机制和高基数 ID 都可能被树迅速利用。"
+      },
+      "interpretation": {
+        "answer": "不纯度、置换和 SHAP 重要度描述不同模型依赖，不自动给出因果作用。",
+        "evidence": "三者都描述模型依赖，不自动说明因果作用。"
+      },
+      "boundary": {
+        "answer": "线上缺失路由或类别集合漂移时，模型虽可输出但路径语义可能失效。",
+        "evidence": "若线上缺失路由或新类别改变，模型仍会输出，但路径含义可能已经失效。"
+      }
+    },
+    {
+      "section": 7,
+      "definition": {
+        "answer": "该手算展示一个金额阈值带来的基尼不纯度下降。",
+        "evidence": "一个阈值让基尼不纯度下降多少"
+      },
+      "problem": {
+        "answer": "它回答六个带标签样本按候选阈值切分是否值得。",
+        "evidence": "按金额阈值切分是否值得？"
+      },
+      "inputOutput": {
+        "answer": "输入六个标签和候选左右分组，输出父、左右 Gini 及增益 0.25。",
+        "evidence": "六个样本标签 [退,退,留,留,留,退]"
+      },
+      "mechanism": {
+        "answer": "分别计算父和两子节点 Gini，按 2/6 与 4/6 加权子节点后从父值扣除。",
+        "evidence": "Gain=0.5−(2/6)×0−(4/6)×0.375=0.25"
+      },
+      "interpretation": {
+        "answer": "0.25 表示该阈值让加权子节点不纯度相对父节点下降 0.25。",
+        "evidence": "树会比较全部合法特征/阈值并选择最大增益。"
+      },
+      "boundary": {
+        "answer": "高基数 ID 也可能靠隔离样本获得虚假高增益，仍需最小叶和防泄漏约束。",
+        "evidence": "若一个高基数ID几乎能逐个隔离样本，它可能得到虚假高增益，因此需限制叶样本并防泄漏。"
+      }
+    },
+    {
+      "section": 8,
+      "definition": {
+        "answer": "图示把多次单特征轴对齐切分组合为矩形叶区和阶梯边界。",
+        "evidence": "多次轴对齐切分形成矩形叶区"
+      },
+      "problem": {
+        "answer": "它解释每个节点只有一个阈值时整棵树为何仍能表达非线性。",
+        "evidence": "每个节点只有一个阈值，整棵树为何能表示非线性？"
+      },
+      "inputOutput": {
+        "answer": "输入二维金额与次数位置，输出由阈值路径对应的退款或留存叶区。",
+        "evidence": "二维特征空间的三次轴对齐切分及对应树"
+      },
+      "mechanism": {
+        "answer": "连续在坐标轴方向切割子区域，将多个简单条件组合成阶梯状边界。",
+        "evidence": "单个规则线性且可读，多层组合产生阶梯状非线性"
+      },
+      "interpretation": {
+        "answer": "每个矩形叶区对应一组路径条件及其叶预测。",
+        "evidence": "叶：退款"
+      },
+      "boundary": {
+        "answer": "旋转边界可能要用很多轴对齐层近似。",
+        "evidence": "旋转边界可能需要很多层。"
+      }
+    },
+    {
+      "section": 9,
+      "definition": {
+        "answer": "预剪枝提前停止分裂；代价复杂度后剪枝先长大树，再按风险加叶数惩罚选择子树。",
+        "evidence": "预剪枝用max_depth、min_samples_leaf、min_gain提前停止"
+      },
+      "problem": {
+        "answer": "它比较提前限制与长满后选择子树对组合切分和复杂度的权衡。",
+        "evidence": "为什么长满后再剪有时比一开始限制深度更好？"
+      },
+      "inputOutput": {
+        "answer": "输入候选树、训练风险、叶数与 α，输出目标 Rα 最小的子树。",
+        "evidence": "Rα(T)=R(T)+α|leaves(T)|"
+      },
+      "mechanism": {
+        "answer": "α 乘叶数形成复杂度惩罚，α 越大越偏好更少叶。",
+        "evidence": "α提高会偏好更少叶。"
+      },
+      "interpretation": {
+        "answer": "训练满分验证差、概率大量为 0/1、结构剧变分别提示叶过小、叶频率方差大和高方差。",
+        "evidence": "训练满分、验证差"
+      },
+      "boundary": {
+        "answer": "剪枝路径、α 选择和最终评估必须分别使用训练、验证和测试证据。",
+        "evidence": "必须在训练折生成剪枝路径、验证选择α，再在测试集评估。"
+      }
+    },
+    {
+      "section": 10,
+      "definition": {
+        "answer": "本节界定缺失、类别编码与时间字段在可部署树管道中的处理边界。",
+        "evidence": "缺失值、类别变量与时间泄漏决定真实可靠性"
+      },
+      "problem": {
+        "answer": "它说明无需数值标准化为何仍不能免除数据治理。",
+        "evidence": "树不需要标准化，为什么数据管道仍可能毁掉模型？"
+      },
+      "inputOutput": {
+        "answer": "输入含缺失、类别和时间字段的数据，输出应是只用预测时可得信息构造的模型特征与路由。",
+        "evidence": "时间数据必须按发生时间切分，不能让未来统计进入过去样本。"
+      },
+      "mechanism": {
+        "answer": "在训练折内处理缺失和编码，按发生时间切分，并审计字段可用时点及代理变量。",
+        "evidence": "高基数类别若目标编码使用全数据，会直接泄漏标签"
+      },
+      "interpretation": {
+        "answer": "目标打乱、时间外验证、敏感切片与可用时点审计用于识别泄漏或代理依赖。",
+        "evidence": "上线前做特征可用时点审计、打乱目标检测、时间外验证和敏感属性切片。"
+      },
+      "boundary": {
+        "answer": "缺失率或类别集合漂移会重写路由，即使模型仍能产生输出。",
+        "evidence": "缺失率或类别集合漂移时，即使模型仍输出，路由路径也可能完全改变。"
+      }
+    },
+    {
+      "section": 12,
+      "definition": {
+        "answer": "随机森林平均预测方差由单树方差、树间误差相关系数与树数共同决定。",
+        "evidence": "若每棵树方差为σ²、两树误差相关ρ，B棵树平均的方差近似为 ρσ²+(1−ρ)σ²/B。"
+      },
+      "problem": {
+        "answer": "它解释复制高度相关的相同树为何无法持续获得降方差收益。",
+        "evidence": "只是多训练几棵相同树，为什么未必有效？"
+      },
+      "inputOutput": {
+        "answer": "输入 σ²、ρ 与 B，输出平均预测方差近似值。",
+        "evidence": "Var(mean)≈ρσ²+(1−ρ)σ²/B"
+      },
+      "mechanism": {
+        "answer": "bootstrap 和随机特征子集降低 ρ，增加 B 只继续缩小不相关部分。",
+        "evidence": "B增大只消除不相关部分"
+      },
+      "interpretation": {
+        "answer": "ρ 高时方差下限高，继续增加树数的收益会很快饱和。",
+        "evidence": "若所有树总用同一个强特征，ρ高，收益很快饱和。"
+      },
+      "boundary": {
+        "answer": "袋外估计不能绕过时间或群组泄漏，增加树数还会增加内存与延迟。",
+        "evidence": "时间序列或群组数据不能随意bootstrap，否则仍会泄漏。"
+      }
+    },
+    {
+      "section": 13,
+      "definition": {
+        "answer": "梯度提升把每轮新树视为函数空间中沿损失负梯度的小步更新。",
+        "evidence": "梯度提升在函数空间沿负梯度小步前进"
+      },
+      "problem": {
+        "answer": "它澄清“拟合残差”只在平方损失下成立。",
+        "evidence": "为什么回归平方损失下“拟合残差”只是一个特例？"
+      },
+      "inputOutput": {
+        "answer": "输入 yi、xi、当前函数 Fm−1 与损失 L，输出负梯度目标 rim 和更新函数 Fm。",
+        "evidence": "rᵢₘ=−[∂L(yᵢ,F(xᵢ))/∂F(xᵢ)]F=Fₘ₋₁；　Fₘ=Fₘ₋₁+ηhₘ"
+      },
+      "mechanism": {
+        "answer": "新树 hm 拟合负梯度，再以学习率 η 加到上一轮集成函数。",
+        "evidence": "hₘ 是新树，η 是学习率。"
+      },
+      "interpretation": {
+        "answer": "平方损失下负梯度等于 y−F；逻辑损失对应概率尺度上的梯度。",
+        "evidence": "平方损失的负梯度等于 y−F，所以新树拟合残差；逻辑损失则拟合概率尺度上的梯度。"
+      },
+      "boundary": {
+        "answer": "树深、学习率、轮数和采样共同决定过拟合风险，早停不能复用测试集。",
+        "evidence": "测试集不能兼作早停监控。"
+      }
+    },
+    {
+      "section": 14,
+      "definition": {
+        "answer": "单路径解释只描述模型在当前输入上执行的阈值规则。",
+        "evidence": "路径只描述模型在当前输入上的执行规则"
+      },
+      "problem": {
+        "answer": "它回答单个阈值条件能否被当作完整拒绝原因。",
+        "evidence": "“因为金额大于500所以拒绝”是完整原因吗？"
+      },
+      "inputOutput": {
+        "answer": "输入当前样本、模型版本与路径条件，输出的是模型执行轨迹及相关局部解释，而非因果理由。",
+        "evidence": "局部SHAP、置换重要度和路径解释回答的问题不同，也都不是因果结论。"
+      },
+      "mechanism": {
+        "answer": "相关特征可互相替代，训练样本的轻微变化就可能换用另一阈值。",
+        "evidence": "相关特征可能互相替代，稍微改变训练样本就会换成另一个阈值。"
+      },
+      "interpretation": {
+        "answer": "路径、局部 SHAP 与置换重要度回答不同的预测依赖问题，都不能直接解释因果。",
+        "evidence": "局部SHAP、置换重要度和路径解释回答的问题不同，也都不是因果结论。"
+      },
+      "boundary": {
+        "answer": "完整解释还要交代版本、输入值、缺失处理、阈值敏感性和申诉规则，避免把代理当真实原因。",
+        "evidence": "解释应同时给预测版本、输入值、缺失处理、相邻阈值敏感性和可申诉规则"
+      }
+    }
+  ]
+}

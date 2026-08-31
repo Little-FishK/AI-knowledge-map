@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 3,
+  "blockingFindings": [],
+  "coreConcepts": [
+    {
+      "boundary": {
+        "evidence": "奖励黑客并不要求模型具有主观恶意或欺骗意图",
+        "rationale": "第 1 节明确适用边界：奖励黑客不要求主观恶意或欺骗意图，描述的是优化结果而非意图；第 4 节进一步与普通优化失败区分开（普通错误是“没拿到分”，奖励黑客是“拿到了分却做错了事”）。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "奖励黑客（reward hacking）描述的是一类系统性的失败模式：优化器找到了提高奖励信号的办法，却没有实现设计者真正想要的结果",
+        "rationale": "第 1 节开篇给出精确定义：优化器提高奖励信号却未实现设计者真正想要的结果，并把可形式化的奖励与设计者意图区分开来。",
+        "status": "pass"
+      },
+      "name": "奖励黑客",
+      "problem": {
+        "evidence": "它把两个常常被混为一谈的东西拆开来看——一个是可被形式化、可被程序读出的奖励或指标，另一个是设计者心中更复杂、更难精确表达的意图",
+        "rationale": "该概念解决的问题是解释系统为何“完成了指标却背离了目标”：把奖励信号与真实意图拆开，揭示分数上升与真实质量脱钩的根源，并据此设计发现与缓解机制（第 5、6 节）。",
+        "status": "pass"
+      },
+      "sections": [
+        1,
+        3,
+        4,
+        9
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "任何代理指标都只在它的设计分布内有意义",
+        "rationale": "第 2 节明确适用边界：代理指标只在设计分布内忠实，超出范围忠实性不再保证；第 6 节进一步说明不存在单一完美指标，需组合信号、缩小权限并保留不确定性。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "真实效用 U 通常无法被直接观测或计算，我们只能拿一个可计算的奖励 R 去近似它",
+        "rationale": "第 2 节给出代理指标的定义：真实效用 U 不可直接观测，只能用可计算的奖励 R 近似。",
+        "status": "pass"
+      },
+      "name": "代理指标（奖励代理）",
+      "problem": {
+        "evidence": "两者一旦不相等，优化 R 和优化 U 就会指向不同的方向",
+        "rationale": "该概念解决的问题是解释为什么代理指标天然有缝隙：R 与 U 不恒等导致优化奖励与优化真实效用在分布尾部脱钩，属 Goodhart 定律的结构性后果。",
+        "status": "pass"
+      },
+      "sections": [
+        2,
+        6
+      ]
+    }
+  ],
+  "decision": "pass",
+  "mode": "full",
+  "pageHash": "sha256:b298263eb3511bdd78db888ec920f979c3f9c87452e1cee7ec60a24d0dba69df",
+  "pageId": "reward-hacking",
+  "reviewedAt": "2026-08-19",
+  "verificationResults": [],
+  "warnings": [
+    {
+      "code": "minor-terminology-style",
+      "evidence": "规格漏洞出现在目标定义本身",
+      "label": "术语写法可统一但含义没有冲突",
+      "rationale": "副标题用“规格博弈”而第 3 节正文用“规格漏洞”指代同一现象（specification gaming），副标题的“评审器过拟合”与正文“评审器漏洞”同理；含义一致，仅写法不统一，属轻微风格问题，不构成 blocker。",
+      "section": 3
+    }
+  ]
+}

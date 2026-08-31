@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "normalization",
+  "pageHash": "sha256:2938df3b5808769f275e649d09070d1a83e1b67dd9d60f446e1cfd97dd5d1fcd",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:28fd970b4751832b4",
+      "resolved": true,
+      "evidence": "最后与可信参考做前向和反向对比。在多种张量形状、序列长度和 ε 设置下比较输出与输入梯度，可以同时检查公式、统计轴和仿射广播。",
+      "rationale": "定向复核第 9、11、12 节及保留的来源列表：原先作为核心结论的 FP16/BF16 具体失效机理、FP32 统计路径和跨精度验收要求均已移除。当前第 9 节限于统计轴、ε 与仿射广播，第 11 节限于公式、轴、广播和常规前后向对齐，第 12 节也未再提出统计精度路径；四项来源保持不变，因此首轮 finding 的验收条件已满足。"
+    }
+  ]
+}

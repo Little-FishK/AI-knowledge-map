@@ -105,11 +105,16 @@ server.stdout.on("data", chunk => {
       [
         "stage2_status",
         "stage2_next_recommended_page",
+        "stage2_resolve_recommended_page",
         "stage2_claim_task",
+        "stage2_enqueue_content_generation",
+        "stage2_import_editorial_candidate",
         "stage2_reset_manual_review",
         "stage2_reset_passed_page",
         "stage2_create_manual_review_preview",
         "stage2_finalize_manual_review",
+        "stage2_return_editorial_for_revision",
+        "stage2_rollback_editorial_candidate",
         "stage2_inspect_publication_candidate",
         "stage2_publish_provisional_page",
         "stage2_rollback_provisional_page",
@@ -117,6 +122,8 @@ server.stdout.on("data", chunk => {
         "stage2_search_project",
         "stage2_read_project_file",
         "stage2_read_task_packet",
+        "stage2_read_content_section",
+        "stage2_save_content_response",
         "stage2_validate_audit_result",
         "stage2_validate_page_result",
         "stage2_submit_result",
@@ -129,6 +136,11 @@ server.stdout.on("data", chunk => {
     assert.match(submitTool.description, /归档当前 Codex 任务/);
     const resetTool = messages[1].result.tools.find(tool => tool.name === "stage2_reset_manual_review");
     assert.deepStrictEqual(resetTool.inputSchema.required, ["pageId", "reason"]);
+    const importTool = messages[1].result.tools.find(tool => tool.name === "stage2_import_editorial_candidate");
+    assert.deepStrictEqual(importTool.inputSchema.required, ["pageId", "reason"]);
+    assert.strictEqual(importTool.inputSchema.properties.useContentGenerationOutput.type, "boolean");
+    assert.strictEqual(importTool.inputSchema.anyOf[1].properties.useContentGenerationOutput.const, true);
+    assert.match(importTool.description, /图表保留/);
     const passedResetTool = messages[1].result.tools.find(tool => tool.name === "stage2_reset_passed_page");
     assert.deepStrictEqual(passedResetTool.inputSchema.required, ["pageId", "reason"]);
     const previewTool = messages[1].result.tools.find(tool => tool.name === "stage2_create_manual_review_preview");

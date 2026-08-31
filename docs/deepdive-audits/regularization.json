@@ -1,0 +1,372 @@
+{
+  "schemaVersion": 2,
+  "pageId": "regularization",
+  "pageHash": "sha256:cbeffaef8bf6b38519d23d80df04b4ae81e257353f7fdc1cd5efeeedceca3a61",
+  "reviewedAt": "2026-07-29",
+  "decision": "pass",
+  "blockingFindings": [],
+  "narrativeAudit": {
+    "reviewedSections": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "sectionOpenings": [
+      {
+        "section": 1,
+        "evidence": "很多模型都能把训练误差降到接近零，优化器该怎样在众多解中选择？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 2,
+        "evidence": "“不要让模型太复杂”怎样变成优化器能使用的标量？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 3,
+        "evidence": "正则项加入后，梯度究竟多出什么？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 4,
+        "evidence": "L2 正则和“每步把权重乘小一点”为什么在 Adam 中不再等价？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 5,
+        "evidence": "随机把激活置零，为什么不是单纯破坏信息？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 6,
+        "evidence": "为什么改变输入但保留标签，也是一种正则化？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 7,
+        "evidence": "不改模型、不改损失，提前停止为什么也能改善泛化？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 8,
+        "evidence": "为什么正则从零逐渐变强时，验证误差常先降后升？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 9,
+        "evidence": "已经有大规模增强、权重衰减和早停时，再加 Dropout 会怎样？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 10,
+        "evidence": "同时改增强、Dropout、权重衰减和训练轮数，为什么得不出可靠结论？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 11,
+        "evidence": "从有限样本到更可信未知表现，正则化在哪些地方施加偏好？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 12,
+        "evidence": "误解 更准确的说法 正则化就是 L2 参数惩罚、表示噪声、数据增强和训练路径都可正则化。",
+        "patternFamily": "definition-copula"
+      },
+      {
+        "section": 13,
+        "evidence": "为什么同一训练损失可能对应泛化不同的多个解？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 14,
+        "evidence": "方向 接下来读 关键问题 为什么需要约束 过拟合 未知风险与训练风险怎样分离？",
+        "patternFamily": "other"
+      }
+    ],
+    "pervasiveTemplateExpression": false,
+    "rationale": "逐节检查了当前 HTML 中全部 14 个章节的首个叙事单元。第 1–11、13–14 节以问题、对照或路线切入；第 12 节的表格首行落入 definition-copula 家族，但同一家族仅覆盖 1/14 节，远低于至少 7 节的阻断阈值，未形成损害教学叙事的普遍模板化表达。"
+  },
+  "sections": [
+    {
+      "section": 1,
+      "definition": {
+        "answer": "正则化是在多个训练拟合相近的可行解之间加入选择偏好，而不是取消模型的拟合能力。",
+        "evidence": "正则化向选择过程加入偏好"
+      },
+      "problem": {
+        "answer": "它针对有限样本不能唯一确定函数、训练损失相近的解却可能有不同未知表现的问题。",
+        "evidence": "有限数据通常不足以唯一确定函数"
+      },
+      "inputOutput": {
+        "answer": "输入是训练损失相近但参数与鲁棒性不同的候选解，输出是更符合所选归纳偏好的解。",
+        "evidence": "许多训练损失相近但参数、鲁棒性和未知表现不同的解"
+      },
+      "mechanism": {
+        "answer": "它通过让某些参数形态或行为获得更低总目标、或更容易被优化器找到来改变解的选择。",
+        "evidence": "让某些解更容易被优化器找到或具有更低总目标"
+      },
+      "interpretation": {
+        "answer": "小权重、稀疏、扰动稳定和较早出现的解只是不同偏好，是否改善泛化必须由任务验证。",
+        "evidence": "小权重、稀疏、图像平移不变或早期停止是否合理，取决于任务"
+      },
+      "boundary": {
+        "answer": "偏好不是普遍真理；强度过大或假设不合任务会压掉真实结构并造成欠拟合。",
+        "evidence": "正则过强会压掉真实复杂性，使训练和验证一起变差"
+      }
+    },
+    {
+      "section": 2,
+      "definition": {
+        "answer": "惩罚式正则把数据目标与带权正则函数相加，形成优化器实际最小化的总目标。",
+        "evidence": "J total (θ)=J data (θ)+λΩ(θ)"
+      },
+      "problem": {
+        "answer": "它把“不要太复杂”之类抽象偏好转成可比较、可求导或可优化的标量。",
+        "evidence": "“不要让模型太复杂”怎样变成优化器能使用的标量？"
+      },
+      "inputOutput": {
+        "answer": "输入数据损失、参数或行为的惩罚函数及强度 λ，输出兼顾拟合与偏好的总目标。",
+        "evidence": "λ 控制权衡"
+      },
+      "mechanism": {
+        "answer": "Ω 对不希望的参数或行为计价，λ 决定这项代价相对于数据拟合的权重。",
+        "evidence": "Ω 衡量不希望出现的参数或行为"
+      },
+      "interpretation": {
+        "answer": "L2 倾向连续缩小各维，L1 更容易产生精确零，组稀疏则可整体移除参数组。",
+        "evidence": "许多参数变为零，产生稀疏"
+      },
+      "boundary": {
+        "answer": "惩罚的几何含义不同；相关特征可让 L1 选择不稳定，无任务含义的分组也不适合组稀疏。",
+        "evidence": "分组必须有任务含义"
+      }
+    },
+    {
+      "section": 3,
+      "definition": {
+        "answer": "L2 在数据梯度之外加入与当前权重成正比、指向零的正则梯度。",
+        "evidence": "正则梯度为 λw"
+      },
+      "problem": {
+        "answer": "本节解决“L2 实际怎样改变一次参数更新”这一具体计算问题。",
+        "evidence": "正则项加入后，梯度究竟多出什么？"
+      },
+      "inputOutput": {
+        "answer": "输入 w、数据梯度、λ 和学习率，合成总梯度后输出更新后的 w。",
+        "evidence": "设当前 w=4、数据梯度 g data =−0.4、λ=0.05、学习率 0.1"
+      },
+      "mechanism": {
+        "answer": "先计算 λw=0.2，与数据梯度 −0.4 相加得 −0.2，再执行梯度下降更新。",
+        "evidence": "总梯度 −0.4+0.2"
+      },
+      "interpretation": {
+        "answer": "数据推动仍占上风，所以权重继续增大，但增幅从 0.04 被压到 0.02。",
+        "evidence": "幅度从无正则的 0.04 降到 0.02"
+      },
+      "boundary": {
+        "answer": "L2 是与数据梯度竞争的拉回项，并不保证每一步都使参数绝对值下降。",
+        "evidence": "正则不是每次强行变小"
+      }
+    },
+    {
+      "section": 4,
+      "definition": {
+        "answer": "AdamW 是把权重衰减从自适应梯度计算中拆出、单独缩小参数的更新方式。",
+        "evidence": "AdamW 在优化更新之外独立执行 θ←(1−ηλ)θ"
+      },
+      "problem": {
+        "answer": "它处理耦合 L2 在 Adam 中被逐参数自适应缩放、导致有效强度难解释的问题。",
+        "evidence": "导致正则有效强度随参数而异"
+      },
+      "inputOutput": {
+        "answer": "输入 Adam 的数据梯度更新、当前权重、学习率 η 与衰减率 λ，输出再经统一衰减的参数。",
+        "evidence": "θ←(1−ηλ)θ"
+      },
+      "mechanism": {
+        "answer": "耦合 L2 把 λθ 混入总梯度并一同被 Adam 缩放；AdamW 则在优化更新之外执行衰减。",
+        "evidence": "对包括 λθ 在内的总梯度做每参数缩放"
+      },
+      "interpretation": {
+        "answer": "解耦使衰减率不再随各参数的历史平方梯度尺度而变化，因此含义更直接。",
+        "evidence": "让衰减更可解释"
+      },
+      "boundary": {
+        "answer": "配置字段名 weight_decay 不能证明具体语义，还要核对优化器实现和参与衰减的参数组。",
+        "evidence": "必须查看具体优化器实现"
+      }
+    },
+    {
+      "section": 5,
+      "definition": {
+        "answer": "Dropout 在训练时随机屏蔽激活，使共享参数反复在不同子网络采样中工作。",
+        "evidence": "每个 batch 相当于采样一个子网络"
+      },
+      "problem": {
+        "answer": "它缓解表示过度依赖固定神经元组合的共适应，而不只是无目的破坏信息。",
+        "evidence": "难以依赖固定共适应"
+      },
+      "inputOutput": {
+        "answer": "输入激活与屏蔽概率 p，输出保留单元按 1−p 校正后的随机稀疏激活。",
+        "evidence": "其余激活通常除以 1−p"
+      },
+      "mechanism": {
+        "answer": "每个批次改变屏蔽组合，迫使参数在多种缺失路径下仍产生可用表示。",
+        "evidence": "被屏蔽单元每批变化"
+      },
+      "interpretation": {
+        "answer": "标准 inverted dropout 训练时校正期望尺度，推理时关闭随机屏蔽并使用完整网络。",
+        "evidence": "推理时使用完整网络，因此必须采用与训练约定匹配的尺度"
+      },
+      "boundary": {
+        "answer": "过高比例会丢失真实信号；已有强增强等正则时收益可能很小，模式切换错误还会造成尺度偏差。",
+        "evidence": "训练/评估模式切换错误会造成系统性尺度偏差"
+      }
+    },
+    {
+      "section": 6,
+      "definition": {
+        "answer": "数据增强通过对输入施加应保持标签不变的变换，把任务不变性写进训练样本。",
+        "evidence": "关于任务对称性和不变性的声明"
+      },
+      "problem": {
+        "answer": "它扩大有限样本附近的覆盖，减少模型依赖固定像素位置或偶然表面特征。",
+        "evidence": "增强扩展每个样本的局部邻域"
+      },
+      "inputOutput": {
+        "answer": "输入原样本和允许变换，输出标签仍正确的额外训练样本。",
+        "evidence": "改变输入但保留标签"
+      },
+      "mechanism": {
+        "answer": "平移、裁剪、改写或加噪让模型在这些变化下保持输出稳定，从而编码所声明的不变性。",
+        "evidence": "迫使模型少依赖固定像素位置"
+      },
+      "interpretation": {
+        "answer": "有效增强意味着变换造成的差异不应改变任务答案，而不仅是增加样本数量。",
+        "evidence": "某些变化不应影响输出"
+      },
+      "boundary": {
+        "answer": "若变换改变了文字方向、关键目标、否定或微弱标签信号，就会注入错误监督。",
+        "evidence": "声明错了，就会稳定地教错模型"
+      }
+    },
+    {
+      "section": 7,
+      "definition": {
+        "answer": "早停用验证集从优化轨迹中选择检查点，以限制继续沿训练损失下降的路径前进。",
+        "evidence": "早停用验证集选择路径上的某个检查点"
+      },
+      "problem": {
+        "answer": "它阻止训练后期继续追逐噪声和个别样本，而无需改模型或损失函数。",
+        "evidence": "继续优化才逐渐拟合噪声与个别样本"
+      },
+      "inputOutput": {
+        "answer": "输入训练过程中的验证指标序列和耐心窗口，输出选中的最佳检查点。",
+        "evidence": "必须保存最佳检查点"
+      },
+      "mechanism": {
+        "answer": "持续监控验证表现，在窗口内不再改善时停止，并恢复到验证最优的模型状态。",
+        "evidence": "耐心窗口太短会把验证噪声当趋势"
+      },
+      "interpretation": {
+        "answer": "它是依赖优化轨迹的过程正则；在线性问题中才可与某些参数惩罚建立更强联系。",
+        "evidence": "深网络中更应把它理解为依赖优化轨迹的过程正则"
+      },
+      "boundary": {
+        "answer": "窗口太短会响应验证噪声，太长可能越过最佳点，不能只查看训练最后一步。",
+        "evidence": "太长又可能越过最佳点"
+      }
+    },
+    {
+      "section": 8,
+      "definition": {
+        "answer": "偏差—方差权衡描述正则增强时拟合能力下降与对样本偶然性敏感度降低之间的竞争。",
+        "evidence": "弱正则保留低偏差但可能高方差"
+      },
+      "problem": {
+        "answer": "它解释了验证误差随正则强度增加常先下降、过强后又上升的形状。",
+        "evidence": "验证误差常先降后升"
+      },
+      "inputOutput": {
+        "answer": "输入一组 λ，输出每个强度下的训练与验证误差曲线，并据此选择候选强度。",
+        "evidence": "正则强度 λ"
+      },
+      "mechanism": {
+        "answer": "增强正则通常提高训练误差并降低对偶然性的敏感；继续增强则压掉真实结构。",
+        "evidence": "强正则减少对样本偶然性的敏感，却可能压掉真实结构"
+      },
+      "interpretation": {
+        "answer": "候选强度应靠验证误差最低区域选择，而不是追求最小训练损失。",
+        "evidence": "验证误差的最低点才是候选"
+      },
+      "boundary": {
+        "answer": "最佳 λ 依赖数据量、模型、优化器和训练时长，配方变化后需要重选。",
+        "evidence": "不能把一次找到的 λ 当永久常数"
+      }
+    },
+    {
+      "section": 9,
+      "definition": {
+        "answer": "正则配方是多个可能互补、重复或相互干扰的约束机制组合，并非独立效果的简单相加。",
+        "evidence": "必须把正则视为配方而不是独立开关"
+      },
+      "problem": {
+        "answer": "它处理强增强、权重衰减、早停和 Dropout 同时存在时，贡献难以独立判断的问题。",
+        "evidence": "不同手段可能约束同一失败路径，也可能互补"
+      },
+      "inputOutput": {
+        "answer": "输入现有正则组合及训练、验证和切片表现，输出下一步的排查、减弱、加强或补数据动作。",
+        "evidence": "观察 更可能的状态 下一步"
+      },
+      "mechanism": {
+        "answer": "多个机制可重复破坏表示或共同限制容量，也可能分别约束不同失败路径，所以会互补或导致欠拟合。",
+        "evidence": "Dropout 再破坏表示可能导致欠拟合"
+      },
+      "interpretation": {
+        "answer": "训练好而验证差可指向过拟合或切分问题；训练和验证都差则更像欠拟合、优化或目标问题。",
+        "evidence": "训练与验证都差 欠拟合、优化或目标问题"
+      },
+      "boundary": {
+        "answer": "总体平均值良好也可能掩盖关键切片覆盖不足，这时继续调 λ 不能替代补数据或重权重。",
+        "evidence": "平均值掩盖覆盖不足"
+      }
+    },
+    {
+      "section": 10,
+      "definition": {
+        "answer": "可归因的正则实验是在固定切分、预算和种子组后，单独改变一类机制并做强度扫描与消融。",
+        "evidence": "一次只改变一类机制"
+      },
+      "problem": {
+        "answer": "它避免同时更改多项配方后，无法判断验证变化究竟由哪项造成。",
+        "evidence": "为什么得不出可靠结论？"
+      },
+      "inputOutput": {
+        "answer": "输入冻结的切分、弱正则基线、强度网格和固定种子组，输出训练、验证、切片与消融证据。",
+        "evidence": "固定预算与随机种子组"
+      },
+      "mechanism": {
+        "answer": "先建立基线，逐类扫描从欠约束到欠拟合的区间，再组合并逐项移除确认贡献。",
+        "evidence": "组合时做消融"
+      },
+      "interpretation": {
+        "answer": "训练略差而验证改善是典型有效信号，但仍要检查切片和最终任务指标并确认跨种子稳定。",
+        "evidence": "验证改善同时训练略差，才符合典型正则证据"
+      },
+      "boundary": {
+        "answer": "切分泄漏、训练预算不同或多项同时变化会破坏归因；正则也不能修复被污染的评测。",
+        "evidence": "按实体/时间去重，保留未用于选择的测试集"
+      }
+    }
+  ]
+}

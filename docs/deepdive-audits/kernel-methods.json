@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 2,
+  "pageId": "kernel-methods",
+  "pageHash": "sha256:e1b6e2b3b89e98b0f55d094c90bf511a736955cb533b3854609df87ae9c6346a",
+  "reviewedAt": "2026-07-30",
+  "decision": "pass",
+  "blockingFindings": [],
+  "narrativeAudit": {
+    "reviewedSections": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      15
+    ],
+    "sectionOpenings": [
+      {
+        "section": 1,
+        "evidence": "很多直线都能分开训练点，为何选离点最远的一条？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 2,
+        "evidence": "C 怎样权衡间隔与训练错误？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 3,
+        "evidence": "不显式构造高维特征，怎样在那里做内积？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 4,
+        "evidence": "γ 太大或太小会怎样？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 5,
+        "evidence": "为什么许多训练点最终不影响边界？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 6,
+        "evidence": "为什么核 SVM 很少直接训练十亿样本？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 7,
+        "evidence": "K(x,z)=(x·z+1)² 怎样避免真正展开高维坐标？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 8,
+        "evidence": "核技巧改变的是分类器，还是坐标系？",
+        "patternFamily": "definition-copula"
+      },
+      {
+        "section": 9,
+        "evidence": "为什么任意“看起来像相似度”的函数不能直接替换内积？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 10,
+        "evidence": "为什么先看测试集调RBF参数会过度乐观？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 12,
+        "evidence": "十万样本的完整 Gram 矩阵为什么难以承受？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 13,
+        "evidence": "距离超平面为2，能说有90%把握吗？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 14,
+        "evidence": "训练时合理的RBF邻域为何会上线后失效？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 15,
+        "evidence": "最终至少报告什么？",
+        "patternFamily": "other"
+      }
+    ],
+    "pervasiveTemplateExpression": false,
+    "rationale": "逐节核对开场句：仅第8节属 definition-copula 家族，其余13节均为提问、现象或场景式开场，definition-copula 覆盖 1/14 远低于阈值，全页无普遍模板化叙事；六问自然分布在各节叙述中而非节尾追加。"
+  },
+  "sections": [
+    {
+      "section": 1,
+      "definition": {
+        "answer": "SVM是分类/回归模型，线性SVM在能分开两类的超平面中找间隔最大的一条",
+        "evidence": "支持向量机（SVM） 是分类或回归模型"
+      },
+      "problem": {
+        "answer": "许多正确边界中，哪条对小扰动更稳",
+        "evidence": "许多训练边界都正确时，哪一条对小扰动更稳"
+      },
+      "inputOutput": {
+        "answer": "输入带标签特征向量，输出带符号决策分数与类别",
+        "evidence": "输入是带标签的特征向量，输出是带符号决策分数及阈值后的类别"
+      },
+      "mechanism": {
+        "answer": "训练放大间隔，预测算新点在边界哪侧",
+        "evidence": "训练时放大间隔，预测时计算新点位于边界哪一侧"
+      },
+      "interpretation": {
+        "answer": "分数绝对值大=离边界远，但不是概率或因果",
+        "evidence": "决策分数绝对值越大表示相对当前模型离边界越远，但不是概率或因果置信度"
+      },
+      "boundary": {
+        "answer": "硬间隔受噪声支配用软间隔；尺度悬殊时大尺度特征主导距离",
+        "evidence": "若特征尺度相差悬殊，几何距离也会被大尺度特征主导"
+      }
+    },
+    {
+      "section": 2,
+      "definition": {
+        "answer": "软间隔目标把边界简单与满足间隔放进同一优化",
+        "evidence": "软间隔目标把“边界尽量简单”和“训练样本尽量满足间隔”放在同一优化里"
+      },
+      "problem": {
+        "answer": "惩罚系数C如何权衡间隔与训练错误",
+        "evidence": "C 怎样权衡间隔与训练错误？"
+      },
+      "inputOutput": {
+        "answer": "输入xᵢ、yᵢ、C；输出w、b、ξᵢ",
+        "evidence": "输入是样本 xᵢ、二分类标签 yᵢ∈{−1,+1} 与惩罚系数 C；输出是边界法向量 w、截距 b 和每个样本的违例量 ξᵢ"
+      },
+      "mechanism": {
+        "answer": "最小化½‖w‖²+CΣξᵢ，约束yᵢ(w·xᵢ+b)≥1−ξᵢ",
+        "evidence": "yᵢ(w·xᵢ+b)≥1−ξᵢ"
+      },
+      "interpretation": {
+        "answer": "目标值只能在同一数据、缩放与参数下比较",
+        "evidence": "目标值只能在同一数据、缩放和参数约定下比较"
+      },
+      "boundary": {
+        "answer": "C非越大越好，必须在隔离验证数据上选",
+        "evidence": "C 不是“越大越好”：过大可能追噪声，过小可能欠拟合，必须在隔离验证数据上选择"
+      }
+    },
+    {
+      "section": 3,
+      "definition": {
+        "answer": "核技巧解决非线性需丰富特征但显式展开过大",
+        "evidence": "核技巧 解决“非线性关系需要丰富特征，但显式展开可能很大”的问题"
+      },
+      "problem": {
+        "answer": "不显式构造高维特征怎样在那里做内积",
+        "evidence": "不显式构造高维特征，怎样在那里做内积？"
+      },
+      "inputOutput": {
+        "answer": "输入x、x′与核K；输出隐式φ映射后的内积数值",
+        "evidence": "输入是两个原始样本 x、x′ 和核函数 K；输出是它们经过某个隐式特征映射 φ 后的内积数值"
+      },
+      "mechanism": {
+        "answer": "对偶只依赖两两内积，用K替换φ内积；先算Gram矩阵再求支持向量系数",
+        "evidence": "SVM 的对偶训练和预测只依赖样本两两内积，因此可用 K(x,x′)=φ(x)·φ(x′) 直接替换"
+      },
+      "interpretation": {
+        "answer": "K大=所选核先验下更相似，不等于语义相同",
+        "evidence": "K 大表示在所选核的先验下更相似，不等于现实语义相同"
+      },
+      "boundary": {
+        "answer": "有效核须半正定；核技巧不消除过拟合与规模成本",
+        "evidence": "核技巧还没有消除过拟合、错误尺度或核矩阵的规模成本"
+      }
+    },
+    {
+      "section": 4,
+      "definition": {
+        "answer": "RBF核把欧氏距离转成0到1的局部相似度",
+        "evidence": "RBF 核 把欧氏距离转换为 0 到 1 的局部相似度"
+      },
+      "problem": {
+        "answer": "直线边界无法表达弯曲分类区域",
+        "evidence": "解决直线边界无法表达弯曲分类区域的问题"
+      },
+      "inputOutput": {
+        "answer": "输入两个已缩放向量与γ；输出核相似度K",
+        "evidence": "输入是两个已缩放向量 x、x′ 和尺度参数 γ；输出是一个核相似度 K"
+      },
+      "mechanism": {
+        "answer": "K=exp(−γ‖x−x′‖²)，γ决定距离衰减速度",
+        "evidence": "γ 决定距离衰减速度"
+      },
+      "interpretation": {
+        "answer": "K只能相对同一缩放和γ解读，不能当概率",
+        "evidence": "K 的数值只能相对于同一缩放和 γ 解读，不能当概率"
+      },
+      "boundary": {
+        "answer": "特征须先在训练折拟合缩放；γ过大过拟合过小欠拟合，须与C联合验证",
+        "evidence": "γ 过大易过拟合、过小易欠拟合，还必须与 C 联合验证"
+      }
+    },
+    {
+      "section": 5,
+      "definition": {
+        "answer": "支持向量=位于间隔边缘/侵入/分错并得非零对偶系数的样本",
+        "evidence": "支持向量 是位于间隔边缘、侵入间隔或分错，并因此得到非零对偶系数的训练样本"
+      },
+      "problem": {
+        "answer": "预测函数不必保存所有训练点的贡献",
+        "evidence": "它解决的是预测函数不必保存所有训练点的贡献"
+      },
+      "inputOutput": {
+        "answer": "输入支持向量、标签、系数与新样本；输出加权核相似度的决策分数",
+        "evidence": "输入是训练后的支持向量、标签、系数和新样本；输出是各支持向量核相似度加权求和后的决策分数"
+      },
+      "mechanism": {
+        "answer": "远离且正确点系数为零，移动/删除支持向量才改变解",
+        "evidence": "远离间隔且已被正确分类的点系数为零，轻微移动通常不改变边界；移动或删除支持向量则可能改变解"
+      },
+      "interpretation": {
+        "answer": "支持向量数量位置揭示依赖哪些样本，但不解释真实因果",
+        "evidence": "支持向量数量和位置揭示当前边界依赖哪些样本，但不能解释真实因果"
+      },
+      "boundary": {
+        "answer": "稀疏只在系数层面，比例接近100%预测仍需大量核计算",
+        "evidence": "“稀疏”只发生在系数层面，不代表训练便宜"
+      }
+    },
+    {
+      "section": 6,
+      "definition": {
+        "answer": "本节判断核SVM统计合适时工程上是否可训练部署",
+        "evidence": "这一节解决“核 SVM 在统计上合适时，工程上是否可训练和部署”"
+      },
+      "problem": {
+        "answer": "为何核SVM很少直接训练十亿样本",
+        "evidence": "为什么核 SVM 很少直接训练十亿样本？"
+      },
+      "inputOutput": {
+        "answer": "输入n、维度、内存、时限、延迟；输出精确核/线性/近似核方案",
+        "evidence": "输入是样本数 n、特征维度、可用内存、训练时限和延迟预算；输出是采用精确核、线性 SVM 还是近似核的方案"
+      },
+      "mechanism": {
+        "answer": "完整核矩阵有n²元素，存储近二次增长，求解超线性",
+        "evidence": "完整核矩阵有 n² 个元素，存储近似二次增长，求解通常也超线性"
+      },
+      "interpretation": {
+        "answer": "近似方案应同时解释质量损失、资源节省与随机误差",
+        "evidence": "近似方案的结果应同时解释质量损失、资源节省和随机误差"
+      },
+      "boundary": {
+        "answer": "稀疏不消除训练核矩阵成本，近似核不保证优于线性",
+        "evidence": "支持向量稀疏不能消除训练核矩阵成本，近似核也不保证比良好表征上的线性模型更优"
+      }
+    },
+    {
+      "section": 7,
+      "definition": {
+        "answer": "手算展示K(x,z)=(x·z+1)²等于六维显式特征内积",
+        "evidence": "核函数只算原空间点积就得到六维特征内积"
+      },
+      "problem": {
+        "answer": "怎样避免真正展开高维坐标",
+        "evidence": "怎样避免真正展开高维坐标？"
+      },
+      "inputOutput": {
+        "answer": "输入x=(1,2)、z=(3,1)；输出核值K=36",
+        "evidence": "取 x=(1,2)、z=(3,1)，x·z=5，所以 K=(5+1)²= 36"
+      },
+      "mechanism": {
+        "answer": "核只算原空间点积即得到六维特征内积",
+        "evidence": "核函数只算原空间点积就得到六维特征内积"
+      },
+      "interpretation": {
+        "answer": "显式内积9+12+4+6+4+1=36与核值一致",
+        "evidence": "显式内积为9+12+4+6+4+1=36"
+      },
+      "boundary": {
+        "answer": "高次更省，但隐式空间复杂度仍反映在泛化和核矩阵",
+        "evidence": "隐式空间的复杂度仍会反映在泛化和核矩阵上"
+      }
+    },
+    {
+      "section": 8,
+      "definition": {
+        "answer": "图示：SVM在隐式特征空间仍是线性最大间隔",
+        "evidence": "SVM 在隐式特征空间仍是线性最大间隔"
+      },
+      "problem": {
+        "answer": "原空间需要圆形边界",
+        "evidence": "原空间：需要圆形边界"
+      },
+      "inputOutput": {
+        "answer": "输入原空间点，加入r²特征后映到特征空间线性切分",
+        "evidence": "特征空间：按 r² 线性切分"
+      },
+      "mechanism": {
+        "answer": "加入r²特征后按r²线性切分",
+        "evidence": "φ(x): 加入 r²"
+      },
+      "interpretation": {
+        "answer": "映回原空间后边界可以非线性",
+        "evidence": "映回原空间后边界可以非线性"
+      },
+      "boundary": {
+        "answer": "隐式空间线性与原空间非线性是同一模型两种视角",
+        "evidence": "SVM 在隐式特征空间仍是线性最大间隔；映回原空间后边界可以非线性"
+      }
+    },
+    {
+      "section": 9,
+      "definition": {
+        "answer": "合法核需Gram矩阵半正定",
+        "evidence": "合法核需满足 ΣᵢⱼaᵢaⱼK(xᵢ,xⱼ)≥0，即 Gram 矩阵半正定"
+      },
+      "problem": {
+        "answer": "为何任意“看起来像相似度”的函数不能直接替换内积",
+        "evidence": "为什么任意“看起来像相似度”的函数不能直接替换内积？"
+      },
+      "inputOutput": {
+        "answer": "输入任意样本与系数；输出二次型aᵀKa≥0的正定性判定",
+        "evidence": "对任意样本与系数，合法核需满足"
+      },
+      "mechanism": {
+        "answer": "K=ΦΦᵀ⇒aᵀKa=‖Φᵀa‖²≥0，对应Hilbert内积保持凸性",
+        "evidence": "aᵀKa=‖Φᵀa‖²≥0"
+      },
+      "interpretation": {
+        "answer": "半正定才对应某内积并使SVM对偶保持凸性",
+        "evidence": "这样才对应某个Hilbert空间内积，并使SVM对偶保持凸性"
+      },
+      "boundary": {
+        "answer": "自定义核应证明正定或检查谱并明确近似处理",
+        "evidence": "应证明正定或检查谱并明确近似处理"
+      }
+    },
+    {
+      "section": 10,
+      "definition": {
+        "answer": "C、γ与缩放必须在嵌套验证中联合选择",
+        "evidence": "先在训练折拟合标准化器，再在内层交叉验证网格/贝叶斯搜索 C、γ"
+      },
+      "problem": {
+        "answer": "为何先看测试集调RBF参数会过度乐观",
+        "evidence": "为什么先看测试集调RBF参数会过度乐观？"
+      },
+      "inputOutput": {
+        "answer": "输入C、γ网格与折；输出嵌套验证选出的参数与一次测试估计",
+        "evidence": "外层或冻结测试集只做一次估计"
+      },
+      "mechanism": {
+        "answer": "先在训练折拟合标准化器，内层CV搜C、γ，外层只做一次估计",
+        "evidence": "先在训练折拟合标准化器，再在内层交叉验证网格/贝叶斯搜索 C、γ"
+      },
+      "interpretation": {
+        "answer": "支持向量比例接近100%常意味预测慢或边界缺稀疏",
+        "evidence": "接近100%常意味着预测慢或边界缺乏稀疏性"
+      },
+      "boundary": {
+        "answer": "无关维与错误尺度让RBF距离失区分，隐式高维也会过拟合",
+        "evidence": "无关维与错误尺度会让RBF距离失去区分，隐式高维也会过拟合"
+      }
+    },
+    {
+      "section": 12,
+      "definition": {
+        "answer": "核矩阵二次规模决定训练上限：n样本产生n²核值",
+        "evidence": "n个样本产生n²个核值"
+      },
+      "problem": {
+        "answer": "十万样本的完整Gram矩阵为何难以承受",
+        "evidence": "十万样本的完整 Gram 矩阵为什么难以承受？"
+      },
+      "inputOutput": {
+        "answer": "输入n；输出核值项数与内存估计（n=十万约40GB）",
+        "evidence": "n=100,000时是10¹⁰项，即使用4字节浮点也约40GB"
+      },
+      "mechanism": {
+        "answer": "稀疏只在训练完成后降部分预测成本，不消除构造与优化成本",
+        "evidence": "支持向量稀疏性只在训练完成后降低部分预测成本，不能消除构造与优化成本"
+      },
+      "interpretation": {
+        "answer": "应画样本量—时间—内存—质量曲线，不从小样本外推可行性",
+        "evidence": "应画样本量—训练时间—内存—质量曲线，而不是从小样本准确率直接外推生产可行性"
+      },
+      "boundary": {
+        "answer": "替代：随机傅里叶特征等近似各有代价",
+        "evidence": "随机傅里叶特征 近似平移不变核映射 需足够随机维数"
+      }
+    },
+    {
+      "section": 13,
+      "definition": {
+        "answer": "SVM决策值是带符号间隔，不是校准概率",
+        "evidence": "决策值表示带符号间隔，尺度随核、C和数据改变，不是校准概率"
+      },
+      "problem": {
+        "answer": "距离超平面为2能否说有90%把握",
+        "evidence": "距离超平面为2，能说有90%把握吗？"
+      },
+      "inputOutput": {
+        "answer": "需校准才得概率，多分类用OvR/OvO",
+        "evidence": "二分类SVM扩展多分类常用one-vs-rest或one-vs-one"
+      },
+      "mechanism": {
+        "answer": "在独立验证数据上做Platt scaling或isotonic calibration",
+        "evidence": "需要在独立验证数据上做Platt scaling或isotonic calibration"
+      },
+      "interpretation": {
+        "answer": "不平衡时准确率掩盖少数类，须报PR-AUC等",
+        "evidence": "同时报告PR-AUC、每类召回、支持向量数和校准误差"
+      },
+      "boundary": {
+        "answer": "训练折既拟合又校准会使概率过度自信",
+        "evidence": "若训练折既用于拟合SVM又用于校准，概率会过度自信"
+      }
+    },
+    {
+      "section": 14,
+      "definition": {
+        "answer": "分布漂移会重写“相似”的含义：固定γ数值失真",
+        "evidence": "固定γ仍输出数值却不再代表原来的局部尺度"
+      },
+      "problem": {
+        "answer": "训练时合理的RBF邻域为何上线后失效",
+        "evidence": "训练时合理的RBF邻域为何会上线后失效？"
+      },
+      "inputOutput": {
+        "answer": "输入线上核相似度分位数等监控；输出漂移信号与重训决策",
+        "evidence": "监控核相似度分位数、支持向量命中率、决策间隔和分组校准"
+      },
+      "mechanism": {
+        "answer": "量纲/设备/编码/人群变化改变成对距离，固定γ不再代表原局部尺度",
+        "evidence": "量纲、设备、编码或人群变化会改变成对距离，固定γ仍输出数值却不再代表原来的局部尺度"
+      },
+      "interpretation": {
+        "answer": "检查新群体是否普遍远离所有支持向量",
+        "evidence": "检查新群体是否普遍远离所有支持向量"
+      },
+      "boundary": {
+        "answer": "标准化器或表示更新时核模型须作为组合版本重训",
+        "evidence": "若标准化器或表示更新，核模型必须作为组合版本重训"
+      }
+    },
+    {
+      "section": 15,
+      "definition": {
+        "answer": "验收检查点：交付前最终至少报告的清单",
+        "evidence": "最终至少报告什么？"
+      },
+      "problem": {
+        "answer": "确保上线前汇报关键配置与质量指标",
+        "evidence": "同时报告标准化流程、C与核参数"
+      },
+      "inputOutput": {
+        "answer": "输出：标准化流程、C与核参数、支持向量比例、校准误差、切片质量、内存与延迟",
+        "evidence": "同时报告标准化流程、C与核参数、支持向量比例、校准误差、切片质量以及目标硬件上的训练内存与单样本延迟"
+      },
+      "mechanism": {
+        "answer": "汇总各前节指标形成验收清单",
+        "evidence": "同时报告标准化流程、C与核参数、支持向量比例"
+      },
+      "interpretation": {
+        "answer": "这些指标共同判断模型能否上线",
+        "evidence": "目标硬件上的训练内存与单样本延迟"
+      },
+      "boundary": {
+        "answer": "缺少校准误差或切片质量即不满足验收",
+        "evidence": "校准误差、切片质量"
+      }
+    }
+  ]
+}

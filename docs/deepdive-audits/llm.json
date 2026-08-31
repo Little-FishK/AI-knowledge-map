@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 3,
+  "pageId": "llm",
+  "pageHash": "sha256:5fc28461a513ba967711e3a20f7c46eeafed9409f368176f885dc7e278dea840",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "findingId": "sha256:411885a133f6609cb",
+      "code": "human-review-issue",
+      "claim": "显示/排版缺陷：图 3 图注「第一个词谁也看不到（只能靠自己）」与图示不完全一致：矩阵第一行仍有一个绿色格子，表示第一个位置可以看到自己。",
+      "sections": [
+        4
+      ],
+      "concept": null,
+      "evidence": "第一个词谁也看不到（只能靠自己）",
+      "rationale": "图注未修改，仍写作「谁也看不到」，与图示第一行第一列的绿色格子（表示第一个位置可以看到自己）矛盾；唯一合规修法是改写图注，但图注位于受返修保护规则禁止改写的图表块内，该元素保持逐字节不变，机器无法修复。",
+      "acceptanceCriteria": "第 4 节图 3 的图注与图示保持一致：若第一行第一列确有表示「看到自己」的绿色格子，图注应准确说明（如「第一个位置只能看到自己」，而非「谁也看不到」），不改变图表承载的实质信息；不得修改来源列表、数值、标题文本和未被指出的章节内容。",
+      "sourceUrls": []
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:ef9c7cfc4deef53c4",
+      "resolved": true,
+      "evidence": "P(w) = softmax(z / T)_w",
+      "rationale": "第 2、7 节的 softmax 公式下标已统一为 w：第 2 节正文 softmax(z)<sub>w</sub> 与展示公式 softmax(z)_w 均为 w 下标，第 7 节正文 softmax(z / T)<sub>w</sub> 与展示公式 softmax(z / T)_w 均为 w 下标；正文与展示公式使用相同下标记号，v/w 不一致已消除，公式渲染正确、数学含义不变。"
+    },
+    {
+      "findingId": "sha256:411885a133f6609cb",
+      "resolved": false,
+      "evidence": "第一个词谁也看不到（只能靠自己）",
+      "rationale": "figure/table protection rule forbids the only compliant fix：图 3 图注与图示的矛盾仍存在，唯一合规修法是改写图注，但图注位于受返修保护规则禁止改写的图表块内，该元素保持逐字节不变，故机器无法修复。"
+    }
+  ]
+}

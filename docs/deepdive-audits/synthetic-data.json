@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 3,
+  "pageId": "synthetic-data",
+  "pageHash": "sha256:949c36a19c121f665bca086b538ed2cd96f6ac6e3e2364c7fa73a3a5497891db",
+  "reviewedAt": "2026-08-16",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-terminology-style",
+      "section": 2,
+      "evidence": "教师模型、程序、伪标签和数据增强这四种来源，生成的内容不同",
+      "rationale": "第二节开头把第三种来源称为“伪标签”，而表格与正文一律使用“自训练”（“未标注输入伪标签”为其生成物）。两者指同一概念，含义无冲突，仅命名不一致。"
+    },
+    {
+      "code": "minor-readability",
+      "section": 11,
+      "evidence": "11</span>把因果链连起来",
+      "rationale": "章节编号从 9 直接跳到 11：原页第 10 章“常见误区与概念依赖”按内容生成规则被排除，编号保留原序。读者会看到编号缺口，但不影响任何内容理解。"
+    },
+    {
+      "code": "minor-repetition",
+      "section": 9,
+      "evidence": "生成成本便宜，不代表筛选、治理和错误成本便宜",
+      "rationale": "第 4 节“不能因为合成候选‘免费’，就把合成比例一路拉到 90%”与第 9 节同一成本论点重复。属跨章节轻度重复，用作强调，不损害阅读。"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "合成数据",
+      "sections": [
+        1,
+        2,
+        9
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "合成数据，指由模型、程序或模拟器产生的训练样本，而不是直接从目标世界观察、再由人工记录下来的样本。",
+        "rationale": "第 1 节开篇给出完整定义，并区分数量与有效信息量。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "先从真实失败切片出发，明确缺什么，再选择相应的生成机制；而不是先生成海量数据，再回头寻找用途。",
+        "rationale": "明确合成数据用于补真实失败缺口，第 9 节进一步给出取舍准则。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "数量再多，也没有增加独立性、新颖性或正确性。",
+        "rationale": "第 1 节明确数量不等于信息；第 9 节给出“应投资真实观察、专家标注与参与式评估”的边界，适用边界清楚。"
+      }
+    },
+    {
+      "name": "验证器（独立验证）",
+      "sections": [
+        3,
+        5
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "验证器同时也是一个选择器。它不只是去掉坏样本，还决定了哪些风格、哪些解法能够存活下来。",
+        "rationale": "第 3、5 节给出验证器的定义、接受概率与选择作用。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "验证器会拒绝的内容，即使生成器大量产出也会被拦下",
+        "rationale": "说明验证器解决的是错误候选混入保留集的问题，并区分通过率与质量。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "它只能证明被写出来的那些断言，别的什么都证明不了。",
+        "rationale": "第 5 节精确给出可执行验证的边界，并讨论 reward hacking 与同源偏差。"
+      }
+    },
+    {
+      "name": "模型坍缩",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "如此迭代，稀有模式逐代消失，而系统性的错误和风格偏好因为总是被生成、总是被学习，反而被逐代放大。",
+        "rationale": "第 7 节给出模型坍缩的机制性定义，与所引文献一致。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "坍缩并不由“用模型输出训练模型”这个动作本身决定，而是由三件事共同决定：每代之间是替换还是累积、合成数据占比多少、以及筛选和验证如何执行。",
+        "rationale": "说明该节回答“是否必然一代比一代差”的问题，并给出关键变量。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "“合成必崩”和“只要筛选就安全”都是过度简化，真实的结论取决于替换、累积和筛选三者如何配合。",
+        "rationale": "明确边界：坍缩并非必然，也不因筛选而自动安全，与两篇来源论文结论一致。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

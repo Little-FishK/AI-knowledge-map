@@ -9,6 +9,12 @@ const { spawn } = require("child_process");
 function createFixture() {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-mcp-capabilities-"));
   fs.mkdirSync(path.join(fixture, ".stage2"), { recursive: true });
+  fs.mkdirSync(path.join(fixture, "data"), { recursive: true });
+  fs.writeFileSync(
+    path.join(fixture, "data", "graph.js"),
+    "window.GRAPH={recommendedLearningPath:[{phase:'基础',steps:[['1.3','alpha'],['1.4','beta']]}]};\n",
+    "utf8",
+  );
   fs.writeFileSync(path.join(fixture, ".stage2", "state.json"), `${JSON.stringify({
     schemaVersion: 1,
     mode: "serial",
@@ -106,15 +112,21 @@ function call(id, name, args = {}) {
       expectedCandidateHash: `sha256:${"0".repeat(64)}`,
       reason: "not authorized",
     }),
+    call(4, "stage2_resolve_recommended_page", { order: "1.3" }),
+    call(5, "stage2_resolve_recommended_page", { order: "1.4" }),
   ]);
   assert.deepStrictEqual(
     controller[0].result.tools.map(tool => tool.name),
-    ["stage2_status", "stage2_next_recommended_page", "stage2_inspect_publication_candidate"],
+    ["stage2_status", "stage2_next_recommended_page", "stage2_resolve_recommended_page", "stage2_enqueue_content_generation", "stage2_import_editorial_candidate", "stage2_finalize_manual_review", "stage2_return_editorial_for_revision", "stage2_rollback_editorial_candidate", "stage2_inspect_publication_candidate"],
   );
   assert.strictEqual(controller[1].result.isError, true);
   assert.match(controller[1].result.content[0].text, /not available/);
   assert.strictEqual(controller[2].result.isError, true);
   assert.match(controller[2].result.content[0].text, /not available/);
+  assert.strictEqual(controller[3].result.isError, false);
+  assert.match(controller[3].result.content[0].text, /"pageId": "alpha"/);
+  assert.strictEqual(controller[4].result.isError, true);
+  assert.match(controller[4].result.content[0].text, /locked to page alpha/);
 
   const publishingController = await runServer("controller", [
     { jsonrpc: "2.0", id: 1, method: "tools/list", params: {} },
@@ -124,6 +136,11 @@ function call(id, name, args = {}) {
       expectedCandidateHash: `sha256:${"0".repeat(64)}`,
       reason: "authorized page-lock test",
     }),
+    call(4, "stage2_rollback_provisional_page", {
+      pageId: "beta",
+      expectedCandidateHash: `sha256:${"0".repeat(64)}`,
+      reason: "authorized page-lock rollback test",
+    }),
   ], {
     STAGE2_MCP_ALLOW_PROVISIONAL_PUBLISH: "1",
   });
@@ -132,14 +149,23 @@ function call(id, name, args = {}) {
     [
       "stage2_status",
       "stage2_next_recommended_page",
+      "stage2_resolve_recommended_page",
+      "stage2_enqueue_content_generation",
+      "stage2_import_editorial_candidate",
+      "stage2_finalize_manual_review",
+      "stage2_return_editorial_for_revision",
+      "stage2_rollback_editorial_candidate",
       "stage2_inspect_publication_candidate",
       "stage2_publish_provisional_page",
+      "stage2_rollback_provisional_page",
     ],
   );
   assert.strictEqual(publishingController[1].result.isError, true);
   assert.match(publishingController[1].result.content[0].text, /locked to page alpha/);
   assert.strictEqual(publishingController[2].result.isError, true);
   assert.match(publishingController[2].result.content[0].text, /locked to page alpha/);
+  assert.strictEqual(publishingController[3].result.isError, true);
+  assert.match(publishingController[3].result.content[0].text, /locked to page alpha/);
 
   const audit = await runServer("audit", [
     { jsonrpc: "2.0", id: 1, method: "tools/list", params: {} },
@@ -188,7 +214,27 @@ function call(id, name, args = {}) {
   assert.strictEqual(repair[3].result.isError, true);
   assert.match(repair[3].result.content[0].text, /single claim/);
 
-  console.log("✓ Stage 2 MCP capability profiles enforce page-locked controller publication, worker boundaries, and one claim");
+  const contentGeneration = await runServer("content-generation", [
+    { jsonrpc: "2.0", id: 1, method: "tools/list", params: {} },
+    call(2, "stage2_search_project", {
+      taskId: "wrong",
+      leaseToken: "wrong",
+      query: "fixture",
+    }),
+    call(3, "stage2_claim_task", { pageId: "alpha" }),
+    call(4, "stage2_claim_task", { pageId: "alpha" }),
+  ]);
+  assert.deepStrictEqual(
+    contentGeneration[0].result.tools.map(tool => tool.name),
+    ["stage2_claim_task", "stage2_read_task_packet", "stage2_read_content_section", "stage2_save_content_response", "stage2_submit_result"],
+  );
+  assert.strictEqual(contentGeneration[1].result.isError, true);
+  assert.match(contentGeneration[1].result.content[0].text, /not available/);
+  assert.strictEqual(JSON.parse(contentGeneration[2].result.content[0].text).status, "paused");
+  assert.strictEqual(contentGeneration[3].result.isError, true);
+  assert.match(contentGeneration[3].result.content[0].text, /single claim/);
+
+  console.log("✓ Stage 2 MCP capability profiles enforce page-locked controller publication, content generation, worker boundaries, and one claim");
 })().catch(error => {
   console.error(error.stack || error.message);
   process.exitCode = 1;

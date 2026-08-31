@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "pageId": "deployment",
+  "pageHash": "sha256:167da0a741769585ea805b35364eaece353d8479c777214d2ef498828cdc995e",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:cba38f1fcab9e53bd",
+      "resolved": true,
+      "evidence": "<span class=\"dd-n\">9</span>把因果链连起来",
+      "rationale": "候选页的可见章节编号已按顺序重排为 1..9 连续：1 运行位置、2 服务路径、3 容量账、4 运行示例、5 优化、6 发布、7 回滚、8 降级、9 因果链综合。第 9 节存在且编号为 9，不再从 8 跳到 10。"
+    },
+    {
+      "findingId": "sha256:97e10ad6190d4947f",
+      "resolved": true,
+      "evidence": "给这个组合分配一个 releaseId，并记录各组件之间的依赖兼容矩阵",
+      "rationale": "第 7 节已统一为无空格的 releaseId 写法，正文出现的全部位置（分配一个 releaseId、按 releaseId 同步恢复、缓存键必须包含 releaseId、输出一个 releaseId）均为一致写法，不再混用 release id。"
+    }
+  ]
+}

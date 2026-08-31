@@ -1,0 +1,38 @@
+{
+  "blockingFindings": [
+    {
+      "acceptanceCriteria": "第 4 节对思维树 ToT 的机制描述（展开多个候选分支、评估优劣、回溯重试）必须在现有来源列表范围内获得可支持的事实依据，或将相关表述调整为现有来源能够支撑的内容；不得通过添加、删除或替换页面来源来满足。",
+      "claim": "第 4 节对照表仍将思维树 ToT 描述为「像搜索一样展开多个分支、评估、回溯」，该分支、评估、回溯搜索机制出自 Yao et al. 2023《Tree of Thoughts》（arXiv:2305.10601），页面现有三篇来源均不涉及该机制，且来源列表不得增删改，关键教学事实仍无来源支撑。",
+      "code": "source-support-blocked",
+      "concept": null,
+      "evidence": "展开多个分支、评估、回溯",
+      "findingId": "cot-src-tot",
+      "rationale": "首轮要求第 4 节对思维树 ToT 的机制描述获得现有来源支持或调整为可支撑内容。返修仅改写了正文机制句（现为「把候选思路组织成树状结构、在比较中取舍」），但同节表格仍保留「不走一条道，而是像搜索一样展开多个分支、评估、回溯」。经联网核验，展开多分支、评估、回溯是 Yao et al.《Tree of Thoughts》(arXiv:2305.10601) 特有的搜索式机制（摘要原文：considering multiple different reasoning paths and self-evaluating choices ... looking ahead or backtracking），Wei et al.（arXiv:2201.11903）、Wang et al.（arXiv:2203.11171）与 OpenAI 思维链可监控性文章均不包含；且第 7 节小结仍写「展开多个分支、评估、回溯，像搜索一样择优」。因此首轮问题未解决。",
+      "sections": [
+        4
+      ],
+      "sourceUrls": [
+        "https://arxiv.org/abs/2201.11903",
+        "https://arxiv.org/abs/2203.11171",
+        "https://arxiv.org/abs/2305.10601",
+        "https://openai.com/index/evaluating-chain-of-thought-monitorability/"
+      ]
+    }
+  ],
+  "coreConcepts": [],
+  "decision": "fail",
+  "mode": "verification",
+  "pageHash": "sha256:fe41744581cd6c81af59e5035e73101c63e2801555f8c3a09553778065814e50",
+  "pageId": "cot",
+  "reviewedAt": "2026-08-17",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "展开多个分支、评估、回溯",
+      "findingId": "cot-src-tot",
+      "rationale": "第 4 节正文机制句虽已改写，但同节对照表仍保留「不走一条道，而是像搜索一样展开多个分支、评估、回溯」，即 Yao et al. 2023 ToT（arXiv:2305.10601）的搜索/评估/回溯机制；页面现有三篇来源均不涉及且来源列表不得增删改，接受标准未满足，故首轮问题未解决。",
+      "resolved": false
+    }
+  ],
+  "warnings": []
+}

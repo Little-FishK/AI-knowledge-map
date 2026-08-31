@@ -1,0 +1,19 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [],
+  "decision": "pass",
+  "mode": "verification",
+  "pageHash": "sha256:6c14f7da6e8577a6e7eb3eae8bd0e908684066f87405117dab1fd738ce5f7c96",
+  "pageId": "prompt-engineering",
+  "reviewedAt": "2026-08-16",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "这一节不引入任何本页之外的新事实，只用第 2、4 节已经建立的机制做一次推演",
+      "findingId": "sha256:0f54e376336d284db",
+      "rationale": "第 6 节已被改写为不依赖现有来源之外的关键事实断言：开篇明确声明只用第 2、4 节已建立的机制做推演；原「模型不区分指令与数据」的独立断言改为对第 2 节接龙机制（前缀统一作为估计下一个 token 的条件，机制中不存在指令/内容分类步骤，与 GPT-3 自回归建模一致）的描述；恶意句子劫持场景被明确标注为「举一个假设性的推演（不是对某次真实攻击的记录）」；原「检测式防护不可靠而需权限隔离」的断言被删除，防护部分改为由第 5 节上下文工程边界推导的上下文准入管理与人工确认等流程性控制，检测式拦截的局限仅作为逻辑推论而非经验结论。该节不再依赖页面三条来源（GPT-3、CoT、ReAct）之外的提示注入文献事实，符合验收标准中「改写为不依赖未经现有来源支持的关键事实断言」的路径。",
+      "resolved": true
+    }
+  ],
+  "warnings": []
+}

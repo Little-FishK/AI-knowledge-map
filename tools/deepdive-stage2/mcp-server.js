@@ -7,13 +7,20 @@ const {
   createManualReviewPreview,
   finalizeManualReview,
   inspectPublicationCandidate,
+  importEditorialCandidate,
+  enqueueContentGeneration,
   nextRecommendedPage,
+  resolveRecommendedPage,
   readAuditProjectFile,
+  readContentGenerationSection,
   readTaskPacketPart,
   releaseLease,
   resetManualReview,
   resetPassedPage,
+  rollbackEditorialCandidate,
+  returnEditorialForRevision,
   rollbackProvisionalPage,
+  saveContentGenerationResponse,
   searchAuditProject,
   status,
   submitResult,
@@ -29,7 +36,9 @@ const lockedWorkerId = String(process.env.STAGE2_MCP_WORKER_ID || "codex-stage2-
 const provisionalPublishAuthorized = /^(?:1|true|yes)$/i.test(
   String(process.env.STAGE2_MCP_ALLOW_PROVISIONAL_PUBLISH || "").trim(),
 );
-const restrictedWorkerProfile = capabilityProfile === "audit" || capabilityProfile === "repair";
+const restrictedWorkerProfile = capabilityProfile === "audit"
+  || capabilityProfile === "repair"
+  || capabilityProfile === "content-generation";
 const pageLockedProfile = restrictedWorkerProfile || capabilityProfile === "controller";
 let buffer = "";
 let claimAttempted = false;
@@ -44,11 +53,23 @@ const allTools = [
   },
   {
     name: "stage2_next_recommended_page",
-    description: "按地图官方推荐学习路径查找下一张尚未终止的理解原理页。只返回页面 ID、顺序与状态，不返回正文；manual-review 与 l3-auto-passed 视为本轮自动流程终态。",
+    description: "按地图官方推荐学习路径查找下一张尚未终止的理解原理页。只返回页面 ID、顺序与状态，不返回正文；manual-review、l3-auto-passed 与 published-approved 视为本轮自动流程终态。",
     inputSchema: {
       type: "object",
       properties: {
         startOrder: { type: "string", pattern: "^\\d+(?:\\.\\d+)*$" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_resolve_recommended_page",
+    description: "按官方推荐顺序精确解析一个节点，即使该页已处于 manual-review、l3-auto-passed 或 published-approved 等终态也返回其 pageId、阶段、当前状态与内容生成状态；只读且不会跳到后续节点。",
+    inputSchema: {
+      type: "object",
+      required: ["order"],
+      properties: {
+        order: { type: "string", pattern: "^\\d+(?:\\.\\d+)*$" },
       },
       additionalProperties: false,
     },
@@ -62,6 +83,44 @@ const allTools = [
         workerId: { type: "string", maxLength: 120 },
         pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
       },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_enqueue_content_generation",
+    description: "由页锁定控制器将一个未获人工批准的既有理解页排入独立 content-generation 队列。控制器记录原状态，任务完成后恢复原状态；不会修改正式页或审计结论。",
+    inputSchema: {
+      type: "object",
+      required: ["pageId", "reason"],
+      properties: {
+        pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+        reason: { type: "string", minLength: 3, maxLength: 500 },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_import_editorial_candidate",
+    description: "由页锁定控制器导入人工整理完成的完整候选页，或导入该页哈希匹配的 content-generation 输出；逐块验证原页图表保留，写入可回滚的待审网站版本，并将页面置为 audit-queued。机器审查通过后仍停在 manual-review，必须人工确认才转为正式版本。",
+    inputSchema: {
+      type: "object",
+      required: ["pageId", "reason"],
+      properties: {
+        pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+        page: { type: "object" },
+        useContentGenerationOutput: { type: "boolean" },
+        reason: { type: "string", minLength: 3, maxLength: 500 },
+        summary: { type: "string", maxLength: 500 },
+        removedSectionTitles: {
+          type: "array",
+          maxItems: 20,
+          items: { type: "string", minLength: 1, maxLength: 120 },
+        },
+      },
+      anyOf: [
+        { required: ["page"] },
+        { properties: { useContentGenerationOutput: { const: true } }, required: ["useContentGenerationOutput"] },
+      ],
       additionalProperties: false,
     },
   },
@@ -127,12 +186,56 @@ const allTools = [
   },
   {
     name: "stage2_finalize_manual_review",
-    description: "复用 manual-review 页面已经完成且与当前候选哈希一致的最终独立审计，重新计算当前门禁；只有零阻断时才由控制器发布，不启动新审计，也不允许绕过门禁。",
+    description: "完成 manual-review：新版正文可由人工明确批准为正式版本，即使仍有机器 blocker；控制器保留被人工覆盖的机器问题记录。旧流程页面仍要求零阻断。不会启动新审查。",
     inputSchema: {
       type: "object",
       required: ["pageId", "reason"],
       properties: {
         pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+        reason: { type: "string", minLength: 3, maxLength: 500 },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_return_editorial_for_revision",
+    description: "人工审查退回新版正文并列出具体问题。控制器只把这些问题交给修改 Agent；修改后仅定向验证这些人工问题，然后直接回到人工审查。",
+    inputSchema: {
+      type: "object",
+      required: ["pageId", "reason", "issues"],
+      properties: {
+        pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+        reason: { type: "string", minLength: 3, maxLength: 500 },
+        issues: {
+          type: "array",
+          minItems: 1,
+          maxItems: 30,
+          items: {
+            type: "object",
+            required: ["claim", "sections", "acceptanceCriteria"],
+            properties: {
+              claim: { type: "string", minLength: 1, maxLength: 1000 },
+              sections: { type: "array", minItems: 1, items: { type: "integer", minimum: 1 } },
+              acceptanceCriteria: { type: "string", minLength: 1, maxLength: 1000 },
+              evidence: { type: "string", maxLength: 1000 },
+              concept: { type: "string", maxLength: 200 },
+            },
+            additionalProperties: false,
+          },
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_rollback_editorial_candidate",
+    description: "撤销哈希匹配且无活动租约的整份待审候选，按控制器回执恢复导入前页面和工作流状态。用于候选构建流程本身有误、必须重新导入的情况。",
+    inputSchema: {
+      type: "object",
+      required: ["pageId", "expectedCandidateHash", "reason"],
+      properties: {
+        pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
+        expectedCandidateHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
         reason: { type: "string", minLength: 3, maxLength: 500 },
       },
       additionalProperties: false,
@@ -241,6 +344,36 @@ const allTools = [
     },
   },
   {
+    name: "stage2_read_content_section",
+    description: "仅供活动 content-generation 租约按章节读取当前锁定页面。返回单章标题、纯文本、原始 HTML 与固定提示词；常见误解和自测章节由控制器硬性拒绝。",
+    inputSchema: {
+      type: "object",
+      required: ["taskId", "leaseToken", "sectionNumber"],
+      properties: {
+        taskId: { type: "string" },
+        leaseToken: { type: "string" },
+        sectionNumber: { type: "integer", minimum: 1 },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_save_content_response",
+    description: "仅供活动 content-generation 租约按顺序保存当前章节的完整 Agent 回复。控制器原子更新 pageId-agent-responses.md；保存成功后才允许读取下一章。",
+    inputSchema: {
+      type: "object",
+      required: ["taskId", "leaseToken", "sectionNumber", "response"],
+      properties: {
+        taskId: { type: "string" },
+        leaseToken: { type: "string" },
+        sectionNumber: { type: "integer", minimum: 1 },
+        title: { type: "string", minLength: 1, maxLength: 200 },
+        response: { type: "string", minLength: 1, maxLength: 100000 },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: "stage2_validate_audit_result",
     description: "Preflight the current audit worker's own result against the lease-bound audit contract without writing state or consuming the single submission.",
     inputSchema: {
@@ -287,10 +420,17 @@ const allTools = [
 const controllerTools = new Set([
   "stage2_status",
   "stage2_next_recommended_page",
+  "stage2_resolve_recommended_page",
+  "stage2_enqueue_content_generation",
+  "stage2_import_editorial_candidate",
+  "stage2_finalize_manual_review",
+  "stage2_return_editorial_for_revision",
+  "stage2_rollback_editorial_candidate",
   "stage2_inspect_publication_candidate",
 ]);
 if (provisionalPublishAuthorized) {
   controllerTools.add("stage2_publish_provisional_page");
+  controllerTools.add("stage2_rollback_provisional_page");
 }
 
 const capabilityTools = {
@@ -308,6 +448,13 @@ const capabilityTools = {
     "stage2_claim_task",
     "stage2_read_task_packet",
     "stage2_validate_page_result",
+    "stage2_submit_result",
+  ]),
+  "content-generation": new Set([
+    "stage2_claim_task",
+    "stage2_read_task_packet",
+    "stage2_read_content_section",
+    "stage2_save_content_response",
     "stage2_submit_result",
   ]),
 };
@@ -403,6 +550,13 @@ function handle(message) {
       if (name === "stage2_next_recommended_page") {
         return response(id, toolResult(nextRecommendedPage(root, args.startOrder || "1.3")));
       }
+      if (name === "stage2_resolve_recommended_page") {
+        const resolved = resolveRecommendedPage(root, args.order);
+        if (capabilityProfile === "controller" && resolved.pageId !== lockedPageId) {
+          return response(id, restrictedError(`This controller process is locked to page ${lockedPageId}`));
+        }
+        return response(id, toolResult(resolved));
+      }
       if (name === "stage2_claim_task") {
         if (restrictedWorkerProfile && claimAttempted) {
           return response(id, restrictedError(`This ${capabilityProfile} process has already attempted its single claim`));
@@ -429,8 +583,14 @@ function handle(message) {
         }
         return response(id, toolResult(compactClaimResult(claim)));
       }
+      if (name === "stage2_enqueue_content_generation") {
+        return response(id, toolResult(enqueueContentGeneration(root, args.pageId, args.reason)));
+      }
       if (name === "stage2_reset_manual_review") {
         return response(id, toolResult(resetManualReview(root, args.pageId, args.reason)));
+      }
+      if (name === "stage2_import_editorial_candidate") {
+        return response(id, toolResult(importEditorialCandidate(root, args.pageId, args)));
       }
       if (name === "stage2_reset_passed_page") {
         return response(id, toolResult(resetPassedPage(root, args.pageId, args.reason)));
@@ -442,6 +602,17 @@ function handle(message) {
         return response(id, toolResult(finalizeManualReview(
           root,
           args.pageId,
+          args.reason,
+        )));
+      }
+      if (name === "stage2_return_editorial_for_revision") {
+        return response(id, toolResult(returnEditorialForRevision(root, args.pageId, args)));
+      }
+      if (name === "stage2_rollback_editorial_candidate") {
+        return response(id, toolResult(rollbackEditorialCandidate(
+          root,
+          args.pageId,
+          args.expectedCandidateHash,
           args.reason,
         )));
       }
@@ -483,6 +654,14 @@ function handle(message) {
       if (name === "stage2_read_task_packet") {
         if (restrictedWorkerProfile) requireBoundLease(args);
         return response(id, toolResult(readTaskPacketPart(root, args)));
+      }
+      if (name === "stage2_read_content_section") {
+        if (capabilityProfile === "content-generation") requireBoundLease(args);
+        return response(id, toolResult(readContentGenerationSection(root, args)));
+      }
+      if (name === "stage2_save_content_response") {
+        if (capabilityProfile === "content-generation") requireBoundLease(args);
+        return response(id, toolResult(saveContentGenerationResponse(root, args)));
       }
       if (name === "stage2_validate_audit_result") {
         if (capabilityProfile === "audit") requireBoundLease(args);

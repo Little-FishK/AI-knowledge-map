@@ -805,14 +805,16 @@
     }
     if (token !== deepDiveRequestToken || activeDeepDiveId !== id) return;
     const provisionalPublication = dd.publication
-      && dd.publication.status === "published-provisional"
+      && ["published-provisional", "published-editorial-draft"].includes(dd.publication.status)
       ? dd.publication
       : null;
+    const editorialDraft = provisionalPublication
+      && provisionalPublication.status === "published-editorial-draft";
     ddEl.classList.toggle("dd-provisional", Boolean(provisionalPublication));
     const provisionalNotice = provisionalPublication
       ? `<div class="dd-provisional-notice" role="status">
           <strong>${esc(provisionalPublication.label || "未通过审计 · 暂行版本")}</strong>
-          <span>该页面已覆盖旧正式页，但尚未通过质量审计${Number.isInteger(provisionalPublication.blockerCount) ? `，当前记录 ${provisionalPublication.blockerCount} 个阻断项` : ""}。</span>
+          <span>${editorialDraft ? "该页面是已经覆盖网站的正文草稿，正在等待机器审查与人工复核。" : `该页面已覆盖旧正式页，但尚未通过质量审查${Number.isInteger(provisionalPublication.blockerCount) ? `，当前记录 ${provisionalPublication.blockerCount} 个阻断项` : ""}。`}</span>
         </div>`
       : "";
     const hero = `<div class="dd-hero">

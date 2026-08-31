@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "streaming",
+  "pageHash": "sha256:7992dc8a1de6d8646b35366b3650fc09a94da8cf9171d3f1179023b24c76c33e",
+  "reviewedAt": "2026-08-16",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:c0d8c55618ad57c88",
+      "resolved": true,
+      "evidence": "浏览器按显示器的刷新率渲染画面——最常见的刷新率是 60Hz，75/120/144Hz 的屏幕也很普遍——会发生什么？如果每个增量都触发一次 DOM 更新，每秒 100 次更新就要挤进约 60 帧的画面里，平均一帧要消化 100/60≈1.7 个 delta",
+      "rationale": "首轮指出的前提错误已修复。第 5 节开头不再声称浏览器每秒最多渲染约 20 帧，而是改为符合事实的表述：浏览器按显示器刷新率渲染，最常见 60Hz，75/120/144Hz 也很普遍。随错误前提产生的“消费速度只有生产速度的五分之一”推导已消失，替换为“每秒 100 次更新挤进约 60 帧、平均一帧消化 100/60≈1.7 个 delta”，数值计算正确。同节表格“16–50ms 一帧批量渲染”与 60Hz 前提不再矛盾（16ms≈60fps）。全页未发现“20 帧”或“五分之一”残留，验收标准全部满足。"
+    }
+  ]
+}

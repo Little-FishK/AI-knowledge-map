@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>神经网络 · 待审草稿</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+  <div id="deepdive" class="dd-provisional">
+    <header class="dd-top">
+      <button class="dd-back" type="button" onclick="history.back()">← 返回</button>
+      <span class="dd-top-name">神经网络 · 待审草稿</span>
+      <button class="dd-x" type="button" title="关闭" onclick="history.back()">×</button>
+    </header>
+    <div class="dd-scroll"><article id="dd-article"></article></div>
+  </div>
+  <script src="./neural-network-curated-candidate.js"></script>
+  <script>
+    (() => {
+      const page = window.DEEPDIVE["neural-network"];
+      const esc = value => String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      const hero = '<div class="dd-hero">'
+        + '<div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>'
+        + '<h1 class="dd-h1 dd-h1-provisional">' + esc(page.title) + '</h1>'
+        + '<div class="dd-provisional-notice" role="status"><strong>机器审查通过 · 等待人工审查</strong><span>该页面是已经覆盖网站的正文草稿，尚未正式发布。</span></div>'
+        + (page.subtitle ? '<div class="dd-sub">' + esc(page.subtitle) + '</div>' : '')
+        + (page.aliases ? '<div class="dd-ali">' + esc(page.aliases) + '</div>' : '')
+        + (page.meta ? '<div class="dd-metabar">' + esc(page.meta) + '</div>' : '')
+        + (page.thesis ? '<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> ' + page.thesis + '</div>' : '')
+        + '</div>';
+      document.getElementById('dd-article').innerHTML = hero + page.html;
+    })();
+  </script>
+</body>
+</html>

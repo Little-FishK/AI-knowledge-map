@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 3,
+  "pageId": "code-generation",
+  "pageHash": "sha256:6b314445486b85af46cae2330c9701658f2902ca8eb03fa974c5f0351f826aa9",
+  "reviewedAt": "2026-08-18",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "section": 4,
+      "message": "正文第 4 节把「用 query 作全局缓存键」的补丁称作「第二个补丁」，但这是示例展示的首个补丁，而小结表称其为「首个补丁」，同一补丁的序号前后不一致。",
+      "rationale": "属于运行示例叙述中的序号笔误，不改变技术内容与因果链，但会让读者疑惑「第一个补丁」在哪里；建议将正文的「第二个补丁」改为「首个补丁」。",
+      "evidence": "第二个补丁，模型用 query 作为全局缓存键"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "AI 编程（代码生成）",
+      "sections": [
+        1,
+        2
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "把一个「意图」翻译成「能跑的代码」",
+        "rationale": "第 1 节把 AI 编程界定为将意图翻译成可运行代码的生成任务而非自由创作，直接回答「是什么」。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "模型要做的，是理解这些输入之后，产出一段机器能够执行、并且符合意图的代码",
+        "rationale": "第 1 节明确它解决需求到候选程序/补丁的翻译问题，输入为需求、已有代码与验收条件，输出为候选补丁、解释或新程序。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "「能跑」是 AI 编程的必要条件，远远不是充分条件",
+        "rationale": "第 1 节写明「能跑」只证明语法与被测路径成立，不证明需求、安全与性能全部满足，给出适用边界。"
+      }
+    },
+    {
+      "name": "代码执行的可验证闭环",
+      "sections": [
+        2,
+        4
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "「写 → 跑 → 看报错 → 改 → 再跑」这个闭环",
+        "rationale": "第 4 节把代码执行定义为「写→跑→看报错→改→再跑」的自我纠正闭环，是代码生成区别于其他文本生成的关键搭档。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "光会「写」代码还不够",
+        "rationale": "第 4 节指出仅会生成代码不可靠，必须把代码跑起来并用运行/测试结果纠错，回答它解决什么问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "测试全绿只支持已被测试覆盖的行为，它不替代代码审查，也不授予自动合并或发布的权力",
+        "rationale": "第 4 节说明测试通过只覆盖被测行为，不能替代审查或授权自动合并发布，给出闭环的适用边界。"
+      }
+    },
+    {
+      "name": "从补全到自主编程 Agent 的进化",
+      "sections": [
+        3
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "它沿着「管得越来越宽」的方向逐级进化",
+        "rationale": "第 3 节界定该概念为 AI 编程沿补全、对话式、仓库级、自主 Agent 逐级扩展决策面的能力谱系。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "理解这条谱系，关键是看每一级把多宽的决策面交给了模型",
+        "rationale": "第 3 节说明它解决的问题是理解能力如何随任务范围逐级演进、每一级交出多宽的决策面。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "阶段更高只表示模型负责的工作面更宽，不代表模型本身变得更聪明",
+        "rationale": "第 3 节写明更高阶段不等于模型更聪明，更宽的负责面也不自动换来更大权限，给出边界。"
+      }
+    },
+    {
+      "name": "上下文工程",
+      "sections": [
+        5
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "把对的上下文，在有限的窗口里喂对",
+        "rationale": "第 5 节把上下文工程界定为在有限窗口内把与修改相关的最小上下文喂对，回答「是什么」。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "为什么同一个模型，写一个小函数时很强，一放进你的大项目里就频繁出错",
+        "rationale": "第 5 节指出它解决的问题：模型在小函数上强、进大项目常出错，根因是没看到项目全貌。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "上下文充分，只表示关键约束被看见了，不表示模型一定做对",
+        "rationale": "第 5 节写明上下文充分只表示约束可见，模型仍可能误解或遗漏未加载路径，给出边界。"
+      }
+    },
+    {
+      "name": "代码生成的风险与把关",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "代码风险控制的输入是候选补丁、依赖、测试、安全规则和审查者，输出是接受、修正、拒绝或待验证项",
+        "rationale": "第 6 节把风险控制界定为以多层证据对候选补丁做接受/修正/拒绝/待验证的处置，回答「是什么」。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "它带来的风险具体有几种",
+        "rationale": "第 6 节明确它解决的问题：幻觉编 API、看着对其实有 bug、安全漏洞、过度信任这几种风险。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "它并不意味着人类审查天然不会漏错",
+        "rationale": "第 6 节说明即便由人把关，人工审查本身也可能漏错，给出边界。"
+      }
+    },
+    {
+      "name": "代码生成评测（片段题与仓库级）",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "采样 k 个候选，只要其中至少一个通过隐藏测试，就算成功",
+        "rationale": "第 6.5 节界定 pass@k 为采样 k 个候选至少一个通过隐藏测试的度量，并与仓库级 SWE-bench 对照。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "一个模型在小函数基准上很强，能否直接推出它会修真实项目？不能直接推出",
+        "rationale": "第 6.5 节说明它解决的问题：片段题高分不能直接推出会修真实仓库，背后是两套测量逻辑。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "测试通过只证明代码通过了现有测试，不证明它安全、性能合格，或者完全符合用户意图",
+        "rationale": "第 6.5 节写明无论 pass@1 还是 pass@k，测试通过都不证明安全、性能与完整意图，给出边界。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

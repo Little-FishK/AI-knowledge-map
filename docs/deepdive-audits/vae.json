@@ -1,0 +1,19 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [],
+  "decision": "pass",
+  "mode": "verification",
+  "pageHash": "sha256:7cd2de915a0c21d5e96893b3385a9b6d35e86b32f3d028d94f40f85670fee628",
+  "pageId": "vae",
+  "reviewedAt": "2026-08-18",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "这个样本在潜空间里落在偏离均值 0.4 个标准差的位置",
+      "findingId": "sha256:e93c4a00a5f40f8be",
+      "rationale": "第4节手算例子的表述已按验收标准修正：原“0.2 个标准差”已改为“0.4 个标准差”。当前正文为“z = μ + σ·ε = 1 + 0.5 × (−0.4) = 0.8”“也就是说，这个样本在潜空间里落在偏离均值 0.4 个标准差的位置”。该表述在数学上正确：z=0.8 与均值 μ=1 相差 0.2 个潜空间单位，除以 σ=0.5 即 0.4 个标准差；且 ε=−0.4 本身就是以标准差为单位的标准化偏移，故“0.4 个标准差”成立。重参数化公式与结论均保持不变，符合验收标准，问题已解决。",
+      "resolved": true
+    }
+  ],
+  "warnings": []
+}

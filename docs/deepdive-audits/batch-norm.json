@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "pageId": "batch-norm",
+  "pageHash": "sha256:bea5687b20bf061ab33e5d21454d8c159fdc3ab0e15ad98f7bf077934227ba80",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:3b5cf7eeb97ca8313",
+      "resolved": true,
+      "evidence": "yᵢ = γ(xᵢ − μ_B)/<math class=\"dd-inline-root\" xmlns=\"http://www.w3.org/1998/Math/MathML\" aria-label=\"σ²_B 加 ε 的平方根\"><msqrt><mtext>σ²_B + ε</mtext></msqrt></math> + β",
+      "rationale": "已检查完整候选中第 1–12 节及其后的延伸内容；所有可见根式均使用 math.dd-inline-root > msqrt > mtext，未发现裸文本 √(…)。第 13 节在当前候选中不存在，因此没有该节的可见根式残留。"
+    },
+    {
+      "findingId": "sha256:27c7d4328962e21e9",
+      "resolved": true,
+      "evidence": "<div class=\"dd-table-wrap\"><table class=\"dd-table\"><thead><tr><th>输入类型</th><th>典型形状</th><th>每个特征或通道参与统计的元素数</th></tr></thead><tbody>",
+      "rationale": "已检查完整候选的可见正文，未发现 Markdown 管道表格源码或 |---| 分隔行；原管道表格均已渲染为 div.dd-table-wrap > table.dd-table，并保留语义化 thead 与 tbody。"
+    }
+  ]
+}

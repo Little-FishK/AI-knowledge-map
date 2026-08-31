@@ -322,6 +322,7 @@ function inspect(id, page, basePage) {
   const programmingFormulaPattern = /\b(?:theta|lambda)\b|sum_|sqrt\s*\(|Math\.|np\.|==|!=|<=|>=|->|\*\*/i;
   const formulaUsesProgrammingNotation = formulaBlocks.some((match) => programmingFormulaPattern.test(text(match[1])));
   const usesPlainTextRadical = /√/.test(html);
+  const rawLatexVisible = /\\(?:frac|partial|theta|varepsilon|epsilon|nabla|Delta|approx|times|cdot|rightarrow|left|right|mathsf|mathbb|operatorname|begin|end)\b/.test(plain);
   const invalidMathMl = [...html.matchAll(/<div\b[^>]*class="[^"]*\bdd-formula\b[^"]*"[^>]*(?:data-display|data-math)="mathml"[^>]*>([\s\S]*?)<\/div>/gi)]
     .some((match) => !/<math\b/i.test(match[1]) || !/<math\b[^>]*aria-label="[^"]+"/i.test(match[1]));
   const formulaContractGaps = [];
@@ -729,6 +730,7 @@ function inspect(id, page, basePage) {
   if (formulaUsesProgrammingNotation) reviewRequired.push("notation.programming-display");
   if (usesPlainTextRadical) reviewRequired.push("notation.plain-text-radical");
   if (invalidMathMl) reviewRequired.push("notation.invalid-mathml");
+  if (rawLatexVisible) reviewRequired.push("notation.raw-latex-visible");
   formulaContractGaps.forEach((gap) => reviewRequired.push(gap));
   exampleContractGaps.forEach((gap) => reviewRequired.push(gap));
   terminologyContractGaps.forEach((gap) => gaps.push(gap));
@@ -760,7 +762,7 @@ function inspect(id, page, basePage) {
       leadAnomalies: leadAnomalies.length,
       authorshipGaps: definitionTemplateGaps.length,
       sectionAuditSource: sectionAudit.source,
-      notationGaps: [formulaUsesCodeWrapper, formulaUsesProgrammingNotation, invalidMathMl].filter(Boolean).length,
+      notationGaps: [formulaUsesCodeWrapper, formulaUsesProgrammingNotation, invalidMathMl, rawLatexVisible].filter(Boolean).length,
       contractVersion,
       formulaContractGaps: formulaContractGaps.length,
       exampleContractGaps: exampleContractGaps.length,

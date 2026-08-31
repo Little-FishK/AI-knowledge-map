@@ -1,0 +1,31 @@
+{
+  "blockingFindings": [
+    {
+      "acceptanceCriteria": "将“35 天”与查询口径统一（改为 30 天，或在正文中明确 35 天的出处），并同步修正图 1 图注中的同一表述；不得改动来源列表，第 7 节 MRR 计算与表格数值保持不变。",
+      "claim": "第 7 节图 1 图注仍写成交叉编码器让“35 天”token 直接互动，与本例查询“质量问题是否受 30 天期限限制”及同节正文“30 天”口径矛盾，首轮指出的数值矛盾只修复了正文关键句，未修复图 1 图注。",
+      "code": "numeric-error",
+      "evidence": "交叉编码器则让“35 天”“质量问题”“不受期限限制”等 token 直接互动",
+      "findingId": "sha256:23becfaf4c5eacf46",
+      "rationale": "接受标准要求将“35 天”与查询口径统一，并同步修正图 1 图注中的同一表述。返修后正文关键句已改为“30 天”，但图 1 图注仍保留“35 天”，同一案例内 30 天/35 天矛盾依旧存在，读者仍无法确定交叉编码器在匹配哪个条件 token，故该问题未完全解决。",
+      "sections": [
+        7
+      ]
+    }
+  ],
+  "coreConcepts": [],
+  "decision": "fail",
+  "mode": "verification",
+  "pageHash": "sha256:935dc32633e8793d3e5a9dc3a3db2f5f9f25350006a2aa0e5b0a59a66e7cac89",
+  "pageId": "reranking",
+  "reviewedAt": "2026-08-17",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "交叉编码器则让“35 天”“质量问题”“不受期限限制”等 token 直接互动",
+      "findingId": "sha256:23becfaf4c5eacf46",
+      "rationale": "第 7 节正文关键句已由“35 天”改为“30 天”，但同节图 1 图注仍写成交叉编码器让“35 天”token 直接互动；接受标准明确要求图注同步修正，图注未修正即数值矛盾仍存在，故未完全解决。",
+      "resolved": false
+    }
+  ],
+  "warnings": []
+}

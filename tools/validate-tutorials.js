@@ -6,9 +6,8 @@ const vm = require("vm");
 const root = process.env.TUTORIAL_ROOT
   ? path.resolve(process.env.TUTORIAL_ROOT)
   : path.join(__dirname, "..");
-const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const tutorialScripts = [...indexHtml.matchAll(/<script src="(data\/tutorials[^"]*\.js)"><\/script>/g)]
-  .map((match) => match[1]);
+// 教程数据不再在首屏由 index.html 加载，改为 app.js 在进入软件视图时按需注入。
+const appJs = fs.readFileSync(path.join(root, "assets", "app.js"), "utf8");
 const requiredTutorialScripts = [
   "data/tutorials.js",
   "data/tutorials-codex-youtube.js",
@@ -20,7 +19,7 @@ vm.createContext(context);
 try {
   const softwareFile = path.join(root, "data", "software.js");
   vm.runInContext(fs.readFileSync(softwareFile, "utf8"), context, { filename: softwareFile });
-  tutorialScripts.forEach((src) => {
+  requiredTutorialScripts.forEach((src) => {
     const file = path.join(root, ...src.split("/"));
     vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
   });
@@ -87,9 +86,8 @@ function checkReview(r) {
   }
 }
 
-const appJs = fs.readFileSync(path.join(root, "assets", "app.js"), "utf8");
 requiredTutorialScripts.forEach((src) => {
-  if (!tutorialScripts.includes(src)) problems.push(`index.html 未加载 ${src}`);
+  if (!appJs.includes(`"${src}"`)) problems.push(`app.js 未按需加载 ${src}`);
 });
 if (!appJs.includes("data-tutorial") || !appJs.includes("openTutorial")) problems.push("app.js 未接入软件教程按钮或打开逻辑");
 

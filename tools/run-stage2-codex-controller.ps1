@@ -17,6 +17,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = $utf8NoBom
+[Console]::InputEncoding = $utf8NoBom
+[Console]::OutputEncoding = $utf8NoBom
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $sourceProfile = Join-Path $repositoryRoot '.codex\profiles\stage2-controller.config.toml'
 $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE '.codex' }
@@ -59,8 +63,8 @@ The caller explicitly selected hold for manual review. If inspection reports wor
 $prompt = @"
 Run exactly one Stage 2 stage for pageId $PageId as a controller-only agent.
 
-1. Call stage2_next_recommended_page with startOrder $StartOrder. You may call stage2_status only for a compact safety check. If the returned page is $PageId, require active false and continue. If the recommendation has advanced past $PageId, call stage2_inspect_publication_candidate for ${PageId}: if it is already terminal, apply the manual-review rule below and stop without spawning; otherwise report the mismatch and stop.
-2. Select exactly one custom agent from pageState: use stage2_audit for audit-queued, or stage2_repair for repair-queued. Reject every other nonterminal state. Spawn that agent with no inherited/full-history fork. Give it only this compact task: claim pageId $PageId once, complete its assigned role, submit exactly one result, report the controller response, and stop.
+1. Call stage2_resolve_recommended_page with order $StartOrder. Require status resolved, pageId $PageId, tracked true, and active false. If the exact resolver returns another page, an untracked page, or an active lease, report the mismatch and stop. You may call stage2_status only for a compact safety check. Do not use stage2_next_recommended_page to resolve this explicitly requested page because that tool intentionally skips terminal states.
+2. Select exactly one custom agent from pageState: use stage2_content_generation for content-generation-queued, stage2_audit for audit-queued, or stage2_repair for repair-queued. Reject every other nonterminal state. Spawn that agent with no inherited/full-history fork. Give it only this compact task: claim pageId $PageId once, complete its assigned role, submit exactly one result, report the controller response, and stop.
 3. Wait for that agent. Do not spawn another worker. Call stage2_inspect_publication_candidate for $PageId once to determine the post-submission workflow and publication state. Apply the manual-review rule below when applicable, report the worker result plus the final inspection, and stop. Do not process another page, and do not attempt claim or submit yourself.
 
 $manualReviewInstruction

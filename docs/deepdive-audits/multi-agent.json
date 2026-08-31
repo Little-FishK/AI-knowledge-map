@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 3,
+  "pageId": "multi-agent",
+  "pageHash": "sha256:7ce31b86792d91425032b643fdd9410d8cc5b0a280b23cc65de31923a2e2154b",
+  "reviewedAt": "2026-08-20",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "code": "human-review-issue",
+      "findingId": "sha256:85aa68f97fbd1f838",
+      "section": 3,
+      "sections": [
+        3,
+        4,
+        5,
+        10
+      ],
+      "concept": null,
+      "claim": "「Agent」与「智能体」仍未统一为一致写法：第 3、4、10 节写作「智能体」，第 1、2、7、8、9、11 节写作「Agent」。",
+      "evidence": "因为每个智能体都要重新理解一遍问题",
+      "rationale": "返修已把正文中的「合并/合并者」与「聚合者/聚合器」统一为「合并/合并者」（第 3、4、5、10 节），但「Agent」与「智能体」的混用仍在：第 3 节「每个智能体」、第 4 节「多个智能体」、第 10 节「某个智能体」保留「智能体」，而第 7 节标题「独立 Agent 不等于独立证据」及第 1、2、8、9、11 节正文保留「Agent」。验收条件「Agent/智能体 统一为一致写法」未满足。",
+      "acceptanceCriteria": "Agent/智能体 统一为一致写法，保持含义不变；不改变任何数值、公式含义、来源列表、标题文本和未被指出的章节内容。",
+      "sourceUrls": []
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:85aa68f97fbd1f838",
+      "resolved": false,
+      "evidence": "因为每个智能体都要重新理解一遍问题",
+      "rationale": "正文中的「合并/合并者」与「聚合者/聚合器」已统一为「合并/合并者」（第 3、4、5、10 节一致），但「Agent」与「智能体」仍未统一：第 3、4、10 节仍写作「智能体」（第 3 节「每个智能体」、第 4 节「多个智能体」、第 10 节「某个智能体」），而第 1、2、7、8、9、11 节仍写作「Agent」（如第 7 节「独立 Agent 不等于独立证据」「五个相同模型的 Agent」）。验收条件要求的「Agent/智能体 统一为一致写法」未满足，故该发现未完全解决。"
+    },
+    {
+      "findingId": "sha256:b9418953537718feb",
+      "resolved": true,
+      "evidence": "成本与可观测性必须按任务树归因",
+      "rationale": "可见章节编号已重排为 1 到 11 连续。此前缺失的第 10 节现已存在（「成本与可观测性必须按任务树归因」，dd-n=10），其后的「把因果链连起来」为 dd-n=11，dd-n 依次为 1..11 无跳号，验收条件满足。"
+    }
+  ]
+}

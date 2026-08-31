@@ -1,0 +1,164 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [
+    {
+      "boundary": {
+        "evidence": "硬真值与教师信号应当组合使用",
+        "rationale": "第 1 节说明教师概率可能失准、不自动等于真值，须与硬真值组合并校准；第 5、7 节补充容量上限与偏差继承边界。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "把教师的完整概率分布而不是单个答案交给学生",
+        "rationale": "第 1 节明确说明蒸馏的机制是教师输出完整概率表，学生以该分布为监督目标拟合。",
+        "status": "pass"
+      },
+      "name": "知识蒸馏",
+      "problem": {
+        "evidence": "把一个较大或较强模型的判断能力迁移给较小模型时",
+        "rationale": "第 1 节开篇即指出蒸馏解决的核心问题是把较强模型的判断能力迁移给较小模型时应传递什么信息。",
+        "status": "pass"
+      },
+      "sections": [
+        1,
+        2,
+        3,
+        5,
+        7
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "公开 API 往往不开放全量 logits",
+        "rationale": "第 4 节列出 API 不开放 logits、词表不对齐、层无法对应、序列只见采样路径等适用限制。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "按信号所在层级可以分出四种",
+        "rationale": "第 4 节把蒸馏信号分为 logit、特征、关系、序列四类并逐一定义。",
+        "status": "pass"
+      },
+      "name": "蒸馏信号层级",
+      "problem": {
+        "evidence": "当拿不到教师内部状态时，还能蒸馏什么",
+        "rationale": "第 4 节说明教师接口受限或架构不同时如何选择可迁移的可见信号。",
+        "status": "pass"
+      },
+      "sections": [
+        4
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "优先询问学生最不确定、而教师可能有增益的样本",
+        "rationale": "第 6 节指出教师查询有成本，应主动选择高边际价值样本而非均匀采样。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "蒸馏数据要按目标行为主动构造课程",
+        "rationale": "第 6 节定义按目标切片选择、验证、去重并组织教师样本的覆盖课程方案。",
+        "status": "pass"
+      },
+      "name": "蒸馏数据覆盖与课程构造",
+      "problem": {
+        "evidence": "学生的偏科由数据覆盖决定，而不是由教师品牌决定",
+        "rationale": "第 6 节说明最强教师只在狭窄数据上教学会导致学生在语言、长度和工具上偏科。",
+        "status": "pass"
+      },
+      "sections": [
+        6
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "对敏感任务，监督信号不能只来自教师一家",
+        "rationale": "第 7 节给出敏感任务需组合硬标签、独立规则、多教师分歧和人工审查的边界要求。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "序列示范中可能混入幻觉、隐私泄露、偏见或过度拒答",
+        "rationale": "第 7 节说明软分布与序列示范会连同教师错误、偏见与拒答倾向一起传递给学生。",
+        "status": "pass"
+      },
+      "name": "教师错误与偏差继承",
+      "problem": {
+        "evidence": "学生更小、更便宜，是否也自然更安全？不会。",
+        "rationale": "第 7 节反驳小模型天然更安全的假设，要求用独立真值识别师生共同盲点。",
+        "status": "pass"
+      },
+      "sections": [
+        7
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "任何组合方案都必须重新做端到端评测",
+        "rationale": "第 8 节说明组合后误差会交互，量化教师或脆弱切片会放大损失，必须重新端到端评测。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "它们改变的东西完全不同，收益和损失来源也各不一样",
+        "rationale": "第 8 节区分蒸馏改变行为主体、量化改变位宽、剪枝改变结构、LoRA 改变任务增量。",
+        "status": "pass"
+      },
+      "name": "蒸馏与量化/剪枝/LoRA 的组合关系",
+      "problem": {
+        "evidence": "四者的共同点是都降低部署成本，但压缩的维度互不相同",
+        "rationale": "第 8 节防止把四种压缩方法误认为具有相同收益与损失来源。",
+        "status": "pass"
+      },
+      "sections": [
+        8
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "硬风险门槛全部通过",
+        "rationale": "第 9 节给出硬风险门槛、真实硬件收益与牺牲能力可回退三者同时满足才可验收的边界。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "不能靠单个基准分，而要同时报告两层证据",
+        "rationale": "第 9 节定义用模型能力层与系统成本层两层证据构成质量—容量—成本前沿验收。",
+        "status": "pass"
+      },
+      "name": "部署验收前沿",
+      "problem": {
+        "evidence": "学生参数少 70%，怎样证明",
+        "rationale": "第 9 节检验参数更少是否真正降低每次成功任务成本，而非只是让失败更便宜。",
+        "status": "pass"
+      },
+      "sections": [
+        9
+      ]
+    }
+  ],
+  "decision": "pass",
+  "mode": "full",
+  "pageHash": "sha256:d407fab7b8e90e1f02305414fd4e24ca1dbf52b0edd02e55f86f8e8e545ea8cc",
+  "pageId": "distillation",
+  "reviewedAt": "2026-08-15",
+  "schemaVersion": 3,
+  "verificationResults": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "label": "章节编号不连续",
+      "rationale": "第 9 节之后直接出现第 11 节，缺少编号 10；正文内容完整、叙述连贯，不影响理解，但编号跳号略显突兀。",
+      "sections": [
+        9,
+        11
+      ]
+    },
+    {
+      "code": "minor-terminology-style",
+      "label": "同义术语写法未统一",
+      "rationale": "同一硬监督来源存在“硬标签”“硬真值”“人工真值”三种写法，正向 KL 被称作“经典方向”；含义没有冲突，但写法可统一、称谓可更精确。",
+      "sections": [
+        1,
+        2,
+        6,
+        7
+      ]
+    }
+  ]
+}

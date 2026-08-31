@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 3,
+  "pageId": "alignment",
+  "pageHash": "sha256:f62e6c6572f9a959e435fa070977eb1e156ee63b25d2cd7771e314ed339cd338",
+  "reviewedAt": "2026-08-18",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-repetition",
+      "section": 3,
+      "message": "第 3 节的三组对照案例（半夜回屋、配制毒物、冷门事实）以几乎相同的措辞在正文项目符号列表和其后的表格中各出现一次，属轻微重复，不影响理解。"
+    },
+    {
+      "code": "minor-terminology-style",
+      "section": 3,
+      "message": "第 3 节图中用「帮助 · 真实性 · 安全」标注评测维度，而正文统一使用「有用/诚实/无害」，两者含义对应、无冲突，但写法可统一。"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "对齐",
+      "sections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "让模型的行为符合人类真正的意图与价值观",
+        "rationale": "第 1 节直接给出对齐的定义：把模型对到「人类真正的意图与价值观」上，并展开为有用、诚实、无害三条目标，清晰回答了「是什么」。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "它学到的是「文本通常怎么接下去」，而不是「什么该说、什么不该说、什么是对的」",
+        "rationale": "第 2 节说明对齐要解决的问题：预训练只学了「最可能说的」（语言似然），不等于「应该说的」，基座模型博学但没分寸，对齐补上这份分寸。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "对齐不等于模型永远服从任何用户",
+        "rationale": "第 1 节末尾明确两条适用边界：对齐不等于无条件服从任何用户（与诚实/无害冲突时应克制、澄清或拒绝），也不是灌输静止教条；第 6 节进一步补充 RLHF 只是手段之一、技术之外还需治理。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

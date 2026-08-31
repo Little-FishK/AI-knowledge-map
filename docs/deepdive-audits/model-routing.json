@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "model-routing",
+  "pageHash": "sha256:58e2f3aed3dc047b914b6a2638da3d22596e05bc72449167b1f1cd300c3a1b6a",
+  "reviewedAt": "2026-08-16",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:82c77665b99a52614",
+      "resolved": true,
+      "evidence": "期望延迟 ETime = Tₛ + Tjudge + r × Tₗ，其中 Tₛ 是小模型延迟，Tjudge 是判定是否升级所需的延迟，Tₗ 是强模型延迟。所有人先承担 Tₛ 与 Tjudge，被升级的比例 r 再额外承担 Tₗ",
+      "rationale": "第 4 节显示公式已改为 ETime = Ts + Tjudge + r × Tl，与正文推导“期望延迟 ETime = Tₛ + Tjudge + r × Tₗ”完全一致；正文保留“所有人先承担 Tₛ 与 Tjudge，被升级的比例 r 再额外承担 Tₗ”的假设，显示公式不再出现旧版 (1−r)×Ts + r×(Ts+Tjudge+Tl) 形式，公式与文字现已一致，符合验收标准的第一种改法。"
+    }
+  ]
+}

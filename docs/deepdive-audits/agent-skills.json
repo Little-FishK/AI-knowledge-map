@@ -1,0 +1,203 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [
+    {
+      "boundary": {
+        "evidence": "正确的做法是保留通用 Agent 的回退路径",
+        "rationale": "第 1 章明确当任务目标持续变化或无法定义通过标准时，应保留通用 Agent 回退路径而不强行封装。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "把一类重复任务的触发、步骤、资源和验收组合成一个版本化能力包",
+        "rationale": "第 1 章明确定义智能体技能为封装重复任务触发、步骤、资源和验收的版本化能力包。",
+        "status": "pass"
+      },
+      "name": "智能体技能",
+      "problem": {
+        "evidence": "反复加载同一套规范、执行同样的安全步骤、产出同类的制品",
+        "rationale": "第 1 章指出技能的收益来自复用，通过固化已验证做法减少重复设计。",
+        "status": "pass"
+      },
+      "sections": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "在高风险、低基率的场景里，首要目标是减少误触发",
+        "rationale": "第 5 章指出比例依赖请求基率，高风险低基率场景应优先减少误触发，给出适用边界。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "技能选择本质上是一个分类问题",
+        "rationale": "第 5 章把技能选择定义为带基率的分类问题，并用精确率与召回率刻画其表现。",
+        "status": "pass"
+      },
+      "name": "技能选择",
+      "problem": {
+        "evidence": "低基率是让高召回显得危险的根源",
+        "rationale": "第 5 章解释高召回在低基率场景为何仍频繁打扰用户，即该概念要解决的问题。",
+        "status": "pass"
+      },
+      "sections": [
+        5
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "入口承载着关键的约束，如果入口里遗漏了这些约束，后续执行就会失真",
+        "rationale": "第 6 章强调渐进披露优化的是何时加载而非能否丢弃，入口遗漏关键约束仍会使执行失真。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "渐进披露正是为了解决这个问题而设计的分阶段加载方式",
+        "rationale": "第 6 章把渐进披露定义为分阶段加载方式：发现时只看轻量描述，选中后加载完整入口。",
+        "status": "pass"
+      },
+      "name": "渐进披露",
+      "problem": {
+        "evidence": "上下文是有限的竞争资源",
+        "rationale": "第 6 章指出把所有技能全文放入系统提示会因上下文竞争让系统变慢变差，渐进披露解决该问题。",
+        "status": "pass"
+      },
+      "sections": [
+        3,
+        6
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "确定性只表示在相同条件下行为稳定",
+        "rationale": "第 7 章明确确定性只表示同条件下行为稳定，不代表代码安全、输入可信或写操作获批。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "脚本确实擅长精确、可重复的操作",
+        "rationale": "第 7 章定义脚本承担解析、计算、格式转换与验证等精确可重复的确定性操作。",
+        "status": "pass"
+      },
+      "name": "确定性脚本",
+      "problem": {
+        "evidence": "解决模型不擅长精确重复操作的问题",
+        "rationale": "第 7 章指出确定性脚本解决模型不擅长精确重复操作的问题。",
+        "status": "pass"
+      },
+      "sections": [
+        7
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "但它无法阻止外部服务自身的变化",
+        "rationale": "第 8 章指出版本锁定无法阻止外部服务自身变化或链接失效，给出治理的外部边界。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "版本要同时锁入口、资源、脚本和环境",
+        "rationale": "第 8 章定义版本治理要同时锁定入口、资源、模板、脚本、依赖和运行环境等完整依赖。",
+        "status": "pass"
+      },
+      "name": "版本治理",
+      "problem": {
+        "evidence": "只改一份参考文档，也可能改变整个技能的行为",
+        "rationale": "第 8 章说明组成部分互相依赖，只改一份参考文档也会改变技能行为，版本治理解决该连锁反应问题。",
+        "status": "pass"
+      },
+      "sections": [
+        8
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "总体端到端分数不能区分误触发与执行错误",
+        "rationale": "第 9 章指出总体分与漂亮示例都不能代表异常输入分布，给出评测的局限性边界。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "评测必须拆成两层",
+        "rationale": "第 9 章定义评测分为选对技能与技能做对任务两层，各自使用各自指标。",
+        "status": "pass"
+      },
+      "name": "分层评测",
+      "problem": {
+        "evidence": "一个笼统的端到端分数无法区分误触发和执行错误",
+        "rationale": "第 9 章指出笼统端到端分数无法区分触发错误与执行错误，分层评测解决该定位问题。",
+        "status": "pass"
+      },
+      "sections": [
+        9
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "保留历史只用于解释旧产物，绝不表示旧技能仍然可以被触发",
+        "rationale": "第 10 章强调保留历史版本只用于解释旧产物，不表示旧技能仍可被触发。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "技能需要下线与回退，不应只增不减",
+        "rationale": "第 10 章定义技能需要保留、合并、弃用、禁用或回退的完整生命周期管理。",
+        "status": "pass"
+      },
+      "name": "技能生命周期管理",
+      "problem": {
+        "evidence": "两个技能功能重叠时继续共存，会让选择变得越来越混乱",
+        "rationale": "第 10 章指出重叠与过时技能共存会持续增加选择混淆与风险，生命周期管理解决该问题。",
+        "status": "pass"
+      },
+      "sections": [
+        10
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "组合成功只表示接口能够衔接",
+        "rationale": "第 12 章强调组合成功只表示接口衔接，不能并发写同一资源或按加载顺序决定权限。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "多个技能同时匹配时要显式消歧与组合",
+        "rationale": "第 12 章定义多技能同时匹配时必须显式消歧或组合，而非任意选择。",
+        "status": "pass"
+      },
+      "name": "冲突解析",
+      "problem": {
+        "evidence": "就不能靠任意选择一个来解决，必须显式地消歧或组合",
+        "rationale": "第 12 章用表格与文档技能同时命中的例子说明不能任意选一个来解决的冲突问题。",
+        "status": "pass"
+      },
+      "sections": [
+        12
+      ]
+    }
+  ],
+  "decision": "pass",
+  "mode": "full",
+  "pageHash": "sha256:2de12524a42dcf218271f8e732a04c1b57a1fdcef58598ede3a38d0f3f307de0",
+  "pageId": "agent-skills",
+  "reviewedAt": "2026-08-18",
+  "schemaVersion": 3,
+  "verificationResults": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "evidence": "多个技能同时匹配时要显式消歧与组合",
+      "label": "章节编号存在缺口",
+      "rationale": "候选页正文章节编号从第 10 章直接跳到第 12 章，缺少第 11 章（第 13 章为综合章）；编号缺口对读者可见，可能源于跳过了自测/常见误解章节，但不影响理解。",
+      "sections": [
+        12
+      ]
+    },
+    {
+      "code": "minor-terminology-style",
+      "evidence": "为相邻技能准备对比反例",
+      "label": "同一概念术语写法不一",
+      "rationale": "近邻反例这一概念在第 5 章写作「对比反例」，而在第 9、12 章写作「近邻反例」，含义一致但用词不统一。",
+      "sections": [
+        5
+      ]
+    }
+  ]
+}

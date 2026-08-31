@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "agent": "stage2-orchestrator",
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "mcp__stage2__stage2_status",
+      "mcp__stage2__stage2_next_recommended_page",
+      "mcp__stage2__stage2_claim_task",
+      "mcp__stage2__stage2_submit_result",
+      "mcp__stage2__stage2_read_task_packet",
+      "mcp__stage2__stage2_search_project",
+      "mcp__stage2__stage2_read_project_file"
+    ],
+    "deny": [
+      "Edit",
+      "Write",
+      "NotebookEdit",
+      "Bash",
+      "Read(./.stage2/**)",
+      "Read(./docs/deepdive-audits/**)",
+      "mcp__stage2__stage2_reset_manual_review",
+      "mcp__stage2__stage2_reset_passed_page",
+      "mcp__stage2__stage2_create_manual_review_preview",
+      "mcp__stage2__stage2_finalize_manual_review",
+      "mcp__stage2__stage2_release_lease"
+    ]
+  }
+}

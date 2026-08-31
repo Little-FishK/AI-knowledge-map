@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 3,
+  "pageId": "post-training",
+  "pageHash": "sha256:4b0cb2c0394504ad5b367256e8adef7c23104a1b2374407a57275b14311fbe51",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "findingId": "sha256:9153b1ccc0bbe1b04",
+      "code": "human-review-issue",
+      "section": 4,
+      "sections": [
+        4,
+        8,
+        9
+      ],
+      "concept": null,
+      "claim": "第三层训练信号的术语仍未统一：第 9 节「概念依赖与延伸」表仍写作「可验证奖励」，与目标清单、第 4 节、第 8 节及第 9 节正文中的「可验证反馈」不一致。",
+      "evidence": "SFT、偏好数据、RLHF/DPO、可验证奖励、KL 约束与回归",
+      "rationale": "reward hacking 已统一为「奖励投机」（第 4 节「奖励黑客」已改为「奖励投机」，与第 8、9 节一致）。但「可验证反馈/可验证奖励」仍未统一：目标清单、第 4、8 节与第 9 节正文已用「可验证反馈」，第 9 节概念依赖表仍保留「可验证奖励」。该表受图表保护规则约束须逐块原样保留、机器不得改写，已确认与原页逐字节一致，因此剩余不一致机器不可修复。",
+      "acceptanceCriteria": "将第 9 节「概念依赖与延伸」表中的「可验证奖励」与页内其余「可验证反馈」统一为同一写法；不得改动数值、公式含义、来源列表、标题文本及未被指出的章节内容。",
+      "sourceUrls": []
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:9153b1ccc0bbe1b04",
+      "resolved": false,
+      "evidence": "SFT、偏好数据、RLHF/DPO、可验证奖励、KL 约束与回归",
+      "rationale": "reward hacking 部分已解决（第 4 节「奖励黑客」已改为「奖励投机」，与第 8、9 节一致）。但第三层训练信号未统一：目标清单、第 4、8 节正文与第 9 节正文已统一为「可验证反馈」，第 9 节「概念依赖与延伸」表仍为「可验证奖励」，与页内其余写法冲突。该表受图表保护规则约束须逐块原样保留、机器不得改写，已确认与原页逐字节一致，因此剩余不一致机器不可修复。"
+    }
+  ]
+}

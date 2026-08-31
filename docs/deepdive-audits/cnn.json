@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 3,
+  "pageId": "cnn",
+  "pageHash": "sha256:365ec13416761dacbc9f942b7bc874a647dcb981020053c7e272b151985b0e14",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:4157d005a85b3f167",
+      "resolved": true,
+      "evidence": "四个窗口的计算依次为：",
+      "rationale": "读者可见正文中，第2节仅有一张“四个窗口”表，第6节仅有一张感受野递推表，第8节仅有一张等变/不变对照表，第9节仅有一张 CNN/ViT 对照表；四张表分别保留窗口数值与内积、r/j 递推数值、性质关系和局部—全局机制关系。文末 stage2-nonrendering-preservation HTML 注释内仍有旧表保留块，但不参与渲染，不构成读者可见重复。"
+    },
+    {
+      "findingId": "sha256:11928bfcf1c54d827",
+      "resolved": true,
+      "evidence": "这张对照表描述机制差异，不预先宣告哪类结构必然更好。实际结果还取决于具体训练设置与运行环境，因此应在相同目标数据、输入分辨率和评测条件下实测，再决定采用 CNN 还是 ViT。",
+      "rationale": "读者可见第9节只比较 CNN 的局部连接/权重共享与 ViT 的 token 自注意力，并保留按目标场景实测的边界；可见正文已无 ConvNeXt、端侧 depthwise/量化、小目标骨干或视频缓存的具体选型结论。相关旧表仅在 nonrendering preservation 注释中，不向读者呈现。"
+    },
+    {
+      "findingId": "sha256:4e8f42b39152345e5",
+      "resolved": true,
+      "evidence": "把因果链连起来",
+      "rationale": "读者可见标题从第9节直接进入第12节；原标题编号11及显著图、遮挡、反事实替换、特征消融、跨数据集复现方法论均未出现在正文，未获当前来源支持的方法论已删除。"
+    }
+  ]
+}

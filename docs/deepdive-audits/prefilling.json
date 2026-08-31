@@ -1,0 +1,56 @@
+{
+  "blockingFindings": [
+    {
+      "acceptanceCriteria": "第 3 节与第 5 节各只保留一张该表格，删除完全重复的第二张表，且不改变周围叙述与其余内容。",
+      "claim": "第 3 节与第 5 节仍各自完整渲染两次同一张表格，成对重复未删除，首轮 harmful-repetition 问题未解决。",
+      "code": "harmful-repetition",
+      "evidence": "正确实现下否",
+      "findingId": "sha256:93d289f09ce3b5147",
+      "rationale": "复核当前候选：第 3 节 dd-agent-response 内已有四概念对比表（提示缓存行为“正确实现下为否”），其后仍紧跟一份独立 dd-table 完整重复同一张表（该格为“正确实现下否”）；第 5 节同样在叙述内渲染前缀风险表后，又以独立表格重复整表（含“旧代码可能含漏洞/注入”）。两处重复均未被删除，验收标准未满足。",
+      "section": 3,
+      "sections": [
+        3,
+        5
+      ]
+    },
+    {
+      "acceptanceCriteria": "在不添加、删除或替换页面来源的前提下，将第 7 节的锚定关键结论改写为可由现有来源支持的表述，或将来源列表问题移交人工裁决。",
+      "claim": "第 7 节“错误前缀造成锚定并诱发支持性编造”的关键结论仍无任何有效来源支持，来源列表问题也未移交人工裁决，首轮 source-support-blocked 未解决。",
+      "code": "source-support-blocked",
+      "evidence": "模型只是在维持连贯性，而连贯性本身被错误的前缀劫持了",
+      "findingId": "sha256:3fa1c531697418cda",
+      "rationale": "当前候选第 7 节仍保留“于是模型更可能去搜寻论证‘是’的材料”与“模型只是在维持连贯性，而连贯性本身被错误的前缀劫持了”等锚定结论，仅将机制叙述改为归因于 LMQL/Guidance。联网核验：arXiv:2305.11627 为 LLM-Pruner（结构剪枝），与锚定无关；2212.06094 为 LMQL、2307.09702 为 Outlines、2109.05093 为 PICARD，均只涉及受控生成/解码，不覆盖锚定效应或支持性编造。来源列表未修改，也未做人工裁决移交，验收标准未满足。",
+      "section": 7,
+      "sections": [
+        7
+      ],
+      "sourceUrls": [
+        "https://arxiv.org/abs/2305.11627",
+        "https://arxiv.org/abs/2212.06094",
+        "https://arxiv.org/abs/2307.09702"
+      ]
+    }
+  ],
+  "coreConcepts": [],
+  "decision": "fail",
+  "mode": "verification",
+  "pageHash": "sha256:2a9fd6fe3bd27cf28cafcc17e9803b4fdbb7e80494e95ce823ae45422f210d87",
+  "pageId": "prefilling",
+  "reviewedAt": "2026-08-16",
+  "schemaVersion": 3,
+  "verificationResults": [
+    {
+      "evidence": "正确实现下否",
+      "findingId": "sha256:93d289f09ce3b5147",
+      "rationale": "第 3 节仍同时存在两份四概念对比表：dd-agent-response 内的表格（提示缓存行为“正确实现下为否”）与其后的独立 dd-table（该格为“正确实现下否”）内容语义相同；第 5 节同样在叙述内渲染前缀风险表后，又以独立表格重复整表（含“旧代码可能含漏洞/注入”）。验收标准要求各节只保留一张表，实际两张均未删除，问题未解决。",
+      "resolved": false
+    },
+    {
+      "evidence": "模型只是在维持连贯性，而连贯性本身被错误的前缀劫持了",
+      "findingId": "sha256:3fa1c531697418cda",
+      "rationale": "第 7 节锚定关键结论原样保留（首轮证据句仍逐字存在），且仍断言“于是模型更可能去搜寻论证‘是’的材料”。来源列表未被修改：条目“Anchoring Effects in Large Language Models”仍链接 arXiv:2305.11627，经联网核验该论文为 LLM-Pruner（结构剪枝），与锚定无关；LMQL（2212.06094）、Outlines（2307.09702）、PICARD（2109.05093）只涉及受控生成/解码，均不覆盖“错误前缀诱发支持性编造”的结论。既未按验收标准改写为现有来源可支持的表述，也未移交人工裁决，问题未解决。",
+      "resolved": false
+    }
+  ],
+  "warnings": []
+}

@@ -5,33 +5,66 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const {
+  CONTENT_GENERATION_PROMPT,
   L3_BLOCKING_CRITERIA,
   L3_NON_BLOCKING_SIGNALS,
   auditBlockers,
   auditGaps,
   claimTask,
+  contentGenerationSections,
   createManualReviewPreview,
+  enqueueContentGeneration,
   enqueueNewNode,
+  editorialContentPolicyGaps,
   finalizeManualReview,
   gateDefects,
   initialize,
+  importEditorialCandidate,
   inspectPublicationCandidate,
   loadState,
   readAuditProjectFile,
+  readContentGenerationSection,
   readTaskPacketPart,
   releaseLease,
+  renderEditorialMarkdown,
   nextRecommendedPage,
+  resolveRecommendedPage,
   resetManualReview,
   resetPassedPage,
+  returnEditorialForRevision,
   publishProvisionalPage,
   rollbackProvisionalPage,
   searchAuditProject,
+  saveContentGenerationResponse,
   setPaused,
   status,
   submitResult,
+  validatePageResult,
 } = require("./deepdive-stage2/core");
 const { pageContentHash } = require("./deepdive-audit-contracts");
 const { scanNarrativeTemplates } = require("./deepdive-narrative-audit");
+
+const renderedEditorialMarkdown = renderEditorialMarkdown([
+  "y = γ(x − μ) / √(σ² + ε) + β",
+  "z = (x − μ) / √((x − μ)² + ε)",
+  "",
+  "| 输入类型 | 典型形状 | 每个特征参与统计的元素数 |",
+  "|---|:---:|---:|",
+  "| 全连接 | [N,C] | N |",
+].join("\n"));
+assert.match(renderedEditorialMarkdown, /<math class="dd-inline-root"[^>]*><msqrt><mtext>σ² \+ ε<\/mtext><\/msqrt><\/math>/);
+assert.doesNotMatch(renderedEditorialMarkdown, /√\(σ² \+ ε\)/);
+assert.match(renderedEditorialMarkdown, /<msqrt><mtext>\(x − μ\)² \+ ε<\/mtext><\/msqrt>/);
+assert.doesNotMatch(renderedEditorialMarkdown, /√\(\(x − μ\)² \+ ε\)/);
+assert.match(renderedEditorialMarkdown, /<div class="dd-table-wrap"><table class="dd-table">/);
+assert.match(renderedEditorialMarkdown, /<th class="dd-align-center">典型形状<\/th>/);
+assert.match(renderedEditorialMarkdown, /<td class="dd-align-right">N<\/td>/);
+assert.doesNotMatch(renderedEditorialMarkdown, /<p>\| 输入类型/);
+assert.deepStrictEqual(editorialContentPolicyGaps({ html: renderedEditorialMarkdown }), []);
+assert.deepStrictEqual(
+  editorialContentPolicyGaps({ html: "<p>y = 1 / √(σ² + ε)</p><p>| A | B | |---|---| | 1 | 2 |</p>" }),
+  ["可见正文不得保留未排版的 √(…) 根式", "可见正文不得保留 Markdown 管道表格分隔行"],
+);
 
 function copyFixture(options = {}) {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-test-"));
@@ -129,6 +162,28 @@ function failingAudit(pageId, pageHash, claim = "正文把关键事实说反了"
   return audit;
 }
 
+function completeEditorialAudit(pageId, pageHash, evidence = "body improved") {
+  const check = { status: "pass", evidence, rationale: "正文已明确覆盖该项。" };
+  return {
+    schemaVersion: 3,
+    pageId,
+    pageHash,
+    reviewedAt: "2026-07-28",
+    mode: "full",
+    decision: "pass",
+    blockingFindings: [],
+    warnings: [],
+    coreConcepts: [{
+      name: "Alpha",
+      sections: [1],
+      definition: check,
+      problem: check,
+      boundary: check,
+    }],
+    verificationResults: [],
+  };
+}
+
 const parsedDefects = gateDefects({
   script: "audit-deepdive-benchmark.js",
   output: [
@@ -156,6 +211,21 @@ try {
     active: false,
     activeRole: null,
   });
+  assert.deepStrictEqual(resolveRecommendedPage(fixture, "1.3"), {
+    status: "resolved",
+    order: "1.3",
+    pageId: "alpha",
+    phase: "基础",
+    tracked: true,
+    pageState: "audit-queued",
+    active: false,
+    activeRole: null,
+    contentGeneration: null,
+  });
+  assert.throws(
+    () => resolveRecommendedPage(fixture, "9.9"),
+    /不存在节点/,
+  );
   const first = claimTask(fixture, "test-auditor");
   assert.strictEqual(first.status, "claimed");
   assert.strictEqual(first.task.role, "audit");
@@ -163,19 +233,21 @@ try {
   assert.deepStrictEqual(first.task.uiCleanup.arguments, { archived: true });
   assert.deepStrictEqual(first.task.uiCleanup.afterSubmitStatuses, [
     "accepted",
+    "content-generated",
     "needs-repair",
     "l3-auto-passed",
+    "awaiting-human-review",
     "rejected",
   ]);
-  assert.strictEqual(first.task.auditContract.schemaVersion, 2);
+  assert.strictEqual(first.task.auditContract.schemaVersion, 3);
   assert.strictEqual(first.task.auditContract.decisionPolicy.type, "binary");
   assert.deepStrictEqual(
     first.task.auditContract.blockingCriteria.map(item => item.code),
     L3_BLOCKING_CRITERIA.map(item => item.code),
   );
-  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "undefined-critical-term"));
-  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "insufficient-core-explanation"));
-  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "title-body-scope-mismatch"));
+  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "core-concept-definition-missing"));
+  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "core-concept-problem-missing"));
+  assert(first.task.auditContract.blockingCriteria.some(item => item.code === "core-concept-boundary-missing"));
   assert.deepStrictEqual(
     first.task.auditContract.nonBlockingSignals.map(item => item.code),
     L3_NON_BLOCKING_SIGNALS.map(item => item.code),
@@ -685,6 +757,23 @@ try {
   passedState.pages.alpha.completionReceipt = ".stage2/results/alpha/completion.json";
   fs.writeFileSync(statePath, `${JSON.stringify(passedState, null, 2)}\n`, "utf8");
 
+  assert.deepStrictEqual(nextRecommendedPage(passedResetFixture, "1.3"), {
+    status: "complete",
+    startOrder: "1.3",
+    remaining: 0,
+  });
+  assert.deepStrictEqual(resolveRecommendedPage(passedResetFixture, "1.3"), {
+    status: "resolved",
+    order: "1.3",
+    pageId: "alpha",
+    phase: "基础",
+    tracked: true,
+    pageState: "l3-auto-passed",
+    active: false,
+    activeRole: null,
+    contentGeneration: null,
+  });
+
   const reset = resetPassedPage(passedResetFixture, "alpha", "人工抽检发现正文质量不足，重新独立审查");
   assert.strictEqual(reset.previousState, "l3-auto-passed");
   assert.strictEqual(reset.nextState, "audit-queued");
@@ -917,3 +1006,452 @@ assert.match(appSource, /published-provisional/);
 assert.match(appSource, /未通过审计/);
 assert.match(styleSource, /dd-h1-provisional/);
 console.log("✓ Stage 2 暂行发布：人工否决、红色标题标记、哈希绑定与回滚测试通过");
+
+const editorialFixture = copyFixture().fixture;
+try {
+  const originalPage = {
+    title: "Alpha",
+    subtitle: "A subtitle",
+    thesis: "A thesis",
+    html: '<section class="dd-sec"><h2><span class="dd-n">1</span>正文<span class="dd-badge">直觉</span></h2><p>body original</p><figure class="dd-fig"><svg></svg><figcaption>图</figcaption></figure><table class="dd-table"><tbody><tr><td>保留表</td></tr></tbody></table></section><section class="dd-sec"><h2><span class="dd-n">2</span>因果链、常见误解与自测<span class="dd-badge">直觉</span></h2><table class="dd-table"><tbody><tr><td>删除表</td></tr></tbody></table></section><section class="dd-sec"><h2><span class="dd-n">3</span>检查你是否真的理解<span class="dd-badge">自测</span></h2><p>quiz</p></section>',
+  };
+  fs.writeFileSync(
+    path.join(editorialFixture, "data", "deepdive", "alpha.js"),
+    `window.DEEPDIVE=window.DEEPDIVE||{};window.DEEPDIVE.alpha=${JSON.stringify(originalPage)};\n`,
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(editorialFixture, "data", "deepdive-runtime", "alpha.js"),
+    `window.DEEPDIVE=window.DEEPDIVE||{};window.DEEPDIVE.alpha=${JSON.stringify(originalPage)};\n`,
+    "utf8",
+  );
+  initialize(editorialFixture);
+  const statePath = path.join(editorialFixture, ".stage2", "state.json");
+  const initializedState = JSON.parse(fs.readFileSync(statePath, "utf8"));
+  initializedState.pages.alpha.state = "l3-auto-passed";
+  fs.writeFileSync(statePath, `${JSON.stringify(initializedState, null, 2)}\n`, "utf8");
+
+  const candidatePage = {
+    ...originalPage,
+    html: '<section class="dd-sec"><h2><span class="dd-n">1</span>正文<span class="dd-badge">直觉</span></h2><p>body improved with a clearer mechanism and boundary</p><figure class="dd-fig"><svg></svg><figcaption>图</figcaption></figure><table class="dd-table"><tbody><tr><td>保留表</td></tr></tbody></table></section>',
+  };
+  const imported = importEditorialCandidate(editorialFixture, "alpha", {
+    page: candidatePage,
+    reason: "人工完成逐章重写与去重",
+    summary: "删除误解和自测，保留图表并改善正文",
+    removedSectionTitles: ["常见误解", "自测", "检查你是否真的理解"],
+  }, {
+    validators: () => [{ script: "fixture", passed: true }],
+  });
+  assert.strictEqual(imported.status, "published-editorial-draft");
+  assert.strictEqual(imported.workflowState, "audit-queued");
+  assert.strictEqual(imported.preservation.originalFigures, 1);
+  assert.strictEqual(imported.preservation.originalRetainedTables, 1);
+  assert.strictEqual(imported.preservation.allowedRemovedTables, 1);
+  assert.strictEqual(loadState(editorialFixture).pages.alpha.editorialWorkflow.status, "machine-audit-pending");
+
+  const auditTask = claimTask(editorialFixture, "editorial-auditor");
+  const machinePassed = submitResult(editorialFixture, {
+    taskId: auditTask.task.taskId,
+    leaseToken: auditTask.task.leaseToken,
+    result: completeEditorialAudit("alpha", auditTask.task.contentHash),
+  }, {
+    evaluateCandidate: () => ({ passed: true, blockers: [], editorialWarnings: [] }),
+    publishEditorialDraft: (_root, _record, targets) => ({ targets, validators: [] }),
+    publishCandidate: () => {
+      throw new Error("人工整理流程机器通过后不得自动正式发布");
+    },
+  });
+  assert.strictEqual(machinePassed.status, "awaiting-human-review");
+  assert.strictEqual(machinePassed.nextState, "manual-review");
+  assert.strictEqual(loadState(editorialFixture).pages.alpha.editorialWorkflow.status, "human-review-pending");
+
+  const finalized = finalizeManualReview(editorialFixture, "alpha", "人工检查通过", {
+    evaluateCandidate: () => ({ passed: true, blockers: [] }),
+    publishCandidate: (_root, record, page, audit) => ({
+      schemaVersion: 1,
+      status: "published",
+      pageId: record.id,
+      pageHash: pageContentHash(page),
+      auditHash: pageContentHash({ ...page, html: JSON.stringify(audit) }),
+      targets: [],
+      validators: [],
+    }),
+  });
+  assert.strictEqual(finalized.status, "published-approved");
+  assert.strictEqual(loadState(editorialFixture).pages.alpha.publication.status, "published-approved");
+} finally {
+  fs.rmSync(editorialFixture, { recursive: true, force: true });
+}
+
+console.log("✓ Stage 2 人工候选：图表保留、待审覆盖、机器审查与人工放行顺序测试通过");
+
+const editorialRepairFixture = copyFixture().fixture;
+try {
+  initialize(editorialRepairFixture);
+  const statePath = path.join(editorialRepairFixture, ".stage2", "state.json");
+  const readyState = JSON.parse(fs.readFileSync(statePath, "utf8"));
+  readyState.pages.alpha.state = "l3-auto-passed";
+  fs.writeFileSync(statePath, `${JSON.stringify(readyState, null, 2)}\n`, "utf8");
+  const candidatePage = {
+    title: "Alpha",
+    subtitle: "A subtitle",
+    thesis: "A thesis",
+    html: '<section class="dd-sec"><h2>One</h2><p>body explains Alpha but omits its boundary</p></section><div class="dd-src"><a href="https://example.com/source">source</a></div>',
+  };
+  importEditorialCandidate(editorialRepairFixture, "alpha", {
+    page: candidatePage,
+    reason: "测试单轮返修与定向复核",
+  }, { validators: () => [{ script: "fixture", passed: true }] });
+  const draftWriter = (_root, _record, targets) => ({ targets, validators: [] });
+  const firstAuditTask = claimTask(editorialRepairFixture, "first-editorial-auditor");
+  const firstAudit = completeEditorialAudit("alpha", firstAuditTask.task.contentHash, "body explains Alpha");
+  firstAudit.decision = "fail";
+  firstAudit.coreConcepts[0].boundary = {
+    status: "fail",
+    evidence: "omits its boundary",
+    rationale: "没有说明适用边界。",
+  };
+  firstAudit.blockingFindings = [{
+    code: "core-concept-boundary-missing",
+    concept: "Alpha",
+    sections: [1],
+    claim: "Alpha 的适用边界缺失",
+    evidence: "omits its boundary",
+    rationale: "读者无法判断何时不适用。",
+    acceptanceCriteria: "在第一节补充明确的适用与不适用条件。",
+  }];
+  const failed = submitResult(editorialRepairFixture, {
+    taskId: firstAuditTask.task.taskId,
+    leaseToken: firstAuditTask.task.leaseToken,
+    result: firstAudit,
+  }, {
+    evaluateCandidate: () => ({ passed: true, blockers: [] }),
+    publishEditorialDraft: draftWriter,
+  });
+  assert.strictEqual(failed.status, "needs-repair");
+  assert.strictEqual(failed.nextState, "repair-queued");
+  let repairState = loadState(editorialRepairFixture).pages.alpha;
+  assert.strictEqual(repairState.editorialWorkflow.initialBlockingFindings.length, 1);
+  assert.strictEqual(repairState.publication.reviewStatus, "repair-pending");
+
+  const repairTask = claimTask(editorialRepairFixture, "editorial-repairer");
+  assert.strictEqual(repairTask.task.role, "repair");
+  assert.strictEqual(repairTask.task.repairScope.maximumRounds, 1);
+  const repairedPage = {
+    ...candidatePage,
+    html: candidatePage.html.replace("omits its boundary", "applies only when its stated assumptions hold"),
+  };
+  const changedSourcePreflight = validatePageResult(editorialRepairFixture, {
+    taskId: repairTask.task.taskId,
+    leaseToken: repairTask.task.leaseToken,
+    result: {
+      page: { ...repairedPage, html: repairedPage.html.replace("example.com/source", "example.com/replacement") },
+      summary: "错误地替换来源",
+    },
+  });
+  assert.strictEqual(changedSourcePreflight.status, "invalid");
+  assert(changedSourcePreflight.gaps.some(item => /不得添加、删除或替换页面来源/.test(item)));
+  const repaired = submitResult(editorialRepairFixture, {
+    taskId: repairTask.task.taskId,
+    leaseToken: repairTask.task.leaseToken,
+    result: { page: repairedPage, summary: "补充适用边界" },
+  }, { publishEditorialDraft: draftWriter });
+  assert.strictEqual(repaired.status, "accepted");
+  const verifyTask = claimTask(editorialRepairFixture, "verification-auditor");
+  assert.strictEqual(verifyTask.task.auditContract.mode, "verification");
+  assert.strictEqual(verifyTask.task.auditContract.verificationFindings.length, 1);
+  const originalFinding = verifyTask.task.auditContract.verificationFindings[0];
+  const verification = {
+    schemaVersion: 3,
+    pageId: "alpha",
+    pageHash: verifyTask.task.contentHash,
+    reviewedAt: "2026-07-28",
+    mode: "verification",
+    decision: "fail",
+    coreConcepts: [],
+    warnings: [],
+    verificationResults: [{
+      findingId: originalFinding.findingId,
+      resolved: false,
+      evidence: "applies only when its stated assumptions hold",
+      rationale: "仍未列出具体假设。",
+    }],
+    blockingFindings: [{
+      findingId: originalFinding.findingId,
+      code: originalFinding.code,
+      concept: originalFinding.concept,
+      sections: originalFinding.sections,
+      claim: "Alpha 的适用边界仍不具体",
+      evidence: "applies only when its stated assumptions hold",
+      rationale: "仍未列出具体假设。",
+      acceptanceCriteria: originalFinding.acceptanceCriteria,
+    }],
+  };
+  const verificationFailed = submitResult(editorialRepairFixture, {
+    taskId: verifyTask.task.taskId,
+    leaseToken: verifyTask.task.leaseToken,
+    result: verification,
+  }, {
+    evaluateCandidate: () => ({ passed: true, blockers: [] }),
+    publishEditorialDraft: draftWriter,
+  });
+  assert.strictEqual(verificationFailed.status, "awaiting-human-review");
+  assert.strictEqual(verificationFailed.nextState, "manual-review");
+  repairState = loadState(editorialRepairFixture).pages.alpha;
+  assert.strictEqual(repairState.repairAttempts, 1);
+  assert.strictEqual(repairState.publication.reviewStatus, "human-review-blocked");
+
+  const approved = finalizeManualReview(editorialRepairFixture, "alpha", "人工确认可正式发布", {
+    publishCandidate: (_root, record, page) => ({
+      schemaVersion: 1,
+      status: "published-human-approved",
+      pageId: record.id,
+      pageHash: pageContentHash(page),
+      targets: [],
+      validators: [],
+    }),
+  });
+  assert.strictEqual(approved.status, "published-approved");
+  assert.strictEqual(approved.overriddenMachineBlockerCount, 1);
+  const approvedState = loadState(editorialRepairFixture).pages.alpha;
+  assert.strictEqual(approvedState.finalReview.humanApproved, true);
+  assert.strictEqual(approvedState.finalReview.blockerCountAtApproval, 1);
+} finally {
+  fs.rmSync(editorialRepairFixture, { recursive: true, force: true });
+}
+
+console.log("✓ Stage 2 新版审查：单轮返修、首次问题定向复核、红色阻断与人工覆盖测试通过");
+
+const humanReturnFixture = copyFixture().fixture;
+try {
+  initialize(humanReturnFixture);
+  const statePath = path.join(humanReturnFixture, ".stage2", "state.json");
+  const readyState = JSON.parse(fs.readFileSync(statePath, "utf8"));
+  readyState.pages.alpha.state = "l3-auto-passed";
+  fs.writeFileSync(statePath, `${JSON.stringify(readyState, null, 2)}\n`, "utf8");
+  const page = {
+    title: "Alpha",
+    subtitle: "A subtitle",
+    thesis: "A thesis",
+    html: '<section class="dd-sec"><h2>One</h2><p>body explains Alpha clearly</p></section>',
+  };
+  importEditorialCandidate(humanReturnFixture, "alpha", {
+    page,
+    reason: "测试人工退回定向修改",
+  }, { validators: () => [{ script: "fixture", passed: true }] });
+  const draftWriter = (_root, _record, targets) => ({ targets, validators: [] });
+  const auditTask = claimTask(humanReturnFixture, "human-return-initial-audit");
+  const passed = submitResult(humanReturnFixture, {
+    taskId: auditTask.task.taskId,
+    leaseToken: auditTask.task.leaseToken,
+    result: completeEditorialAudit("alpha", auditTask.task.contentHash, "body explains Alpha"),
+  }, {
+    evaluateCandidate: () => ({ passed: true, blockers: [] }),
+    publishEditorialDraft: draftWriter,
+  });
+  assert.strictEqual(passed.nextState, "manual-review");
+  const returned = returnEditorialForRevision(humanReturnFixture, "alpha", {
+    reason: "人工要求补充一个具体边界",
+    issues: [{
+      claim: "第一节边界仍然太抽象",
+      sections: [1],
+      evidence: "body explains Alpha clearly",
+      acceptanceCriteria: "增加一个明确的不适用条件",
+    }],
+  }, { publishEditorialDraft: draftWriter });
+  assert.strictEqual(returned.nextState, "repair-queued");
+  assert.strictEqual(returned.verificationSource, "human");
+  const repairTask = claimTask(humanReturnFixture, "human-return-repair");
+  const changedPage = { ...page, html: page.html.replace("clearly", "clearly and not outside the stated range") };
+  submitResult(humanReturnFixture, {
+    taskId: repairTask.task.taskId,
+    leaseToken: repairTask.task.leaseToken,
+    result: { page: changedPage, summary: "按人工意见补充边界" },
+  }, { publishEditorialDraft: draftWriter });
+  const verificationTask = claimTask(humanReturnFixture, "human-return-verifier");
+  assert.strictEqual(verificationTask.task.auditContract.mode, "verification");
+  assert.strictEqual(verificationTask.task.auditContract.verificationSource, "human");
+  const finding = verificationTask.task.auditContract.verificationFindings[0];
+  const verified = submitResult(humanReturnFixture, {
+    taskId: verificationTask.task.taskId,
+    leaseToken: verificationTask.task.leaseToken,
+    result: {
+      schemaVersion: 3,
+      pageId: "alpha",
+      pageHash: verificationTask.task.contentHash,
+      reviewedAt: "2026-07-28",
+      mode: "verification",
+      decision: "pass",
+      blockingFindings: [],
+      warnings: [],
+      coreConcepts: [],
+      verificationResults: [{
+        findingId: finding.findingId,
+        resolved: true,
+        evidence: "not outside the stated range",
+        rationale: "人工指出的边界问题已补充。",
+      }],
+    },
+  }, {
+    evaluateCandidate: () => ({ passed: true, blockers: [] }),
+    publishEditorialDraft: draftWriter,
+  });
+  assert.strictEqual(verified.status, "awaiting-human-review");
+  assert.strictEqual(verified.nextState, "manual-review");
+} finally {
+  fs.rmSync(humanReturnFixture, { recursive: true, force: true });
+}
+
+console.log("✓ Stage 2 人工退回：仅修改并验证人工指出的问题，然后直接回到人工审查");
+
+const { fixture: contentFixture } = copyFixture();
+try {
+  initialize(contentFixture);
+  const sourcePath = path.join(contentFixture, "data", "deepdive", "alpha.js");
+  const contentPage = {
+    title: "Alpha",
+    subtitle: "A subtitle",
+    thesis: "A thesis",
+    html: [
+      '<section class="dd-sec"><h2><span class="dd-n">1</span>第一章</h2><p>第一章正文。</p></section>',
+      '<section class="dd-sec"><h2><span class="dd-n">2</span>常见误区与学习路线</h2><p>不应发送。</p></section>',
+      '<section class="dd-sec"><h2><span class="dd-n">3</span>第二章</h2><p>第二章正文。</p></section>',
+      '<section class="dd-sec"><h2><span class="dd-n">4</span>检查你是否真的理解</h2><p>不应发送。</p></section>',
+    ].join(""),
+  };
+  fs.writeFileSync(
+    sourcePath,
+    `window.DEEPDIVE=window.DEEPDIVE||{};window.DEEPDIVE.alpha=${JSON.stringify(contentPage)};\n`,
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(contentFixture, "data", "deepdive-runtime", "alpha.js"),
+    `window.DEEPDIVE=window.DEEPDIVE||{};window.DEEPDIVE.alpha=${JSON.stringify(contentPage)};\n`,
+    "utf8",
+  );
+  fs.mkdirSync(path.join(contentFixture, "docs", "deepdive-reviews"), { recursive: true });
+  fs.writeFileSync(
+    path.join(contentFixture, "docs", "deepdive-reviews", "1x-section-text-review.md"),
+    [
+      "# 1.x 节点理解原理页：分章节纯文本审阅稿",
+      "",
+      "## 1.3 Alpha（alpha）",
+      "",
+      "### 1.3.1 第一章",
+      "",
+      "第一章正文。",
+      "",
+      "### 1.3.2 常见误区与学习路线",
+      "",
+      "不应发送。",
+      "",
+      "### 1.3.3 第二章",
+      "",
+      "第二章正文。",
+      "",
+      "### 1.3.4 检查你是否真的理解",
+      "",
+      "不应发送。",
+      "",
+    ].join("\n"),
+    "utf8",
+  );
+  const extracted = contentGenerationSections(contentPage);
+  assert.deepStrictEqual(extracted.map(section => section.skipped), [false, true, false, true]);
+  const queued = enqueueContentGeneration(contentFixture, "alpha", "为新版流程生成逐章知识解析素材");
+  assert.strictEqual(queued.nextState, "content-generation-queued");
+  assert.deepStrictEqual(queued.eligibleSections.map(section => section.sectionNumber), [1, 3]);
+  assert.deepStrictEqual(queued.skippedSections.map(section => section.sectionNumber), [2, 4]);
+  const task = claimTask(contentFixture, "content-generator", "alpha");
+  assert.strictEqual(task.task.role, "content-generation");
+  assert.strictEqual(task.task.prompt, CONTENT_GENERATION_PROMPT);
+  assert.match(task.task.prompt, /完整教学正文/);
+  assert.match(task.task.prompt, /不得输出带反斜杠的 LaTeX 命令/);
+  assert.strictEqual(Object.hasOwn(task.task, "page"), false);
+  assert.deepStrictEqual(
+    task.task.sectionDelivery.eligibleSections.map(section => section.sectionNumber),
+    [1, 3],
+  );
+  const firstSection = readContentGenerationSection(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 1,
+  });
+  assert.strictEqual(firstSection.prompt, CONTENT_GENERATION_PROMPT);
+  assert.strictEqual(firstSection.section.text, "第一章正文。");
+  assert.strictEqual(firstSection.nextSectionNumber, 3);
+  assert.throws(() => readContentGenerationSection(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 3,
+  }), /必须按顺序读取/);
+  assert.throws(() => readContentGenerationSection(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 2,
+  }), /禁止发送/);
+  assert.throws(() => saveContentGenerationResponse(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 1,
+    title: "第一章",
+    response: "????????????????",
+  }), /连续问号/);
+  assert.throws(() => saveContentGenerationResponse(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 1,
+    title: "第一章",
+    response: "公式里出现\u000b非法转义",
+  }), /非法控制字符/);
+  const firstSaved = saveContentGenerationResponse(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 1,
+    title: "第一章",
+    response: "第一章的原始解析回复。",
+  });
+  assert.strictEqual(firstSaved.status, "saved");
+  assert.strictEqual(firstSaved.nextSectionNumber, 3);
+  const secondSection = readContentGenerationSection(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 3,
+  });
+  assert.strictEqual(secondSection.done, true);
+  const secondSaved = saveContentGenerationResponse(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 3,
+    title: "第二章",
+    response: "第二章的原始解析回复。",
+  });
+  assert.strictEqual(secondSaved.done, true);
+  const completed = submitResult(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    result: {
+      pageId: "alpha",
+      responses: [
+        { sectionNumber: 1, title: "第一章", response: "第一章的原始解析回复。" },
+        { sectionNumber: 3, title: "第二章", response: "第二章的原始解析回复。" },
+      ],
+      summary: "完成两章解析",
+    },
+  });
+  assert.strictEqual(completed.status, "content-generated");
+  assert.strictEqual(completed.nextState, "audit-queued");
+  const responseDocument = fs.readFileSync(
+    path.join(contentFixture, "docs", "deepdive-reviews", "alpha-agent-responses.md"),
+    "utf8",
+  );
+  assert.match(responseDocument, /第一章的原始解析回复/);
+  assert.match(responseDocument, /第二章的原始解析回复/);
+  assert.doesNotMatch(responseDocument, /不应发送/);
+  assert.strictEqual(loadState(contentFixture).pages.alpha.contentGeneration.status, "complete");
+} finally {
+  fs.rmSync(contentFixture, { recursive: true, force: true });
+}
+
+console.log("✓ Stage 2 content-generation：单页租约逐章读取，跳过误解/自测并原样保存回复");

@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 2,
+  "pageId": "information-theory",
+  "pageHash": "sha256:490468ce089e6f9d8f58921ae9208a93826ce482794cf987fa99bad3a0732e48",
+  "reviewedAt": "2026-07-29",
+  "decision": "pass",
+  "blockingFindings": [],
+  "narrativeAudit": {
+    "reviewedSections": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "sectionOpenings": [
+      {
+        "section": 1,
+        "evidence": "后面所有公式究竟在对什么对象做计算？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 2,
+        "evidence": "概率越小的事件一旦发生，为什么带来的信息越多？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 3,
+        "evidence": "单个事件的信息量有高有低，怎样概括一个分布整体上有多难预测？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 4,
+        "evidence": "真实事件按 P 出现，模型却按 Q 分配概率时，平均损失是多少？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 5,
+        "evidence": "KL 不需要凭空记忆，它可以从「用了错误的 Q 多花多少」直接推出。",
+        "patternFamily": "other"
+      },
+      {
+        "section": 6,
+        "evidence": "既然 P 和 Q 都能写成概率向量，为什么不直接算两点间的直线距离？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 7,
+        "evidence": "平均损失是 1.6 bit/token 很抽象，怎样换成较直观的等效选择数？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 8,
+        "evidence": "真实天气 P=(1/2, 1/4, 1/4)，模型 Q=(1/2, 3/8, 1/8)，每一步怎样对应前面的定义？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 9,
+        "evidence": "现实中不知道 P，训练程序又是怎样得到交叉熵损失的？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 10,
+        "evidence": "不要孤立背公式：每一个新量都在回答上一步尚未回答的问题。",
+        "patternFamily": "other"
+      },
+      {
+        "section": 11,
+        "evidence": "P 是训练集里直接可见的真理",
+        "patternFamily": "definition-copula"
+      },
+      {
+        "section": 12,
+        "evidence": "给定 P(雨) = 0.25，计算“今天下雨”的自信息，并说明单位。",
+        "patternFamily": "other"
+      },
+      {
+        "section": 13,
+        "evidence": "进入本页前 只需会读概率和加权平均；本页已补充对数、期望、P 与 Q",
+        "patternFamily": "other"
+      }
+    ],
+    "pervasiveTemplateExpression": false,
+    "rationale": "逐节检查全部 13 个正文区块的首个可见开场。第 1–10 节主要以问题、推导动机或综合过渡开启，第 12 节以练习指令开启，第 13 节以路线表开启；只有第 11 节首行误解使用 definition-copula 家族。该家族仅覆盖 1/13 节，远低于至少 3 节且不少于全部章节一半的阻断阈值，未形成损害教学叙事的普遍模板化表达。"
+  },
+  "sections": [
+    {
+      "section": 1,
+      "definition": {
+        "answer": "本节界定有限事件空间中的真实分布 P、模型分布 Q、对数单位与按 P 取期望。",
+        "evidence": "P(x) 表示事件 x 真实出现的概率——长期来看，25% 的天会下雪。Q(x) 则是模型给事件 x 分配的概率"
+      },
+      "problem": {
+        "answer": "它解决后续公式中数据生成者、模型打分者与平均权重容易混为一谈的问题。",
+        "evidence": "看到 P，先问「事件实际按谁出现」；看到 Q，先问「模型给这个真实事件多少概率」"
+      },
+      "inputOutput": {
+        "answer": "输入是事件集合、P、Q 与待平均的函数值，输出是按真实频率加权的期望或平均代价。",
+        "evidence": "事件仍然按 P 的频率出现，但损失或码长由 Q 决定，最后再用 P 做加权平均"
+      },
+      "mechanism": {
+        "answer": "事件按 P 出现并由 P 加权，Q 提供损失；对数把独立概率的乘积转换成可累加量。",
+        "evidence": "对数正好把乘法变成加法：log₂(ab) = log₂a + log₂b"
+      },
+      "interpretation": {
+        "answer": "教学例子中的 P 是已知设定，现实中的 P 通常只能由样本近似，而 Q 由模型给出。",
+        "evidence": "教学例子会直接给出 P，但现实中 P 通常未知，只能用样本频率近似。Q 则由模型给出。"
+      },
+      "boundary": {
+        "answer": "经验频率仅是对未知 P 的估计；抽样偏差存在时不能把样本频率当成真实概率。",
+        "evidence": "样本可能有偏差，频率不等于真实概率。"
+      }
+    },
+    {
+      "section": 2,
+      "definition": {
+        "answer": "自信息是事件在 P 下发生后所体现的意外程度，即该事件概率的负二进制对数。",
+        "evidence": "它衡量“意外程度”，不是重要性。"
+      },
+      "problem": {
+        "answer": "它把单个已发生结果在真实分布下有多罕见转换成可比较、可累加的 bit 数。",
+        "evidence": "自信息只告诉你这个结果在 P 下有多罕见，不告诉你它值不值得关注。"
+      },
+      "inputOutput": {
+        "answer": "输入事件 x 及其真实概率 P(x)，输出该事件以 bit 表示的自信息 I_P(x)。",
+        "evidence": "P 从 1/2、1/4 到 1/8，自信息依次是 1、2、3 bit。"
+      },
+      "mechanism": {
+        "answer": "对 P(x) 取以 2 为底的对数并加负号；概率每减半一次，自信息增加 1 bit。",
+        "evidence": "概率减半，自信息增加 1 bit"
+      },
+      "interpretation": {
+        "answer": "自信息越大表示该结果在 P 下越罕见，但不表示它更有任务价值。",
+        "evidence": "更罕见，所以信息量更大。"
+      },
+      "boundary": {
+        "answer": "高自信息只陈述概率上的稀有性，不能推出事件重要、有用、真实或正确。",
+        "evidence": "高自信息不等于事件重要、有用或正确；它只是一个关于概率的纯数学量。"
+      }
+    },
+    {
+      "section": 3,
+      "definition": {
+        "answer": "熵 H(P) 是真实分布中各事件自信息按 P(x) 加权后的长期平均不确定性。",
+        "evidence": "熵就是把每个事件的自信息按真实频率 P 求平均。"
+      },
+      "problem": {
+        "answer": "它把不同事件的单次意外程度汇总为一个可描述整个分布预测难度的指标。",
+        "evidence": "用来把不同事件的单次意外程度汇总成一个分布级别的量。"
+      },
+      "inputOutput": {
+        "answer": "输入完整真实分布 P，输出以 bit/次表示的平均不确定性或理想长期编码代价。",
+        "evidence": "对于 P=(1/2, 1/4, 1/4)，三个事件的信息量分别是 1、2、2 bit，加权平均：H(P) = 1/2 × 1 + 1/4 × 2 + 1/4 × 2 = 1.5 bit/次。"
+      },
+      "mechanism": {
+        "answer": "先对每个事件计算负对数概率，再用其真实出现频率 P(x) 加权求和。",
+        "evidence": "三个事件的信息量分别是 1、2、2 bit，加权平均"
+      },
+      "interpretation": {
+        "answer": "在相同事件空间与口径下，H(P) 越高意味着重复试验长期平均越难预测。",
+        "evidence": "H(P) 越高，表示长期平均更难预测。"
+      },
+      "boundary": {
+        "answer": "熵评价的是 P 的不确定性而不是模型正确性；编码解释还依赖长期、无损和分布稳定。",
+        "evidence": "模型也可以给出高度集中的 Q，甚至令 H(Q)=0，却把全部概率压在错误结果上；这不能说明 H(P)=0，只说明预测分布很确定但可能很错。"
+      }
+    },
+    {
+      "section": 4,
+      "definition": {
+        "answer": "交叉熵 H(P,Q) 是事件按 P 出现、却用 Q 给出的概率计算单次对数损失后再按 P 平均。",
+        "evidence": "由于事件实际仍按 P 出现，长期平均时必须用 P 作权重，这样就得到了交叉熵"
+      },
+      "problem": {
+        "answer": "它衡量模型分布 Q 面对真实分布 P 生成的数据时平均需要承担多少预测或编码代价。",
+        "evidence": "Q 给真实事件的概率越大，损失越小；如果 Q 很自信地漏掉真实事件，损失会非常大。"
+      },
+      "inputOutput": {
+        "answer": "输入同一事件空间上的 P 与 Q，输出 H(P,Q)，本页以 bit/事件表示。",
+        "evidence": "P 作权重 得到交叉熵 H(P,Q)"
+      },
+      "mechanism": {
+        "answer": "P 决定各事件长期出现频率，Q(x) 决定该真实事件的负对数损失，最后由 P 加权。",
+        "evidence": "P 决定哪些事件多常出现，Q 决定模型为这些事件付出多少损失。"
+      },
+      "interpretation": {
+        "answer": "数值较低表示 Q 平均为真实发生事件分配了更高概率；Q=P 时达到当前口径下最低值。",
+        "evidence": "数值较低表示 Q 平均给真实事件分配了更高概率。"
+      },
+      "boundary": {
+        "answer": "交叉熵不能跨数据分布、对数底数或预测单位直接比较，Q=P 也不证明语义理解或其他能力。",
+        "evidence": "这并不等于模型掌握了生成机制、语义或其他能力。不同数据分布、对数底数或预测单位下的数值不能直接横向比较。"
+      }
+    },
+    {
+      "section": 5,
+      "definition": {
+        "answer": "正向 KL 散度 D_KL(P∥Q) 是使用 Q 代替 P 后每次事件平均多付出的对数代价。",
+        "evidence": "KL 散度衡量使用 Q 代替 P 后，每次事件平均多付出的 bit 数。"
+      },
+      "problem": {
+        "answer": "它把真实分布自身不可约的不确定性与模型把概率放错位置造成的额外损失分离开。",
+        "evidence": "两者相减，就是模型概率放错位置造成的额外损失"
+      },
+      "inputOutput": {
+        "answer": "输入有方向顺序的 P 与 Q，输出非负的 D_KL(P∥Q)，本页单位为 bit/次。",
+        "evidence": "H(P,Q) − H(P) = Σx P(x) log₂[P(x)/Q(x)] = D_KL(P∥Q)"
+      },
+      "mechanism": {
+        "answer": "先以 P 加权求交叉熵，再减去 P 自身的熵，等价于按 P 平均对数比 P(x)/Q(x)。",
+        "evidence": "H(P,Q) 减去 H(P)"
+      },
+      "interpretation": {
+        "answer": "结果为零表示 Q 在 P 会发生的事件上完全匹配；数值增大表示平均编码后悔增加。",
+        "evidence": "它永远不小于 0（吉布斯不等式），只有 Q 和 P 完全一致时才等于 0。"
+      },
+      "boundary": {
+        "answer": "KL 不能交换方向；P 未知时只能估计，且 Q 对 P 正概率事件给零概率会使其发散。",
+        "evidence": "KL 的方向不可交换；P 未知时只能估计；Q 给零概率会让它发散。"
+      }
+    },
+    {
+      "section": 6,
+      "definition": {
+        "answer": "本节并列界定欧氏距离的概率坐标几何差与 KL 的按 P 加权平均对数代价。",
+        "evidence": "它衡量的是坐标差，具有对称性；KL 则衡量概率比例造成的平均对数代价"
+      },
+      "problem": {
+        "answer": "比较二者是为了避免把有方向的编码代价 KL 误当成普通对称几何距离。",
+        "evidence": "这项比较的价值：防止把 KL 当作普通距离来计算。"
+      },
+      "inputOutput": {
+        "answer": "输入两组概率向量 P、Q；欧氏距离输出几何长度，KL(P∥Q) 输出有方向的 bit/事件代价。",
+        "evidence": "关注什么 概率坐标相差多远 Q 预测 P 时多付多少对数代价"
+      },
+      "mechanism": {
+        "answer": "欧氏距离逐坐标作差、平方求和再开方；KL 则按 P 加权概率比的对数。",
+        "evidence": "欧氏距离把两个分布当成普通向量，计算坐标差平方和的平方根"
+      },
+      "interpretation": {
+        "answer": "同一 P、Q 下约 0.177 与约 0.104 bit 分别表达几何接近和编码后悔，数值不可同义解读。",
+        "evidence": "欧氏距离约为 0.177，正向 KL 约为 0.104 bit。"
+      },
+      "boundary": {
+        "answer": "两个量的单位、方向性与数学性质不同，不能互换、相加或据此断言某一种总是更优。",
+        "evidence": "两个数不能互换或相加——它们回答的不是同一个问题。"
+      }
+    },
+    {
+      "section": 7,
+      "definition": {
+        "answer": "困惑度是把按 P 加权的 Q 平均对数损失指数化后得到的等效分支数。",
+        "evidence": "它把真实数据上的平均对数损失换算成等效分支数"
+      },
+      "problem": {
+        "answer": "它把抽象的 bit/token 或 nat/token 平均损失转换成较直观的等概率选择基准。",
+        "evidence": "就这项平均损失而言，与每一步面对 4 个等概率候选的基准情形相当。"
+      },
+      "inputOutput": {
+        "answer": "输入平均交叉熵及其匹配的对数底数，输出对应的 PPL 等效分支数。",
+        "evidence": "PPL = 2"
+      },
+      "mechanism": {
+        "answer": "bit/token 损失用 2 的幂还原，nat/token 损失用指数函数 exp 还原。",
+        "evidence": "若训练损失使用自然对数（单位是 nat/token），应使用 PPL = exp(loss)；若使用 log₂，才使用 2^loss。"
+      },
+      "interpretation": {
+        "answer": "PPL 越低表示 Q 给实际 token 的平均几何平均概率越高，不等于 Q 自身预测熵的指数。",
+        "evidence": "PPL 越低只说明模型给实际 token 的平均几何平均概率更高。"
+      },
+      "boundary": {
+        "answer": "它不是词表或真实候选数，不直接评价事实、推理与安全，且 token 级结果不能跨 tokenizer 直比。",
+        "evidence": "不同 tokenizer 会改变预测单位和序列长度，所以 token 级 PPL 通常不能跨 tokenizer 直接比较"
+      }
+    },
+    {
+      "section": 8,
+      "definition": {
+        "answer": "本节是以三天气 P、Q 为输入，贯通熵、交叉熵、KL 与困惑度的完整数值手算。",
+        "evidence": "同一组 P、Q 依次产生熵、交叉熵、KL 和 PPL。"
+      },
+      "problem": {
+        "answer": "它用于检查各量的对象角色、计算顺序和数值结果是否共同支持前述机制链。",
+        "evidence": "P 负责加权，Q 负责代价。"
+      },
+      "inputOutput": {
+        "answer": "输入 P=(1/2,1/4,1/4) 与 Q=(1/2,3/8,1/8)，输出 H(P)、H(P,Q)、KL 与 PPL。",
+        "evidence": "真实天气 P=(1/2, 1/4, 1/4)，模型 Q=(1/2, 3/8, 1/8)"
+      },
+      "mechanism": {
+        "answer": "先按 P 的自身码长求熵，再将 Q 的码长按 P 加权求交叉熵，相减得 KL，最后指数化得 PPL。",
+        "evidence": "事件仍按 P 出现，把 Q 码长按 P 加权：H(P,Q) ≍ 1.6038 bit。"
+      },
+      "interpretation": {
+        "answer": "Q 对雨分配过多且对雪分配过少，雪被低估产生主要正额外代价，最终 KL 约 0.1038 bit。",
+        "evidence": "雪的概率放错位置是主要额外代价来源。"
+      },
+      "boundary": {
+        "answer": "这个算例只验证有限离散事件的算术链，不能替代语言模型大规模离散条件分布与有限样本估计。",
+        "evidence": "它不是连续分布。相同公式仍适用，但估计误差、上下文条件和分词口径都会影响数值。"
+      }
+    },
+    {
+      "section": 9,
+      "definition": {
+        "answer": "经验交叉熵是有限 token 序列上真实下一 token 负对数概率的样本或批次平均。",
+        "evidence": "除以 token 数 n，得到平均 token 损失；再对训练批次求平均，就是常见的经验交叉熵。"
+      },
+      "problem": {
+        "answer": "它在真实分布 P 无法直接观测时，为语言模型训练提供可计算的有限样本损失。",
+        "evidence": "它用有限样本近似未知的真实分布 P，而不是直接知道 P。"
+      },
+      "inputOutput": {
+        "answer": "输入真实 token 序列及 Q 给出的条件概率，输出序列 NLL、平均 token 损失或批次平均损失。",
+        "evidence": "训练样本上的平均负对数概率"
+      },
+      "mechanism": {
+        "answer": "逐步条件概率先相乘成序列似然，取对数后化为求和，再取负号并除以有效 token 数。",
+        "evidence": "对数似然把逐步概率的乘法变成对数之和，便于稳定计算；再取负号"
+      },
+      "interpretation": {
+        "answer": "训练损失下降只表示 Q 更贴合当前训练样本，验证损失才是新数据表现的较好但有噪估计。",
+        "evidence": "“训练损失下降”只说明模型更适合当前训练样本。"
+      },
+      "boundary": {
+        "answer": "经验损失受过拟合、样本量、抽样偏差与分布偏移影响，不能替代事实、推理或安全评测。",
+        "evidence": "验证损失是更好的近似，但同样受样本量、分布偏移和抽样偏差限制。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 3,
+  "pageId": "jailbreak",
+  "pageHash": "sha256:087aa62cffb63bba87885674f3e9e721a434ce1c74aa3d501ada1f9ceeaab291",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "code": "image-text-mismatch",
+      "findingId": "sha256:506e0be0290f4bbdd",
+      "claim": "第6节图1的SVG aria-label仍描述旧分层链（消息信任、模型策略、输出策略、工具权限、人工批准和业务资产），与实际渲染方框（信任分层、模型策略、策略/权限、人工/出口、资产）不一致，未达成渲染方框、正文与aria-label三者一致。",
+      "evidence": "攻击输入从左向右依次经过信任分层、模型策略、策略/权限、人工/出口，最后才触及资产",
+      "rationale": "正文已改为与SVG渲染方框一致（信任分层、模型策略、策略/权限、人工/出口、资产），但SVG的aria-label未同步更新，仍描述为“消息信任、模型策略、输出策略、工具权限、人工批准和业务资产”，把输出策略、工具权限、人工批准列为独立层，与渲染方框的“策略/权限”“人工/出口”合并方式及“信任分层”“资产”命名不一致。验收标准要求渲染方框、正文描述与aria-label三者一致，故该问题仍未完全解决。",
+      "acceptanceCriteria": "使图1的aria-label与渲染方框及正文描述三者一致：将aria-label更新为与渲染方框（攻击输入、信任分层、模型策略、策略/权限、人工/出口、资产）对应的层链描述。",
+      "sections": [
+        6
+      ]
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:506e0be0290f4bbdd",
+      "resolved": false,
+      "evidence": "攻击输入从左向右依次经过信任分层、模型策略、策略/权限、人工/出口，最后才触及资产",
+      "rationale": "正文已改为与SVG渲染方框一致，但SVG的aria-label仍为旧的“消息信任、模型策略、输出策略、工具权限、人工批准和业务资产”，与渲染方框不一致，未满足三者一致的验收标准。"
+    }
+  ]
+}

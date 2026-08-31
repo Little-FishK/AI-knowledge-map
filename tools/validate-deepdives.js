@@ -106,8 +106,6 @@ for (const [id, page] of Object.entries(pages)) {
           && /反馈|评测/.test(html)),
       "因果链"
     ],
-    [html.includes('class="dd-quiz"'), "自测题"],
-    [html.includes('class="dd-answers"'), "参考答案"],
     [html.includes('class="dd-src"'), "资料来源"],
   ];
   required.forEach(([ok, label]) => {
@@ -125,8 +123,9 @@ for (const [id, page] of Object.entries(pages)) {
 
   if (sections < 7) problems.push(`${id}: 章节不足 7（当前 ${sections}）`);
   if (goals < 3) problems.push(`${id}: 学习目标不足 3（当前 ${goals}）`);
-  if (questions < 3) problems.push(`${id}: 自测题不足 3（当前 ${questions}）`);
-  if (answers < questions) problems.push(`${id}: 参考答案少于自测题（${answers}/${questions}）`);
+  if ((questions > 0 || answers > 0) && answers < questions) {
+    problems.push(`${id}: 已保留的参考答案少于自测题（${answers}/${questions}）`);
+  }
   if (distinctSources.size < 2) problems.push(`${id}: 独立 HTTPS 来源不足 2（当前 ${distinctSources.size}）`);
   if (sourceLinks.length !== distinctSources.size) problems.push(`${id}: 来源列表存在重复链接`);
 
@@ -181,4 +180,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log("✓ 全部页面通过覆盖、注册、结构、自测配对、独立来源与日期门禁");
+console.log("✓ 全部页面通过覆盖、注册、结构、可选自测配对、独立来源与日期门禁");

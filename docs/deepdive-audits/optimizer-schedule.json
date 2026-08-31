@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 2,
+  "pageId": "optimizer-schedule",
+  "pageHash": "sha256:ca3bc2355e55dcfe144a512aab316e7959ab07dffec620d653dd9a81b663d0dc",
+  "reviewedAt": "2026-08-01",
+  "decision": "pass",
+  "blockingFindings": [],
+  "narrativeAudit": {
+    "reviewedSections": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "sectionOpenings": [
+      {
+        "section": 1,
+        "evidence": "反向传播已经算出每个参数的斜率，直接减去它还缺什么？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 2,
+        "evidence": "最简单的优化器究竟保存什么状态？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 3,
+        "evidence": "在狭长谷地里，历史梯度怎样把左右摆动变成向前速度？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 4,
+        "evidence": "只有方向平均还不够时，平方梯度历史提供了什么信息？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 5,
+        "evidence": "把 (λ/2)||θ||² 加进损失，与每步直接缩小参数，什么时候不再等价？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 6,
+        "evidence": "同一个步长为什么很难同时适合训练初期、中期和收尾？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 7,
+        "evidence": "扩大全局 batch 只改变吞吐，还是也改变梯度和可用学习率？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 8,
+        "evidence": "损失突然 NaN 时，降低学习率、裁剪和损失缩放解决的是同一问题吗？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 9,
+        "evidence": "只看到 loss=1.23 时，为什么几乎无法判断优化器是否健康？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 10,
+        "evidence": "一套可复现训练配方怎样从梯度一直连接到验证表现？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 11,
+        "evidence": "误解 更准确的说法",
+        "patternFamily": "other"
+      },
+      {
+        "section": 12,
+        "evidence": "在贯穿场景中，为什么 Momentum 会弱化横向摆动却积累纵向速度？",
+        "patternFamily": "other"
+      },
+      {
+        "section": 13,
+        "evidence": "方向 接下来读 要追问什么",
+        "patternFamily": "other"
+      }
+    ],
+    "pervasiveTemplateExpression": false,
+    "rationale": "十三个被交付页识别为可审阅的章节开场均未落入 definition-copula、understand-first 或 judge-by 家族；多数以具体机制问题开场，表格与补充章节则直接以栏目或练习进入，因此不存在达到半数且至少三节的同族模板复用。"
+  },
+  "sections": [
+    {
+      "section": 1,
+      "definition": {
+        "answer": "优化器把当前批次的局部带噪梯度转换为更稳定的参数更新。",
+        "evidence": "把这份局部、带噪的方向证据转换成稳定更新"
+      },
+      "problem": {
+        "answer": "本节处理采样噪声、参数尺度差异和狭长谷地中的方向反复变号。",
+        "evidence": "它可能含采样噪声，不同参数的数值尺度可能相差几个数量级"
+      },
+      "inputOutput": {
+        "answer": "输入当前批次梯度以及可用历史状态，输出供参数移动使用的稳定更新。",
+        "evidence": "当前批次、当前位置的一阶方向"
+      },
+      "mechanism": {
+        "answer": "优化器结合梯度历史形成更新，调度器另行确定不同阶段的全局步长。",
+        "evidence": "怎样结合梯度历史形成更新？"
+      },
+      "interpretation": {
+        "answer": "优化器改变到达目标的训练轨迹，但不会重新定义任务所追求的目标。",
+        "evidence": "优化器的工作不是重新定义目标"
+      },
+      "boundary": {
+        "answer": "优化器不能修复数据标签错误，也不能保证目标本身代表真实需求。",
+        "evidence": "修复数据与标签错误"
+      }
+    },
+    {
+      "section": 2,
+      "definition": {
+        "answer": "SGD 是仅使用当前 mini-batch 梯度和当前学习率的最小优化基线。",
+        "evidence": "SGD 只使用当前 mini-batch 梯度"
+      },
+      "problem": {
+        "answer": "它提供额外状态和内存很小、更新行为容易解释的比较基线。",
+        "evidence": "额外内存小、行为容易解释"
+      },
+      "inputOutput": {
+        "answer": "输入当前参数、当前批梯度与学习率，输出减去缩放梯度后的下一参数。",
+        "evidence": "当前 mini-batch 梯度 gₜ 和学习率 ηₜ"
+      },
+      "mechanism": {
+        "answer": "每一步直接按学习率缩放当前梯度，不维护任何每参数历史状态。",
+        "evidence": "它没有每参数历史状态"
+      },
+      "interpretation": {
+        "answer": "单步梯度噪声会造成抖动，但长期平均仍可能沿有用方向前进。",
+        "evidence": "长期平均可能仍朝有用方向前进"
+      },
+      "boundary": {
+        "answer": "复杂方法早期训练损失下降更快，不代表相同预算或验证指标整体更好。",
+        "evidence": "就不能宣称整体更好"
+      }
+    },
+    {
+      "section": 3,
+      "definition": {
+        "answer": "Momentum 用历史梯度的指数平均形成带惯性的参数更新方向。",
+        "evidence": "横向仍会摆动，但幅度不再等于原梯度"
+      },
+      "problem": {
+        "answer": "它缓解狭长谷地中陡峭方向左右摆动而平坦方向前进缓慢的问题。",
+        "evidence": "把左右摆动变成向前速度"
+      },
+      "inputOutput": {
+        "answer": "输入当前梯度、旧动量和 β，输出新动量并据此产生下一参数。",
+        "evidence": "初始速度为 0"
+      },
+      "mechanism": {
+        "answer": "历史动量与当前梯度加权求和，使同号分量积累、交替分量部分抵消。",
+        "evidence": "横向翻转被历史削弱"
+      },
+      "interpretation": {
+        "answer": "数值表中纵向动量逐步接近 −1，横向动量幅度小于原梯度。",
+        "evidence": "纵向接近稳定 −1"
+      },
+      "boundary": {
+        "answer": "β 越高虽然平滑窗口越长，却会反应迟缓并可能因惯性越过目标。",
+        "evidence": "带着惯性越过目标"
+      }
+    },
+    {
+      "section": 4,
+      "definition": {
+        "answer": "Adam 同时维护梯度一阶矩和平方梯度二阶矩，用于缩放参数更新。",
+        "evidence": "估计平方梯度尺度"
+      },
+      "problem": {
+        "answer": "它处理不同参数的历史梯度尺度差异，并为稀疏或小尺度参数调整步长。",
+        "evidence": "梯度历史一直很大的参数会被分母缩小"
+      },
+      "inputOutput": {
+        "answer": "输入当前梯度、矩状态和超参数，输出经过偏差修正与尺度归一的更新。",
+        "evidence": "帽子表示对初始化为零造成的早期偏差进行修正"
+      },
+      "mechanism": {
+        "answer": "一阶矩平滑方向，平方梯度矩进入分母，η 再控制总体移动幅度。",
+        "evidence": "梯度历史一直很大的参数会被分母缩小"
+      },
+      "interpretation": {
+        "answer": "历史梯度大的参数有效步长较小，稀疏或小尺度参数可能相对更大。",
+        "evidence": "可能得到相对更大步长"
+      },
+      "boundary": {
+        "answer": "自适应缩放不免除全局学习率、矩系数、ε、批量和裁剪的联合调试。",
+        "evidence": "默认值是常用起点，不是跨任务定律"
+      }
+    },
+    {
+      "section": 5,
+      "definition": {
+        "answer": "AdamW 将参数比例衰减与 Adam 的自适应梯度更新解耦执行。",
+        "evidence": "AdamW 将衰减解耦"
+      },
+      "problem": {
+        "answer": "它避免 L2 项随任务梯度一起被每参数预条件器改变衰减强度。",
+        "evidence": "使不同参数受到不同强度的“正则”"
+      },
+      "inputOutput": {
+        "answer": "输入参数、任务梯度、η 与 λ，输出自适应更新和独立衰减后的参数。",
+        "evidence": "θ←θ−η·AdamUpdate(g)−ηλθ"
+      },
+      "mechanism": {
+        "answer": "先形成 Adam 梯度更新，再独立减去由 ηλθ 给出的比例衰减项。",
+        "evidence": "参数更新时独立缩小"
+      },
+      "interpretation": {
+        "answer": "解耦后 λ 更接近所有被衰减参数共同遵循的统一缩小率。",
+        "evidence": "λ 更接近统一的参数缩小率"
+      },
+      "boundary": {
+        "answer": "偏置和归一化尺度是否排除在衰减外仍需实验验证，并非固定语法规则。",
+        "evidence": "不是语法规则"
+      }
+    },
+    {
+      "section": 6,
+      "definition": {
+        "answer": "学习率调度让全局参数步长按训练初期、中期和收尾阶段发生变化。",
+        "evidence": "让学习率从较低值逐步升至峰值的阶段"
+      },
+      "problem": {
+        "answer": "它协调初期统计未稳定、主要学习阶段和后期精细移动的不同步长需求。",
+        "evidence": "很难同时适合训练初期、中期和收尾"
+      },
+      "inputOutput": {
+        "answer": "输入训练步数及调度配方，输出当前处于预热、峰值或衰减阶段的学习率。",
+        "evidence": "预热 峰值/平台 衰减"
+      },
+      "mechanism": {
+        "answer": "预热从低值升到峰值，峰值阶段承担主要学习，随后以选定规则衰减。",
+        "evidence": "衰减也可线性、余弦或分段"
+      },
+      "interpretation": {
+        "answer": "预热限制早期尖峰，后期衰减减少参数在噪声中的持续游走。",
+        "evidence": "降低参数在噪声中持续游走"
+      },
+      "boundary": {
+        "answer": "总步数或批量发生变化后，原调度曲线的绝对步数不能直接照搬。",
+        "evidence": "不能只复制原曲线的绝对步数"
+      }
+    },
+    {
+      "section": 7,
+      "definition": {
+        "answer": "批量大小同时影响梯度噪声、更新频率、显存吞吐和可用学习率。",
+        "evidence": "更大批量降低梯度采样噪声"
+      },
+      "problem": {
+        "answer": "本节说明扩大全局 batch 不仅改变系统吞吐，也改变优化统计条件。",
+        "evidence": "还是也改变梯度和可用学习率"
+      },
+      "inputOutput": {
+        "answer": "微批量、累积步数和设备规模共同决定有效 batch 及优化器更新频率。",
+        "evidence": "有效 batch 与优化器更新频率"
+      },
+      "mechanism": {
+        "answer": "更大 batch 降低梯度采样噪声，同时减少每个 epoch 的参数更新次数。",
+        "evidence": "减少每个 epoch 的更新次数"
+      },
+      "interpretation": {
+        "answer": "越过临界批量继续放大时，收益可能主要来自并行吞吐而非统计效率。",
+        "evidence": "收益可能主要来自并行吞吐"
+      },
+      "boundary": {
+        "answer": "线性学习率缩放和预热只是有限条件下的起点，比较还须声明预算口径。",
+        "evidence": "但只在一定范围与条件下有效"
+      }
+    },
+    {
+      "section": 8,
+      "definition": {
+        "answer": "梯度裁剪、损失缩放和有限值检测分别保护更新幅度与低精度数值范围。",
+        "evidence": "它们保护不同环节"
+      },
+      "problem": {
+        "answer": "本节区分梯度爆炸、小梯度下溢和 Inf/NaN 等不同数值故障。",
+        "evidence": "解决的是同一问题吗"
+      },
+      "inputOutput": {
+        "answer": "输入梯度及有限值状态，输出裁剪或还原后的梯度，或异常时的跳步决策。",
+        "evidence": "在 Inf/NaN 时跳过更新并调整缩放"
+      },
+      "mechanism": {
+        "answer": "裁剪限制异常范数，损失缩放先放大再还原，检测则在非有限值时跳步。",
+        "evidence": "更新前再还原"
+      },
+      "interpretation": {
+        "answer": "三种机制作用环节不同，因此 NaN 不能统一归因或只靠同一种保护解决。",
+        "evidence": "它们保护不同环节"
+      },
+      "boundary": {
+        "answer": "这些保护不能修复消失梯度、错误目标或长期过大的峰值学习率。",
+        "evidence": "不能把消失梯度、错误目标或长期过大峰值学习率“裁好”"
+      }
+    },
+    {
+      "section": 9,
+      "definition": {
+        "answer": "优化日志诊断把损失、学习率、梯度范数、优化状态和更新幅度连接起来。",
+        "evidence": "必须记录 回答的问题 危险信号"
+      },
+      "problem": {
+        "answer": "它避免仅凭单个 loss 数字判断健康状态而遗漏调度、梯度和更新异常。",
+        "evidence": "为什么几乎无法判断优化器是否健康"
+      },
+      "inputOutput": {
+        "answer": "输入训练与验证运行指标，输出学习率错位、梯度异常或更新停滞等定位。",
+        "evidence": "必须记录 回答的问题 危险信号"
+      },
+      "mechanism": {
+        "answer": "先验证小样本可学，再扫描学习率区间，并在固定数据与预算下比较配方。",
+        "evidence": "先用几十个样本确认能过拟合"
+      },
+      "interpretation": {
+        "answer": "非零梯度但更新极小表示更新链受阻，单步移动过大则是明显危险信号。",
+        "evidence": "非零梯度却几乎不更新，或单步跳太远"
+      },
+      "boundary": {
+        "answer": "一次同时修改多项无法可靠归因，扩大规模也应先进行小比例试跑。",
+        "evidence": "不要一次改五项后归功于优化器名字"
+      }
+    },
+    {
+      "section": 10,
+      "definition": {
+        "answer": "本节把损失、梯度、优化器状态、调度、数值保护与验证串成完整因果链。",
+        "evidence": "损失与数据产生当前 mini-batch 的目标信号"
+      },
+      "problem": {
+        "answer": "它解决孤立理解各组件时无法解释训练配方怎样最终影响验证表现的问题。",
+        "evidence": "从梯度一直连接到验证表现"
+      },
+      "inputOutput": {
+        "answer": "输入损失与数据产生的批次目标信号，最终得到可由验证集判断的训练轨迹。",
+        "evidence": "损失与数据产生当前 mini-batch 的目标信号"
+      },
+      "mechanism": {
+        "answer": "历史状态提取方向尺度，全局学习率定幅度，调度与数值机制分阶段保护更新。",
+        "evidence": "Momentum 或 Adam 的状态提取历史方向与尺度"
+      },
+      "interpretation": {
+        "answer": "训练日志证明更新是否发生，验证集则判断形成的参数轨迹能否泛化。",
+        "evidence": "验证集判断轨迹是否泛化"
+      },
+      "boundary": {
+        "answer": "任何批量、总步数或规模变化都会改变组合条件，因此必须重新验证整套配方。",
+        "evidence": "任何批量、步数或规模变化都要重新验证整套组合"
+      }
+    },
+    {
+      "section": 11,
+      "definition": {
+        "answer": "本节以对照表列出五个常见误解，并给出更准确的机制或评估说法。",
+        "evidence": "误解 更准确的说法"
+      },
+      "problem": {
+        "answer": "它纠正 Adam 自动选学习率、AdamW 等于 L2 等会误导调参的判断。",
+        "evidence": "Adam 会自动找到合适学习率"
+      },
+      "inputOutput": {
+        "answer": "输入一个绝对化的优化器判断，输出带全局学习率、预算或任务指标约束的修正。",
+        "evidence": "仍依赖全局学习率和调度"
+      },
+      "mechanism": {
+        "answer": "每行将误解与对应机制直接对照，使自适应缩放、解耦衰减和裁剪职责分开。",
+        "evidence": "AdamW 把参数衰减从自适应梯度更新中解耦"
+      },
+      "interpretation": {
+        "answer": "Adam 的每参数缩放仍依赖全局学习率，不能理解为自动找到合适步长。",
+        "evidence": "它做每参数缩放，仍依赖全局学习率和调度"
+      },
+      "boundary": {
+        "answer": "训练损失下降更快不能单独证明更好，还需同预算验证、稳定性和任务指标。",
+        "evidence": "还需相同预算下的验证、稳定性、内存和最终任务指标"
+      }
+    },
+    {
+      "section": 12,
+      "definition": {
+        "answer": "本节用五道场景化练习和参考答案检查对优化器整体配方的理解。",
+        "evidence": "在贯穿场景中，为什么 Momentum 会弱化横向摆动却积累纵向速度？"
+      },
+      "problem": {
+        "answer": "练习覆盖动量方向、Adam 矩、权重衰减、恢复训练和放大 batch 的理解缺口。",
+        "evidence": "为什么 Momentum 会弱化横向摆动却积累纵向速度"
+      },
+      "inputOutput": {
+        "answer": "输入五个训练场景问题，输出关于方向、尺度、状态恢复和预算复验的解释。",
+        "evidence": "参考答案"
+      },
+      "mechanism": {
+        "answer": "交替梯度在指数平均中抵消，而长期同号分量会持续积累形成动量。",
+        "evidence": "交替梯度在指数平均中互相抵消；长期同号分量持续累积"
+      },
+      "interpretation": {
+        "answer": "一阶矩负责平滑方向，二阶矩负责尺度缩放，全局学习率决定整体幅度。",
+        "evidence": "一阶矩平滑方向，二阶矩按历史尺度缩放参数，全局学习率控制整体幅度"
+      },
+      "boundary": {
+        "answer": "全局 batch 放大后必须先明确预算口径并重新扫描学习率与预热配置。",
+        "evidence": "明确固定样本/算力/墙钟哪一种预算"
+      }
+    },
+    {
+      "section": 13,
+      "definition": {
+        "answer": "本节给出概念依赖与延伸路线，把当前主题映射到五类后续学习节点。",
+        "evidence": "方向 接下来读 要追问什么"
+      },
+      "problem": {
+        "answer": "它帮助继续追查局部方向、历史梯度、权重衰减、深层稳定和规模扩展问题。",
+        "evidence": "局部方向从哪里来"
+      },
+      "inputOutput": {
+        "answer": "输入当前未解的训练问题，输出建议阅读节点以及下一步需要追问的机制。",
+        "evidence": "方向 接下来读 要追问什么"
+      },
+      "mechanism": {
+        "answer": "表格按问题方向连接梯度下降、反向传播、正则化、归一化和分布式训练。",
+        "evidence": "规模扩大后的配方 分布式训练"
+      },
+      "interpretation": {
+        "answer": "过关意味着能从日志重建梯度到调度阶段的链条，并辨别配方改善维度。",
+        "evidence": "梯度 → 优化器状态 → 有效更新 → 调度阶段"
+      },
+      "boundary": {
+        "answer": "配方变化的效果必须区分速度、稳定性、泛化与比较口径，不能混为同一收益。",
+        "evidence": "改善了速度、稳定性、泛化还是只改变了比较口径"
+      }
+    }
+  ]
+}

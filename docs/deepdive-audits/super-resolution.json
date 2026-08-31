@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 3,
+  "pageId": "super-resolution",
+  "pageHash": "sha256:858fef2afab87cc4d195e34c98f2ce94bcfe3627566ff851286beef5c5837619",
+  "reviewedAt": "2026-08-18",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "message": "正文章节编号从 12 直接跳到 14，缺少第 13 节编号，编号不连续但不影响理解。"
+    },
+    {
+      "code": "minor-readability",
+      "message": "第 14 节末尾的验证协议使用了“权限边界”“拒绝原因”等与超分辨率主题关联较弱的通用措辞，疑似模板残留，但未造成语义残缺。"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "超分辨率（欠定逆问题）",
+      "sections": [
+        1,
+        5
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "超分辨率的本质是从退化观测反推高分辨率解释，而不是找回被删掉的真实信息",
+        "rationale": "第1节明确界定超分辨率的本质，第5节用原创图把欠定逆问题可视化。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "真正的问题从来不在于“把尺寸变大”，而在于“把已经被丢弃的信息找回来”",
+        "rationale": "第1节直接点明它解决的是恢复被丢弃信息的问题，而非放大尺寸。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "监控取证要求细节必须真实可信，而娱乐放大则允许更自由地生成",
+        "rationale": "第1节末以取证与娱乐的对立明确适用边界，并贯穿全页。"
+      }
+    },
+    {
+      "name": "经典退化模型",
+      "sections": [
+        2
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "它表达的物理含义是：一张高清图先被某个模糊核抹掉高频细节，再被抽掉大部分像素",
+        "rationale": "第2节给出退化模型并用物理含义解释模型是什么。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "这就是训练退化与真实退化不匹配造成的失败",
+        "rationale": "第2节说明它要解决的是训练退化与真实退化的失配问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "经典退化模型的价值不在于它是否真实，而在于它明确暴露了模型的假设边界",
+        "rationale": "第2节末尾明确指出超出该链的成像过程超出模型能力范围。"
+      }
+    },
+    {
+      "name": "感知—失真权衡",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "同一个低清输入，用不同的目标函数训练，会得到不同倾向的高清答案",
+        "rationale": "第6节开篇定义不同损失优化不同答案的核心。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "没有任何单一损失能同时做到两者最优",
+        "rationale": "第6节点明它解决的取舍矛盾：失真与感知无法同时最优。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "取证、测量类任务应偏向失真，让输出忠实于观测；观感增强类任务应偏向感知，接受生成性的细节",
+        "rationale": "第6节末尾按任务类型给出失真/感知的适用边界。"
+      }
+    },
+    {
+      "name": "盲超分",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "盲超分之所以难，不在于网络不够深，而在于真实图像的退化链远超出训练合成器能模拟的范围",
+        "rationale": "第7节界定盲超分的本质是退化覆盖而非网络深度。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "合成器如果只按固定顺序制造训练样本，就永远遇不到真实世界里那些由不同设备、不同流程交错产生的“顺序效应”",
+        "rationale": "第7节说明它解决的是真实退化链的顺序效应覆盖问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "盲超分的进步，本质上是退化覆盖范围的扩大，而覆盖范围的上限决定了模型能力的上限",
+        "rationale": "第7节末尾以退化覆盖范围划定能力边界，并提出分域部署。"
+      }
+    },
+    {
+      "name": "扩散超分",
+      "sections": [
+        8
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "它输出的不是一张确定的“重建结果”，而是从条件分布中抽取的一个样本",
+        "rationale": "第8节明确扩散超分输出条件样本而非唯一重建。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "同一个低清输入、换一个随机种子，就会得到一张细节不同但同样合理的高清图",
+        "rationale": "第8节说明它揭示的是后验不确定性的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "在医学、科学成像和取证场景里，不确定性本身就是必须如实报告的信息",
+        "rationale": "第8节按创意与医学/取证场景给出使用边界。"
+      }
+    },
+    {
+      "name": "数据一致性回投影",
+      "sections": [
+        9
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "数据一致性回投影是一种检验超分结果的方法",
+        "rationale": "第9节开篇定义回投影检验是什么。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "所以回投影是必要检查，却不是充分证明",
+        "rationale": "第9节点明它解决的问题边界：只能证明兼容不能证明真实。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "回投影只能在这族解释内部排除掉退化后对不上的那些",
+        "rationale": "第9节明确回投影只能排除不兼容候选、无法区分真假。"
+      }
+    },
+    {
+      "name": "幻觉",
+      "sections": [
+        10
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "文字、人脸和规则纹理是幻觉风险最高的区域",
+        "rationale": "第10节界定幻觉高风险区是什么。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "在输入证据不足时，它会倾向选择那个最常见的模式",
+        "rationale": "第10节解释幻觉由强先验在证据不足时补全导致。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "对抗这种幻觉风险，需要主动设计检查手段，而不是依赖肉眼判断",
+        "rationale": "第10节末尾给出应对幻觉风险的设计边界。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

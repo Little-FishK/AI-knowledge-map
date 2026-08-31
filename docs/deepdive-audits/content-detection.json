@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 3,
+  "pageId": "content-detection",
+  "pageHash": "sha256:65ca16536ce19f9ded5cb0c76754e3f4118310e93cd2745fcc6354510af4ee48",
+  "reviewedAt": "2026-08-18",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "label": "表达可以更顺畅但不存在语义残缺",
+      "sections": [
+        13
+      ],
+      "message": "章节编号从第 11 节直接跳到第 13 节，缺少编号为 12 的章节，最后一节“把因果链连起来”被标为 13。正文内容完整、可理解，但编号断裂应修正。",
+      "evidence": "把因果链连起来"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "统计检测器（分布差异分类）",
+      "sections": [
+        2
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "统计检测器的核心假设是：生成器输出与人类产出在某个可观测空间中留下了不同的分布痕迹",
+        "rationale": "第 2 节明确说明统计检测器通过拟合生成器与人类产出的分布差异来判断来源。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "它的输入是待检内容的原始字节、像素或词元序列，输出通常是一个介于 0 和 1 之间的置信度分数",
+        "rationale": "第 2 节说明其解决的是区分机器生成与人类产出的分类问题，并给出输入输出关系。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "必须用未见过的模型、真实的编辑链和训练时间之后产生的数据来测试",
+        "rationale": "第 2 节明确其边界：学到的只是特定分布下的表面痕迹，分布漂移会使检测失效，评测必须覆盖时间外、模型外数据。"
+      }
+    },
+    {
+      "name": "水印（可检测嵌入信号）",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "在生成过程中主动嵌入一个密钥相关的可检测信号",
+        "rationale": "第 6 节明确水印是在生成过程中主动嵌入的密钥相关信号。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "验证器使用对应密钥或统计检测方法来判断信号是否存在",
+        "rationale": "第 6 节说明水印解决的是生成过程/输出是否留下可验证标记的判断问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "“检测到水印”是一个强证据——它表明该内容经过了某个嵌入水印的生成流程；但“未检测到水印”是一个弱证据",
+        "rationale": "第 6 节明确边界：检测到水印是强证据，未检测到是弱证据，无法区分无水印与信号被破坏。"
+      }
+    },
+    {
+      "name": "签名溯源（声明完整性验证）",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "验证一份内容所附带的存在性声明是否完整、是否被篡改",
+        "rationale": "第 7 节明确签名溯源验证的是存在性声明的完整性与是否被篡改。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "验证器的工作是确认这份清单本身没有被改动过，并且签发清单的证书链是可信的",
+        "rationale": "第 7 节说明其解决的是确认清单未被篡改且证书链可信的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "签名保证了声明的完整性，却不保证声明者的诚实，也不保证被声明的事件确实发生过",
+        "rationale": "第 7 节明确边界：签名证明完整性，不证明声明者诚实或事件真实。"
+      }
+    },
+    {
+      "name": "基率与阳性预测值（贝叶斯）",
+      "sections": [
+        3
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "必须结合场景中 AI 内容本身的占比——基率——来计算",
+        "rationale": "第 3 节说明阳性后验必须结合基率计算，给出 PPV 的贝叶斯定义。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "实际部署后的阳性判断也可能绝大多数是错的",
+        "rationale": "第 3 节说明其解决的是低基率下高准确率仍产生大量误报的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "只有当阳性带来的行动后果与 PPV 所代表的真实可信度相匹配时，检测器的输出才是有意义的",
+        "rationale": "第 3 节明确边界：总体准确率有误导性，阈值必须回到具体基率与误判成本。"
+      }
+    },
+    {
+      "name": "混合内容区域级与链式来源",
+      "sections": [
+        8
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "溯源信息不能只保存一个最终文件，而要保存完整的变换链",
+        "rationale": "第 8 节说明混合内容需要保存完整变换链而非整文件二分类。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "如果系统只能输出“全 AI”或“全真实”两个标签，这个问题的任何答案都是错的",
+        "rationale": "第 8 节说明其解决的是混合内容无法用整文件二分类正确描述的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "区域级检测给出的是一个带有不确定性的定位结果，而不是精确的像素掩码",
+        "rationale": "第 8 节明确边界：区域级检测只是带不确定性的定位，而非精确掩码。"
+      }
+    },
+    {
+      "name": "阈值与决策（按用途风险设计）",
+      "sections": [
+        10
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "阈值的本质是把连续的置信度分数映射成“采取某种行动”的分界点",
+        "rationale": "第 10 节明确阈值的本质是把连续分数映射为行动分界点。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "同一个检测器，用于不同的决策场景时，不应该使用同一个阈值",
+        "rationale": "第 10 节说明其解决的是不同用途下误判代价差异巨大、阈值不能统一的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "检测输出在任何情况下都不应单独成为纪律处分、学术判定或法律结论的依据",
+        "rationale": "第 10 节明确边界：检测输出不能单独作为高影响后果的依据。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

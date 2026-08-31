@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 3,
+  "pageId": "attention",
+  "pageHash": "sha256:3867013f2b9c8666fa4db69cdea70aeaeed848b75b2d5ec7994b83ef85c13ada",
+  "reviewedAt": "2026-08-13",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-repetition",
+      "sections": [
+        8
+      ],
+      "evidence": "每个位置先产生 Query、Key 和 Value。当前 Query 与所有 Key 做点积，得到基于内容匹配的分数；分数经过按维度缩放和 softmax 后，变成总和为 1 的权重；这些权重再用于对所有 Value 加权求和，生成当前位置的新表示。",
+      "message": "第 8 节作为综合总结，较完整地再次复述了前文的机制与取舍；重复有教学目的且未损害理解，因此仅记为非阻断提示。"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "注意力机制（Q/K/V 与缩放点积）",
+      "sections": [
+        1,
+        2,
+        3
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "注意力计算由匹配、归一化和汇总三步组成。",
+        "rationale": "第 2 节明确说明查询与键匹配、softmax 归一化以及按值汇总，完整回答了该机制是什么。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "这个过程同时处理“远距离信息可能很重要”和“关注对象必须随内容改变”两个问题。",
+        "rationale": "第 1 节直接给出了注意力要解决的远距离依赖与内容动态选择问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "某个词获得高权重，只说明它在当前注意力头、当前输入和当前可见性条件下更匹配，并不等于解释概率，也不能单独证明它是模型最终结论的唯一原因。",
+        "rationale": "第 2 节把权重的适用解释限制在当前头、输入和可见性条件内，并明确排除因果保证。"
+      }
+    },
+    {
+      "name": "自注意力与交叉注意力",
+      "sections": [
+        4
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "“自”限定了信息来源：Query、Key、Value 来自同一个序列。若 Query 来自一个序列，而 Key 和 Value 来自另一个序列，这种变体称为交叉注意力。",
+        "rationale": "第 4 节以 Q、K、V 的来源准确区分自注意力与交叉注意力。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "它解决的是句子内部各个词如何互相参照，从而形成对角色和关系的上下文理解。",
+        "rationale": "第 4 节明确指出自注意力所解决的是序列内部相互参照与上下文关系建模。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "因此，自注意力适合建模一个序列内部的相互参照，交叉注意力适合让一个序列有选择地读取另一个序列。",
+        "rationale": "第 4 节明确给出两种注意力分别适用于同序列内部建模和跨序列读取的边界。"
+      }
+    },
+    {
+      "name": "全局自注意力的路径长度与并行性",
+      "sections": [
+        5
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "全局自注意力则允许任意两个可见位置在同一层内直接交互",
+        "rationale": "第 5 节清楚描述全局自注意力在单层建立可见位置直接交互的结构特征。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "注意力成为转折点，不只是因为它能表示词与词之间的关系，而是因为同一种机制同时缓解了两个瓶颈：用一层内的直接交互缩短长距离信息路径，并让所有位置的计算能够并行。",
+        "rationale": "第 5 节直接说明该结构用于缓解 RNN 的长路径和串行计算两个瓶颈。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "但“路径更短”并不等于信息不会变化，也不保证模型一定学到正确关联。",
+        "rationale": "第 5 节明确限制了短路径优势的含义，避免把结构便利误解为正确性保证。"
+      }
+    },
+    {
+      "name": "多头注意力",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "多头注意力在同一层并行运行多组注意力，为这些不同的匹配方式提供多个表示子空间和多条信息路由，而不必把所有关系都压进同一组分数。",
+        "rationale": "第 6 节明确说明多头是在多个投影子空间并行运行注意力并提供多条信息路由。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "但同一对词可能同时存在语法、指代、位置等不同关系。",
+        "rationale": "第 6 节说明单一相关性表示不足以覆盖同一 token 对的多种关系，这正是多头机制要缓解的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "多头也不保证每个头都形成稳定、独立且容易解释的职责。",
+        "rationale": "第 6 节明确指出多头只提供能力，不保证专门化、独立性或可解释性。"
+      }
+    },
+    {
+      "name": "标准全局注意力的平方级开销",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "设序列长度为 n，每个位置都要对 n 个位置计算匹配分数，因此注意力分数矩阵包含 n×n = n² 个元素。",
+        "rationale": "第 7 节从两两匹配和分数矩阵大小准确界定了平方级开销。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "这解释了长上下文推理为什么会迅速变慢、变贵：上下文每增加一档，注意力付出的不是线性增加的代价。",
+        "rationale": "第 7 节明确把平方增长与长上下文的计算及工程成本联系起来。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "n² 描述的是注意力两两交互的核心成本，并不等于模型的全部成本。",
+        "rationale": "第 7 节明确限定 n² 所描述的是核心两两交互成本，而非整个模型总成本。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

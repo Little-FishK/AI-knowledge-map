@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 3,
+  "pageId": "speech",
+  "pageHash": "sha256:f03d4a9801001b1c5cece4d69dd68e33110769a95b76e446df5176a9c7ace62b",
+  "reviewedAt": "2026-08-18",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [
+    {
+      "code": "minor-image-caption",
+      "message": "第6节正文与图1的aria-label都称声学编码器拆解出语言内容、说话人和环境三类并行表示，但图中只画出语言内容与说话人/韵律两条输出通道，噪声仅标注在输入波形框内，未作为独立表示画出，图文存在轻微不一致；建议在图注中说明环境表示被抑制而非作为独立通道。",
+      "section": 6,
+      "evidence": "波形先经过声学编码，被拆解成几类并行的表示——语言内容表示、说话人表示和环境表示"
+    },
+    {
+      "code": "minor-terminology-style",
+      "message": "同一说话人特征向量在文中分别写作“身份嵌入”（第1节）、“说话人嵌入”与“说话人向量”（第12节），含义一致但写法不统一，可统一为“说话人嵌入”。",
+      "section": 12,
+      "evidence": "说话人嵌入则是身份的最小表示"
+    }
+  ],
+  "coreConcepts": [
+    {
+      "name": "ASR（自动语音识别）",
+      "sections": [
+        1,
+        2,
+        7,
+        8
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "自动语音识别（ASR）的目标是尽可能只保留语言内容，同时对说话人身份和噪声不敏感",
+        "rationale": "第1、2节明确界定ASR是从波形提取语言内容、对身份与噪声不敏感的任务，并由声学编码、序列对齐与解码组成。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "语音识别的根本困难在于：波形的每一帧与文字的 token 之间没有一一对应的关系",
+        "rationale": "第2节说明ASR要解决的变长音频到变长文字的对齐难题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "在安静录音室里测出的低 WER 不能代表呼叫中心的真实表现",
+        "rationale": "第1、7、8节说明其适用边界：任务类型决定容错标准，流式识别取舍未来上下文，口音/噪声/重叠说话改变数据分布。"
+      }
+    },
+    {
+      "name": "TTS（文本转语音）",
+      "sections": [
+        1,
+        4,
+        9
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "文本转语音（TTS）的方向恰好相反。给定一段文字，TTS 需要把缺失的信息补回去",
+        "rationale": "第1、4节说明TTS是ASR的逆向：从文字补回时长、韵律与音色，先形成声学计划再由声码器合成波形。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "文本转语音面对的核心难题是：同一句话存在无数种正确的读法。",
+        "rationale": "第4节指出文字不含时长、停顿、重音，TTS必须从中选出一份合理读法。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "这三条轴之间没有必然的正相关，甚至可能互相冲突。",
+        "rationale": "第4、9节说明错误可能出现在规范化到声码器的任一环节，且自然度、可懂度、身份相似互不保证。"
+      }
+    },
+    {
+      "name": "WER（词错误率）",
+      "sections": [
+        3
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "词错误率（WER）衡量识别结果与参考文本之间需要通过多少次编辑操作才能变得一致",
+        "rationale": "第3节定义WER=(S+D+I)/N并给出替换、删除、插入三类编辑操作。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "WER 把所有错误一视同仁，掩盖了错误的业务严重性差异",
+        "rationale": "第3节指出WER无法区分语义轻重，关键实体需单独统计错误率。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "WER 适合作为整体的、可比的基准，但绝不能替代面向具体业务后果的细粒度评估。",
+        "rationale": "第3节说明其对切分粒度敏感、必须报告字/词粒度，且不能替代细粒度业务评估。"
+      }
+    },
+    {
+      "name": "声音克隆（voice cloning）",
+      "sections": [
+        1,
+        10
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "声音克隆进一步把身份这一层显式地提取出来：它把参考音频中的身份嵌入（说话人特征的向量表示）作为生成条件",
+        "rationale": "第1、10节定义声音克隆是把参考音频的身份嵌入作为生成条件、复现特定说话人音色。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "公开演讲录音并不等于任何人可以合法克隆这个声音。",
+        "rationale": "第10节指出可获取不等于同意，身份可被单独抽取、保存与复用带来冒充风险。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "声音相似度永远不能替代密码、令牌或生物特征的多因素验证，因为音色本身是可复制的。",
+        "rationale": "第10节给出边界：需主体同意、用途绑定与撤销，高风险场景额外限制，声音相似不可替代多因素验证。"
+      }
+    },
+    {
+      "name": "流式识别（streaming ASR）",
+      "sections": [
+        7
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "流式识别与离线识别的本质差别在于模型能看到多少未来。",
+        "rationale": "第7节界定流式识别只能看有限右上下文，与离线整段可见相对。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "实时字幕场景里模型做不到这一点：它只能看到有限的右上下文",
+        "rationale": "第7节说明实时字幕因看不到未来而反复跳字的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "如果提交得太早，字幕就会频繁修订、不断跳字；提交得太晚，虽然稳定，却牺牲了实时性。",
+        "rationale": "第7节给出边界：稳定性阈值、端点检测在延迟与准确之间权衡，临时文本与可执行意图必须分离。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

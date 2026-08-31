@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 3,
+  "pageId": "clip",
+  "pageHash": "sha256:4f21eabe1cf55452d1a55d5344c445adc445ed15296c105a3ead6d764b7d1c98",
+  "reviewedAt": "2026-08-13",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "type": "content-audit",
+      "code": "formula-error",
+      "findingId": "clip-formula-display-1",
+      "section": 4,
+      "sections": [
+        4
+      ],
+      "concept": null,
+      "claim": "第 4 节 SVG 仍把已经除以 τ 的 logits 矩阵标成 S/τ。",
+      "evidence": "相似度矩阵 S/τ",
+      "rationale": "第 2 节已定义 Sᵢⱼ=vᵢᵀtⱼ/τ，第 4 节正文也说明 8、2、3、7 已经除以 τ；SVG 标签因此仍表示错误的二次缩放。",
+      "acceptanceCriteria": "图示矩阵标签与第 2 节定义保持一致，明确 8、2、3、7 是一次除以 τ 后的 logits，且不再表达 S 被再次除以 τ。"
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "clip-formula-display-1",
+      "resolved": false,
+      "evidence": "相似度矩阵 S/τ",
+      "rationale": "第 2 节定义 Sᵢⱼ=vᵢᵀtⱼ/τ，第 4 节正文也明确 8、2、3、7 是一次温度缩放后的 logits；但同节 SVG 仍标为 S/τ，继续表达对 S 再除一次 τ，未满足标签与定义一致的验收条件。"
+    },
+    {
+      "findingId": "clip-source-support-1",
+      "resolved": true,
+      "evidence": "它本身不输出关于解剖、事实、审美、版权或安全的独立判断。",
+      "rationale": "修复后的第 9 节已不再声称表面线索可抬高 CLIP 分数，也不再出现 reward hacking 或对抗规避结论；现有内容仅依据 CLIP 分数的输入输出边界限定其用途，因此首次审计所指的专门经验性主张及其来源阻断已消除。"
+    }
+  ]
+}

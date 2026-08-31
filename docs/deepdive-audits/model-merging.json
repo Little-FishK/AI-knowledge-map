@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 3,
+  "pageId": "model-merging",
+  "pageHash": "sha256:5a39d88f9af9a3a80e8c6f94c82f6a2770634ceaa254732a7f94c6c1c7fff314",
+  "reviewedAt": "2026-08-16",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "acceptanceCriteria": "第 6 节中关于随机丢弃并重标度、随机性导致每次运行结果可能不同的机制断言被移除，或改写为不超出页面现有四条来源可支持范围的表述；不得通过新增、删除或替换来源列表来解决。",
+      "claim": "第 6 节仍保留随机丢弃并重标度、随机性导致每次运行结果可能不同的机制断言，四条现有来源均无法支撑",
+      "code": "source-support-blocked",
+      "evidence": "随机丢弃带来方差，同一种子之外的运行不可复现",
+      "findingId": "sha256:bb4c43cb532426116",
+      "rationale": "第 6 节已移除 DARE 名称（标题与正文不再出现 DARE），但验收标准点名的两条机制断言仍然保留：表格行“随机丢弃 + 重标度”与正文“随机丢弃带来方差，同一种子之外的运行不可复现”仍是“随机丢弃并重标度、随机性导致每次运行结果可能不同”的 DARE 机制表述。四条现有来源（Model soups、Task Arithmetic、TIES-Merging、Git Re-Basin）均不含随机丢弃与重标度（TIES 为按幅度确定性修剪）；来源列表未修改且按规定不得修改。断言既未移除，也未改写为来源可支持的表述，问题未解决。",
+      "sections": [
+        6
+      ],
+      "sourceUrls": [
+        "https://arxiv.org/abs/2311.03099"
+      ]
+    }
+  ],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "evidence": "随机丢弃带来方差，同一种子之外的运行不可复现",
+      "findingId": "sha256:bb4c43cb532426116",
+      "rationale": "第 6 节虽已移除 DARE 名称，但验收标准点名的两条机制断言（随机丢弃并重标度、随机性导致每次运行结果可能不同）仍以表格行“随机丢弃 + 重标度”和正文“随机丢弃带来方差，同一种子之外的运行不可复现”的形式保留；四条现有来源均不涉及随机丢弃与重标度，无法支撑，且来源列表不得修改，因此未解决。",
+      "resolved": false
+    },
+    {
+      "evidence": "适配器存的是相对共同基座的小增量，而不是一份完整的独立权重",
+      "findingId": "sha256:1f3c2c629bad6885d",
+      "rationale": "第 7 节已完全移除 LoRA 名称、低秩公式 ΔWᵢ=(αᵢ/rᵢ)×Bᵢ×Aᵢ 及 A/B 矩阵与秩的表述；整节改写为通用适配器叙述，其合并公式明确落回第 3 节任务向量形式 θ合并 = θ基座 + Σᵢ αᵢ × Δᵢ（Task Arithmetic 已在本页来源列表中），路由与合并的取舍改述为该框架的直接推论，不再依赖任何 LoRA 专属事实。满足验收标准。",
+      "resolved": true
+    }
+  ],
+  "warnings": []
+}

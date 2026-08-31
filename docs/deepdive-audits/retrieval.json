@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 3,
+  "pageId": "retrieval",
+  "pageHash": "sha256:3cded749517b66589ec1303f5bebd5928783d17b88dcc38153b0158ee03a1dcd",
+  "reviewedAt": "2026-08-19",
+  "mode": "verification",
+  "decision": "fail",
+  "blockingFindings": [
+    {
+      "findingId": "sha256:8cb30a6d198ff20dd",
+      "code": "human-review-issue",
+      "claim": "「Top-K」「TopK」「前 K」三种写法未完全统一：正文已统一为「Top-K」，但第 3 节图注与第 6 节表格仍保留「前 K」，与正文「Top-K」并存混用。",
+      "evidence": "到库里找最相似的前 K 个片段（近似最近邻）返回",
+      "rationale": "figure/table protection rule forbids the only compliant fix",
+      "acceptanceCriteria": "第 2、3、4、5、6 节中 Top-K / TopK / 前 K 统一为一致写法（如统一为「Top-K」），保持含义不变。",
+      "sections": [
+        3,
+        6
+      ]
+    }
+  ],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:ff750839376d91205",
+      "resolved": true,
+      "evidence": "计算查询向量与各文档向量之间的余弦相似度，取相似度最高的前几个",
+      "rationale": "第 2 节取最大值的相似度已改为「余弦相似度」，「距离」仅与「最近」搭配用于最近邻搜索，不再与最大化搭配。"
+    },
+    {
+      "findingId": "sha256:2284adfc166561a25",
+      "resolved": true,
+      "evidence": "出现「中间迷失」——长上下文里位于中段的信息更容易被模型忽略",
+      "rationale": "第 1、5 节「中间迷失」均统一为「长上下文中段信息更易被忽略」的中段位置退化含义，与常见含义一致。"
+    },
+    {
+      "findingId": "sha256:8cb30a6d198ff20dd",
+      "resolved": false,
+      "evidence": "到库里找最相似的前 K 个片段（近似最近邻）返回",
+      "rationale": "figure/table protection rule forbids the only compliant fix：正文 Top-K/TopK 已统一为「Top-K」，但「前 K」仍保留在第 3 节图注与第 6 节表格，图、表按规则须逐块原样保留，返修 Agent 无法机器修改。"
+    },
+    {
+      "findingId": "sha256:6203eba71a7b619b1",
+      "resolved": true,
+      "evidence": "<span class=\"dd-n\">8</span>概念依赖与延伸学习",
+      "rationale": "可见章节编号已重排为从 1 到 8 连续（dd-n 依次 1..8），原编号 10 的「概念依赖与延伸学习」已改为 8，不再跳档。"
+    }
+  ]
+}

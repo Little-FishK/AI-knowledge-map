@@ -1,0 +1,194 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [
+    {
+      "boundary": {
+        "evidence": "表示的质量决定了生成质量的上限",
+        "rationale": "点明表示是有损瓶颈，生成模型只能在表示允许的范围内工作。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "波形是按固定采样率记录的连续数值序列",
+        "rationale": "界定波形是固定采样率下的连续幅度序列，并说明频谱表示与神经 codec 是压缩替代，构成本页最核心的表示概念。",
+        "status": "pass"
+      },
+      "name": "声学表示与时间结构（波形、频谱与离散声码）",
+      "problem": {
+        "evidence": "同样长度的音频比文字包含多得多的“时间步”",
+        "rationale": "说明直接逐样本生成为何代价巨大：音频时间步数量级远超文字。",
+        "status": "pass"
+      },
+      "sections": [
+        1,
+        2
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "码率与保真度之间的权衡",
+        "rationale": "指出码率—保真度边界：压缩越狠，瞬态、高频与空间感丢失越多。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "把一段高频连续波形重排成“每秒少量帧、每帧若干离散码”的结构",
+        "rationale": "界定 codec 把高频波形压缩为低帧率、多层码本离散结构。",
+        "status": "pass"
+      },
+      "name": "神经codec与多码本残差量化",
+      "problem": {
+        "evidence": "码本规模会迅速膨胀到无法训练",
+        "rationale": "说明为何需要残差向量量化而非单一超大词表：单码本覆盖全部声学形态不可行。",
+        "status": "pass"
+      },
+      "sections": [
+        2,
+        3
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "模型家族是工具取舍，不是质量结论",
+        "rationale": "明确适用边界：家族选择取决于任务长度、交互速度、编辑需求与硬件。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "音频生成并不只有“像大语言模型那样逐 token 生成”这一条路",
+        "rationale": "界定存在多个建模家族，各自在时间、质量与控制上取舍。",
+        "status": "pass"
+      },
+      "name": "生成范式（离散自回归、连续/潜空间扩散、掩码迭代、混合层级）",
+      "problem": {
+        "evidence": "不同的建模家族在时间结构、质量和可控性上各有取舍",
+        "rationale": "说明问题不是选一个最优家族，而是按任务在速度、质量、可控性间权衡。",
+        "status": "pass"
+      },
+      "sections": [
+        6
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "先生成和声、节拍或段落草图",
+        "rationale": "给出层级式解法边界：先规划宏观骨架再填充声学细节。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "音乐需要分钟级重复、变化和和声规划",
+        "rationale": "界定音乐除局部统计（音色、节奏）外还有跨分钟的重复、变化与和声规划。",
+        "status": "pass"
+      },
+      "name": "长程音乐结构",
+      "problem": {
+        "evidence": "要么因为缺乏长程记忆而无限重复同样的乐句，要么因为不知道主题是什么而做无目的的变化",
+        "rationale": "说明短窗口模型为何产出随机拼贴式的整曲。",
+        "status": "pass"
+      },
+      "sections": [
+        7
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "限制参考旋律的长度，只取足以表达轮廓的最小信息",
+        "rationale": "给出工程边界：分离通道、限制参考长度、随机化音色，防止身份借道混入。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "既要保持旋律的轮廓，又不能把原录音的身份原样复制过来",
+        "rationale": "界定条件控制要区分「遵循」音高时间结构与「复制」录音身份。",
+        "status": "pass"
+      },
+      "name": "条件控制（遵循与复制）",
+      "problem": {
+        "evidence": "连同录音本身的音色、演奏者特征、背景噪声一起搬过来",
+        "rationale": "说明复制会带入音色、演奏者与背景噪声，破坏生成而非指引。",
+        "status": "pass"
+      },
+      "sections": [
+        8
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "不同内容对码率的敏感性并不相同",
+        "rationale": "指出适用边界：打击乐、人声、环境音对码率敏感性与失真阈值各异。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "codec 的有损压缩设定了一个不可逾越的天花板",
+        "rationale": "界定 codec 有损压缩为生成器设定不可逾越的天花板。",
+        "status": "pass"
+      },
+      "name": "codec失真天花板（表示边界）",
+      "problem": {
+        "evidence": "解码后却仍有“水下声”或金属感",
+        "rationale": "说明即便 token 全对仍可能失真，问题在于 codec 而非生成器。",
+        "status": "pass"
+      },
+      "sections": [
+        9
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "另一个必须防范的偏差是“只挑最佳样本”",
+        "rationale": "给出评测纪律边界：固定提示集、随机种子、生成预算与失败率，防挑样偏差。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "把音质、内容、结构和多样性拆成彼此独立的维度",
+        "rationale": "界定评测需把四个维度拆开分别测量。",
+        "status": "pass"
+      },
+      "name": "评测框架（音质、内容、结构、多样性分开）",
+      "problem": {
+        "evidence": "用一个 Fréchet 距离之类的单一指标，无法回答“音乐好不好听、是否符合提示”",
+        "rationale": "说明单一分布距离指标忽略结构、混音与伪影，无法回答好坏与匹配。",
+        "status": "pass"
+      },
+      "sections": [
+        10
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "设立明确的使用策略和申诉通道",
+        "rationale": "给出治理边界：对身份模仿、欺诈、仇恨与危险音效设用途策略和申诉。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "版权、身份与内容安全属于生成链的一部分",
+        "rationale": "界定版权、身份与内容安全是生成链内置环节而非事后附加。",
+        "status": "pass"
+      },
+      "name": "版权、身份与内容安全治理",
+      "problem": {
+        "evidence": "训练数据是否获得了许可，模型是否记忆了特定作品",
+        "rationale": "说明存在许可、记忆、近复制、风格、身份等多个不同性质的治理问题。",
+        "status": "pass"
+      },
+      "sections": [
+        11
+      ]
+    }
+  ],
+  "decision": "pass",
+  "mode": "full",
+  "pageHash": "sha256:241e236a097832700a49519172258597080215bf21d806bb854ab73de95be35b",
+  "pageId": "audio-generation",
+  "reviewedAt": "2026-08-18",
+  "schemaVersion": 3,
+  "verificationResults": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "message": "章节编号从第12节直接跳到第14节，缺少第13节；第14节「把因果链连起来」作为综合章节内容自洽，不损害理解，但编号不连续。",
+      "rationale": "页面共13个章节元素，显示编号为1–12与14，缺13；正文无残缺，属编号缺陷而非语义残缺。"
+    },
+    {
+      "code": "minor-repetition",
+      "message": "「表示质量决定生成上限 / codec失真天花板」主题在第1、2、9、14节反复出现，属对核心命题的逐步展开与显式交叉引用，未损害阅读。",
+      "rationale": "第9节明确标注「这正是前面讨论的码率—保真度边界的延续」，为有意的教学递进而非无意义重复。"
+    }
+  ]
+}

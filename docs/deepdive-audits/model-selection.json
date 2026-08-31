@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "model-selection",
+  "pageHash": "sha256:817bc1d443a7f46c36a13c4a012942ed838fc7999db03966a34b31b41edcf10d",
+  "reviewedAt": "2026-08-16",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:f147b16f04c5ef1c8",
+      "resolved": true,
+      "evidence": "十个就只剩约 99%，要到第十一个才跌破 99%",
+      "rationale": "第 8 章已把原断言“十个就跌破 99%”修正为“十个就只剩约 99%，要到第十一个才跌破 99%”。按该章自身近似公式 Asystem ≈ ∏ᵢ Aᵢ 验证：0.999^10 ≈ 0.990045，即约 99.0%，仍高于 99%，与“只剩约 99%”一致；0.999^11 ≈ 0.989055，即约 98.9%，首次跌破 99%，与“第十一个才跌破”一致。同句前部“三个各 99.9% 的串行依赖，端到端只剩约 99.7%”保持正确（0.999³ ≈ 99.7%）。修复满足验收标准，该数值错误已解决。"
+    }
+  ]
+}

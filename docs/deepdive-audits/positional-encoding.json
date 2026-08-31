@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 3,
+  "pageId": "positional-encoding",
+  "pageHash": "sha256:edef514e4c1a6505ec15a9eb5f2e02990949ec6695b9e393612c868c32ac64ae",
+  "reviewedAt": "2026-08-13",
+  "mode": "full",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [
+    {
+      "name": "无位置自注意力的排列等变性",
+      "sections": [
+        1
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "这个性质叫排列等变：模型仍能保持每个输出与相应输入的对应关系",
+        "rationale": "正文准确区分排列等变与排列不变，并说明输入、输出会同步重排。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "模型就没有独立的坐标来区分“这个 token 在第 1 位”还是“它在第 7 位”",
+        "rationale": "正文明确指出纯内容注意力缺少可用的位置编号。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "“只能看过去”主要规定了可见范围，并不足以独立表达精确距离、周期或更细致的顺序模式",
+        "rationale": "正文说明因果遮罩提供方向结构，但不能替代精确位置机制。"
+      }
+    },
+    {
+      "name": "位置注入机制",
+      "sections": [
+        2
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "它更准确地表示一类设计：把 token 的坐标、位置差或距离关系注入注意力计算。",
+        "rationale": "正文把位置编码概括为注入坐标关系的一类设计，而非单一格式。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "表示层注入、分数层注入和 Q/K 几何变换都能让注意力感知位置",
+        "rationale": "正文清楚说明不同注入路径共同解决注意力缺少坐标信号的问题。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "但“公式能延伸到哪里”与“模型在延伸范围内仍能可靠解释什么”是两件不同的事。",
+        "rationale": "正文明确区分数学可计算范围与模型实际可用范围。"
+      }
+    },
+    {
+      "name": "正弦绝对位置编码",
+      "sections": [
+        3
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "正弦位置编码把位置索引转换为一个可与 token 表示相加的多维向量。",
+        "rationale": "正文给出定义、标准公式以及 PE、pos、i、d 的符号含义。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "只用单一频率时，指针转完一周便回到相同坐标，彼此相隔一个或多个周期的位置就会混淆。",
+        "rationale": "正文解释多频设计用于延后单一周期造成的位置混淆。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "数学上能够计算任意 pos 的编码，只说明函数在训练长度之外仍有定义。",
+        "rationale": "正文明确指出表外可计算不等于可靠长度外推。"
+      }
+    },
+    {
+      "name": "旋转位置编码（RoPE）",
+      "sections": [
+        4,
+        5
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "RoPE 不把位置作为一个独立向量加到内容上，而是按位置旋转查询 Q 和键 K。",
+        "rationale": "正文准确说明 RoPE 的对象和变换方式，并以二维旋转展示几何含义。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "查询和键共同拥有的那部分绝对旋转由此相消，点积中的位置因素只剩键相对查询多转了多少。",
+        "rationale": "正文推导旋转点积只保留相对位移，并用数值例验证共同平移不改变该贡献。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "因此，实际点积不是单独由位置差决定",
+        "rationale": "正文避免把示例余弦值误当成一般结论，并说明实际分数仍受内容方向与频率分组影响。"
+      }
+    },
+    {
+      "name": "相对位置偏置与 ALiBi",
+      "sections": [
+        6
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "可以把距离关系加到注意力的原始分数上，而不必先把位置混入 token 表示。",
+        "rationale": "正文给出相对偏置公式及全部符号含义，说明偏置在 softmax 前修改 logits。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "内容项回答“这两个表示是否匹配”，位置项回答“这个相对距离应当怎样影响匹配”，两者相加后共同决定注意力分配。",
+        "rationale": "正文明确说明分数层距离信号与内容匹配的分工。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "若远距离关系不应天然受罚，或者相关性随距离呈现不同结构，这个偏好就未必合适。",
+        "rationale": "正文指出 ALiBi 的线性远距惩罚是一种任务相关的归纳偏好。"
+      }
+    },
+    {
+      "name": "长上下文位置缩放与有效长度",
+      "sections": [
+        7,
+        8
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "它们改变的核心仍是“位置索引如何转成每对维度的旋转相位”。",
+        "rationale": "正文涵盖位置插值、基频调整和分维缩放的共同作用对象。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "直接把位置推进到 64K，会让 RoPE 的相位进入大量未训练区域。",
+        "rationale": "正文明确说明缩放旨在缓解训练范围外的相位分布偏移。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "“RoPE 支持多长”不是一个只由旋转公式决定的常数。",
+        "rationale": "正文系统列出频率分辨率、训练分布、缩放、缓存实现和任务标准等共同边界。"
+      }
+    },
+    {
+      "name": "KV cache 的位置一致性",
+      "sections": [
+        9
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "新 token 的 Q 和 K 必须使用它在完整序列中的位置索引，而不能直接采用当前小批张量里的局部索引。",
+        "rationale": "正文准确界定增量推理中的全局 position ID 一致性要求。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "若 position ID 错一位，RoPE 会按错误角度旋转新 Q/K；它们与缓存中历史 K 的相对相位随之偏移",
+        "rationale": "正文说明静默错位如何在形状合法时破坏注意力距离语义。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "前缀复用会让新序列从一个已有缓存长度继续计数；滑动窗口可能只保留部分历史，却不能随意把保留 token 的位置语义改成局部编号",
+        "rationale": "正文覆盖前缀复用、滑窗、分页、左填充及异长批次等高风险实现边界。"
+      }
+    },
+    {
+      "name": "位置能力评测",
+      "sections": [
+        10
+      ],
+      "definition": {
+        "status": "pass",
+        "evidence": "一个有效的评测以同一任务在不同长度、不同证据位置和不同计算路径下的结果为输入，观察答案、成功率或 logits 怎样随这些因素变化。",
+        "rationale": "正文将评测定义为长度、证据深度、任务和计算路径的受控对照。"
+      },
+      "problem": {
+        "status": "pass",
+        "evidence": "目标是确认模型的输出确实由位置与顺序信息驱动，而不是靠固定模板、局部线索或偶然命中。",
+        "rationale": "正文明确评测用于排除模板、内容与偶然命中的假阳性。"
+      },
+      "boundary": {
+        "status": "pass",
+        "evidence": "最终报告应给出分布，而不是只公布一个最大可用长度。",
+        "rationale": "正文要求分切片成功率、置信区间及全量与 cache 路径对齐，避免单点最大长度结论。"
+      }
+    }
+  ],
+  "verificationResults": []
+}

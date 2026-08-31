@@ -1,0 +1,78 @@
+{
+  "blockingFindings": [],
+  "coreConcepts": [
+    {
+      "boundary": {
+        "evidence": "世界模型不是对世界的完整复制",
+        "rationale": "第 1 节明确适用边界：它是针对决策任务保留必要变量的近似模拟器，能生成逼真视频不等于预测对了行动后果；第 2 节补充部分可观察时须整合历史的状态充分性要求。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "把高维、嘈杂的观察压缩成一个内部状态",
+        "rationale": "第 1 节明确界定世界模型是什么：把观察压缩成内部状态，并在该状态上预测动作后的下一状态、奖励与终止；第 2 节再给出编码器、动力学与奖励三个组件的符号关系。'是什么'解释完整。",
+        "status": "pass"
+      },
+      "name": "世界模型",
+      "problem": {
+        "evidence": "如果每个候选行动都要放到真实世界里试一次",
+        "rationale": "第 1 节说明它解决的问题：真实试错昂贵且危险（机器人碰撞、游戏失败、生产数据污染），世界模型让智能体在想象中先筛掉明显差的方案，从而减少真实环境试错。",
+        "status": "pass"
+      },
+      "sections": [
+        1,
+        2
+      ]
+    },
+    {
+      "boundary": {
+        "evidence": "每一步都要重新规划一次，计算负担显著增加",
+        "rationale": "第 5 节给出适用边界：每步重规划带来计算负担，需在滚动长度 H、候选数量与实时延迟之间取舍；且校正检查点必须来自真实环境而非模型续写。",
+        "status": "pass"
+      },
+      "definition": {
+        "evidence": "每一轮在模型内向前滚动 H 步",
+        "rationale": "第 5 节明确界定模型预测控制是什么：每轮在模型内滚动 H 步选出预测回报最高的动作序列，但只执行第一个动作，再用真实观察更新状态并重新规划。",
+        "status": "pass"
+      },
+      "name": "模型预测控制",
+      "problem": {
+        "evidence": "模型的预测会随滚动长度累积误差",
+        "rationale": "第 5 节说明它解决的问题：长滚动预测误差随长度累积、越滚越不可信，MPC 通过每轮只迈一步就回到真实观察校正来限制误差累积。",
+        "status": "pass"
+      },
+      "sections": [
+        5
+      ]
+    }
+  ],
+  "decision": "pass",
+  "mode": "full",
+  "pageHash": "sha256:e0f9c7a75ffbc9878a3758a13164c9b0b682adf96f1e99b54d36ac5e4042f49e",
+  "pageId": "world-models",
+  "reviewedAt": "2026-08-18",
+  "schemaVersion": 3,
+  "verificationResults": [],
+  "warnings": [
+    {
+      "code": "minor-readability",
+      "message": "章节编号从第 8 节直接跳到第 10 节（缺少第 9 节），应是移除自测/常见误解章节后遗留的编号缺口，不影响正文理解。",
+      "sections": [
+        10
+      ]
+    },
+    {
+      "code": "minor-terminology-style",
+      "message": "图 1 用 a₁/a₂ 标注两条候选动作（直行 a₁、绕行 a₂），而第 2 节用 aₜ 表示时间步 t 的动作；图中文字使含义清晰，但下标语义不一致，建议统一记法。",
+      "sections": [
+        4
+      ]
+    },
+    {
+      "code": "minor-readability",
+      "message": "第 2 节公式的 MathML 把上下标压平、并把预测状态上的帽子渲染成字面 'hat'（形如 'hat z t+1'），而同段正文的 Unicode 写法 ẑ₍ₜ₊₁₎ = f(zₜ, aₜ) 才是正确读法；数学关系本身无误，仅显示排版可改进。",
+      "sections": [
+        2
+      ]
+    }
+  ]
+}

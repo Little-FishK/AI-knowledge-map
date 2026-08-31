@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "distributed-training",
+  "pageHash": "sha256:fb324eca60ab7b96e180c9600f3f6c968e8a74aacd05fb9a00dd65f0827c25f8",
+  "reviewedAt": "2026-08-15",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:ae3cc13956e9c2231",
+      "resolved": true,
+      "evidence": "以 131072×262144 的 MLP 权重矩阵为例，输入维度 131072、输出维度 262144（约 344 亿个参数），仅这一层的权重按 FP16 存储就约需 68.7GB，单卡放不下",
+      "rationale": "第 4 节动机示例已由 4096×16384 改为 131072×262144：131072×262144×2 字节（FP16）≈ 68.7GB，约 344 亿参数，属数百亿参数级 MLP，单层权重即超出常见单卡显存，量级正确；候选正文中不再出现 4096×16384 被表述为单卡放不下的说法，满足验收标准。"
+    }
+  ]
+}

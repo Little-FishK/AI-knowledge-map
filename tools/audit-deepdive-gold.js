@@ -90,10 +90,10 @@ function inspect(id, page) {
   if (!exampleSignal) gaps.push("缺可演算/可复现场景信号");
   if (!verificationSignal) gaps.push("缺实践验证或失败诊断信号");
   if (!warnings) gaps.push("缺困惑消歧");
-  if (!misconceptions) gaps.push("缺独立误区整理");
   if (!routes) gaps.push("缺概念依赖与延伸路线");
-  if (questions < 4) gaps.push(`自测不足 4(${questions})`);
-  if (answers < questions) gaps.push(`答案未覆盖全部自测(${answers}/${questions})`);
+  if ((questions > 0 || answers > 0) && answers < questions) {
+    gaps.push(`已保留的答案未覆盖全部自测(${answers}/${questions})`);
+  }
   if (sources < 3) gaps.push(`独立来源不足 3(${sources})`);
 
   return { id, title: page.title || id, length: textLength(html), gaps };

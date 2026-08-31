@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "pageId": "quantization",
+  "pageHash": "sha256:cb069a6b0de015fdec2df542fc016c64420048b5497af3b869c59d8c5f061c52",
+  "reviewedAt": "2026-08-16",
+  "mode": "verification",
+  "decision": "pass",
+  "blockingFindings": [],
+  "warnings": [],
+  "coreConcepts": [],
+  "verificationResults": [
+    {
+      "findingId": "sha256:9d68aed2a9d922ab6",
+      "resolved": true,
+      "evidence": "它检测的是隐藏状态里的离群特征维度，即激活矩阵中幅度异常大的列，对应权重矩阵输入侧的行，而不是 per-channel 量化所说的权重输出通道",
+      "rationale": "第 5 节已把 LLM.int8 的检测对象改述为隐藏状态的离群特征维度（激活矩阵的列、权重矩阵输入侧的行），旧表述“检测哪些输出通道含有离群大值”已从当前候选页中删除，且“输出通道”一词现在只出现在与 per-channel 权重输出通道的明确否定对比中，与第 4 节的 per-channel 用法保持区分，符合接受标准；该改述与 arXiv:2208.07339 摘要所述 isolates the outlier feature dimensions into a 16-bit matrix multiplication 一致。"
+    }
+  ]
+}
