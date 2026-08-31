@@ -5,6 +5,9 @@
   "use strict";
 
   const G = window.GRAPH;
+  const ROUTER = window.APP_ROUTER;
+  if (!ROUTER) throw new Error("URL 路由模块未加载");
+  const SITE_TITLE = "AI 知识地图";
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
 
@@ -33,6 +36,17 @@
   const learnedNodes = loadLearnedNodes();
   let activeDeepDiveId = null;
   let officialPathActive = false;
+  let routeApplyToken = 0;
+
+  function setDocumentTitle(label) {
+    document.title = label ? `${label}｜${SITE_TITLE}` : SITE_TITLE;
+  }
+
+  function goToRoute(route, options = {}) {
+    const changed = ROUTER.navigate(route, options);
+    // replaceState 不触发 hashchange；重复点击当前路由也应重新应用该状态。
+    if (!changed || options.replace) applyRoute(route);
+  }
   let officialPathRestore = null;
 
   window.DEEPDIVE = window.DEEPDIVE || {};
@@ -163,7 +177,7 @@
       if (!list) return;
       list.addEventListener("click", event => {
         const button = event.target.closest("[data-learning-goto]");
-        if (button) select(button.getAttribute("data-learning-goto"), true);
+        if (button) goToRoute({ name: "node", id: button.getAttribute("data-learning-goto") });
       });
     });
     renderLearningPanel();
@@ -267,9 +281,11 @@
     const button = document.querySelector("[data-learn-node]");
     if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
     const previousButton = document.querySelector("[data-prev-node]");
-    if (previousButton) previousButton.addEventListener("click", () => openDeepDive(previousButton.getAttribute("data-prev-node")));
+    if (previousButton) previousButton.addEventListener("click", () =>
+      goToRoute({ name: "concept", id: previousButton.getAttribute("data-prev-node") }));
     const nextButton = document.querySelector("[data-next-node]");
-    if (nextButton) nextButton.addEventListener("click", () => openDeepDive(nextButton.getAttribute("data-next-node")));
+    if (nextButton) nextButton.addEventListener("click", () =>
+      goToRoute({ name: "concept", id: nextButton.getAttribute("data-next-node") }));
   }
 
   function removeOfficialPathMarkers() {
@@ -647,17 +663,16 @@
   // 详情面板里的所有内联链接统一委托：概念跳转 / 深读页 / 软件教程 / 关联软件
   detailBody.addEventListener("click", async event => {
     const swLink = event.target.closest("[data-library-software]");
-    if (swLink) { await setMode("software"); openSoftware(swLink.getAttribute("data-library-software")); return; }
+    if (swLink) { goToRoute({ name: "software-item", id: swLink.getAttribute("data-library-software") }); return; }
     const goto = event.target.closest("[data-goto]");
     if (goto) {
-      if (mode !== "graph") await setMode("graph");
-      select(goto.getAttribute("data-goto"), true);
+      goToRoute({ name: "node", id: goto.getAttribute("data-goto") });
       return;
     }
     const dd = event.target.closest("[data-dd]");
-    if (dd) { openDeepDive(dd.getAttribute("data-dd")); return; }
+    if (dd) { goToRoute({ name: "concept", id: dd.getAttribute("data-dd") }); return; }
     const tutorial = event.target.closest("[data-tutorial]");
-    if (tutorial) { openTutorial(tutorial.getAttribute("data-tutorial")); return; }
+    if (tutorial) { goToRoute({ name: "tutorial", id: tutorial.getAttribute("data-tutorial") }); return; }
   });
 
   function esc(s) {
@@ -848,10 +863,20 @@
   }
 
   if (ddEl) {
-    document.getElementById("dd-back").addEventListener("click", closeDeepDive);
-    document.getElementById("dd-close").addEventListener("click", closeDeepDive);
+    const leaveDeepDive = () => {
+      const route = ROUTER.parse(window.location.hash);
+      if (route.name === "tutorial") {
+        goToRoute({ name: "software-item", id: route.id }, { replace: true });
+      } else if (route.name === "concept") {
+        goToRoute({ name: "node", id: route.id }, { replace: true });
+      } else {
+        goToRoute({ name: "map" }, { replace: true });
+      }
+    };
+    document.getElementById("dd-back").addEventListener("click", leaveDeepDive);
+    document.getElementById("dd-close").addEventListener("click", leaveDeepDive);
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && !ddEl.classList.contains("hidden")) closeDeepDive();
+      if (e.key === "Escape" && !ddEl.classList.contains("hidden")) leaveDeepDive();
     });
   }
 
@@ -908,7 +933,7 @@
     centerOnNode(node, detailWasClosed);
   }
 
-  document.getElementById("detail-close").addEventListener("click", () => {
+  function clearGraphSelection() {
     viewportMoveToken++;
     cy.stop(true, false);
     detail.classList.add("closed");
@@ -916,15 +941,14 @@
     cy.nodes(".sel").removeClass("sel");
     applyFocus();
     requestAnimationFrame(() => cy.resize());
-  });
+  }
 
-  cy.on("tap", "node", evt => select(evt.target.id(), false));
+  document.getElementById("detail-close").addEventListener("click", () =>
+    goToRoute({ name: mode === "software" ? "software" : mode === "library" ? "library" : "map" }));
+
+  cy.on("tap", "node", evt => goToRoute({ name: "node", id: evt.target.id() }));
   cy.on("tap", evt => {
-    if (evt.target === cy) {
-      state.selected = null;
-      cy.nodes(".sel").removeClass("sel");
-      applyFocus();
-    }
+    if (evt.target === cy) goToRoute({ name: "map" });
   });
 
   /* ───────────────────────── 控制栏 ───────────────────────── */
@@ -970,7 +994,7 @@
       return;
     }
     const nodeButton = event.target.closest("[data-domain-node]");
-    if (nodeButton) select(nodeButton.dataset.domainNode, true);
+    if (nodeButton) goToRoute({ name: "node", id: nodeButton.dataset.domainNode });
   });
   initLearningPanel();
   document.querySelector("#official-path-toggle em").textContent =
@@ -1088,7 +1112,7 @@
   results.addEventListener("click", event => {
     const item = event.target.closest(".sr-item");
     if (!item) return;
-    select(item.dataset.id, true);
+    goToRoute({ name: "node", id: item.dataset.id });
     results.classList.remove("open");
     search.value = "";
   });
@@ -1169,7 +1193,7 @@
   // 软件卡片点击统一委托到软件视图容器
   swView.addEventListener("click", event => {
     const card = event.target.closest("[data-sw]");
-    if (card) openSoftware(card.getAttribute("data-sw"));
+    if (card) goToRoute({ name: "software-item", id: card.getAttribute("data-sw") });
   });
 
   const scheduleLibraryRender = debounce(() => renderLibraryItems(), 120);
@@ -1177,7 +1201,7 @@
   // 资料库内所有交互统一委托到资料库视图容器
   libraryView.addEventListener("click", event => {
     const item = event.target.closest("[data-library-item]");
-    if (item) { openLibraryItem(item.getAttribute("data-library-item")); return; }
+    if (item) { goToRoute({ name: "library-item", id: item.getAttribute("data-library-item") }); return; }
     const cls = event.target.closest("[data-library-class]");
     if (cls) {
       libraryClass = cls.getAttribute("data-library-class");
@@ -1196,7 +1220,10 @@
   });
   libraryView.addEventListener("keydown", event => {
     const item = event.target.closest("[data-library-item]");
-    if (item && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); openLibraryItem(item.getAttribute("data-library-item")); }
+    if (item && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      goToRoute({ name: "library-item", id: item.getAttribute("data-library-item") });
+    }
   });
   libraryView.addEventListener("change", event => {
     const dropdown = event.target.closest(".lib-sub-select");
@@ -1573,8 +1600,96 @@
     }
   }
 
+  async function applyRoute(route = ROUTER.parse(window.location.hash)) {
+    const token = ++routeApplyToken;
+    const stale = () => token !== routeApplyToken;
+
+    // 路由是唯一页面状态来源：先收起覆盖层，再按目标地址恢复底层视图。
+    closeDeepDive();
+
+    if (route.name === "map") {
+      await setMode("graph");
+      if (stale()) return;
+      clearGraphSelection();
+      setDocumentTitle();
+      return;
+    }
+
+    if (route.name === "node" || route.name === "concept") {
+      const node = byId[route.id];
+      if (!node || (route.name === "concept" && !DEEPDIVE_IDS.has(route.id))) {
+        goToRoute({ name: "map" }, { replace: true });
+        return;
+      }
+      await setMode("graph");
+      if (stale()) return;
+      select(route.id, true);
+      if (route.name === "concept") {
+        await openDeepDive(route.id);
+        if (stale()) return;
+        setDocumentTitle(`${node.title} · 理解原理`);
+      } else {
+        setDocumentTitle(node.title);
+      }
+      return;
+    }
+
+    if (route.name === "software" || route.name === "software-item" || route.name === "tutorial") {
+      await setMode("software");
+      if (stale()) return;
+      if (route.name === "software") {
+        setDocumentTitle("软件目录");
+        return;
+      }
+      const software = SW && (SW.items || []).find(item => item.id === route.id);
+      if (!software) {
+        goToRoute({ name: "software" }, { replace: true });
+        return;
+      }
+      openSoftware(route.id);
+      if (route.name === "tutorial") {
+        const tutorial = TUTORIALS && TUTORIALS.items && TUTORIALS.items[route.id];
+        if (!tutorial) {
+          goToRoute({ name: "software-item", id: route.id }, { replace: true });
+          return;
+        }
+        openTutorial(route.id);
+        setDocumentTitle(tutorial.title);
+      } else {
+        setDocumentTitle(software.name);
+      }
+      return;
+    }
+
+    if (route.name === "library" || route.name === "library-item") {
+      await setMode("library");
+      if (stale()) return;
+      if (route.name === "library") {
+        setDocumentTitle("专业资料库");
+        return;
+      }
+      const item = LIBRARY && (LIBRARY.items || []).find(entry => entry.id === route.id);
+      if (!item) {
+        goToRoute({ name: "library" }, { replace: true });
+        return;
+      }
+      openLibraryItem(route.id);
+      setDocumentTitle(item.title);
+      return;
+    }
+
+    goToRoute({ name: "map" }, { replace: true });
+  }
+
   document.querySelectorAll(".mode-nav-btn").forEach(button =>
-    button.addEventListener("click", () => setMode(button.getAttribute("data-mode"))));
+    button.addEventListener("click", () => {
+      const targetMode = button.getAttribute("data-mode");
+      goToRoute({ name: targetMode === "software" ? "software" : targetMode === "library" ? "library" : "map" });
+    }));
+
+  window.addEventListener("hashchange", () => applyRoute());
+  if (window.location.hash) applyRoute();
+  else goToRoute({ name: "map" }, { replace: true });
 
   // 暴露给调试用
   window.__cy = cy;

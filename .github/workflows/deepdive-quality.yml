@@ -5,6 +5,7 @@ on:
     paths:
       - "assets/app.js"
       - "assets/layout-quality.js"
+      - "assets/router.js"
       - "assets/style.css"
       - "data/graph.js"
       - "data/software.js"
@@ -54,6 +55,9 @@ jobs:
 
       - name: Validate graph, layout, software and tutorials
         run: npm run validate
+
+      - name: Exercise URL routing fixtures
+        run: npm run test:routing
 
       - name: Enforce deep-dive quality gate
         run: npm run quality:deepdives
