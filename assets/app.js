@@ -8,7 +8,9 @@
   const ROUTER = window.APP_ROUTER;
   const APP = window.AIMap;
   if (!ROUTER) throw new Error("URL 路由模块未加载");
-  if (!APP || !APP.shared || !APP.createDeepDiveLoader) throw new Error("前端公共模块未加载");
+  if (!APP || !APP.shared || !APP.createDeepDiveLoader || !APP.createSoftwareView || !APP.createLibraryView) {
+    throw new Error("前端模块未完整加载");
+  }
   const SITE_TITLE = "AI 知识地图";
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
@@ -1083,424 +1085,31 @@
   applyFilters();
   restorePresetLayout();
 
-  /* ───────────────────────── 软件模式 ───────────────────────── */
-  // 软件目录、教程与资料库数据不在首屏加载，切到对应视图时按需注入。
-  let SW = window.SOFTWARE || null;
-  let TUTORIALS = window.TUTORIALS || null;
-  let LIBRARY = window.PRO_LIBRARY || null;
-  let LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || {};
-  let LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || {};
+  /* ───────────────────── 软件与资料库视图 ───────────────────── */
   let mode = "graph";               // graph | software | library
   const swView = document.getElementById("software-view");
   const libraryView = document.getElementById("library-view");
-  let swBuilt = false;
-  let libraryBuilt = false;
-  let libraryClass = "all";
-  let librarySubcategory = "all";
-  let libraryQuery = "";
-
-  const DATA_BUNDLES = {
-    software: [
-      "data/software.js",
-      "data/tutorials.js",
-      "data/tutorials-codex-youtube.js",
-      "data/tutorials-claude-code.js",
-      "data/tutorials-video-generated.js"
-    ],
-    library: [
-      "data/library.js",
-      "data/library-official-technical.js",
-      "data/library-platform-profiles.js",
-      "data/software.js"
-    ]
-  };
-
-  // 顺序加载某个视图的数据包（幂等：脚本只会真正加载一次），再刷新对应全局引用。
-  async function ensureBundle(name) {
-    await loadScriptsInOrder(DATA_BUNDLES[name] || []);
-    if (name === "software") {
-      SW = window.SOFTWARE || SW;
-      TUTORIALS = window.TUTORIALS || TUTORIALS;
-    } else if (name === "library") {
-      LIBRARY = window.PRO_LIBRARY || LIBRARY;
-      LIBRARY_PROFILES = window.LIBRARY_PLATFORM_PROFILES || LIBRARY_PROFILES;
-      LIBRARY_PROFILE_GUIDANCE = window.LIBRARY_PROFILE_GUIDANCE || LIBRARY_PROFILE_GUIDANCE;
-      SW = window.SOFTWARE || SW;   // 资料条目里的关联软件需要软件数据
-    }
-  }
-
-  // 软件卡片点击统一委托到软件视图容器
-  swView.addEventListener("click", event => {
-    const card = event.target.closest("[data-sw]");
-    if (card) goToRoute({ name: "software-item", id: card.getAttribute("data-sw") });
+  const softwareView = APP.createSoftwareView({
+    view: swView,
+    detail,
+    detailBody,
+    deepDiveElement: ddEl,
+    byId,
+    escapeHtml: esc,
+    markdown: mdLite,
+    loadScriptsInOrder,
+    navigate: goToRoute,
   });
-
-  const scheduleLibraryRender = debounce(() => renderLibraryItems(), 120);
-
-  // 资料库内所有交互统一委托到资料库视图容器
-  libraryView.addEventListener("click", event => {
-    const item = event.target.closest("[data-library-item]");
-    if (item) { goToRoute({ name: "library-item", id: item.getAttribute("data-library-item") }); return; }
-    const cls = event.target.closest("[data-library-class]");
-    if (cls) {
-      libraryClass = cls.getAttribute("data-library-class");
-      librarySubcategory = "all";
-      libraryView.querySelectorAll("[data-library-class]").forEach(button => button.classList.toggle("active", button === cls));
-      renderLibrarySubcategories();
-      renderLibraryItems();
-      return;
-    }
-    const sub = event.target.closest("[data-library-subcategory]");
-    if (sub) {
-      librarySubcategory = sub.getAttribute("data-library-subcategory");
-      renderLibrarySubcategories();
-      renderLibraryItems();
-    }
+  const libraryCatalogView = APP.createLibraryView({
+    view: libraryView,
+    detail,
+    detailBody,
+    byId,
+    escapeHtml: esc,
+    debounce,
+    loadScriptsInOrder,
+    navigate: goToRoute,
   });
-  libraryView.addEventListener("keydown", event => {
-    const item = event.target.closest("[data-library-item]");
-    if (item && (event.key === "Enter" || event.key === " ")) {
-      event.preventDefault();
-      goToRoute({ name: "library-item", id: item.getAttribute("data-library-item") });
-    }
-  });
-  libraryView.addEventListener("change", event => {
-    const dropdown = event.target.closest(".lib-sub-select");
-    if (!dropdown || !dropdown.value) return;
-    [libraryClass, librarySubcategory] = dropdown.value.split("::");
-    libraryView.querySelectorAll("[data-library-class]").forEach(button =>
-      button.classList.toggle("active", button.getAttribute("data-library-class") === libraryClass));
-    renderLibrarySubcategories();
-    renderLibraryItems();
-  });
-  libraryView.addEventListener("input", event => {
-    const searchInput = event.target.closest(".lib-search");
-    if (!searchInput) return;
-    libraryQuery = searchInput.value;
-    scheduleLibraryRender();
-  });
-
-  function buildSoftware() {
-    if (swBuilt || !SW) return;
-    const catItems = {};
-    SW.categories.forEach(c => { catItems[c.id] = []; });
-    SW.items.forEach(it => { (catItems[it.cat] || (catItems[it.cat] = [])).push(it); });
-    let h = `<div class="sw-head"><h2>AI 软件目录</h2>
-      <p>手工精选、按功能分类的著名 AI 软件。点软件看详情，详情里的<span class="xref">蓝字概念</span>可跳回知识地图。</p></div>`;
-    SW.categories.forEach(c => {
-      const items = catItems[c.id] || [];
-      if (!items.length) return;
-      h += `<section class="sw-cat"><h3 style="color:${c.color}">${c.emoji} ${esc(c.label)}<em>${items.length}</em></h3><div class="sw-grid">`;
-      items.forEach(it => {
-        h += `<div class="sw-card" data-sw="${esc(it.id)}" style="border-left-color:${c.color}">
-          <div class="sw-name">${esc(it.name)}</div>
-          <div class="sw-by">${esc(it.by || "")}</div>
-          <div class="sw-sum">${esc(it.summary || "")}</div></div>`;
-      });
-      h += `</div></section>`;
-    });
-    swView.innerHTML = h;
-    // 卡片点击由 swView 的委托监听统一处理
-    swBuilt = true;
-  }
-
-  function openSoftware(id) {
-    const it = (SW.items || []).find(x => x.id === id);
-    if (!it) return;
-    const cat = SW.categories.find(c => c.id === it.cat) || { label: "", color: "#888", emoji: "" };
-    const hasTutorial = !!(TUTORIALS && TUTORIALS.items && TUTORIALS.items[id]);
-    let h = `<div class="d-domain" style="color:${cat.color}">${cat.emoji} ${esc(cat.label)}`
-          + (it.by ? `<span style="color:var(--fg-faint)"> · ${esc(it.by)}</span>` : "")
-          + (hasTutorial ? `<button class="dd-open" data-tutorial="${esc(id)}" title="打开软件使用教程">🎓 使用教程</button>` : "")
-          + `</div>`;
-    h += `<h2 class="d-title">${esc(it.name)}</h2>`;
-    h += `<div class="d-summary">${esc(it.summary || "")}</div>`;
-    if (it.body) h += `<div class="d-sec"><div class="d-body">${mdLite(it.body)}</div></div>`;
-    if (Array.isArray(it.models) && it.models.length) {
-      h += `<div class="d-sec"><h4>当前主要模型 <span class="d-asof">· 截至 2026-07</span></h4><div class="d-models">`
-        + it.models.map(m => `<div class="d-model"><b>${esc(m.name)}</b>${m.note ? `<span>${esc(m.note)}</span>` : ""}</div>`).join("")
-        + `</div></div>`;
-    }
-    if (it.concept && byId[it.concept]) {
-      h += `<div class="d-sec"><h4>背后的概念</h4>
-        <div class="rel"><span class="rel-to" data-goto="${esc(it.concept)}">${esc(byId[it.concept].title)}</span>
-        <span class="rel-lbl">在知识地图里查看</span></div></div>`;
-    }
-    detailBody.innerHTML = h;
-    detail.classList.remove("closed");
-    detailBody.scrollTop = 0;
-    // 正文/概念链接、使用教程按钮由 detailBody 的委托监听统一处理
-  }
-
-  function openTutorial(id) {
-    const t = TUTORIALS && TUTORIALS.items && TUTORIALS.items[id];
-    if (!t || !ddEl) return;
-    let body = `<div class="dd-hero">
-        <div class="dd-eyebrow">使用教程 · SOFTWARE GUIDE</div>
-        <h1 class="dd-h1">${esc(t.title)}</h1>
-        ${t.subtitle ? `<div class="dd-sub">${esc(t.subtitle)}</div>` : ""}
-        ${t.meta ? `<div class="dd-metabar">${esc(t.meta)}</div>` : ""}
-        ${t.overview ? `<div class="dd-thesis"><span class="dd-thesis-l">核心方法</span> ${esc(t.overview)}</div>` : ""}
-      </div>`;
-
-    if (Array.isArray(t.learningPath) && t.learningPath.length) {
-      body += `<section class="dd-sec tutorial-learning"><h2>建议学习顺序</h2><ol class="dd-chain">`
-        + t.learningPath.map(x => `<li>${esc(x)}</li>`).join("") + `</ol></section>`;
-    }
-
-    const platforms = TUTORIALS.platforms || [];
-    const firstPopulated = platforms.find(p => (t.resources || []).some(r => r.platform === p.id));
-    const initialPlatform = firstPopulated ? firstPopulated.id : (platforms[0] && platforms[0].id);
-    body += `<div class="tutorial-layout">
-      <nav class="tutorial-sidebar" aria-label="教程平台">
-        <div class="tutorial-sidebar-title">资源平台</div>
-        ${platforms.map(p => {
-          const count = (t.resources || []).filter(r => r.platform === p.id).length;
-          return `<button class="tutorial-platform-btn${p.id === initialPlatform ? " active" : ""}" type="button" data-platform="${esc(p.id)}" style="--platform-color:${p.color}">
-            <span class="tutorial-platform-label"><span>${p.emoji}</span>${esc(p.label)}</span><span class="tutorial-count">${count}</span>
-          </button>`;
-        }).join("")}
-      </nav>
-      <div class="tutorial-platform-content" id="tutorial-platform-content"></div>
-    </div>`;
-
-    if (t.sourceNote) body += `<div class="dd-src"><b>提炼范围与时效说明</b><p>${esc(t.sourceNote)}</p>
-      ${(t.officialSources || []).length ? `<b>操作校准来源</b><ul>${t.officialSources.map(source => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener">${esc(source.label)}</a></li>`).join("")}</ul>` : ""}
-      ${t.accessDate ? `<div class="dd-src-date">访问日期：${esc(t.accessDate)}</div>` : ""}</div>`;
-    document.getElementById("dd-top-name").textContent = t.title;
-    document.getElementById("dd-article").innerHTML = body;
-
-    const contentEl = document.getElementById("tutorial-platform-content");
-    const renderPlatform = platformId => {
-      const p = platforms.find(item => item.id === platformId);
-      if (!p || !contentEl) return;
-      const resources = (t.resources || []).filter(r => r.platform === p.id);
-      let html = `<section class="tutorial-platform"><header class="tutorial-platform-head">
-        <div><div class="tutorial-platform-kicker">当前平台</div><h2>${p.emoji} ${esc(p.label)}</h2></div>
-        <span>${resources.length} 条已复核教程</span>
-      </header>`;
-      if (!resources.length) {
-        html += `<div class="tutorial-empty">尚未收录经过复核的 ${esc(p.label)} 教程。你仍可通过左侧栏切换其他平台。</div></section>`;
-        contentEl.innerHTML = html;
-        return;
-      }
-      resources.forEach((r, idx) => {
-        const coverage = (r.coverage || []).map(item => `<section class="tutorial-action">
-          <h5>${esc(item.title)}</h5>
-          ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
-          ${item.done ? `<div class="tutorial-done"><b>完成标志</b>${esc(item.done)}</div>` : ""}
-        </section>`).join("");
-        const unique = (r.uniqueTechniques || []).map(item => `<section class="tutorial-unique">
-          <h5>${esc(item.title)}</h5>
-          ${item.scenario ? `<p><b>适用场景：</b>${esc(item.scenario)}</p>` : ""}
-          ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
-          ${item.result ? `<div class="tutorial-done"><b>最终得到</b>${esc(item.result)}</div>` : ""}
-        </section>`).join("");
-        html += `<details class="tutorial-card" style="border-left-color:${p.color}"${idx === 0 ? " open" : ""}>
-          <summary class="tutorial-card-head"><div>
-            <h3>${esc(r.title)}</h3>
-            <div class="tutorial-meta">${esc(r.creator || "")} · ${esc(r.publishedAt || "")}${r.duration ? ` · ${esc(r.duration)}` : ""}</div>
-          </div><span class="tutorial-expand" aria-hidden="true">⌄</span></summary>
-          <div class="tutorial-card-body">
-            ${r.audience ? `<div class="tutorial-audience"><b>适合：</b>${esc(r.audience)}</div>` : ""}
-            ${r.summary ? `<h4>完整内容总结</h4><p class="tutorial-summary">${esc(r.summary)}</p>` : ""}
-            ${coverage ? `<h4>视频教授的完整操作</h4><div class="tutorial-actions">${coverage}</div>` : ""}
-            ${unique ? `<h4>独门内容 <span>· 相对本页其他四条教程</span></h4><div class="tutorial-uniques">${unique}</div>` : ""}
-            ${r.caution ? `<div class="dd-note warn"><b>复核提醒</b>　${esc(r.caution)}</div>` : ""}
-            <a class="tutorial-link" href="${esc(r.url)}" target="_blank" rel="noopener">在 ${esc(p.label)} 打开原教程 ↗</a>
-          </div>
-        </details>`;
-      });
-      contentEl.innerHTML = html + `</section>`;
-    };
-
-    ddEl.querySelectorAll(".tutorial-platform-btn").forEach(btn => btn.addEventListener("click", () => {
-      ddEl.querySelectorAll(".tutorial-platform-btn").forEach(item => item.classList.remove("active"));
-      btn.classList.add("active");
-      renderPlatform(btn.getAttribute("data-platform"));
-    }));
-    if (initialPlatform) renderPlatform(initialPlatform);
-    ddEl.classList.remove("hidden");
-    ddEl.querySelector(".dd-scroll").scrollTop = 0;
-  }
-
-  function libraryClassById(id) {
-    return LIBRARY && (LIBRARY.sourceClasses || []).find(item => item.id === id);
-  }
-
-  function librarySubcategoryById(source, id) {
-    return source && (source.subcategories || []).find(item => item.id === id);
-  }
-
-  function libraryPlatformProfile(source, subcategory) {
-    return source && subcategory && LIBRARY_PROFILES[`${source.id}/${subcategory.id}`];
-  }
-
-  function libraryPlatformProfileHtml(source) {
-    if (!source || librarySubcategory === "all") return "";
-    const subcategory = librarySubcategoryById(source, librarySubcategory);
-    const profile = libraryPlatformProfile(source, subcategory);
-    if (!subcategory || !profile) return "";
-    const guidance = LIBRARY_PROFILE_GUIDANCE[source.id] || {};
-    const overview = profile.overview || `${profile.positioning}${profile.background}其运营或维护主体为${profile.organization}；关于创始或发起团队：${profile.foundingTeam}`;
-    const strengths = profile.strengths || guidance.strengths || [];
-    const offers = profile.offers || guidance.offers || [];
-    const howToUse = profile.howToUse || guidance.howToUse || [];
-    const caution = profile.caution || guidance.caution || "";
-    const website = profile.website
-      ? `<a class="lib-profile-link" href="${esc(profile.website)}" target="_blank" rel="noopener">访问官方网站 ↗</a>`
-      : `<span class="lib-profile-no-link">集合型来源 · 无统一网址</span>`;
-    return `<article class="lib-platform-profile" aria-labelledby="lib-profile-title">
-      <header class="lib-profile-title">
-        <div><span>${profile.kind === "collection" ? "来源集合" : "平台档案"}</span><h3 id="lib-profile-title">${esc(subcategory.label)}</h3></div>
-        ${website}
-      </header>
-      <div class="lib-profile-intro">
-        <span>正式介绍</span>
-        <p>${esc(overview)}</p>
-      </div>
-      <section class="lib-profile-strengths"><h4>平台优势与特征</h4><div>${strengths.map(item => `<p>${esc(item)}</p>`).join("")}</div></section>
-      <dl class="lib-profile-facts">
-        <div><dt>发展背景</dt><dd>${esc(profile.background)}</dd></div>
-        <div><dt>相关公司 / 组织</dt><dd>${esc(profile.organization)}</dd></div>
-        <div><dt>创始人 / 发起团队</dt><dd>${esc(profile.foundingTeam)}</dd></div>
-      </dl>
-      <div class="lib-profile-sections">
-        <section><h4>这个网站主要提供什么</h4><ul>${offers.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
-        <section><h4>在资料库中如何使用</h4><ul>${howToUse.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
-      </div>
-      ${caution ? `<aside class="lib-profile-caution"><b>使用边界</b><p>${esc(caution)}</p></aside>` : ""}
-      <footer>资料复核日期：${esc(profile.reviewedAt)}</footer>
-    </article>`;
-  }
-
-  function renderLibrarySubcategories() {
-    const container = libraryView && libraryView.querySelector(".lib-subnav");
-    if (!container || !LIBRARY) return;
-    const source = libraryClassById(libraryClass);
-    if (!source) {
-      const options = (LIBRARY.sourceClasses || []).map(group =>
-        `<optgroup label="${esc(group.order + ". " + group.label)}">${(group.subcategories || []).map(sub =>
-          `<option value="${esc(group.id + "::" + sub.id)}">${esc(sub.label)} — ${esc(sub.short)}</option>`).join("")}</optgroup>`).join("");
-      container.innerHTML = `<div class="lib-subnav-head"><div><b>二级来源</b><span>共 ${(LIBRARY.sourceClasses || []).reduce((sum, group) => sum + (group.subcategories || []).length, 0)} 个平台与来源集合</span></div></div>
-        <div class="lib-sub-overview"><span>选择一个具体平台，会同时定位到它所属的一级来源。</span>
-          <select class="lib-sub-select" aria-label="选择二级来源"><option value="">浏览全部二级来源…</option>${options}</select>
-        </div>`;
-      // change 事件由 libraryView 的委托监听统一处理
-      return;
-    }
-    const counts = {};
-    (LIBRARY.items || []).filter(item => item.sourceClass === source.id)
-      .forEach(item => { counts[item.sourceSubcategory] = (counts[item.sourceSubcategory] || 0) + 1; });
-    container.innerHTML = `<div class="lib-subnav-head"><div><b>${source.order}. ${esc(source.label)} · 二级来源</b><span>${esc(source.short)}</span></div><em>${(source.subcategories || []).length} 个</em></div>
-      <div class="lib-subchips">
-        <button class="lib-subchip${librarySubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">全部 <span>${(LIBRARY.items || []).filter(item => item.sourceClass === source.id).length}</span></button>
-        ${(source.subcategories || []).map(sub => `<button class="lib-subchip${librarySubcategory === sub.id ? " active" : ""}" type="button" data-library-subcategory="${esc(sub.id)}" title="${esc(sub.short)}">${esc(sub.label)} <span>${counts[sub.id] || 0}</span></button>`).join("")}
-      </div>${libraryPlatformProfileHtml(source)}`;
-    // 二级来源筛选点击由 libraryView 的委托监听统一处理
-  }
-
-  function renderLibraryItems() {
-    if (!LIBRARY || !libraryView) return;
-    const grid = libraryView.querySelector(".lib-grid");
-    const note = libraryView.querySelector(".lib-filter-note");
-    if (!grid) return;
-    const query = libraryQuery.trim().toLocaleLowerCase("zh-CN");
-    const items = (LIBRARY.items || []).filter(item => {
-      if (libraryClass !== "all" && item.sourceClass !== libraryClass) return false;
-      if (librarySubcategory !== "all" && item.sourceSubcategory !== librarySubcategory) return false;
-      if (!query) return true;
-      const source = libraryClassById(item.sourceClass);
-      const subcategory = librarySubcategoryById(source, item.sourceSubcategory);
-      return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label]
-        .concat(item.tags || []).join(" ").toLocaleLowerCase("zh-CN").includes(query);
-    });
-    if (note) note.textContent = `${items.length} 条资料`;
-    grid.innerHTML = items.length ? items.map(item => {
-      const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
-      const subcategory = librarySubcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
-      return `<article class="lib-card" data-library-item="${esc(item.id)}" style="--source-color:${source.color}" tabindex="0">
-        <div class="lib-card-top">
-          <span class="lib-badge">${esc(source.label)}</span>
-          <span class="lib-subbadge">${esc(subcategory.label)}</span>
-          ${item.discoveryOnly ? `<span class="lib-discovery">仅作发现</span>` : ""}
-          <span class="lib-tier">${esc(item.authorityTier)}</span>
-        </div>
-        <h3 class="lib-title">${esc(item.title)}</h3>
-        <div class="lib-publisher">${esc(item.publisher)} · ${esc(item.contentKind)}</div>
-        <p class="lib-summary">${esc(item.summary)}</p>
-        <div class="lib-card-foot">${(item.tags || []).slice(0, 4).map(tag => `<span class="lib-tag">${esc(tag)}</span>`).join("")}</div>
-      </article>`;
-    }).join("") : `<div class="lib-empty">当前来源分类和搜索条件下没有资料。</div>`;
-    // 卡片点击 / 键盘由 libraryView 的委托监听统一处理
-  }
-
-  function buildLibrary() {
-    if (libraryBuilt || !LIBRARY || !libraryView) return;
-    const counts = {};
-    (LIBRARY.items || []).forEach(item => { counts[item.sourceClass] = (counts[item.sourceClass] || 0) + 1; });
-    libraryView.innerHTML = `<header class="lib-head">
-      <div><h2>专业资料库</h2><p>按信息来源分类，保留证据用途、适用边界和与知识地图的关联。</p></div>
-      <div class="lib-count">9 类一级来源 · ${(LIBRARY.sourceClasses || []).reduce((sum, source) => sum + (source.subcategories || []).length, 0)} 个二级来源 · ${(LIBRARY.items || []).length} 条种子资料</div>
-    </header>
-    <div class="lib-layout">
-      <nav class="lib-sources" aria-label="资料来源分类">
-        <button class="lib-source active" type="button" data-library-class="all" style="--source-color:var(--accent)">
-          <span class="lib-source-order">ALL</span><span class="lib-source-label">全部来源</span><span class="lib-source-count">${(LIBRARY.items || []).length}</span>
-        </button>
-        ${(LIBRARY.sourceClasses || []).map(source => `<button class="lib-source" type="button" data-library-class="${esc(source.id)}" style="--source-color:${source.color}">
-          <span class="lib-source-order">${source.order}</span><span class="lib-source-label">${esc(source.label)}</span><span class="lib-source-count">${counts[source.id] || 0}</span>
-        </button>`).join("")}
-      </nav>
-      <section class="lib-content">
-        <div class="lib-subnav"></div>
-        <div class="lib-toolbar">
-          <input class="lib-search" type="search" placeholder="搜索标题、发布者、资料形式或标签" aria-label="搜索专业资料">
-          <span class="lib-filter-note"></span>
-        </div>
-        <div class="lib-grid"></div>
-      </section>
-    </div>`;
-    // 一级来源点击与搜索输入由 libraryView 的委托监听统一处理
-    libraryBuilt = true;
-    renderLibrarySubcategories();
-    renderLibraryItems();
-  }
-
-  function openLibraryItem(id) {
-    const item = LIBRARY && (LIBRARY.items || []).find(entry => entry.id === id);
-    if (!item) return;
-    const source = libraryClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
-    const subcategory = librarySubcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
-    const linkedNodes = (item.linkedNodes || []).filter(nodeId => byId[nodeId]);
-    const linkedSoftware = (item.linkedSoftware || []).map(softwareId =>
-      SW && (SW.items || []).find(entry => entry.id === softwareId)).filter(Boolean);
-    let h = `<div class="d-domain" style="color:${source.color}">${source.order}. ${esc(source.label)}
-      <span style="color:var(--fg-faint)"> · ${esc(item.authorityTier)} · ${esc(item.contentKind)}</span></div>
-      <h2 class="d-title">${esc(item.title)}</h2>
-      <div class="d-summary">${esc(item.summary)}</div>
-      <div class="d-sec"><h4>来源记录</h4><dl class="lib-detail-meta">
-        <dt>一级来源</dt><dd>${esc(source.label)}</dd>
-        <dt>二级来源</dt><dd>${esc(subcategory.label)}</dd>
-        <dt>发布者</dt><dd>${esc(item.publisher)}</dd>
-        <dt>资料集合</dt><dd>${esc(item.collection)}</dd>
-        <dt>发布状态</dt><dd>${esc(item.reviewStatus)}</dd>
-        <dt>一手来源</dt><dd>${item.primarySource ? "是" : "否"}</dd>
-        <dt>访问日期</dt><dd>${esc(item.accessedAt)}</dd>
-      </dl></div>
-      ${item.selectionReason ? `<div class="d-sec"><h4>为什么入选</h4><div class="d-body"><p>${esc(item.selectionReason)}</p></div></div>` : ""}
-      <div class="d-sec"><h4>可以支持什么</h4><div class="d-body"><p>${esc(item.evidenceUse)}</p></div></div>
-      <div class="d-sec"><h4>使用边界</h4><div class="d-body"><p>${(item.limitations || []).map(limit => `· ${esc(limit)}`).join("<br>")}</p></div></div>`;
-    if (linkedNodes.length) h += `<div class="d-sec"><h4>关联节点</h4>${linkedNodes.map(nodeId =>
-      `<div class="rel"><span class="rel-to" data-goto="${esc(nodeId)}">${esc(byId[nodeId].title)}</span><span class="rel-lbl">在地图中查看</span></div>`).join("")}</div>`;
-    if (linkedSoftware.length) h += `<div class="d-sec"><h4>关联软件</h4>${linkedSoftware.map(software =>
-      `<div class="rel"><span class="rel-to" data-library-software="${esc(software.id)}">${esc(software.name)}</span><span class="rel-lbl">在软件目录中查看</span></div>`).join("")}</div>`;
-    h += `<a class="lib-source-link" href="${esc(item.url)}" target="_blank" rel="noopener">打开原始资料 ↗</a>`;
-    detailBody.innerHTML = h;
-    detail.classList.remove("closed");
-    detailBody.scrollTop = 0;
-    // 关联节点 / 关联软件链接由 detailBody 的委托监听统一处理
-  }
 
   async function setMode(m) {
     mode = m;
@@ -1526,17 +1135,8 @@
     detail.classList.add("closed");
     if (isGraph) setTimeout(() => cy.resize(), 30);
 
-    // 数据按需加载：首次进入软件/资料库视图时注入对应数据包，加载期间显示占位。
-    if (isSW) {
-      if (!swBuilt) swView.innerHTML = `<div class="view-loading" role="status">正在加载软件目录…</div>`;
-      await ensureBundle("software");
-      buildSoftware();
-    }
-    if (isLibrary) {
-      if (!libraryBuilt) libraryView.innerHTML = `<div class="view-loading" role="status">正在加载专业资料库…</div>`;
-      await ensureBundle("library");
-      buildLibrary();
-    }
+    if (isSW) await softwareView.ensureReady();
+    if (isLibrary) await libraryCatalogView.ensureReady();
   }
 
   async function applyRoute(route = ROUTER.parse(window.location.hash)) {
@@ -1582,19 +1182,19 @@
         setDocumentTitle("软件目录");
         return;
       }
-      const software = SW && (SW.items || []).find(item => item.id === route.id);
+      const software = softwareView.findSoftware(route.id);
       if (!software) {
         goToRoute({ name: "software" }, { replace: true });
         return;
       }
-      openSoftware(route.id);
+      softwareView.openSoftware(route.id);
       if (route.name === "tutorial") {
-        const tutorial = TUTORIALS && TUTORIALS.items && TUTORIALS.items[route.id];
+        const tutorial = softwareView.findTutorial(route.id);
         if (!tutorial) {
           goToRoute({ name: "software-item", id: route.id }, { replace: true });
           return;
         }
-        openTutorial(route.id);
+        softwareView.openTutorial(route.id);
         setDocumentTitle(tutorial.title);
       } else {
         setDocumentTitle(software.name);
@@ -1609,12 +1209,12 @@
         setDocumentTitle("专业资料库");
         return;
       }
-      const item = LIBRARY && (LIBRARY.items || []).find(entry => entry.id === route.id);
+      const item = libraryCatalogView.findItem(route.id);
       if (!item) {
         goToRoute({ name: "library" }, { replace: true });
         return;
       }
-      openLibraryItem(route.id);
+      libraryCatalogView.openItem(route.id);
       setDocumentTitle(item.title);
       return;
     }
