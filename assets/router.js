@@ -27,7 +27,7 @@
     if (rest.length || !ROUTES_WITH_ID.has(section)) {
       return { name: "not-found", path: raw };
     }
-    if (section === "map") return id ? { name: "node", id } : { name: "map" };
+    if (section === "map") return id ? { name: "not-found", path: raw } : { name: "map" };
     if (section === "concept") return id ? { name: "concept", id } : { name: "not-found", path: raw };
     if (section === "software") return id ? { name: "software-item", id } : { name: "software" };
     if (section === "tutorial") return id ? { name: "tutorial", id } : { name: "not-found", path: raw };
@@ -38,7 +38,6 @@
     const value = route || { name: "map" };
     const id = value.id == null ? "" : encodeURIComponent(String(value.id));
     switch (value.name) {
-      case "node": return id ? `#/map/${id}` : "#/map";
       case "concept": return id ? `#/concept/${id}` : "#/map";
       case "software": return "#/software";
       case "software-item": return id ? `#/software/${id}` : "#/software";

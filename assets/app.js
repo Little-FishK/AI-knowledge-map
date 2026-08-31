@@ -37,6 +37,8 @@
   let activeDeepDiveId = null;
   let officialPathActive = false;
   let routeApplyToken = 0;
+  let activeRoute = null;
+  let pendingMapNode = null;
 
   function setDocumentTitle(label) {
     document.title = label ? `${label}｜${SITE_TITLE}` : SITE_TITLE;
@@ -177,7 +179,7 @@
       if (!list) return;
       list.addEventListener("click", event => {
         const button = event.target.closest("[data-learning-goto]");
-        if (button) goToRoute({ name: "node", id: button.getAttribute("data-learning-goto") });
+        if (button) select(button.getAttribute("data-learning-goto"), true);
       });
     });
     renderLearningPanel();
@@ -666,7 +668,7 @@
     if (swLink) { goToRoute({ name: "software-item", id: swLink.getAttribute("data-library-software") }); return; }
     const goto = event.target.closest("[data-goto]");
     if (goto) {
-      goToRoute({ name: "node", id: goto.getAttribute("data-goto") });
+      showNodeOnMap(goto.getAttribute("data-goto"), true);
       return;
     }
     const dd = event.target.closest("[data-dd]");
@@ -868,7 +870,7 @@
       if (route.name === "tutorial") {
         goToRoute({ name: "software-item", id: route.id }, { replace: true });
       } else if (route.name === "concept") {
-        goToRoute({ name: "node", id: route.id }, { replace: true });
+        goToRoute({ name: "map" }, { replace: true });
       } else {
         goToRoute({ name: "map" }, { replace: true });
       }
@@ -933,6 +935,16 @@
     centerOnNode(node, detailWasClosed);
   }
 
+  function showNodeOnMap(id, jumped) {
+    if (!byId[id]) return;
+    if (mode === "graph" && ROUTER.parse(window.location.hash).name === "map") {
+      select(id, jumped);
+      return;
+    }
+    pendingMapNode = { id, jumped };
+    goToRoute({ name: "map" });
+  }
+
   function clearGraphSelection() {
     viewportMoveToken++;
     cy.stop(true, false);
@@ -943,12 +955,14 @@
     requestAnimationFrame(() => cy.resize());
   }
 
-  document.getElementById("detail-close").addEventListener("click", () =>
-    goToRoute({ name: mode === "software" ? "software" : mode === "library" ? "library" : "map" }));
+  document.getElementById("detail-close").addEventListener("click", () => {
+    if (mode === "graph") clearGraphSelection();
+    else goToRoute({ name: mode === "software" ? "software" : "library" });
+  });
 
-  cy.on("tap", "node", evt => goToRoute({ name: "node", id: evt.target.id() }));
+  cy.on("tap", "node", evt => select(evt.target.id(), false));
   cy.on("tap", evt => {
-    if (evt.target === cy) goToRoute({ name: "map" });
+    if (evt.target === cy) clearGraphSelection();
   });
 
   /* ───────────────────────── 控制栏 ───────────────────────── */
@@ -994,7 +1008,7 @@
       return;
     }
     const nodeButton = event.target.closest("[data-domain-node]");
-    if (nodeButton) goToRoute({ name: "node", id: nodeButton.dataset.domainNode });
+    if (nodeButton) select(nodeButton.dataset.domainNode, true);
   });
   initLearningPanel();
   document.querySelector("#official-path-toggle em").textContent =
@@ -1112,7 +1126,7 @@
   results.addEventListener("click", event => {
     const item = event.target.closest(".sr-item");
     if (!item) return;
-    goToRoute({ name: "node", id: item.dataset.id });
+    select(item.dataset.id, true);
     results.classList.remove("open");
     search.value = "";
   });
@@ -1603,6 +1617,8 @@
   async function applyRoute(route = ROUTER.parse(window.location.hash)) {
     const token = ++routeApplyToken;
     const stale = () => token !== routeApplyToken;
+    const previousRoute = activeRoute;
+    activeRoute = route;
 
     // 路由是唯一页面状态来源：先收起覆盖层，再按目标地址恢复底层视图。
     closeDeepDive();
@@ -1610,27 +1626,27 @@
     if (route.name === "map") {
       await setMode("graph");
       if (stale()) return;
-      clearGraphSelection();
+      const pending = pendingMapNode;
+      pendingMapNode = null;
+      if (pending && byId[pending.id]) select(pending.id, pending.jumped);
+      else if (previousRoute && previousRoute.name === "concept" && byId[previousRoute.id]) select(previousRoute.id, true);
+      else clearGraphSelection();
       setDocumentTitle();
       return;
     }
 
-    if (route.name === "node" || route.name === "concept") {
+    if (route.name === "concept") {
       const node = byId[route.id];
-      if (!node || (route.name === "concept" && !DEEPDIVE_IDS.has(route.id))) {
+      if (!node || !DEEPDIVE_IDS.has(route.id)) {
         goToRoute({ name: "map" }, { replace: true });
         return;
       }
       await setMode("graph");
       if (stale()) return;
       select(route.id, true);
-      if (route.name === "concept") {
-        await openDeepDive(route.id);
-        if (stale()) return;
-        setDocumentTitle(`${node.title} · 理解原理`);
-      } else {
-        setDocumentTitle(node.title);
-      }
+      await openDeepDive(route.id);
+      if (stale()) return;
+      setDocumentTitle(`${node.title} · 理解原理`);
       return;
     }
 
