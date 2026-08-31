@@ -8,7 +8,8 @@
   const ROUTER = window.APP_ROUTER;
   const APP = window.AIMap;
   if (!ROUTER) throw new Error("URL 路由模块未加载");
-  if (!APP || !APP.shared || !APP.createDeepDiveLoader || !APP.createSoftwareView || !APP.createLibraryView) {
+  if (!APP || !APP.shared || !APP.createDeepDiveLoader || !APP.createLearningView || !APP.createDeepDiveView
+      || !APP.createSoftwareView || !APP.createLibraryView) {
     throw new Error("前端模块未完整加载");
   }
   const SITE_TITLE = "AI 知识地图";
@@ -48,9 +49,8 @@
     revision: DEEPDIVE_RUNTIME_REVISION,
   });
   const ensureDeepDive = deepDiveLoader.ensure;
-  const LEARNING_STORAGE_KEY = "ai-knowledge-map.learned.v1";
-  const learnedNodes = loadLearnedNodes();
-  let activeDeepDiveId = null;
+  let learningView = null;
+  let deepDiveView = null;
   let officialPathActive = false;
   let routeApplyToken = 0;
   let activeRoute = null;
@@ -66,193 +66,6 @@
     if (!changed || options.replace) applyRoute(route);
   }
   let officialPathRestore = null;
-
-  /* ── 学习面板：固定元素引用、按钮索引、节点顺序（用于局部更新） ── */
-  const learningEls = {};
-  const learningButtons = new Map();          // nodeId -> <button>
-  const nodeIndex = new Map(G.nodes.map((n, i) => [n.id, i]));
-
-  function preloadRecommendedNeighbors(id) {
-    const currentIndex = RECOMMENDED_INDEX.get(id);
-    const previous = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex - 1] : null;
-    const next = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex + 1] : null;
-    if (previous) ensureDeepDive(previous.id).catch(error => console.warn(error.message));
-    if (next) ensureDeepDive(next.id).catch(error => console.warn(error.message));
-  }
-
-  function loadLearnedNodes() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(LEARNING_STORAGE_KEY) || "[]");
-      return new Set(Array.isArray(saved) ? saved.filter(id => !!byId[id]) : []);
-    } catch (e) {
-      console.warn("学习进度读取失败，将使用空进度：", e);
-      return new Set();
-    }
-  }
-
-  function saveLearnedNodes() {
-    try {
-      localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(Array.from(learnedNodes)));
-    } catch (e) {
-      console.warn("学习进度保存失败：", e);
-    }
-  }
-
-  function learningButtonHtml(id) {
-    const learned = learnedNodes.has(id);
-    const currentIndex = RECOMMENDED_INDEX.get(id);
-    const previousStep = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex - 1] : null;
-    const nextStep = Number.isInteger(currentIndex) ? RECOMMENDED_PATH[currentIndex + 1] : null;
-    const previousNode = previousStep && byId[previousStep.id];
-    const nextNode = nextStep && byId[nextStep.id];
-    const previousButton = previousStep && previousNode
-      ? `<button type="button" class="dd-path-btn dd-prev-btn" data-prev-node="${esc(previousStep.id)}" aria-label="上一节 ${esc(previousStep.order)}：${esc(previousNode.title)}">
-          <span aria-hidden="true">←</span>
-          <span class="dd-path-copy"><small>上一节 ${esc(previousStep.order)}</small><strong>${esc(previousNode.title)}</strong></span>
-        </button>`
-      : "";
-    const nextButton = nextStep && nextNode
-      ? `<button type="button" class="dd-path-btn dd-next-btn" data-next-node="${esc(nextStep.id)}" aria-label="下一节 ${esc(nextStep.order)}：${esc(nextNode.title)}">
-          <span class="dd-path-copy"><small>下一节 ${esc(nextStep.order)}</small><strong>${esc(nextNode.title)}</strong></span>
-          <span aria-hidden="true">→</span>
-        </button>`
-      : "";
-    return `<section class="dd-learning-complete">
-      <div>
-        <div class="dd-learning-kicker">${learned ? "学习进度已更新" : "完成本页学习了吗？"}</div>
-        <div class="dd-learning-copy">${learned ? "这个节点已计入主页的“已学习”列表。" : "标记后可在主页侧栏随时查看已学与未学节点。"}</div>
-      </div>
-      <div class="dd-learning-actions">
-        ${previousButton}
-        <button type="button" class="dd-learn-btn${learned ? " is-learned" : ""}" data-learn-node="${esc(id)}" aria-pressed="${learned}">
-          ${learned ? "✓ 已学习" : "标记为已学习"}
-        </button>
-        ${nextButton}
-      </div>
-    </section>`;
-  }
-
-  // 一次性缓存固定元素与两个列表的委托监听（只在初始化时调用）
-  function initLearningPanel() {
-    [
-      "learning-done-count", "learning-total-count", "learning-percent", "learning-progress-bar",
-      "learning-done-label", "learning-todo-label", "learning-done-list", "learning-todo-list"
-    ].forEach(id => { learningEls[id] = document.getElementById(id); });
-
-    [learningEls["learning-done-list"], learningEls["learning-todo-list"]].forEach(list => {
-      if (!list) return;
-      list.addEventListener("click", event => {
-        const button = event.target.closest("[data-learning-goto]");
-        if (button) select(button.getAttribute("data-learning-goto"), true);
-      });
-    });
-    renderLearningPanel();
-  }
-
-  function makeLearningButton(n) {
-    const domain = DOMAINS[n.domain] || { color: "#888", label: n.domain };
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "learning-node";
-    button.setAttribute("data-learning-goto", n.id);
-    button.title = domain.label;
-    button.innerHTML = `<span class="dot" style="background:${domain.color}"></span><span>${esc(n.title)}</span>`;
-    return button;
-  }
-
-  function setLearningEmptyState(list, isDone) {
-    if (!list) return;
-    const hasNodes = !!list.querySelector(".learning-node");
-    let empty = list.querySelector(".learning-empty");
-    if (hasNodes) { if (empty) empty.remove(); return; }
-    if (!empty) {
-      empty = document.createElement("div");
-      empty.className = "learning-empty";
-      empty.textContent = isDone ? "还没有标记已学习的节点" : "所有节点都已学习";
-      list.appendChild(empty);
-    }
-  }
-
-  function updateLearningCounts() {
-    const total = G.nodes.length;
-    const doneCount = learnedNodes.size;
-    const percent = total ? Math.round(doneCount / total * 100) : 0;
-    if (!learningEls["learning-done-count"]) return;
-    learningEls["learning-done-count"].textContent = doneCount;
-    learningEls["learning-total-count"].textContent = ` / ${total} 个节点`;
-    learningEls["learning-percent"].textContent = `${percent}%`;
-    learningEls["learning-progress-bar"].style.width = `${percent}%`;
-    learningEls["learning-done-label"].textContent = doneCount;
-    learningEls["learning-todo-label"].textContent = total - doneCount;
-  }
-
-  // 全量构建两个列表（仅初始化或批量变更时用）
-  function renderLearningPanel() {
-    const doneList = learningEls["learning-done-list"];
-    const todoList = learningEls["learning-todo-list"];
-    if (!doneList || !todoList) return;
-    doneList.innerHTML = "";
-    todoList.innerHTML = "";
-    learningButtons.clear();
-    G.nodes.forEach(n => {
-      const button = makeLearningButton(n);
-      learningButtons.set(n.id, button);
-      (learnedNodes.has(n.id) ? doneList : todoList).appendChild(button);
-    });
-    setLearningEmptyState(doneList, true);
-    setLearningEmptyState(todoList, false);
-    updateLearningCounts();
-  }
-
-  // 保持 G.nodes 顺序把按钮插入目标列表
-  function insertLearningButtonInOrder(list, id) {
-    const button = learningButtons.get(id);
-    if (!button) return;
-    const start = (nodeIndex.get(id) ?? -1) + 1;
-    for (let i = start; i < G.nodes.length; i++) {
-      const other = learningButtons.get(G.nodes[i].id);
-      if (other && other.parentNode === list) { list.insertBefore(button, other); return; }
-    }
-    list.appendChild(button);
-  }
-
-  function toggleLearnedNode(id) {
-    if (!byId[id]) return;
-    const nowLearned = !learnedNodes.has(id);
-    if (nowLearned) learnedNodes.add(id);
-    else learnedNodes.delete(id);
-    saveLearnedNodes();
-
-    const doneList = learningEls["learning-done-list"];
-    const todoList = learningEls["learning-todo-list"];
-    if (learningButtons.has(id) && doneList && todoList) {
-      insertLearningButtonInOrder(nowLearned ? doneList : todoList, id);
-      setLearningEmptyState(doneList, true);
-      setLearningEmptyState(todoList, false);
-      updateLearningCounts();
-    } else {
-      renderLearningPanel();
-    }
-
-    if (activeDeepDiveId === id) {
-      const current = document.querySelector(".dd-learning-complete");
-      if (current) {
-        current.outerHTML = learningButtonHtml(id);
-        bindLearningButton();
-      }
-    }
-  }
-
-  function bindLearningButton() {
-    const button = document.querySelector("[data-learn-node]");
-    if (button) button.addEventListener("click", () => toggleLearnedNode(button.getAttribute("data-learn-node")));
-    const previousButton = document.querySelector("[data-prev-node]");
-    if (previousButton) previousButton.addEventListener("click", () =>
-      goToRoute({ name: "concept", id: previousButton.getAttribute("data-prev-node") }));
-    const nextButton = document.querySelector("[data-next-node]");
-    if (nextButton) nextButton.addEventListener("click", () =>
-      goToRoute({ name: "concept", id: nextButton.getAttribute("data-next-node") }));
-  }
 
   function removeOfficialPathMarkers() {
     cy.nodes(".official-path-node").removeData("officialOrder");
@@ -722,92 +535,34 @@
   }
 
   /* ───────────────────── 理解原理（深读页） ───────────────────── */
-
   const ddEl = document.getElementById("deepdive");
-
-  let deepDiveRequestToken = 0;
-
-  async function openDeepDive(id) {
-    if (!ddEl || !DEEPDIVE_IDS.has(id)) return;
-    const token = ++deepDiveRequestToken;
-    activeDeepDiveId = id;
-    document.getElementById("dd-top-name").textContent = byId[id] ? byId[id].title : id;
-    document.getElementById("dd-article").innerHTML =
-      '<div class="dd-loading" role="status">正在加载理解原理页…</div>';
-    ddEl.classList.remove("dd-provisional");
-    ddEl.classList.remove("hidden");
-    ddEl.querySelector(".dd-scroll").scrollTop = 0;
-
-    let dd;
-    try {
-      dd = await ensureDeepDive(id);
-    } catch (error) {
-      if (token !== deepDiveRequestToken) return;
-      document.getElementById("dd-article").innerHTML =
-        `<div class="dd-loading dd-loading-error" role="alert">${esc(error.message)}，请返回后重试。</div>`;
-      return;
-    }
-    if (token !== deepDiveRequestToken || activeDeepDiveId !== id) return;
-    const provisionalPublication = dd.publication
-      && ["published-provisional", "published-editorial-draft"].includes(dd.publication.status)
-      ? dd.publication
-      : null;
-    const editorialDraft = provisionalPublication
-      && provisionalPublication.status === "published-editorial-draft";
-    ddEl.classList.toggle("dd-provisional", Boolean(provisionalPublication));
-    const provisionalNotice = provisionalPublication
-      ? `<div class="dd-provisional-notice" role="status">
-          <strong>${esc(provisionalPublication.label || "未通过审计 · 暂行版本")}</strong>
-          <span>${editorialDraft ? "该页面是已经覆盖网站的正文草稿，正在等待机器审查与人工复核。" : `该页面已覆盖旧正式页，但尚未通过质量审查${Number.isInteger(provisionalPublication.blockerCount) ? `，当前记录 ${provisionalPublication.blockerCount} 个阻断项` : ""}。`}</span>
-        </div>`
-      : "";
-    const hero = `<div class="dd-hero">
-        <div class="dd-eyebrow">理解原理 · CONCEPT DEEP DIVE</div>
-        <h1 class="dd-h1${provisionalPublication ? " dd-h1-provisional" : ""}">${esc(dd.title)}</h1>
-        ${provisionalNotice}
-        ${dd.subtitle ? `<div class="dd-sub">${esc(dd.subtitle)}</div>` : ""}
-        ${dd.aliases ? `<div class="dd-ali">${esc(dd.aliases)}</div>` : ""}
-        ${dd.meta ? `<div class="dd-metabar">${esc(dd.meta)}</div>` : ""}
-        ${dd.thesis ? `<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> ${dd.thesis}</div>` : ""}
-      </div>`;
-    document.getElementById("dd-top-name").textContent = dd.title;
-    document.getElementById("dd-article").innerHTML = hero + (dd.html || "") + learningButtonHtml(id);
-    bindLearningButton();
-    ddEl.querySelector(".dd-scroll").scrollTop = 0;
-    preloadRecommendedNeighbors(id);
-  }
-
-  function closeDeepDive() {
-    deepDiveRequestToken++;
-    if (ddEl) {
-      ddEl.classList.add("hidden");
-      ddEl.classList.remove("dd-provisional");
-    }
-    activeDeepDiveId = null;
-  }
-
-  // 仅在本地质量审计查询参数存在时暴露稳定测试入口；正常页面不增加全局 API。
-  if (new URLSearchParams(window.location.search).has("quality-audit")) {
-    window.__DEEPDIVE_QUALITY_AUDIT__ = { open: openDeepDive, close: closeDeepDive };
-  }
-
-  if (ddEl) {
-    const leaveDeepDive = () => {
-      const route = ROUTER.parse(window.location.hash);
-      if (route.name === "tutorial") {
-        goToRoute({ name: "software-item", id: route.id }, { replace: true });
-      } else if (route.name === "concept") {
-        goToRoute({ name: "map" }, { replace: true });
-      } else {
-        goToRoute({ name: "map" }, { replace: true });
-      }
-    };
-    document.getElementById("dd-back").addEventListener("click", leaveDeepDive);
-    document.getElementById("dd-close").addEventListener("click", leaveDeepDive);
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && !ddEl.classList.contains("hidden")) leaveDeepDive();
-    });
-  }
+  learningView = APP.createLearningView({
+    graph: G,
+    domains: DOMAINS,
+    byId,
+    recommendedPath: RECOMMENDED_PATH,
+    recommendedIndex: RECOMMENDED_INDEX,
+    escapeHtml: esc,
+    storageKey: "ai-knowledge-map.learned.v1",
+    ensureDeepDive,
+    navigate: goToRoute,
+    selectNode: select,
+    isDeepDiveActive: id => Boolean(deepDiveView && deepDiveView.isActive(id)),
+  });
+  deepDiveView = APP.createDeepDiveView({
+    element: ddEl,
+    ids: DEEPDIVE_IDS,
+    byId,
+    escapeHtml: esc,
+    ensurePage: ensureDeepDive,
+    renderLearning: learningView.renderButtonHtml,
+    bindLearning: learningView.bindButtons,
+    preloadNeighbors: learningView.preloadNeighbors,
+    router: ROUTER,
+    navigate: goToRoute,
+  });
+  const openDeepDive = deepDiveView.open;
+  const closeDeepDive = deepDiveView.close;
 
   let viewportMoveToken = 0;
 
@@ -937,7 +692,7 @@
     const nodeButton = event.target.closest("[data-domain-node]");
     if (nodeButton) select(nodeButton.dataset.domainNode, true);
   });
-  initLearningPanel();
+  learningView.init();
   document.querySelector("#official-path-toggle em").textContent =
     `${RECOMMENDED_PATH.length} 节点 · ${(G.recommendedLearningPath || []).length} 层`;
   document.getElementById("official-path-toggle").addEventListener("click", () =>
