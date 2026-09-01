@@ -15,9 +15,9 @@
     "stage2:rollback-provisional": "node tools/run-deepdive-stage2.js rollback-provisional",
     "stage2:editorial": "node tools/run-stage2-editorial-controller.js",
     "stage2:mcp": "node tools/deepdive-stage2/mcp-server.js",
-    "validate": "node tools/validate.js && node tools/validate-deepdives.js && node tools/validate-software.js && node tools/validate-tutorials.js && node tools/validate-video-applications.js && node tools/validate-library.js",
-    "validate:library": "node tools/validate-library.js",
-    "validate:tutorials": "node tools/validate-tutorials.js",
+    "validate": "node tools/validators/graph.js && node tools/validators/deepdives.js && node tools/validators/software.js && node tools/validators/tutorials.js && node tools/validators/video-applications.js && node tools/validators/library.js",
+    "validate:library": "node tools/validators/library.js",
+    "validate:tutorials": "node tools/validators/tutorials.js",
     "video:context": "node tools/video-ingest/build-context.js",
     "video:proposal": "node tools/video-ingest/create-proposal.js",
     "video:finalize-proposal": "node tools/video-ingest/finalize-proposal.js",
@@ -44,7 +44,8 @@
     "test:video-ingest": "node tools/test-video-ingest.js && node tools/test-video-apply.js && node tools/test-video-shadow-review.js && node tools/test-video-node-package.js && node tools/test-video-node-apply.js && node tools/test-video-calibration.js",
     "test:routing": "node tools/test-routing.js",
     "test:app": "node tools/test-app-smoke.js",
-    "quality:all": "npm run validate && npm run test:routing && npm run test:app && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
+    "test:tooling": "node tests/tooling/project-root.test.js",
+    "quality:all": "npm run validate && npm run test:tooling && npm run test:routing && npm run test:app && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },
   "devDependencies": {
     "playwright": "1.61.1"
