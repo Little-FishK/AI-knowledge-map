@@ -82,7 +82,7 @@ ai_knowledge_map/
 | # | 任务 |
 |---|---|
 | M1-1 ✅ | 入库规范已定稿到 `INGEST.md`；`PROMPT_TEMPLATE.md` 是换主题复用模板，不是入库模板 |
-| M1-2 ✅ | 提案采用便于人工阅读的 Markdown 格式，见 `tools/proposals/001-openai-agents-guide.md` |
+| M1-2 ✅ | 提案采用便于人工阅读的 Markdown 格式，见 `artifacts/ingest/001-openai-agents-guide.md` |
 | M1-3 🟡 | 网页与视频资料流程均已跑通；Codex、Claude Code 共完成 20 条正式视频教程，本地文档样本尚未跑通 |
 | M1-4 🟡 | 已执行 title/aliases + 语义人工去重；尚未形成自动化匹配工具 |
 | M1-5 ✅ | 三层升降级已取消，改为人工确认 stable/evolving，规则见 `INGEST.md` |

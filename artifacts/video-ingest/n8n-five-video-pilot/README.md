@@ -30,7 +30,7 @@
 | OpenTelemetry | 候选；缺精确环境变量与完整安装 | 补充可观测性 |
 | n8n Assistant | 候选；预览功能概览 | 不新增、不补充通用概念 |
 
-结构化判定见 `pilot.json`，批量复核汇总见 `shadow-batch-report.json`。每条视频自己的 `context.json`、`proposal.json`、`proposal.md`、`shadow/assessment.json` 和 `shadow/review.json` 位于同级的对应 slug 目录；原始音视频、转录、关键帧与 OCR 位于 Git 忽略的 `tools/_raw/video/`。
+结构化判定见 `pilot.json`，批量复核汇总见 `shadow-batch-report.json`。每条视频自己的 `context.json`、`proposal.json`、`proposal.md`、`shadow/assessment.json` 和 `shadow/review.json` 位于同级的对应 slug 目录；原始音视频、转录、关键帧与 OCR 位于 Git 忽略的 `.video-runtime/raw/video/`。
 
 ## 这次真实发现的问题
 

@@ -10,7 +10,7 @@
 1. **教程轨**：视频是否足以成为某软件教程页的一条正式资源，或是否需要新建教程页。
 2. **概念轨**：视频是否提供了新节点、已有节点补充或别名，并单独判断是否值得成为核心节点候选。
 
-同一视频可以只通过其中一轨，也可以两轨都不通过。v0.1 永远先写入 `tools/proposals/video/` 供审核；没有“批准后自动应用”能力，不能直接改 `data/graph.js` 或 `data/tutorials*.js`。
+同一视频可以只通过其中一轨，也可以两轨都不通过。v0.1 永远先写入 `artifacts/video-ingest/` 供审核；没有“批准后自动应用”能力，不能直接改 `data/graph.js` 或 `data/tutorials*.js`。
 
 ## 2. 流程
 
@@ -26,7 +26,7 @@ video:validate-proposal --ready
 等待人工逐项批准（v0.2 才实现应用）
 ```
 
-原始音视频、帧和证据包应放在 `tools/_raw/video/`，该目录不进入 Git。提案和报告可以进入 `tools/proposals/video/`，以便审查与追溯。
+原始音视频、帧和证据包应放在 `.video-runtime/raw/video/`，该目录不进入 Git。提案和报告可以进入 `artifacts/video-ingest/`，以便审查与追溯。
 
 ## 3. 运行方式
 
@@ -35,7 +35,7 @@ video:validate-proposal --ready
 ```powershell
 py -3.11 tools/video-evidence.py `
   "https://www.youtube.com/watch?v=..." `
-  "tools/_raw/video/codex-001/evidence" `
+  ".video-runtime/raw/video/codex-001/evidence" `
   --asr auto `
   --prompt "Codex AGENTS.md MCP context compaction"
 ```
@@ -54,9 +54,9 @@ JSON 包含逐段时间、帧时间、OCR、取证限制和 `contentHash`。提�
 
 ```powershell
 npm run video:proposal -- `
-  --evidence "tools/_raw/video/codex-001/evidence.evidence.json" `
+  --evidence ".video-runtime/raw/video/codex-001/evidence.evidence.json" `
   --software codex `
-  --output "tools/proposals/video/codex-001/proposal.json"
+  --output "artifacts/video-ingest/codex-001/proposal.json"
 ```
 
 同时生成：
@@ -79,9 +79,9 @@ npm run video:proposal -- `
 
 ```powershell
 npm run video:context -- `
-  --evidence "tools/_raw/video/codex-001/evidence.evidence.json" `
+  --evidence ".video-runtime/raw/video/codex-001/evidence.evidence.json" `
   --software codex `
-  --output "tools/proposals/video/codex-001/context.json"
+  --output "artifacts/video-ingest/codex-001/context.json"
 ```
 
 ### 3.3 校验
@@ -90,16 +90,16 @@ npm run video:context -- `
 
 ```powershell
 npm run video:validate-proposal -- `
-  --evidence "tools/_raw/video/codex-001/evidence.evidence.json" `
-  --proposal "tools/proposals/video/codex-001/proposal.json"
+  --evidence ".video-runtime/raw/video/codex-001/evidence.evidence.json" `
+  --proposal "artifacts/video-ingest/codex-001/proposal.json"
 ```
 
 AI填写完全部判断后，把 `proposal.status` 改为 `ready`，再运行严格校验：
 
 ```powershell
 npm run video:validate-proposal -- `
-  --evidence "tools/_raw/video/codex-001/evidence.evidence.json" `
-  --proposal "tools/proposals/video/codex-001/proposal.json" `
+  --evidence ".video-runtime/raw/video/codex-001/evidence.evidence.json" `
+  --proposal "artifacts/video-ingest/codex-001/proposal.json" `
   --ready
 ```
 
@@ -252,7 +252,7 @@ npm run test:video-ingest
 - 拒绝把具体模型名、顺带提及的多模态/向量数据库和产品节点 Chat Trigger 误建为知识节点；
 - `--ready` 严格校验通过；2026-07-24 经维护者批准后由 v0.2 成功应用。
 
-可审查提案与批准文件位于 `tools/proposals/video/n8n-ai-agent-part1/`。应用结果为 1 个 n8n 教程页和 4 项现有节点补充任务；原始音视频、转录、帧、plan 与回滚凭据仍只保存在被 Git 忽略的 `tools/_raw/`。
+可审查提案与批准文件位于 `artifacts/video-ingest/n8n-ai-agent-part1/`。应用结果为 1 个 n8n 教程页和 4 项现有节点补充任务；原始音视频、转录、帧、plan 与回滚凭据仍只保存在被 Git 忽略的 `.video-runtime/raw/`。
 
 ## 7. v0.1 明确不做
 
@@ -271,8 +271,8 @@ v0.2 把“内容判断”和“写入授权”分开。`proposal.json` 保持�
 
 ```powershell
 npm run video:approve -- `
-  --proposal "tools/proposals/video/n8n-ai-agent-part1/proposal.json" `
-  --output "tools/proposals/video/n8n-ai-agent-part1/proposal.approval.json"
+  --proposal "artifacts/video-ingest/n8n-ai-agent-part1/proposal.json" `
+  --output "artifacts/video-ingest/n8n-ai-agent-part1/proposal.approval.json"
 ```
 
 默认状态为 `draft`，教程和每个概念都是 `pending`。也可在明确审阅后用命令生成完整批准：
@@ -407,8 +407,8 @@ npm run video:shadow-review -- `
 
 ```powershell
 npm run video:shadow-batch -- `
-  --manifest "tools/proposals/video/shadow-batch.example.json" `
-  --output "tools/_raw/video/shadow-batch.summary.json" `
+  --manifest "artifacts/video-ingest/shadow-batch.example.json" `
+  --output ".video-runtime/raw/video/shadow-batch.summary.json" `
   --write-reports
 ```
 
@@ -525,15 +525,15 @@ npm run video:node-package -- `
 
 v0.5 不生成或应用节点。它把批量影子预测与版本化的标准答案逐候选比较，回答一个更严格的问题：当前自动裁判是否已经积累了足够多、足够多样的证据，可以开始开发正式自动应用。
 
-标准答案保存在 `tools/proposals/video/calibration-labels-v05.json`。每个样本按候选术语记录期望决定与核心身份；标签属于项目编辑基线，不从提案自报分数自动复制。
+标准答案保存在 `artifacts/video-ingest/calibration-labels-v05.json`。每个样本按候选术语记录期望决定与核心身份；标签属于项目编辑基线，不从提案自报分数自动复制。
 
 运行：
 
 ```powershell
 npm run video:calibrate -- `
-  --batch "tools/_raw/video/shadow-batch.summary.json" `
-  --labels "tools/proposals/video/calibration-labels-v05.json" `
-  --output "tools/_raw/video/calibration-v05.json"
+  --batch ".video-runtime/raw/video/shadow-batch.summary.json" `
+  --labels "artifacts/video-ingest/calibration-labels-v05.json" `
+  --output ".video-runtime/raw/video/calibration-v05.json"
 ```
 
 默认开放条件全部不可互相补偿：
@@ -571,7 +571,7 @@ npm run video:calibrate -- `
 - `tools/video-ingest/calibration.js`
 - `tools/video-ingest/calibrate-shadow.js`
 - `tools/video-ingest/schemas/calibration-labels.schema.json`
-- `tools/proposals/video/calibration-labels-v05.json`
+- `artifacts/video-ingest/calibration-labels-v05.json`
 - `tests/video-ingest/calibration.test.js`
 
 ## 12. 正式节点应用：仅做两类机械检查

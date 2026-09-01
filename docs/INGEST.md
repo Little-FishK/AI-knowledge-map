@@ -13,7 +13,7 @@
   ↓ ① 取全文
   ↓ ② 抽概念 → ③ 去重匹配 → ④ 判层级 → ⑤ 找连接
   ↓
-tools/proposals/NNN-<slug>.md   ← 人读的提案，不是机器格式
+artifacts/ingest/NNN-<slug>.md   ← 人读的提案，不是机器格式
   ↓ ⑥ 人工审核（改 / 删 / 确认）
   ↓ ⑦ 合并 → 校验 → 重算布局 → 提交
 data/graph.js
@@ -28,7 +28,7 @@ data/graph.js
 | 视频 | 使用 `tools/video-evidence.py` 生成字幕、关键帧 OCR 与带哈希的 evidence JSON；v0.1 双轨提案与 v0.2 批准、预览、应用、回滚见 [VIDEO_INGEST.md](VIDEO_INGEST.md) |
 | 本地文档 | 直接 Read |
 
-抽出的原文放 `tools/_raw/`（已 gitignore，**不入库、不发布**）。
+抽出的原文放 `.video-runtime/raw/`（已 gitignore，**不入库、不发布**）。
 
 ## 2. 抽概念
 

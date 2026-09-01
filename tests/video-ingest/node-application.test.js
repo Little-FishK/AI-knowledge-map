@@ -18,7 +18,7 @@ const { sha256 } = require("../../tools/video-ingest/core");
 const ROOT = PROJECT_ROOT;
 const legacyPackageDir = path.join(
   ROOT,
-  "tools/proposals/video/elevenlabs-official-voice-clone/node-package-preview"
+  "artifacts/video-ingest/elevenlabs-official-voice-clone/node-package-preview"
 );
 
 function graphAt(root) {

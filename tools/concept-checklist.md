@@ -2,7 +2,7 @@
 
 > **这份文件是我们的原创编排**：概念取自对 340 个 roadmap.sh 节点 + aiknowledgemap 688 个节点的通读与筛选，
 > 但**分区、分层、合并、取舍、命名全部由我们决定**，且**所有定义文字将由我们自己撰写**。
-> roadmap.sh 的原始清单只作工作草稿，存放于 `tools/_raw/`（已 gitignore，不入库、不发布）。
+> roadmap.sh 的原始清单只作工作草稿，存放于 `.video-runtime/raw/`（已 gitignore，不入库、不发布）。
 > 相关调研：[source-survey.md](source-survey.md) · [import-notes.md](import-notes.md)
 
 **P0** = M0 必填 | **P1** = M1 之后补 | **详情页** = 不建节点，收进某概念的详情页

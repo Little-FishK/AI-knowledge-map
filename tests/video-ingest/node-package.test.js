@@ -16,16 +16,14 @@ const {
 const {
   createContentPacket
 } = require("../../tools/video-ingest/create-node-content-packet");
+const { bindSyntheticEvidence } = require("../fixtures/video-ingest/synthetic-evidence");
 
 const ROOT = PROJECT_ROOT;
-const proposal = JSON.parse(fs.readFileSync(
-  path.join(ROOT, "tools/proposals/video/n8n-ai-agent-part1/proposal.json"),
+const sourceProposal = JSON.parse(fs.readFileSync(
+  path.join(ROOT, "artifacts/video-ingest/n8n-ai-agent-part1/proposal.json"),
   "utf8"
 ));
-const evidence = JSON.parse(fs.readFileSync(
-  path.join(ROOT, "tools/_raw/video/n8n-ai-agent-part1/evidence.evidence.json"),
-  "utf8"
-));
+const { evidence, proposal } = bindSyntheticEvidence(sourceProposal);
 const projectData = loadProjectData();
 const candidateId = "quasar-lattice-arbitration";
 const evidenceRef = proposal.conceptTrack.candidates[0].evidenceRefs[0];

@@ -14,8 +14,10 @@ domain; commands should use their canonical domain paths directly.
   deep-dive workflows.
 - `deepdive-stage2/`: the protected Stage 2 controller and MCP implementation.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
-- `proposals/`: generated or reviewed ingestion artifacts; these are not
-  executable source files.
+
+Generated or reviewed ingestion artifacts live in the top-level `artifacts/`
+directory. Local media, transcripts, frames, and dependency caches live in the
+ignored `.video-runtime/` workspace.
 
 Tests live in the top-level `tests/` directory, grouped into `app/`, `deepdive/`,
 `stage2/`, `tooling/`, and `video-ingest/`. Tooling-specific documentation

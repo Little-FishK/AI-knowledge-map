@@ -2,6 +2,7 @@
 
 const assert = require("assert");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { PROJECT_ROOT } = require("../../tools/shared/project-root");
 const {
@@ -25,10 +26,10 @@ const {
 const {
   reviewBatch
 } = require("../../tools/video-ingest/review-shadow-batch");
+const { bindSyntheticEvidence } = require("../fixtures/video-ingest/synthetic-evidence");
 
 const ROOT = PROJECT_ROOT;
-const proposalFile = path.join(ROOT, "tools/proposals/video/n8n-ai-agent-part1/proposal.json");
-const evidenceFile = path.join(ROOT, "tools/_raw/video/n8n-ai-agent-part1/evidence.evidence.json");
+const proposalFile = path.join(ROOT, "artifacts/video-ingest/n8n-ai-agent-part1/proposal.json");
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
@@ -74,8 +75,7 @@ function independentAssessment(proposal, evidence, decisions) {
 }
 
 function run() {
-  const proposal = readJson(proposalFile);
-  const evidence = readJson(evidenceFile);
+  const { evidence, proposal } = bindSyntheticEvidence(readJson(proposalFile));
   const projectData = loadProjectData();
   const before = graphFingerprint(projectData.graph);
 
@@ -278,22 +278,31 @@ function run() {
   assert.deepStrictEqual(parseModelJson("```json\n" + JSON.stringify(assessment) + "\n```"), assessment);
   assert.throws(() => parseModelJson("说明\n{}"), /不是单一 JSON/);
 
-  const batch = reviewBatch({
-    schemaVersion: 1,
-    jobs: [{
-      id: "n8n-no-assessment",
-      proposal: proposalFile,
-      evidence: evidenceFile
-    }]
-  }, {
-    base: ROOT,
-    projectData,
-    generatedAt: "2026-07-24T00:00:00.000Z"
-  });
-  assert.strictEqual(batch.totals.jobs, 1);
-  assert.strictEqual(batch.totals.blocked, 1);
-  assert.strictEqual(batch.totals.formalWrites, 0);
-  assert.strictEqual(batch.totals.candidateCount, proposal.conceptTrack.candidates.length);
+  const batchFixture = fs.mkdtempSync(path.join(os.tmpdir(), "video-shadow-batch-"));
+  try {
+    const batchProposalFile = path.join(batchFixture, "proposal.json");
+    const batchEvidenceFile = path.join(batchFixture, "evidence.json");
+    fs.writeFileSync(batchProposalFile, JSON.stringify(proposal), "utf8");
+    fs.writeFileSync(batchEvidenceFile, JSON.stringify(evidence), "utf8");
+    const batch = reviewBatch({
+      schemaVersion: 1,
+      jobs: [{
+        id: "n8n-no-assessment",
+        proposal: batchProposalFile,
+        evidence: batchEvidenceFile
+      }]
+    }, {
+      base: ROOT,
+      projectData,
+      generatedAt: "2026-07-24T00:00:00.000Z"
+    });
+    assert.strictEqual(batch.totals.jobs, 1);
+    assert.strictEqual(batch.totals.blocked, 1);
+    assert.strictEqual(batch.totals.formalWrites, 0);
+    assert.strictEqual(batch.totals.candidateCount, proposal.conceptTrack.candidates.length);
+  } finally {
+    fs.rmSync(batchFixture, { recursive: true, force: true });
+  }
 
   const metrics = graphMetrics(projectData.graph);
   assert.strictEqual(Object.keys(metrics).length, projectData.graph.nodes.length);
