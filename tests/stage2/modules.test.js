@@ -7,6 +7,7 @@ const path = require("path");
 const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/audit-project-access");
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
+const { createControllerLifecycle } = require("../../tools/deepdive-stage2/lib/controller-lifecycle");
 const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/lib/editorial-candidate-import");
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
@@ -336,6 +337,45 @@ try {
   assert.strictEqual(released.nextState, "audit-queued");
   assert.strictEqual(orchestrationState.pages.queued.lease, null);
 
+  const lifecycleState = {
+    schemaVersion: 7,
+    mode: "serial",
+    paused: false,
+    updatedAt: new Date().toISOString(),
+    pages: {
+      review: {
+        id: "review",
+        state: "manual-review",
+        repairAttempts: 1,
+        blockers: [{ code: "formula-error" }],
+        reviewHistory: [{ round: 1 }],
+        finalReview: { status: "manual-review" },
+        lease: null,
+      },
+    },
+  };
+  const lifecycleEvents = [];
+  const lifecycle = createControllerLifecycle({
+    defaultRoot: root,
+    schemaVersion: 7,
+    queueByRole: { audit: "audit-queued" },
+    acquireLock: () => () => {},
+    activeRecord: state => Object.values(state.pages).find(record => record.lease) || null,
+    appendEvent: (_root, type, details) => lifecycleEvents.push({ type, details }),
+    clone: value => JSON.parse(JSON.stringify(value)),
+    expireLease: () => null,
+    loadState: () => lifecycleState,
+    saveState: (_root, state) => state,
+  });
+  assert.strictEqual(lifecycle.status(root).counts["manual-review"], 1);
+  assert.strictEqual(lifecycle.setPaused(root, true).paused, true);
+  assert.strictEqual(lifecycleEvents[0].type, "queue-paused");
+  const retried = lifecycle.retry(root, "review");
+  assert.strictEqual(retried.state, "audit-queued");
+  assert.strictEqual(retried.repairAttempts, 0);
+  assert.deepStrictEqual(retried.blockers, []);
+  assert.deepStrictEqual(retried.reviewHistory, []);
+
   const reviewState = {
     pages: {
       review: {
@@ -378,7 +418,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、任务编排、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
