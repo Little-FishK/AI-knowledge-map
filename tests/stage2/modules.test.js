@@ -7,6 +7,7 @@ const path = require("path");
 const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/audit-project-access");
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
+const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
@@ -154,7 +155,51 @@ try {
   assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "before");
   assert(publication.applyCoreMembership("window.GRAPH={core: [\"a\"]};", "b").includes('"b"'));
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、审计规则、发布事务和编辑稿渲染测试通过");
+  const candidateValidation = createEditorialCandidateValidation({
+    isConfiguredRemovedSectionTitle: (title, configured = ["自测"]) => configured.includes(title),
+    sha256,
+  });
+  assert.deepStrictEqual(candidateValidation.validatePage("page", null), ["result.page 必须是对象"]);
+  assert.deepStrictEqual(candidateValidation.validatePage("page", {
+    id: "page",
+    title: "标题",
+    subtitle: "副标题",
+    thesis: "命题",
+    html: "<section><h2>机制</h2><p>正文</p></section>",
+  }), []);
+  const retainedSection = [
+    "<section><h2>机制</h2>",
+    '<figure class="dd-fig"><span>图</span></figure>',
+    '<table class="dd-table"><tr><td>数据</td></tr></table>',
+    "</section>",
+  ].join("");
+  const removedSection = [
+    "<section><h2>自测</h2>",
+    '<table class="dd-table"><tr><td>题目</td></tr></table>',
+    "</section>",
+  ].join("");
+  const preservation = candidateValidation.editorialPreservationReport(
+    { html: retainedSection + removedSection },
+    { html: retainedSection },
+    ["自测"],
+  );
+  assert.strictEqual(preservation.passed, true);
+  assert.strictEqual(preservation.allowedRemovedTables, 1);
+  assert.strictEqual(preservation.missingFigureCount, 0);
+  const policyGaps = candidateValidation.editorialContentPolicyGaps({
+    html: '<section><h2>自测</h2><div class="dd-quiz">题目</div><p>√(x)</p></section>',
+  });
+  assert(policyGaps.some(gap => gap.includes("独立“自测”章节")));
+  assert(policyGaps.includes("不得生成自测题"));
+  assert(policyGaps.some(gap => gap.includes("根式")));
+  assert.deepStrictEqual(
+    candidateValidation.visibleRawLatexSections({
+      html: "<section><h2>公式</h2><p>\\frac a b</p></section>",
+    }).map(section => section.section),
+    [1],
+  );
+
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选校验、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
