@@ -54,7 +54,7 @@
 - 每张卡：`summary` 一句话定位；`body` 一小段讲「是什么 + 最擅长什么 + 和同类的区别」，介绍文字**一律原创**。
 - 可选 `models`（仅单厂商卡）：`[{ name, note }]` 列当前主要型号，详情页自动标「截至 2026-07」。重刷时对照官方型号页，删淘汰款。
 - 正文提到概念节点用 `[[node-id]]` 内联链接（点击跨模式跳转到概念）；提到本目录其他软件也可用 `[[software-id]]`。
-- `concept` 必须指向一个真实存在的概念节点（改完用 `tools/validate-software.js` 校验，拦悬空 `concept` 和坏 `[[引用]]`）。
+- `concept` 必须指向一个真实存在的概念节点（改完用 `tools/validators/software.js` 校验，拦悬空 `concept` 和坏 `[[引用]]`）。
 
 ## 七、使用教程页
 
@@ -65,4 +65,4 @@
 - 软件目录共 62 个条目，覆盖 12 个门类，正文含 104 个可校验的内联概念/软件引用。
 - 已建立 Codex、Claude Code 两个使用教程页，共 20 条正式视频资源。
 - 两个教程页均为 Bilibili 5 条 + YouTube 5 条；每条均按 [TUTORIALS.md](TUTORIALS.md) 保存证据等级、五项标准和质量评分。
-- 修改后统一运行 `npm run validate`；其中 `tools/validate-software.js` 与 `tools/validate-tutorials.js` 分别负责软件和教程数据门禁。
+- 修改后统一运行 `npm run validate`；其中 `tools/validators/software.js` 与 `tools/validators/tutorials.js` 分别负责软件和教程数据门禁。

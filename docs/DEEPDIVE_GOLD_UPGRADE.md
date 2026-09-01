@@ -8,7 +8,7 @@
 
 基线日期：2026-07-22  
 节点与页面：129/129  
-审计命令：`node tools/audit-deepdive-gold.js`
+审计命令：`node tools/deepdive/quality/audit-deepdive-gold.js`
 
 首次扫描结果：
 
@@ -43,8 +43,8 @@
 
 ### 验证证据
 
-- `node tools/validate-deepdives.js`：129 个页面继续全部通过发布门禁。
-- `node tools/audit-deepdive-gold.js`：标杆候选由 1 增至 4；需要系统重写由 110 降至 107。
+- `node tools/validators/deepdives.js`：129 个页面继续全部通过发布门禁。
+- `node tools/deepdive/quality/audit-deepdive-gold.js`：标杆候选由 1 增至 4；需要系统重写由 110 降至 107。
 - 真实浏览器桌面检查：损失函数页 13 节、1 个 SVG、7 张表，无内容横向溢出。
 - 真实浏览器 390×844 检查：三页文章宽度均与容器一致，表格无溢出，SVG 无异常尺寸。
 - 浏览器控制台：无 warning/error。

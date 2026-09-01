@@ -186,7 +186,7 @@ function completeEditorialAudit(pageId, pageHash, evidence = "body improved") {
 }
 
 const parsedDefects = gateDefects({
-  script: "audit-deepdive-benchmark.js",
+  script: "tools/deepdive/quality/audit-deepdive-benchmark.js",
   output: [
     "  - image-generation: section.missing-inputOutput.section-2",
     "  - image-generation: section.insufficient-inputOutput-boundary.section-2",

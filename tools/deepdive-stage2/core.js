@@ -6,18 +6,25 @@ const os = require("os");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
-const { loadDeepDivePages } = require("../deepdive-loader");
-const { pageContentHash } = require("../deepdive-audit-contracts");
+const { loadDeepDivePages } = require("../deepdive/runtime/deepdive-loader");
+const { pageContentHash } = require("../deepdive/quality/deepdive-audit-contracts");
 const {
   TEMPLATE_FAMILIES,
   narrativeTemplateBlockers,
   plainText,
   scanNarrativeTemplates,
-} = require("../deepdive-narrative-audit");
+} = require("../deepdive/quality/deepdive-narrative-audit");
 const { transformGraph } = require("../video-ingest/node-application");
 const { graphFingerprint } = require("../video-ingest/shadow-review");
 
 const ROOT = path.join(__dirname, "..", "..");
+const TOOL_SCRIPTS = Object.freeze({
+  graphValidator: "tools/validators/graph.js",
+  deepDiveValidator: "tools/validators/deepdives.js",
+  videoApplicationValidator: "tools/validators/video-applications.js",
+  deepDiveL2Audit: "tools/deepdive/quality/audit-deepdive-gold.js",
+  deepDiveL3Audit: "tools/deepdive/quality/audit-deepdive-benchmark.js",
+});
 const STATE_SCHEMA_VERSION = 1;
 const AUDIT_SCHEMA_VERSION = 3;
 const CONTENT_GENERATION_PROMPT = [
@@ -1103,10 +1110,10 @@ function buildPacket(root, record, role) {
           "docs/DEEPDIVE.md",
           "docs/DEEPDIVE_QUALITY_GATE.md",
           "docs/DEEPDIVE_GATE_ERROR_CATALOG.md",
-          "tools/audit-deepdive-benchmark.js",
-          "tools/audit-deepdive-gold.js",
-          "tools/deepdive-audit-contracts.js",
-          "tools/validate-deepdives.js",
+          TOOL_SCRIPTS.deepDiveL3Audit,
+          TOOL_SCRIPTS.deepDiveL2Audit,
+          "tools/deepdive/quality/deepdive-audit-contracts.js",
+          TOOL_SCRIPTS.deepDiveValidator,
         ])],
         blocked: [
           ".git/",
@@ -1707,7 +1714,7 @@ function pageSourceSignature(page) {
 
 function evaluateEditorialCandidate(root, record, page) {
   const policyGaps = editorialContentPolicyGaps(page);
-  const results = [runGate(root, root, "validate-deepdives.js")];
+  const results = [runGate(root, root, TOOL_SCRIPTS.deepDiveValidator)];
   return {
     passed: policyGaps.length === 0 && results.every(result => result.passed),
     results,
@@ -2248,7 +2255,7 @@ function copyFixture(root) {
 }
 
 function runGate(root, fixture, script, args = []) {
-  const result = spawnSync(process.execPath, [path.join(root, "tools", script), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, ...script.split("/")), ...args], {
     cwd: fixture,
     encoding: "utf8",
     env: {
@@ -2314,9 +2321,9 @@ function evaluateCandidate(root, record, page, audit) {
   try {
     stageCandidateInFixture(fixture, record, page, audit);
     const results = [
-      runGate(root, fixture, "validate-deepdives.js"),
-      runGate(root, fixture, "audit-deepdive-gold.js", ["--require-candidate", record.id]),
-      runGate(root, fixture, "audit-deepdive-benchmark.js", ["--require-benchmark", record.id]),
+      runGate(root, fixture, TOOL_SCRIPTS.deepDiveValidator),
+      runGate(root, fixture, TOOL_SCRIPTS.deepDiveL2Audit, ["--require-candidate", record.id]),
+      runGate(root, fixture, TOOL_SCRIPTS.deepDiveL3Audit, ["--require-benchmark", record.id]),
     ];
     return {
       passed: results.every(result => result.passed),
@@ -2605,10 +2612,10 @@ function publishCandidate(root, record, page, audit) {
       written.push(target);
     });
     const validators = [
-      runGate(root, root, "validate.js"),
-      runGate(root, root, "validate-deepdives.js"),
-      runGate(root, root, "audit-deepdive-benchmark.js", ["--require-benchmark", record.id]),
-      runGate(root, root, "validate-video-applications.js"),
+      runGate(root, root, TOOL_SCRIPTS.graphValidator),
+      runGate(root, root, TOOL_SCRIPTS.deepDiveValidator),
+      runGate(root, root, TOOL_SCRIPTS.deepDiveL3Audit, ["--require-benchmark", record.id]),
+      runGate(root, root, TOOL_SCRIPTS.videoApplicationValidator),
     ];
     const failed = validators.find(result => !result.passed);
     if (failed) throw new Error(`发布后集成检查失败：${failed.script}\n${failed.output}`);
@@ -2640,9 +2647,9 @@ function publishEditorialHumanApprovedCandidate(root, record, page, audit, optio
   const result = writePublicationTargets(root, record, targets, {
     ...options,
     validators: options.validators || (() => [
-      runGate(root, root, "validate.js"),
-      runGate(root, root, "validate-deepdives.js"),
-      runGate(root, root, "validate-video-applications.js"),
+      runGate(root, root, TOOL_SCRIPTS.graphValidator),
+      runGate(root, root, TOOL_SCRIPTS.deepDiveValidator),
+      runGate(root, root, TOOL_SCRIPTS.videoApplicationValidator),
     ]),
   });
   const receipt = {
@@ -2717,9 +2724,9 @@ function writePublicationTargets(root, record, targets, options = {}) {
       written.push(target);
     });
     const validatorFactory = options.validators || (() => [
-      runGate(root, root, "validate.js"),
-      runGate(root, root, "validate-deepdives.js"),
-      runGate(root, root, "validate-video-applications.js"),
+      runGate(root, root, TOOL_SCRIPTS.graphValidator),
+      runGate(root, root, TOOL_SCRIPTS.deepDiveValidator),
+      runGate(root, root, TOOL_SCRIPTS.videoApplicationValidator),
     ]);
     const validators = validatorFactory();
     const failed = validators.find(result => !result.passed);

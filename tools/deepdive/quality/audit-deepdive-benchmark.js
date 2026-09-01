@@ -1,10 +1,10 @@
 /*
  * L3 教学一致性自动门禁。
  *
- * 报告：node tools/audit-deepdive-benchmark.js
- * 严格：node tools/audit-deepdive-benchmark.js --require-benchmark neural-network
- * 增量：node tools/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-baseline.json
- * 基线模板：node tools/audit-deepdive-benchmark.js --write-baseline docs/deepdive-l3-baseline.json
+ * 报告：node tools/deepdive/quality/audit-deepdive-benchmark.js
+ * 严格：node tools/deepdive/quality/audit-deepdive-benchmark.js --require-benchmark neural-network
+ * 增量：node tools/deepdive/quality/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-baseline.json
+ * 基线模板：node tools/deepdive/quality/audit-deepdive-benchmark.js --write-baseline docs/deepdive-l3-baseline.json
  *
  * 结构代理分只作诊断；已知教学完整性缺陷是不可补偿的阻断项。
  * L3 不替代 L4 人工事实、推导与真实教学效果审校。
@@ -800,9 +800,6 @@ function changedIds() {
     "index.html",
     "data/deepdive/00-deepdive-factory.js",
     "data/deepdive/zz-deepdive-quality-completion.js",
-    "tools/audit-deepdive-benchmark.js",
-    "tools/deepdive-loader.js",
-    "tools/deepdive-audit-contracts.js",
     "tools/deepdive/quality/audit-deepdive-benchmark.js",
     "tools/deepdive/runtime/deepdive-loader.js",
     "tools/deepdive/quality/deepdive-audit-contracts.js",

@@ -1,9 +1,9 @@
 /*
  * 真实 Chromium 渲染与基础 WCAG 自动审计。
  *
- * node tools/audit-deepdive-browser.js
- * node tools/audit-deepdive-browser.js --id reasoning-models
- * node tools/audit-deepdive-browser.js --changed
+ * node tools/deepdive/quality/audit-deepdive-browser.js
+ * node tools/deepdive/quality/audit-deepdive-browser.js --id reasoning-models
+ * node tools/deepdive/quality/audit-deepdive-browser.js --changed
  *
  * 需要 playwright。常规 CI 执行 `npm install`；Codex 工作区会自动尝试其
  * 随附依赖。此工具只覆盖可自动判定的 WCAG 子集，不宣称完整 WCAG 认证。

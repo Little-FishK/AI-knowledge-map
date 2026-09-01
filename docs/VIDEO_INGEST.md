@@ -221,7 +221,7 @@ npm run video:validate-proposal -- `
 - `tools/video-ingest/create-proposal.js`：草稿和报告。
 - `tools/video-ingest/validate-proposal.js`：命令行校验。
 - `tools/video-ingest/schemas/`：v1 数据合同。
-- `tools/test-video-ingest.js`：正常与失败夹具。
+- `tests/video-ingest/ingest.test.js`：正常与失败夹具。
 
 运行回归：
 
@@ -446,7 +446,7 @@ npm run video:shadow-batch -- `
 - `tools/video-ingest/review-proposal-shadow.js`
 - `tools/video-ingest/review-shadow-batch.js`
 - `tools/video-ingest/schemas/shadow-assessment.schema.json`
-- `tools/test-video-shadow-review.js`
+- `tests/video-ingest/shadow-review.test.js`
 
 ## 10. v0.4：新节点完整原子包预览
 
@@ -519,7 +519,7 @@ npm run video:node-package -- `
 - `tools/video-ingest/node-package.js`
 - `tools/video-ingest/schemas/node-package-content.schema.json`
 - `tools/video-ingest/schemas/node-package.schema.json`
-- `tools/test-video-node-package.js`
+- `tests/video-ingest/node-package.test.js`
 
 ## 11. v0.5：批量影子校准与开放门禁
 
@@ -572,7 +572,7 @@ npm run video:calibrate -- `
 - `tools/video-ingest/calibrate-shadow.js`
 - `tools/video-ingest/schemas/calibration-labels.schema.json`
 - `tools/proposals/video/calibration-labels-v05.json`
-- `tools/test-video-calibration.js`
+- `tests/video-ingest/calibration.test.js`
 
 ## 12. 正式节点应用：仅做两类机械检查
 
@@ -613,7 +613,7 @@ npm run video:node-rollback -- `
 - `tools/video-ingest/node-application.js`
 - `tools/video-ingest/apply-node-package.js`
 - `tools/video-ingest/rollback-node-application.js`
-- `tools/test-video-node-apply.js`
+- `tests/video-ingest/node-application.test.js`
 
 ## 13. 第二阶段接管理解原理页（当前有效边界）
 

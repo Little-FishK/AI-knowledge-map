@@ -121,7 +121,7 @@
 
 ### 评分如何记进数据并被强制校验
 
-三层审核不再只停留在本文档，而是作为每条资源的 `review` 字段记进 `data/tutorials.js`，由 `tools/validate-tutorials.js` 强制校验：
+三层审核不再只停留在本文档，而是作为每条资源的 `review` 字段记进 `data/tutorials.js`，由 `tools/validators/tutorials.js` 强制校验：
 
 ```js
 review: {
@@ -223,4 +223,4 @@ py -3.11 tools/video-evidence.py <视频URL> <输出前缀> [--asr auto|groq|loc
 - Codex 展示 10 条正式教程：Bilibili 5 + YouTube 5。
 - Claude Code 展示 10 条正式教程：Bilibili 5 + YouTube 5。
 - 当前合计 20 条资源，全部具有 E2 及以上证据、五项标准全 2、质量评分达到正式收录线；小红书、GitHub、文章与文档分类结构保留，等待后续按同一标准扩充。
-- 当前快照已通过 `tools/validate-tutorials.js`；修改后统一运行 `npm run validate`，同时继续运行软件目录和页面级校验。
+- 当前快照已通过 `tools/validators/tutorials.js`；修改后统一运行 `npm run validate`，同时继续运行软件目录和页面级校验。

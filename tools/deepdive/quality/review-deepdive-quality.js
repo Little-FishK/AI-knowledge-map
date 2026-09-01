@@ -1,9 +1,9 @@
 /*
  * L4 人工内容审校记录校验。
  *
- * 报告：node tools/review-deepdive-quality.js
- * 模板：node tools/review-deepdive-quality.js --template reasoning-models
- * 阻断：node tools/review-deepdive-quality.js --require-current reasoning-models
+ * 报告：node tools/deepdive/quality/review-deepdive-quality.js
+ * 模板：node tools/deepdive/quality/review-deepdive-quality.js --template reasoning-models
+ * 阻断：node tools/deepdive/quality/review-deepdive-quality.js --require-current reasoning-models
  */
 "use strict";
 

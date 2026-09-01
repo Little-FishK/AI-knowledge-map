@@ -408,10 +408,13 @@ function planFingerprint(plan) {
 }
 
 function runIntegrationValidators(root) {
-  const scripts = ["validate.js", "validate-deepdives.js"];
+  const scripts = [
+    "tools/validators/graph.js",
+    "tools/validators/deepdives.js"
+  ];
   const outputs = [];
   scripts.forEach(script => {
-    const result = spawnSync(process.execPath, [path.join(ROOT, "tools", script)], {
+    const result = spawnSync(process.execPath, [path.join(ROOT, ...script.split("/"))], {
       cwd: root,
       encoding: "utf8",
       env: { ...process.env, GRAPH_ROOT: root, DEEPDIVE_ROOT: root }

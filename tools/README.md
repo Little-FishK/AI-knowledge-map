@@ -1,8 +1,7 @@
 # Tooling layout
 
 `tools/` contains executable project workflows. Implementations are grouped by
-domain; root-level JavaScript files are legacy-compatible command entrypoints
-while callers migrate to the grouped paths.
+domain; commands should use their canonical domain paths directly.
 
 ## Directories
 
@@ -19,20 +18,18 @@ while callers migrate to the grouped paths.
   executable source files.
 
 Tests live in the top-level `tests/` directory, grouped into `app/`, `deepdive/`,
-`stage2/`, `tooling/`, and `video-ingest/`. Root-level `test-*.js` files are
-temporary compatibility entrypoints. Tooling-specific documentation belongs in
-`docs/` unless it must remain next to an executable.
+`stage2/`, `tooling/`, and `video-ingest/`. Tooling-specific documentation
+belongs in `docs/` unless it must remain next to an executable.
 
 ## Migration contract
 
 1. Move one domain at a time without changing its behavior.
-2. Keep the previous command path as a thin compatibility entrypoint.
+2. Update internal callers, package scripts, CI, and documentation to the new path.
 3. Resolve repository files through `shared/project-root.js`, not by counting
    parent directories from the implementation file.
-4. Update package scripts and internal callers only after both paths pass the
-   same tests.
-5. Remove compatibility entrypoints only after CI, MCP configuration, scheduled
-   controllers, tests, and documentation no longer reference them.
+4. Run the domain tests before removing or renaming the previous implementation.
+5. Search CI, MCP configuration, scheduled controllers, tests, and documentation
+   for stale paths before completing a migration.
 
 The Stage 2 implementation is migrated last. Its state, lease, capability, and
 publication contracts must remain unchanged throughout the tooling refactor.

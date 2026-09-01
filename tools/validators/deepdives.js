@@ -1,4 +1,4 @@
-/* 理解原理页 L1 发布门禁 —— node tools/validate-deepdives.js */
+/* 理解原理页 L1 发布门禁 —— node tools/validators/deepdives.js */
 "use strict";
 
 const fs = require("fs");

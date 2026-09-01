@@ -325,12 +325,12 @@ function runDeepDiveGates(pkg) {
       "utf8"
     );
     const commands = [
-      ["validate-deepdives.js", []],
-      ["audit-deepdive-gold.js", ["--require-candidate", pkg.node.id]],
-      ["audit-deepdive-benchmark.js", ["--require-benchmark", pkg.node.id]]
+      ["tools/validators/deepdives.js", []],
+      ["tools/deepdive/quality/audit-deepdive-gold.js", ["--require-candidate", pkg.node.id]],
+      ["tools/deepdive/quality/audit-deepdive-benchmark.js", ["--require-benchmark", pkg.node.id]]
     ];
     const results = commands.map(([script, args]) => {
-      const result = spawnSync(process.execPath, [path.join(ROOT, "tools", script), ...args], {
+      const result = spawnSync(process.execPath, [path.join(ROOT, ...script.split("/")), ...args], {
         cwd: fixture,
         encoding: "utf8",
         env: { ...process.env, DEEPDIVE_ROOT: fixture }

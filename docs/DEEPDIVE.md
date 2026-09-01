@@ -97,7 +97,7 @@ Codex 写第一版时自述犯了 5 个错，这 5 条正是本标准的由来�
 - **L3 教学一致性**：结构代理分只作诊断；自动阻断可确定举证的渲染污染、结构化依赖、公式、评测、单位，以及高置信的节尾证据集中和纯追加合同修补。注意：它不能穷尽收束写法，也不能判断内容正确性和教学有效性。
 - **L4 人工标杆认证**：关键项全部通过、六个维度均达最低分、总分至少 88，并用内容哈希绑定人工审校证据。
 
-每次修改后运行 `node tools/check-deepdive-quality.js`。核心标杆发布还应运行 `node tools/check-deepdive-quality.js --l4-certified <id>`。错误分类、成熟规范来源和规则准入合同见 [DEEPDIVE_GATE_ERROR_CATALOG.md](DEEPDIVE_GATE_ERROR_CATALOG.md)。自动门禁不能替代事实、公式、认知连续与示例有效性的 L4 人工审校。
+每次修改后运行 `node tools/deepdive/quality/check-deepdive-quality.js`。核心标杆发布还应运行 `node tools/deepdive/quality/check-deepdive-quality.js --l4-certified <id>`。错误分类、成熟规范来源和规则准入合同见 [DEEPDIVE_GATE_ERROR_CATALOG.md](DEEPDIVE_GATE_ERROR_CATALOG.md)。自动门禁不能替代事实、公式、认知连续与示例有效性的 L4 人工审校。
 
 ## 七、进入教学一致性与人工标杆审校的标准
 
@@ -116,4 +116,4 @@ Codex 写第一版时自述犯了 5 个错，这 5 条正是本标准的由来�
 9. **来源可维护**：至少 3 个优先级清楚的一手或权威来源；快速变化内容标明访问日期和版本边界。
 10. **逐页人工复核**：准确性、认知连续、原理深度、示例消歧、练习和来源六项均有文字依据；禁止仅凭字数或组件数给高分。
 
-运行 `node tools/audit-deepdive-gold.js` 可查看页面进入标杆审校前的**结构性缺口**。该脚本只负责找线索：它不能判断公式是否正确、例子是否真的解释机制，也不能代替浏览器阅读和人工评分。
+运行 `node tools/deepdive/quality/audit-deepdive-gold.js` 可查看页面进入标杆审校前的**结构性缺口**。该脚本只负责找线索：它不能判断公式是否正确、例子是否真的解释机制，也不能代替浏览器阅读和人工评分。

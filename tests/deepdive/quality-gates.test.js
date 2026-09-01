@@ -1,4 +1,4 @@
-/* 分层门禁回归与故障夹具 —— node tools/test-deepdive-quality.js */
+/* 分层门禁回归与故障夹具 —— node tests/deepdive/quality-gates.test.js */
 "use strict";
 
 const assert = require("assert");

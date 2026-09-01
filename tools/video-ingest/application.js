@@ -390,11 +390,11 @@ function atomicWrite(file, content) {
 function runApplicationValidators(root) {
   const validators = [
     {
-      script: path.join(ROOT, "tools", "validate-tutorials.js"),
+      script: path.join(ROOT, "tools", "validators", "tutorials.js"),
       env: { TUTORIAL_ROOT: root }
     },
     {
-      script: path.join(ROOT, "tools", "validate-video-applications.js"),
+      script: path.join(ROOT, "tools", "validators", "video-applications.js"),
       env: { VIDEO_APPLICATION_ROOT: root }
     }
   ];

@@ -6,7 +6,7 @@
 window.TUTORIALS = {
   meta: { version: "0.5", updatedAt: "2026-07-22" },
 
-  /* 评分块 review（TUTORIALS.md 三层审核落到数据，由 tools/validate-tutorials.js 强制校验）：
+  /* 评分块 review（TUTORIALS.md 三层审核落到数据，由 tools/validators/tutorials.js 强制校验）：
    *   evidence : "E0"|"E1"|"E2"|"E3"          —— 第一层证据等级
    *   status   : "formal"|"candidate"          —— 最终状态；formal 须过全部三层
    *   standards: {accuracy,alignment,reproducibility,traceability,safety} 各 0|1|2（第二层，正式收录须全 2）

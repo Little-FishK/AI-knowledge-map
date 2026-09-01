@@ -33,7 +33,7 @@
 
 ## 自动验证
 
-运行 `node tools/validate-deepdives.js`，结果应为：
+运行 `node tools/validators/deepdives.js`，结果应为：
 
 ```text
 核心节点 28 · 已加载原理页 129

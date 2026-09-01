@@ -37,7 +37,7 @@
 命令：
 
 ```powershell
-node tools/validate-deepdives.js
+node tools/validators/deepdives.js
 ```
 
 全部条件都是阻断项：
@@ -56,7 +56,7 @@ L1 不判断来源是否一手、题目是否高质量或内容是否正确。
 命令：
 
 ```powershell
-node tools/audit-deepdive-gold.js
+node tools/deepdive/quality/audit-deepdive-gold.js
 ```
 
 候选页至少应具备：
@@ -74,13 +74,13 @@ node tools/audit-deepdive-gold.js
 严格要求单页达到 L2：
 
 ```powershell
-node tools/audit-deepdive-gold.js --require-candidate reasoning-models
+node tools/deepdive/quality/audit-deepdive-gold.js --require-candidate reasoning-models
 ```
 
 合并时只阻断变更集新增的结构缺口：
 
 ```powershell
-node tools/audit-deepdive-gold.js --changed --baseline docs/deepdive-quality-baseline.json
+node tools/deepdive/quality/audit-deepdive-gold.js --changed --baseline docs/deepdive-quality-baseline.json
 ```
 
 `deepdive-quality-baseline.json` 只用于显式记录既有债务，不允许把新页面或新缺口加入基线来绕过审校。减少的缺口应及时从基线删除。
@@ -287,19 +287,19 @@ quality: {
 全量报告：
 
 ```powershell
-node tools/audit-deepdive-benchmark.js
+node tools/deepdive/quality/audit-deepdive-benchmark.js
 ```
 
 严格要求单页通过 L3 教学一致性门禁：
 
 ```powershell
-node tools/audit-deepdive-benchmark.js --require-benchmark reasoning-models
+node tools/deepdive/quality/audit-deepdive-benchmark.js --require-benchmark reasoning-models
 ```
 
 PR 增量阻断：
 
 ```powershell
-node tools/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-baseline.json
+node tools/deepdive/quality/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-baseline.json
 ```
 
 `deepdive-l3-baseline.json` 显式记录启用 L3 v2 时的历史债务。新页面没有基线，必须零缺口；既有页面不得新增缺口。基线不是“通过”，每条债务必须能追溯到规则 ID，减少后及时删除。禁止把新页面、新缺陷或无期限豁免写入基线绕过审校。
@@ -360,13 +360,13 @@ node tools/audit-deepdive-benchmark.js --changed --baseline docs/deepdive-l3-bas
 生成当前页面模板：
 
 ```powershell
-node tools/review-deepdive-quality.js --template reasoning-models
+node tools/deepdive/quality/review-deepdive-quality.js --template reasoning-models
 ```
 
 验证某页是否具有当前有效认证：
 
 ```powershell
-node tools/review-deepdive-quality.js --require-current reasoning-models
+node tools/deepdive/quality/review-deepdive-quality.js --require-current reasoning-models
 ```
 
 页面内容一旦变化，哈希失配，原认证自动失效。快速变化主题建议有效期不超过 90 天；稳定基础主题不超过 365 天。
@@ -374,7 +374,7 @@ node tools/review-deepdive-quality.js --require-current reasoning-models
 生成与当前页面哈希绑定的真实浏览器证据：
 
 ```powershell
-node tools/audit-deepdive-browser.js --id reasoning-models --report docs/evidence/reasoning-models-browser.json
+node tools/deepdive/quality/audit-deepdive-browser.js --id reasoning-models --report docs/evidence/reasoning-models-browser.json
 ```
 
 `browser-report` 必须由该工具生成、通过桌面和移动视口、包含当前页面哈希，并由审校记录再次校验文件 SHA-256。复现日志仍需人工判断其结论是否可信；自动门禁只负责确保记录存在、未被篡改且交叉引用真实页面内容。
@@ -384,19 +384,19 @@ node tools/audit-deepdive-browser.js --id reasoning-models --report docs/evidenc
 常规回归：
 
 ```powershell
-node tools/check-deepdive-quality.js
+node tools/deepdive/quality/check-deepdive-quality.js
 ```
 
 门禁工具自身的回归测试：
 
 ```powershell
-node tools/test-deepdive-quality.js
+node tests/deepdive/quality-gates.test.js
 ```
 
 要求某页具有 L4 人工认证：
 
 ```powershell
-node tools/check-deepdive-quality.js --l4-certified reasoning-models
+node tools/deepdive/quality/check-deepdive-quality.js --l4-certified reasoning-models
 ```
 
 合并规则：
@@ -436,7 +436,7 @@ node tools/check-deepdive-quality.js --l4-certified reasoning-models
 
 ```powershell
 npm install
-node tools/audit-deepdive-browser.js --changed
+node tools/deepdive/quality/audit-deepdive-browser.js --changed
 ```
 
 工具使用真实 Chromium，在 1280×900 与 390×844 两个视口检查渲染、页面/表格重排、标题层级、图像替代文本、SVG 名称、表头、链接与按钮名称、键盘焦点、Escape 关闭、文本对比度和控制台错误。它只覆盖可自动判断的 WCAG 子集，不能据此声明完整 WCAG 2.2 AA 合规。

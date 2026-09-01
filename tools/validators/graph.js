@@ -1,5 +1,5 @@
 /* 数据校验 —— 每次改完 data/graph.js 必跑
- *   node tools/validate.js
+ *   node tools/validators/graph.js
  *
  * 已经踩过的坑，都在这里设了闸：
  *   - 中文正文里写英文双引号会直接破坏 JS 字符串语法（踩过两次）

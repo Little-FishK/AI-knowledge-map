@@ -1,5 +1,5 @@
 /* 软件目录校验 —— 每次改完 data/software.js 必跑
- *   node tools/validate-software.js
+ *   node tools/validators/software.js
  *
  * 拦的坑（和 validate.js 同源）：
  *   - 中文正文里用英文双引号破坏 JS 字符串
