@@ -11,10 +11,12 @@ const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/con
 const { createControllerLifecycle } = require("../../tools/deepdive-stage2/lib/controller-lifecycle");
 const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/lib/editorial-candidate-import");
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
+const { createManualReviewPreviewServices } = require("../../tools/deepdive-stage2/lib/manual-review-preview");
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createResultSubmissionWorkflow } = require("../../tools/deepdive-stage2/lib/result-submission-workflow");
+const { createReviewRecovery } = require("../../tools/deepdive-stage2/lib/review-recovery");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
 const { createTaskOrchestration } = require("../../tools/deepdive-stage2/lib/task-orchestration");
 
@@ -417,6 +419,43 @@ try {
   assert.deepStrictEqual(retried.blockers, []);
   assert.deepStrictEqual(retried.reviewHistory, []);
 
+  const recoveryState = {
+    pages: {
+      review: {
+        id: "review",
+        state: "manual-review",
+        repairAttempts: 1,
+        blockers: [{ code: "formula-error" }],
+        reviewHistory: [{ round: 1 }],
+        finalReview: { status: "manual-review" },
+        lease: null,
+      },
+    },
+  };
+  const recoveryEvents = [];
+  const recovery = createReviewRecovery({
+    defaultRoot: root,
+    acquireLock: () => () => {},
+    appendEvent: (_root, type, details) => recoveryEvents.push({ type, details }),
+    loadState: () => recoveryState,
+    saveState: (_root, state) => state,
+  });
+  const resetReview = recovery.resetManualReview(root, "review", "重新进行独立复审");
+  assert.strictEqual(resetReview.nextState, "audit-queued");
+  assert.deepStrictEqual(recoveryState.pages.review.blockers, []);
+  assert.deepStrictEqual(recoveryState.pages.review.reviewHistory, []);
+  assert.strictEqual(recoveryEvents[0].type, "manual-review-reset");
+
+  const previewServices = createManualReviewPreviewServices({});
+  const unsafePreview = '<section onclick="run()"><script>alert(1)</script><a href="javascript:run()">链接</a></section>';
+  const safePreview = previewServices.sanitizePreviewHtml(unsafePreview);
+  assert(!safePreview.includes("<script"));
+  assert(!safePreview.includes("onclick="));
+  assert(!safePreview.includes("javascript:"));
+  const previewRecord = {};
+  assert.deepStrictEqual(previewServices.ensureReviewHistory(previewRecord), []);
+  assert.strictEqual(previewRecord.reviewHistory.length, 0);
+
   const reviewState = {
     pages: {
       review: {
@@ -459,7 +498,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、候选门禁、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、候选门禁、内容生成、候选构建、候选校验、结果提交、审查恢复与预览、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
