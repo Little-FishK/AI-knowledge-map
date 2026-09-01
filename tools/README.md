@@ -14,8 +14,9 @@ domain; commands should use their canonical domain paths directly.
   deep-dive workflows.
 - `deepdive-stage2/`: the protected Stage 2 controller and MCP implementation;
   `core.js` is the stable public facade and `lib/` contains internal storage,
-  audit access, content generation, editorial candidate validation, manual-review
-  workflows, audit rules, publication transactions, and editorial rendering.
+  audit access, content generation, editorial candidate construction/import,
+  editorial candidate validation, manual-review workflows, audit rules,
+  publication transactions, and editorial rendering.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
 
 Generated or reviewed ingestion artifacts live in the top-level `artifacts/`

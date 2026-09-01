@@ -7,6 +7,7 @@ const path = require("path");
 const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/audit-project-access");
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
+const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/lib/editorial-candidate-import");
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
@@ -200,6 +201,48 @@ try {
     [1],
   );
 
+  const responseDirectory = path.join(root, "docs", "deepdive-reviews");
+  fs.mkdirSync(responseDirectory, { recursive: true });
+  const responseMarkdown = "# Review Agent Responses\n\n## 1. 机制\n\n生成后的完整机制说明。\n";
+  fs.writeFileSync(path.join(responseDirectory, "review-agent-responses.md"), responseMarkdown, "utf8");
+  const candidateImport = createEditorialCandidateImport({
+    defaultRoot: root,
+    clone: value => JSON.parse(JSON.stringify(value)),
+    contentGenerationResponseEncodingError: contentGeneration.contentGenerationResponseEncodingError,
+    exactHtmlBlocks: candidateValidation.exactHtmlBlocks,
+    htmlBlockWithClass: candidateValidation.htmlBlockWithClass,
+    isConfiguredRemovedSectionTitle: title => ["常见误解", "自测"].includes(title),
+    sectionRecordsForPreservation: candidateValidation.sectionRecordsForPreservation,
+    sha256,
+    withinRoot: store.withinRoot,
+  });
+  const preservedFigure = '<figure class="dd-fig"><span>原图</span></figure>';
+  const builtCandidate = candidateImport.buildEditorialPageFromContentGeneration(root, {
+    id: "review",
+    contentGeneration: {
+      status: "complete",
+      outputFile: "docs/deepdive-reviews/review-agent-responses.md",
+      outputHash: sha256(responseMarkdown),
+    },
+  }, {
+    id: "review",
+    title: "标题",
+    subtitle: "副标题",
+    thesis: "命题",
+    html: [
+      '<div class="dd-goals">学习目标</div>',
+      '<div class="dd-chain">因果链</div>',
+      `<section class="dd-sec"><h2><span class="dd-n">1</span>机制</h2><p>旧正文</p>${preservedFigure}</section>`,
+      '<div class="dd-src">资料来源</div>',
+    ].join("\n"),
+  });
+  assert(builtCandidate.page.html.includes("生成后的完整机制说明"));
+  assert(builtCandidate.page.html.includes(preservedFigure));
+  assert.strictEqual(builtCandidate.source.sectionCount, 1);
+  assert.throws(() => candidateImport.buildEditorialPageFromContentGeneration(root, {
+    id: "review",
+  }, {}), /没有已完成且可验证/);
+
   const reviewState = {
     pages: {
       review: {
@@ -242,7 +285,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选校验、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选构建、候选校验、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
