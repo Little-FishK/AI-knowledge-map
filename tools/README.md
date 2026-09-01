@@ -18,8 +18,10 @@ while callers migrate to the grouped paths.
 - `proposals/`: generated or reviewed ingestion artifacts; these are not
   executable source files.
 
-Tests are moving to the top-level `tests/` directory by domain. Tooling-specific
-documentation belongs in `docs/` unless it must remain next to an executable.
+Tests live in the top-level `tests/` directory, grouped into `app/`, `deepdive/`,
+`stage2/`, `tooling/`, and `video-ingest/`. Root-level `test-*.js` files are
+temporary compatibility entrypoints. Tooling-specific documentation belongs in
+`docs/` unless it must remain next to an executable.
 
 ## Migration contract
 
