@@ -7,6 +7,8 @@ const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
 const { createAuditProjectAccess } = require("./lib/audit-project-access");
+const { createAuditRules } = require("./lib/audit-rules");
+const { createContentGeneration } = require("./lib/content-generation");
 const {
   escapeEditorialHtml,
   normalizedBlockText,
@@ -21,7 +23,6 @@ const { clone, createStateStore, sha256 } = require("./lib/state-store");
 const { loadDeepDivePages } = require("../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../deepdive/quality/deepdive-audit-contracts");
 const {
-  TEMPLATE_FAMILIES,
   narrativeTemplateBlockers,
   plainText,
   scanNarrativeTemplates,
@@ -138,6 +139,43 @@ const CODEX_TASK_ARCHIVE_STATUSES = [
 const DEFAULT_EDITORIAL_REMOVED_SECTIONS = ["常见误解", "常见误区", "自测", "检查你是否真的理解"];
 const CONTENT_GENERATION_SKIPPED_TITLES = ["常见误解", "常见误区", "自测", "检查你是否真的理解"];
 const CONTENT_GENERATION_MAX_RESPONSE_CHARS = 100_000;
+const {
+  contentGenerationManifest,
+  contentGenerationMarkdown,
+  contentGenerationOutputShape,
+  contentGenerationResponseEncodingError,
+  contentGenerationResultGaps,
+  contentGenerationReviewMaterial,
+  contentGenerationSections,
+  isConfiguredRemovedSectionTitle,
+  readContentGenerationSection,
+  saveContentGenerationResponse,
+} = createContentGeneration({
+  defaultRoot: ROOT,
+  prompt: CONTENT_GENERATION_PROMPT,
+  skippedTitles: CONTENT_GENERATION_SKIPPED_TITLES,
+  removedSectionTitles: DEFAULT_EDITORIAL_REMOVED_SECTIONS,
+  maxResponseChars: CONTENT_GENERATION_MAX_RESPONSE_CHARS,
+  authorizeTaskLease,
+  sha256,
+  acquireLock,
+  appendEvent,
+  atomicWrite,
+  loadState,
+  saveState,
+  withinRoot,
+});
+const { auditBlockers, auditGaps } = createAuditRules({
+  schemaVersion: AUDIT_SCHEMA_VERSION,
+  sixQuestions: SIX_QUESTIONS,
+  blockerCodes: L3_BLOCKER_CODES,
+  warningCodes: L3_WARNING_CODES,
+  legacyBlockerCodes: LEGACY_BLOCKER_CODES,
+  visibleRawLatexSections,
+  auditContract,
+  clone,
+  sha256,
+});
 
 function archiveCurrentTaskDirective(reason) {
   return {
@@ -438,294 +476,6 @@ function pageSubmissionShape(page) {
   };
 }
 
-function cleanContentSectionTitle(headingHtml, fallback) {
-  const withoutMetadata = String(headingHtml || "")
-    .replace(/<span\b[^>]*class=["'][^"']*\bdd-n\b[^"']*["'][^>]*>[\s\S]*?<\/span>/gi, " ")
-    .replace(/<span\b[^>]*class=["'][^"']*\bdd-badge\b[^"']*["'][^>]*>[\s\S]*?<\/span>/gi, " ");
-  return plainText(withoutMetadata)
-    .replace(/^\d+(?:\.\d+)*\s+/, "")
-    .replace(/[。；]+$/g, "")
-    .trim() || fallback;
-}
-
-function isSkippedContentGenerationTitle(title) {
-  const normalized = String(title || "").replace(/\s+/g, "").replace(/[：:。；]/g, "");
-  return CONTENT_GENERATION_SKIPPED_TITLES.some(item => normalized.includes(item.replace(/\s+/g, "")));
-}
-
-function isConfiguredRemovedSectionTitle(title, removedSectionTitles = DEFAULT_EDITORIAL_REMOVED_SECTIONS) {
-  const normalized = String(title || "").replace(/\s+/g, "").replace(/[：:。；]/g, "");
-  return (removedSectionTitles || []).some(item => {
-    const removed = String(item || "").replace(/\s+/g, "").replace(/[：:。；]/g, "");
-    return removed && normalized.includes(removed);
-  });
-}
-
-function contentGenerationSections(page) {
-  const html = String(page && page.html || "");
-  const matches = [...html.matchAll(
-    /<section\b[^>]*class=["'][^"']*\bdd-sec\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi,
-  )];
-  const source = matches.length
-    ? matches.map(match => match[0])
-    : [...html.matchAll(/<section\b[^>]*>[\s\S]*?<\/section>/gi)].map(match => match[0]);
-  return source.map((sectionHtml, index) => {
-    const headingMatch = sectionHtml.match(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/i);
-    const title = cleanContentSectionTitle(headingMatch && headingMatch[1], `第 ${index + 1} 章`);
-    const bodyHtml = sectionHtml.replace(/<h[1-6]\b[^>]*>[\s\S]*?<\/h[1-6]>/i, " ");
-    return {
-      sectionNumber: index + 1,
-      title,
-      skipped: isSkippedContentGenerationTitle(title),
-      text: plainText(bodyHtml),
-      html: sectionHtml,
-      contentHash: sha256(sectionHtml),
-    };
-  });
-}
-
-function contentGenerationReviewMaterial(root, record) {
-  const graphSource = fs.readFileSync(path.join(root, "data", "graph.js"), "utf8");
-  const graphContext = { window: {} };
-  vm.createContext(graphContext);
-  vm.runInContext(graphSource, graphContext);
-  const phases = graphContext.window.GRAPH
-    && Array.isArray(graphContext.window.GRAPH.recommendedLearningPath)
-    ? graphContext.window.GRAPH.recommendedLearningPath
-    : [];
-  const step = phases.flatMap(phase => phase.steps || [])
-    .find(item => String(item[1]) === record.id);
-  if (!step) throw new Error(`官方推荐学习路径中不存在页面：${record.id}`);
-  const order = String(step[0]);
-  const group = order.split(".")[0];
-  const relativePath = `docs/deepdive-reviews/${group}x-section-text-review.md`;
-  const file = withinRoot(root, relativePath);
-  if (!fs.existsSync(file)) throw new Error(`缺少旧理解原理页章节审阅稿：${relativePath}`);
-  const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);
-  const escapedId = record.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pagePattern = new RegExp(`^##\\s+${order.replace(/\./g, "\\.")}\\s+(.+?)（${escapedId}）\\s*$`);
-  const start = lines.findIndex(line => pagePattern.test(line));
-  if (start < 0) throw new Error(`章节审阅稿中不存在页面：${order} ${record.id}`);
-  const titleMatch = lines[start].match(pagePattern);
-  const end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
-  const pageLines = lines.slice(start + 1, end < 0 ? lines.length : end);
-  const sections = [];
-  let current = null;
-  pageLines.forEach(line => {
-    const heading = line.match(/^###\s+(\d+(?:\.\d+)*)\s+(.+?)\s*$/);
-    if (heading) {
-      if (current) sections.push(current);
-      current = {
-        sectionNumber: sections.length + 1,
-        sourceOrder: heading[1],
-        title: heading[2].trim(),
-        body: [],
-      };
-      return;
-    }
-    if (current) current.body.push(line);
-  });
-  if (current) sections.push(current);
-  const normalizedSections = sections.map(section => {
-    const text = section.body.join("\n").trim();
-    return {
-      sectionNumber: section.sectionNumber,
-      sourceOrder: section.sourceOrder,
-      title: section.title,
-      skipped: isSkippedContentGenerationTitle(section.title),
-      text,
-      html: null,
-      contentHash: sha256(text),
-    };
-  });
-  if (!normalizedSections.length) throw new Error(`页面 ${record.id} 的章节审阅稿没有章节`);
-  return {
-    pageId: record.id,
-    order,
-    title: titleMatch[1].trim(),
-    sourceFile: relativePath,
-    sourceHash: sha256(fs.readFileSync(file, "utf8")),
-    sections: normalizedSections,
-  };
-}
-
-function contentGenerationManifest(material) {
-  const sections = Array.isArray(material && material.sections)
-    ? material.sections
-    : contentGenerationSections(material);
-  return {
-    eligibleSections: sections.filter(section => !section.skipped).map(section => ({
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      contentHash: section.contentHash,
-    })),
-    skippedSections: sections.filter(section => section.skipped).map(section => ({
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      reason: "按内容生成合同跳过常见误解与自测章节",
-    })),
-  };
-}
-
-function contentGenerationOutputShape(material) {
-  const manifest = contentGenerationManifest(material);
-  return {
-    pageId: "<page-id>",
-    responses: manifest.eligibleSections.map(section => ({
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      response: "<对该章节执行控制器返回的完整固定提示词后得到的原始回复>",
-    })),
-    summary: "<可选，至多 500 字>",
-  };
-}
-
-function contentGenerationResponseEncodingError(value) {
-  const text = String(value || "");
-  if (text.includes("\uFFFD")) return "包含 Unicode 替换字符，疑似发生编码损坏";
-  if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
-    return "包含非法控制字符，疑似反斜杠转义被错误解析";
-  }
-  if (/\?{8,}/.test(text)) return "包含连续问号，疑似非 UTF-8 管道将正文替换为问号";
-  return null;
-}
-
-function contentGenerationResultGaps(record, material, result) {
-  const gaps = [];
-  const manifest = contentGenerationManifest(material);
-  if (!result || typeof result !== "object" || Array.isArray(result)) {
-    return ["result 必须是对象"];
-  }
-  if (result.pageId !== record.id) gaps.push("result.pageId 与任务页面不一致");
-  if (!Array.isArray(result.responses)) {
-    gaps.push("result.responses 必须是数组");
-    return gaps;
-  }
-  if (result.responses.length !== manifest.eligibleSections.length) {
-    gaps.push("result.responses 必须恰好覆盖全部可处理章节");
-  }
-  const seen = new Set();
-  result.responses.forEach((response, index) => {
-    const expected = manifest.eligibleSections[index];
-    if (!response || typeof response !== "object" || Array.isArray(response)) {
-      gaps.push(`responses[${index}] 必须是对象`);
-      return;
-    }
-    if (!Number.isInteger(response.sectionNumber)) {
-      gaps.push(`responses[${index}].sectionNumber 必须是整数`);
-    } else if (seen.has(response.sectionNumber)) {
-      gaps.push(`章节 ${response.sectionNumber} 重复`);
-    } else {
-      seen.add(response.sectionNumber);
-    }
-    if (expected && response.sectionNumber !== expected.sectionNumber) {
-      gaps.push(`responses[${index}] 必须对应第 ${expected.sectionNumber} 章并保持原顺序`);
-    }
-    if (expected && String(response.title || "").trim() !== expected.title) {
-      gaps.push(`responses[${index}].title 与任务章节标题不一致`);
-    }
-    const responseText = String(response.response || "").trim();
-    if (!responseText) gaps.push(`responses[${index}].response 不能为空`);
-    const encodingError = contentGenerationResponseEncodingError(responseText);
-    if (encodingError) gaps.push(`responses[${index}].response ${encodingError}`);
-    if (responseText.length > CONTENT_GENERATION_MAX_RESPONSE_CHARS) {
-      gaps.push(`responses[${index}].response 超过 ${CONTENT_GENERATION_MAX_RESPONSE_CHARS} 字符`);
-    }
-  });
-  if (String(result.summary || "").length > 500) gaps.push("result.summary 最多 500 字符");
-  return gaps;
-}
-
-function contentGenerationMarkdown(material, result) {
-  const lines = [
-    `# ${String(material && material.title || result.pageId)} Agent Responses`,
-    "",
-    `> 页面：${result.pageId}。以下内容按原页章节顺序，由同一个 content-generation Agent 对每章执行控制器返回的完整固定提示词后原样汇总。常见误解与自测章节未发送。`,
-    "",
-  ];
-  result.responses.forEach(response => {
-    lines.push(`## ${response.sectionNumber}. ${response.title}`, "", String(response.response).trim(), "");
-  });
-  return `${lines.join("\n").trim()}\n`;
-}
-
-function saveContentGenerationResponse(root = ROOT, input = {}) {
-  const resolvedRoot = path.resolve(root);
-  const release = acquireLock(resolvedRoot);
-  try {
-    const state = loadState(resolvedRoot);
-    const record = Object.values(state.pages).find(page =>
-      page.lease && page.lease.taskId === input.taskId
-    );
-    if (!record) throw new Error("内容生成响应对应的活动租约不存在");
-    if (record.lease.token !== input.leaseToken) throw new Error("内容生成响应的租约令牌无效");
-    if (record.lease.role !== "content-generation") throw new Error("只有 content-generation 角色可以保存章节回复");
-    if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("内容生成租约已经过期");
-    const material = contentGenerationReviewMaterial(resolvedRoot, record);
-    const manifest = contentGenerationManifest(material);
-    const savedResponses = Array.isArray(record.contentGeneration && record.contentGeneration.savedResponses)
-      ? record.contentGeneration.savedResponses
-      : [];
-    const expected = manifest.eligibleSections[savedResponses.length];
-    if (!expected) throw new Error("所有允许章节的回复均已保存");
-    const sectionNumber = Number(input.sectionNumber);
-    if (sectionNumber !== expected.sectionNumber) {
-      throw new Error(`必须先保存第 ${expected.sectionNumber} 章“${expected.title}”的回复`);
-    }
-    if (input.title != null && String(input.title).trim() !== expected.title) {
-      throw new Error("章节标题与当前待保存章节不一致");
-    }
-    const response = String(input.response || "").trim();
-    if (!response) throw new Error("章节回复不能为空");
-    const encodingError = contentGenerationResponseEncodingError(response);
-    if (encodingError) throw new Error(`章节回复拒绝保存：${encodingError}`);
-    if (response.length > CONTENT_GENERATION_MAX_RESPONSE_CHARS) {
-      throw new Error(`章节回复超过 ${CONTENT_GENERATION_MAX_RESPONSE_CHARS} 字符`);
-    }
-    const saved = {
-      sectionNumber: expected.sectionNumber,
-      title: expected.title,
-      response,
-      savedAt: new Date().toISOString(),
-    };
-    savedResponses.push(saved);
-    record.contentGeneration.savedResponses = savedResponses;
-    record.contentGeneration.status = savedResponses.length === manifest.eligibleSections.length
-      ? "responses-saved"
-      : "in-progress";
-    const outputRelative = record.contentGeneration.outputFile;
-    const markdown = contentGenerationMarkdown(material, {
-      pageId: record.id,
-      responses: savedResponses,
-    });
-    atomicWrite(withinRoot(resolvedRoot, outputRelative), markdown);
-    record.contentGeneration.outputHash = sha256(markdown);
-    record.updatedAt = saved.savedAt;
-    saveState(resolvedRoot, state);
-    const next = manifest.eligibleSections[savedResponses.length] || null;
-    appendEvent(resolvedRoot, "content-generation-response-saved", {
-      id: record.id,
-      taskId: input.taskId,
-      sectionNumber: saved.sectionNumber,
-      savedCount: savedResponses.length,
-      remainingCount: manifest.eligibleSections.length - savedResponses.length,
-    });
-    return {
-      status: "saved",
-      pageId: record.id,
-      sectionNumber: saved.sectionNumber,
-      savedCount: savedResponses.length,
-      totalCount: manifest.eligibleSections.length,
-      outputFile: outputRelative,
-      outputHash: record.contentGeneration.outputHash,
-      nextSectionNumber: next ? next.sectionNumber : null,
-      done: !next,
-    };
-  } finally {
-    release();
-  }
-}
-
 function readTaskPacketPart(root = ROOT, input = {}) {
   const resolvedRoot = path.resolve(root);
   const record = authorizeTaskLease(resolvedRoot, input.taskId, input.leaseToken);
@@ -766,52 +516,6 @@ function readTaskPacketPart(root = ROOT, input = {}) {
     totalChars: html.length,
     done: nextOffset >= html.length,
     content: html.slice(offset, nextOffset),
-  };
-}
-
-function readContentGenerationSection(root = ROOT, input = {}) {
-  const resolvedRoot = path.resolve(root);
-  const record = authorizeTaskLease(resolvedRoot, input.taskId, input.leaseToken);
-  if (record.lease.role !== "content-generation") {
-    throw new Error("只有 content-generation 角色可以读取内容生成章节");
-  }
-  const requestedSection = Number(input.sectionNumber);
-  if (!Number.isInteger(requestedSection) || requestedSection < 1) {
-    throw new Error("sectionNumber 必须是正整数");
-  }
-  const material = contentGenerationReviewMaterial(resolvedRoot, record);
-  const sections = material.sections;
-  const section = sections.find(item => item.sectionNumber === requestedSection);
-  if (!section) throw new Error(`页面 ${record.id} 不存在第 ${requestedSection} 章`);
-  if (section.skipped) {
-    throw new Error(`第 ${requestedSection} 章“${section.title}”按合同禁止发送给内容生成 Agent`);
-  }
-  const manifest = contentGenerationManifest(material);
-  const savedCount = Array.isArray(record.contentGeneration && record.contentGeneration.savedResponses)
-    ? record.contentGeneration.savedResponses.length
-    : 0;
-  const expected = manifest.eligibleSections[savedCount];
-  if (!expected) throw new Error("所有允许章节均已处理，请提交最终结果");
-  if (requestedSection !== expected.sectionNumber) {
-    throw new Error(`必须按顺序读取第 ${expected.sectionNumber} 章“${expected.title}”`);
-  }
-  const eligible = sections.filter(item => !item.skipped);
-  const position = eligible.findIndex(item => item.sectionNumber === requestedSection);
-  const next = position >= 0 ? eligible[position + 1] : null;
-  return {
-    status: "ok",
-    pageId: record.id,
-    role: record.lease.role,
-    prompt: CONTENT_GENERATION_PROMPT,
-    section: {
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      contentHash: section.contentHash,
-      text: section.text,
-      sourceOrder: section.sourceOrder,
-    },
-    nextSectionNumber: next ? next.sectionNumber : null,
-    done: !next,
   };
 }
 
@@ -1277,301 +981,6 @@ function compactBlocker(blocker) {
     section: Number.isInteger(blocker && blocker.section) ? blocker.section : null,
     message: String(blocker && (blocker.message || blocker.evidence) || JSON.stringify(blocker || {})).slice(0, 1000),
   };
-}
-
-function legacyAuditGaps(id, page, audit) {
-  const gaps = [];
-  const narrativeScan = scanNarrativeTemplates(page);
-  const visiblePageText = [page.title, page.subtitle, page.thesis, page.html]
-    .map(value => String(value || "").replace(/<[^>]+>/g, " "))
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-  const sectionCount = (String(page.html || "").match(/<section\b/gi) || []).length;
-  const rawLatexSections = visibleRawLatexSections(page);
-  if (!audit || typeof audit !== "object") return ["独立审计结果缺失"];
-  if (audit.schemaVersion !== 2) {
-    gaps.push("独立审计 schemaVersion 必须为 2");
-  }
-  if (audit.pageId !== id) gaps.push("独立审计 pageId 不匹配");
-  if (audit.pageHash !== pageContentHash(page)) gaps.push("独立审计 pageHash 与当前正文不匹配");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(audit.reviewedAt || "")) gaps.push("独立审计日期无效");
-  if (!["pass", "fail"].includes(audit.decision)) {
-    gaps.push("独立审计 decision 必须是 pass 或 fail");
-  }
-  if (!Array.isArray(audit.blockingFindings)) {
-    gaps.push("独立审计 blockingFindings 必须是数组");
-  } else {
-    audit.blockingFindings.forEach((finding, index) => {
-      if (!finding || typeof finding !== "object") {
-        gaps.push(`blockingFindings[${index}] 必须是对象`);
-        return;
-      }
-      if (!LEGACY_BLOCKER_CODES.has(finding.code)) {
-        gaps.push(`blockingFindings[${index}] 使用了非阻断代码：${finding.code || "<missing>"}`);
-      }
-      if (!String(finding.claim || "").trim()) {
-        gaps.push(`blockingFindings[${index}].claim 缺失`);
-      }
-      if (!String(finding.evidence || "").trim()) {
-        gaps.push(`blockingFindings[${index}].evidence 缺失`);
-      } else {
-        const evidence = String(finding.evidence).replace(/\s+/g, " ").trim();
-        if (!visiblePageText.includes(evidence)) {
-          gaps.push(`blockingFindings[${index}].evidence 不是当前正文中的可见证据`);
-        }
-      }
-      if (!String(finding.rationale || "").trim()) {
-        gaps.push(`blockingFindings[${index}].rationale 缺失`);
-      }
-      if (finding.section !== null && !Number.isInteger(finding.section)) {
-        gaps.push(`blockingFindings[${index}].section 必须是章节序号或 null`);
-      } else if (Number.isInteger(finding.section)
-        && (finding.section < 1 || finding.section > sectionCount)) {
-        gaps.push(`blockingFindings[${index}].section 超出当前正文章节范围`);
-      }
-    });
-    if (audit.decision === "pass" && audit.blockingFindings.length) {
-      gaps.push("decision=pass 时 blockingFindings 必须为空");
-    }
-    if (audit.decision === "fail" && !audit.blockingFindings.length) {
-      gaps.push("decision=fail 时必须提供至少一个高置信阻断项");
-    }
-  }
-  if (rawLatexSections.length && (audit.decision !== "fail"
-    || !Array.isArray(audit.blockingFindings)
-    || !audit.blockingFindings.some(finding => finding && finding.code === "formula-error"))) {
-    gaps.push(`正文第 ${rawLatexSections.map(item => item.section).join("、")} 节显示原始 LaTeX 命令，必须以 formula-error 阻断`);
-  }
-  const narrativeAudit = audit.narrativeAudit;
-  if (!narrativeAudit || typeof narrativeAudit !== "object") {
-    gaps.push("独立审计缺少 narrativeAudit 模板化叙事检查");
-  } else {
-    const expectedSections = narrativeScan.sections.map(section => section.section);
-    const reviewedSections = Array.isArray(narrativeAudit.reviewedSections)
-      ? narrativeAudit.reviewedSections
-      : [];
-    const normalizedReviewed = [...new Set(reviewedSections.filter(Number.isInteger))].sort((a, b) => a - b);
-    if (JSON.stringify(normalizedReviewed) !== JSON.stringify(expectedSections)) {
-      gaps.push("narrativeAudit.reviewedSections 必须覆盖全部核心教学章节且不得重复");
-    }
-    if (!Array.isArray(narrativeAudit.sectionOpenings)
-      || narrativeAudit.sectionOpenings.length !== narrativeScan.sectionCount) {
-      gaps.push("narrativeAudit.sectionOpenings 必须逐个核心教学章节提供开场证据");
-    } else {
-      const openingSections = new Set();
-      narrativeAudit.sectionOpenings.forEach((opening, index) => {
-        const sectionNumber = Number.isInteger(opening && opening.section)
-          ? opening.section
-          : index + 1;
-        const section = narrativeScan.sections.find(item => item.section === sectionNumber);
-        if (openingSections.has(sectionNumber)) {
-          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节重复`);
-        }
-        openingSections.add(sectionNumber);
-        if (!section) {
-          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节超出正文范围`);
-          return;
-        }
-        const evidence = String(opening && opening.evidence || "").replace(/\s+/g, " ").trim();
-        if (!evidence || !section.text.includes(evidence)) {
-          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节缺少当前正文中的开场证据`);
-        }
-        if (!TEMPLATE_FAMILIES.has(opening && opening.patternFamily)) {
-          gaps.push(`narrativeAudit.sectionOpenings 第 ${sectionNumber} 节 patternFamily 非法`);
-        }
-      });
-    }
-    if (typeof narrativeAudit.pervasiveTemplateExpression !== "boolean") {
-      gaps.push("narrativeAudit.pervasiveTemplateExpression 必须是布尔值");
-    }
-    if (!String(narrativeAudit.rationale || "").trim()) {
-      gaps.push("narrativeAudit.rationale 缺失");
-    }
-    if (narrativeAudit.pervasiveTemplateExpression === true) {
-      const hasTemplateBlocker = Array.isArray(audit.blockingFindings)
-        && audit.blockingFindings.some(finding => finding && finding.code === "harmful-template-expression");
-      if (audit.decision !== "fail" || !hasTemplateBlocker) {
-        gaps.push("narrativeAudit 判定存在普遍模板化表达时，必须以 harmful-template-expression 判定 fail");
-      }
-    }
-  }
-  if (!Array.isArray(audit.sections) || !audit.sections.length) {
-    gaps.push("独立审计缺少逐节结果");
-    return gaps;
-  }
-  const expectedAuditSections = narrativeScan.sections.map(section => section.section);
-  const submittedAuditSections = audit.sections
-    .map(section => section && section.section)
-    .filter(Number.isInteger);
-  const uniqueSubmittedSections = [...new Set(submittedAuditSections)].sort((a, b) => a - b);
-  if (JSON.stringify(uniqueSubmittedSections) !== JSON.stringify(expectedAuditSections)
-    || submittedAuditSections.length !== uniqueSubmittedSections.length) {
-    gaps.push("独立审计 sections 必须恰好覆盖全部核心教学章节且不得重复");
-  }
-  audit.sections.forEach((section, index) => {
-    const sectionNumber = Number.isInteger(section && section.section) ? section.section : index + 1;
-    const pageSection = narrativeScan.sections.find(item => item.section === sectionNumber);
-    SIX_QUESTIONS.forEach(question => {
-      const answer = section && section[question];
-      if (!answer || !String(answer.answer || "").trim() || !String(answer.evidence || "").trim()) {
-        gaps.push(`第 ${sectionNumber} 节：读者无法从正文确定 ${question}`);
-        return;
-      }
-      if (audit.decision === "pass" && String(answer.answer).trim().length < 16) {
-        gaps.push(`第 ${sectionNumber} 节：${question} 的审计答案少于 16 字`);
-      }
-      const evidence = plainText(answer.evidence);
-      if (!pageSection || !evidence || !pageSection.text.includes(evidence)) {
-        gaps.push(`第 ${sectionNumber} 节：${question} 的 evidence 不是本节正文中的可见证据`);
-      }
-    });
-  });
-  return gaps;
-}
-
-function visibleAuditText(page) {
-  return [page.title, page.subtitle, page.thesis, page.html]
-    .map(value => plainText(String(value || "")))
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function auditGaps(id, page, audit, contract = null) {
-  if (audit && audit.schemaVersion === 2 && (!contract || contract.schemaVersion === 2 || contract.legacyCompatible)) {
-    return legacyAuditGaps(id, page, audit);
-  }
-  const gaps = [];
-  const expected = contract || auditContract();
-  const mode = expected.mode || "full";
-  const visibleText = visibleAuditText(page);
-  const sectionCount = (String(page.html || "").match(/<section\b/gi) || []).length;
-  const rawLatexSections = visibleRawLatexSections(page);
-  if (!audit || typeof audit !== "object") return ["独立审查结果缺失"];
-  if (audit.schemaVersion !== AUDIT_SCHEMA_VERSION) gaps.push(`独立审查 schemaVersion 必须为 ${AUDIT_SCHEMA_VERSION}`);
-  if (audit.pageId !== id) gaps.push("独立审查 pageId 不匹配");
-  if (audit.pageHash !== pageContentHash(page)) gaps.push("独立审查 pageHash 与当前正文不匹配");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(audit.reviewedAt || "")) gaps.push("独立审查日期无效");
-  if (audit.mode !== mode) gaps.push(`独立审查 mode 必须为 ${mode}`);
-  if (!["pass", "fail"].includes(audit.decision)) gaps.push("独立审查 decision 必须是 pass 或 fail");
-  const findings = Array.isArray(audit.blockingFindings) ? audit.blockingFindings : null;
-  if (!findings) gaps.push("独立审查 blockingFindings 必须是数组");
-  (findings || []).forEach((finding, index) => {
-    if (!finding || typeof finding !== "object") {
-      gaps.push(`blockingFindings[${index}] 必须是对象`);
-      return;
-    }
-    const verificationCodeAllowed = mode === "verification"
-      && (expected.verificationFindings || []).some(item => item.findingId === finding.findingId && item.code === finding.code);
-    if (!L3_BLOCKER_CODES.has(finding.code) && !verificationCodeAllowed) {
-      gaps.push(`blockingFindings[${index}] 使用了非阻断代码：${finding.code || "<missing>"}`);
-    }
-    ["claim", "evidence", "rationale", "acceptanceCriteria"].forEach(field => {
-      if (!String(finding[field] || "").trim()) gaps.push(`blockingFindings[${index}].${field} 缺失`);
-    });
-    const evidence = plainText(finding.evidence);
-    if (evidence && !visibleText.includes(evidence)) gaps.push(`blockingFindings[${index}].evidence 不是当前正文中的可见证据`);
-    const sections = Array.isArray(finding.sections)
-      ? finding.sections
-      : (Number.isInteger(finding.section) ? [finding.section] : []);
-    if (!sections.length || sections.some(section => !Number.isInteger(section) || section < 1 || section > sectionCount)) {
-      gaps.push(`blockingFindings[${index}].sections 必须包含有效章节序号`);
-    }
-    if (finding.code === "source-support-blocked") {
-      const urls = Array.isArray(finding.sourceUrls) ? finding.sourceUrls : [];
-      if (!urls.length || urls.some(url => !/^https:\/\//.test(String(url)))) {
-        gaps.push(`blockingFindings[${index}].sourceUrls 必须包含联网核验使用的 HTTPS 来源`);
-      }
-    }
-  });
-  if (audit.decision === "pass" && (findings || []).length) gaps.push("decision=pass 时 blockingFindings 必须为空");
-  if (audit.decision === "fail" && !(findings || []).length) gaps.push("decision=fail 时必须提供至少一个 blocker");
-  if (mode === "full" && rawLatexSections.length && (audit.decision !== "fail"
-    || !(findings || []).some(finding => finding && finding.code === "formula-error"))) {
-    gaps.push(`正文第 ${rawLatexSections.map(item => item.section).join("、")} 节显示原始 LaTeX 命令，必须以 formula-error 阻断`);
-  }
-  if (!Array.isArray(audit.warnings)) gaps.push("独立审查 warnings 必须是数组");
-  (Array.isArray(audit.warnings) ? audit.warnings : []).forEach((warning, index) => {
-    if (!warning || typeof warning !== "object") {
-      gaps.push(`warnings[${index}] 必须是对象`);
-      return;
-    }
-    if (!L3_WARNING_CODES.has(warning.code)) gaps.push(`warnings[${index}] 使用了非法 warning 代码`);
-    if (!String(warning.message || warning.rationale || "").trim()) gaps.push(`warnings[${index}] 缺少说明`);
-  });
-
-  if (mode === "full") {
-    if (!Array.isArray(audit.coreConcepts) || !audit.coreConcepts.length) {
-      gaps.push("完整审查必须自行识别至少一个核心概念");
-    } else {
-      const names = new Set();
-      audit.coreConcepts.forEach((concept, index) => {
-        const name = String(concept && concept.name || "").trim();
-        if (!name) gaps.push(`coreConcepts[${index}].name 缺失`);
-        if (names.has(name)) gaps.push(`coreConcepts[${index}] 核心概念重复：${name}`);
-        names.add(name);
-        if (!Array.isArray(concept.sections) || !concept.sections.length
-          || concept.sections.some(section => !Number.isInteger(section) || section < 1 || section > sectionCount)) {
-          gaps.push(`coreConcepts[${index}].sections 必须包含有效章节序号`);
-        }
-        for (const part of ["definition", "problem", "boundary"]) {
-          const check = concept && concept[part];
-          if (!check || !["pass", "fail"].includes(check.status)) {
-            gaps.push(`coreConcepts[${index}].${part}.status 必须是 pass 或 fail`);
-            continue;
-          }
-          if (!String(check.evidence || "").trim() || !visibleText.includes(plainText(check.evidence))) {
-            gaps.push(`coreConcepts[${index}].${part}.evidence 必须来自当前正文`);
-          }
-          if (!String(check.rationale || "").trim()) gaps.push(`coreConcepts[${index}].${part}.rationale 缺失`);
-          if (check.status === "fail") {
-            const code = `core-concept-${part}-missing`;
-            if (!(findings || []).some(finding => finding && finding.code === code && String(finding.concept || "").trim() === name)) {
-              gaps.push(`核心概念 ${name} 的 ${part} 失败时必须提交 ${code} blocker`);
-            }
-          }
-        }
-      });
-    }
-    if (Array.isArray(audit.verificationResults) && audit.verificationResults.length) {
-      gaps.push("完整审查不得提交 verificationResults");
-    }
-  } else {
-    if (Array.isArray(audit.coreConcepts) && audit.coreConcepts.length) gaps.push("定向复核不得重新生成核心概念清单");
-    const expectedFindings = expected.verificationFindings || [];
-    const results = Array.isArray(audit.verificationResults) ? audit.verificationResults : [];
-    const expectedIds = expectedFindings.map(finding => finding.findingId).sort();
-    const actualIds = results.map(result => result && result.findingId).sort();
-    if (JSON.stringify(expectedIds) !== JSON.stringify(actualIds)) gaps.push("定向复核必须逐项覆盖首轮全部阻断问题且不得增加新问题");
-    results.forEach((result, index) => {
-      if (typeof result.resolved !== "boolean") gaps.push(`verificationResults[${index}].resolved 必须是布尔值`);
-      if (!String(result.evidence || "").trim() || !visibleText.includes(plainText(result.evidence))) {
-        gaps.push(`verificationResults[${index}].evidence 必须来自返修后的当前正文`);
-      }
-      if (!String(result.rationale || "").trim()) gaps.push(`verificationResults[${index}].rationale 缺失`);
-    });
-    const unresolvedIds = results.filter(result => result && result.resolved === false).map(result => result.findingId).sort();
-    const submittedIds = (findings || []).map(finding => finding.findingId).sort();
-    if (JSON.stringify(unresolvedIds) !== JSON.stringify(submittedIds)) gaps.push("定向复核的 blockingFindings 必须恰好对应仍未解决的首轮问题");
-  }
-  return gaps;
-}
-
-function auditBlockers(audit) {
-  if (!audit || audit.decision !== "fail" || !Array.isArray(audit.blockingFindings)) return [];
-  return audit.blockingFindings.map((finding, index) => ({
-    type: "content-audit",
-    code: finding.code,
-    findingId: finding.findingId || sha256(`${finding.code}:${JSON.stringify(finding.sections || finding.section)}:${finding.claim}:${index}`).slice(0, 24),
-    section: Number.isInteger(finding.section) ? finding.section : (finding.sections || [])[0] || null,
-    sections: clone(finding.sections || (Number.isInteger(finding.section) ? [finding.section] : [])),
-    concept: finding.concept || null,
-    message: `${finding.claim}：${finding.rationale}`,
-    evidence: finding.evidence,
-    acceptanceCriteria: finding.acceptanceCriteria || "修复该问题并保留相关章节原意",
-    sourceUrls: clone(finding.sourceUrls || []),
-  }));
 }
 
 function validateAuditResult(root = ROOT, input = {}) {

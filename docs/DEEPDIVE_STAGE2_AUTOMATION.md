@@ -27,6 +27,8 @@ flowchart LR
 | 公共控制器门面/状态机 | `tools/deepdive-stage2/core.js` | 保持 CLI、MCP 和测试使用的稳定接口，编排任务、状态转换、失败恢复和发布 |
 | 状态存储与锁 | `tools/deepdive-stage2/lib/state-store.js` | 管理 `.stage2` 路径、原子写入、控制器锁、事件与状态读写 |
 | 审计项目访问 | `tools/deepdive-stage2/lib/audit-project-access.js` | 实施 audit 租约校验、路径拒绝、文件读取与受限搜索 |
+| 内容生成 | `tools/deepdive-stage2/lib/content-generation.js` | 定位页锁定旧稿、按序开放章节、校验并原子保存同一 Agent 的逐章回复 |
+| 审计规则 | `tools/deepdive-stage2/lib/audit-rules.js` | 校验 L2/L3 审计结构、可见证据、定向复核范围并生成净化 blocker |
 | 编辑稿渲染 | `tools/deepdive-stage2/lib/editorial-markdown.js` | 将人工编辑 Markdown 安全转换为理解原理页 HTML，并处理表格保留比较 |
 | 命令入口 | `tools/run-deepdive-stage2.js` | 初始化、暂停、恢复、查看状态和人工诊断 |
 | Codex 窄接口 | `tools/deepdive-stage2/mcp-server.js` | 只暴露状态、领取一项任务、提交一项结果 |

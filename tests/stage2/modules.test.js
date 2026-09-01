@@ -5,6 +5,8 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/audit-project-access");
+const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
+const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
 
@@ -73,7 +75,60 @@ try {
   assert(rendered.includes("<div class=\"dd-table-wrap\">"));
   assert(rendered.includes("dd-align-right"));
 
-  console.log("✓ Stage 2 内部模块：状态存储、审计只读边界和编辑稿渲染测试通过");
+  const contentGeneration = createContentGeneration({
+    defaultRoot: root,
+    prompt: "完整固定提示词",
+    skippedTitles: ["常见误解", "自测"],
+    removedSectionTitles: ["常见误解", "自测"],
+    maxResponseChars: 100,
+    authorizeTaskLease: () => { throw new Error("not used"); },
+    sha256,
+    acquireLock: store.acquireLock,
+    appendEvent: store.appendEvent,
+    atomicWrite: store.atomicWrite,
+    loadState: store.loadState,
+    saveState: store.saveState,
+    withinRoot: store.withinRoot,
+  });
+  const sections = contentGeneration.contentGenerationSections({
+    html: [
+      '<section class="dd-sec"><h2><span class="dd-n">1</span>机制</h2><p>正文</p></section>',
+      '<section class="dd-sec"><h2>自测</h2><p>问题</p></section>',
+    ].join(""),
+  });
+  assert.deepStrictEqual(sections.map(section => section.title), ["机制", "自测"]);
+  assert.deepStrictEqual(
+    contentGeneration.contentGenerationManifest({ sections }).eligibleSections.map(section => section.sectionNumber),
+    [1],
+  );
+  assert(contentGeneration.contentGenerationResponseEncodingError("????????") !== null);
+
+  const auditRules = createAuditRules({
+    schemaVersion: 3,
+    sixQuestions: [],
+    blockerCodes: new Set(["formula-error"]),
+    warningCodes: new Set(),
+    legacyBlockerCodes: new Set(["formula-error"]),
+    visibleRawLatexSections: () => [],
+    auditContract: () => ({ schemaVersion: 3, mode: "full" }),
+    clone: value => JSON.parse(JSON.stringify(value)),
+    sha256,
+  });
+  const blockers = auditRules.auditBlockers({
+    decision: "fail",
+    blockingFindings: [{
+      code: "formula-error",
+      claim: "公式错误",
+      rationale: "符号关系相反",
+      evidence: "a = b",
+      sections: [1],
+    }],
+  });
+  assert.strictEqual(blockers.length, 1);
+  assert.strictEqual(blockers[0].code, "formula-error");
+  assert.deepStrictEqual(blockers[0].sections, [1]);
+
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、审计规则和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
