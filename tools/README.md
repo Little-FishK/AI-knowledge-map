@@ -17,8 +17,9 @@ domain; commands should use their canonical domain paths directly.
   audit access, content generation, editorial candidate construction/import,
   editorial candidate validation, result submission/state transitions,
   controller lifecycle/state commands, task queue/lease orchestration,
-  candidate gate execution, review recovery/preview, manual-review workflows,
-  audit rules, publication transactions, and editorial rendering.
+  content-generation/new-node queue commands, candidate gate execution, review
+  recovery/preview, manual-review workflows, audit rules, publication
+  transactions, and editorial rendering.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
 
 Generated or reviewed ingestion artifacts live in the top-level `artifacts/`

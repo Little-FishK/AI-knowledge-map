@@ -13,6 +13,7 @@ const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
 const { createManualReviewPreviewServices } = require("../../tools/deepdive-stage2/lib/manual-review-preview");
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
+const { createNewNodeQueue } = require("../../tools/deepdive-stage2/lib/new-node-queue");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createResultSubmissionWorkflow } = require("../../tools/deepdive-stage2/lib/result-submission-workflow");
@@ -112,6 +113,30 @@ try {
     [1],
   );
   assert(contentGeneration.contentGenerationResponseEncodingError("????????") !== null);
+  assert.strictEqual(typeof contentGeneration.enqueueContentGeneration, "function");
+
+  const newNodeState = { pages: {} };
+  const newNodeEvents = [];
+  const newNodeQueue = createNewNodeQueue({
+    defaultRoot: root,
+    acquireLock: () => () => {},
+    appendEvent: (_root, type, details) => newNodeEvents.push({ type, details }),
+    clone: value => JSON.parse(JSON.stringify(value)),
+    loadDeepDivePages: () => ({}),
+    loadState: () => newNodeState,
+    saveState: (_root, state) => state,
+  });
+  const queuedNode = newNodeQueue.enqueueNewNode(root, {
+    node: { id: "queued-node", title: "排队节点" },
+  }, {
+    originIds: ["video-1"],
+  });
+  assert.strictEqual(queuedNode.state, "write-queued");
+  assert.deepStrictEqual(queuedNode.origin.ids, ["video-1"]);
+  assert.strictEqual(newNodeEvents[0].type, "new-node-enqueued");
+  assert.throws(() => newNodeQueue.enqueueNewNode(root, {
+    node: { id: "queued-node" },
+  }, {}), /页面任务已存在/);
 
   const auditRules = createAuditRules({
     schemaVersion: 3,
@@ -498,7 +523,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、候选门禁、内容生成、候选构建、候选校验、结果提交、审查恢复与预览、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、领域入队、候选门禁、内容生成、候选构建、候选校验、结果提交、审查恢复与预览、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }

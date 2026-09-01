@@ -12,6 +12,7 @@ const { createEditorialCandidateImport } = require("./lib/editorial-candidate-im
 const { createEditorialCandidateValidation } = require("./lib/editorial-candidate-validation");
 const { createManualReviewWorkflow } = require("./lib/manual-review-workflow");
 const { createManualReviewPreviewServices } = require("./lib/manual-review-preview");
+const { createNewNodeQueue } = require("./lib/new-node-queue");
 const { createPublication } = require("./lib/publication");
 const { createResultSubmissionWorkflow } = require("./lib/result-submission-workflow");
 const { createReviewRecovery } = require("./lib/review-recovery");
@@ -20,7 +21,6 @@ const {
   renderEditorialMarkdown,
 } = require("./lib/editorial-markdown");
 const { clone, createStateStore, sha256 } = require("./lib/state-store");
-const { loadDeepDivePages } = require("../deepdive/runtime/deepdive-loader");
 
 const ROOT = path.join(__dirname, "..", "..");
 const TOOL_SCRIPTS = Object.freeze({
@@ -139,6 +139,7 @@ const {
   contentGenerationResultGaps,
   contentGenerationReviewMaterial,
   contentGenerationSections,
+  enqueueContentGeneration,
   isConfiguredRemovedSectionTitle,
   readContentGenerationSection,
   saveContentGenerationResponse,
@@ -148,7 +149,10 @@ const {
   skippedTitles: CONTENT_GENERATION_SKIPPED_TITLES,
   removedSectionTitles: DEFAULT_EDITORIAL_REMOVED_SECTIONS,
   maxResponseChars: CONTENT_GENERATION_MAX_RESPONSE_CHARS,
+  activeRecord: (...args) => activeRecord(...args),
   authorizeTaskLease: (...args) => authorizeTaskLease(...args),
+  clone,
+  expireLease: (...args) => expireLease(...args),
   sha256,
   acquireLock,
   appendEvent,
@@ -235,6 +239,14 @@ const {
   defaultRoot: ROOT,
   acquireLock,
   appendEvent,
+  loadState,
+  saveState,
+});
+const { enqueueNewNode } = createNewNodeQueue({
+  defaultRoot: ROOT,
+  acquireLock,
+  appendEvent,
+  clone,
   loadState,
   saveState,
 });
@@ -422,68 +434,6 @@ const {
   restoreTarget,
 });
 
-function enqueueContentGeneration(root = ROOT, id, reason) {
-  const resolvedRoot = path.resolve(root);
-  const release = acquireLock(resolvedRoot);
-  try {
-    const state = loadState(resolvedRoot);
-    expireLease(resolvedRoot, state);
-    const record = state.pages[id];
-    if (!record) throw new Error(`不存在页面状态：${id}`);
-    if (activeRecord(state)) throw new Error("存在活动租约，不能排入内容生成任务");
-    if (!record.published || record.integration) {
-      throw new Error("内容生成只适用于已有正式理解页");
-    }
-    if (record.state === "published-approved") {
-      throw new Error(`页面 ${id} 已由人工批准，无需重新生成内容`);
-    }
-    const enqueueReason = String(reason || "").trim();
-    if (enqueueReason.length < 3) throw new Error("排队原因至少需要 3 个字符");
-    const material = contentGenerationReviewMaterial(resolvedRoot, record);
-    const manifest = contentGenerationManifest(material);
-    if (!manifest.eligibleSections.length) throw new Error(`页面 ${id} 没有可用于内容生成的章节`);
-    const previousState = record.contentGeneration
-      && record.contentGeneration.status !== "complete"
-      && record.contentGeneration.previousState
-      ? record.contentGeneration.previousState
-      : record.state;
-    record.contentGeneration = {
-      schemaVersion: 1,
-      status: "queued",
-      previousState,
-      sourceOrder: material.order,
-      sourceFile: material.sourceFile,
-      sourceHash: material.sourceHash,
-      outputFile: `docs/deepdive-reviews/${id}-agent-responses.md`,
-      eligibleSections: clone(manifest.eligibleSections),
-      skippedSections: clone(manifest.skippedSections),
-      savedResponses: [],
-      enqueuedAt: new Date().toISOString(),
-      reason: enqueueReason.slice(0, 500),
-    };
-    record.state = "content-generation-queued";
-    record.updatedAt = new Date().toISOString();
-    saveState(resolvedRoot, state);
-    appendEvent(resolvedRoot, "content-generation-enqueued", {
-      id,
-      previousState,
-      eligibleSectionCount: manifest.eligibleSections.length,
-      skippedSectionCount: manifest.skippedSections.length,
-      reason: enqueueReason.slice(0, 500),
-    });
-    return {
-      status: "queued",
-      pageId: id,
-      previousState,
-      nextState: record.state,
-      outputFile: record.contentGeneration.outputFile,
-      ...manifest,
-    };
-  } finally {
-    release();
-  }
-}
-
 function recommendedPathPages(root) {
   const resolvedRoot = path.resolve(root);
   const graphSource = fs.readFileSync(path.join(resolvedRoot, "data", "graph.js"), "utf8");
@@ -555,43 +505,6 @@ function nextRecommendedPage(root = ROOT, startOrder = "1.3") {
     active: Boolean(record.lease),
     activeRole: record.lease ? record.lease.role : null,
   };
-}
-
-function enqueueNewNode(root = ROOT, integration, material) {
-  const resolvedRoot = path.resolve(root);
-  const release = acquireLock(resolvedRoot);
-  try {
-    const state = loadState(resolvedRoot);
-    const id = integration && integration.node && integration.node.id;
-    if (!id || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) {
-      throw new Error("新节点 integration.node.id 缺失或格式无效");
-    }
-    if (state.pages[id]) throw new Error(`页面任务已存在：${id}`);
-    if (loadDeepDivePages(resolvedRoot)[id]) throw new Error(`理解原理页已经存在：${id}`);
-    state.pages[id] = {
-    id,
-    origin: { type: "video-new-node", ids: clone((material && material.originIds) || []) },
-    sourcePaths: [],
-    state: "write-queued",
-    attempt: 0,
-    repairAttempts: 0,
-    contentHash: null,
-    auditHash: null,
-    blockers: [],
-    editorialWarnings: [],
-    candidateFile: null,
-    auditFile: null,
-    integration: clone({ ...integration, material }),
-    lease: null,
-    published: false,
-    updatedAt: new Date().toISOString(),
-    };
-    saveState(resolvedRoot, state);
-    appendEvent(resolvedRoot, "new-node-enqueued", { id });
-    return clone(state.pages[id]);
-  } finally {
-    release();
-  }
 }
 
 module.exports = {
