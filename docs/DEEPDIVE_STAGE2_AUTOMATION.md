@@ -28,6 +28,7 @@ flowchart LR
 | 状态存储与锁 | `tools/deepdive-stage2/lib/state-store.js` | 管理 `.stage2` 路径、原子写入、控制器锁、事件与状态读写 |
 | 控制器生命周期 | `tools/deepdive-stage2/lib/controller-lifecycle.js` | 初始化页面状态、合并待处理补充材料，并提供状态查询、暂停、恢复和普通重试命令 |
 | 审计项目访问 | `tools/deepdive-stage2/lib/audit-project-access.js` | 实施 audit 租约校验、路径拒绝、文件读取与受限搜索 |
+| 候选门禁执行 | `tools/deepdive-stage2/lib/candidate-gate.js` | 构建隔离临时夹具、运行 L1/L2/L3 验证器、解析缺陷并刷新候选阻断状态 |
 | 内容生成 | `tools/deepdive-stage2/lib/content-generation.js` | 定位页锁定旧稿、按序开放章节、校验并原子保存同一 Agent 的逐章回复 |
 | 候选构建与导入 | `tools/deepdive-stage2/lib/editorial-candidate-import.js` | 从内容生成结果构建候选、保留原图表，并原子提交待审稿、回执与控制器状态 |
 | 候选页纯校验 | `tools/deepdive-stage2/lib/editorial-candidate-validation.js` | 校验页面结构、禁止内容、原始 LaTeX、来源签名与图表/章节保留，不读写控制器状态 |

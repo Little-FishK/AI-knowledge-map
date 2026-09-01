@@ -371,6 +371,7 @@ function createPublication(options) {
     applyCoreMembership,
     candidateRelativePath,
     editorialPublicationRelativePath,
+    loadRuntimeIds,
     pageOverrideSource,
     pageRegistrationSource,
     privateAuditRelativePath,
@@ -381,6 +382,8 @@ function createPublication(options) {
     publishEditorialHumanApprovedCandidate,
     refreshEditorialDraftPublication,
     restoreTarget,
+    runtimeManifestSource,
+    runtimeSource,
     targetRecord,
     writePublicationTargets,
   };

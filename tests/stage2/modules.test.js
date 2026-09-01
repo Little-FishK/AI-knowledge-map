@@ -6,6 +6,7 @@ const os = require("os");
 const path = require("path");
 const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/audit-project-access");
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
+const { createCandidateGate } = require("../../tools/deepdive-stage2/lib/candidate-gate");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
 const { createControllerLifecycle } = require("../../tools/deepdive-stage2/lib/controller-lifecycle");
 const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/lib/editorial-candidate-import");
@@ -159,6 +160,46 @@ try {
   publication.restoreTarget(root, target);
   assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "before");
   assert(publication.applyCoreMembership("window.GRAPH={core: [\"a\"]};", "b").includes('"b"'));
+
+  const gateFixture = path.join(root, "candidate-gate-fixture");
+  fs.mkdirSync(path.join(gateFixture, "data", "deepdive"), { recursive: true });
+  fs.mkdirSync(path.join(gateFixture, "data", "deepdive-runtime"), { recursive: true });
+  fs.mkdirSync(path.join(gateFixture, "docs"), { recursive: true });
+  fs.writeFileSync(path.join(gateFixture, "data", "graph.js"), "window.GRAPH={core:[]};\n", "utf8");
+  const gatePage = {
+    id: "new-page",
+    title: "新页面",
+    subtitle: "副标题",
+    thesis: "命题",
+    html: "<section><h2>机制</h2><p>正文</p></section>",
+  };
+  const candidateGate = createCandidateGate({
+    toolScripts: {},
+    applyCoreMembership: publication.applyCoreMembership,
+    clone: value => JSON.parse(JSON.stringify(value)),
+    graphFingerprint: () => "bound-graph",
+    loadDeepDivePages: () => ({ "new-page": gatePage }),
+    loadRuntimeIds: () => ["existing-page"],
+    pageOverrideSource: publication.pageOverrideSource,
+    pageRegistrationSource: publication.pageRegistrationSource,
+    runtimeManifestSource: publication.runtimeManifestSource,
+    runtimeSource: publication.runtimeSource,
+    transformGraph: source => source,
+  });
+  candidateGate.stageCandidateInFixture(gateFixture, {
+    id: "new-page",
+    integration: {
+      bindings: { graphHash: "bound-graph" },
+      core: { requested: false },
+    },
+  }, gatePage, { decision: "pass" });
+  assert(fs.existsSync(path.join(gateFixture, "data", "deepdive", "new-page.js")));
+  assert(fs.existsSync(path.join(gateFixture, "data", "deepdive-runtime", "new-page.js")));
+  assert(fs.readFileSync(
+    path.join(gateFixture, "data", "deepdive-runtime", "manifest.js"),
+    "utf8",
+  ).includes("new-page"));
+  assert.strictEqual(candidateGate.gateDefects({ script: "gate.js", output: "failed" }, "new-page")[0].type, "gate");
 
   const candidateValidation = createEditorialCandidateValidation({
     isConfiguredRemovedSectionTitle: (title, configured = ["自测"]) => configured.includes(title),
@@ -418,7 +459,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、控制器生命周期、任务编排、候选门禁、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
