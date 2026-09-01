@@ -8,6 +8,7 @@ const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/au
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
+const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
@@ -199,7 +200,49 @@ try {
     [1],
   );
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选校验、审计规则、发布事务和编辑稿渲染测试通过");
+  const reviewState = {
+    pages: {
+      review: {
+        id: "review",
+        state: "manual-review",
+        lease: null,
+        blockers: [],
+        finalReview: { status: "pending" },
+        editorialWorkflow: {
+          status: "human-review-pending",
+          auditMode: "full",
+          verificationSource: "machine",
+          initialBlockingFindings: [],
+        },
+      },
+    },
+  };
+  const workflowEvents = [];
+  const manualReview = createManualReviewWorkflow({
+    defaultRoot: root,
+    acquireLock: () => () => {},
+    appendEvent: (_root, type, details) => workflowEvents.push({ type, details }),
+    loadState: () => reviewState,
+    saveState: (_root, state) => state,
+    clone: value => JSON.parse(JSON.stringify(value)),
+    sha256,
+    currentPage: () => ({ html: "<section><h2>机制</h2><p>正文</p></section>" }),
+    refreshEditorialDraftPublication: () => ({ status: "published-editorial-draft" }),
+  });
+  const returned = manualReview.returnEditorialForRevision(root, "review", {
+    reason: "人工发现机制说明不完整",
+    issues: [{
+      claim: "机制说明不完整",
+      acceptanceCriteria: "补充完整因果链",
+      sections: [1],
+    }],
+  });
+  assert.strictEqual(returned.status, "repair-queued");
+  assert.strictEqual(reviewState.pages.review.state, "repair-queued");
+  assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
+  assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
+
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选校验、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
