@@ -9,6 +9,10 @@ while callers migrate to the grouped paths.
 - `shared/`: project-wide path and process helpers with no domain state.
 - `validators/`: graph, deep-dive, software, tutorial, video-application, and
   library validation implementations.
+- `deepdive/quality/`: L2/L3/browser audits, L4 review validation, and their
+  shared audit-contract modules.
+- `deepdive/runtime/`: page loading and runtime build support shared across
+  deep-dive workflows.
 - `deepdive-stage2/`: the protected Stage 2 controller and MCP implementation.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
 - `proposals/`: generated or reviewed ingestion artifacts; these are not
