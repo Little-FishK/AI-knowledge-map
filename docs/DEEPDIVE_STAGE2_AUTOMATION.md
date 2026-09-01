@@ -31,6 +31,7 @@ flowchart LR
 | 候选构建与导入 | `tools/deepdive-stage2/lib/editorial-candidate-import.js` | 从内容生成结果构建候选、保留原图表，并原子提交待审稿、回执与控制器状态 |
 | 候选页纯校验 | `tools/deepdive-stage2/lib/editorial-candidate-validation.js` | 校验页面结构、禁止内容、原始 LaTeX、来源签名与图表/章节保留，不读写控制器状态 |
 | 结果提交与状态流转 | `tools/deepdive-stage2/lib/result-submission-workflow.js` | 校验各角色提交合同，保存结果，并推进内容生成、候选返修、机器审计和发布状态 |
+| 任务队列与租约 | `tools/deepdive-stage2/lib/task-orchestration.js` | 按角色优先级领取单任务、校验或释放租约，并按页锁定规则构建和分页交付任务包 |
 | 人工审查工作流 | `tools/deepdive-stage2/lib/manual-review-workflow.js` | 编排人工退回、最终确认、暂行发布授权以及暂行/编辑候选回滚状态 |
 | 审计规则 | `tools/deepdive-stage2/lib/audit-rules.js` | 校验 L2/L3 审计结构、可见证据、定向复核范围并生成净化 blocker |
 | 发布事务 | `tools/deepdive-stage2/lib/publication.js` | 生成发布目标、执行写前哈希检查和验证器，并在失败时按逆序原子恢复 |

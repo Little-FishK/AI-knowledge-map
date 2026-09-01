@@ -14,6 +14,7 @@ const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/edi
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createResultSubmissionWorkflow } = require("../../tools/deepdive-stage2/lib/result-submission-workflow");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
+const { createTaskOrchestration } = require("../../tools/deepdive-stage2/lib/task-orchestration");
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-modules-"));
 try {
@@ -281,6 +282,60 @@ try {
   assert.strictEqual(invalidPageResult.status, "invalid");
   assert(invalidPageResult.gaps.includes("result.summary is missing"));
 
+  const orchestrationState = {
+    policy: { leaseMinutes: 45 },
+    pages: {
+      queued: {
+        id: "queued",
+        state: "auditing",
+        attempt: 1,
+        lease: {
+          taskId: "queued:audit:1:expired",
+          token: "expired-token",
+          role: "audit",
+          expiresAt: new Date(Date.now() - 1_000).toISOString(),
+        },
+      },
+    },
+  };
+  const orchestrationEvents = [];
+  const taskOrchestration = createTaskOrchestration({
+    defaultRoot: root,
+    queueByRole: { audit: "audit-queued" },
+    acquireLock: () => () => {},
+    appendEvent: (_root, type, details) => orchestrationEvents.push({ type, details }),
+    clone: value => JSON.parse(JSON.stringify(value)),
+    loadState: () => orchestrationState,
+    saveState: (_root, state) => state,
+  });
+  const expired = taskOrchestration.expireLease(root, orchestrationState);
+  assert.strictEqual(expired.taskId, "queued:audit:1:expired");
+  assert.strictEqual(orchestrationState.pages.queued.state, "audit-queued");
+  assert.strictEqual(orchestrationState.pages.queued.lease, null);
+  assert.strictEqual(orchestrationEvents[0].type, "lease-expired");
+  orchestrationState.pages.queued.state = "auditing";
+  orchestrationState.pages.queued.lease = {
+    taskId: "queued:audit:2:active",
+    token: "active-token",
+    role: "audit",
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+  };
+  assert.throws(() => taskOrchestration.releaseLease(
+    root,
+    "queued",
+    "manual recovery",
+    "wrong-task",
+  ), /taskId 不匹配/);
+  assert.strictEqual(orchestrationState.pages.queued.lease.taskId, "queued:audit:2:active");
+  const released = taskOrchestration.releaseLease(
+    root,
+    "queued",
+    "manual recovery",
+    "queued:audit:2:active",
+  );
+  assert.strictEqual(released.nextState, "audit-queued");
+  assert.strictEqual(orchestrationState.pages.queued.lease, null);
+
   const reviewState = {
     pages: {
       review: {
@@ -323,7 +378,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、任务编排、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
