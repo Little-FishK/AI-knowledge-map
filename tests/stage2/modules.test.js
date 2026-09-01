@@ -12,6 +12,7 @@ const { createEditorialCandidateValidation } = require("../../tools/deepdive-sta
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
+const { createResultSubmissionWorkflow } = require("../../tools/deepdive-stage2/lib/result-submission-workflow");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-modules-"));
@@ -243,6 +244,43 @@ try {
     id: "review",
   }, {}), /没有已完成且可验证/);
 
+  let activeSubmissionRole = "audit";
+  const submissionWorkflow = createResultSubmissionWorkflow({
+    defaultRoot: root,
+    authorizeTaskLease: () => ({
+      id: "review",
+      lease: { role: activeSubmissionRole },
+      editorialWorkflow: activeSubmissionRole === "repair" ? {} : null,
+    }),
+    currentPage: () => ({
+      id: "review",
+      title: "标题",
+      subtitle: "副标题",
+      thesis: "命题",
+      html: '<section><h2>机制</h2><p>正文</p></section>',
+    }),
+    auditContract: () => ({ schemaVersion: 3, mode: "full" }),
+    auditGaps: () => [],
+    validatePage: candidateValidation.validatePage,
+    editorialContentPolicyGaps: candidateValidation.editorialContentPolicyGaps,
+    editorialPreservationReport: candidateValidation.editorialPreservationReport,
+    pageSourceSignature: candidateValidation.pageSourceSignature,
+    visibleRawLatexSections: candidateValidation.visibleRawLatexSections,
+  });
+  assert.strictEqual(submissionWorkflow.validateAuditResult(root, {
+    taskId: "audit-task",
+    leaseToken: "lease-token",
+    result: {},
+  }).status, "valid");
+  activeSubmissionRole = "repair";
+  const invalidPageResult = submissionWorkflow.validatePageResult(root, {
+    taskId: "repair-task",
+    leaseToken: "lease-token",
+    result: { page: { id: "review" } },
+  });
+  assert.strictEqual(invalidPageResult.status, "invalid");
+  assert(invalidPageResult.gaps.includes("result.summary is missing"));
+
   const reviewState = {
     pages: {
       review: {
@@ -285,7 +323,7 @@ try {
   assert.strictEqual(reviewState.pages.review.editorialWorkflow.auditMode, "verification");
   assert.strictEqual(workflowEvents[0].type, "editorial-returned-for-human-revision");
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选构建、候选校验、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、候选构建、候选校验、结果提交、人工审查、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
