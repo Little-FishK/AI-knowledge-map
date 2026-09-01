@@ -8,6 +8,7 @@ const { createAuditProjectAccess } = require("../../tools/deepdive-stage2/lib/au
 const { createAuditRules } = require("../../tools/deepdive-stage2/lib/audit-rules");
 const { createContentGeneration } = require("../../tools/deepdive-stage2/lib/content-generation");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
+const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-modules-"));
@@ -128,7 +129,32 @@ try {
   assert.strictEqual(blockers[0].code, "formula-error");
   assert.deepStrictEqual(blockers[0].sections, [1]);
 
-  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、审计规则和编辑稿渲染测试通过");
+  const publication = createPublication({
+    toolScripts: {},
+    clone: value => JSON.parse(JSON.stringify(value)),
+    sha256,
+    atomicWrite: store.atomicWrite,
+    readJson: store.readJson,
+    withinRoot: store.withinRoot,
+    writeJson: store.writeJson,
+    loadSupplementQueue: () => ({ items: [] }),
+    runGate: () => ({ script: "unused", passed: true }),
+  });
+  fs.writeFileSync(path.join(root, "published.txt"), "before", "utf8");
+  const target = publication.targetRecord(root, "published.txt", "after");
+  assert.throws(() => publication.writePublicationTargets(root, {}, [target], {
+    validators: () => [{ script: "forced-failure", passed: false, output: "failed" }],
+  }), /已恢复本次暂行发布写入/);
+  assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "before");
+  publication.writePublicationTargets(root, {}, [target], {
+    validators: () => [{ script: "success", passed: true }],
+  });
+  assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "after");
+  publication.restoreTarget(root, target);
+  assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "before");
+  assert(publication.applyCoreMembership("window.GRAPH={core: [\"a\"]};", "b").includes('"b"'));
+
+  console.log("✓ Stage 2 内部模块：存储、访问、内容生成、审计规则、发布事务和编辑稿渲染测试通过");
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
