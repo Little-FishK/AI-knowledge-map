@@ -6,6 +6,18 @@ const os = require("os");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
+const { createAuditProjectAccess } = require("./lib/audit-project-access");
+const {
+  escapeEditorialHtml,
+  normalizedBlockText,
+  renderEditorialMarkdown,
+  responseDocumentSections,
+  tableBlocks,
+  tableContentOverlap,
+  tableRowTexts,
+  textSimilarity,
+} = require("./lib/editorial-markdown");
+const { clone, createStateStore, sha256 } = require("./lib/state-store");
 const { loadDeepDivePages } = require("../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../deepdive/quality/deepdive-audit-contracts");
 const {
@@ -26,6 +38,30 @@ const TOOL_SCRIPTS = Object.freeze({
   deepDiveL3Audit: "tools/deepdive/quality/audit-deepdive-benchmark.js",
 });
 const STATE_SCHEMA_VERSION = 1;
+const {
+  acquireLock,
+  appendEvent,
+  atomicWrite,
+  loadState,
+  readJson,
+  resultDirectory,
+  saveState,
+  stageDirectory,
+  stateFile,
+  withinRoot,
+  writeJson,
+} = createStateStore({
+  defaultRoot: ROOT,
+  schemaVersion: STATE_SCHEMA_VERSION,
+});
+const {
+  readAuditProjectFile,
+  searchAuditProject,
+} = createAuditProjectAccess({
+  defaultRoot: ROOT,
+  loadState,
+  withinRoot,
+});
 const AUDIT_SCHEMA_VERSION = 3;
 const CONTENT_GENERATION_PROMPT = [
   "把当前章节解析并改写为可直接用于“理解原理页”的完整教学正文。",
@@ -81,12 +117,6 @@ const ACTIVE_BY_ROLE = {
   "content-generation": "content-generating",
 };
 const ROLE_PRIORITY = ["repair", "update", "write", "audit"];
-const AUDIT_READABLE_EXTENSIONS = new Set([
-  ".cjs", ".css", ".csv", ".html", ".js", ".json", ".md", ".mjs",
-  ".svg", ".toml", ".ts", ".txt", ".xml", ".yaml", ".yml",
-]);
-const AUDIT_READ_MAX_BYTES = 512 * 1024;
-const AUDIT_SEARCH_MAX_FILES = 6000;
 const WRITING_NARRATIVE_POLICY = [
   "【大量模板化表达硬约束】不得把原文中多样化的章节开场统一改写成定义句。",
   "“是在 / 是一类 / 是一种 / 是…… / 指的是 / 可以理解为”等都属于同一个 definition-copula 句式家族，替换连接词不算句式多样化。",
@@ -109,10 +139,6 @@ const DEFAULT_EDITORIAL_REMOVED_SECTIONS = ["常见误解", "常见误区", "自
 const CONTENT_GENERATION_SKIPPED_TITLES = ["常见误解", "常见误区", "自测", "检查你是否真的理解"];
 const CONTENT_GENERATION_MAX_RESPONSE_CHARS = 100_000;
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
 function archiveCurrentTaskDirective(reason) {
   return {
     required: true,
@@ -124,118 +150,6 @@ function archiveCurrentTaskDirective(reason) {
   };
 }
 
-function sha256(value) {
-  const text = typeof value === "string" ? value : JSON.stringify(value);
-  return `sha256:${crypto.createHash("sha256").update(text).digest("hex")}`;
-}
-
-function stageDirectory(root = ROOT) {
-  return path.join(path.resolve(root), ".stage2");
-}
-
-function stateFile(root = ROOT) {
-  return path.join(stageDirectory(root), "state.json");
-}
-
-function eventsFile(root = ROOT) {
-  return path.join(stageDirectory(root), "events.jsonl");
-}
-
-function lockFile(root = ROOT) {
-  return path.join(stageDirectory(root), "controller.lock");
-}
-
-function resultDirectory(root, id) {
-  return path.join(stageDirectory(root), "results", id);
-}
-
-function withinRoot(root, relativePath) {
-  const absolute = path.resolve(root, relativePath);
-  const relative = path.relative(path.resolve(root), absolute);
-  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
-    throw new Error(`目标路径越出项目根目录：${relativePath}`);
-  }
-  return absolute;
-}
-
-function atomicWrite(file, content) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.tmp-${process.pid}-${Date.now()}`;
-  fs.writeFileSync(temporary, content, "utf8");
-  fs.renameSync(temporary, file);
-}
-
-function acquireLock(root) {
-  const file = lockFile(root);
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  try {
-    const descriptor = fs.openSync(file, "wx");
-    fs.writeFileSync(descriptor, JSON.stringify({
-      pid: process.pid,
-      acquiredAt: new Date().toISOString(),
-    }), "utf8");
-    fs.closeSync(descriptor);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-    let stale = false;
-    try {
-      const details = readJson(file);
-      stale = Date.now() - Date.parse(details.acquiredAt) > 2 * 60 * 60_000;
-    } catch (_ignored) {
-      stale = false;
-    }
-    if (!stale) throw new Error("第二阶段控制器正由另一个进程使用");
-    fs.unlinkSync(file);
-    return acquireLock(root);
-  }
-  return () => {
-    if (fs.existsSync(file)) fs.unlinkSync(file);
-  };
-}
-
-function writeJson(file, value) {
-  atomicWrite(file, `${JSON.stringify(value, null, 2)}\n`);
-}
-
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
-}
-
-function appendEvent(root, type, details = {}) {
-  const event = {
-    at: new Date().toISOString(),
-    type,
-    ...details,
-  };
-  fs.mkdirSync(stageDirectory(root), { recursive: true });
-  fs.appendFileSync(eventsFile(root), `${JSON.stringify(event)}\n`, "utf8");
-  return event;
-}
-
-function loadState(root = ROOT) {
-  const file = stateFile(root);
-  if (!fs.existsSync(file)) {
-    throw new Error("第二阶段状态尚未初始化；先运行 stage2:init");
-  }
-  const state = readJson(file);
-  if (state.schemaVersion !== STATE_SCHEMA_VERSION || !state.pages) {
-    throw new Error("第二阶段状态文件版本无效");
-  }
-  return state;
-}
-
-function authorizeAuditProjectRead(root, taskId, leaseToken) {
-  const state = loadState(root);
-  const record = Object.values(state.pages).find(page =>
-    page.lease && page.lease.taskId === taskId
-  );
-  if (!record) throw new Error("只读项目访问对应的审计租约不存在");
-  if (record.lease.token !== leaseToken) throw new Error("只读项目访问的租约令牌无效");
-  if (record.lease.role !== "audit") throw new Error("只有 audit 角色可以读取项目");
-  if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("审计租约已经过期");
-  return record;
-}
-
 function authorizeTaskLease(root, taskId, leaseToken) {
   const state = loadState(root);
   const record = Object.values(state.pages).find(page =>
@@ -245,154 +159,6 @@ function authorizeTaskLease(root, taskId, leaseToken) {
   if (record.lease.token !== leaseToken) throw new Error("任务包续读的租约令牌无效");
   if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("任务包续读的租约已经过期");
   return record;
-}
-
-function auditPathDenied(relativePath) {
-  const normalized = String(relativePath || "").replace(/\\/g, "/").replace(/^\.\//, "");
-  const lower = normalized.toLowerCase();
-  const basename = path.posix.basename(lower);
-  return (
-    !normalized
-    || normalized.startsWith("/")
-    || /^[a-z]:\//i.test(normalized)
-    || lower === ".git"
-    || lower.startsWith(".git/")
-    || lower === ".stage2"
-    || lower.startsWith(".stage2/")
-    || lower === "node_modules"
-    || lower.startsWith("node_modules/")
-    || lower.includes("/node_modules/")
-    || lower === "docs/deepdive-audits"
-    || lower.startsWith("docs/deepdive-audits/")
-    || basename === ".env"
-    || basename.startsWith(".env.")
-    || /\.(key|pem|pfx|p12|keystore)$/i.test(basename)
-    || /(^|[-_.])(secret|secrets|credential|credentials)([-_.]|$)/i.test(basename)
-  );
-}
-
-function resolveAuditReadableFile(root, relativePath) {
-  const normalized = String(relativePath || "").replace(/\\/g, "/").replace(/^\.\//, "");
-  if (auditPathDenied(normalized)) throw new Error(`审计只读接口禁止访问：${relativePath}`);
-  if (!AUDIT_READABLE_EXTENSIONS.has(path.extname(normalized).toLowerCase())) {
-    throw new Error(`审计只读接口不支持该文件类型：${relativePath}`);
-  }
-  const file = withinRoot(root, normalized);
-  if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
-    throw new Error(`项目文件不存在：${relativePath}`);
-  }
-  const realRoot = fs.realpathSync(path.resolve(root));
-  const realFile = fs.realpathSync(file);
-  const realRelative = path.relative(realRoot, realFile);
-  if (!realRelative || realRelative.startsWith("..") || path.isAbsolute(realRelative)) {
-    throw new Error(`项目文件通过链接越出根目录：${relativePath}`);
-  }
-  const size = fs.statSync(realFile).size;
-  if (size > AUDIT_READ_MAX_BYTES) {
-    throw new Error(`项目文件超过审计只读上限：${relativePath}`);
-  }
-  return { file: realFile, relativePath: normalized, size };
-}
-
-function readAuditProjectFile(root = ROOT, input = {}) {
-  const resolvedRoot = path.resolve(root);
-  const record = authorizeAuditProjectRead(
-    resolvedRoot,
-    input.taskId,
-    input.leaseToken,
-  );
-  const target = resolveAuditReadableFile(resolvedRoot, input.path);
-  const lines = fs.readFileSync(target.file, "utf8").split(/\r?\n/);
-  const startLine = Math.max(1, Number(input.startLine) || 1);
-  const requestedEnd = Number(input.endLine) || startLine + 399;
-  const endLine = Math.min(lines.length, Math.max(startLine, requestedEnd), startLine + 399);
-  return {
-    status: "ok",
-    pageId: record.id,
-    path: target.relativePath,
-    size: target.size,
-    startLine,
-    endLine,
-    totalLines: lines.length,
-    content: lines.slice(startLine - 1, endLine).join("\n"),
-  };
-}
-
-function collectAuditReadableFiles(root) {
-  const files = [];
-  const visit = directory => {
-    if (files.length >= AUDIT_SEARCH_MAX_FILES) return;
-    const entries = fs.readdirSync(directory, { withFileTypes: true })
-      .sort((left, right) => left.name.localeCompare(right.name));
-    for (const entry of entries) {
-      if (files.length >= AUDIT_SEARCH_MAX_FILES) break;
-      const absolute = path.join(directory, entry.name);
-      const relative = path.relative(root, absolute).replace(/\\/g, "/");
-      if (auditPathDenied(relative) || entry.isSymbolicLink()) continue;
-      if (entry.isDirectory()) {
-        visit(absolute);
-        continue;
-      }
-      if (
-        entry.isFile()
-        && AUDIT_READABLE_EXTENSIONS.has(path.extname(entry.name).toLowerCase())
-        && entry.name
-        && fs.statSync(absolute).size <= AUDIT_READ_MAX_BYTES
-      ) {
-        files.push(relative);
-      }
-    }
-  };
-  visit(root);
-  return files;
-}
-
-function searchAuditProject(root = ROOT, input = {}) {
-  const resolvedRoot = path.resolve(root);
-  const record = authorizeAuditProjectRead(
-    resolvedRoot,
-    input.taskId,
-    input.leaseToken,
-  );
-  const query = String(input.query || "").trim();
-  if (query.length < 2 || query.length > 160) {
-    throw new Error("项目搜索词长度必须为 2–160 个字符");
-  }
-  const prefix = String(input.pathPrefix || "").replace(/\\/g, "/").replace(/^\.\//, "");
-  if (prefix && auditPathDenied(prefix)) throw new Error(`审计只读接口禁止搜索：${prefix}`);
-  const maximum = Math.min(50, Math.max(1, Number(input.maxResults) || 20));
-  const needle = query.toLocaleLowerCase();
-  const matches = [];
-  for (const relative of collectAuditReadableFiles(resolvedRoot)) {
-    if (prefix && relative !== prefix && !relative.startsWith(`${prefix.replace(/\/$/, "")}/`)) {
-      continue;
-    }
-    const lines = fs.readFileSync(path.join(resolvedRoot, relative), "utf8").split(/\r?\n/);
-    for (let index = 0; index < lines.length; index++) {
-      if (!lines[index].toLocaleLowerCase().includes(needle)) continue;
-      matches.push({
-        path: relative,
-        line: index + 1,
-        text: lines[index].trim().slice(0, 500),
-      });
-      if (matches.length >= maximum) break;
-    }
-    if (matches.length >= maximum) break;
-  }
-  return {
-    status: "ok",
-    pageId: record.id,
-    query,
-    pathPrefix: prefix || null,
-    matches,
-    truncated: matches.length >= maximum,
-  };
-}
-
-function saveState(root, state) {
-  state.updatedAt = new Date().toISOString();
-  writeJson(stateFile(root), state);
-  return state;
 }
 
 function sourceRegistrationMap(root) {
@@ -1329,231 +1095,6 @@ function editorialPreservationReport(originalPage, candidatePage, removedSection
     removedSectionTitles: [...allowedRemoved],
     stillPresentRemovedSections,
   };
-}
-
-function escapeEditorialHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function extractEditorialRadicals(value) {
-  const radicals = [];
-  const input = String(value || "");
-  let source = "";
-  for (let index = 0; index < input.length;) {
-    if (input[index] !== "√") {
-      source += input[index];
-      index += 1;
-      continue;
-    }
-    let cursor = index + 1;
-    while (cursor < input.length && /\s/u.test(input[cursor])) cursor += 1;
-    let radicand = "";
-    let end = cursor;
-    if (input[cursor] === "(") {
-      let depth = 1;
-      cursor += 1;
-      const start = cursor;
-      while (cursor < input.length && depth > 0 && input[cursor] !== "\n") {
-        if (input[cursor] === "(") depth += 1;
-        if (input[cursor] === ")") depth -= 1;
-        cursor += 1;
-      }
-      if (depth === 0) {
-        radicand = input.slice(start, cursor - 1);
-        end = cursor;
-      }
-    } else {
-      const simple = input.slice(cursor).match(/^([^\s()，,。；;:+\-*/=]+)/u);
-      if (simple) {
-        radicand = simple[1];
-        end = cursor + simple[1].length;
-      }
-    }
-    if (!radicand) {
-      source += input[index];
-      index += 1;
-      continue;
-    }
-    const token = `\uE000RADICAL${radicals.length}\uE001`;
-    radicals.push({ token, radicand });
-    source += token;
-    index = end;
-  }
-  return { source, radicals };
-}
-
-function renderEditorialInlineMarkdown(value) {
-  const { source, radicals } = extractEditorialRadicals(value);
-  let rendered = escapeEditorialHtml(source);
-  rendered = rendered.replace(/`([^`]+)`/g, "<code>$1</code>");
-  rendered = rendered.replace(/\\\((.+?)\\\)/g, '<span class="dd-inline-math" role="math">$1</span>');
-  rendered = rendered.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  radicals.forEach(({ token, radicand }) => {
-    const safeRadicand = escapeEditorialHtml(radicand.trim());
-    rendered = rendered.replace(
-      token,
-      `<math class="dd-inline-root" aria-label="根号 ${safeRadicand}"><msqrt><mtext>${safeRadicand}</mtext></msqrt></math>`,
-    );
-  });
-  return rendered;
-}
-
-function markdownTableCells(line) {
-  const trimmed = String(line || "").trim();
-  if (!trimmed.includes("|")) return null;
-  const withoutEdges = trimmed.replace(/^\|/, "").replace(/\|$/, "");
-  const cells = withoutEdges.split(/(?<!\\)\|/).map(cell => cell.trim().replace(/\\\|/g, "|"));
-  return cells.length >= 2 ? cells : null;
-}
-
-function markdownTableAlignments(line) {
-  const cells = markdownTableCells(line);
-  if (!cells || cells.some(cell => !/^:?-{3,}:?$/.test(cell))) return null;
-  return cells.map(cell => {
-    if (cell.startsWith(":") && cell.endsWith(":")) return "center";
-    if (cell.endsWith(":")) return "right";
-    return "left";
-  });
-}
-
-function normalizedBlockText(block) {
-  return plainText(block).replace(/\s+/g, "").trim();
-}
-
-function tableRowTexts(block) {
-  return [...String(block).matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)]
-    .map(match => plainText(match[1]).replace(/[^\p{L}\p{N}]+/gu, ""))
-    .filter(Boolean);
-}
-
-function tableContentOverlap(a, b) {
-  if (!a.length || !b.length) return 0;
-  const setB = new Set(b);
-  const shared = a.filter(row => setB.has(row)).length;
-  return shared / Math.max(a.length, b.length);
-}
-
-function textBigrams(text) {
-  const set = new Set();
-  for (let index = 0; index < text.length - 1; index += 1) set.add(text.slice(index, index + 2));
-  return set;
-}
-
-function textSimilarity(a, b) {
-  if (!a || !b) return 0;
-  const bigramsA = textBigrams(a);
-  const bigramsB = textBigrams(b);
-  let shared = 0;
-  bigramsA.forEach(gram => { if (bigramsB.has(gram)) shared += 1; });
-  return (2 * shared) / (bigramsA.size + bigramsB.size);
-}
-
-function tableBlocks(html) {
-  return [...String(html || "").matchAll(/<div\b[^>]*class="[^"]*\bdd-table-wrap\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi)]
-    .map(match => match[0]);
-}
-
-function renderEditorialTable(headerCells, alignments, bodyRows) {
-  const cell = (tag, value, alignment) => (
-    `<${tag} class="dd-align-${alignment}">${renderEditorialInlineMarkdown(value)}</${tag}>`
-  );
-  const header = `<thead><tr>${headerCells.map((value, index) => (
-    cell("th", value, alignments[index] || "left")
-  )).join("")}</tr></thead>`;
-  const body = `<tbody>${bodyRows.map(row => `<tr>${headerCells.map((_, index) => (
-    cell("td", row[index] || "", alignments[index] || "left")
-  )).join("")}</tr>`).join("")}</tbody>`;
-  return `<div class="dd-table-wrap"><table class="dd-table">${header}${body}</table></div>`;
-}
-
-function renderEditorialMarkdown(markdown) {
-  const lines = String(markdown || "").replace(/\r\n?/g, "\n").split("\n");
-  const blocks = [];
-  let paragraph = [];
-  let list = null;
-  const flushParagraph = () => {
-    if (!paragraph.length) return;
-    blocks.push(`<p>${renderEditorialInlineMarkdown(paragraph.join(" ").trim())}</p>`);
-    paragraph = [];
-  };
-  const flushList = () => {
-    if (!list) return;
-    blocks.push(`<${list.tag}>${list.items.map(item => `<li>${renderEditorialInlineMarkdown(item)}</li>`).join("")}</${list.tag}>`);
-    list = null;
-  };
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
-    if (!line.trim()) {
-      flushParagraph();
-      flushList();
-      continue;
-    }
-    if (line.trim() === "\\[") {
-      flushParagraph();
-      flushList();
-      const formula = [];
-      index += 1;
-      while (index < lines.length && lines[index].trim() !== "\\]") {
-        formula.push(lines[index]);
-        index += 1;
-      }
-      const source = formula.join("\n").trim();
-      blocks.push(`<div class="dd-equation" role="math" aria-label="${escapeEditorialHtml(source.replace(/\s+/g, " "))}"><span>${escapeEditorialHtml(source)}</span></div>`);
-      continue;
-    }
-    const headerCells = markdownTableCells(line);
-    const alignments = index + 1 < lines.length ? markdownTableAlignments(lines[index + 1]) : null;
-    if (headerCells && alignments && headerCells.length === alignments.length) {
-      flushParagraph();
-      flushList();
-      const rows = [];
-      index += 2;
-      while (index < lines.length) {
-        const cells = markdownTableCells(lines[index]);
-        if (!cells || cells.length !== headerCells.length) break;
-        rows.push(cells);
-        index += 1;
-      }
-      index -= 1;
-      blocks.push(renderEditorialTable(headerCells, alignments, rows));
-      continue;
-    }
-    const unordered = line.match(/^\s*[-*]\s+(.+)$/);
-    const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
-    if (unordered || ordered) {
-      flushParagraph();
-      const tag = unordered ? "ul" : "ol";
-      if (list && list.tag !== tag) flushList();
-      if (!list) list = { tag, items: [] };
-      list.items.push((unordered || ordered)[1].trim());
-      continue;
-    }
-    flushList();
-    const heading = line.match(/^#{3,6}\s+(.+)$/);
-    if (heading) {
-      flushParagraph();
-      blocks.push(`<h3>${renderEditorialInlineMarkdown(heading[1])}</h3>`);
-      continue;
-    }
-    paragraph.push(line.trim());
-  }
-  flushParagraph();
-  flushList();
-  return blocks.join("\n");
-}
-
-function responseDocumentSections(markdown) {
-  return [...String(markdown || "").matchAll(/(?:^|\n)##\s+(\d+)\.\s+([^\r\n]+)\r?\n\r?\n([\s\S]*?)(?=\r?\n##\s+\d+\.\s+|$)/g)]
-    .map(match => ({
-      sectionNumber: Number(match[1]),
-      title: match[2].trim(),
-      markdown: match[3].trim(),
-    }));
 }
 
 function buildEditorialPageFromContentGeneration(root, record, publishedPage) {

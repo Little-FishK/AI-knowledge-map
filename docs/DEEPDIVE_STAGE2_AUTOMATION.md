@@ -24,7 +24,10 @@ flowchart LR
 
 | 部件 | 位置 | 责任 |
 |---|---|---|
-| 调度器/状态机 | `tools/deepdive-stage2/core.js` | 决定下一项任务、租约、状态转换、失败恢复和发布 |
+| 公共控制器门面/状态机 | `tools/deepdive-stage2/core.js` | 保持 CLI、MCP 和测试使用的稳定接口，编排任务、状态转换、失败恢复和发布 |
+| 状态存储与锁 | `tools/deepdive-stage2/lib/state-store.js` | 管理 `.stage2` 路径、原子写入、控制器锁、事件与状态读写 |
+| 审计项目访问 | `tools/deepdive-stage2/lib/audit-project-access.js` | 实施 audit 租约校验、路径拒绝、文件读取与受限搜索 |
+| 编辑稿渲染 | `tools/deepdive-stage2/lib/editorial-markdown.js` | 将人工编辑 Markdown 安全转换为理解原理页 HTML，并处理表格保留比较 |
 | 命令入口 | `tools/run-deepdive-stage2.js` | 初始化、暂停、恢复、查看状态和人工诊断 |
 | Codex 窄接口 | `tools/deepdive-stage2/mcp-server.js` | 只暴露状态、领取一项任务、提交一项结果 |
 | 运行状态 | `.stage2/state.json` | 130 页与新节点的唯一进度事实源 |
@@ -33,7 +36,7 @@ flowchart LR
 | 写作政策 | `.stage2/policies/writing-policy.md` | 写作者可见的稳定要求，不含审计答案 |
 | 定时触发器 | Codex 桌面应用的自动化 | 定时创建一个全新、无项目对话并调用窄接口 |
 
-调度器放在仓库里，因为它必须与数据结构、门禁和版本一起演进；定时器放在 Codex 桌面应用里，因为它只负责按时唤醒，不持有业务状态。
+调度器放在仓库里，因为它必须与数据结构、门禁和版本一起演进；定时器放在 Codex 桌面应用里，因为它只负责按时唤醒，不持有业务状态。`core.js` 是稳定门面，不应重新承载已拆出的底层实现；内部模块也不得反向依赖 `core.js`，以免形成循环依赖。
 
 ## 3. 状态机
 

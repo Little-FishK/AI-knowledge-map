@@ -12,7 +12,9 @@ domain; commands should use their canonical domain paths directly.
   shared audit-contract modules.
 - `deepdive/runtime/`: page loading and runtime build support shared across
   deep-dive workflows.
-- `deepdive-stage2/`: the protected Stage 2 controller and MCP implementation.
+- `deepdive-stage2/`: the protected Stage 2 controller and MCP implementation;
+  `core.js` is the stable public facade and `lib/` contains internal storage,
+  audit-access, and editorial-rendering responsibilities.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
 
 Generated or reviewed ingestion artifacts live in the top-level `artifacts/`
@@ -33,5 +35,6 @@ belongs in `docs/` unless it must remain next to an executable.
 5. Search CI, MCP configuration, scheduled controllers, tests, and documentation
    for stale paths before completing a migration.
 
-The Stage 2 implementation is migrated last. Its state, lease, capability, and
-publication contracts must remain unchanged throughout the tooling refactor.
+Stage 2 is refactored behind its existing `core.js` facade. Its state, lease,
+capability, and publication contracts must remain unchanged while internal
+responsibilities move into focused modules.
