@@ -6,8 +6,12 @@ const vm = require("vm");
 const root = process.env.TUTORIAL_ROOT
   ? path.resolve(process.env.TUTORIAL_ROOT)
   : path.join(__dirname, "..");
-// 教程数据不再在首屏由 index.html 加载，改为 app.js 在进入软件视图时按需注入。
-const appJs = fs.readFileSync(path.join(root, "assets", "app.js"), "utf8");
+// 教程数据不在首屏加载，由前端软件视图在首次进入时按需注入。
+const frontendFiles = [path.join(root, "assets", "app.js")]
+  .concat(fs.readdirSync(path.join(root, "assets", "app"))
+    .filter(name => name.endsWith(".js"))
+    .map(name => path.join(root, "assets", "app", name)));
+const frontendJs = frontendFiles.map(file => fs.readFileSync(file, "utf8")).join("\n");
 const requiredTutorialScripts = [
   "data/tutorials.js",
   "data/tutorials-codex-youtube.js",
@@ -87,9 +91,9 @@ function checkReview(r) {
 }
 
 requiredTutorialScripts.forEach((src) => {
-  if (!appJs.includes(`"${src}"`)) problems.push(`app.js 未按需加载 ${src}`);
+  if (!frontendJs.includes(`"${src}"`)) problems.push(`前端软件视图未按需加载 ${src}`);
 });
-if (!appJs.includes("data-tutorial") || !appJs.includes("openTutorial")) problems.push("app.js 未接入软件教程按钮或打开逻辑");
+if (!frontendJs.includes("data-tutorial") || !frontendJs.includes("openTutorial")) problems.push("前端未接入软件教程按钮或打开逻辑");
 
 const platformDup = T.platforms.map(x => x.id).filter((v, i, a) => a.indexOf(v) !== i);
 if (platformDup.length) problems.push("重复的平台 id：" + platformDup.join(", "));

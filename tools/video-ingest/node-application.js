@@ -233,8 +233,8 @@ function transformGraph(source, manifest) {
 }
 
 function transformIndex(source, nodeId) {
-  const manifest = '<script src="data/deepdive-runtime/manifest.js"></script>';
-  if (!source.includes(manifest)) {
+  const manifest = /<script\b[^>]*\bsrc=["']data\/deepdive-runtime\/manifest\.js["'][^>]*><\/script>/;
+  if (!manifest.test(source)) {
     throw new Error("index.html 缺少理解原理页按需加载清单");
   }
   return source;

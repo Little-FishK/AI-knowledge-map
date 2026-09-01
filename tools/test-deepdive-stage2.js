@@ -1000,7 +1000,12 @@ try {
   fs.rmSync(rejectedPassedFixture, { recursive: true, force: true });
 }
 
-const appSource = fs.readFileSync(path.join(__dirname, "..", "assets", "app.js"), "utf8");
+const frontendRoot = path.join(__dirname, "..", "assets");
+const appSource = [fs.readFileSync(path.join(frontendRoot, "app.js"), "utf8")]
+  .concat(fs.readdirSync(path.join(frontendRoot, "app"))
+    .filter(name => name.endsWith(".js"))
+    .map(name => fs.readFileSync(path.join(frontendRoot, "app", name), "utf8")))
+  .join("\n");
 const styleSource = fs.readFileSync(path.join(__dirname, "..", "assets", "style.css"), "utf8");
 assert.match(appSource, /published-provisional/);
 assert.match(appSource, /未通过审计/);

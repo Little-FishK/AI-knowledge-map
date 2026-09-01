@@ -42,8 +42,20 @@ function loadProject(root = ROOT) {
   load("data/graph.js");
   load("data/software.js");
   const index = readTextIfExists(withinRoot(root, "index.html"));
-  const tutorialScripts = [...index.matchAll(/<script src="(data\/tutorials[^"]*\.js)"><\/script>/g)]
-    .map((match) => match[1]);
+  const appDirectory = withinRoot(root, "assets/app");
+  const frontendSources = [
+    index,
+    readTextIfExists(withinRoot(root, "assets/app.js")),
+    ...(fs.existsSync(appDirectory)
+      ? fs.readdirSync(appDirectory)
+        .filter(name => name.endsWith(".js"))
+        .map(name => readTextIfExists(path.join(appDirectory, name)))
+      : []),
+  ].join("\n");
+  const tutorialScripts = [...new Set(
+    [...frontendSources.matchAll(/["'](data\/tutorials[^"']*\.js)["']/g)]
+      .map(match => match[1])
+  )];
   tutorialScripts.forEach(load);
   return {
     graph: context.window.GRAPH,

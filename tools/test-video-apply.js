@@ -206,6 +206,7 @@ function copyFixtureRoot(target) {
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(ROOT, ...relative.split("/")), destination);
   });
+  fs.cpSync(path.join(ROOT, "assets", "app"), path.join(target, "assets", "app"), { recursive: true });
   fs.writeFileSync(
     path.join(target, "data", "tutorials-video-generated.js"),
     renderGeneratedTutorials({ schemaVersion: 1, pages: {} }),

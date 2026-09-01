@@ -101,6 +101,19 @@ async function exerciseApp(browser, baseUrl, label) {
 
   try {
     await page.goto(`${baseUrl}#/map`, { waitUntil: "load" });
+    const firstDomainToggle = page.locator("[data-domain-toggle]").first();
+    await firstDomainToggle.click();
+    if (await firstDomainToggle.getAttribute("aria-expanded") !== "true") {
+      throw new Error(`${label}：大区节点列表无法展开`);
+    }
+    const zoomBefore = await page.locator("#map-zoom-level").textContent();
+    await page.locator("#map-zoom-in").click();
+    const zoomAfter = await page.locator("#map-zoom-level").textContent();
+    if (zoomBefore === zoomAfter) throw new Error(`${label}：地图缩放控件没有生效`);
+    await page.keyboard.press("Shift+Comma");
+    const zoomAfterKeyboard = await page.locator("#map-zoom-level").textContent();
+    if (zoomAfterKeyboard === zoomAfter) throw new Error(`${label}：地图键盘缩放没有生效`);
+
     await page.locator("#search").fill("神经网络");
     await page.locator('#search-results [data-id="neural-network"]').click();
     if (!page.url().endsWith("#/map")) throw new Error(`${label}：普通节点选择改变了 URL`);
@@ -109,6 +122,10 @@ async function exerciseApp(browser, baseUrl, label) {
     await page.locator('[data-dd="neural-network"]').click();
     await waitForHash("#/concept/neural-network");
     await page.locator("#deepdive h1").filter({ hasText: "神经网络" }).waitFor();
+    await page.locator('[data-learn-node="neural-network"]').click();
+    if (await page.locator('[data-learn-node="neural-network"]').getAttribute("aria-pressed") !== "true") {
+      throw new Error(`${label}：学习进度按钮没有更新`);
+    }
     await page.goBack();
     await waitForHash("#/map");
     await page.locator("#detail h2").filter({ hasText: "神经网络" }).waitFor();

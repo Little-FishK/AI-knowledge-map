@@ -86,6 +86,7 @@ function changedIds(allIds) {
   ]);
   for (const line of git.stdout.split(/\r?\n/).filter(Boolean)) {
     const rawPath = (baseRef ? line : line.slice(3).split(" -> ").pop()).replace(/\\/g, "/");
+    if (rawPath.startsWith("assets/app/")) return allIds;
     if (globalFiles.has(rawPath)) return allIds;
     if (!rawPath.startsWith("data/deepdive/") || !rawPath.endsWith(".js")) continue;
     const file = path.join(root, ...rawPath.split("/"));
