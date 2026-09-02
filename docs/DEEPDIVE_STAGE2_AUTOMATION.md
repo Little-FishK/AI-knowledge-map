@@ -25,7 +25,7 @@ flowchart LR
 | 部件 | 位置 | 责任 |
 |---|---|---|
 | 公共控制器门面/状态机 | `tools/deepdive-stage2/core.js` | 保持 CLI、MCP 和测试使用的稳定接口，编排任务、状态转换、失败恢复和发布 |
-| 状态存储与锁 | `tools/deepdive-stage2/lib/state-store.js` | 管理 `.stage2` 路径、原子写入、控制器锁、事件与状态读写 |
+| 状态存储与锁 | `tools/deepdive-stage2/lib/state-store.js` | 管理仓库内状态与仓库外运行材料的路径映射、原子写入、控制器锁和事件读写 |
 | 控制器生命周期 | `tools/deepdive-stage2/lib/controller-lifecycle.js` | 初始化页面状态、合并待处理补充材料，并提供状态查询、暂停、恢复和普通重试命令 |
 | 审计项目访问 | `tools/deepdive-stage2/lib/audit-project-access.js` | 实施 audit 租约校验、路径拒绝、文件读取与受限搜索 |
 | 候选门禁执行 | `tools/deepdive-stage2/lib/candidate-gate.js` | 构建隔离临时夹具、运行 L1/L2/L3 验证器、解析缺陷并刷新候选阻断状态 |
@@ -44,12 +44,14 @@ flowchart LR
 | 命令入口 | `tools/run-deepdive-stage2.js` | 初始化、暂停、恢复、查看状态和人工诊断 |
 | Codex 窄接口 | `tools/deepdive-stage2/mcp-server.js` | 只暴露状态、领取一项任务、提交一项结果 |
 | 运行状态 | `.stage2/state.json` | 130 页与新节点的唯一进度事实源 |
-| 私有结果 | `.stage2/results/` | 候选页、私有审计与发布回执；不进 Git |
-| 事件日志 | `.stage2/events.jsonl` | 只追加的运行轨迹；不进 Git |
+| 私有结果 | 本机数据根目录下 `stage2/results/` | 候选页、私有审计与发布回执；状态中仍使用稳定的 `.stage2/results/...` 逻辑路径 |
+| 预览与事件 | 本机数据根目录下 `stage2/previews/`、`stage2/events.jsonl` | 未发布预览与只追加运行轨迹；不占用仓库工作区 |
 | 写作政策 | `.stage2/policies/writing-policy.md` | 写作者可见的稳定要求，不含审计答案 |
 | 定时触发器 | Codex 桌面应用的自动化 | 定时创建一个全新、无项目对话并调用窄接口 |
 
 调度器放在仓库里，因为它必须与数据结构、门禁和版本一起演进；定时器放在 Codex 桌面应用里，因为它只负责按时唤醒，不持有业务状态。`core.js` 是稳定门面，不应重新承载已拆出的底层实现；内部模块也不得反向依赖 `core.js`，以免形成循环依赖。
+
+本机数据根目录默认遵循操作系统惯例；Windows 为 `%LOCALAPPDATA%\ai-knowledge-map`。可通过 `AI_KNOWLEDGE_MAP_DATA_DIR` 覆盖，并用 `npm run local-data:paths` 查看所有解析结果。正式状态文件与稳定政策仍留在仓库中，便于版本化和恢复；大体积、私有、可持续增长的运行材料放在仓库外。旧运行材料只能由完整权限的 Stage 2 MCP 控制器调用 `stage2_local_data_status` 检查，再调用 `stage2_migrate_local_data` 迁移；禁止直接搬动 `.stage2` 文件。
 
 ## 3. 状态机
 
@@ -242,7 +244,7 @@ npm run video:stage2-enqueue-new -- `
 
 ## 8. 发布与回滚
 
-Agent 提交的内容只进入 `.stage2/results/`，不是正式页面。控制器随后：
+Agent 提交的内容只进入本机 `stage2/results/`。状态文件继续记录 `.stage2/results/...` 逻辑路径，由存储层解析到仓库外实际位置；这些内容不是正式页面。控制器随后：
 
 1. 校验任务 ID、租约令牌、角色和页面 ID。
 2. 把审计与候选页面分别保存，保持上下文隔离。

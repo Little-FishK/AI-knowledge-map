@@ -13,6 +13,7 @@ const { createEditorialCandidateImport } = require("../../tools/deepdive-stage2/
 const { createEditorialCandidateValidation } = require("../../tools/deepdive-stage2/lib/editorial-candidate-validation");
 const { createManualReviewPreviewServices } = require("../../tools/deepdive-stage2/lib/manual-review-preview");
 const { createManualReviewWorkflow } = require("../../tools/deepdive-stage2/lib/manual-review-workflow");
+const { createLocalDataMigration } = require("../../tools/deepdive-stage2/lib/local-data-migration");
 const { createNewNodeQueue } = require("../../tools/deepdive-stage2/lib/new-node-queue");
 const { renderEditorialMarkdown } = require("../../tools/deepdive-stage2/lib/editorial-markdown");
 const { createPublication } = require("../../tools/deepdive-stage2/lib/publication");
@@ -48,6 +49,43 @@ try {
   release();
   const releaseAgain = store.acquireLock(root);
   releaseAgain();
+
+  const migrationRoot = path.join(root, "migration-project");
+  const migrationData = path.join(root, "migration-local-data");
+  const migrationStore = createStateStore({
+    defaultRoot: migrationRoot,
+    schemaVersion: 7,
+    localDataRoot: migrationData,
+  });
+  migrationStore.saveState(migrationRoot, {
+    schemaVersion: 7,
+    pages: { alpha: { id: "alpha", state: "audit-queued", lease: null } },
+  });
+  fs.mkdirSync(path.join(migrationRoot, ".stage2", "results", "alpha"), { recursive: true });
+  fs.mkdirSync(path.join(migrationRoot, ".stage2", "previews"), { recursive: true });
+  fs.writeFileSync(path.join(migrationRoot, ".stage2", "results", "alpha", "candidate.json"), "{}\n", "utf8");
+  fs.writeFileSync(path.join(migrationRoot, ".stage2", "previews", "alpha.html"), "preview\n", "utf8");
+  fs.writeFileSync(path.join(migrationRoot, ".stage2", "events.jsonl"), "{\"type\":\"before\"}\n", "utf8");
+  fs.writeFileSync(path.join(migrationRoot, ".stage2", "state.json.bak"), "backup\n", "utf8");
+  const migration = createLocalDataMigration({
+    defaultRoot: migrationRoot,
+    acquireLock: migrationStore.acquireLock,
+    appendEvent: migrationStore.appendEvent,
+    loadState: migrationStore.loadState,
+    runtimeDirectory: migrationStore.runtimeDirectory,
+    stageDirectory: migrationStore.stageDirectory,
+  });
+  const migrated = migration.migrate(migrationRoot, "fixture migration");
+  assert.strictEqual(migrated.status, "migrated");
+  assert(fs.existsSync(path.join(migrationData, "stage2", "results", "alpha", "candidate.json")));
+  assert(fs.existsSync(path.join(migrationData, "stage2", "previews", "alpha.html")));
+  assert(fs.existsSync(path.join(migrationData, "stage2", "events.jsonl")));
+  assert(fs.existsSync(path.join(migrationData, "stage2", "backups", "state.json.bak")));
+  assert(!fs.existsSync(path.join(migrationRoot, ".stage2", "results")));
+  assert.strictEqual(
+    migrationStore.withinRoot(migrationRoot, ".stage2/results/alpha/candidate.json"),
+    path.join(migrationData, "stage2", "results", "alpha", "candidate.json"),
+  );
 
   fs.writeFileSync(path.join(root, "guide.md"), "Stage 2 模块化测试\n第二行\n", "utf8");
   const access = createAuditProjectAccess({

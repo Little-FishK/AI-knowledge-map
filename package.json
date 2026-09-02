@@ -15,6 +15,7 @@
     "stage2:rollback-provisional": "node tools/run-deepdive-stage2.js rollback-provisional",
     "stage2:editorial": "node tools/run-stage2-editorial-controller.js",
     "stage2:mcp": "node tools/deepdive-stage2/mcp-server.js",
+    "local-data:paths": "node tools/local-data-paths.js",
     "validate": "node tools/validators/graph.js && node tools/validators/deepdives.js && node tools/validators/software.js && node tools/validators/tutorials.js && node tools/validators/video-applications.js && node tools/validators/library.js",
     "validate:library": "node tools/validators/library.js",
     "validate:tutorials": "node tools/validators/tutorials.js",
@@ -44,7 +45,7 @@
     "test:video-ingest": "node tests/video-ingest/ingest.test.js && node tests/video-ingest/application.test.js && node tests/video-ingest/shadow-review.test.js && node tests/video-ingest/node-package.test.js && node tests/video-ingest/node-application.test.js && node tests/video-ingest/calibration.test.js",
     "test:routing": "node tests/app/routing.test.js",
     "test:app": "node tests/app/app-smoke.test.js",
-    "test:tooling": "node tests/tooling/project-root.test.js && node tests/tooling/deepdive-quality-modules.test.js && node tests/tooling/standalone-page-source.test.js && node tools/deepdive/quality/verify-standalone-sources.js",
+    "test:tooling": "node tests/tooling/project-root.test.js && node tests/tooling/local-data-root.test.js && node tests/tooling/deepdive-quality-modules.test.js && node tests/tooling/standalone-page-source.test.js && node tools/deepdive/quality/verify-standalone-sources.js",
     "quality:all": "npm run validate && npm run test:tooling && npm run test:routing && npm run test:app && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },
   "devDependencies": {

@@ -12,6 +12,7 @@ const { createEditorialCandidateImport } = require("./lib/editorial-candidate-im
 const { createEditorialCandidateValidation } = require("./lib/editorial-candidate-validation");
 const { createManualReviewWorkflow } = require("./lib/manual-review-workflow");
 const { createManualReviewPreviewServices } = require("./lib/manual-review-preview");
+const { createLocalDataMigration } = require("./lib/local-data-migration");
 const { createNewNodeQueue } = require("./lib/new-node-queue");
 const { createPublication } = require("./lib/publication");
 const { createResultSubmissionWorkflow } = require("./lib/result-submission-workflow");
@@ -21,6 +22,7 @@ const {
   renderEditorialMarkdown,
 } = require("./lib/editorial-markdown");
 const { clone, createStateStore, sha256 } = require("./lib/state-store");
+const { resolveLocalDataRoot } = require("../shared/local-data-root");
 
 const ROOT = path.join(__dirname, "..", "..");
 const TOOL_SCRIPTS = Object.freeze({
@@ -38,6 +40,7 @@ const {
   loadState,
   readJson,
   resultDirectory,
+  runtimeDirectory,
   saveState,
   stageDirectory,
   stateFile,
@@ -46,6 +49,18 @@ const {
 } = createStateStore({
   defaultRoot: ROOT,
   schemaVersion: STATE_SCHEMA_VERSION,
+  localDataRoot: resolveLocalDataRoot(),
+});
+const {
+  migrate: migrateLocalData,
+  status: localDataStatus,
+} = createLocalDataMigration({
+  defaultRoot: ROOT,
+  acquireLock,
+  appendEvent,
+  loadState,
+  runtimeDirectory,
+  stageDirectory,
 });
 const {
   readAuditProjectFile,
@@ -526,8 +541,10 @@ module.exports = {
   initialize,
   importEditorialCandidate,
   inspectPublicationCandidate,
+  localDataStatus,
   loadState,
   mergePendingSupplements,
+  migrateLocalData,
   nextRecommendedPage,
   resolveRecommendedPage,
   pageRegistrationSource,

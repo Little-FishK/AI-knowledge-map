@@ -7,6 +7,8 @@ const {
   createManualReviewPreview,
   finalizeManualReview,
   inspectPublicationCandidate,
+  localDataStatus,
+  migrateLocalData,
   importEditorialCandidate,
   enqueueContentGeneration,
   nextRecommendedPage,
@@ -50,6 +52,23 @@ const allTools = [
     name: "stage2_status",
     description: "查看串行理解原理页队列的汇总状态；不返回页面正文。",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "stage2_local_data_status",
+    description: "查看 Stage 2 本机运行材料的新旧位置与完整性摘要；不读取页面正文且不修改任何文件。",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "stage2_migrate_local_data",
+    description: "在无活动租约时，把 results、previews、events 和状态备份完整校验后迁到仓库外本机数据目录；保留正式状态文件和页面正文。",
+    inputSchema: {
+      type: "object",
+      required: ["reason"],
+      properties: {
+        reason: { type: "string", minLength: 3, maxLength: 500 },
+      },
+      additionalProperties: false,
+    },
   },
   {
     name: "stage2_next_recommended_page",
@@ -547,6 +566,10 @@ function handle(message) {
     }
     try {
       if (name === "stage2_status") return response(id, toolResult(status(root)));
+      if (name === "stage2_local_data_status") return response(id, toolResult(localDataStatus(root)));
+      if (name === "stage2_migrate_local_data") {
+        return response(id, toolResult(migrateLocalData(root, args.reason)));
+      }
       if (name === "stage2_next_recommended_page") {
         return response(id, toolResult(nextRecommendedPage(root, args.startOrder || "1.3")));
       }

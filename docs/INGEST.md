@@ -28,7 +28,7 @@ data/graph.js
 | 视频 | 使用 `tools/video-evidence.py` 生成字幕、关键帧 OCR 与带哈希的 evidence JSON；v0.1 双轨提案与 v0.2 批准、预览、应用、回滚见 [VIDEO_INGEST.md](VIDEO_INGEST.md) |
 | 本地文档 | 直接 Read |
 
-抽出的原文放 `.video-runtime/raw/`（已 gitignore，**不入库、不发布**）。
+抽出的原文放仓库外的本机 `video/raw/` 数据目录（运行 `npm run local-data:paths -- videoRaw` 查看），**不入库、不发布**。
 
 ## 2. 抽概念
 

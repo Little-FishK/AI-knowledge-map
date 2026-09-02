@@ -8,4 +8,5 @@ useful for audit history but are not executable tooling or runtime website data.
   shadow-review results, and node-package previews.
 
 Large source media, transcripts, frames, temporary packets, application plans,
-and rollback receipts belong in the ignored `.video-runtime/` workspace.
+and rollback receipts belong in the external `video/raw` local-data directory.
+Run `npm run local-data:paths -- videoRaw` from the repository to locate it.

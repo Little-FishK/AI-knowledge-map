@@ -23,8 +23,10 @@ domain; commands should use their canonical domain paths directly.
 - `video-ingest/`: video proposal, review, application, and rollback workflows.
 
 Generated or reviewed ingestion artifacts live in the top-level `artifacts/`
-directory. Local media, transcripts, frames, and dependency caches live in the
-ignored `.video-runtime/` workspace.
+directory. Local media, transcripts, frames, dependency caches, Stage 2 private
+results, previews, events, and logs live under the external local-data root.
+Run `npm run local-data:paths` to display the resolved directories. Override the
+default with `AI_KNOWLEDGE_MAP_DATA_DIR` when required.
 
 Tests live in the top-level `tests/` directory, grouped into `app/`, `deepdive/`,
 `stage2/`, `tooling/`, and `video-ingest/`. Tooling-specific documentation

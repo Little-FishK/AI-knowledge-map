@@ -13,9 +13,20 @@ function sha256(value) {
   return `sha256:${crypto.createHash("sha256").update(text).digest("hex")}`;
 }
 
-function createStateStore({ defaultRoot, schemaVersion }) {
+function createStateStore({ defaultRoot, schemaVersion, localDataRoot = null }) {
+  const resolvedDefaultRoot = path.resolve(defaultRoot);
+  const resolvedLocalDataRoot = localDataRoot ? path.resolve(localDataRoot) : null;
+
   function stageDirectory(root = defaultRoot) {
     return path.join(path.resolve(root), ".stage2");
+  }
+
+  function runtimeDirectory(root = defaultRoot) {
+    const resolvedRoot = path.resolve(root);
+    if (resolvedLocalDataRoot && resolvedRoot === resolvedDefaultRoot) {
+      return path.join(resolvedLocalDataRoot, "stage2");
+    }
+    return stageDirectory(resolvedRoot);
   }
 
   function stateFile(root = defaultRoot) {
@@ -23,20 +34,35 @@ function createStateStore({ defaultRoot, schemaVersion }) {
   }
 
   function eventsFile(root = defaultRoot) {
-    return path.join(stageDirectory(root), "events.jsonl");
+    return path.join(runtimeDirectory(root), "events.jsonl");
   }
 
   function lockFile(root = defaultRoot) {
-    return path.join(stageDirectory(root), "controller.lock");
+    return path.join(runtimeDirectory(root), "controller.lock");
   }
 
   function resultDirectory(root, id) {
-    return path.join(stageDirectory(root), "results", id);
+    return path.join(runtimeDirectory(root), "results", id);
   }
 
   function withinRoot(root, relativePath) {
-    const absolute = path.resolve(root, relativePath);
-    const relative = path.relative(path.resolve(root), absolute);
+    const normalized = String(relativePath || "").replace(/\\/g, "/");
+    if (!normalized || path.posix.isAbsolute(normalized)) {
+      throw new Error(`目标路径越出项目根目录：${relativePath}`);
+    }
+    const clean = path.posix.normalize(normalized);
+    if (clean === ".." || clean.startsWith("../")) {
+      throw new Error(`目标路径越出项目根目录：${relativePath}`);
+    }
+    const runtimePrefix = ".stage2/";
+    const runtimeManaged = clean === ".stage2/results"
+      || clean.startsWith(".stage2/results/")
+      || clean === ".stage2/previews"
+      || clean.startsWith(".stage2/previews/");
+    const base = runtimeManaged ? runtimeDirectory(root) : path.resolve(root);
+    const managedRelative = runtimeManaged ? clean.slice(runtimePrefix.length) : clean;
+    const absolute = path.resolve(base, managedRelative);
+    const relative = path.relative(base, absolute);
     if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
       throw new Error(`目标路径越出项目根目录：${relativePath}`);
     }
@@ -92,7 +118,7 @@ function createStateStore({ defaultRoot, schemaVersion }) {
       type,
       ...details,
     };
-    fs.mkdirSync(stageDirectory(root), { recursive: true });
+    fs.mkdirSync(runtimeDirectory(root), { recursive: true });
     fs.appendFileSync(eventsFile(root), `${JSON.stringify(event)}\n`, "utf8");
     return event;
   }
@@ -124,6 +150,7 @@ function createStateStore({ defaultRoot, schemaVersion }) {
     lockFile,
     readJson,
     resultDirectory,
+    runtimeDirectory,
     saveState,
     stageDirectory,
     stateFile,

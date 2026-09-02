@@ -105,6 +105,8 @@ server.stdout.on("data", chunk => {
       messages[1].result.tools.map(tool => tool.name),
       [
         "stage2_status",
+        "stage2_local_data_status",
+        "stage2_migrate_local_data",
         "stage2_next_recommended_page",
         "stage2_resolve_recommended_page",
         "stage2_claim_task",
