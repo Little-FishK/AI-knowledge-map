@@ -5,6 +5,8 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { resolveProjectRoot } = require("../shared/project-root");
+const { loadDeepDivePages, SOURCE_LAYOUT_FILE } = require("../deepdive/runtime/deepdive-loader");
+const { loadStandalonePageFile } = require("../deepdive/runtime/standalone-page-source");
 
 const root = resolveProjectRoot("DEEPDIVE_ROOT");
 const deepDiveDir = path.join(root, "data", "deepdive");
@@ -49,13 +51,27 @@ load(path.join(root, "data", "graph.js"));
 const deepDiveFiles = fs.readdirSync(deepDiveDir)
   .filter((file) => file.endsWith(".js"))
   .sort();
-deepDiveFiles.forEach((file) => load(path.join(deepDiveDir, file)));
 
 const graph = context.window.GRAPH;
-const pages = context.window.DEEPDIVE || {};
+const pages = loadDeepDivePages(root);
 const nodeIds = graph.nodes.map((node) => node.id);
 const nodeIdSet = new Set(nodeIds);
 const problems = [];
+
+if (!fs.existsSync(path.join(deepDiveDir, SOURCE_LAYOUT_FILE))) {
+  problems.push(`data/deepdive 缺少 ${SOURCE_LAYOUT_FILE} 独立页面布局声明`);
+}
+
+deepDiveFiles.forEach(file => {
+  try {
+    const { id, page } = loadStandalonePageFile(path.join(deepDiveDir, file));
+    if (JSON.stringify(page) !== JSON.stringify(pages[id])) {
+      problems.push(`${id}: 独立加载结果与规范加载器不一致`);
+    }
+  } catch (error) {
+    problems.push(error.message);
+  }
+});
 
 if (nodeIdSet.size !== nodeIds.length) {
   problems.push("data/graph.js 存在重复节点 id");
@@ -68,26 +84,6 @@ nodeIds.forEach((id) => {
 
 const extras = Object.keys(pages).filter((id) => !nodeIdSet.has(id));
 if (extras.length) problems.push(`存在无对应节点的原理页：${extras.join(", ")}`);
-
-// 同一个 id 不应由多个文件注册。共享页面包可以注册多个 id，但每个 id 只能有一个来源文件。
-const registrations = new Map();
-deepDiveFiles.forEach((file) => {
-  const source = fs.readFileSync(path.join(deepDiveDir, file), "utf8");
-  const ids = [
-    ...source.matchAll(/window\.DEEPDIVE\s*\[\s*["']([^"']+)["']\s*\]\s*=/g),
-    ...source.matchAll(/register\s*\(\s*["']([^"']+)["']/g),
-  ].map((match) => match[1]);
-  ids.forEach((id) => {
-    if (!registrations.has(id)) registrations.set(id, []);
-    registrations.get(id).push(file);
-  });
-});
-for (const [id, files] of registrations) {
-  const uniqueFiles = [...new Set(files)];
-  if (uniqueFiles.length > 1) {
-    problems.push(`${id}: 存在多个注册来源（${uniqueFiles.join(", ")}）`);
-  }
-}
 
 for (const [id, page] of Object.entries(pages)) {
   if (!page) continue;
@@ -167,8 +163,8 @@ const indexPages = indexContext.window.DEEPDIVE || {};
 Object.keys(pages).forEach((id) => {
   if (!indexPages[id]) {
     problems.push(`${id}: index.html 运行后未注册原理页`);
-  } else if (indexPages[id].title !== pages[id].title || indexPages[id].html !== pages[id].html) {
-    problems.push(`${id}: index.html 最终内容被覆盖或与目录审计不一致`);
+  } else if (JSON.stringify(indexPages[id]) !== JSON.stringify(pages[id])) {
+    problems.push(`${id}: 按需运行时与规范源码完整对象不一致`);
   }
 });
 
@@ -179,4 +175,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log("✓ 全部页面通过覆盖、注册、结构、可选自测配对、独立来源与日期门禁");
+console.log("✓ 全部页面通过独立源码、结构、可选自测配对、独立来源、日期与运行时一致性门禁");

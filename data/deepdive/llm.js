@@ -1,329 +1,404 @@
-/* 理解原理页 —— 大语言模型 LLM
- * 写作规约见 docs/DEEPDIVE.md（一节一问 / 严格依赖顺序 / 直觉·数学·工程分层 /
- * 困惑当场点破 / 认知连续 > 技术完整）。全文原创，图示自绘。
- */
+/* Canonical standalone deep-dive page. Managed by the Stage 2 controller. */
 window.DEEPDIVE = window.DEEPDIVE || {};
 window.DEEPDIVE["llm"] = {
-  title: "大语言模型 LLM",
-  subtitle: "从「预测下一个词」到「像助手一样对话」",
-  aliases: "Large Language Model · 大模型 · LLM",
-  meta: "建议 40–55 分钟 · 基础 → 中级 · 需要：概率、向量、交叉熵（先读过「神经网络」「Transformer」深读页更顺）",
-  thesis: "现代生成式大语言模型通常以 Transformer 为骨架，预训练时核心目标是<b>给定前文预测下一个 token 的概率分布</b>；后训练、检索、工具与系统编排再塑造实际产品行为。翻译、代码与部分推理能力会从大规模训练中涌现，但不能把所有能力和风险都归结为单一目标。",
-  html: `
-<div class="dd-goals">
-  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
-  <ul>
-    <li><b>必要性</b>——旧的「一个任务一个模型」范式差在哪，为什么「一个通用语言模型」是质变。</li>
-    <li><b>机制</b>——它每一步具体在算什么：从一串 token 到「下一个 token 的概率分布」。</li>
-    <li><b>训练</b>——「预测下一个词」这个目标，怎样让它不用人工标注就能吃下整个互联网。</li>
-    <li><b>根本困惑</b>——一个只会猜下一个词的模型，凭什么会推理、翻译、写代码。</li>
-    <li><b>从基座到助手</b>——为什么预训练完的模型还不能当 ChatGPT 用，还要哪两步。</li>
-    <li><b>一句话推出一切</b>——为什么幻觉是结构性的，为什么要 RAG、要对齐、会被提示注入、有知识截止。</li>
-  </ul>
-</div>
-
-<div class="dd-note key">
-  <b>贯穿全页的最小例子</b>　我们始终用一个最短的提示：<b>「法国的首都是 ___」</b>。全页跟着它走一遍——看它怎样被切成 token、变成向量、被算出「下一个词大概率是<b>巴黎</b>」，再滚动生成一整句。遇到符号别急着背，回到这个例子就清楚了。
-</div>
-
-<div class="dd-note intuition">
-  <b>前置最小说明</b>　本页会用到几个来自其他概念的零件，这里给出「够用版」，想深入可看各自的深读页：<b>token</b>＝文本被切成的小片段；<b>嵌入 embedding</b>＝把每个 token 变成一串数字（向量）；<b>Transformer</b>＝一种能让每个位置「看」全部前文、并层层加工的神经网络；<b>softmax</b>＝把一组实数压成「加起来等于 1」的概率；<b>交叉熵</b>＝衡量「预测的概率分布」离「真实答案」有多远的损失。</div>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">1</span>为什么需要大语言模型<span class="dd-badge intuition">直觉</span></h2>
-  <p class="dd-lead">本节回答：我们已经有神经网络了，为什么还要「大语言模型」这样一类特殊的东西？</p>
-
-  <h3>1.1 旧世界：一个任务，一个模型，一堆标注</h3>
-  <p>在 LLM 之前，处理语言是「分而治之」：情感分类训一个模型，机器翻译训另一个，问答、摘要、命名实体识别各训各的。每一个都要<b>大量人工标注</b>的专用数据，而且换个任务几乎从头再来。这条路能走，但又贵又碎，且每个模型都只懂自己那一小块。</p>
-
-  <h3>1.2 关键转念：几乎所有语言任务都能写成「续写文本」</h3>
-  <p>有一个朴素但极强的观察：把任务塞进文字里，它们就都变成了同一件事——<b>接着往下写</b>。</p>
-  <div class="dd-note intuition"><b>把任务变成续写</b>
-  翻译 = 续写「<code>英文：… 中文：___</code>」；
-  问答 = 续写「<code>问：… 答：___</code>」；
-  摘要 = 续写「<code>原文：… 摘要：___</code>」；
-  情感分类 = 续写「<code>这条评价的情绪是：___</code>」。
-  只要一个模型足够会「续写」，它就<b>用同一套参数</b>顺手做了所有这些任务——不必为每个任务单独建模型、单独标数据。</div>
-  <p>于是问题从「怎么为每个任务建模型」变成了「怎么训练一个特别会续写的通用模型」。这个「特别会续写的模型」，就是大语言模型。它<b>值不值得</b>、<b>怎么做到</b>，是后面全部内容。</p>
-  <div class="dd-note eng"><b>它不是万能，也不该万能</b>　LLM 擅长开放、语言性的任务。但要精确计算、要可靠事实、要严格可复现，直接问它并不合适——后面会看到这是它的<b>结构性</b>短板，而不是「再大一点就好」。</div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">2</span>它每一步到底在算什么<span class="dd-badge math">数学</span></h2>
-  <p class="dd-lead">上一节说它「会续写」。抛开神秘感，续写这件事，机器每一步具体在算什么？</p>
-  <p>答案朴素得让人意外：给定前面的一串 token，模型输出的是<b>整个词表上的一个概率分布</b>——词表里每一个候选 token，各自「接下来最可能是我」的概率。</p>
-
-  <figure class="dd-fig">
-    <svg viewBox="0 0 560 210" role="img" aria-label="给定前文，模型输出下一个 token 的概率分布">
-      <text x="20" y="30" class="svg-t">前文：「法国 的 首都 是」　→　模型　→　下一个 token 的概率</text>
-      <g font-size="14">
-        <rect x="30" y="55" width="180" height="20" rx="3" fill="#21252d" stroke="#2c313b"/><rect x="30" y="55" width="128" height="20" rx="3" fill="#6b8cbe"/>
-        <text x="222" y="70" class="svg-tn">巴黎　0.62</text>
-        <rect x="30" y="85" width="180" height="20" rx="3" fill="#21252d" stroke="#2c313b"/><rect x="30" y="85" width="20" height="20" rx="3" fill="#6b8cbe" opacity=".7"/>
-        <text x="222" y="100" class="svg-t">里昂　0.09</text>
-        <rect x="30" y="115" width="180" height="20" rx="3" fill="#21252d" stroke="#2c313b"/><rect x="30" y="115" width="13" height="20" rx="3" fill="#6b8cbe" opacity=".6"/>
-        <text x="222" y="130" class="svg-t">法国　0.05</text>
-        <rect x="30" y="145" width="180" height="20" rx="3" fill="#21252d" stroke="#2c313b"/><rect x="30" y="145" width="8" height="20" rx="3" fill="#6b8cbe" opacity=".5"/>
-        <text x="222" y="160" class="svg-t">一　0.03</text>
-        <text x="222" y="188" class="svg-t">… 词表里其余几万个 token，概率都很小</text>
-      </g>
-    </svg>
-    <figcaption>图 1　模型的每一步输出，不是一个词，而是<b>词表上所有 token 的一张概率表</b>。这张表由最后一层的数值经 <code>softmax</code> 归一化得到。</figcaption>
-  </figure>
-
-  <div class="dd-formula">P(下一个 token = w │ 前文) = softmax(z)_w</div>
-  <p class="dd-formula-note"><b>符号说明：</b><code>P</code> 表示条件概率，<code>w</code> 是词表中的某个候选 token，竖线右侧“前文”表示概率以当前上下文为条件；<code>z</code> 是模型最后一层为每个候选 token 算出的实数向量（logits），<code>softmax(z)_w</code> 表示 softmax 把整排 z 归一化后取候选 w 对应的那一项。所有候选项相加等于 1。</p>
-
-  <h3>2.1 一次一个词：自回归生成</h3>
-  <p>有了「下一个 token 的概率表」，怎么生成一整句？<b>把它接回去，再来一遍</b>：挑出「巴黎」，拼到前文末尾变成「法国的首都是巴黎」，再让模型预测<b>下一个</b> token（可能是「。」或「，」），如此滚动，直到生成结束符。这种「一次一个、每步都把已生成的接回输入」的方式，叫<b>自回归（autoregressive）</b>。</p>
-
-  <figure class="dd-fig">
-    <svg viewBox="0 0 560 150" role="img" aria-label="自回归生成的滚动循环">
-      <rect x="20" y="40" width="150" height="34" rx="6" fill="#21252d" stroke="#2c313b"/><text x="95" y="62" text-anchor="middle" class="svg-tn">法国 的 首都 是</text>
-      <line x1="170" y1="57" x2="220" y2="57" stroke="#6b7484" stroke-width="1.6" marker-end="url(#a2)"/>
-      <rect x="220" y="42" width="70" height="30" rx="6" fill="#1a1d23" stroke="#6b8cbe"/><text x="255" y="62" text-anchor="middle" class="svg-t">模型</text>
-      <line x1="290" y1="57" x2="340" y2="57" stroke="#6b7484" stroke-width="1.6" marker-end="url(#a2)"/>
-      <rect x="340" y="42" width="90" height="30" rx="6" fill="#21252d" stroke="#4f9d78"/><text x="385" y="62" text-anchor="middle" class="svg-tn">巴黎</text>
-      <path d="M385,74 C385,110 150,110 95,84" fill="none" stroke="#d3a05a" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a3)"/>
-      <text x="245" y="128" text-anchor="middle" class="svg-t" fill="#d3a05a">把生成的词拼回前文，再预测下一个</text>
-      <defs>
-        <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker>
-        <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#d3a05a"/></marker>
-      </defs>
-    </svg>
-    <figcaption>图 2　自回归：模型一次只吐一个 token，然后把它接回输入、再算下一个。你看到的「流畅长文」，是这个循环滚了很多次的结果。</figcaption>
-  </figure>
-
-  <div class="dd-note warn"><b>你可能会困惑</b>　「它是不是先在心里想好整句，再说出来？」——<b>不是</b>。它没有全局草稿，就是一步一步、每步只挑「此刻最可能的下一个 token」。这条性质后面很重要：它解释了为什么模型能一本正经地把话说圆、却在中途拐进一个根本不存在的事实。</div>
-
-  <div class="dd-note math"><b>写成一个乘积</b>　整段文本的概率，被拆成每一步条件概率的连乘：<code>P(x₁…xₙ) = Π P(xₜ │ x₁…xₜ₋₁)</code>。这里 <code>xₜ</code> 是第 t 个 token，<code>x₁…xₜ₋₁</code> 是它之前的前缀，<code>n</code> 是序列长度，<code>Π</code> 表示把每一步条件概率相乘。这就是「语言模型」这个名字的数学含义——它建模的是<b>文本序列的概率</b>。</div>
-
-  <h3>2.2 手算两步序列概率</h3>
-  <p>在图中的前文后，假设模型选“巴黎”的条件概率是 0.62；接上“巴黎”后，句号的条件概率是 0.80。那么生成“巴黎。”这条两步路径的联合概率是：</p>
-  <div class="dd-formula">P(巴黎。│前文)=0.62×0.80=0.496</div>
-  <table class="dd-table"><thead><tr><th>第一步</th><th>第二步条件概率</th><th>整条路径概率</th></tr></thead><tbody><tr><td>巴黎：0.62</td><td>句号：0.80</td><td>0.496</td></tr><tr><td>里昂：0.09</td><td>句号：0.90</td><td>0.081</td></tr></tbody></table>
-  <p>第二条路径的第二步更“顺”，仍补不回第一步的巨大差距。真实生成拥有指数多条路径：贪心只保留当前概率最高的一个 token；束搜索同时保留有限条累计概率较高的候选路径；随机采样则按每一步分布探索。它们是不同解码规则，不能混称为“模型的答案”。</p>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">3</span>从文字到向量：token 与嵌入<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
-  <p class="dd-lead">第 2 节默默假设了模型「能读」前文。可模型只会算数字，「法国的首都是」这串汉字，怎么变成它能处理的东西？</p>
-  <p>分两步：<b>切分</b>与<b>嵌入</b>。</p>
-  <ol class="dd-steps">
-    <li><b>分词（tokenization）</b>：文本先被切成一个个 <b>token</b>（子词片段），每个 token 对应词表里的一个编号。常见词往往整词一个 token，生僻词会被拆成几块。于是「法国的首都是」变成一串整数 id，比如 <code>[121, 340, 88, 502]</code>。</li>
-    <li><b>嵌入（embedding）</b>：每个 token id 查一张大表，取出一个几百到几千维的<b>向量</b>；再叠加一个表示「它排在第几位」的<b>位置编码</b>。到这里，一串文字终于变成了一叠模型能做数学运算的向量。</li>
-  </ol>
-  <div class="dd-note intuition"><b>为什么必须先变成向量</b>　神经网络只会对连续数字做加权求和与非线性变换。离散的字符/词编号（1 号词、2 号词）本身没有「远近」可言；嵌入把它们放进一个连续空间，让<b>语义相近的词落在相近的位置</b>，模型才有的算。</div>
-  <div class="dd-note eng"><b>一个务实的后果</b>　计费和「上下文长度」都按 token 算，不按字数；而且模型「看不见字母」——问它「strawberry 里有几个 r」常出错，因为字母信息在分词那一步就被打包进 token 了。</div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">4</span>中间那个 Transformer 做了什么<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
-  <p class="dd-lead">输入已经是一叠向量了。核心命题说「超大 Transformer」，那它把这些向量<b>怎么了</b>，才能算出下一个词？</p>
-  <p>这里只讲它在 LLM 里扮演的角色（完整原理见 Transformer 深读页）。一句话：<b>它把「前文的每个 token 向量」反复加工，让每个位置的向量都吸收进它需要的上下文，最终得到一个「足以预测下一个 token」的表示。</b></p>
-  <p>关键机制是<b>注意力</b>：处理某个位置时，模型对<b>前面所有位置</b>算一组「相关性权重」，按权重把它们的信息汇总过来。所以预测「首都是___」时，模型能把注意力落在「法国」上，而不是被语序束缚。很多个注意力层叠起来，信息就被逐层组合成越来越抽象的表示。</p>
-
-  <h3>4.1 一个 LLM 特有的关键约束：因果掩码</h3>
-  <p>训练时整段文本是一次性喂进去的。但预测第 t 个 token 时，模型<b>绝不能偷看</b>第 t 个及以后的词——否则就是「拿着答案预测答案」，学不到任何东西。为此在注意力里加一层<b>因果掩码（causal mask）</b>：每个位置只允许看它<b>左边</b>的位置。</p>
-  <figure class="dd-fig">
-    <svg viewBox="0 0 380 210" role="img" aria-label="因果掩码：每个位置只能看它左边的位置">
-      <text x="190" y="24" text-anchor="middle" class="svg-t">行 = 正在预测的位置　列 = 它能看的位置</text>
-      <g font-size="12">
-        <text x="30" y="60" class="svg-t">法国</text><text x="30" y="95" class="svg-t">的</text><text x="30" y="130" class="svg-t">首都</text><text x="30" y="165" class="svg-t">是</text>
-        <text x="95" y="44" class="svg-t">法</text><text x="145" y="44" class="svg-t">的</text><text x="195" y="44" class="svg-t">首</text><text x="245" y="44" class="svg-t">是</text>
-      </g>
-      <g>
-        <rect x="85" y="50" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="135" y="50" width="34" height="24" fill="#21252d" stroke="#2c313b"/><rect x="185" y="50" width="34" height="24" fill="#21252d" stroke="#2c313b"/><rect x="235" y="50" width="34" height="24" fill="#21252d" stroke="#2c313b"/>
-        <rect x="85" y="85" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="135" y="85" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="185" y="85" width="34" height="24" fill="#21252d" stroke="#2c313b"/><rect x="235" y="85" width="34" height="24" fill="#21252d" stroke="#2c313b"/>
-        <rect x="85" y="120" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="135" y="120" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="185" y="120" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="235" y="120" width="34" height="24" fill="#21252d" stroke="#2c313b"/>
-        <rect x="85" y="155" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="135" y="155" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="185" y="155" width="34" height="24" fill="#4f9d78" opacity=".8"/><rect x="235" y="155" width="34" height="24" fill="#4f9d78" opacity=".8"/>
-      </g>
-      <text x="300" y="110" class="svg-t">绿=可看</text><text x="300" y="132" class="svg-t">空=挡住</text>
-    </svg>
-    <figcaption>图 3　因果掩码是一张下三角。第一个词谁也看不到（只能靠自己），越往后能看的前文越多——这正是「只用前文预测下一个词」在计算上的实现。</figcaption>
-  </figure>
-  <div class="dd-note math"><b>它省了大工程</b>　有了因果掩码，一段长度 n 的文本喂一次，就同时得到了 n 个训练样本（每个位置都在「用它的前文预测它的下一个」）。这让训练效率极高，是海量文本能被高效利用的关键之一。</div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">5</span>训练目标：预训练就是一个巨大的交叉熵<span class="dd-badge math">数学</span></h2>
-  <p class="dd-lead">结构清楚了。那这几千亿个参数，是怎么从数据里学出来的？为什么能用「整个互联网」这么多数据？</p>
-  <p>诀窍在于目标选得巧：让模型预测下一个 token，而<b>正确答案就是文本里真实的下一个 token</b>——数据自己给自己当标签，<b>不需要任何人工标注</b>。这叫<b>自监督学习</b>，也正是它能吃下海量文本的根本原因：不用人标，数据就几乎无限。</p>
-  <p>训练时用<b>交叉熵</b>损失衡量「预测的概率分布」离「真实的下一个 token」有多远，再用梯度下降把它压小：</p>
-  <div class="dd-formula">L = − Σₜ log P(xₜ │ x₁…xₜ₋₁)</div>
-  <p class="dd-formula-note"><b>符号说明：</b><code>L</code> 是一段训练文本的总损失，<code>Σₜ</code> 表示对所有预测位置 t 求和；<code>xₜ</code> 是位置 t 的真实 token，<code>x₁…xₜ₋₁</code> 是它之前的前缀，<code>P</code> 是模型给真实 token 的条件概率。概率越低，<code>−log</code> 越大，惩罚越重。训练就是把这个“对真实后续的惊讶程度”不断压小。</p>
-  <p><b>怎样读这个结果：</b>输入是文本前缀与其中真实的后继 token，输出是模型的词表概率分布和汇总损失。损失下降表示模型对这类文本的真实后续更少“意外”，不表示这些文本已经过事实核验。它还受训练语料的时间、语言、来源、噪声和偏见限制；扩大数据与参数不能自动消除这些边界。</p>
-  <div class="dd-note key"><b>为什么「不用标注」这么重要</b>　旧范式的天花板是人工标注：标得越多越贵越慢。自监督把这个瓶颈<b>拆掉了</b>——于是「加数据、加参数、加算力」成了可以持续下注的方向（这条经验规律叫缩放定律）。<b>「能 scale」这件事，根子就在「预测下一个词不用人标答案」。</b></div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">6</span>为什么「猜下一个词」能学会推理<span class="dd-badge intuition">直觉</span></h2>
-  <p class="dd-lead">这是全页最反直觉、也最关键的一节。一个只会猜下一个词的模型，凭什么会翻译、写代码、甚至推理？</p>
-  <div class="dd-note warn"><b>先承认这确实反直觉</b>　「预测下一个词」听起来像高级的输入法联想。但请注意一件事：<b>要把下一个词猜准，往往被迫理解到位。</b></div>
-  <p>把「猜词」逼到极致，会发生什么：</p>
-  <ul class="dd-steps">
-    <li>要续写一段<b>推理</b>（「因为 A 且 B，所以 ___」），模型必须学到足以预测结论的模式或中间表示；这可能支持真正的新题泛化，也可能只是复现训练中常见模板，必须用分布外题目区分。</li>
-    <li>要续写一段<b>代码</b>，就得懂语法和语义，否则下一个 token 填错程序就崩。</li>
-    <li>要续写一段<b>对话</b>，就得建模对方的意图和语气。</li>
-    <li>要续写「<code>1234 × 5678 = ___</code>」，就得掌握乘法的规律。</li>
-  </ul>
-  <p>换句话说，「预测下一个词」覆盖了非常广的统计任务：为了降低损失，模型会学到可复用的语法、事实、代码和部分推理表示。<b>这些能力不是由单独类别标签逐项教授，而是在预测目标中作为可迁移副产品形成。</b>但会输出正确推理步骤，不等于每次都执行可靠算法；模仿、记忆和真正组合泛化会混在一起。</p>
-  <p><b>把输入和输出说清楚：</b>输入是大量、多样的训练文本和足够的模型容量；训练直接输出的是更低的预测损失与一组内部表示，而可被提示调用的翻译、代码或推理表现是这些表示的迁移结果。能力测评上升只能说明模型在该测试中表现更好，不能单凭流畅回答断言它具有人的理解；要用新组合、反事实和分布外题目检查能力边界。</p>
-  <div class="dd-note intuition"><b>压缩与理解的关系</b>　为了用有限参数在许多上下文中续写，模型会学习可复用的语法、语义和推理模式；这解释了它为何能泛化。但参数也会记忆训练片段，行为能力也不等同于人类理解。更稳妥的说法是：<b>压缩压力促成了有用的内部表示</b>，而不是“规律就是完整理解”。</div>
-  <p>这一切都以<b>规模</b>为前提。参数、数据、算力按比例一起放大时，模型这种「猜词能力」会平滑地变强，很多具体能力也随之出现。</p>
-  <div class="dd-note warn"><b>诚实的边角</b>　「某些能力在规模跨过某个点后<b>突然涌现</b>」是流行说法，但也有研究指出，换一种连续的评价方式后曲线其实是平滑上升的——「突然」可能来自我们用了非黑即白的指标。这个争论没有定论；知道它有争议即可，不必站队。</div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">7</span>生成时的旋钮：采样、温度、上下文窗口<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
-  <p class="dd-lead">第 2 节说输出是「一张概率表」。既然是概率，具体怎么从里面挑词？这直接决定了它多稳、多有创意。</p>
-  <h3>7.1 挑词：贪心 vs 采样</h3>
-  <p>最简单是<b>贪心</b>：每步都挑概率最高的那个 token。稳，但容易呆板、重复。更常用的是<b>随机采样</b>：按概率大小掷骰子，高概率词更可能被选中，但低概率词也有机会——这带来多样性和「创意」。</p>
-  <p>因此，解码过程的输入是模型给出的 logits、采样参数和当前可见前文，输出是本步被选中的 token；循环执行后才得到最终文本。它改变的是同一模型概率分布的取法，而不是重新训练模型。</p>
-  <h3>7.2 温度：一个调「胆量」的旋钮</h3>
-  <p>采样前，先把 logit 除以一个<b>温度</b> <code>T</code> 再做 softmax：</p>
-  <div class="dd-formula">P(w) = softmax(z / T)_w</div>
-  <p class="dd-formula-note"><code>z</code> 是词表各候选的 logits，<code>T</code> 是采样温度，<code>w</code> 是某个候选 token，<code>P(w)</code> 是温度缩放后选到它的概率。T 只改变当前分布的形状，不会修改模型参数或补充新知识。</p>
-  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>温度</th><th>对分布的影响</th><th>表现</th></tr></thead><tbody>
-    <tr><td>T → 0</td><td>分布变尖，几乎只剩最高那个</td><td>确定、保守、可能重复</td></tr>
-    <tr><td>T = 1</td><td>就用模型原本的分布</td><td>默认</td></tr>
-    <tr><td>T &gt; 1</td><td>分布被摊平，低概率词也有机会</td><td>多样、有创意、也更容易跑偏</td></tr>
-  </tbody></table></div>
-  <div class="dd-note math"><b>温度其实在调「熵」</b>　用信息论的话说，温度调的是输出分布的<b>不确定性（熵）</b>：低温＝低熵＝更笃定，高温＝高熵＝更发散。所谓「让模型更有创意」，本质就是把这张概率表摊得更平一点。</div>
-  <h3>7.3 上下文窗口：它一次能看多长前文</h3>
-  <p>模型一次能直接条件化的 token 数有上限，叫<b>上下文窗口</b>。窗口之外的内容不会自动参与本次计算，除非应用重新检索或摘要注入。标准全局注意力的分数矩阵随长度平方增长，是重要约束；KV 缓存、硬件、位置表示和训练长度也共同影响可用窗口。</p>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">8</span>从「基座」到「助手」：三步<span class="dd-badge eng">工程</span></h2>
-  <p class="dd-lead">预训练完，我们得到一个会「续写」的超强模型。可你把问题丢给它，它可能续写出<b>更多问题</b>而不是回答。为什么？还差哪几步？</p>
-  <p>因为预训练只教了它「文本通常怎么接下去」，没教它「被提问时应该<b>回答</b>」。补齐要两步，合起来是今天所有对话模型走的三段路：</p>
-  <p>这里的输入不再只是原始网页文本，而是“指令—理想回答”示范、回答偏好比较或反馈数据；输出是参数经过继续更新、行为更符合目标规范的助手模型。比较三个阶段时，要分别观察知识与续写能力、指令遵循率、偏好和安全指标，不能把“更听话”误读成“事实更正确”。后训练只改变行为倾向，无法保证每次回答都正确、安全，也不能替代检索、工具和外部验证。</p>
-  <div class="dd-table-wrap"><table class="dd-table">
-    <thead><tr><th>阶段</th><th>做什么</th><th>补上了什么</th></tr></thead>
-    <tbody>
-      <tr><td>① 预训练（得到<b>基座模型</b>）</td><td>海量文本上自监督预测下一个词</td><td>渊博的语言、知识、模式——但不听话</td></tr>
-      <tr><td>② 指令微调 SFT</td><td>用「指令 → 理想回答」的示范数据继续训练</td><td>学会「被问就答」的对话格式与习惯</td></tr>
-      <tr><td>③ 偏好对齐（RLHF / DPO）</td><td>用人类对「哪个回答更好」的偏好来调</td><td>答得更有用、更安全、更像人想要的</td></tr>
-    </tbody>
-  </table></div>
-  <figure class="dd-fig">
-    <svg viewBox="0 0 560 120" role="img" aria-label="从基座模型到对话助手的三阶段">
-      <g>
-        <rect x="20" y="40" width="150" height="46" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="95" y="60" text-anchor="middle" class="svg-tn">基座模型</text><text x="95" y="78" text-anchor="middle" class="svg-t">博学 · 不听话</text>
-        <line x1="170" y1="63" x2="205" y2="63" stroke="#6b7484" stroke-width="1.6" marker-end="url(#a4)"/>
-        <rect x="205" y="40" width="150" height="46" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="280" y="60" text-anchor="middle" class="svg-tn">＋指令微调</text><text x="280" y="78" text-anchor="middle" class="svg-t">学会「被问就答」</text>
-        <line x1="355" y1="63" x2="390" y2="63" stroke="#6b7484" stroke-width="1.6" marker-end="url(#a4)"/>
-        <rect x="390" y="40" width="150" height="46" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="465" y="60" text-anchor="middle" class="svg-tn">＋偏好对齐</text><text x="465" y="78" text-anchor="middle" class="svg-t">有用 · 安全 · 像人想要</text>
-      </g>
-      <defs><marker id="a4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
-    </svg>
-    <figcaption>图 4　你日常用的对话模型，都是走完这三步的产物。基座模型很强，但「能对话、听话、安全」是后两步教的。</figcaption>
-  </figure>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">9</span>一句话，推出 LLM 的一切<span class="dd-badge intuition">综合</span></h2>
-  <p class="dd-lead">现在把机制收束成一句能记一辈子的话——它几乎能推出 LLM 的所有典型行为和风险。</p>
-  <div class="dd-note key"><b>记住这一句</b>　它输出的是<b>「在训练数据的统计规律下，最可能接下去的内容」，而不是「事实」</b>。它优化的是「像不像人写的下一个词」，从来不是「对不对」。</div>
-  <p>从这一句往下推：</p>
-  <div class="dd-table-wrap"><table class="dd-table">
-    <thead><tr><th>由这句性质</th><th>直接推出</th></tr></thead>
-    <tbody>
-      <tr><td>只追求「最可能」，没有真值约束</td><td>会<b>幻觉</b>——把话说得流畅自信，内容却是编的</td></tr>
-      <tr><td>知识全来自训练那一刻的数据</td><td>有<b>知识截止日期</b>；要最新/私有事实，得<b>外挂检索（RAG）</b></td></tr>
-      <tr><td>「最可能说的」≠「应该说的」</td><td>需要<b>对齐</b>，才不会有用地帮倒忙</td></tr>
-      <tr><td>在它眼里，指令和数据都只是 token</td><td>会被<b>提示注入</b>——藏在内容里的指令可能被当成命令执行</td></tr>
-      <tr><td>一次一个 token、无全局草稿</td><td>能把错误答案也说得圆；靠「让它先写推理过程」等技巧改善</td></tr>
-    </tbody>
-  </table></div>
-  <p>这里的<b>语言似然</b>，是模型依照训练数据的统计规律，给某段续写分配的相对可能性；它用来比较哪种续写更像训练文本，并不负责核验事实真伪。语言似然不等于事实真值，确实解释了幻觉风险和为什么需要外部证据；但 RAG 还解决知识更新与私有数据，对齐处理偏好和安全目标，提示注入则源于指令与不可信数据共享同一输入通道。它们相关，却不是完全相同的单一根因。</p>
-  <p>给定提示和上下文，模型输出候选 token 的概率以及由解码形成的续写；若任务要求事实结论，还必须把续写交给检索、引用或工具验证。高语言似然只能解释“像训练文本”，不能当作事实证明。</p>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">10</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
-  <p class="dd-lead">把全页串成一条链，逐环检查「每个环节为什么必须存在」。</p>
-  <ol class="dd-chain">
-    <li>把语言任务都改写成「续写」，就能用<b>一个</b>通用模型顶替一堆专用模型。<span>（§1）</span></li>
-    <li>「续写」= 每步在词表上输出一张概率表，取一个词再拼回、滚动生成。<span>（§2）</span></li>
-    <li>文字先被切成 token、再变成向量，模型才有的算。<span>（§3）</span></li>
-    <li>Transformer 用带因果掩码的注意力，把前文加工成「足以预测下一个词」的表示。<span>（§4）</span></li>
-    <li>训练目标是「预测真实的下一个词」，答案来自文本本身——不用标注，所以能吃海量数据、能 scale。<span>（§5）</span></li>
-    <li>把「猜词」逼到极致，理解、推理、翻译作为副产品被逼出来；规模越大越强。<span>（§6）</span></li>
-    <li>生成时用采样与温度在「稳」和「有创意」之间调，上下文窗口决定它能看多长。<span>（§7）</span></li>
-    <li>预训练得到博学的基座；再经指令微调和偏好对齐，才成为听话、安全的助手。<span>（§8）</span></li>
-    <li>语言似然不等于事实真值，带来幻觉与外部证据需求；对齐和提示注入还分别涉及目标规范与信任边界。<span>（§9）</span></li>
-  </ol>
-  <div class="dd-note key"><b>过关标准</b>　如果你能不看笔记，讲清「为什么预测下一个词不用标注、又能学会推理」，并说出「为什么幻觉是结构性的」，你就真正跨过了 LLM 的原理门槛。</div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">11</span>常见误解<span class="dd-badge intuition">直觉</span></h2>
-  <div class="dd-table-wrap"><table class="dd-table">
-    <thead><tr><th>误解</th><th>更准确的理解</th></tr></thead>
-    <tbody>
-      <tr><td>它像数据库，在「查」答案</td><td>它在<b>生成</b>最可能的下一个词；没有可查的条目，也因此会编</td></tr>
-      <tr><td>它先想好整句再回答</td><td>一次一个 token 自回归生成，没有全局草稿</td></tr>
-      <tr><td>它知道自己不知道</td><td>不知道。答对和瞎编，它做的是<b>同一件事</b>：挑最可能的下一个词</td></tr>
-      <tr><td>参数量越大一定越强</td><td>要参数、数据、算力<b>按比例</b>配平；单拉一项会浪费</td></tr>
-      <tr><td>它能实时知道最新消息</td><td>知识止于训练时；要最新/私有信息得靠检索（RAG）或工具</td></tr>
-      <tr><td>调「温度」是在改它的知识</td><td>只是在改<b>挑词的随机性</b>（分布的熵），不改它会什么</td></tr>
-      <tr><td>ChatGPT 就是预训练出来的</td><td>预训练只给基座；「会对话、听话、安全」是指令微调和对齐教的</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">12</span>检查你是否真的理解<span class="dd-badge intuition">自测</span></h2>
-  <ol class="dd-quiz">
-    <li>「把任务改写成续写」为什么能让一个模型顶替一堆专用模型？</li>
-    <li>模型每一步的输出到底是什么？为什么说它是「一张概率表」而不是「一个词」？</li>
-    <li>自回归生成是什么意思？它和「先想好整句再说」有何本质不同？</li>
-    <li>为什么预训练「不需要人工标注」？这一点和「能 scale」有什么关系？</li>
-    <li>因果掩码解决了什么问题？没有它训练会出什么错？</li>
-    <li>用一句话解释：为什么「只会猜下一个词」的模型能学会推理？</li>
-    <li>温度调高和调低，分别让生成变成什么样？它在调分布的什么？</li>
-    <li>为什么预训练完的基座模型还不能直接当聊天助手用？</li>
-    <li>为什么说「幻觉是结构性的」，而不是「再大一点就能修好」？</li>
-  </ol>
-  <details class="dd-answers"><summary>参考答案</summary>
-    <ol>
-      <li>因为翻译/问答/摘要/分类都能表述成「给定前文，接着往下写」，于是同一套「会续写」的参数就能顺手做全部，不必各自建模型、各自标数据。</li>
-      <li>是词表上所有候选 token 的一张概率分布（最后一层数值经 softmax 得到）；取其中一个（贪心或采样）才得到一个词。</li>
-      <li>一次只生成一个 token、并把它拼回输入再预测下一个；它没有全局草稿，是逐词滚动出来的，所以能把错误也说得很圆。</li>
-      <li>因为「正确答案」就是文本里真实的下一个 token，数据自己当标签；不靠人标，数据近乎无限，于是加数据/参数/算力成了可持续的路。</li>
-      <li>它保证预测第 t 个词时只看前文、不偷看答案；没有它等于拿答案预测答案，学不到东西。</li>
-      <li>因为要把下一个词猜准，往往被迫理解语法、事实、逻辑和意图——能力是为猜准而被逼出的副产品。</li>
-      <li>调高＝分布摊平＝更随机多样也更易跑偏；调低＝分布变尖＝更确定保守；它调的是输出分布的不确定性（熵）。</li>
-      <li>基座只学了「文本通常怎么接」，没学「被问要回答」；还要指令微调教它对话、偏好对齐教它有用又安全。</li>
-      <li>因为它优化的目标是「最可能的下一个词」（似然），本就没有真值约束；规模能让它更像、更少错，但只要目标是似然而非真相，编造的可能就消不掉。</li>
-    </ol>
-  </details>
-</section>
-
-<section class="dd-sec">
-  <h2><span class="dd-n">13</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
-  <div class="dd-table-wrap"><table class="dd-table">
-    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
-    <tbody>
-      <tr><td>先修</td><td>神经网络、Transformer、注意力、token 与分词、嵌入、softmax、交叉熵、自监督学习</td></tr>
-      <tr><td><b>本页核心</b></td><td>下一个 token 预测、自回归生成、因果掩码、预训练目标、采样与温度、上下文窗口、基座→SFT→对齐</td></tr>
-      <tr><td>紧邻延伸</td><td>缩放定律、幻觉、RAG、对齐、RLHF、提示工程、提示注入</td></tr>
-      <tr><td>更远</td><td>多模态、混合专家 MoE、推理模型、Agent、微调、量化与部署</td></tr>
-    </tbody>
-  </table></div>
-  <div class="dd-note key"><b>过关标准</b>　讲清「为什么预测下一个词不用标注、又能学会推理」，并说出「为什么幻觉是结构性的」，你就跨过了 LLM 的原理门槛。</div>
-</section>
-
-<div class="dd-src">
-  <b>资料来源与改编说明</b>
-  <ul>
-    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., Language Models are Few-Shot Learners</a>：自回归语言建模、上下文学习与规模效应。</li>
-    <li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al., Scaling Laws for Neural Language Models</a>：参数、数据、计算与损失的经验缩放关系。</li>
-    <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., Training language models to follow instructions</a>：预训练模型与可用助手之间的后训练过程。</li>
-  </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
-</div>
-`
+  "title": "大语言模型 LLM",
+  "subtitle": "从「预测下一个词」到「像助手一样对话」",
+  "aliases": "Large Language Model · 大模型 · LLM",
+  "meta": "建议 40–55 分钟 · 基础 → 中级 · 需要：概率、向量、交叉熵（先读过「神经网络」「Transformer」深读页更顺）",
+  "thesis": "现代生成式大语言模型通常以 Transformer 为骨架，预训练时核心目标是<b>给定前文预测下一个 token 的概率分布</b>；后训练、检索、工具与系统编排再塑造实际产品行为。翻译、代码与部分推理能力会从大规模训练中涌现，但不能把所有能力和风险都归结为单一目标。",
+  "html": "<div class=\"dd-goals\">\n  <div class=\"dd-goals-h\">读完这一页，你应该能自己回答：</div>\n  <ul>\n    <li><b>必要性</b>——旧的「一个任务一个模型」范式差在哪，为什么「一个通用语言模型」是质变。</li>\n    <li><b>机制</b>——它每一步具体在算什么：从一串 token 到「下一个 token 的概率分布」。</li>\n    <li><b>训练</b>——「预测下一个词」这个目标，怎样让它不用人工标注就能吃下整个互联网。</li>\n    <li><b>根本困惑</b>——一个只会猜下一个词的模型，凭什么会推理、翻译、写代码。</li>\n    <li><b>从基座到助手</b>——为什么预训练完的模型还不能当 ChatGPT 用，还要哪两步。</li>\n    <li><b>一句话划清边界</b>——为什么语言似然不等于事实真值，为什么会有幻觉与知识截止，以及对齐能改变什么、不能保证什么。</li>\n  </ul>\n</div>\n<ol class=\"dd-chain\">\n    <li>把语言任务都改写成「续写」，就能用<b>一个</b>通用模型顶替一堆专用模型。<span>（§1）</span></li>\n    <li>「续写」= 每步在词表上输出一张概率表，取一个词再拼回、滚动生成。<span>（§2）</span></li>\n    <li>文字先被切成 token、再变成向量，模型才有的算。<span>（§3）</span></li>\n    <li>Transformer 用带因果掩码的注意力，把前文加工成「足以预测下一个词」的表示。<span>（§4）</span></li>\n    <li>训练目标是「预测真实的下一个词」，答案来自文本本身——不用标注，所以能吃海量数据、能 scale。<span>（§5）</span></li>\n    <li>把「猜词」逼到极致，理解、推理、翻译作为副产品被逼出来；规模越大越强。<span>（§6）</span></li>\n    <li>生成时用采样与温度在「稳」和「有创意」之间调，上下文窗口决定它能看多长。<span>（§7）</span></li>\n    <li>预训练得到博学的基座；再经指令微调和偏好对齐，才成为听话、安全的助手。<span>（§8）</span></li>\n    <li>语言似然不等于事实真值，带来幻觉与事实核验需求；对齐调整行为偏好，却不能替代事实核验。<span>（§9）</span></li>\n  </ol>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">1</span>为什么需要大语言模型<span class=\"dd-badge intuition\">直觉</span></h2>\n<div class=\"dd-agent-response\"><p>在大语言模型出现之前，自然语言处理通常采用“一个任务对应一个模型”的做法：情感分类、机器翻译、问答、摘要、命名实体识别各自训练，各自依赖大量人工标注的专用数据。这样的系统可以在单项任务上工作，但每增加或更换一个任务，往往就要重新准备数据、训练模型，已有模型的能力也很难直接迁移。结果是开发成本高、系统彼此割裂，每个模型通常只处理自己负责的一小块问题。</p>\n<p>大语言模型所依赖的关键转变，是把看似不同的语言任务统一写成“根据已有文本继续生成文本”。例如，翻译可以表示为“英文：…… 中文：___”，问答可以表示为“问：…… 答：___”，摘要可以表示为“原文：…… 摘要：___”，情感分类也可以表示为“这条评价的情绪是：___”。这些形式的输入虽然表达了不同任务，但要求模型给出的输出都一样：补全下一个合适的文本片段。</p>\n<p>统一任务形式会改变模型建设的方式。输入是包含任务说明和待处理内容的文本，输出是符合该任务要求的续写；中间不再需要为每种任务设计一套完全独立的模型。只要同一个模型能够根据上下文判断“这里应该续写什么”，同一套参数就有机会完成翻译、问答、摘要或分类。问题因此从“怎样为每项任务分别建模”，转化为“怎样训练一个足够擅长文本续写的通用模型”。大语言模型正是对这个问题的回答。</p>\n<p>这里的“续写”并不等于机械地补一句话。模型必须从输入文字中识别任务类型、理解已有内容，并生成与上下文和任务要求相匹配的输出。任务被编码在文字中，所以改变提示文字就可以改变模型要完成的工作，而不必立刻重新训练一个专用模型。这也是通用语言模型相对于旧式专用模型的核心价值：用统一的输入输出接口和同一套参数覆盖多种语言任务，减少每个任务都从头构建系统的需要。</p>\n<p>这种统一也有明确边界。大语言模型适合开放、以语言表达和生成作为核心的任务，但“能够生成看起来合适的文本”不等于“能够保证精确计算、事实可靠或结果严格可复现”。当任务要求精确数值、可核验事实或稳定一致的输出时，单纯依赖模型续写并不合适。这些限制来自其以文本续写为中心的机制，不能简单理解为只要模型再大一些就会自然消失。</p></div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">2</span>它每一步到底在算什么<span class=\"dd-badge math\">数学</span></h2>\n<div class=\"dd-agent-response\"><p>给定前面已经出现的一串 token，大语言模型在一次计算中并不直接输出一个确定的词，而是为词表中的每个候选 token 计算“它成为下一个 token”的条件概率。可以写成：</p>\n<p>P(下一个 token = w │ 前文) = softmax(z)<sub>w</sub></p>\n<p>其中，w 是词表中的某个候选 token，“前文”是当前上下文，z 是模型最后一层为词表中所有候选项算出的实数向量，也叫 logits。logit 本身还不是概率，可以为任意实数；softmax 将整组 logits 转换为非负且总和为 1 的概率分布，softmax(z)<sub>w</sub> 就是候选 w 对应的那一项。模型每一步真正给出的，因此是覆盖整个词表的一张概率表，而不是单独一个词。</p>\n<p>要从这张概率表生成文本，还需要一种选择规则从中挑出一个 token。选出的 token 会被追加到前文末尾，新的完整前缀再次送入模型，模型再计算下一张概率表。例如，在“法国的首都是”之后选出“巴黎”，输入便变成“法国的首都是巴黎”；下一步模型可能再选“。”或“，”。这个“生成一个、接回输入、再生成一个”的滚动过程称为自回归生成。长篇文本不是一次性写出的完整草稿，而是这个循环重复许多次的结果，直到模型生成结束符。</p>\n<p>这也意味着，模型在某一步只根据当时已有的前缀决定下一步，并没有先准备好一份不可更改的全局答案。每次新生成的 token 都会改变后续步骤的条件，早期选择会把生成带向不同路径。模型因此可能连续生成局部上很顺畅的文字，却在某一步进入错误路径，随后又按照错误前缀把话继续说圆。</p>\n<p>从数学上看，整段文本的概率可以分解为逐步条件概率的乘积：</p>\n<p>P(x₁…xₙ) = ∏ₜ₌₁ⁿ P(xₜ │ x₁…xₜ₋₁)</p>\n<p>xₜ 表示第 t 个 token，x₁…xₜ₋₁ 是它之前的全部前缀，n 是序列长度。这个分解说明，“语言模型”建模的是完整文本序列的概率，而序列概率由每一步“在当前前缀下生成下一个 token”的概率共同决定。</p>\n<p>例如，给定某段前文，模型第一步选择“巴黎”的条件概率为 0.62；把“巴黎”接入前文后，第二步选择句号的条件概率为 0.80。那么生成“巴黎。”这条两步路径的条件概率为：</p>\n<p>P(巴黎。│前文) = 0.62 × 0.80 = 0.496</p>\n<p>若另一条路径第一步选择“里昂”的概率为 0.09，随后选择句号的概率为 0.90，那么“里昂。”的路径概率是 0.09 × 0.90 = 0.081。尽管第二条路径的第二步概率更高，整条路径仍然远低于第一条，因为序列概率取决于沿途所有条件概率的乘积，后一步的高概率无法完全补回前一步的巨大差距。</p>\n<p>真实文本存在指数数量的候选路径，模型给出的概率分布与最终采用哪条路径并不是同一个概念。贪心解码每一步只保留当前概率最高的 token；束搜索同时保留有限条累计概率较高的候选路径；随机采样则按照每一步的概率分布进行选择和探索。它们使用同一个模型分布，却可能产生不同结果，因此应当把“模型计算出的概率”与“解码规则选出的文本”区分开来。</p></div>\n<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 560 210\" role=\"img\" aria-label=\"给定前文，模型输出下一个 token 的概率分布\">\n      <text x=\"20\" y=\"30\" class=\"svg-t\">前文：「法国 的 首都 是」　→　模型　→　下一个 token 的概率</text>\n      <g font-size=\"14\">\n        <rect x=\"30\" y=\"55\" width=\"180\" height=\"20\" rx=\"3\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"30\" y=\"55\" width=\"128\" height=\"20\" rx=\"3\" fill=\"#6b8cbe\"/>\n        <text x=\"222\" y=\"70\" class=\"svg-tn\">巴黎　0.62</text>\n        <rect x=\"30\" y=\"85\" width=\"180\" height=\"20\" rx=\"3\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"30\" y=\"85\" width=\"20\" height=\"20\" rx=\"3\" fill=\"#6b8cbe\" opacity=\".7\"/>\n        <text x=\"222\" y=\"100\" class=\"svg-t\">里昂　0.09</text>\n        <rect x=\"30\" y=\"115\" width=\"180\" height=\"20\" rx=\"3\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"30\" y=\"115\" width=\"13\" height=\"20\" rx=\"3\" fill=\"#6b8cbe\" opacity=\".6\"/>\n        <text x=\"222\" y=\"130\" class=\"svg-t\">法国　0.05</text>\n        <rect x=\"30\" y=\"145\" width=\"180\" height=\"20\" rx=\"3\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"30\" y=\"145\" width=\"8\" height=\"20\" rx=\"3\" fill=\"#6b8cbe\" opacity=\".5\"/>\n        <text x=\"222\" y=\"160\" class=\"svg-t\">一　0.03</text>\n        <text x=\"222\" y=\"188\" class=\"svg-t\">… 词表里其余几万个 token，概率都很小</text>\n      </g>\n    </svg>\n    <figcaption>图 1　模型的每一步输出，不是一个词，而是<b>词表上所有 token 的一张概率表</b>。这张表由最后一层的数值经 <code>softmax</code> 归一化得到。</figcaption>\n  </figure>\n<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 560 150\" role=\"img\" aria-label=\"自回归生成的滚动循环\">\n      <rect x=\"20\" y=\"40\" width=\"150\" height=\"34\" rx=\"6\" fill=\"#21252d\" stroke=\"#2c313b\"/><text x=\"95\" y=\"62\" text-anchor=\"middle\" class=\"svg-tn\">法国 的 首都 是</text>\n      <line x1=\"170\" y1=\"57\" x2=\"220\" y2=\"57\" stroke=\"#6b7484\" stroke-width=\"1.6\" marker-end=\"url(#a2)\"/>\n      <rect x=\"220\" y=\"42\" width=\"70\" height=\"30\" rx=\"6\" fill=\"#1a1d23\" stroke=\"#6b8cbe\"/><text x=\"255\" y=\"62\" text-anchor=\"middle\" class=\"svg-t\">模型</text>\n      <line x1=\"290\" y1=\"57\" x2=\"340\" y2=\"57\" stroke=\"#6b7484\" stroke-width=\"1.6\" marker-end=\"url(#a2)\"/>\n      <rect x=\"340\" y=\"42\" width=\"90\" height=\"30\" rx=\"6\" fill=\"#21252d\" stroke=\"#4f9d78\"/><text x=\"385\" y=\"62\" text-anchor=\"middle\" class=\"svg-tn\">巴黎</text>\n      <path d=\"M385,74 C385,110 150,110 95,84\" fill=\"none\" stroke=\"#d3a05a\" stroke-width=\"1.6\" stroke-dasharray=\"5 4\" marker-end=\"url(#a3)\"/>\n      <text x=\"245\" y=\"128\" text-anchor=\"middle\" class=\"svg-t\" fill=\"#d3a05a\">把生成的词拼回前文，再预测下一个</text>\n      <defs>\n        <marker id=\"a2\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 z\" fill=\"#6b7484\"/></marker>\n        <marker id=\"a3\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 z\" fill=\"#d3a05a\"/></marker>\n      </defs>\n    </svg>\n    <figcaption>图 2　自回归：模型一次只吐一个 token，然后把它接回输入、再算下一个。你看到的「流畅长文」，是这个循环滚了很多次的结果。</figcaption>\n  </figure>\n<table class=\"dd-table\"><thead><tr><th>第一步</th><th>第二步条件概率</th><th>整条路径概率</th></tr></thead><tbody><tr><td>巴黎：0.62</td><td>句号：0.80</td><td>0.496</td></tr><tr><td>里昂：0.09</td><td>句号：0.90</td><td>0.081</td></tr></tbody></table>\n<div class=\"dd-formula\">P(下一个 token = w │ 前文) = softmax(z)_w</div>\n<div class=\"dd-formula\">P(巴黎。│前文)=0.62×0.80=0.496</div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">3</span>从文字到向量：token 与嵌入<span class=\"dd-badge math\">数学</span><span class=\"dd-badge intuition\">直觉</span></h2>\n<div class=\"dd-agent-response\"><p>文字不能直接进入神经网络，因为神经网络执行的是对数字的加权求和与非线性变换。要把“法国的首都是”这样的字符串变成可计算的输入，需要先后经过分词和嵌入：分词把文本转换为离散编号，嵌入再把编号转换为连续向量。</p>\n<p>分词（tokenization）首先按照词表把文本切成一系列 token。token 通常是子词片段：常见词可能整体对应一个 token，生僻词则可能被拆成多个片段。每个 token 在词表中都有一个整数编号，因此“法国的首都是”最终可以表示成类似 [121, 340, 88, 502] 的 token id 序列。这里的整数只起索引作用；编号 121 与编号 340 的数值差，并不表示两个 token 在含义上有多远，也不能直接作为语义关系使用。</p>\n<p>嵌入（embedding）负责把每个 token id 映射成一个几百到几千维的向量。可以把它理解为用 id 在一张大表中查找对应的一行：输入是离散编号，输出是由许多连续数值组成的向量。嵌入空间可以承载“远近”关系，使语义相近的 token 落在较接近的位置。这样，后续网络对向量进行数学运算时，才有可能利用其中编码的语义关系，而不是把词表编号误当成有大小意义的数值。</p>\n<p>只有 token 的含义还不够，序列中的位置也会影响理解。同一个 token 出现在句首和句尾，对上下文的作用可能不同。因此，每个 token 的嵌入还要叠加表示“它排在第几位”的位置编码。经过这一步，输入不再是一串文字或整数，而是一叠同时携带 token 信息与顺序信息的向量；这才是模型后续计算实际接收的表示。</p>\n<p>这条转换链可以写成：</p>\n<p>文本 → token 序列 → token id 序列 → token 嵌入 + 位置编码 → 向量序列</p>\n<p>每一步都改变了表示形式。分词决定原始文本的哪些片段作为基本处理单位，嵌入把这些单位放入连续空间，位置编码则补上排列顺序。模型处理的是最后得到的向量序列，并不直接操作人看到的字符。</p>\n<p>这一机制带来两个务实后果。第一，计费与上下文长度通常按 token 计算，而不是按字数计算；同样长度的可见文本，因为切分方式不同，可能占用不同数量的 token。第二，字符信息可能在分词时被打包进较大的 token，模型并不总能直接逐字母观察文本。例如询问“strawberry 里有几个 r”时，模型可能出错，因为它接收到的基本单位未必是逐个字母。嵌入擅长为后续语义计算提供连续表示，但它不能保证字符级细节始终以可直接计数的形式保留下来。</p></div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">4</span>中间那个 Transformer 做了什么<span class=\"dd-badge intuition\">直觉</span><span class=\"dd-badge math\">数学</span></h2>\n<div class=\"dd-agent-response\"><p>Transformer 接收的是一串带有位置信息的 token 向量。它的任务不是直接把这些向量翻译回文字，而是反复加工每个位置的表示，让该位置逐步吸收预测所需的上下文信息。经过多层处理后，最后得到的表示包含了足以计算下一个 token 概率的信息。</p>\n<p>其中的关键机制是注意力。处理某个位置时，模型会计算它与前面各位置之间的相关性权重，再按照这些权重汇总前文信息。权重越高，相应位置的信息对当前表示的影响越大。例如在“法国的首都是___”中进行预测时，当前位置可以把较多注意力放到“法国”上，从而把国家与待补全内容联系起来，而不必只依赖紧挨着空缺的 token。注意力解决的是“当前预测应该从前文哪些位置取信息，以及各取多少”的问题。</p>\n<p>一层注意力得到的上下文还会被继续加工；很多层叠加后，信息可以逐层组合。于是，每个位置起初只是一个局部 token 向量，经过反复更新后，会变成融合了相关前文的、更抽象的上下文表示。Transformer 在大语言模型中的核心角色，可以概括为：输入前文各位置的向量，输出经过上下文化的向量，并以此支撑下一个 token 的预测。</p>\n<p>用于自回归语言模型时，注意力还必须满足一个关键约束：第 t 个位置不能访问第 t 个位置之后的信息。训练时为了提高计算效率，整段文本可以一次送入模型；但如果某个位置能够看到自己要预测的 token 或更后面的内容，模型就相当于拿着答案预测答案，训练目标会失去意义。</p>\n<p>因果掩码（causal mask）在注意力计算中实施这一限制。它允许每个位置只关注自己左侧已经出现的位置，禁止使用右侧的未来信息。把所有位置之间“能否查看”的关系画成矩阵，会得到下三角形：序列开头可用的信息最少，越靠后的位置能够看到的前文越长。这正是“只根据前文预测下一个 token”在 Transformer 计算中的实现。</p>\n<p>因果掩码同时带来重要的训练效率。一段长度为 n 的文本只需一次并行输入，就可以在各个位置上同时构造训练信号：每个位置都利用自己获准看到的前文，预测紧随其后的 token。虽然这些位置在一次计算中共同处理，它们仍严格受掩码约束，不能互相泄露未来答案。于是，一段文本可以同时提供 n 个逐位置预测样本，使海量文本得到高效利用。</p>\n<p>这套机制的边界也来自同一约束。一个位置只能汇总已经出现的内容，不能在预测时使用尚未生成的未来 token；模型的表示会随前缀增长而改变。因此，Transformer 所形成的是“以当前前文为条件”的上下文表示，而不是预先知道整段后续文本的全局草稿。</p></div>\n<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 380 210\" role=\"img\" aria-label=\"因果掩码：每个位置只能看它左边的位置\">\n      <text x=\"190\" y=\"24\" text-anchor=\"middle\" class=\"svg-t\">行 = 正在预测的位置　列 = 它能看的位置</text>\n      <g font-size=\"12\">\n        <text x=\"30\" y=\"60\" class=\"svg-t\">法国</text><text x=\"30\" y=\"95\" class=\"svg-t\">的</text><text x=\"30\" y=\"130\" class=\"svg-t\">首都</text><text x=\"30\" y=\"165\" class=\"svg-t\">是</text>\n        <text x=\"95\" y=\"44\" class=\"svg-t\">法</text><text x=\"145\" y=\"44\" class=\"svg-t\">的</text><text x=\"195\" y=\"44\" class=\"svg-t\">首</text><text x=\"245\" y=\"44\" class=\"svg-t\">是</text>\n      </g>\n      <g>\n        <rect x=\"85\" y=\"50\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"135\" y=\"50\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"185\" y=\"50\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"235\" y=\"50\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/>\n        <rect x=\"85\" y=\"85\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"135\" y=\"85\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"185\" y=\"85\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/><rect x=\"235\" y=\"85\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/>\n        <rect x=\"85\" y=\"120\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"135\" y=\"120\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"185\" y=\"120\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"235\" y=\"120\" width=\"34\" height=\"24\" fill=\"#21252d\" stroke=\"#2c313b\"/>\n        <rect x=\"85\" y=\"155\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"135\" y=\"155\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"185\" y=\"155\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/><rect x=\"235\" y=\"155\" width=\"34\" height=\"24\" fill=\"#4f9d78\" opacity=\".8\"/>\n      </g>\n      <text x=\"300\" y=\"110\" class=\"svg-t\">绿=可看</text><text x=\"300\" y=\"132\" class=\"svg-t\">空=挡住</text>\n    </svg>\n    <figcaption>图 3　因果掩码是一张下三角。第一个词谁也看不到（只能靠自己），越往后能看的前文越多——这正是「只用前文预测下一个词」在计算上的实现。</figcaption>\n  </figure>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">5</span>训练目标：预训练就是一个巨大的交叉熵<span class=\"dd-badge math\">数学</span></h2>\n<div class=\"dd-agent-response\"><p>预训练要解决的问题，是怎样从海量普通文本中为大量模型参数提供学习信号。下一个 token 预测之所以适合这个任务，是因为监督答案已经包含在文本本身：给定前缀 x₁…xₜ₋₁，位置 t 上真实出现的 token xₜ 就是正确目标。训练数据不需要人工逐条标注类别或答案，文本可以自动拆成大量“前缀—真实后继”样本。这种由数据自身产生标签的方式称为自监督学习。</p>\n<p>对每个前缀，模型输出词表上所有候选 token 的概率分布。训练需要衡量这个分布是否把足够高的概率分给真实后继，使用的损失是交叉熵。在一段文本上，总损失可写为：</p>\n<p>L = −∑ₜ log P(xₜ │ x₁…xₜ₋₁)</p>\n<p>L 是各预测位置损失的总和；t 表示当前要预测的位置；xₜ 是文本在该位置真实出现的 token；x₁…xₜ₋₁ 是它之前的前缀；P(xₜ │ x₁…xₜ₋₁) 是模型在看到这个前缀后分配给真实 token 的条件概率。∑ₜ 表示把整段文本各位置的损失加起来。</p>\n<p>负对数决定了惩罚方式。若模型给真实 token 很高的概率，log P 接近 0，对应的 −log P 较小；若模型给真实 token 的概率很低，−log P 就很大，模型会受到更重惩罚。因此，损失可以理解为模型面对真实后续时的“惊讶程度”：越不相信实际出现的 token，损失越大。</p>\n<p>计算出损失后，梯度下降根据损失相对于参数的变化方向调整模型参数，使后续面对类似前缀时，真实 token 获得更高概率。这个过程在大量文本和大量位置上反复进行。输入是文本前缀以及文本中真实的后继 token，模型直接输出的是词表概率分布，训练系统再把真实后继对应的概率汇总成损失。预训练本质上就是在极大规模的数据上持续压低这组交叉熵损失。</p>\n<p>损失下降只表示模型对训练分布中这类文本的真实后续变得更少意外，不能解释为文本内容已经得到事实核验。模型学习的是语料中出现的统计规律，能力与边界都会受到训练语料的时间、语言、来源、噪声和偏见影响。增加数据与参数可以扩大训练规模，但不会自动消除这些限制。</p>\n<p>自监督的重要性在于拆除了人工标注的吞吐瓶颈。旧式任务依赖人来制作标签，数据越多，成本和时间通常越高；下一个 token 预测则能直接从普通文本中取得答案，因此可以持续扩大数据、参数和算力。这种随规模增加而改善模型的经验规律被称为缩放定律，而它能够成立的基础之一，正是预训练目标不要求人为给每条文本标注正确后续。</p></div>\n<div class=\"dd-formula\">L = − Σₜ log P(xₜ │ x₁…xₜ₋₁)</div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">6</span>为什么「猜下一个词」能学会推理<span class=\"dd-badge intuition\">直觉</span></h2>\n<div class=\"dd-agent-response\"><p>“预测下一个 token”看起来像输入法联想，但当这个目标被应用到大量、多样的文本并被要求做到很高精度时，任务本身会迫使模型学习许多可复用的结构。下一个 token 往往取决于前文的语法、语义、事实关系、说话意图或推导过程；如果模型没有形成足以表示这些关系的内部模式，就很难持续降低预测损失。</p>\n<p>例如，要续写“因为 A 且 B，所以___”，正确后续取决于 A、B 与结论之间的关系，模型需要学到能够支持该预测的推理模式或中间表示。要续写代码，下一 token 必须符合语法和语义，否则程序会出错；要续写对话，需要根据对方的意图和语气选择合适表达；要补全“1234 × 5678 = ___”，则需要掌握足以产生结果的乘法规律。表面上这些都是下一 token 预测，实际需要利用的信息和规律却各不相同。</p>\n<p>训练的直接输入，是大量且多样的文本以及具有足够容量的模型；直接优化结果，是更低的预测损失和一组内部表示。翻译、代码生成或推理表现不是由单独的任务类别标签逐项教出来的，而是模型为完成广泛预测任务所形成的表示，在新提示下迁移出来的能力。预测目标覆盖的上下文越多样，能够在不同场景复用的语法、事实、代码和部分推理表示就越有价值。</p>\n<p>可以从“压缩压力”理解这种迁移。模型必须用有限参数应对许多不同上下文，逐条孤立记住所有情况并不是唯一作用方式；学习可复用的语法、语义和推理模式，能帮助它在更多前缀上预测后续。这解释了模型为什么可能泛化到未原样见过的输入。但参数也会记忆训练片段，因此最终行为通常混合了记忆、模板模仿和组合泛化，不能把规律性表现直接等同于完整理解。</p>\n<p>判断模型是否真的获得了可迁移的推理能力，不能只看它是否能流畅写出正确步骤。一个答案可能来自复现训练中常见模板，也可能来自能推广到新问题的内部表示。要区分两者，需要使用新组合、反事实和分布外题目：如果题目形式或要素组合发生变化，能力仍能保持，才更能支持“形成了可泛化表示”的解释。即使某项测评得分提高，也只能说明模型在该测试上表现更好，不能据此断言它拥有人的理解，或每次都在执行可靠算法。</p>\n<p>这些能力的发展还依赖规模。参数、数据与算力按比例增大时，模型的预测能力会增强，许多具体表现也随之出现。常见说法是某些能力在规模跨过阈值后“突然涌现”，但这一现象仍有争议：当评价指标是非黑即白时，平滑改善可能看起来像突然跳变；换用连续指标后，曲线也可能呈现平滑上升。因此，更稳妥的结论是，扩大规模能加强预测能力并促成多种可迁移表现，但能力何时出现、是否真正突然，以及它由记忆还是组合泛化支撑，都需要具体测评，而不能只从流畅输出判断。</p></div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">7</span>生成时的旋钮：采样、温度、上下文窗口<span class=\"dd-badge math\">数学</span><span class=\"dd-badge eng\">工程</span></h2>\n<div class=\"dd-agent-response\"><p>模型在每一步给出的是词表上的 logits 或由它们归一化得到的概率分布，最终文本还取决于解码规则怎样从分布中选择 token。解码的输入包括模型 logits、当前可见前文以及采样参数，输出是本步选中的一个 token；把这个 token 接回前文并循环执行，才形成完整文本。改变解码方式只会改变如何使用同一个模型的概率分布，不会重新训练参数，也不会给模型补充新知识。</p>\n<p>最简单的规则是贪心解码：每一步都选择当前概率最高的 token。它的结果较确定，但逐步只看当前最优选择，容易产生呆板或重复的文本。随机采样则按照概率分布进行选择，高概率 token 更容易被选中，低概率 token 仍保留一定机会。随机性由此带来不同生成路径和更高多样性，也意味着同样的前文可能得到不同结果。</p>\n<p>温度 T 在采样前改变概率分布的形状。计算方式是先把每个 logit 除以 T，再做 softmax：</p>\n<p>P(w) = softmax(z / T)<sub>w</sub></p>\n<p>z 是词表中各候选 token 的 logits，w 是其中一个候选，P(w) 是温度缩放后选到它的概率。温度不会改变候选的知识来源，只会重新调整候选之间的相对概率。</p>\n<p>当 T → 0 时，logit 之间的差异被放大，分布变得很尖，概率几乎集中在最高候选上，输出更确定、更保守，也可能更容易重复。当 T = 1 时，直接使用模型原本的分布。当 T &gt; 1 时，logit 差异被压缩，分布更平坦，原本概率较低的 token 获得更多被选中的机会，文本因而更多样，但也更容易偏离合适路径。</p>\n<p>从信息论角度看，温度调节的是输出分布的不确定性，也就是熵。低温对应低熵，少数候选占据主要概率；高温对应高熵，概率分散到更多候选。所谓“提高创意”，在这个机制中不是模型突然获得了新想法，而是采样时允许更多低概率路径被探索。温度越高并不意味着质量必然越好，它是在稳定性与多样性之间调整取舍。</p>\n<p>生成还能使用多少前文，则受上下文窗口限制。上下文窗口规定模型一次计算能够直接条件化的 token 数上限；窗口之外的内容不会自动参与当前预测。若应用希望使用更早的信息，需要把它重新检索出来或摘要后注入当前上下文。窗口按 token 而不是可见字数衡量，因此文本切分方式也会影响实际可放入的内容量。</p>\n<p>扩大可用窗口会受到计算与模型结构的共同约束。标准全局注意力需要计算各位置之间的注意力分数，其矩阵规模随序列长度平方增长；此外，KV 缓存、硬件资源、位置表示和训练时使用的长度也都会影响实际可用窗口。上下文窗口因此只是模型当前能够“直接看到”的范围，并不等同于永久记忆；窗口更长也不表示其中每条信息都会被同等有效地利用。</p></div>\n<table class=\"dd-table\"><thead><tr><th>温度</th><th>对分布的影响</th><th>表现</th></tr></thead><tbody>\n    <tr><td>T → 0</td><td>分布变尖，几乎只剩最高那个</td><td>确定、保守、可能重复</td></tr>\n    <tr><td>T = 1</td><td>就用模型原本的分布</td><td>默认</td></tr>\n    <tr><td>T &gt; 1</td><td>分布被摊平，低概率词也有机会</td><td>多样、有创意、也更容易跑偏</td></tr>\n  </tbody></table>\n<div class=\"dd-formula\">P(w) = softmax(z / T)_w</div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">8</span>从「基座」到「助手」：三步<span class=\"dd-badge eng\">工程</span></h2>\n<div class=\"dd-agent-response\"><p>预训练完成后得到的是基座模型。它已经能根据大量文本中学到的语言、知识和模式进行续写，但预训练目标只要求它判断“文本通常怎样接下去”，并没有专门要求它把用户输入识别为指令并给出有帮助的回答。因此，把一个问题直接交给基座模型时，它可能继续生成更多问题、模仿网页段落，或者采用其他在训练文本中常见的延续方式，而不一定像助手那样作答。</p>\n<p>从基座模型到日常使用的对话助手，通常要经过三个阶段。第一阶段是预训练：输入海量原始文本，通过自监督的下一个 token 预测学习通用的语言、知识与模式。它产出能力广泛的基座模型，但“会续写”不等于“会遵循指令”。</p>\n<p>第二阶段是指令微调，也叫 SFT。训练数据不再只是原始网页文本，而是“指令 → 理想回答”的示范。模型继续更新参数，学习看到指令后采用怎样的回答格式、怎样围绕问题组织内容，以及“被问就答”的对话习惯。SFT 主要补上的是指令遵循行为：它把基座模型已有的能力引导到助手式交互中。</p>\n<p>第三阶段是偏好对齐，典型方法包括 RLHF 和 DPO。训练信号来自人类对“哪个回答更好”的偏好比较或相应反馈，模型据此调整回答倾向，使输出更有用、更安全，也更接近人们期望的表达方式。这里学习的不是单一标准答案，而是多个候选回答之间的相对偏好。</p>\n<p>三段过程的输入和目标不同：</p>\n<p>预训练：原始海量文本 → 学习通用续写能力 → 基座模型 指令微调：指令与理想回答示范 → 学习遵循指令 → 对话行为成形 偏好对齐：回答比较或反馈数据 → 调整回答倾向 → 更符合有用性与安全规范</p>\n<p>评估三个阶段时也应区分不同指标。预训练后的变化更适合观察知识与续写能力，指令微调要看指令遵循率，偏好对齐则要看偏好与安全指标。模型变得更听话、更符合表达规范，并不必然表示它掌握了更多可靠事实，也不能把回答风格改善直接当作事实准确率提高。</p>\n<p>后训练改变的是模型的行为倾向，而不是为每次输出提供绝对保证。完成指令微调和偏好对齐的助手仍可能回答错误，也无法保证每次都安全。需要最新或可核验事实时，仍要依靠检索、工具和外部验证。日常对话模型之所以既能对话又较听话，是预训练能力与后续行为训练共同作用的结果；后两阶段让能力更容易被按人类意图调用，却不能消除生成机制本身的边界。</p></div>\n<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 560 120\" role=\"img\" aria-label=\"从基座模型到对话助手的三阶段\">\n      <g>\n        <rect x=\"20\" y=\"40\" width=\"150\" height=\"46\" rx=\"8\" fill=\"#21252d\" stroke=\"#6b8cbe\"/><text x=\"95\" y=\"60\" text-anchor=\"middle\" class=\"svg-tn\">基座模型</text><text x=\"95\" y=\"78\" text-anchor=\"middle\" class=\"svg-t\">博学 · 不听话</text>\n        <line x1=\"170\" y1=\"63\" x2=\"205\" y2=\"63\" stroke=\"#6b7484\" stroke-width=\"1.6\" marker-end=\"url(#a4)\"/>\n        <rect x=\"205\" y=\"40\" width=\"150\" height=\"46\" rx=\"8\" fill=\"#21252d\" stroke=\"#4f9d78\"/><text x=\"280\" y=\"60\" text-anchor=\"middle\" class=\"svg-tn\">＋指令微调</text><text x=\"280\" y=\"78\" text-anchor=\"middle\" class=\"svg-t\">学会「被问就答」</text>\n        <line x1=\"355\" y1=\"63\" x2=\"390\" y2=\"63\" stroke=\"#6b7484\" stroke-width=\"1.6\" marker-end=\"url(#a4)\"/>\n        <rect x=\"390\" y=\"40\" width=\"150\" height=\"46\" rx=\"8\" fill=\"#21252d\" stroke=\"#d3a05a\"/><text x=\"465\" y=\"60\" text-anchor=\"middle\" class=\"svg-tn\">＋偏好对齐</text><text x=\"465\" y=\"78\" text-anchor=\"middle\" class=\"svg-t\">有用 · 安全 · 像人想要</text>\n      </g>\n      <defs><marker id=\"a4\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 z\" fill=\"#6b7484\"/></marker></defs>\n    </svg>\n    <figcaption>图 4　你日常用的对话模型，都是走完这三步的产物。基座模型很强，但「能对话、听话、安全」是后两步教的。</figcaption>\n  </figure>\n<table class=\"dd-table\">\n    <thead><tr><th>阶段</th><th>做什么</th><th>补上了什么</th></tr></thead>\n    <tbody>\n      <tr><td>① 预训练（得到<b>基座模型</b>）</td><td>海量文本上自监督预测下一个词</td><td>渊博的语言、知识、模式——但不听话</td></tr>\n      <tr><td>② 指令微调 SFT</td><td>用「指令 → 理想回答」的示范数据继续训练</td><td>学会「被问就答」的对话格式与习惯</td></tr>\n      <tr><td>③ 偏好对齐（RLHF / DPO）</td><td>用人类对「哪个回答更好」的偏好来调</td><td>答得更有用、更安全、更像人想要的</td></tr>\n    </tbody>\n  </table>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">9</span>一句话，划清语言似然的边界<span class=\"dd-badge intuition\">综合</span></h2>\n<div class=\"dd-agent-response\"><p>理解大语言模型行为的核心句是：它输出的是“在训练数据的统计规律下，最可能接下去的内容”，而不是经过核验的“事实”。</p>\n<p>给定提示和当前上下文，模型计算候选 token 的概率，再由解码过程逐步形成续写。这里的语言似然，是模型依据训练数据中的统计规律，为不同续写分配的相对可能性；它回答的是“哪段文字更像训练数据中可能出现的后续”，不是“哪段文字在现实中为真”。模型优化的是下一个 token 是否像合理的人类文本，而训练目标本身没有独立的真值约束。</p>\n<p>这一区分直接解释了幻觉风险。一段错误内容也可能拥有很高的语言似然：只要用词、句式和上下文关系足够自然，模型就可能流畅而自信地生成它。高概率只能说明续写符合模型学到的文本规律，不能成为事实证明。若任务要求事实结论，生成结果还必须经过检索、引用或工具验证。</p>\n<p>模型的知识来自训练时可用的数据，因此会有知识截止日期，也不会自动知道训练数据之外的最新信息或私有信息。这个时效边界与幻觉并不相同：前者限制模型可能掌握的信息范围，后者说明即使文字流畅，也不能据此判定内容为真。</p>\n<p>“最可能出现的文字”也不等于“人希望模型说的话”。训练文本中的常见续写未必有用、安全或符合用户意图，因此还需要对齐训练来调整模型的行为偏好。对齐处理的是回答是否更符合人类偏好和安全目标，它与事实核验有关联，但不能替代事实核验。</p>\n<p>自回归生成一次只决定一个 token，没有预先固定的全局草稿。某一步进入错误路径后，后续 token 会以已经出错的前缀为条件，继续生成局部连贯的内容，于是错误答案也可能被解释得很完整。让模型先写出推理过程等提示技巧，有时能改善生成路径，但不能提供正确性保证。</p>\n<p>幻觉、知识截止和对齐需求彼此相关，却不是完全相同的单一问题：幻觉涉及语言似然与事实真值的差异；知识截止限制训练所得信息的时效范围；对齐调整偏好与安全行为，但不把语言概率变成事实证明。使用模型时，最重要的边界就是始终把“像真的”与“有证据证明是真的”分开。</p>\n<p>还要避免把这些边界压成一条万能因果链。前文能够推出的是：语言概率不是事实证明，训练数据存在时效边界，对齐改变行为倾向。至于如何接入外部资料、怎样划分输入中的信任边界，需要各自的机制与证据，不能只凭“下一个 token”目标作结论。所以下表中的 RAG 与提示注入只作为延伸议题索引，不承担具体机制或证据边界的说明。</p></div>\n<table class=\"dd-table\">\n    <thead><tr><th>由这句性质</th><th>直接推出</th></tr></thead>\n    <tbody>\n      <tr><td>只追求「最可能」，没有真值约束</td><td>会<b>幻觉</b>——把话说得流畅自信，内容却是编的</td></tr>\n      <tr><td>知识全来自训练那一刻的数据</td><td>有<b>知识截止日期</b>；要最新/私有事实，得<b>外挂检索（RAG）</b></td></tr>\n      <tr><td>「最可能说的」≠「应该说的」</td><td>需要<b>对齐</b>，才不会有用地帮倒忙</td></tr>\n      <tr><td>在它眼里，指令和数据都只是 token</td><td>会被<b>提示注入</b>——藏在内容里的指令可能被当成命令执行</td></tr>\n      <tr><td>一次一个 token、无全局草稿</td><td>能把错误答案也说得圆；靠「让它先写推理过程」等技巧改善</td></tr>\n    </tbody>\n  </table>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">10</span>把整条因果链连起来<span class=\"dd-badge intuition\">综合</span></h2>\n<div class=\"dd-agent-response\"><p>大语言模型的完整机制可以从“把语言任务统一成续写”开始理解。翻译、问答、摘要或分类原本需要不同的专用系统，但只要把任务要求和输入都写进文本，它们的输出就都可以表示为“接下来应该出现什么”。统一的续写接口，使同一个模型和同一套参数能够覆盖许多语言任务。</p>\n<p>“续写”在计算上不是一次生成整段答案，而是每一步都在整个词表上输出一张概率表，再根据解码规则选出一个 token。选中的 token 被拼回前文，模型以新的前缀继续预测下一步。长文本就是这个自回归循环不断滚动的结果，因此当前选择既决定本步输出，也会成为后续预测的条件。</p>\n<p>文字本身不能直接参与神经网络运算，所以输入首先要被切分为 token，并转换为 token id。每个 id 再映射成连续的嵌入向量，并加入位置信息。这样，离散文字才变成模型能够进行加权求和与非线性变换的向量序列。</p>\n<p>Transformer 接收这组向量，利用注意力从前文不同位置汇总相关信息，把每个位置反复加工成适合预测后继 token 的上下文表示。因果掩码限制每个位置只能使用左侧前文，不能偷看未来答案。这个限制一方面保持了“只根据前文预测后续”的任务定义，另一方面允许一整段文本在一次训练计算中同时产生多个逐位置预测信号。</p>\n<p>训练时，目标 token 就是原始文本在相应位置真实出现的后继，因此文本可以自己提供标签，不需要人工逐条标注。交叉熵惩罚模型没有给真实 token 足够高概率的情况，梯度下降则不断调整参数、降低这种损失。自监督目标拆除了人工标注瓶颈，使扩大数据、参数与算力成为可持续的训练路径。</p>\n<p>下一 token 预测之所以能产生翻译、代码或部分推理表现，是因为准确预测不同类型文本的后续，需要形成可复用的语法、语义、事实和推理模式。当预测任务覆盖足够多样的数据、模型又有足够容量时，这些内部表示可以在提示下迁移到具体任务。但这种表现可能混合记忆、模仿和真正的组合泛化，流畅输出本身不能证明可靠推理。</p>\n<p>生成阶段并不再学习参数，而是决定怎样使用模型已有的概率分布。贪心解码偏向稳定，随机采样带来多样性；温度通过改变分布的尖锐或平坦程度，在保守与发散之间调整。上下文窗口则限制一次预测能直接使用多少 token，窗口之外的信息不会自动参与计算。</p>\n<p>预训练只得到擅长续写的基座模型。要让它成为能遵循要求的助手，还需要用“指令—理想回答”示范进行指令微调，再利用回答偏好或反馈进行偏好对齐。后训练使行为更听话、更有用、更符合安全目标，但不能保证事实一定正确，也不能消除生成机制的其他风险。</p>\n<p>整条链最终落在一个重要边界上：模型优化的是训练数据统计规律下的语言似然，不是事实真值。没有真值约束时，错误内容也可能被生成得流畅可信，因此幻觉具有结构性，流畅回答本身不能充当事实证明。与此同时，对齐处理的是目标规范与行为偏好，它会改变模型倾向于怎样回答，却不能保证回答已经过事实核验。</p></div>\n</section>\n<section class=\"dd-sec\" data-source=\"content-generation\"><h2><span class=\"dd-n\">13</span>概念依赖与延伸学习<span class=\"dd-badge eng\">路线</span></h2>\n<div class=\"dd-agent-response\"><p>理解大语言模型需要沿着一条明确的概念依赖链前进。最底层是神经网络及其数值计算基础：模型只能处理连续数字，因此文字必须先经过 token 化与分词，映射为编号，再通过嵌入变成向量。softmax 负责把模型输出的 logits 转成词表概率分布，交叉熵则衡量模型给真实后继 token 的概率是否足够高。自监督学习解释了真实文本为什么能直接提供训练目标，而不需要额外人工标签。</p>\n<p>Transformer 与注意力构成处理向量序列的核心结构。注意力让当前位置从相关前文位置汇总信息，Transformer 通过多层加工形成上下文化表示。在语言模型中，因果掩码进一步规定每个位置只能使用左侧前文，从而把 Transformer 变成适合“根据前文预测下一个 token”的结构。神经网络、token、嵌入、注意力、softmax、交叉熵与自监督学习因此不是彼此孤立的术语，而是从文字输入到训练信号的连续机制。</p>\n<p>建立这些先修概念后，页面核心可以串成一条主线：下一个 token 预测定义每一步要解决的问题；自回归生成把一次预测循环成完整文本；因果掩码保证每一步只使用已出现的前文；预训练目标利用文本中的真实后继计算损失；采样与温度决定怎样从概率分布选择 token；上下文窗口规定一次计算可直接使用的前文范围；基座模型再依次经过指令微调 SFT 和偏好对齐，成为更能遵循指令的助手。</p>\n<p>紧邻这条主线的延伸主题，分别回答规模、事实与控制问题。缩放定律讨论数据、参数和算力扩大时能力怎样变化；幻觉讨论语言似然与事实真值不一致带来的错误；对齐与 RLHF 调整模型对人类偏好和安全目标的响应。RAG、提示工程与提示注入也属于进一步学习的延伸主题，但仅凭本页的生成主线，不能判断它们的具体工作方式或风险边界。</p>\n<p>再向外扩展，可以学习多模态、混合专家 MoE、推理模型、Agent、微调以及量化与部署。这些主题分别把语言模型连接到更多输入形式、不同模型结构与计算方式、更复杂的推理和行动流程、面向具体任务的参数调整，以及实际运行中的资源约束。它们建立在同一个基础之上：模型先把输入转换为可计算表示，再依据训练得到的参数产生条件概率，并通过生成或外部系统形成最终行为。</p>\n<p>这张依赖图中最关键的两条因果关系是：预测下一个 token 的答案来自文本本身，所以不需要人工逐条标注；而要在多样文本中持续预测准确，模型会形成可迁移的语法、语义和部分推理表示。与此同时，训练目标优化的是语言似然而非事实真值，所以错误内容也可能获得高概率并被流畅生成，幻觉因而是生成机制的结构性风险。</p></div>\n<table class=\"dd-table\">\n    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>\n    <tbody>\n      <tr><td>先修</td><td>神经网络、Transformer、注意力、token 与分词、嵌入、softmax、交叉熵、自监督学习</td></tr>\n      <tr><td><b>本页核心</b></td><td>下一个 token 预测、自回归生成、因果掩码、预训练目标、采样与温度、上下文窗口、基座→SFT→对齐</td></tr>\n      <tr><td>紧邻延伸</td><td>缩放定律、幻觉、RAG、对齐、RLHF、提示工程、提示注入</td></tr>\n      <tr><td>更远</td><td>多模态、混合专家 MoE、推理模型、Agent、微调、量化与部署</td></tr>\n    </tbody>\n  </table>\n</section>\n<div class=\"dd-src\">\n  <b>资料来源与改编说明</b>\n  <ul>\n    <li><a href=\"https://arxiv.org/abs/2005.14165\" target=\"_blank\" rel=\"noopener\">Brown et al., Language Models are Few-Shot Learners</a>：自回归语言建模、上下文学习与规模效应。</li>\n    <li><a href=\"https://arxiv.org/abs/2001.08361\" target=\"_blank\" rel=\"noopener\">Kaplan et al., Scaling Laws for Neural Language Models</a>：参数、数据、计算与损失的经验缩放关系。</li>\n    <li><a href=\"https://arxiv.org/abs/2203.02155\" target=\"_blank\" rel=\"noopener\">Ouyang et al., Training language models to follow instructions</a>：预训练模型与可用助手之间的后训练过程。</li>\n  </ul>\n  <div class=\"dd-src-date\">访问日期：2026-07-21</div>\n</div>",
+  "quality": {
+    "contractVersion": 2,
+    "examples": [
+      {
+        "section": 2,
+        "evidence": {
+          "setup": "假设模型选“巴黎”的条件概率是 0.62",
+          "rule": "条件概率的连乘",
+          "steps": "0.62×0.80=0.496",
+          "interpretation": "仍补不回第一步的巨大差距"
+        }
+      }
+    ],
+    "formulas": [
+      {
+        "id": "llm-next-token-softmax",
+        "section": 2,
+        "formulaIndex": 1,
+        "symbols": [
+          {
+            "name": "P",
+            "meaning": "在给定前文后为候选 token 分配的条件概率",
+            "evidence": "P 表示条件概率"
+          },
+          {
+            "name": "w",
+            "meaning": "词表中的一个候选 token",
+            "evidence": "w 是词表中的某个候选 token"
+          },
+          {
+            "name": "z",
+            "meaning": "模型为词表所有候选产生的原始分数向量",
+            "evidence": "z 是模型最后一层为每个候选 token 算出的实数向量"
+          },
+          {
+            "name": "softmax",
+            "meaning": "把原始分数归一化为总和为一的概率分布",
+            "evidence": "softmax 把整排 z 归一化"
+          }
+        ]
+      },
+      {
+        "id": "llm-path-probability",
+        "section": 2,
+        "formulaIndex": 2,
+        "symbols": [
+          {
+            "name": "P",
+            "meaning": "按当前前文逐步选中目标 token 的条件概率",
+            "evidence": "P 表示条件概率"
+          }
+        ]
+      },
+      {
+        "id": "llm-training-cross-entropy",
+        "section": 5,
+        "formulaIndex": 1,
+        "symbols": [
+          {
+            "name": "L",
+            "meaning": "整段训练序列的负对数似然损失",
+            "evidence": "L 是一段训练文本的总损失"
+          },
+          {
+            "name": "Σ",
+            "meaning": "把每个 token 位置的损失相加",
+            "evidence": "Σₜ 表示对所有预测位置 t 求和"
+          },
+          {
+            "name": "t",
+            "meaning": "当前预测位置的编号",
+            "evidence": "位置 t 的真实 token"
+          },
+          {
+            "name": "log",
+            "meaning": "把目标 token 的概率转换为对数惩罚",
+            "evidence": "−log 越大，惩罚越重"
+          },
+          {
+            "name": "P",
+            "meaning": "给定此前 token 时真实下一个 token 的条件概率",
+            "evidence": "P 是模型给真实 token 的条件概率"
+          },
+          {
+            "name": "x",
+            "meaning": "训练文本序列中的 token",
+            "evidence": "xₜ 是位置 t 的真实 token"
+          }
+        ]
+      },
+      {
+        "id": "llm-temperature",
+        "section": 7,
+        "formulaIndex": 1,
+        "symbols": [
+          {
+            "name": "P",
+            "meaning": "温度调整后的候选 token 概率",
+            "evidence": "P(w) 是温度缩放后选到它的概率"
+          },
+          {
+            "name": "w",
+            "meaning": "当前要比较的候选 token",
+            "evidence": "w 是某个候选 token"
+          },
+          {
+            "name": "softmax",
+            "meaning": "把调温后的原始分数归一化成概率",
+            "evidence": "再做 softmax"
+          },
+          {
+            "name": "z",
+            "meaning": "模型输出的词表原始分数向量",
+            "evidence": "z 是词表各候选的 logits"
+          },
+          {
+            "name": "T",
+            "meaning": "控制概率分布尖锐或平坦程度的温度参数",
+            "evidence": "T 是采样温度"
+          }
+        ]
+      }
+    ],
+    "termReviews": [
+      {
+        "section": 9,
+        "reviewedAt": "2026-07-26",
+        "terms": [
+          {
+            "name": "似然",
+            "meaning": "模型依照训练数据统计规律给某段续写分配的相对可能性",
+            "purpose": "用于比较不同续写与训练文本统计规律的相似程度",
+            "definitionEvidence": "给某段续写分配的相对可能性",
+            "purposeEvidence": "用来比较哪种续写更像训练文本"
+          }
+        ]
+      }
+    ],
+    "sectionContracts": [
+      {
+        "section": 1,
+        "definition": {
+          "answer": "大语言模型把多种语言任务统一改写成依据前文继续生成 token 的任务。",
+          "evidence": "这个「特别会续写的模型」，就是大语言模型"
+        },
+        "problem": {
+          "answer": "它用同一个生成接口承接问答、翻译、摘要、写作等不同语言任务。",
+          "evidence": "处理语言是「分而治之」"
+        },
+        "inputOutput": {
+          "answer": "输入包含任务要求和已有文本的提示，输出是逐步追加形成的续写。",
+          "evidence": "把任务塞进文字里"
+        },
+        "mechanism": {
+          "answer": "任务被语言化后，模型反复执行下一个 token 预测，直到得到完整回答。",
+          "evidence": "只要一个模型足够会「续写」"
+        },
+        "interpretation": {
+          "answer": "所谓通用主要指多种任务共享接口与参数，不等于每项能力都同样可靠。",
+          "evidence": "不必为每个任务单独建模型、单独标数据"
+        },
+        "boundary": {
+          "answer": "精确计算、实时事实和严格可复现输出往往仍需工具、检索或结构化系统。",
+          "evidence": "要精确计算、要可靠事实、要严格可复现"
+        }
+      },
+      {
+        "section": 2,
+        "definition": {
+          "answer": "自回归生成是在每一步根据已有前缀预测下一个 token 的概率分布。",
+          "evidence": "整个词表上的一个概率分布"
+        },
+        "problem": {
+          "answer": "它把整段文本生成拆成可以逐步计算和采样的一连串局部决策。",
+          "evidence": "怎么生成一整句"
+        },
+        "inputOutput": {
+          "answer": "输入是当前前缀，输出是词表概率分布以及按解码规则选出的一个 token。",
+          "evidence": "词表上所有 token 的一张概率表"
+        },
+        "mechanism": {
+          "answer": "模型用 softmax 得到概率，选中 token 后把它接回前文并循环执行。",
+          "evidence": "把它接回去，再来一遍"
+        },
+        "interpretation": {
+          "answer": "完整答案的路径概率是各步条件概率之积，早期低概率选择会持续压低整条路径。",
+          "evidence": "整段文本的概率，被拆成每一步条件概率的连乘"
+        },
+        "boundary": {
+          "answer": "模型不会先写好全局草稿；贪心、采样和束搜索会从同一分布得到不同结果。",
+          "evidence": "它没有全局草稿"
+        }
+      },
+      {
+        "section": 3,
+        "definition": {
+          "answer": "token 化把文本切成词表编号，嵌入再把离散编号变成可计算的连续向量。",
+          "evidence": "每个 token 对应词表里的一个编号"
+        },
+        "problem": {
+          "answer": "它为神经网络建立从人类文字到数值表示的入口。",
+          "evidence": "可模型只会算数字"
+        },
+        "inputOutput": {
+          "answer": "输入是原始文本，输出依次是 token 编号和叠加位置信息的向量序列。",
+          "evidence": "一串文字终于变成了一叠模型能做数学运算的向量"
+        },
+        "mechanism": {
+          "answer": "分词器按词表切分，模型查嵌入表并加入位置编码后交给 Transformer。",
+          "evidence": "每个 token id 查一张大表"
+        },
+        "interpretation": {
+          "answer": "相近向量表示模型在训练中学到了相似用法，不代表两个 token 完全同义。",
+          "evidence": "语义相近的词落在相近的位置"
+        },
+        "boundary": {
+          "answer": "token 数不是字数，生僻词、拼写和不同语言可能产生差异很大的切分成本。",
+          "evidence": "计费和「上下文长度」都按 token 算，不按字数"
+        }
+      },
+      {
+        "section": 4,
+        "definition": {
+          "answer": "带因果掩码的 Transformer 把前文向量加工成用于预测下一 token 的上下文表示。",
+          "evidence": "把「前文的每个 token 向量」反复加工"
+        },
+        "problem": {
+          "answer": "它需要在不偷看未来答案的条件下，让当前位置综合此前各处信息。",
+          "evidence": "才能算出下一个词"
+        },
+        "inputOutput": {
+          "answer": "输入是含位置的 token 向量序列，输出是每个位置融合前文后的上下文表示。",
+          "evidence": "输入已经是一叠向量了"
+        },
+        "mechanism": {
+          "answer": "自注意力选择相关前文并按权重汇总，层叠加工产生上下文表示。",
+          "evidence": "按权重把它们的信息汇总过来"
+        },
+        "interpretation": {
+          "answer": "某位置更关注“法国”等前文只能说明该次计算的关联权重更高。",
+          "evidence": "模型能把注意力落在「法国」上"
+        },
+        "boundary": {
+          "answer": "因果掩码是训练有效性的边界；若看见未来 token，模型会学会抄答案。",
+          "evidence": "否则就是「拿着答案预测答案」"
+        }
+      },
+      {
+        "section": 5,
+        "definition": {
+          "answer": "预训练用文本自身的下一个 token 作为目标，以交叉熵衡量预测误差。",
+          "evidence": "让模型预测下一个 token"
+        },
+        "problem": {
+          "answer": "它让模型能利用海量未人工标注文本学习语言统计规律与可复用表示。",
+          "evidence": "数据自己给自己当标签"
+        },
+        "inputOutput": {
+          "answer": "输入是文本前缀和真实后继 token，输出是词表概率与汇总后的训练损失。",
+          "evidence": "输入是文本前缀与其中真实的后继 token"
+        },
+        "mechanism": {
+          "answer": "真实 token 概率越低，负对数惩罚越大；梯度下降据此更新全部参数。",
+          "evidence": "把这个“对真实后续的惊讶程度”不断压小"
+        },
+        "interpretation": {
+          "answer": "损失下降表示模型对训练分布中的真实续写更少意外，不表示句子已经被事实核验。",
+          "evidence": "损失下降表示模型对这类文本的真实后续更少“意外”"
+        },
+        "boundary": {
+          "answer": "训练数据有限且带偏差、噪声和时效边界，规模扩大也不能自动消除这些问题。",
+          "evidence": "扩大数据与参数不能自动消除这些边界"
+        }
+      },
+      {
+        "section": 6,
+        "definition": {
+          "answer": "涌现能力是广泛预测训练中形成的模式和表示在新任务上的可迁移表现。",
+          "evidence": "作为可迁移副产品形成"
+        },
+        "problem": {
+          "answer": "它解释了模型没有为每个任务单独训练，却能通过提示完成多种新任务。",
+          "evidence": "一个只会猜下一个词的模型，凭什么会翻译"
+        },
+        "inputOutput": {
+          "answer": "输入是大规模多样文本与足够模型容量，输出是可被提示调用的语言和任务模式。",
+          "evidence": "输入是大量、多样的训练文本和足够的模型容量"
+        },
+        "mechanism": {
+          "answer": "预测不同文本迫使模型压缩并复用语法、语义、世界共现和任务格式等规律。",
+          "evidence": "为了降低损失，模型会学到可复用的语法、事实、代码和部分推理表示"
+        },
+        "interpretation": {
+          "answer": "新任务成绩提升是可观察能力证据，但不能单凭流畅回答断言模型具有人的理解。",
+          "evidence": "能力测评上升只能说明模型在该测试中表现更好"
+        },
+        "boundary": {
+          "answer": "看似推理的输出可能来自模式模仿；分布变化、反事实或细节扰动仍可能使能力失效。",
+          "evidence": "模仿、记忆和真正组合泛化会混在一起"
+        }
+      },
+      {
+        "section": 7,
+        "definition": {
+          "answer": "解码是把模型给出的词表分数转成实际 token 序列的选择过程。",
+          "evidence": "具体怎么从里面挑词"
+        },
+        "problem": {
+          "answer": "它在确定性、文本多样性与退化风险之间调节实际生成行为。",
+          "evidence": "决定了它多稳、多有创意"
+        },
+        "inputOutput": {
+          "answer": "输入是 logits、温度、采样规则和可见上下文，输出是选定 token 及最终文本。",
+          "evidence": "解码过程的输入是模型给出的 logits"
+        },
+        "mechanism": {
+          "answer": "温度改变分布尖锐度，贪心取最大项，采样按概率抽取，束搜索保留多条候选路径。",
+          "evidence": "按概率大小掷骰子"
+        },
+        "interpretation": {
+          "answer": "低温通常使分布更集中、输出更稳定，高温使候选更平均、结果更多样。",
+          "evidence": "分布被摊平，低概率词也有机会"
+        },
+        "boundary": {
+          "answer": "温度不增加知识；上下文窗口也限制可见历史，长序列还带来计算和注意力稀释问题。",
+          "evidence": "不会修改模型参数或补充新知识"
+        }
+      },
+      {
+        "section": 8,
+        "definition": {
+          "answer": "后训练把会续写的基础模型进一步塑造成能遵循指令与偏好的助手。",
+          "evidence": "从「基座」到「助手」"
+        },
+        "problem": {
+          "answer": "它弥合原始文本续写目标与用户希望得到的有用、安全、合规回答之间的差距。",
+          "evidence": "可你把问题丢给它"
+        },
+        "inputOutput": {
+          "answer": "输入是示范、偏好比较或反馈数据，输出是行为更符合目标规范的助手模型。",
+          "evidence": "输入不再只是原始网页文本"
+        },
+        "mechanism": {
+          "answer": "预训练先学通用模式，指令微调学习回答格式，偏好优化再调整候选回答排序。",
+          "evidence": "补齐要两步，合起来是今天所有对话模型走的三段路"
+        },
+        "interpretation": {
+          "answer": "阶段对照能区分知识能力、指令遵循和偏好行为分别由哪类训练改变。",
+          "evidence": "不能把“更听话”误读成“事实更正确”"
+        },
+        "boundary": {
+          "answer": "对齐只能改变行为倾向，不能保证每个输入都正确、安全，也不能替代外部验证。",
+          "evidence": "后训练只改变行为倾向"
+        }
+      },
+      {
+        "section": 9,
+        "definition": {
+          "answer": "语言似然是续写符合训练分布的相对可能性，并不是命题事实真值。",
+          "evidence": "给某段续写分配的相对可能性"
+        },
+        "problem": {
+          "answer": "它解释为何流畅生成仍会幻觉，并帮助区分检索、对齐与提示注入等不同治理问题。",
+          "evidence": "语言似然不等于事实真值"
+        },
+        "inputOutput": {
+          "answer": "输入是提示与可用上下文，输出是统计上可能的续写，而不是经过事实数据库核验的结论。",
+          "evidence": "模型输出候选 token 的概率以及由解码形成的续写"
+        },
+        "mechanism": {
+          "answer": "下一个 token 目标奖励像训练文本的续写，却没有内置事实、权限或指令信任边界。",
+          "evidence": "从来不是「对不对」"
+        },
+        "interpretation": {
+          "answer": "幻觉、知识截止、对齐偏差和提示注入相关但根因不同，必须分别诊断。",
+          "evidence": "它们相关，却不是完全相同的单一根因"
+        },
+        "boundary": {
+          "answer": "高风险结论需借助检索、工具、引用和权限隔离，不能把语言概率当作事实证明。",
+          "evidence": "为什么需要外部证据"
+        }
+      }
+    ]
+  },
+  "publication": {
+    "schemaVersion": 1,
+    "status": "published-provisional",
+    "reviewStatus": "manual-review",
+    "label": "未通过审计 · 暂行版本",
+    "blockerCount": 1,
+    "candidateHash": "sha256:5fc28461a513ba967711e3a20f7c46eeafed9409f368176f885dc7e278dea840",
+    "publishedAt": "2026-08-19T20:14:41.652Z",
+    "reason": "用户批量授权：节点 3 (llm) 显示缺陷返修（softmax 下标统一）后定向复核，以红色暂行版本重新发布（publish-provisional）；图3 图注因图表保护规则不可机器修，保留为人工决策项。非最终批准，非 L3 Pass。"
+  }
 };

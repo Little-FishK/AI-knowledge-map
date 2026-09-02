@@ -8,6 +8,7 @@ const { spawnSync } = require("child_process");
 const { loadDeepDivePages: loadDeepDivePagesFromDisk } = require("../../deepdive/runtime/deepdive-loader");
 const { transformGraph: transformGraphSource } = require("../../video-ingest/node-application");
 const { graphFingerprint: fingerprintGraph } = require("../../video-ingest/shadow-review");
+const { standaloneLayoutSource } = require("../../deepdive/runtime/standalone-page-source");
 
 function createCandidateGate(dependencies) {
   const {
@@ -22,7 +23,6 @@ function createCandidateGate(dependencies) {
     loadDeepDivePages = loadDeepDivePagesFromDisk,
     loadRuntimeIds,
     loadState,
-    pageOverrideSource,
     pageRegistrationSource,
     readJson,
     runtimeManifestSource,
@@ -55,13 +55,19 @@ function createCandidateGate(dependencies) {
         pageRegistrationSource(id, page),
         "utf8",
       );
-    } else {
-      fs.writeFileSync(
-        path.join(fixture, "data", "deepdive", `zzzzz-stage2-${id}.js`),
-        pageOverrideSource(id, page),
-        "utf8",
-      );
     }
+    fs.writeFileSync(
+      path.join(fixture, "data", "deepdive", `${id}.js`),
+      pageRegistrationSource(id, page),
+      "utf8",
+    );
+    fs.writeFileSync(
+      path.join(fixture, "data", "deepdive", ".standalone-pages.json"),
+      standaloneLayoutSource(
+        fs.readdirSync(path.join(fixture, "data", "deepdive")).filter(file => file.endsWith(".js")).length,
+      ),
+      "utf8",
+    );
     fs.mkdirSync(path.join(fixture, "docs", "deepdive-audits"), { recursive: true });
     fs.writeFileSync(
       path.join(fixture, "docs", "deepdive-audits", `${id}.json`),

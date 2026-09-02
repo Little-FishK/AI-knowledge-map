@@ -455,7 +455,7 @@ npm run test:quality-gates
 
 夹具明确要求以下坏样例失败：重复页面注册、非核心节点漏页、重复来源、未来访问日期、题答不配、L2 缺少验证/诊断信号、L2 结构齐全但缺少 L3 高阶练习/机制链、L3 参照页哈希漂移、把 L3 记录冒充 L4、使用“已检查”敷衍 L4 摘要、篡改证据 artifact，以及正文变化后继续复用旧 L4 哈希认证。
 
-历史上被最终版本覆盖的 `guardrails`、`system-prompt` 页面及两个恢复垫片保存在 `docs/history/deepdive-registrations/`，不再参与运行时加载。当前规范文件分别是 `batch-28-agent-systems.js` 和 `batch-31a-control-boundaries.js`。
+历史上被最终版本覆盖的 `guardrails`、`system-prompt` 页面及两个恢复垫片保存在 `docs/history/deepdive-registrations/`，不再参与运行时加载。当前规范文件是 [guardrails.js](../data/deepdive/guardrails.js) 和 [system-prompt.js](../data/deepdive/system-prompt.js)，二者均可独立加载。
 
 ## 10. 规范维护
 

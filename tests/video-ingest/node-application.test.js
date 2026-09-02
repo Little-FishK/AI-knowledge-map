@@ -72,6 +72,12 @@ try {
     "utf8"
   );
   fs.rmSync(path.join(fixture, "data/deepdive/voice-cloning.js"), { force: true });
+  const sourceLayoutFile = path.join(fixture, "data/deepdive/.standalone-pages.json");
+  fs.writeFileSync(
+    sourceLayoutFile,
+    `${JSON.stringify({ schemaVersion: 1, mode: "standalone-page", pageCount: 129 }, null, 2)}\n`,
+    "utf8",
+  );
   fs.rmSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js"), { force: true });
   const runtimeManifestFile = path.join(fixture, "data/deepdive-runtime/manifest.js");
   fs.writeFileSync(
@@ -88,7 +94,7 @@ try {
   const plan = buildNodeApplyPlan(packageDir, { root: fixture });
   assert.strictEqual(plan.status, "ready", JSON.stringify(plan.blockers));
   assert.strictEqual(plan.idempotent, false);
-  assert.strictEqual(plan.targets.length, 4);
+  assert.strictEqual(plan.targets.length, 5);
 
   const receipt = applyNodePlan(plan, { root: fixture });
   assert.strictEqual(receipt.status, "applied");
@@ -103,6 +109,7 @@ try {
   assert(pathSteps.some(step => step[0] === "8.13" && step[1] === "content-detection"));
   assert(fs.existsSync(path.join(fixture, "data/deepdive/voice-cloning.js")));
   assert(fs.existsSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js")));
+  assert.strictEqual(JSON.parse(fs.readFileSync(sourceLayoutFile, "utf8")).pageCount, 130);
   assert(fs.readFileSync(runtimeManifestFile, "utf8").includes('"voice-cloning"'));
   assert(!fs.readFileSync(path.join(fixture, "index.html"), "utf8")
     .includes('data/deepdive/voice-cloning.js'));
@@ -117,6 +124,7 @@ try {
   assert.strictEqual(graphAt(fixture).nodes.length, 129);
   assert(!fs.existsSync(path.join(fixture, "data/deepdive/voice-cloning.js")));
   assert(!fs.existsSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js")));
+  assert.strictEqual(JSON.parse(fs.readFileSync(sourceLayoutFile, "utf8")).pageCount, 129);
 
   const tampered = path.join(fixture, "tampered-package");
   fs.cpSync(packageDir, tampered, { recursive: true });

@@ -44,7 +44,7 @@
     "test:video-ingest": "node tests/video-ingest/ingest.test.js && node tests/video-ingest/application.test.js && node tests/video-ingest/shadow-review.test.js && node tests/video-ingest/node-package.test.js && node tests/video-ingest/node-application.test.js && node tests/video-ingest/calibration.test.js",
     "test:routing": "node tests/app/routing.test.js",
     "test:app": "node tests/app/app-smoke.test.js",
-    "test:tooling": "node tests/tooling/project-root.test.js && node tests/tooling/deepdive-quality-modules.test.js",
+    "test:tooling": "node tests/tooling/project-root.test.js && node tests/tooling/deepdive-quality-modules.test.js && node tests/tooling/standalone-page-source.test.js && node tools/deepdive/quality/verify-standalone-sources.js",
     "quality:all": "npm run validate && npm run test:tooling && npm run test:routing && npm run test:app && npm run test:quality-gates && npm run test:video-ingest && npm run test:stage2 && npm run quality:deepdives"
   },
   "devDependencies": {

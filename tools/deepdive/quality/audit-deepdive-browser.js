@@ -81,7 +81,8 @@ function changedIds(allIds) {
     "index.html",
     "assets/app.js",
     "assets/style.css",
-    "data/deepdive/00-deepdive-factory.js",
+    "data/deepdive/.standalone-pages.json",
+    "tools/deepdive/runtime/standalone-page-source.js",
   ]);
   for (const line of git.stdout.split(/\r?\n/).filter(Boolean)) {
     const rawPath = (baseRef ? line : line.slice(3).split(" -> ").pop()).replace(/\\/g, "/");

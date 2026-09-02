@@ -8,7 +8,7 @@ const canonicalNarrative = require("../../tools/deepdive/quality/deepdive-narrat
 
 assert.deepStrictEqual(
   Object.keys(canonicalLoader).sort(),
-  ["loadDeepDivePages", "loadDeepDivePagesFromGit", "resolveGitBaseRef"]
+  ["SOURCE_LAYOUT_FILE", "loadDeepDivePages", "loadDeepDivePagesFromGit", "resolveGitBaseRef"]
 );
 assert.deepStrictEqual(
   Object.keys(canonicalContracts).sort(),

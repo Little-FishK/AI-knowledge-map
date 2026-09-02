@@ -91,10 +91,13 @@ const assessment = {
 
 const previousWindow = global.window;
 global.window = {};
-const deepDiveFile = path.join(ROOT, "data/deepdive/neural-network.js");
+const deepDiveFile = path.join(ROOT, "data/deepdive/unsupervised-learning.js");
 delete require.cache[require.resolve(deepDiveFile)];
 require(deepDiveFile);
-const referencePage = global.window.DEEPDIVE["neural-network"];
+const referencePage = JSON.parse(JSON.stringify(global.window.DEEPDIVE["unsupervised-learning"]));
+// 原子包夹具没有独立 Stage 2 审计；使用 v1 内联合同只验证旧包门禁接线，
+// v2 正式候选仍必须由 Stage 2 提供哈希绑定的外置独立审计。
+referencePage.quality.contractVersion = 1;
 global.window = previousWindow;
 
 const content = {

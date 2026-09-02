@@ -10,6 +10,10 @@ const {
   sha256
 } = require("./core");
 const { graphFingerprint } = require("./shadow-review");
+const {
+  loadStandalonePageSource,
+  standaloneLayoutSource,
+} = require("../deepdive/runtime/standalone-page-source");
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -44,10 +48,7 @@ function loadGraph(root) {
 }
 
 function loadDeepDive(file, nodeId) {
-  const context = { window: {} };
-  vm.createContext(context);
-  vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-  return context.window.DEEPDIVE && context.window.DEEPDIVE[nodeId];
+  return loadStandalonePageSource(fs.readFileSync(file, "utf8"), file, nodeId);
 }
 
 function packageSeal(manifest) {
@@ -263,23 +264,8 @@ function loadRuntimeManifest(root) {
 }
 
 function compileFinalDeepDive(root, nodeId, sourceContent) {
-  const directory = withinRoot(root, "data/deepdive");
-  const targetName = `${nodeId}.js`;
-  const files = fs.readdirSync(directory)
-    .filter(file => file.endsWith(".js") && file !== targetName)
-    .concat(targetName)
-    .sort();
-  const context = { window: {} };
-  vm.createContext(context);
-  files.forEach(file => {
-    const content = file === targetName
-      ? sourceContent
-      : fs.readFileSync(path.join(directory, file), "utf8");
-    vm.runInContext(content, context, { filename: path.join(directory, file) });
-  });
-  const page = context.window.DEEPDIVE && context.window.DEEPDIVE[nodeId];
-  if (!page) throw new Error(`无法编译理解原理页运行时内容：${nodeId}`);
-  return page;
+  const file = withinRoot(root, `data/deepdive/${nodeId}.js`);
+  return loadStandalonePageSource(sourceContent, file, nodeId);
 }
 
 function targetRecord(root, relativePath, afterContent) {
@@ -363,6 +349,13 @@ function buildNodeApplyPlan(packageDir, options = {}) {
     targets = [
       targetRecord(root, "data/graph.js", transformGraph(graphContent, manifest)),
       targetRecord(root, `data/deepdive/${manifest.node.id}.js`, deepDiveContent),
+      targetRecord(
+        root,
+        "data/deepdive/.standalone-pages.json",
+        standaloneLayoutSource(
+          fs.readdirSync(withinRoot(root, "data/deepdive")).filter(file => file.endsWith(".js")).length + 1,
+        ),
+      ),
       targetRecord(
         root,
         `data/deepdive-runtime/${manifest.node.id}.js`,

@@ -207,7 +207,6 @@ try {
     graphFingerprint: () => "bound-graph",
     loadDeepDivePages: () => ({ "new-page": gatePage }),
     loadRuntimeIds: () => ["existing-page"],
-    pageOverrideSource: publication.pageOverrideSource,
     pageRegistrationSource: publication.pageRegistrationSource,
     runtimeManifestSource: publication.runtimeManifestSource,
     runtimeSource: publication.runtimeSource,

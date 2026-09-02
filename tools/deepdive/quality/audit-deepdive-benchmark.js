@@ -775,13 +775,6 @@ function inspect(id, page, basePage) {
   };
 }
 
-function idsFromSource(source) {
-  return [
-    ...source.matchAll(/window\.DEEPDIVE\s*\[\s*["']([^"']+)["']\s*\]\s*=/g),
-    ...source.matchAll(/register\s*\(\s*["']([^"']+)["']/g),
-  ].map((match) => match[1]);
-}
-
 function changedIds() {
   const all = new Set(Object.keys(pages));
   const baseRef = process.env.DEEPDIVE_BASE_REF || process.env.GITHUB_BASE_REF || "";
@@ -796,12 +789,6 @@ function changedIds() {
   if (git.status !== 0) return all;
   const changed = new Set();
   const globalFiles = new Set([
-    "data/graph.js",
-    "index.html",
-    "data/deepdive/00-deepdive-factory.js",
-    "data/deepdive/zz-deepdive-quality-completion.js",
-    "tools/deepdive/quality/audit-deepdive-benchmark.js",
-    "tools/deepdive/runtime/deepdive-loader.js",
     "tools/deepdive/quality/deepdive-audit-contracts.js",
     "docs/deepdive-l3-benchmark.json",
   ]);
@@ -812,10 +799,10 @@ function changedIds() {
       changed.add(path.basename(rawPath, ".json"));
       continue;
     }
-    if (!rawPath.startsWith("data/deepdive/") || !rawPath.endsWith(".js")) continue;
-    const file = path.join(root, ...rawPath.split("/"));
-    if (fs.existsSync(file)) idsFromSource(fs.readFileSync(file, "utf8")).forEach((id) => changed.add(id));
   }
+  [...new Set([...Object.keys(pages), ...Object.keys(basePages)])]
+    .filter(id => JSON.stringify(pages[id]) !== JSON.stringify(basePages[id]))
+    .forEach(id => changed.add(id));
   return changed;
 }
 

@@ -242,6 +242,10 @@ function writeFixture(directory, page, graphIds = ["fixture"]) {
     `window.DEEPDIVE = window.DEEPDIVE || {}; window.DEEPDIVE["fixture"] = ${JSON.stringify(page)};`,
   );
   fs.writeFileSync(
+    path.join(directory, "data", "deepdive", ".standalone-pages.json"),
+    `${JSON.stringify({ schemaVersion: 1, mode: "standalone-page", pageCount: 1 })}\n`,
+  );
+  fs.writeFileSync(
     path.join(directory, "data", "deepdive-runtime", "fixture.js"),
     `window.DEEPDIVE = window.DEEPDIVE || {}; window.DEEPDIVE["fixture"] = ${JSON.stringify(page)};`,
   );
@@ -328,7 +332,11 @@ try {
     path.join(fixture, "data", "deepdive", "duplicate.js"),
     'window.DEEPDIVE = window.DEEPDIVE || {}; window.DEEPDIVE["fixture"] = { title: "重复注册" };',
   );
-  expectFail("validate-deepdives.js", [], fixture, /fixture: 存在多个注册来源/);
+  fs.writeFileSync(
+    path.join(fixture, "data", "deepdive", ".standalone-pages.json"),
+    `${JSON.stringify({ schemaVersion: 1, mode: "standalone-page", pageCount: 2 })}\n`,
+  );
+  expectFail("validate-deepdives.js", [], fixture, /注册 ID fixture 与文件名 duplicate 不一致/);
 
   writeFixture(fixture, basePage(), ["fixture", "missing-noncore"]);
   expectFail("validate-deepdives.js", [], fixture, /missing-noncore: 缺理解原理页/);

@@ -58,4 +58,4 @@
 
 ## 自动验证
 
-运行 `node tools/validators/deepdives.js`。门禁会加载 `data/deepdive/` 下全部页面，并检查节点对应关系、核心覆盖、必需组件、章节、练习、来源、访问日期及 `index.html` 脚本入口。
+运行 `node tools/validators/deepdives.js`。门禁会隔离加载 `data/deepdive/` 下的每个页面，强制文件名与页面 ID 一致、一个文件只注册一个完整页面，并检查节点对应关系、必需组件、章节、练习、来源、访问日期及按需运行时一致性。

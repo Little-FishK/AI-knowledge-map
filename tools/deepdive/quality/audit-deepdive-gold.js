@@ -10,7 +10,10 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
-const { loadDeepDivePages } = require("../runtime/deepdive-loader");
+const {
+  loadDeepDivePages,
+  loadDeepDivePagesFromGit,
+} = require("../runtime/deepdive-loader");
 const { resolveProjectRoot } = require("../../shared/project-root");
 
 const root = resolveProjectRoot("DEEPDIVE_ROOT");
@@ -111,13 +114,6 @@ const changedOnly = process.argv.includes("--changed");
 const baselineAt = process.argv.indexOf("--baseline");
 const baselinePath = baselineAt >= 0 ? process.argv[baselineAt + 1] : "";
 
-function idsFromSource(source) {
-  return [
-    ...source.matchAll(/window\.DEEPDIVE\s*\[\s*["']([^"']+)["']\s*\]\s*=/g),
-    ...source.matchAll(/register\s*\(\s*["']([^"']+)["']/g),
-  ].map((match) => match[1]);
-}
-
 function changedIds() {
   const baseRef = process.env.DEEPDIVE_BASE_REF || process.env.GITHUB_BASE_REF || "";
   if (!baseRef && process.env.CI) {
@@ -134,22 +130,16 @@ function changedIds() {
     encoding: "utf8",
   });
   if (git.status !== 0) return new Set(Object.keys(context.window.DEEPDIVE || {}));
-  const ids = new Set();
   const all = new Set(Object.keys(context.window.DEEPDIVE || {}));
-  const globalFiles = new Set([
-    "data/graph.js",
-    "index.html",
-    "data/deepdive/00-deepdive-factory.js",
-  ]);
+  const globalFiles = new Set();
   for (const line of git.stdout.split(/\r?\n/).filter(Boolean)) {
     const rawPath = (baseRef ? line : line.slice(3).split(" -> ").pop()).replace(/\\/g, "/");
     if (globalFiles.has(rawPath)) return all;
-    if (!rawPath.startsWith("data/deepdive/") || !rawPath.endsWith(".js")) continue;
-    const file = path.join(root, ...rawPath.split("/"));
-    if (!fs.existsSync(file)) continue;
-    idsFromSource(fs.readFileSync(file, "utf8")).forEach((id) => ids.add(id));
   }
-  return ids;
+  const basePages = loadDeepDivePagesFromGit(root);
+  if (!Object.keys(basePages).length) return all;
+  return new Set([...new Set([...Object.keys(context.window.DEEPDIVE || {}), ...Object.keys(basePages)])]
+    .filter(id => JSON.stringify(context.window.DEEPDIVE[id]) !== JSON.stringify(basePages[id])));
 }
 
 function loadBaseline(file) {

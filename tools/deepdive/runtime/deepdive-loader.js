@@ -6,19 +6,39 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { spawnSync } = require("child_process");
+const {
+  loadStandalonePageDirectory,
+  loadStandalonePageSource,
+} = require("./standalone-page-source");
 
-function loadDeepDivePages(root) {
+const SOURCE_LAYOUT_FILE = ".standalone-pages.json";
+
+function evaluateLegacyDeepDiveSources(sources) {
   const context = { window: {} };
   vm.createContext(context);
-  const directory = path.join(root, "data", "deepdive");
-  fs.readdirSync(directory)
-    .filter(file => file.endsWith(".js"))
-    .sort()
-    .forEach(file => {
-      const fullPath = path.join(directory, file);
-      vm.runInContext(fs.readFileSync(fullPath, "utf8"), context, { filename: fullPath });
+  [...sources]
+    .sort((left, right) => left.filename.localeCompare(right.filename))
+    .forEach(({ filename, source }) => {
+      vm.runInContext(source, context, { filename });
     });
   return context.window.DEEPDIVE || {};
+}
+
+function loadDeepDivePages(root) {
+  const directory = path.join(root, "data", "deepdive");
+  const layoutFile = path.join(directory, SOURCE_LAYOUT_FILE);
+  if (!fs.existsSync(layoutFile)) {
+    throw new Error(`data/deepdive 缺少 ${SOURCE_LAYOUT_FILE}；不再支持排序覆盖式源码`);
+  }
+  const layout = JSON.parse(fs.readFileSync(layoutFile, "utf8"));
+  if (layout.schemaVersion !== 1 || layout.mode !== "standalone-page") {
+    throw new Error(`data/deepdive/${SOURCE_LAYOUT_FILE} 布局声明无效`);
+  }
+  const pages = loadStandalonePageDirectory(directory);
+  if (layout.pageCount !== Object.keys(pages).length) {
+    throw new Error(`data/deepdive/${SOURCE_LAYOUT_FILE} 页面数量与独立源码不一致`);
+  }
+  return pages;
 }
 
 function resolveGitBaseRef(root) {
@@ -74,22 +94,30 @@ function loadDeepDivePagesFromGit(root, reference = resolveGitBaseRef(root)) {
   ]);
   if (listed.status !== 0) return {};
 
-  const files = listed.stdout
+  const listedFiles = listed.stdout
     .split(/\r?\n/)
     .map((file) => file.trim().replace(/\\/g, "/"))
-    .filter((file) => file.startsWith("data/deepdive/") && file.endsWith(".js"))
-    .sort();
-  const context = { window: {} };
-  vm.createContext(context);
+    .filter((file) => file.startsWith("data/deepdive/"));
+  const files = listedFiles.filter(file => file.endsWith(".js")).sort();
   const blobs = readGitBlobs(root, files.map((file) => `${reference}:${file}`));
   if (!blobs) return {};
-  for (let index = 0; index < files.length; index += 1) {
-    vm.runInContext(blobs[index], context, { filename: `${reference}:${files[index]}` });
+  if (listedFiles.includes(`data/deepdive/${SOURCE_LAYOUT_FILE}`)) {
+    const pages = Object.create(null);
+    files.forEach((file, index) => {
+      const id = path.posix.basename(file, ".js");
+      pages[id] = loadStandalonePageSource(blobs[index], `${reference}:${file}`, id);
+    });
+    return pages;
   }
-  return context.window.DEEPDIVE || {};
+  const sources = files.map((file, index) => ({
+    filename: file,
+    source: blobs[index],
+  }));
+  return evaluateLegacyDeepDiveSources(sources);
 }
 
 module.exports = {
+  SOURCE_LAYOUT_FILE,
   loadDeepDivePages,
   loadDeepDivePagesFromGit,
   resolveGitBaseRef,

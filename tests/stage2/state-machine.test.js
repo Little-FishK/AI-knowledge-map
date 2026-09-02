@@ -88,6 +88,11 @@ function copyFixture(options = {}) {
     "utf8",
   );
   fs.writeFileSync(
+    path.join(fixture, "data", "deepdive", ".standalone-pages.json"),
+    `${JSON.stringify({ schemaVersion: 1, mode: "standalone-page", pageCount: 1 })}\n`,
+    "utf8",
+  );
+  fs.writeFileSync(
     path.join(fixture, "data", "deepdive-runtime", "alpha.js"),
     `window.DEEPDIVE=window.DEEPDIVE||{};window.DEEPDIVE.alpha=${JSON.stringify(page)};\n`,
     "utf8",
@@ -954,10 +959,10 @@ try {
   );
   assert.strictEqual(provisional.status, "published-provisional");
   assert.strictEqual(provisional.workflowState, "manual-review");
-  const overridePath = path.join(provisionalFixture, "data", "deepdive", "zzzzz-stage2-alpha.js");
-  const overrideSource = fs.readFileSync(overridePath, "utf8");
-  assert.match(overrideSource, /published-provisional/);
-  assert.match(overrideSource, /manual-review/);
+  const canonicalPath = path.join(provisionalFixture, "data", "deepdive", "alpha.js");
+  const canonicalSource = fs.readFileSync(canonicalPath, "utf8");
+  assert.match(canonicalSource, /published-provisional/);
+  assert.match(canonicalSource, /manual-review/);
   const publishedState = loadState(provisionalFixture).pages.alpha;
   assert.strictEqual(publishedState.state, "manual-review");
   assert.strictEqual(publishedState.publication.status, "published-provisional");
@@ -971,7 +976,8 @@ try {
   );
   assert.strictEqual(rolledBack.status, "rolled-back");
   assert.strictEqual(loadState(provisionalFixture).pages.alpha.publication, null);
-  assert.strictEqual(fs.existsSync(overridePath), false);
+  assert.strictEqual(fs.existsSync(canonicalPath), true);
+  assert.doesNotMatch(fs.readFileSync(canonicalPath, "utf8"), /published-provisional/);
 } finally {
   fs.rmSync(provisionalFixture, { recursive: true, force: true });
 }

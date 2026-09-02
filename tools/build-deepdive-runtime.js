@@ -2,25 +2,14 @@
 
 const fs = require("fs");
 const path = require("path");
-const vm = require("vm");
+const { loadDeepDivePages } = require("./deepdive/runtime/deepdive-loader");
 
 const root = path.join(__dirname, "..");
-const sourceDir = path.join(root, "data", "deepdive");
 const outputDir = path.join(root, "data", "deepdive-runtime");
 const indexFile = path.join(root, "index.html");
 
-function load(file, context) {
-  vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-}
-
 function buildPages() {
-  const context = { window: {} };
-  vm.createContext(context);
-  fs.readdirSync(sourceDir)
-    .filter(file => file.endsWith(".js"))
-    .sort()
-    .forEach(file => load(path.join(sourceDir, file), context));
-  return context.window.DEEPDIVE || {};
+  return loadDeepDivePages(root);
 }
 
 function runtimeSource(id, page) {
@@ -32,17 +21,18 @@ function runtimeSource(id, page) {
 function rewriteIndex(ids) {
   const original = fs.readFileSync(indexFile, "utf8");
   const withoutSources = original.replace(
-    /\s*<script src="data\/deepdive\/[^"]+\.js"><\/script>/g,
+    /\s*<script\b[^>]*\bsrc=["']data\/deepdive\/[^"']+\.js["'][^>]*><\/script>/g,
     "",
   );
-  const manifestTag = '<script src="data/deepdive-runtime/manifest.js"></script>';
-  const anchor = '<script src="assets/layout-quality.js"></script>';
+  const manifestTag = '<script defer src="data/deepdive-runtime/manifest.js"></script>';
+  const anchorPattern = /<script\b[^>]*\bsrc=["']assets\/layout-quality\.js["'][^>]*><\/script>/;
   const cleaned = withoutSources.replace(
-    /\s*<script src="data\/deepdive-runtime\/manifest\.js"><\/script>/g,
+    /\s*<script\b[^>]*\bsrc=["']data\/deepdive-runtime\/manifest\.js["'][^>]*><\/script>/g,
     "",
   );
-  if (!cleaned.includes(anchor)) throw new Error("index.html 缺少运行时清单插入锚点");
-  const next = cleaned.replace(anchor, `${manifestTag}\n${anchor}`);
+  const anchor = cleaned.match(anchorPattern);
+  if (!anchor) throw new Error("index.html 缺少运行时清单插入锚点");
+  const next = cleaned.replace(anchorPattern, `${manifestTag}\n${anchor[0]}`);
   fs.writeFileSync(indexFile, next, "utf8");
   return ids.length;
 }
@@ -67,4 +57,6 @@ function main() {
   console.log(`✓ 已生成 ${ids.length} 个按需理解原理页运行时文件`);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { buildPages, main, rewriteIndex, runtimeSource };
