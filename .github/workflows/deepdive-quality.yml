@@ -2,26 +2,9 @@ name: Project quality gate
 
 on:
   pull_request:
-    paths:
-      - "assets/app.js"
-      - "assets/app/**"
-      - "assets/layout-quality.js"
-      - "assets/router.js"
-      - "assets/style.css"
-      - "data/graph.js"
-      - "data/software.js"
-      - "data/tutorials*.js"
-      - "data/deepdive/**"
-      - "docs/**"
-      - "docs/deepdive-quality-baseline.json"
-      - "docs/deepdive-l3-benchmark.json"
-      - "docs/deepdive-l3-baseline.json"
-      - "docs/deepdive-quality-reviews.json"
-      - "index.html"
-      - "package.json"
-      - "tools/**"
-      - "tests/**"
-      - ".github/workflows/deepdive-quality.yml"
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -33,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      DEEPDIVE_BASE_REF: ${{ github.base_ref }}
+      DEEPDIVE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:

@@ -23,6 +23,7 @@ const {
   loadSectionAudit,
   pageContentHash,
 } = require("./deepdive-audit-contracts");
+const { benchmarkChangeScope } = require("./benchmark-change-scope");
 const { scanNarrativeTemplates } = require("./deepdive-narrative-audit");
 const { resolveProjectRoot } = require("../../shared/project-root");
 
@@ -790,11 +791,33 @@ function changedIds() {
   const changed = new Set();
   const globalFiles = new Set([
     "tools/deepdive/quality/deepdive-audit-contracts.js",
-    "docs/deepdive-l3-benchmark.json",
   ]);
   for (const line of git.stdout.split(/\r?\n/).filter(Boolean)) {
     const rawPath = (baseRef ? line : line.slice(3).split(" -> ").pop()).replace(/\\/g, "/");
     if (globalFiles.has(rawPath)) return all;
+    if (rawPath === "docs/deepdive-l3-benchmark.json") {
+      const previous = spawnSync(
+        "git",
+        [
+          "-c",
+          `safe.directory=${root.replace(/\\/g, "/")}`,
+          "show",
+          `${baseRef ? resolvedBase : "HEAD"}:docs/deepdive-l3-benchmark.json`,
+        ],
+        { cwd: root, encoding: "utf8" },
+      );
+      if (previous.status !== 0) return all;
+      let previousBenchmark;
+      try {
+        previousBenchmark = JSON.parse(previous.stdout);
+      } catch (_) {
+        return all;
+      }
+      const scope = benchmarkChangeScope(previousBenchmark, benchmark);
+      if (scope.allPages) return all;
+      scope.pageIds.forEach(id => changed.add(id));
+      continue;
+    }
     if (rawPath.startsWith("docs/deepdive-audits/") && rawPath.endsWith(".json")) {
       changed.add(path.basename(rawPath, ".json"));
       continue;
