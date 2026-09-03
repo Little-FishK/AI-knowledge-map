@@ -33,6 +33,7 @@ function createResultSubmissionWorkflow(dependencies) {
     pageSourceSignature,
     privateAuditRelativePath,
     publishCandidate,
+    readResponsesV2,
     refreshEditorialDraftPublication,
     resultDirectory,
     runGate,
@@ -41,6 +42,7 @@ function createResultSubmissionWorkflow(dependencies) {
     validatePage,
     visibleRawLatexSections,
     withinRoot,
+    writeResponseObject,
     writeJson,
   } = dependencies;
 
@@ -135,9 +137,11 @@ function createResultSubmissionWorkflow(dependencies) {
       const result = input.result || {};
       if (role === "content-generation") {
         const material = contentGenerationReviewMaterial(resolvedRoot, record);
-        const savedResponses = Array.isArray(record.contentGeneration && record.contentGeneration.savedResponses)
-          ? record.contentGeneration.savedResponses.map(({ sectionNumber, title, response }) => ({ sectionNumber, title, response }))
-          : [];
+        const savedResponses = readResponsesV2(
+          resolvedRoot,
+          record.id,
+          record.contentGeneration,
+        ).map(({ sectionNumber, title, response }) => ({ sectionNumber, title, response }));
         const completedResult = result.useSavedResponses === true
           ? { pageId: record.id, responses: savedResponses, summary: result.summary || "" }
           : result;
@@ -163,6 +167,11 @@ function createResultSubmissionWorkflow(dependencies) {
           outputFile: outputRelative,
           outputHash: sha256(markdown),
           summary: String(completedResult.summary || "").slice(0, 500),
+          savedResponsesRef: writeResponseObject(
+            resolvedRoot,
+            record.id,
+            savedResponses,
+          ).reference,
         };
         record.state = previousState;
         record.lease = null;

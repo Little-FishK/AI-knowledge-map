@@ -42,7 +42,7 @@ flowchart LR
 | 发布事务 | `tools/deepdive-stage2/lib/publication.js` | 生成发布目标、执行写前哈希检查和验证器，并在失败时按逆序原子恢复 |
 | 编辑稿渲染 | `tools/deepdive-stage2/lib/editorial-markdown.js` | 将人工编辑 Markdown 安全转换为理解原理页 HTML，并处理表格保留比较 |
 | 命令入口 | `tools/run-deepdive-stage2.js` | 初始化、暂停、恢复、查看状态和人工诊断 |
-| Codex 窄接口 | `tools/deepdive-stage2/mcp-server.js` | 只暴露状态、领取一项任务、提交一项结果 |
+| Codex 窄接口 | `tools/deepdive-stage2/mcp-server.js` | 按能力配置暴露状态、只读存储诊断、领取一项任务与提交一项结果；存储诊断仅供完整权限控制器使用 |
 | 运行状态 | `.stage2/state.json` | 130 页与新节点的唯一进度事实源 |
 | 私有结果 | 本机数据根目录下 `stage2/results/` | 候选页、私有审计与发布回执；状态中仍使用稳定的 `.stage2/results/...` 逻辑路径 |
 | 预览与事件 | 本机数据根目录下 `stage2/previews/`、`stage2/events.jsonl` | 未发布预览与只追加运行轨迹；不占用仓库工作区 |
@@ -194,6 +194,16 @@ npm run stage2:status
 npm run stage2:pause
 npm run stage2:resume
 ```
+
+完整权限 MCP 还提供 `stage2_state_storage_report`，用于迁移前只读统计正式状态文件的顶层字段、聚合页面字段、最大叶字段路径及 `.stage2/results/`、`.stage2/previews/` 逻辑引用完整性。报告只包含字段名、类型、字节数、计数、摘要哈希和告警代码；不返回页面 ID、字段值、正文、私有审计结论或逻辑引用的具体路径，也不会领取租约、刷新过期租约或写入任何文件。该工具不向 controller、audit、repair 和 content-generation 受限配置开放。
+
+Schema v2 首先只以影子格式存在，正式控制器仍严格读取和写入 Schema v1。完整权限 MCP 的 `stage2_build_state_v2_shadow` 必须接收刚由诊断工具返回的精确 v1 摘要，并要求全局无活动租约；它把 `contentGeneration.savedResponses` 写成仓库外、按 SHA-256 命名且绑定页面的不可变对象，再把引用写入 `.stage2/previews/state-v2-shadow.json`。影子状态写入前后都必须重新读取外置对象并无损还原为 v1，与正式状态做深度等价比较；摘要变化、对象损坏、页面绑定不符或语义不等价时一律拒绝更新影子清单。该阶段不改变 `STATE_SCHEMA_VERSION`、`loadState`、正式状态、队列、租约或发布结果。
+
+大对象迁移先进入双写回填阶段：`stage2_backfill_state_v2_objects` 在精确 v1 摘要匹配且无活动租约时，为每个 `contentGeneration.savedResponses` 生成或复用仓库外内容寻址对象，并把 `savedResponsesRef` 写回正式 v1。内联 `savedResponses` 必须完整保留，现有读取路径完全不变；控制器保存每个新章节回复和最终提交时，也同步更新并回读验证该引用。回填只能改变迁移引用和状态文件顶层更新时间，页面数量、页面状态、内联回复及正式 Schema 版本必须保持不变。
+
+双读验证阶段仍返回并使用 Schema v1 内联回复，但每次读取、续写或最终提交内容生成回复前，都必须同时读取 `savedResponsesRef` 指向的对象，验证摘要、页面绑定、数量和逐条深度等价；任何差异都会阻断当前操作。完整权限 MCP 的只读工具 `stage2_validate_state_v2_dual_read` 还会用精确 v1 摘要全量核对所有双写引用与当前 v2 影子，报告只包含计数、摘要和问题代码，不返回页面 ID、正文、审计结论或字段值。该阶段仍不改变 `STATE_SCHEMA_VERSION`，也不从 v2 返回业务状态。
+
+正式切换由完整权限 MCP 的 `stage2_switch_state_v2` 完成。调用方必须同时提供刚通过双读验证的 v1 正式状态摘要和 v2 影子摘要；控制器要求全局无活动租约，重新核对影子来源、所有内容寻址对象的路径、摘要、字节数、页面绑定、回复数量和无损还原结果。切换前先在本机运行数据目录写入并回读校验完整 v1 备份，随后用原子替换把 `.stage2/state.json` 升为 Schema v2。正式 v2 只保留 `savedResponsesRef`，运行时只从外置对象读取，禁止回退到或重新写入内联 `savedResponses`；对象缺失、损坏或元数据错配时必须失败关闭。重复调用仅在正式状态仍与目标影子摘要完全相同时返回 `already-switched`。
 
 初始化会扫描当前 130 页并导入待处理的视频补充：
 

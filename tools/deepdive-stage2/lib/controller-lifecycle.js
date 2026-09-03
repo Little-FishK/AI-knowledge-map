@@ -114,6 +114,12 @@ function createControllerLifecycle(dependencies) {
       const registrations = sourceRegistrationMap(resolvedRoot);
       const state = existing || {
         schemaVersion: schemaVersion,
+        ...(schemaVersion === 2 ? {
+          storage: {
+            schemaVersion: 1,
+            contentGenerationSavedResponses: "external-content-addressed",
+          },
+        } : {}),
         mode: "serial",
         paused: false,
         policy: {

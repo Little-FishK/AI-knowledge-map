@@ -21,7 +21,9 @@ function createContentGeneration(options) {
     appendEvent,
     atomicWrite,
     loadState,
+    readResponsesV2,
     saveState,
+    writeResponseObject,
     withinRoot,
   } = options;
 
@@ -250,9 +252,7 @@ function createContentGeneration(options) {
       if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("内容生成租约已经过期");
       const material = contentGenerationReviewMaterial(resolvedRoot, record);
       const manifest = contentGenerationManifest(material);
-      const savedResponses = Array.isArray(record.contentGeneration && record.contentGeneration.savedResponses)
-        ? record.contentGeneration.savedResponses
-        : [];
+      const savedResponses = readResponsesV2(resolvedRoot, record.id, record.contentGeneration);
       const expected = manifest.eligibleSections[savedResponses.length];
       if (!expected) throw new Error("所有允许章节的回复均已保存");
       const sectionNumber = Number(input.sectionNumber);
@@ -276,7 +276,11 @@ function createContentGeneration(options) {
         savedAt: new Date().toISOString(),
       };
       savedResponses.push(saved);
-      record.contentGeneration.savedResponses = savedResponses;
+      record.contentGeneration.savedResponsesRef = writeResponseObject(
+        resolvedRoot,
+        record.id,
+        savedResponses,
+      ).reference;
       record.contentGeneration.status = savedResponses.length === manifest.eligibleSections.length
         ? "responses-saved"
         : "in-progress";
@@ -331,9 +335,7 @@ function createContentGeneration(options) {
       throw new Error(`第 ${requestedSection} 章“${section.title}”按合同禁止发送给内容生成 Agent`);
     }
     const manifest = contentGenerationManifest(material);
-    const savedCount = Array.isArray(record.contentGeneration && record.contentGeneration.savedResponses)
-      ? record.contentGeneration.savedResponses.length
-      : 0;
+    const savedCount = readResponsesV2(resolvedRoot, record.id, record.contentGeneration).length;
     const expected = manifest.eligibleSections[savedCount];
     if (!expected) throw new Error("所有允许章节均已处理，请提交最终结果");
     if (requestedSection !== expected.sectionNumber) {
@@ -394,7 +396,7 @@ function createContentGeneration(options) {
         outputFile: `docs/deepdive-reviews/${id}-agent-responses.md`,
         eligibleSections: clone(manifest.eligibleSections),
         skippedSections: clone(manifest.skippedSections),
-        savedResponses: [],
+        savedResponsesRef: null,
         enqueuedAt: new Date().toISOString(),
         reason: enqueueReason.slice(0, 500),
       };

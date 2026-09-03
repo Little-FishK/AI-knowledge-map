@@ -7,6 +7,7 @@ const { createAuditProjectAccess } = require("./lib/audit-project-access");
 const { createAuditRules } = require("./lib/audit-rules");
 const { createCandidateGate } = require("./lib/candidate-gate");
 const { createContentGeneration } = require("./lib/content-generation");
+const { createContentGenerationResponseStore } = require("./lib/content-generation-response-store");
 const { createControllerLifecycle } = require("./lib/controller-lifecycle");
 const { createEditorialCandidateImport } = require("./lib/editorial-candidate-import");
 const { createEditorialCandidateValidation } = require("./lib/editorial-candidate-validation");
@@ -17,6 +18,11 @@ const { createNewNodeQueue } = require("./lib/new-node-queue");
 const { createPublication } = require("./lib/publication");
 const { createResultSubmissionWorkflow } = require("./lib/result-submission-workflow");
 const { createReviewRecovery } = require("./lib/review-recovery");
+const { createStateDiagnostics } = require("./lib/state-diagnostics");
+const { createStateV2Backfill } = require("./lib/state-v2-backfill");
+const { createStateV2Cutover } = require("./lib/state-v2-cutover");
+const { createStateV2DualRead } = require("./lib/state-v2-dual-read");
+const { createStateV2Shadow } = require("./lib/state-v2-shadow");
 const { createTaskOrchestration } = require("./lib/task-orchestration");
 const {
   renderEditorialMarkdown,
@@ -32,7 +38,7 @@ const TOOL_SCRIPTS = Object.freeze({
   deepDiveL2Audit: "tools/deepdive/quality/audit-deepdive-gold.js",
   deepDiveL3Audit: "tools/deepdive/quality/audit-deepdive-benchmark.js",
 });
-const STATE_SCHEMA_VERSION = 1;
+const STATE_SCHEMA_VERSION = 2;
 const {
   acquireLock,
   appendEvent,
@@ -50,6 +56,75 @@ const {
   defaultRoot: ROOT,
   schemaVersion: STATE_SCHEMA_VERSION,
   localDataRoot: resolveLocalDataRoot(),
+});
+const { loadState: loadLegacyState } = createStateStore({
+  defaultRoot: ROOT,
+  schemaVersion: 1,
+  localDataRoot: resolveLocalDataRoot(),
+});
+const { stateStorageReport } = createStateDiagnostics({
+  defaultRoot: ROOT,
+  loadState,
+  stateFile,
+  withinRoot,
+});
+const {
+  readResponseObject,
+  readResponsesDual,
+  readResponsesV2,
+  writeResponseObject,
+} = createContentGenerationResponseStore({
+  atomicWrite,
+  clone,
+  readJson,
+  sha256,
+  withinRoot,
+});
+const { backfillStateV2Objects } = createStateV2Backfill({
+  defaultRoot: ROOT,
+  acquireLock,
+  appendEvent,
+  clone,
+  loadState: loadLegacyState,
+  readResponseObject,
+  saveState,
+  sha256,
+  writeResponseObject,
+});
+const { buildStateV2Shadow, rehydrateShadow } = createStateV2Shadow({
+  defaultRoot: ROOT,
+  acquireLock,
+  atomicWrite,
+  clone,
+  loadState: loadLegacyState,
+  readResponseObject,
+  readJson,
+  sha256,
+  writeResponseObject,
+  withinRoot,
+});
+const { validateStateV2DualRead } = createStateV2DualRead({
+  defaultRoot: ROOT,
+  clone,
+  loadState: loadLegacyState,
+  readJson,
+  readResponsesDual,
+  rehydrateShadow,
+  sha256,
+  withinRoot,
+});
+const { switchStateV2 } = createStateV2Cutover({
+  defaultRoot: ROOT,
+  acquireLock,
+  appendEvent,
+  atomicWrite,
+  clone,
+  readJson,
+  readResponseObject,
+  rehydrateShadow,
+  sha256,
+  stateFile,
+  withinRoot,
 });
 const {
   migrate: migrateLocalData,
@@ -173,7 +248,9 @@ const {
   appendEvent,
   atomicWrite,
   loadState,
+  readResponsesV2,
   saveState,
+  writeResponseObject,
   withinRoot,
 });
 const {
@@ -371,6 +448,7 @@ const {
   pageSourceSignature,
   privateAuditRelativePath,
   publishCandidate,
+  readResponsesV2,
   refreshEditorialDraftPublication,
   resultDirectory,
   runGate,
@@ -379,6 +457,7 @@ const {
   validatePage,
   visibleRawLatexSections,
   withinRoot,
+  writeResponseObject,
   writeJson,
 });
 const {
@@ -529,6 +608,8 @@ module.exports = {
   applyCoreMembership,
   auditBlockers,
   auditGaps,
+  backfillStateV2Objects,
+  buildStateV2Shadow,
   claimTask,
   contentGenerationSections,
   createManualReviewPreview,
@@ -567,8 +648,11 @@ module.exports = {
   setPaused,
   sha256,
   status,
+  stateStorageReport,
   submitResult,
+  switchStateV2,
   validateAuditResult,
+  validateStateV2DualRead,
   validatePageResult,
   validatePage,
 };

@@ -17,7 +17,11 @@ function createFixture() {
     "utf8",
   );
   fs.writeFileSync(path.join(fixture, ".stage2", "state.json"), `${JSON.stringify({
-    schemaVersion: 1,
+    schemaVersion: 2,
+    storage: {
+      schemaVersion: 1,
+      contentGenerationSavedResponses: "external-content-addressed",
+    },
     mode: "serial",
     paused: true,
     policy: { maxRepairAttempts: 2, leaseMinutes: 45 },

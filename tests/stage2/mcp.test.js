@@ -12,7 +12,11 @@ fs.mkdirSync(path.join(fixture, ".stage2"), { recursive: true });
 fs.writeFileSync(
   path.join(fixture, ".stage2", "state.json"),
   `${JSON.stringify({
-    schemaVersion: 1,
+    schemaVersion: 2,
+    storage: {
+      schemaVersion: 1,
+      contentGenerationSavedResponses: "external-content-addressed",
+    },
     mode: "serial",
     paused: true,
     policy: { maxRepairAttempts: 2, leaseMinutes: 45 },
@@ -97,14 +101,30 @@ server.stdout.on("data", chunk => {
     buffer = buffer.slice(newline + 1);
     if (line) messages.push(JSON.parse(line));
   }
-  if (messages.length < 5) return;
+  if (messages.length < 10) return;
   clearTimeout(timeout);
   try {
-    assert.strictEqual(messages[0].result.serverInfo.name, "ai-knowledge-map-stage2");
+    const byId = new Map(messages.map(message => [message.id, message]));
+    const initializeResponse = byId.get(1);
+    const toolsResponse = byId.get(2);
+    const resetResponse = byId.get(3);
+    const releaseResponse = byId.get(4);
+    const passedResetResponse = byId.get(5);
+    const storageResponse = byId.get(6);
+    const shadowResponse = byId.get(7);
+    const backfillResponse = byId.get(8);
+    const dualReadResponse = byId.get(9);
+    const cutoverResponse = byId.get(10);
+    assert.strictEqual(initializeResponse.result.serverInfo.name, "ai-knowledge-map-stage2");
     assert.deepStrictEqual(
-      messages[1].result.tools.map(tool => tool.name),
+      toolsResponse.result.tools.map(tool => tool.name),
       [
         "stage2_status",
+        "stage2_state_storage_report",
+        "stage2_build_state_v2_shadow",
+        "stage2_backfill_state_v2_objects",
+        "stage2_validate_state_v2_dual_read",
+        "stage2_switch_state_v2",
         "stage2_local_data_status",
         "stage2_migrate_local_data",
         "stage2_next_recommended_page",
@@ -132,37 +152,37 @@ server.stdout.on("data", chunk => {
         "stage2_submit_result",
       ],
     );
-    const claimTool = messages[1].result.tools.find(tool => tool.name === "stage2_claim_task");
+    const claimTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_claim_task");
     assert.strictEqual(claimTool.inputSchema.properties.pageId.pattern, "^[a-z0-9][a-z0-9-]*$");
     assert.match(claimTool.description, /uiCleanup/);
-    const submitTool = messages[1].result.tools.find(tool => tool.name === "stage2_submit_result");
+    const submitTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_submit_result");
     assert.match(submitTool.description, /归档当前 Codex 任务/);
-    const resetTool = messages[1].result.tools.find(tool => tool.name === "stage2_reset_manual_review");
+    const resetTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_reset_manual_review");
     assert.deepStrictEqual(resetTool.inputSchema.required, ["pageId", "reason"]);
-    const importTool = messages[1].result.tools.find(tool => tool.name === "stage2_import_editorial_candidate");
+    const importTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_import_editorial_candidate");
     assert.deepStrictEqual(importTool.inputSchema.required, ["pageId", "reason"]);
     assert.strictEqual(importTool.inputSchema.properties.useContentGenerationOutput.type, "boolean");
     assert.strictEqual(importTool.inputSchema.anyOf[1].properties.useContentGenerationOutput.const, true);
     assert.match(importTool.description, /图表保留/);
-    const passedResetTool = messages[1].result.tools.find(tool => tool.name === "stage2_reset_passed_page");
+    const passedResetTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_reset_passed_page");
     assert.deepStrictEqual(passedResetTool.inputSchema.required, ["pageId", "reason"]);
-    const previewTool = messages[1].result.tools.find(tool => tool.name === "stage2_create_manual_review_preview");
+    const previewTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_create_manual_review_preview");
     assert.deepStrictEqual(previewTool.inputSchema.required, ["pageId"]);
     assert.strictEqual(previewTool.inputSchema.properties.rounds.maxItems, 2);
-    const finalizeTool = messages[1].result.tools.find(tool => tool.name === "stage2_finalize_manual_review");
+    const finalizeTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_finalize_manual_review");
     assert.deepStrictEqual(finalizeTool.inputSchema.required, ["pageId", "reason"]);
-    const inspectPublicationTool = messages[1].result.tools.find(tool => tool.name === "stage2_inspect_publication_candidate");
+    const inspectPublicationTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_inspect_publication_candidate");
     assert.deepStrictEqual(inspectPublicationTool.inputSchema.required, ["pageId"]);
-    const provisionalTool = messages[1].result.tools.find(tool => tool.name === "stage2_publish_provisional_page");
+    const provisionalTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_publish_provisional_page");
     assert.deepStrictEqual(provisionalTool.inputSchema.required, ["pageId", "expectedCandidateHash", "reason"]);
     assert.match(provisionalTool.description, /不伪造 L3 通过/);
-    const rollbackTool = messages[1].result.tools.find(tool => tool.name === "stage2_rollback_provisional_page");
+    const rollbackTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_rollback_provisional_page");
     assert.deepStrictEqual(rollbackTool.inputSchema.required, ["pageId", "expectedCandidateHash", "reason"]);
-    const resetResult = JSON.parse(messages[2].result.content[0].text);
-    const passedResetResult = JSON.parse(messages[3].result.content[0].text);
-    const releaseResult = JSON.parse(messages[4].result.content[0].text);
-    assert.strictEqual(Object.hasOwn(messages[2].result, "structuredContent"), false);
-    assert.strictEqual(Object.hasOwn(messages[3].result, "structuredContent"), false);
+    const resetResult = JSON.parse(resetResponse.result.content[0].text);
+    const passedResetResult = JSON.parse(passedResetResponse.result.content[0].text);
+    const releaseResult = JSON.parse(releaseResponse.result.content[0].text);
+    assert.strictEqual(Object.hasOwn(resetResponse.result, "structuredContent"), false);
+    assert.strictEqual(Object.hasOwn(passedResetResponse.result, "structuredContent"), false);
     assert.strictEqual(resetResult.status, "reset");
     assert.strictEqual(resetResult.previousState, "manual-review");
     assert.strictEqual(resetResult.nextState, "audit-queued");
@@ -173,6 +193,19 @@ server.stdout.on("data", chunk => {
     assert.strictEqual(passedResetResult.previousState, "l3-auto-passed");
     assert.strictEqual(passedResetResult.nextState, "audit-queued");
     assert.strictEqual(passedResetResult.published, true);
+    const storageReport = JSON.parse(storageResponse.result.content[0].text);
+    assert.strictEqual(storageReport.readOnly, true);
+    assert.strictEqual(storageReport.pages.count, 3);
+    assert.strictEqual(storageReport.safeguards.valuesIncluded, false);
+    assert.strictEqual(storageReport.safeguards.pageIdsIncluded, false);
+    assert.strictEqual(shadowResponse.result.isError, true);
+    assert.match(shadowResponse.result.content[0].text, /状态文件版本无效/);
+    assert.strictEqual(backfillResponse.result.isError, true);
+    assert.match(backfillResponse.result.content[0].text, /状态文件版本无效/);
+    assert.strictEqual(dualReadResponse.result.isError, true);
+    assert.match(dualReadResponse.result.content[0].text, /状态文件版本无效/);
+    assert.strictEqual(cutoverResponse.result.isError, true);
+    assert.match(cutoverResponse.result.content[0].text, /正式 Schema v2 状态已经变化/);
     console.log("✓ 第二阶段 MCP：初始化、工具清单和 JSONL stdio 协议测试通过");
     cleanup(0);
   } catch (error) {
@@ -205,6 +238,60 @@ server.stdin.write(`${JSON.stringify({
     protocolVersion: "2025-06-18",
     capabilities: {},
     clientInfo: { name: "fixture", version: "1.0.0" },
+  },
+})}\n`);
+server.stdin.write(`${JSON.stringify({
+  jsonrpc: "2.0",
+  id: 10,
+  method: "tools/call",
+  params: {
+    name: "stage2_switch_state_v2",
+    arguments: {
+      expectedSourceDigest: `sha256:${"0".repeat(64)}`,
+      expectedShadowDigest: `sha256:${"0".repeat(64)}`,
+    },
+  },
+})}\n`);
+server.stdin.write(`${JSON.stringify({
+  jsonrpc: "2.0",
+  id: 9,
+  method: "tools/call",
+  params: {
+    name: "stage2_validate_state_v2_dual_read",
+    arguments: {
+      expectedSourceDigest: `sha256:${"0".repeat(64)}`,
+    },
+  },
+})}\n`);
+server.stdin.write(`${JSON.stringify({
+  jsonrpc: "2.0",
+  id: 8,
+  method: "tools/call",
+  params: {
+    name: "stage2_backfill_state_v2_objects",
+    arguments: {
+      expectedSourceDigest: `sha256:${"0".repeat(64)}`,
+    },
+  },
+})}\n`);
+server.stdin.write(`${JSON.stringify({
+  jsonrpc: "2.0",
+  id: 7,
+  method: "tools/call",
+  params: {
+    name: "stage2_build_state_v2_shadow",
+    arguments: {
+      expectedSourceDigest: `sha256:${"0".repeat(64)}`,
+    },
+  },
+})}\n`);
+server.stdin.write(`${JSON.stringify({
+  jsonrpc: "2.0",
+  id: 6,
+  method: "tools/call",
+  params: {
+    name: "stage2_state_storage_report",
+    arguments: {},
   },
 })}\n`);
 server.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} })}\n`);

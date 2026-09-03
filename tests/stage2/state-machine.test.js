@@ -1426,6 +1426,18 @@ try {
   });
   assert.strictEqual(firstSaved.status, "saved");
   assert.strictEqual(firstSaved.nextSectionNumber, 3);
+  const firstGeneration = loadState(contentFixture).pages.alpha.contentGeneration;
+  const firstObjectFile = path.join(contentFixture, firstGeneration.savedResponsesRef.path);
+  const firstObjectSource = fs.readFileSync(firstObjectFile, "utf8");
+  const corruptedFirstObject = JSON.parse(firstObjectSource);
+  corruptedFirstObject.responses[0].response += "损坏";
+  fs.writeFileSync(firstObjectFile, `${JSON.stringify(corruptedFirstObject, null, 2)}\n`, "utf8");
+  assert.throws(() => readContentGenerationSection(contentFixture, {
+    taskId: task.task.taskId,
+    leaseToken: task.task.leaseToken,
+    sectionNumber: 3,
+  }), /摘要不匹配/);
+  fs.writeFileSync(firstObjectFile, firstObjectSource, "utf8");
   const secondSection = readContentGenerationSection(contentFixture, {
     taskId: task.task.taskId,
     leaseToken: task.task.leaseToken,
@@ -1461,7 +1473,12 @@ try {
   assert.match(responseDocument, /第一章的原始解析回复/);
   assert.match(responseDocument, /第二章的原始解析回复/);
   assert.doesNotMatch(responseDocument, /不应发送/);
-  assert.strictEqual(loadState(contentFixture).pages.alpha.contentGeneration.status, "complete");
+  const completedGeneration = loadState(contentFixture).pages.alpha.contentGeneration;
+  assert.strictEqual(completedGeneration.status, "complete");
+  assert.strictEqual(Object.hasOwn(completedGeneration, "savedResponses"), false);
+  assert.strictEqual(completedGeneration.savedResponsesRef.responseCount, 2);
+  assert.match(completedGeneration.savedResponsesRef.path, /^\.stage2\/results\/content-generation-responses\/objects\//);
+  assert.ok(fs.existsSync(path.join(contentFixture, completedGeneration.savedResponsesRef.path)));
 } finally {
   fs.rmSync(contentFixture, { recursive: true, force: true });
 }

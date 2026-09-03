@@ -3,6 +3,8 @@
 const path = require("path");
 const {
   ROOT,
+  backfillStateV2Objects,
+  buildStateV2Shadow,
   claimTask,
   createManualReviewPreview,
   finalizeManualReview,
@@ -24,11 +26,14 @@ const {
   rollbackProvisionalPage,
   saveContentGenerationResponse,
   searchAuditProject,
+  stateStorageReport,
   status,
   submitResult,
+  switchStateV2,
   publishProvisionalPage,
   validateAuditResult,
   validatePageResult,
+  validateStateV2DualRead,
 } = require("./core");
 
 const root = path.resolve(process.env.DEEPDIVE_STAGE2_ROOT || ROOT);
@@ -52,6 +57,60 @@ const allTools = [
     name: "stage2_status",
     description: "查看串行理解原理页队列的汇总状态；不返回页面正文。",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "stage2_state_storage_report",
+    description: "只读统计正式状态文件、页面字段和外置逻辑引用的体积与完整性；只返回字段名、字节数、计数、摘要哈希和告警代码，不返回页面 ID、正文、审计结论或任何字段值。",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "stage2_build_state_v2_shadow",
+    description: "根据精确的 Schema v1 状态摘要，在仓库外生成并回读验证 Schema v2 影子状态和内容寻址回复对象；拒绝活动租约，不修改正式状态，现有控制器仍只读取 Schema v1。",
+    inputSchema: {
+      type: "object",
+      required: ["expectedSourceDigest"],
+      properties: {
+        expectedSourceDigest: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_backfill_state_v2_objects",
+    description: "在精确摘要匹配且无活动租约时，把 Schema v1 内联内容生成回复写入仓库外内容寻址对象，并将已验证引用双写回正式 v1；保留全部内联回复且不切换读取路径。",
+    inputSchema: {
+      type: "object",
+      required: ["expectedSourceDigest"],
+      properties: {
+        expectedSourceDigest: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_validate_state_v2_dual_read",
+    description: "只读比较正式 Schema v1 内联回复、双写的内容寻址对象和当前 Schema v2 影子；验证摘要、页面绑定、数量与深度等价，不返回页面 ID、正文、审计结论或字段值。",
+    inputSchema: {
+      type: "object",
+      required: ["expectedSourceDigest"],
+      properties: {
+        expectedSourceDigest: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "stage2_switch_state_v2",
+    description: "在正式 v1 与已验证 v2 影子的精确摘要均匹配、且没有活动租约时，将正式状态原子切换到 Schema v2 外置对象读取；先保存并校验完整 v1 回滚备份，切换后不再保留内联大对象。",
+    inputSchema: {
+      type: "object",
+      required: ["expectedSourceDigest", "expectedShadowDigest"],
+      properties: {
+        expectedSourceDigest: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+        expectedShadowDigest: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      },
+      additionalProperties: false,
+    },
   },
   {
     name: "stage2_local_data_status",
@@ -566,6 +625,25 @@ function handle(message) {
     }
     try {
       if (name === "stage2_status") return response(id, toolResult(status(root)));
+      if (name === "stage2_state_storage_report") {
+        return response(id, toolResult(stateStorageReport(root)));
+      }
+      if (name === "stage2_build_state_v2_shadow") {
+        return response(id, toolResult(buildStateV2Shadow(root, args.expectedSourceDigest)));
+      }
+      if (name === "stage2_backfill_state_v2_objects") {
+        return response(id, toolResult(backfillStateV2Objects(root, args.expectedSourceDigest)));
+      }
+      if (name === "stage2_validate_state_v2_dual_read") {
+        return response(id, toolResult(validateStateV2DualRead(root, args.expectedSourceDigest)));
+      }
+      if (name === "stage2_switch_state_v2") {
+        return response(id, toolResult(switchStateV2(
+          root,
+          args.expectedSourceDigest,
+          args.expectedShadowDigest,
+        )));
+      }
       if (name === "stage2_local_data_status") return response(id, toolResult(localDataStatus(root)));
       if (name === "stage2_migrate_local_data") {
         return response(id, toolResult(migrateLocalData(root, args.reason)));
