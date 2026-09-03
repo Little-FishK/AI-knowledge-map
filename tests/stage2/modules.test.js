@@ -21,6 +21,13 @@ const { createResultSubmissionWorkflow } = require("../../tools/deepdive-stage2/
 const { createReviewRecovery } = require("../../tools/deepdive-stage2/lib/review-recovery");
 const { createStateStore, sha256 } = require("../../tools/deepdive-stage2/lib/state-store");
 const { createTaskOrchestration } = require("../../tools/deepdive-stage2/lib/task-orchestration");
+const { semanticFingerprint } = require("../../tools/graph/diagnostics");
+const {
+  buildGraphShadow,
+  promoteGraphWriteAuthority,
+  renderGraphSource,
+  verifyGraphShadow,
+} = require("../../tools/graph/shadow");
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "stage2-modules-"));
 try {
@@ -225,6 +232,53 @@ try {
   publication.restoreTarget(root, target);
   assert.strictEqual(fs.readFileSync(path.join(root, "published.txt"), "utf8"), "before");
   assert(publication.applyCoreMembership("window.GRAPH={core: [\"a\"]};", "b").includes('"b"'));
+
+  const graphBefore = {
+    meta: { version: "test" },
+    core: ["alpha"],
+    recommendedLearningPath: [{ phase: "基础", steps: [["1", "alpha"]] }],
+    positions: { alpha: [0, 0] },
+    domains: { foundations: { title: "基础" } },
+    edgeTypes: { requires: { directed: true } },
+    nodes: [{ id: "alpha", domain: "foundations", body: "before" }],
+    edges: [],
+  };
+  assert(
+    publication.applyCoreMembership(renderGraphSource(graphBefore), "beta")
+      .includes('"beta"'),
+  );
+  fs.mkdirSync(path.join(root, "data"), { recursive: true });
+  const graphFile = path.join(root, "data", "graph.js");
+  fs.writeFileSync(graphFile, `window.GRAPH = ${JSON.stringify(graphBefore)};\n`, "utf8");
+  const graphBeforeDigest = semanticFingerprint(graphBefore);
+  buildGraphShadow(root, graphBeforeDigest);
+  promoteGraphWriteAuthority(root, graphBeforeDigest);
+  const graphAfter = JSON.parse(JSON.stringify(graphBefore));
+  graphAfter.nodes[0].body = "after";
+  const graphTarget = publication.targetRecord(
+    root,
+    "data/graph.js",
+    renderGraphSource(graphAfter),
+  );
+  const graphWrite = publication.writePublicationTargets(root, {}, [graphTarget], {
+    validators: () => [{ script: "success", passed: true }],
+  });
+  assert.strictEqual(graphWrite.graphAuthority.status, "written");
+  assert.strictEqual(graphWrite.graphAuthority.writeAuthority, "shards");
+  assert.deepStrictEqual(verifyGraphShadow(root).graph, graphAfter);
+
+  const graphRejected = JSON.parse(JSON.stringify(graphAfter));
+  graphRejected.nodes[0].body = "must-rollback";
+  const rejectedGraphTarget = publication.targetRecord(
+    root,
+    "data/graph.js",
+    renderGraphSource(graphRejected),
+  );
+  assert.throws(() => publication.writePublicationTargets(root, {}, [rejectedGraphTarget], {
+    validators: () => [{ script: "forced-failure", passed: false, output: "failed" }],
+  }), /已恢复本次暂行发布写入/);
+  assert.strictEqual(fs.readFileSync(graphFile, "utf8"), graphTarget.afterContent);
+  assert.deepStrictEqual(verifyGraphShadow(root).graph, graphAfter);
 
   const gateFixture = path.join(root, "candidate-gate-fixture");
   fs.mkdirSync(path.join(gateFixture, "data", "deepdive"), { recursive: true });

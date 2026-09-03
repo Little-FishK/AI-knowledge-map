@@ -104,13 +104,21 @@
 ```jsonc
 { "from": "attention", "to": "transformer", "type": "part-of", "label": "（可选）" }
 ```
-存储：单文件 `data/graph.js`（`window.GRAPH = { meta, core, positions, domains, edgeTypes, nodes, edges }`）。用 `graph.js` 而非 `graph.json` 是为了 `file://` 双击即开（浏览器禁止 fetch 本地文件）。
+存储权威：`data/graph-shadow/` 中的结构分片与逐节点 JSON。`data/graph.js` 是由权威分片确定性生成的兼容运行时文件（`window.GRAPH = { meta, core, positions, domains, edgeTypes, nodes, edges }`），仅用于保持静态页面和 `file://` 双击即开能力，禁止直接编辑。
+
+只读诊断由 `npm run graph:diagnose` 生成。报告统计各数据块体积、全局引用完整性和拆分收益，并输出 `sha256-canonical-json-v1` 语义指纹；对象键顺序和排版变化不影响指纹，数组顺序与任何字段值变化都会改变指纹。该命令不会写入图数据。
+
+初始分片使用 `npm run graph:shadow -- --expected-source-digest <完整语义指纹>` 建立。它把各顶层区块和每个节点写入 `data/graph-shadow/`，再从磁盘逐文件校验字节数与 SHA-256、按清单顺序重组，并要求深度等价、整体语义指纹、八个顶层区块指纹和引用完整性全部通过。
+
+双读门禁使用 `npm run graph:dual-read -- --expected-source-digest <完整语义指纹>`。运行时仍返回兼容 `data/graph.js`，同时连续两次从磁盘校验并重组权威分片，再比较深度等价、整体及区块指纹、节点顺序和边顺序；还要求 `graph.js` 的字节内容等于确定性生成结果。验证期间任一侧变化、任何分片异常或人工直接修改生成物都会失败关闭。项目级 `npm run validate` 包含该门禁。
+
+写入权威已切换到分片。新节点原子应用/回滚、Stage 2 新节点正式发布，以及 `tools/gen-disc-layout.js` 的坐标重算，都先在临时目录生成并完整验证新分片、替换权威目录，再生成 `graph.js` 并运行原有门禁；任一步失败都会恢复旧权威分片和旧生成物。写入回执记录更新前后语义指纹。`npm run graph:materialize -- --expected-source-digest <指纹>` 可从权威分片恢复兼容生成物，但不能反向用 `graph.js` 覆盖分片。
 
 ## 4. 半自动入库流程
 1. 你提供资料（网址/视频链接/文档路径）。
 2. 抽取（由当前协作 AI 完成）：识别概念 → 与现有节点做**去重匹配**（title/aliases + 语义判断）→ 建议成熟度 → 生成到现有节点的候选边。
 3. 产出**可审核的 diff 提案**（新增哪些节点/边、更新哪些字段、附来源），而非直接写库。
-4. 你审核（改/删/确认）→ 合并进 `data/graph.js`。
+4. 你审核（改/删/确认）→ 通过正式写入工具更新权威分片，并自动生成 `data/graph.js`。
 5. 静态页重新加载即生效。
 
 > 去重匹配是技术难点：同一概念不同叫法要能合并，避免图里长出重复节点。首版用"标题+别名精确/模糊匹配"，不够再加嵌入向量。

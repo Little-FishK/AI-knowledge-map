@@ -1,0 +1,34 @@
+{
+  "id": "agent-frameworks",
+  "title": "Agent 框架",
+  "aliases": [
+    "LangGraph",
+    "CrewAI",
+    "AutoGen",
+    "Agent SDK"
+  ],
+  "maturity": "evolving",
+  "domain": "coding",
+  "heat": 0.75,
+  "summary": "帮你搭 Agent 循环、状态管理和多 Agent 编排的工具库。",
+  "body": "这一层变化极快（所以本节点标为**演进中**）——今天的主流框架一年后可能就换了一批，所以理解 [[agent]] / [[agent-loop]] / [[multi-agent]] 这些底层概念，比熟练某个框架重要得多。\n\n大致分两类：**编排型**（LangGraph、CrewAI、AutoGen）帮你定义多个 Agent 之间的协作图与状态流转；**厂商 SDK**（各家的 Agent SDK）贴近自家模型的能力，抽象更薄。\n\n一个常被低估的选项是不用框架。[[agent-loop]] 的核心不过是「调模型 → 解析工具调用 → 执行 → 把结果拼回上下文 → 再调」，手写一遍往往比调试框架的抽象层更快，也更容易看清出了什么问题。",
+  "cases": [
+    {
+      "title": "先手写一遍",
+      "text": "在引入任何框架前，用几十行代码手写一个能调 2 个工具的 [[agent-loop]]。跑通之后你会清楚框架到底替你做了什么、值不值。"
+    },
+    {
+      "title": "声明式 vs 代码优先",
+      "text": "有的框架要求你预先把整个工作流画成图（节点是 Agent、边是跳转），可视化清晰，但工作流一动态就变得笨重，还得学一套专用表达方式。另一类直接用普通代码表达流程，不必预先定义整张图，更灵活。**这是选框架时的主要分歧点**，比对比功能列表更值得先想清楚。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "doc",
+      "title": "A practical guide to building agents (OpenAI)",
+      "ref": "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf"
+    }
+  ],
+  "createdAt": "2026-07-19",
+  "updatedAt": "2026-07-19"
+}

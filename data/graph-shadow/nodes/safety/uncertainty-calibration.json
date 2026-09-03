@@ -1,0 +1,35 @@
+{
+  "id": "uncertainty-calibration",
+  "title": "不确定性校准与选择性预测",
+  "aliases": [
+    "Uncertainty Calibration",
+    "Calibration",
+    "Selective Prediction",
+    "置信度校准"
+  ],
+  "maturity": "stable",
+  "domain": "safety",
+  "heat": 0.69,
+  "summary": "让置信度与真实正确率匹配，并在风险过高时拒答、检索或转人工。",
+  "body": "**是什么**\n\n若模型对一组声称 80% 置信的问题确实约有 80% 正确，就称为校准良好。选择性预测允许系统在不确定时不作答。\n\n**为什么 Logprobs 不够**\n\n[[logprobs]] 是 token 的条件概率，不是整条事实的正确率；流畅常见措辞可以高概率生成错误内容，分布变化还会破坏原有校准。\n\n**它缓解什么**\n\n校准可为 [[hallucination]] 风险分级，触发检索、验证或 [[human-in-the-loop]]，使系统在覆盖率与准确率之间做明确取舍。\n\n**怎么评估**\n\n使用可靠性图、ECE、Brier 分数和风险—覆盖曲线，并在真实业务分组上重新校准；不能只在公开基准上算一个总分。",
+  "cases": [
+    {
+      "title": "拒答是一种能力",
+      "text": "医疗问答系统宁可只回答 60% 的问题、把其余转医生，也可能比强行覆盖 100% 更安全。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "On Calibration of Modern Neural Networks (2017)",
+      "ref": "https://arxiv.org/abs/1706.04599"
+    },
+    {
+      "type": "url",
+      "title": "Selective Classification for Deep Neural Networks (2017)",
+      "ref": "https://arxiv.org/abs/1705.08500"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

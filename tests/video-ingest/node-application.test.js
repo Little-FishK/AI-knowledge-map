@@ -14,6 +14,12 @@ const {
   rollbackNodeReceipt
 } = require("../../tools/video-ingest/node-application");
 const { sha256 } = require("../../tools/video-ingest/core");
+const { semanticFingerprint } = require("../../tools/graph/diagnostics");
+const {
+  buildGraphShadow,
+  promoteGraphWriteAuthority,
+  verifyGraphShadow,
+} = require("../../tools/graph/shadow");
 
 const ROOT = PROJECT_ROOT;
 const legacyPackageDir = path.join(
@@ -65,6 +71,10 @@ try {
     `window.GRAPH = ${JSON.stringify(installed, null, 2)};\n`,
     "utf8"
   );
+  fs.rmSync(path.join(fixture, "data/graph-shadow"), { recursive: true, force: true });
+  const fixtureDigest = semanticFingerprint(installed);
+  buildGraphShadow(fixture, fixtureDigest);
+  promoteGraphWriteAuthority(fixture, fixtureDigest);
   fs.writeFileSync(
     path.join(fixture, "index.html"),
     fs.readFileSync(path.join(fixture, "index.html"), "utf8")
@@ -98,7 +108,14 @@ try {
 
   const receipt = applyNodePlan(plan, { root: fixture });
   assert.strictEqual(receipt.status, "applied");
+  assert.strictEqual(receipt.graphAuthority.status, "written");
+  assert.strictEqual(receipt.graphAuthority.writeAuthority, "shards");
+  assert.strictEqual(receipt.graphAuthority.deepEqualAfterReload, true);
   const after = graphAt(fixture);
+  assert.strictEqual(
+    semanticFingerprint(verifyGraphShadow(fixture).graph),
+    semanticFingerprint(after),
+  );
   assert.strictEqual(after.nodes.length, 130);
   assert(after.nodes.some(node => node.id === "voice-cloning"));
   assert.strictEqual(after.edges.length, before.edges.length + 5);
@@ -121,7 +138,12 @@ try {
 
   const rollback = rollbackNodeReceipt(receipt, { root: fixture });
   assert.strictEqual(rollback.status, "rolled-back");
+  assert.strictEqual(rollback.graphAuthority.status, "written");
   assert.strictEqual(graphAt(fixture).nodes.length, 129);
+  assert.strictEqual(
+    semanticFingerprint(verifyGraphShadow(fixture).graph),
+    semanticFingerprint(graphAt(fixture)),
+  );
   assert(!fs.existsSync(path.join(fixture, "data/deepdive/voice-cloning.js")));
   assert(!fs.existsSync(path.join(fixture, "data/deepdive-runtime/voice-cloning.js")));
   assert.strictEqual(JSON.parse(fs.readFileSync(sourceLayoutFile, "utf8")).pageCount, 129);

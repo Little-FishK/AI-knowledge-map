@@ -6,6 +6,10 @@ domain; commands should use their canonical domain paths directly.
 ## Directories
 
 - `shared/`: project-wide path and process helpers with no domain state.
+- `graph/`: read-only graph storage diagnostics, canonical semantic
+  fingerprinting, guarded shard-shadow generation, fail-closed dual-read validation,
+  authoritative shard transactions, and deterministic `data/graph.js`
+  materialization used by every official graph writer.
 - `validators/`: graph, deep-dive, software, tutorial, video-application, and
   library validation implementations.
 - `deepdive/quality/`: L2/L3/browser audits, L4 review validation, and their

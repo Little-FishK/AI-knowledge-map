@@ -1,0 +1,39 @@
+{
+  "id": "training-data-governance",
+  "title": "训练数据治理",
+  "aliases": [
+    "Training Data Governance",
+    "Data Curation",
+    "Data Provenance",
+    "训练数据管理"
+  ],
+  "maturity": "evolving",
+  "domain": "safety",
+  "heat": 0.86,
+  "summary": "管理训练数据的来源、许可、质量、去重、配比与可追溯性，决定能力也决定风险。",
+  "body": "**是什么**\n\n训练数据治理覆盖数据从采集、授权、清洗、去重、分类配比到删除和审计的全生命周期，并记录每份数据从哪里来、允许怎样使用。\n\n**为什么是能力问题**\n\n[[pretraining]] 学到什么取决于看过什么；重复数据会放大记忆，领域配比会改变能力，低质量或机器生成数据会污染学习信号。\n\n**为什么也是安全问题**\n\n它连接 [[privacy]]、[[bias-fairness]]、[[data-poisoning]]、版权与 [[synthetic-data]]。上线后再加护栏，无法完全修复训练阶段已经注入的偏差和后门。\n\n**怎么治理**\n\n保留来源与许可元数据，做近重复去重、敏感信息过滤、分群质量评估和版本化数据清单，并让删除请求能追踪到受影响的训练批次。",
+  "cases": [
+    {
+      "title": "去重不只是省空间",
+      "text": "同一段文本重复上千次会让模型更易逐字记忆，也会让被重复的观点在训练中获得不成比例的权重。"
+    },
+    {
+      "title": "合成数据回流",
+      "text": "模型生成内容重新进入训练集时，需要标记来源和质量，否则错误与风格会被下一代模型继续放大。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "The Pile (2020)",
+      "ref": "https://arxiv.org/abs/2101.00027"
+    },
+    {
+      "type": "url",
+      "title": "Deduplicating Training Data Makes Language Models Better (2021)",
+      "ref": "https://arxiv.org/abs/2107.06499"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

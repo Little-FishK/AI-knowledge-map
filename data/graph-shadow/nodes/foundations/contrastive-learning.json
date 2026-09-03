@@ -1,0 +1,34 @@
+{
+  "id": "contrastive-learning",
+  "title": "对比学习",
+  "aliases": [
+    "Contrastive Learning",
+    "对比式学习",
+    "对比损失"
+  ],
+  "maturity": "stable",
+  "domain": "foundations",
+  "heat": 0.57,
+  "summary": "把相关样本表示拉近、不相关样本推远，学出可检索、可迁移的表示空间。",
+  "body": "**是什么**\n\n对比学习用正样本对和负样本对训练 [[embedding]]：相同语义、同一对象的不同视图应靠近，不相关内容应远离。\n\n**为什么有效**\n\n它不要求为每个样本指定类别，只需要构造哪些内容相配，从而能利用大规模弱标注配对。\n\n**它支撑什么**\n\n[[clip]] 用图文配对做跨模态对比，语义检索也依赖同类表示目标；它是 [[multimodal]] 对齐的重要路线。\n\n**边界**\n\n负样本选择、批量大小和数据偏差会塑造空间；向量接近只代表训练目标下相似，不等于逻辑蕴含或事实相同。",
+  "cases": [
+    {
+      "title": "同一张图的两种裁剪",
+      "text": "把同一图像的不同增强视为正对、其他图像视为负对，模型会学习对颜色抖动和裁剪更稳健的表示。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "SimCLR (2020)",
+      "ref": "https://arxiv.org/abs/2002.05709"
+    },
+    {
+      "type": "url",
+      "title": "CLIP (2021)",
+      "ref": "https://arxiv.org/abs/2103.00020"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

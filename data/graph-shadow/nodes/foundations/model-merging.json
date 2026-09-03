@@ -1,0 +1,35 @@
+{
+  "id": "model-merging",
+  "title": "模型合并与适配器组合",
+  "aliases": [
+    "Model Merging",
+    "Adapter Merging",
+    "Task Arithmetic",
+    "模型合并"
+  ],
+  "maturity": "evolving",
+  "domain": "foundations",
+  "heat": 0.48,
+  "summary": "在不重新完整训练的情况下组合多个模型或适配器的能力，但容易产生参数干扰。",
+  "body": "**是什么**\n\n把多个微调模型的权重差分或多个 [[peft-lora]] 适配器按规则组合，尝试得到兼具多项能力的新模型。\n\n**为什么有吸引力**\n\n它复用已有训练成果，比重新收集联合数据并完整 [[fine-tuning]] 更快，也便于实验不同能力配方。\n\n**主要困难**\n\n参数在不同训练中可能发生置换和冲突，简单平均会相互抵消；一个任务增强也可能破坏另一个任务。\n\n**怎么应对**\n\n在相同基础模型上合并、控制权重、处理符号冲突，并用多任务回归集验证；没有评测的合并只是碰运气。",
+  "cases": [
+    {
+      "title": "能力不是颜料",
+      "text": "把代码适配器和客服适配器各取 50% 并不保证得到两者各一半能力，参数更新可能在同一方向上冲突。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Editing Models with Task Arithmetic (2022)",
+      "ref": "https://arxiv.org/abs/2212.04089"
+    },
+    {
+      "type": "url",
+      "title": "TIES-Merging (2023)",
+      "ref": "https://arxiv.org/abs/2306.01708"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

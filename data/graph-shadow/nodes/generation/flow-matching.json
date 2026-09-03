@@ -1,0 +1,35 @@
+{
+  "id": "flow-matching",
+  "title": "Flow Matching / Rectified Flow",
+  "aliases": [
+    "Flow Matching",
+    "Rectified Flow",
+    "流匹配",
+    "校正流"
+  ],
+  "maturity": "evolving",
+  "domain": "generation",
+  "heat": 0.63,
+  "summary": "直接学习把噪声连续运输到数据的速度场，是与扩散紧密相关的现代生成路径。",
+  "body": "**是什么**\n\nFlow Matching 为噪声到数据规定连续概率路径，训练网络预测路径上的速度场；采样时求解 ODE，把噪声沿流线运输成样本。\n\n**和扩散的关系**\n\n[[diffusion]] 常学习反向去噪或分数；Flow Matching 学速度。某些扩散路径可被统一进 Flow Matching 框架，但两者训练参数化和采样解释不同。\n\n**为什么重要**\n\n合适的路径可以更直、更容易用较少数值步求解，因此被用于高分辨率 [[image-generation]] 和 [[video-generation]]。\n\n**边界**\n\n步数少不代表免费：模型容量、路径设计、求解误差和条件对齐仍决定质量；Rectified Flow 也只是流匹配家族的一类。",
+  "cases": [
+    {
+      "title": "弯路和直路",
+      "text": "若噪声到图像的运输轨迹弯曲，数值求解要很多小步；让路径更直，可以用更少步骤近似，但训练必须学准速度场。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Flow Matching for Generative Modeling (2022)",
+      "ref": "https://arxiv.org/abs/2210.02747"
+    },
+    {
+      "type": "url",
+      "title": "Flow Straight and Fast (2022)",
+      "ref": "https://arxiv.org/abs/2209.03003"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

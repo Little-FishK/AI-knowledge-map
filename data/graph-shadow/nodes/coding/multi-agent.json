@@ -1,0 +1,34 @@
+{
+  "id": "multi-agent",
+  "title": "多 Agent 编排",
+  "aliases": [
+    "Multi-agent",
+    "Manager 模式",
+    "Handoff",
+    "交接"
+  ],
+  "maturity": "stable",
+  "domain": "coding",
+  "heat": 0.7,
+  "summary": "把工作拆给多个 Agent 协作完成，两种主流模式：中心调度与对等交接。",
+  "body": "**是什么**\n\n当单个 [[agent]] 的工具太多、指令太复杂时，把工作拆给多个各司其职的 Agent。两种主流模式：\n\n| 模式 | 怎么运作 | 谁在控场 |\n|---|---|---|\n| **Manager（Agent 即工具）** | 一个中心 Agent 通过 [[tool-calling]] 调用各专业 Agent，自己汇总结果 | 中心 Agent 全程控场，用户只和它对话 |\n| **Decentralized（交接）** | 各 Agent 平等，一个把控制权**单向移交**给另一个，连同对话状态一起 | 移交后原 Agent 不再参与 |\n\n关键区别是**控制权**：Manager 模式里子 Agent 只是被调用的工具，结果要回到中心；交接模式里控制权真的转移了，接手的 Agent 直接面对用户。\n\n**为什么不该急着上多 Agent**\n\n多个 Agent 看起来更清晰（职责分离），但引入了真实的额外成本：跨 Agent 的上下文传递、更多的失败点、更难的调试和评测。\n\n**默认应该先把单个 Agent 的能力做满**——加工具比加 Agent 便宜得多。出现下面两种信号才考虑拆：\n\n- **逻辑过于复杂**：提示里塞满 if-then-else 分支，模板难以维护\n- **工具过载**：注意问题不在工具**数量**，而在**相似度**。十几个界限清晰的工具可能没问题，几个功能重叠的工具却会让模型频繁选错。先试着把工具描述写清楚，无效再拆\n\n**它的代价**\n\n每一次移交或调用都要传递上下文，而 [[context-window]] 是有限的——多 Agent 系统很容易在传递中丢失信息。失败也更难定位：出问题时要判断是哪个 Agent 的哪一步判断错了。这和 [[agent-loop]] 单 Agent 的「加工具」路线是一组权衡：拆开换来职责清晰，代价是协调开销。",
+  "cases": [
+    {
+      "title": "两种模式的典型场景",
+      "text": "**Manager**：「把『你好』翻译成西/法/意」——中心 Agent 分别调用三个翻译 Agent（作为工具），合成一个回答，用户只感知到一个助手。**交接**：客服系统里分诊 Agent 判断是订单问题，就把控制权连同对话历史交给订单 Agent，自己退出。"
+    },
+    {
+      "title": "工具过载不是数量问题",
+      "text": "有的系统能管好 15 个界限清晰的工具，有的却在 10 个功能重叠的工具上翻车。拆分之前先问：是不是把工具描述写清楚就能解决？"
+    }
+  ],
+  "sources": [
+    {
+      "type": "doc",
+      "title": "A practical guide to building agents (OpenAI)",
+      "ref": "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf"
+    }
+  ],
+  "createdAt": "2026-07-19",
+  "updatedAt": "2026-07-19"
+}

@@ -1,0 +1,2498 @@
+[
+  {
+    "from": "attention",
+    "to": "transformer",
+    "type": "part-of",
+    "label": "核心组件"
+  },
+  {
+    "from": "embedding",
+    "to": "transformer",
+    "type": "part-of",
+    "label": "输入层"
+  },
+  {
+    "from": "transformer",
+    "to": "llm",
+    "type": "enables",
+    "label": "架构基础"
+  },
+  {
+    "from": "tokenization",
+    "to": "llm",
+    "type": "prerequisite",
+    "label": "输入表示"
+  },
+  {
+    "from": "sampling-params",
+    "to": "llm",
+    "type": "part-of",
+    "label": "解码阶段"
+  },
+  {
+    "from": "tokenization",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "以 token 计量"
+  },
+  {
+    "from": "context-window",
+    "to": "llm",
+    "type": "constrains",
+    "label": "单次可见上限"
+  },
+  {
+    "from": "context-window",
+    "to": "rag",
+    "type": "constrains",
+    "label": "所以要切块"
+  },
+  {
+    "from": "attention",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "平方级开销"
+  },
+  {
+    "from": "lost-in-middle",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "塞得进≠读得到"
+  },
+  {
+    "from": "attention",
+    "to": "lost-in-middle",
+    "type": "enables",
+    "label": "注意力稀释是成因"
+  },
+  {
+    "from": "lost-in-middle",
+    "to": "rag",
+    "type": "threatens",
+    "label": "材料给了也用不上"
+  },
+  {
+    "from": "retrieval",
+    "to": "lost-in-middle",
+    "type": "mitigates",
+    "label": "少放 + 重排放两端"
+  },
+  {
+    "from": "rag",
+    "to": "embedding",
+    "type": "uses",
+    "label": "语义检索"
+  },
+  {
+    "from": "rag",
+    "to": "vector-db",
+    "type": "uses",
+    "label": "存储与召回"
+  },
+  {
+    "from": "vector-db",
+    "to": "embedding",
+    "type": "uses",
+    "label": "存的就是向量"
+  },
+  {
+    "from": "rag",
+    "to": "llm",
+    "type": "uses",
+    "label": "基于材料生成"
+  },
+  {
+    "from": "rag",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "提供真实材料"
+  },
+  {
+    "from": "prompt-engineering",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "要求引用原文"
+  },
+  {
+    "from": "prompt-injection",
+    "to": "agent",
+    "type": "threatens",
+    "label": "劫持工具权限"
+  },
+  {
+    "from": "prompt-injection",
+    "to": "llm",
+    "type": "threatens",
+    "label": "指令与数据同构"
+  },
+  {
+    "from": "prompt-injection",
+    "to": "tool-calling",
+    "type": "threatens",
+    "label": "放大破坏面"
+  },
+  {
+    "from": "tool-calling",
+    "to": "agent",
+    "type": "enables",
+    "label": "接上外部世界"
+  },
+  {
+    "from": "agent",
+    "to": "llm",
+    "type": "uses",
+    "label": "决策大脑"
+  },
+  {
+    "from": "mcp",
+    "to": "tool-calling",
+    "type": "variant-of",
+    "label": "标准化"
+  },
+  {
+    "from": "agent",
+    "to": "rag",
+    "type": "uses",
+    "label": "检索作为工具"
+  },
+  {
+    "from": "rag",
+    "to": "fine-tuning",
+    "type": "contrast",
+    "label": "喂事实 vs 改行为"
+  },
+  {
+    "from": "prompt-engineering",
+    "to": "fine-tuning",
+    "type": "contrast",
+    "label": "零成本 vs 需训练"
+  },
+  {
+    "from": "prompt-engineering",
+    "to": "rag",
+    "type": "contrast",
+    "label": "怎么问 vs 给什么"
+  },
+  {
+    "from": "fine-tuning",
+    "to": "llm",
+    "type": "uses",
+    "label": "改造权重"
+  },
+  {
+    "from": "sampling-params",
+    "to": "hallucination",
+    "type": "related",
+    "label": "高温度加剧"
+  },
+  {
+    "from": "llm",
+    "to": "prompt-engineering",
+    "type": "related",
+    "label": "作用对象"
+  },
+  {
+    "from": "chunking",
+    "to": "rag",
+    "type": "part-of",
+    "label": "离线阶段"
+  },
+  {
+    "from": "retrieval",
+    "to": "rag",
+    "type": "part-of",
+    "label": "在线阶段"
+  },
+  {
+    "from": "retrieval",
+    "to": "embedding",
+    "type": "uses",
+    "label": "算相似度"
+  },
+  {
+    "from": "retrieval",
+    "to": "vector-db",
+    "type": "uses",
+    "label": "近似最近邻"
+  },
+  {
+    "from": "context-window",
+    "to": "chunking",
+    "type": "constrains",
+    "label": "所以要切小"
+  },
+  {
+    "from": "chunking",
+    "to": "retrieval",
+    "type": "constrains",
+    "label": "切法定上限"
+  },
+  {
+    "from": "cot",
+    "to": "prompt-engineering",
+    "type": "variant-of",
+    "label": "推理类技巧"
+  },
+  {
+    "from": "structured-output",
+    "to": "prompt-engineering",
+    "type": "part-of",
+    "label": "格式约束"
+  },
+  {
+    "from": "structured-output",
+    "to": "tool-calling",
+    "type": "enables",
+    "label": "调用请求即结构化输出"
+  },
+  {
+    "from": "cot",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "减少推理跳步"
+  },
+  {
+    "from": "cot",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "输出变长"
+  },
+  {
+    "from": "agent-loop",
+    "to": "agent",
+    "type": "part-of",
+    "label": "核心机制"
+  },
+  {
+    "from": "agent-loop",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "行动环节"
+  },
+  {
+    "from": "agent-memory",
+    "to": "agent",
+    "type": "part-of",
+    "label": "跨轮次状态"
+  },
+  {
+    "from": "agent-memory",
+    "to": "rag",
+    "type": "uses",
+    "label": "长期记忆即检索"
+  },
+  {
+    "from": "context-window",
+    "to": "agent-memory",
+    "type": "constrains",
+    "label": "装不下才要外部记忆"
+  },
+  {
+    "from": "agent-loop",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "每轮结果都拼回上下文"
+  },
+  {
+    "from": "diffusion",
+    "to": "image-generation",
+    "type": "enables",
+    "label": "当今主流路径"
+  },
+  {
+    "from": "diffusion",
+    "to": "transformer",
+    "type": "uses",
+    "label": "新一代骨干"
+  },
+  {
+    "from": "image-generation",
+    "to": "embedding",
+    "type": "uses",
+    "label": "文本图像对齐"
+  },
+  {
+    "from": "jailbreak",
+    "to": "llm",
+    "type": "threatens",
+    "label": "绕过安全边界"
+  },
+  {
+    "from": "jailbreak",
+    "to": "prompt-injection",
+    "type": "related",
+    "label": "手法重叠、目标不同"
+  },
+  {
+    "from": "alignment",
+    "to": "jailbreak",
+    "type": "mitigates",
+    "label": "训练模型拒绝"
+  },
+  {
+    "from": "alignment",
+    "to": "llm",
+    "type": "constrains",
+    "label": "塑造行为边界"
+  },
+  {
+    "from": "alignment",
+    "to": "fine-tuning",
+    "type": "uses",
+    "label": "SFT + 偏好优化"
+  },
+  {
+    "from": "self-supervised-learning",
+    "to": "unsupervised-learning",
+    "type": "variant-of",
+    "label": "有明确目标"
+  },
+  {
+    "from": "self-supervised-learning",
+    "to": "pretraining",
+    "type": "enables",
+    "label": "训练信号来自数据本身"
+  },
+  {
+    "from": "self-supervised-learning",
+    "to": "supervised-learning",
+    "type": "contrast",
+    "label": "绕开标注瓶颈"
+  },
+  {
+    "from": "self-supervised-learning",
+    "to": "scaling-law",
+    "type": "enables",
+    "label": "数据不再受标注限制"
+  },
+  {
+    "from": "diffusion",
+    "to": "self-supervised-learning",
+    "type": "is-a",
+    "label": "加噪即造样本"
+  },
+  {
+    "from": "regularization",
+    "to": "overfitting",
+    "type": "mitigates",
+    "label": "限制死记硬背"
+  },
+  {
+    "from": "regularization",
+    "to": "fine-tuning",
+    "type": "mitigates",
+    "label": "小数据微调必备"
+  },
+  {
+    "from": "gradient-descent",
+    "to": "regularization",
+    "type": "related",
+    "label": "小批量噪声自带"
+  },
+  {
+    "from": "curse-of-dimensionality",
+    "to": "clustering",
+    "type": "threatens",
+    "label": "距离失去区分度"
+  },
+  {
+    "from": "curse-of-dimensionality",
+    "to": "retrieval",
+    "type": "threatens",
+    "label": "同上"
+  },
+  {
+    "from": "dimensionality-reduction",
+    "to": "curse-of-dimensionality",
+    "type": "mitigates",
+    "label": "压低维度"
+  },
+  {
+    "from": "embedding",
+    "to": "curse-of-dimensionality",
+    "type": "mitigates",
+    "label": "有结构的高维可用"
+  },
+  {
+    "from": "reward-hacking",
+    "to": "alignment",
+    "type": "threatens",
+    "label": "优化的是讨好非求真"
+  },
+  {
+    "from": "reward-hacking",
+    "to": "reinforcement-learning",
+    "type": "threatens",
+    "label": "奖励函数写不对"
+  },
+  {
+    "from": "reward-hacking",
+    "to": "hallucination",
+    "type": "constrains",
+    "label": "奖励自信语气"
+  },
+  {
+    "from": "alignment",
+    "to": "supervised-learning",
+    "type": "uses",
+    "label": "SFT 阶段"
+  },
+  {
+    "from": "jailbreak",
+    "to": "lost-in-middle",
+    "type": "uses",
+    "label": "长上下文淹没安全指令"
+  },
+  {
+    "from": "constitutional-ai",
+    "to": "rlhf",
+    "type": "variant-of",
+    "label": "AI反馈替代人工"
+  },
+  {
+    "from": "constitutional-ai",
+    "to": "alignment",
+    "type": "part-of",
+    "label": "可扩展可透明的对齐"
+  },
+  {
+    "from": "constitutional-ai",
+    "to": "reward-hacking",
+    "type": "mitigates",
+    "label": "原则替代偏好统计"
+  },
+  {
+    "from": "constitutional-ai",
+    "to": "governance",
+    "type": "related",
+    "label": "成文原则可议可改"
+  },
+  {
+    "from": "prefilling",
+    "to": "structured-output",
+    "type": "enables",
+    "label": "预填 { 锁格式"
+  },
+  {
+    "from": "prefilling",
+    "to": "system-prompt",
+    "type": "contrast",
+    "label": "预置回答 vs 设定框架"
+  },
+  {
+    "from": "prefilling",
+    "to": "constrained-decoding",
+    "type": "contrast",
+    "label": "轻量控制 vs 硬保证"
+  },
+  {
+    "from": "jailbreak",
+    "to": "prefilling",
+    "type": "uses",
+    "label": "预填肯定开头绕拒绝"
+  },
+  {
+    "from": "citations",
+    "to": "rag",
+    "type": "part-of",
+    "label": "让检索结论可溯源"
+  },
+  {
+    "from": "citations",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "结论挂出处可核实"
+  },
+  {
+    "from": "citations",
+    "to": "structured-output",
+    "type": "uses",
+    "label": "规范引用格式"
+  },
+  {
+    "from": "context-compaction",
+    "to": "context-window",
+    "type": "mitigates",
+    "label": "腾出窗口"
+  },
+  {
+    "from": "context-compaction",
+    "to": "agent-loop",
+    "type": "part-of",
+    "label": "长任务不失忆"
+  },
+  {
+    "from": "context-compaction",
+    "to": "agent-memory",
+    "type": "related",
+    "label": "压缩即一种记忆取舍"
+  },
+  {
+    "from": "context-compaction",
+    "to": "context-engineering",
+    "type": "part-of",
+    "label": "长时运行的机制"
+  },
+  {
+    "from": "agent-skills",
+    "to": "agent",
+    "type": "part-of",
+    "label": "可插拔能力包"
+  },
+  {
+    "from": "agent-skills",
+    "to": "context-engineering",
+    "type": "variant-of",
+    "label": "惰性加载能力"
+  },
+  {
+    "from": "agent-skills",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "技能含若干工具"
+  },
+  {
+    "from": "agent-skills",
+    "to": "context-compaction",
+    "type": "related",
+    "label": "一个管进一个管出"
+  },
+  {
+    "from": "clip",
+    "to": "embedding",
+    "type": "uses",
+    "label": "图文同一空间"
+  },
+  {
+    "from": "clip",
+    "to": "image-generation",
+    "type": "enables",
+    "label": "文字导向生成"
+  },
+  {
+    "from": "clip",
+    "to": "multimodal",
+    "type": "part-of",
+    "label": "跨模态对齐"
+  },
+  {
+    "from": "vae",
+    "to": "diffusion",
+    "type": "part-of",
+    "label": "潜在扩散的压缩层"
+  },
+  {
+    "from": "vae",
+    "to": "gan",
+    "type": "contrast",
+    "label": "编码重建 vs 对抗"
+  },
+  {
+    "from": "vae",
+    "to": "neural-network",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "audio-generation",
+    "to": "diffusion",
+    "type": "uses",
+    "label": "去噪或自回归"
+  },
+  {
+    "from": "audio-generation",
+    "to": "speech",
+    "type": "contrast",
+    "label": "造声音 vs 读文字"
+  },
+  {
+    "from": "image-editing",
+    "to": "image-generation",
+    "type": "variant-of",
+    "label": "有起点地改"
+  },
+  {
+    "from": "image-editing",
+    "to": "controllable-generation",
+    "type": "related",
+    "label": "都在控细节"
+  },
+  {
+    "from": "super-resolution",
+    "to": "image-generation",
+    "type": "variant-of",
+    "label": "受原图约束地生成"
+  },
+  {
+    "from": "super-resolution",
+    "to": "hallucination",
+    "type": "related",
+    "label": "补的细节可能是编的"
+  },
+  {
+    "from": "world-models",
+    "to": "video-generation",
+    "type": "variant-of",
+    "label": "从看到可交互"
+  },
+  {
+    "from": "world-models",
+    "to": "synthetic-data",
+    "type": "enables",
+    "label": "生成世界里训练"
+  },
+  {
+    "from": "world-models",
+    "to": "reinforcement-learning",
+    "type": "related",
+    "label": "模型化环境"
+  },
+  {
+    "from": "content-detection",
+    "to": "image-generation",
+    "type": "threatens",
+    "label": "越逼真越难辨"
+  },
+  {
+    "from": "content-detection",
+    "to": "gan",
+    "type": "contrast",
+    "label": "检测 vs 生成对抗"
+  },
+  {
+    "from": "content-detection",
+    "to": "governance",
+    "type": "part-of",
+    "label": "合规要求标注"
+  },
+  {
+    "from": "content-detection",
+    "to": "speech",
+    "type": "threatens",
+    "label": "音色克隆诈骗"
+  },
+  {
+    "from": "code-generation",
+    "to": "llm",
+    "type": "uses",
+    "label": "写代码"
+  },
+  {
+    "from": "code-generation",
+    "to": "code-execution",
+    "type": "contrast",
+    "label": "写 vs 跑,天生一对"
+  },
+  {
+    "from": "code-generation",
+    "to": "hallucination",
+    "type": "threatens",
+    "label": "编不存在的API"
+  },
+  {
+    "from": "code-generation",
+    "to": "context-engineering",
+    "type": "uses",
+    "label": "仓库级需喂对上下文"
+  },
+  {
+    "from": "coding-tools",
+    "to": "code-generation",
+    "type": "uses",
+    "label": "整合进开发流"
+  },
+  {
+    "from": "coding-tools",
+    "to": "agent-loop",
+    "type": "uses",
+    "label": "仓库级 Agent"
+  },
+  {
+    "from": "coding-tools",
+    "to": "code-execution",
+    "type": "uses",
+    "label": "写跑改闭环"
+  },
+  {
+    "from": "planning",
+    "to": "agent",
+    "type": "part-of",
+    "label": "拆解复杂目标"
+  },
+  {
+    "from": "planning",
+    "to": "cot",
+    "type": "variant-of",
+    "label": "拆行动而非推理"
+  },
+  {
+    "from": "planning",
+    "to": "agent-loop",
+    "type": "constrains",
+    "label": "蓝图 vs 施工"
+  },
+  {
+    "from": "human-in-the-loop",
+    "to": "agent",
+    "type": "constrains",
+    "label": "关键步人工确认"
+  },
+  {
+    "from": "human-in-the-loop",
+    "to": "guardrails",
+    "type": "part-of",
+    "label": "落实高危确认"
+  },
+  {
+    "from": "human-in-the-loop",
+    "to": "logprobs",
+    "type": "uses",
+    "label": "低置信升级给人"
+  },
+  {
+    "from": "workflow-orchestration",
+    "to": "agent",
+    "type": "contrast",
+    "label": "写死流程 vs 自主"
+  },
+  {
+    "from": "workflow-orchestration",
+    "to": "multi-agent",
+    "type": "related",
+    "label": "Manager 带编排色彩"
+  },
+  {
+    "from": "workflow-orchestration",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "节点里调工具"
+  },
+  {
+    "from": "streaming",
+    "to": "llm",
+    "type": "uses",
+    "label": "自回归逐字生成"
+  },
+  {
+    "from": "streaming",
+    "to": "structured-output",
+    "type": "contrast",
+    "label": "边发 vs 等完整"
+  },
+  {
+    "from": "streaming",
+    "to": "guardrails",
+    "type": "constrains",
+    "label": "边发难拦截"
+  },
+  {
+    "from": "logprobs",
+    "to": "sampling-params",
+    "type": "part-of",
+    "label": "暴露概率分布"
+  },
+  {
+    "from": "logprobs",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "低置信可转人工"
+  },
+  {
+    "from": "logprobs",
+    "to": "interpretability",
+    "type": "related",
+    "label": "取出黑箱确定性"
+  },
+  {
+    "from": "system-prompt",
+    "to": "prompt-engineering",
+    "type": "part-of",
+    "label": "设定整场框架"
+  },
+  {
+    "from": "system-prompt",
+    "to": "in-context-learning",
+    "type": "uses",
+    "label": "身份作为上下文"
+  },
+  {
+    "from": "jailbreak",
+    "to": "system-prompt",
+    "type": "threatens",
+    "label": "说服模型无视它"
+  },
+  {
+    "from": "system-prompt",
+    "to": "context-engineering",
+    "type": "part-of",
+    "label": "上下文的固定层"
+  },
+  {
+    "from": "self-consistency",
+    "to": "cot",
+    "type": "variant-of",
+    "label": "多路投票"
+  },
+  {
+    "from": "self-consistency",
+    "to": "sampling-params",
+    "type": "uses",
+    "label": "高温制造多样性"
+  },
+  {
+    "from": "self-consistency",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "多数票纠错"
+  },
+  {
+    "from": "tree-of-thoughts",
+    "to": "cot",
+    "type": "variant-of",
+    "label": "加搜索与回溯"
+  },
+  {
+    "from": "tree-of-thoughts",
+    "to": "evaluation",
+    "type": "uses",
+    "label": "评估分支剪枝"
+  },
+  {
+    "from": "tree-of-thoughts",
+    "to": "reasoning-models",
+    "type": "related",
+    "label": "结构化推理"
+  },
+  {
+    "from": "observability",
+    "to": "agent-loop",
+    "type": "mitigates",
+    "label": "看清哪步出错"
+  },
+  {
+    "from": "observability",
+    "to": "evaluation",
+    "type": "related",
+    "label": "线上闭环补评测"
+  },
+  {
+    "from": "observability",
+    "to": "prompt-caching",
+    "type": "uses",
+    "label": "记录命中率成本"
+  },
+  {
+    "from": "code-execution",
+    "to": "tool-calling",
+    "type": "variant-of",
+    "label": "最强的工具"
+  },
+  {
+    "from": "code-execution",
+    "to": "agent",
+    "type": "enables",
+    "label": "算准+验证闭环"
+  },
+  {
+    "from": "code-execution",
+    "to": "guardrails",
+    "type": "uses",
+    "label": "最高危需最强隔离"
+  },
+  {
+    "from": "code-execution",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "执行结果客观"
+  },
+  {
+    "from": "computer-use",
+    "to": "agent",
+    "type": "part-of",
+    "label": "操作无 API 的软件"
+  },
+  {
+    "from": "computer-use",
+    "to": "multimodal",
+    "type": "uses",
+    "label": "看屏幕"
+  },
+  {
+    "from": "computer-use",
+    "to": "agent-loop",
+    "type": "variant-of",
+    "label": "感知+鼠标键盘"
+  },
+  {
+    "from": "prompt-injection",
+    "to": "computer-use",
+    "type": "threatens",
+    "label": "劫持鼠标键盘权限"
+  },
+  {
+    "from": "reflection",
+    "to": "agent-loop",
+    "type": "part-of",
+    "label": "观察反思环节"
+  },
+  {
+    "from": "reflection",
+    "to": "self-consistency",
+    "type": "contrast",
+    "label": "串行改 vs 并行投票"
+  },
+  {
+    "from": "reflection",
+    "to": "hallucination",
+    "type": "constrains",
+    "label": "不懂就反思不出"
+  },
+  {
+    "from": "knowledge-graph",
+    "to": "rag",
+    "type": "variant-of",
+    "label": "检索关系而非片段"
+  },
+  {
+    "from": "knowledge-graph",
+    "to": "advanced-rag",
+    "type": "part-of",
+    "label": "GraphRAG"
+  },
+  {
+    "from": "knowledge-graph",
+    "to": "embedding",
+    "type": "contrast",
+    "label": "关系 vs 相似度"
+  },
+  {
+    "from": "react",
+    "to": "reflection",
+    "type": "uses",
+    "label": "观察后反思"
+  },
+  {
+    "from": "in-context-learning",
+    "to": "llm",
+    "type": "part-of",
+    "label": "涌现能力"
+  },
+  {
+    "from": "in-context-learning",
+    "to": "prompt-engineering",
+    "type": "enables",
+    "label": "few-shot 的原理"
+  },
+  {
+    "from": "in-context-learning",
+    "to": "fine-tuning",
+    "type": "contrast",
+    "label": "不改权重 vs 改权重"
+  },
+  {
+    "from": "in-context-learning",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "例子占预算"
+  },
+  {
+    "from": "context-engineering",
+    "to": "prompt-engineering",
+    "type": "variant-of",
+    "label": "从问法到放什么"
+  },
+  {
+    "from": "context-engineering",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "预算分配"
+  },
+  {
+    "from": "context-engineering",
+    "to": "agent-loop",
+    "type": "part-of",
+    "label": "每轮重构上下文"
+  },
+  {
+    "from": "context-engineering",
+    "to": "lost-in-middle",
+    "type": "mitigates",
+    "label": "少而精"
+  },
+  {
+    "from": "react",
+    "to": "agent-loop",
+    "type": "variant-of",
+    "label": "循环的原型"
+  },
+  {
+    "from": "react",
+    "to": "cot",
+    "type": "uses",
+    "label": "推理环节"
+  },
+  {
+    "from": "react",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "行动环节"
+  },
+  {
+    "from": "react",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "行动结果纠正推理"
+  },
+  {
+    "from": "data-poisoning",
+    "to": "pretraining",
+    "type": "threatens",
+    "label": "训练阶段下毒"
+  },
+  {
+    "from": "data-poisoning",
+    "to": "rag",
+    "type": "threatens",
+    "label": "污染知识库"
+  },
+  {
+    "from": "data-poisoning",
+    "to": "prompt-injection",
+    "type": "contrast",
+    "label": "训练时 vs 推理时"
+  },
+  {
+    "from": "red-teaming",
+    "to": "data-poisoning",
+    "type": "mitigates",
+    "label": "探测后门"
+  },
+  {
+    "from": "adversarial-robustness",
+    "to": "neural-network",
+    "type": "threatens",
+    "label": "决策边界不合人意"
+  },
+  {
+    "from": "adversarial-robustness",
+    "to": "curse-of-dimensionality",
+    "type": "related",
+    "label": "高维必有对抗方向"
+  },
+  {
+    "from": "adversarial-robustness",
+    "to": "jailbreak",
+    "type": "related",
+    "label": "文本版对抗"
+  },
+  {
+    "from": "bias-fairness",
+    "to": "pretraining",
+    "type": "threatens",
+    "label": "继承并放大数据偏见"
+  },
+  {
+    "from": "bias-fairness",
+    "to": "rlhf",
+    "type": "related",
+    "label": "标注者也带偏见"
+  },
+  {
+    "from": "bias-fairness",
+    "to": "alignment",
+    "type": "part-of",
+    "label": "价值的一部分"
+  },
+  {
+    "from": "privacy",
+    "to": "overfitting",
+    "type": "related",
+    "label": "记忆越强泄露越多"
+  },
+  {
+    "from": "privacy",
+    "to": "hallucination",
+    "type": "contrast",
+    "label": "泄露真实 vs 编造"
+  },
+  {
+    "from": "privacy",
+    "to": "deployment",
+    "type": "constrains",
+    "label": "数据出境限制"
+  },
+  {
+    "from": "guardrails",
+    "to": "privacy",
+    "type": "mitigates",
+    "label": "PII 输出过滤"
+  },
+  {
+    "from": "governance",
+    "to": "alignment",
+    "type": "related",
+    "label": "制度兜底技术不确定"
+  },
+  {
+    "from": "governance",
+    "to": "interpretability",
+    "type": "constrains",
+    "label": "要求可审计"
+  },
+  {
+    "from": "governance",
+    "to": "guardrails",
+    "type": "related",
+    "label": "同为风险分级思路"
+  },
+  {
+    "from": "moe",
+    "to": "transformer",
+    "type": "variant-of",
+    "label": "稀疏化前馈层"
+  },
+  {
+    "from": "moe",
+    "to": "scaling-law",
+    "type": "enables",
+    "label": "参数与算力脱钩"
+  },
+  {
+    "from": "distillation",
+    "to": "pretraining",
+    "type": "contrast",
+    "label": "搬能力 vs 重训"
+  },
+  {
+    "from": "distillation",
+    "to": "quantization",
+    "type": "contrast",
+    "label": "换小模型 vs 压精度"
+  },
+  {
+    "from": "distillation",
+    "to": "synthetic-data",
+    "type": "variant-of",
+    "label": "教师造数据"
+  },
+  {
+    "from": "synthetic-data",
+    "to": "scaling-law",
+    "type": "mitigates",
+    "label": "真实数据见底"
+  },
+  {
+    "from": "synthetic-data",
+    "to": "self-supervised-learning",
+    "type": "variant-of",
+    "label": "自造训练信号"
+  },
+  {
+    "from": "synthetic-data",
+    "to": "reasoning-models",
+    "type": "enables",
+    "label": "生成+验证"
+  },
+  {
+    "from": "model-families",
+    "to": "deployment",
+    "type": "related",
+    "label": "闭源 vs 开源取舍"
+  },
+  {
+    "from": "model-families",
+    "to": "model-selection",
+    "type": "related",
+    "label": "怎么挑"
+  },
+  {
+    "from": "reasoning-models",
+    "to": "model-families",
+    "type": "part-of",
+    "label": "推理档"
+  },
+  {
+    "from": "evaluation",
+    "to": "model-selection",
+    "type": "enables",
+    "label": "先有基线才能换"
+  },
+  {
+    "from": "evaluation",
+    "to": "rag",
+    "type": "related",
+    "label": "调优靠它衡量"
+  },
+  {
+    "from": "reward-hacking",
+    "to": "evaluation",
+    "type": "threatens",
+    "label": "裁判也会被骗"
+  },
+  {
+    "from": "overfitting",
+    "to": "evaluation",
+    "type": "threatens",
+    "label": "测试集污染"
+  },
+  {
+    "from": "advanced-rag",
+    "to": "rag",
+    "type": "variant-of",
+    "label": "基础之上加处理"
+  },
+  {
+    "from": "advanced-rag",
+    "to": "agent",
+    "type": "uses",
+    "label": "Agentic RAG"
+  },
+  {
+    "from": "advanced-rag",
+    "to": "retrieval",
+    "type": "uses",
+    "label": "查询改写"
+  },
+  {
+    "from": "inference-optimization",
+    "to": "attention",
+    "type": "mitigates",
+    "label": "平方级瓶颈"
+  },
+  {
+    "from": "inference-optimization",
+    "to": "context-window",
+    "type": "mitigates",
+    "label": "长上下文才可行"
+  },
+  {
+    "from": "prompt-caching",
+    "to": "inference-optimization",
+    "type": "variant-of",
+    "label": "KV 缓存跨请求复用"
+  },
+  {
+    "from": "quantization",
+    "to": "inference-optimization",
+    "type": "part-of",
+    "label": "低精度换速度"
+  },
+  {
+    "from": "quantization",
+    "to": "regularization",
+    "type": "related",
+    "label": "精度宽容同源"
+  },
+  {
+    "from": "quantization",
+    "to": "deployment",
+    "type": "enables",
+    "label": "消费级硬件能跑"
+  },
+  {
+    "from": "deployment",
+    "to": "inference-optimization",
+    "type": "uses",
+    "label": "自托管要自己扛"
+  },
+  {
+    "from": "deployment",
+    "to": "model-selection",
+    "type": "related",
+    "label": "API vs 自托管"
+  },
+  {
+    "from": "rlhf",
+    "to": "alignment",
+    "type": "part-of",
+    "label": "对齐核心环节"
+  },
+  {
+    "from": "rlhf",
+    "to": "reinforcement-learning",
+    "type": "uses",
+    "label": "PPO"
+  },
+  {
+    "from": "reward-hacking",
+    "to": "rlhf",
+    "type": "threatens",
+    "label": "讨好而非正确"
+  },
+  {
+    "from": "rlhf",
+    "to": "fine-tuning",
+    "type": "variant-of",
+    "label": "跟在 SFT 之后"
+  },
+  {
+    "from": "red-teaming",
+    "to": "jailbreak",
+    "type": "mitigates",
+    "label": "上线前找漏洞"
+  },
+  {
+    "from": "red-teaming",
+    "to": "prompt-injection",
+    "type": "mitigates",
+    "label": "主动攻自己"
+  },
+  {
+    "from": "red-teaming",
+    "to": "guardrails",
+    "type": "related",
+    "label": "找漏洞→补护栏"
+  },
+  {
+    "from": "red-teaming",
+    "to": "evaluation",
+    "type": "contrast",
+    "label": "异常 vs 正常输入"
+  },
+  {
+    "from": "interpretability",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "从根上理解成因"
+  },
+  {
+    "from": "interpretability",
+    "to": "attention",
+    "type": "uses",
+    "label": "看注意力（仅线索）"
+  },
+  {
+    "from": "interpretability",
+    "to": "alignment",
+    "type": "enables",
+    "label": "验证真学会价值"
+  },
+  {
+    "from": "interpretability",
+    "to": "neural-network",
+    "type": "constrains",
+    "label": "黑箱难打开"
+  },
+  {
+    "from": "multimodal",
+    "to": "transformer",
+    "type": "uses",
+    "label": "统一 token 化"
+  },
+  {
+    "from": "multimodal",
+    "to": "embedding",
+    "type": "uses",
+    "label": "共享语义空间"
+  },
+  {
+    "from": "multimodal",
+    "to": "llm",
+    "type": "variant-of",
+    "label": "多模态扩展"
+  },
+  {
+    "from": "image-generation",
+    "to": "multimodal",
+    "type": "part-of",
+    "label": "文→图方向"
+  },
+  {
+    "from": "multimodal",
+    "to": "agent",
+    "type": "enables",
+    "label": "看界面截图"
+  },
+  {
+    "from": "gan",
+    "to": "diffusion",
+    "type": "contrast",
+    "label": "对抗 vs 去噪"
+  },
+  {
+    "from": "gan",
+    "to": "neural-network",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "video-generation",
+    "to": "diffusion",
+    "type": "variant-of",
+    "label": "加时间维度"
+  },
+  {
+    "from": "video-generation",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "多帧算力压力"
+  },
+  {
+    "from": "controllable-generation",
+    "to": "image-generation",
+    "type": "mitigates",
+    "label": "文字控不住构图"
+  },
+  {
+    "from": "controllable-generation",
+    "to": "fine-tuning",
+    "type": "uses",
+    "label": "LoRA 保持身份"
+  },
+  {
+    "from": "speech",
+    "to": "multimodal",
+    "type": "is-a",
+    "label": "音频模态"
+  },
+  {
+    "from": "speech",
+    "to": "transformer",
+    "type": "uses",
+    "label": "音频 token 化"
+  },
+  {
+    "from": "multi-agent",
+    "to": "agent",
+    "type": "part-of",
+    "label": "复杂时的组织方式"
+  },
+  {
+    "from": "multi-agent",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "Manager 模式靠调用"
+  },
+  {
+    "from": "context-window",
+    "to": "multi-agent",
+    "type": "constrains",
+    "label": "移交时易丢上下文"
+  },
+  {
+    "from": "multi-agent",
+    "to": "agent-loop",
+    "type": "contrast",
+    "label": "拆开 vs 加工具"
+  },
+  {
+    "from": "guardrails",
+    "to": "prompt-injection",
+    "type": "mitigates",
+    "label": "分层防御"
+  },
+  {
+    "from": "guardrails",
+    "to": "jailbreak",
+    "type": "mitigates",
+    "label": "输入输出双侧"
+  },
+  {
+    "from": "guardrails",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "输出校验"
+  },
+  {
+    "from": "guardrails",
+    "to": "agent",
+    "type": "part-of",
+    "label": "生产必备"
+  },
+  {
+    "from": "guardrails",
+    "to": "tool-calling",
+    "type": "constrains",
+    "label": "高危操作需确认"
+  },
+  {
+    "from": "model-selection",
+    "to": "prompt-caching",
+    "type": "uses",
+    "label": "成本杠杆之一"
+  },
+  {
+    "from": "model-selection",
+    "to": "agent",
+    "type": "constrains",
+    "label": "每环节选不同模型"
+  },
+  {
+    "from": "reasoning-models",
+    "to": "model-selection",
+    "type": "contrast",
+    "label": "贵且慢，按需使用"
+  },
+  {
+    "from": "mcp-architecture",
+    "to": "mcp",
+    "type": "part-of",
+    "label": "三角色与传输层"
+  },
+  {
+    "from": "mcp-architecture",
+    "to": "tool-calling",
+    "type": "uses",
+    "label": "Tools 映射到工具调用"
+  },
+  {
+    "from": "prompt-injection",
+    "to": "mcp-architecture",
+    "type": "threatens",
+    "label": "第三方 Server 不可信"
+  },
+  {
+    "from": "agent-loop",
+    "to": "prompt-caching",
+    "type": "uses",
+    "label": "每轮重读历史"
+  },
+  {
+    "from": "agent-memory",
+    "to": "chunking",
+    "type": "uses",
+    "label": "长期记忆即 RAG"
+  },
+  {
+    "from": "agent-memory",
+    "to": "retrieval",
+    "type": "uses",
+    "label": "存进去还要捞得回"
+  },
+  {
+    "from": "reranking",
+    "to": "retrieval",
+    "type": "part-of",
+    "label": "精排环节"
+  },
+  {
+    "from": "reranking",
+    "to": "lost-in-middle",
+    "type": "mitigates",
+    "label": "只剩几条都在两端"
+  },
+  {
+    "from": "reranking",
+    "to": "rag",
+    "type": "mitigates",
+    "label": "召回对了但排后面"
+  },
+  {
+    "from": "reranking",
+    "to": "attention",
+    "type": "uses",
+    "label": "交叉编码"
+  },
+  {
+    "from": "vector-db",
+    "to": "reranking",
+    "type": "constrains",
+    "label": "近似检索的排序误差"
+  },
+  {
+    "from": "constrained-decoding",
+    "to": "structured-output",
+    "type": "part-of",
+    "label": "最硬的一档"
+  },
+  {
+    "from": "constrained-decoding",
+    "to": "sampling-params",
+    "type": "constrains",
+    "label": "屏蔽非法 token"
+  },
+  {
+    "from": "structured-output",
+    "to": "agent",
+    "type": "enables",
+    "label": "循环不中断"
+  },
+  {
+    "from": "prompt-caching",
+    "to": "attention",
+    "type": "uses",
+    "label": "复用 KV"
+  },
+  {
+    "from": "prompt-caching",
+    "to": "agent",
+    "type": "mitigates",
+    "label": "多轮重复计费"
+  },
+  {
+    "from": "prompt-caching",
+    "to": "prompt-engineering",
+    "type": "constrains",
+    "label": "按稳定性排序"
+  },
+  {
+    "from": "backprop",
+    "to": "vanishing-gradient",
+    "type": "enables",
+    "label": "连乘导致"
+  },
+  {
+    "from": "vanishing-gradient",
+    "to": "rnn",
+    "type": "threatens",
+    "label": "长依赖学不到"
+  },
+  {
+    "from": "vanishing-gradient",
+    "to": "neural-network",
+    "type": "constrains",
+    "label": "限制深度"
+  },
+  {
+    "from": "residual-connection",
+    "to": "vanishing-gradient",
+    "type": "mitigates",
+    "label": "给梯度开直通车"
+  },
+  {
+    "from": "attention",
+    "to": "vanishing-gradient",
+    "type": "mitigates",
+    "label": "路径长度为 1"
+  },
+  {
+    "from": "residual-connection",
+    "to": "transformer",
+    "type": "part-of",
+    "label": "每层两处"
+  },
+  {
+    "from": "residual-connection",
+    "to": "cnn",
+    "type": "part-of",
+    "label": "ResNet"
+  },
+  {
+    "from": "scaling-law",
+    "to": "pretraining",
+    "type": "constrains",
+    "label": "配平参数与数据"
+  },
+  {
+    "from": "scaling-law",
+    "to": "llm",
+    "type": "enables",
+    "label": "敢于持续加注"
+  },
+  {
+    "from": "transformer",
+    "to": "scaling-law",
+    "type": "enables",
+    "label": "可并行才谈得上放大"
+  },
+  {
+    "from": "reasoning-models",
+    "to": "scaling-law",
+    "type": "contrast",
+    "label": "测试时 vs 预训练"
+  },
+  {
+    "from": "cnn",
+    "to": "neural-network",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "rnn",
+    "to": "neural-network",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "transformer",
+    "to": "neural-network",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "transformer",
+    "to": "rnn",
+    "type": "contrast",
+    "label": "并行 vs 顺序"
+  },
+  {
+    "from": "neural-network",
+    "to": "gradient-descent",
+    "type": "uses",
+    "label": "训练方式"
+  },
+  {
+    "from": "backprop",
+    "to": "gradient-descent",
+    "type": "enables",
+    "label": "高效算梯度"
+  },
+  {
+    "from": "backprop",
+    "to": "rnn",
+    "type": "constrains",
+    "label": "梯度消失"
+  },
+  {
+    "from": "decision-tree",
+    "to": "supervised-learning",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "clustering",
+    "to": "unsupervised-learning",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "dimensionality-reduction",
+    "to": "unsupervised-learning",
+    "type": "is-a",
+    "label": ""
+  },
+  {
+    "from": "overfitting",
+    "to": "supervised-learning",
+    "type": "constrains",
+    "label": "泛化上限"
+  },
+  {
+    "from": "supervised-learning",
+    "to": "unsupervised-learning",
+    "type": "contrast",
+    "label": "要不要标注"
+  },
+  {
+    "from": "decision-tree",
+    "to": "neural-network",
+    "type": "contrast",
+    "label": "表格数据常胜"
+  },
+  {
+    "from": "pretraining",
+    "to": "unsupervised-learning",
+    "type": "is-a",
+    "label": "自监督"
+  },
+  {
+    "from": "pretraining",
+    "to": "llm",
+    "type": "part-of",
+    "label": "第一阶段"
+  },
+  {
+    "from": "pretraining",
+    "to": "transformer",
+    "type": "uses",
+    "label": "训练对象"
+  },
+  {
+    "from": "pretraining",
+    "to": "gradient-descent",
+    "type": "uses",
+    "label": ""
+  },
+  {
+    "from": "fine-tuning",
+    "to": "supervised-learning",
+    "type": "is-a",
+    "label": "SFT"
+  },
+  {
+    "from": "alignment",
+    "to": "reinforcement-learning",
+    "type": "uses",
+    "label": "RLHF"
+  },
+  {
+    "from": "reinforcement-learning",
+    "to": "agent",
+    "type": "contrast",
+    "label": "两种「智能体」"
+  },
+  {
+    "from": "cnn",
+    "to": "diffusion",
+    "type": "uses",
+    "label": "早期 U-Net 骨干"
+  },
+  {
+    "from": "dimensionality-reduction",
+    "to": "embedding",
+    "type": "related",
+    "label": "嵌入可视化"
+  },
+  {
+    "from": "clustering",
+    "to": "embedding",
+    "type": "uses",
+    "label": "文本主题归纳"
+  },
+  {
+    "from": "overfitting",
+    "to": "fine-tuning",
+    "type": "threatens",
+    "label": "小数据微调易过拟合"
+  },
+  {
+    "from": "reasoning-models",
+    "to": "llm",
+    "type": "variant-of",
+    "label": "推理时扩展"
+  },
+  {
+    "from": "reasoning-models",
+    "to": "cot",
+    "type": "uses",
+    "label": "把思维链内化"
+  },
+  {
+    "from": "agent-frameworks",
+    "to": "agent",
+    "type": "uses",
+    "label": "工程封装"
+  },
+  {
+    "from": "batch-norm",
+    "to": "neural-network",
+    "type": "part-of",
+    "label": "训练稳定层"
+  },
+  {
+    "from": "batch-norm",
+    "to": "vanishing-gradient",
+    "type": "mitigates",
+    "label": "稳住数值尺度"
+  },
+  {
+    "from": "batch-norm",
+    "to": "residual-connection",
+    "type": "related",
+    "label": "深层网络两支柱"
+  },
+  {
+    "from": "batch-norm",
+    "to": "transformer",
+    "type": "contrast",
+    "label": "BN vs 层归一化"
+  },
+  {
+    "from": "batch-norm",
+    "to": "regularization",
+    "type": "related",
+    "label": "批内噪声带正则"
+  },
+  {
+    "from": "gradient-descent",
+    "to": "loss-function",
+    "type": "uses",
+    "label": "沿它下降"
+  },
+  {
+    "from": "backprop",
+    "to": "loss-function",
+    "type": "uses",
+    "label": "回传它的梯度"
+  },
+  {
+    "from": "llm",
+    "to": "loss-function",
+    "type": "uses",
+    "label": "预测下一token的交叉熵"
+  },
+  {
+    "from": "loss-function",
+    "to": "overfitting",
+    "type": "related",
+    "label": "训练损失≠泛化"
+  },
+  {
+    "from": "loss-function",
+    "to": "evaluation",
+    "type": "contrast",
+    "label": "优化的 vs 在乎的"
+  },
+  {
+    "from": "loss-function",
+    "to": "reward-hacking",
+    "type": "related",
+    "label": "目标写不对就钻空子"
+  },
+  {
+    "from": "information-theory",
+    "to": "loss-function",
+    "type": "enables",
+    "label": "交叉熵损失"
+  },
+  {
+    "from": "information-theory",
+    "to": "llm",
+    "type": "related",
+    "label": "困惑度即交叉熵"
+  },
+  {
+    "from": "information-theory",
+    "to": "sampling-params",
+    "type": "related",
+    "label": "温度即调熵"
+  },
+  {
+    "from": "information-theory",
+    "to": "rlhf",
+    "type": "related",
+    "label": "KL 散度当缰绳"
+  },
+  {
+    "from": "distillation",
+    "to": "information-theory",
+    "type": "uses",
+    "label": "KL 匹配老师分布"
+  },
+  {
+    "from": "kernel-methods",
+    "to": "supervised-learning",
+    "type": "is-a",
+    "label": "经典分类器"
+  },
+  {
+    "from": "kernel-methods",
+    "to": "neural-network",
+    "type": "contrast",
+    "label": "手工核 vs 学表示"
+  },
+  {
+    "from": "kernel-methods",
+    "to": "curse-of-dimensionality",
+    "type": "related",
+    "label": "高维里反而可控"
+  },
+  {
+    "from": "kernel-methods",
+    "to": "decision-tree",
+    "type": "contrast",
+    "label": "两大经典分类器"
+  },
+  {
+    "from": "kernel-methods",
+    "to": "regularization",
+    "type": "related",
+    "label": "最大间隔即一种正则"
+  },
+  {
+    "from": "post-training",
+    "to": "pretraining",
+    "type": "prerequisite",
+    "label": "基座之后"
+  },
+  {
+    "from": "post-training",
+    "to": "fine-tuning",
+    "type": "uses",
+    "label": "监督指令阶段"
+  },
+  {
+    "from": "post-training",
+    "to": "rlhf",
+    "type": "uses",
+    "label": "偏好阶段"
+  },
+  {
+    "from": "post-training",
+    "to": "alignment",
+    "type": "enables",
+    "label": "塑造助手行为"
+  },
+  {
+    "from": "post-training",
+    "to": "synthetic-data",
+    "type": "uses",
+    "label": "生成训练任务"
+  },
+  {
+    "from": "post-training",
+    "to": "reasoning-models",
+    "type": "enables",
+    "label": "训练推理策略"
+  },
+  {
+    "from": "positional-encoding",
+    "to": "transformer",
+    "type": "part-of",
+    "label": "注入顺序"
+  },
+  {
+    "from": "positional-encoding",
+    "to": "attention",
+    "type": "enables",
+    "label": "让注意力识别先后"
+  },
+  {
+    "from": "positional-encoding",
+    "to": "context-window",
+    "type": "constrains",
+    "label": "影响长度外推"
+  },
+  {
+    "from": "positional-encoding",
+    "to": "lost-in-middle",
+    "type": "related",
+    "label": "位置偏差因素"
+  },
+  {
+    "from": "normalization",
+    "to": "transformer",
+    "type": "part-of",
+    "label": "每层稳定组件"
+  },
+  {
+    "from": "normalization",
+    "to": "batch-norm",
+    "type": "contrast",
+    "label": "单样本 vs 批统计"
+  },
+  {
+    "from": "normalization",
+    "to": "vanishing-gradient",
+    "type": "mitigates",
+    "label": "稳定激活尺度"
+  },
+  {
+    "from": "normalization",
+    "to": "residual-connection",
+    "type": "related",
+    "label": "深层训练搭档"
+  },
+  {
+    "from": "optimizer-schedule",
+    "to": "gradient-descent",
+    "type": "variant-of",
+    "label": "实际更新配方"
+  },
+  {
+    "from": "optimizer-schedule",
+    "to": "backprop",
+    "type": "uses",
+    "label": "消费梯度"
+  },
+  {
+    "from": "pretraining",
+    "to": "optimizer-schedule",
+    "type": "uses",
+    "label": "稳定大规模训练"
+  },
+  {
+    "from": "fine-tuning",
+    "to": "optimizer-schedule",
+    "type": "uses",
+    "label": "控制适配幅度"
+  },
+  {
+    "from": "optimizer-schedule",
+    "to": "loss-function",
+    "type": "uses",
+    "label": "优化目标"
+  },
+  {
+    "from": "peft-lora",
+    "to": "fine-tuning",
+    "type": "variant-of",
+    "label": "只训少量参数"
+  },
+  {
+    "from": "peft-lora",
+    "to": "quantization",
+    "type": "uses",
+    "label": "QLoRA"
+  },
+  {
+    "from": "peft-lora",
+    "to": "deployment",
+    "type": "enables",
+    "label": "一底座多适配器"
+  },
+  {
+    "from": "model-merging",
+    "to": "peft-lora",
+    "type": "uses",
+    "label": "组合适配器"
+  },
+  {
+    "from": "model-merging",
+    "to": "fine-tuning",
+    "type": "contrast",
+    "label": "合并 vs 重训"
+  },
+  {
+    "from": "model-merging",
+    "to": "evaluation",
+    "type": "uses",
+    "label": "防能力互相破坏"
+  },
+  {
+    "from": "distributed-training",
+    "to": "pretraining",
+    "type": "enables",
+    "label": "突破单卡限制"
+  },
+  {
+    "from": "distributed-training",
+    "to": "scaling-law",
+    "type": "enables",
+    "label": "把算力变成规模"
+  },
+  {
+    "from": "distributed-training",
+    "to": "optimizer-schedule",
+    "type": "related",
+    "label": "全局批量影响配方"
+  },
+  {
+    "from": "distributed-training",
+    "to": "deployment",
+    "type": "contrast",
+    "label": "训练并行 vs 推理服务"
+  },
+  {
+    "from": "contrastive-learning",
+    "to": "embedding",
+    "type": "enables",
+    "label": "塑造表示空间"
+  },
+  {
+    "from": "contrastive-learning",
+    "to": "clip",
+    "type": "part-of",
+    "label": "图文对比目标"
+  },
+  {
+    "from": "contrastive-learning",
+    "to": "multimodal",
+    "type": "enables",
+    "label": "跨模态对齐"
+  },
+  {
+    "from": "retrieval",
+    "to": "contrastive-learning",
+    "type": "uses",
+    "label": "训练语义检索器"
+  },
+  {
+    "from": "model-evaluation",
+    "to": "evaluation",
+    "type": "contrast",
+    "label": "模型能力 vs 应用目标"
+  },
+  {
+    "from": "model-evaluation",
+    "to": "model-selection",
+    "type": "enables",
+    "label": "提供选择证据"
+  },
+  {
+    "from": "model-evaluation",
+    "to": "reasoning-models",
+    "type": "related",
+    "label": "按计算预算比较"
+  },
+  {
+    "from": "model-evaluation",
+    "to": "code-generation",
+    "type": "related",
+    "label": "pass@k 与仓库任务"
+  },
+  {
+    "from": "model-evaluation",
+    "to": "red-teaming",
+    "type": "related",
+    "label": "能力与安全两面"
+  },
+  {
+    "from": "model-routing",
+    "to": "model-selection",
+    "type": "uses",
+    "label": "请求级选择"
+  },
+  {
+    "from": "model-routing",
+    "to": "evaluation",
+    "type": "uses",
+    "label": "学习升级边界"
+  },
+  {
+    "from": "model-routing",
+    "to": "deployment",
+    "type": "part-of",
+    "label": "多模型服务"
+  },
+  {
+    "from": "model-routing",
+    "to": "moe",
+    "type": "contrast",
+    "label": "应用路由 vs token 路由"
+  },
+  {
+    "from": "model-routing",
+    "to": "workflow-orchestration",
+    "type": "related",
+    "label": "按条件分支"
+  },
+  {
+    "from": "data-drift-monitoring",
+    "to": "observability",
+    "type": "uses",
+    "label": "读取线上轨迹"
+  },
+  {
+    "from": "data-drift-monitoring",
+    "to": "evaluation",
+    "type": "uses",
+    "label": "触发回归评测"
+  },
+  {
+    "from": "data-drift-monitoring",
+    "to": "deployment",
+    "type": "part-of",
+    "label": "上线后职责"
+  },
+  {
+    "from": "data-drift-monitoring",
+    "to": "model-routing",
+    "type": "related",
+    "label": "漂移时调整路由"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "agent",
+    "type": "part-of",
+    "label": "执行身份边界"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "tool-calling",
+    "type": "constrains",
+    "label": "调用前授权"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "mcp",
+    "type": "related",
+    "label": "连接不等于授权"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "prompt-injection",
+    "type": "mitigates",
+    "label": "权限截断攻击"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "human-in-the-loop",
+    "type": "uses",
+    "label": "高风险再确认"
+  },
+  {
+    "from": "agent-identity-access",
+    "to": "privacy",
+    "type": "related",
+    "label": "最小数据访问"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "pretraining",
+    "type": "constrains",
+    "label": "数据决定能力边界"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "synthetic-data",
+    "type": "constrains",
+    "label": "标记生成来源"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "data-poisoning",
+    "type": "mitigates",
+    "label": "来源与异常审计"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "privacy",
+    "type": "mitigates",
+    "label": "敏感信息治理"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "bias-fairness",
+    "type": "mitigates",
+    "label": "分群与配比检查"
+  },
+  {
+    "from": "training-data-governance",
+    "to": "scaling-law",
+    "type": "constrains",
+    "label": "高质量数据有限"
+  },
+  {
+    "from": "uncertainty-calibration",
+    "to": "logprobs",
+    "type": "uses",
+    "label": "原始概率信号"
+  },
+  {
+    "from": "uncertainty-calibration",
+    "to": "hallucination",
+    "type": "mitigates",
+    "label": "风险分级与拒答"
+  },
+  {
+    "from": "uncertainty-calibration",
+    "to": "human-in-the-loop",
+    "type": "enables",
+    "label": "低置信转人工"
+  },
+  {
+    "from": "uncertainty-calibration",
+    "to": "guardrails",
+    "type": "part-of",
+    "label": "选择性拒答"
+  },
+  {
+    "from": "uncertainty-calibration",
+    "to": "model-evaluation",
+    "type": "uses",
+    "label": "可靠性曲线"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "reasoning-models",
+    "type": "part-of",
+    "label": "推理时扩展轴"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "cot",
+    "type": "uses",
+    "label": "延长单条轨迹"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "self-consistency",
+    "type": "uses",
+    "label": "多候选投票"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "tree-of-thoughts",
+    "type": "uses",
+    "label": "搜索与回溯"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "reflection",
+    "type": "uses",
+    "label": "检查与修正"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "code-execution",
+    "type": "uses",
+    "label": "外部验证器"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "scaling-law",
+    "type": "contrast",
+    "label": "推理算力 vs 训练算力"
+  },
+  {
+    "from": "test-time-compute",
+    "to": "reward-hacking",
+    "type": "threatens",
+    "label": "弱验证器会被钻空子"
+  },
+  {
+    "from": "flow-matching",
+    "to": "diffusion",
+    "type": "related",
+    "label": "概率路径可统一"
+  },
+  {
+    "from": "flow-matching",
+    "to": "image-generation",
+    "type": "enables",
+    "label": "现代生成引擎"
+  },
+  {
+    "from": "flow-matching",
+    "to": "video-generation",
+    "type": "enables",
+    "label": "高维时空生成"
+  },
+  {
+    "from": "flow-matching",
+    "to": "vae",
+    "type": "uses",
+    "label": "常在潜空间运行"
+  },
+  {
+    "from": "state-space-models",
+    "to": "transformer",
+    "type": "contrast",
+    "label": "线性状态 vs 全局注意力"
+  },
+  {
+    "from": "state-space-models",
+    "to": "attention",
+    "type": "contrast",
+    "label": "压缩状态 vs 位置两两交互"
+  },
+  {
+    "from": "state-space-models",
+    "to": "rnn",
+    "type": "related",
+    "label": "递归状态传统"
+  },
+  {
+    "from": "state-space-models",
+    "to": "context-window",
+    "type": "related",
+    "label": "长序列线性扫描"
+  },
+  {
+    "from": "state-space-models",
+    "to": "model-families",
+    "type": "related",
+    "label": "替代骨架方向"
+  },
+  {
+    "from": "voice-cloning",
+    "label": "目标说话者条件化的语音合成",
+    "to": "speech",
+    "type": "is-a"
+  },
+  {
+    "from": "voice-cloning",
+    "label": "参考音频控制说话者身份",
+    "to": "controllable-generation",
+    "type": "is-a"
+  },
+  {
+    "from": "voice-cloning",
+    "label": "专业克隆更新目标说话者参数",
+    "to": "fine-tuning",
+    "type": "uses"
+  },
+  {
+    "from": "voice-cloning",
+    "label": "复制可识别的声音生物特征",
+    "to": "privacy",
+    "type": "threatens"
+  },
+  {
+    "from": "content-detection",
+    "label": "鉴别合成或冒用音频",
+    "to": "voice-cloning",
+    "type": "mitigates"
+  }
+]

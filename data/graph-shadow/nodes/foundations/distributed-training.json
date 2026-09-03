@@ -1,0 +1,36 @@
+{
+  "id": "distributed-training",
+  "title": "分布式训练与并行策略",
+  "aliases": [
+    "Distributed Training",
+    "Data Parallelism",
+    "Tensor Parallelism",
+    "Pipeline Parallelism",
+    "分布式训练"
+  ],
+  "maturity": "stable",
+  "domain": "foundations",
+  "heat": 0.58,
+  "summary": "把模型、数据和计算拆到多张加速卡上，突破单卡显存与训练时间限制。",
+  "body": "**是什么**\n\n数据并行复制模型、切分批次；张量并行拆一个算子；流水线并行把不同层放到不同设备。真实大模型训练常混合多种策略。\n\n**为什么需要**\n\n当参数、优化器状态和激活放不进单卡时，[[pretraining]] 必须跨设备；同时还要让大量设备保持高利用率。\n\n**代价**\n\n并行会引入通信、同步、气泡和容错成本。卡数翻倍不会自动让训练快一倍，网络拓扑常成为瓶颈。\n\n**怎么应对**\n\n按模型大小、序列长度和互联带宽选择并行组合，监控计算/通信重叠和故障恢复，而不只看理论 FLOPs。",
+  "cases": [
+    {
+      "title": "为什么三种并行要混用",
+      "text": "数据并行解决吞吐，张量并行解决单层太大，流水线并行解决层数太多；单独一种通常无法覆盖超大模型。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Megatron-LM (2019)",
+      "ref": "https://arxiv.org/abs/1909.08053"
+    },
+    {
+      "type": "url",
+      "title": "ZeRO (2019)",
+      "ref": "https://arxiv.org/abs/1910.02054"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

@@ -14,6 +14,12 @@ const {
   loadStandalonePageSource,
   standaloneLayoutSource,
 } = require("../deepdive/runtime/standalone-page-source");
+const {
+  prepareGraphAuthorityWrite,
+  renderGraphSource,
+  writeGraphAuthority,
+} = require("../graph/shadow");
+const { parseGraphSource } = require("../graph/diagnostics");
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -347,7 +353,11 @@ function buildNodeApplyPlan(packageDir, options = {}) {
     const runtimeManifest = loadRuntimeManifest(root);
     const finalDeepDive = compileFinalDeepDive(root, manifest.node.id, deepDiveContent);
     targets = [
-      targetRecord(root, "data/graph.js", transformGraph(graphContent, manifest)),
+      targetRecord(
+        root,
+        "data/graph.js",
+        renderGraphSource(parseGraphSource(transformGraph(graphContent, manifest))),
+      ),
       targetRecord(root, `data/deepdive/${manifest.node.id}.js`, deepDiveContent),
       targetRecord(
         root,
@@ -450,6 +460,10 @@ function applyNodePlan(plan, options = {}) {
     return receipt;
   }
   const root = path.resolve(options.root || plan.root || ROOT);
+  const writesGraph = plan.targets.some(target => target.relativePath === "data/graph.js");
+  const graphBaseline = writesGraph ? prepareGraphAuthorityWrite(root) : null;
+  let currentShadowDigest = graphBaseline && graphBaseline.sourceDigest;
+  let graphAuthority = null;
   const written = [];
   try {
     plan.targets.forEach(target => {
@@ -457,7 +471,16 @@ function applyNodePlan(plan, options = {}) {
       if (sha256(readTextIfExists(file)) !== target.beforeHash) {
         throw new Error(`目标自预览后已变化：${target.relativePath}`);
       }
-      atomicWrite(file, target.afterContent);
+      if (target.relativePath === "data/graph.js") {
+        graphAuthority = writeGraphAuthority(
+          root,
+          parseGraphSource(target.afterContent),
+          { expectedPreviousDigest: currentShadowDigest },
+        );
+        currentShadowDigest = graphAuthority.sourceDigest;
+      } else {
+        atomicWrite(file, target.afterContent);
+      }
       written.push(target);
     });
     const validatorOutput = runIntegrationValidators(root);
@@ -470,12 +493,34 @@ function applyNodePlan(plan, options = {}) {
       root,
       operations: clone(plan.operations),
       targets: clone(plan.targets),
+      graphAuthority: graphAuthority && {
+        status: graphAuthority.status,
+        previousSourceDigest: graphAuthority.previousSourceDigest,
+        sourceDigest: graphAuthority.sourceDigest,
+        writeAuthority: graphAuthority.writeAuthority,
+        deepEqualAfterReload: graphAuthority.deepEqualAfterReload,
+      },
       validatorOutput
     };
     receipt.receiptHash = sha256(receipt);
     return receipt;
   } catch (error) {
-    written.reverse().forEach(target => restoreTarget(root, target));
+    written.reverse().forEach(target => {
+      if (target.relativePath === "data/graph.js") {
+        try {
+          const restored = writeGraphAuthority(
+            root,
+            parseGraphSource(target.beforeContent),
+            { expectedPreviousDigest: currentShadowDigest },
+          );
+          currentShadowDigest = restored.sourceDigest;
+        } catch (authorityRestoreError) {
+          error.message += `\n图分片权威恢复失败：${authorityRestoreError.message}`;
+        }
+      } else {
+        restoreTarget(root, target);
+      }
+    });
     error.message += "\n已自动恢复所有已写目标。";
     throw error;
   }
@@ -490,6 +535,10 @@ function rollbackNodeReceipt(receipt, options = {}) {
   delete copy.receiptHash;
   if (sha256(copy) !== expectedHash) throw new Error("节点回滚凭据哈希不匹配");
   const root = path.resolve(options.root || receipt.root || ROOT);
+  const writesGraph = receipt.targets.some(target => target.relativePath === "data/graph.js");
+  const graphBaseline = writesGraph ? prepareGraphAuthorityWrite(root) : null;
+  let currentShadowDigest = graphBaseline && graphBaseline.sourceDigest;
+  let graphAuthority = null;
   const restored = [];
   try {
     receipt.targets.forEach(target => {
@@ -497,7 +546,16 @@ function rollbackNodeReceipt(receipt, options = {}) {
       if (sha256(readTextIfExists(file)) !== target.afterHash) {
         throw new Error(`目标在应用后又被修改，拒绝覆盖：${target.relativePath}`);
       }
-      restoreTarget(root, target);
+      if (target.relativePath === "data/graph.js") {
+        graphAuthority = writeGraphAuthority(
+          root,
+          parseGraphSource(target.beforeContent),
+          { expectedPreviousDigest: currentShadowDigest },
+        );
+        currentShadowDigest = graphAuthority.sourceDigest;
+      } else {
+        restoreTarget(root, target);
+      }
       restored.push(target);
     });
     const validatorOutput = runIntegrationValidators(root);
@@ -506,11 +564,31 @@ function rollbackNodeReceipt(receipt, options = {}) {
       status: "rolled-back",
       receiptHash: expectedHash,
       rolledBackAt: new Date().toISOString(),
+      graphAuthority: graphAuthority && {
+        status: graphAuthority.status,
+        previousSourceDigest: graphAuthority.previousSourceDigest,
+        sourceDigest: graphAuthority.sourceDigest,
+        writeAuthority: graphAuthority.writeAuthority,
+        deepEqualAfterReload: graphAuthority.deepEqualAfterReload,
+      },
       validatorOutput
     };
   } catch (error) {
     restored.reverse().forEach(target => {
-      atomicWrite(withinRoot(root, target.relativePath), target.afterContent);
+      if (target.relativePath === "data/graph.js") {
+        try {
+          const reapplied = writeGraphAuthority(
+            root,
+            parseGraphSource(target.afterContent),
+            { expectedPreviousDigest: currentShadowDigest },
+          );
+          currentShadowDigest = reapplied.sourceDigest;
+        } catch (authorityRestoreError) {
+          error.message += `\n图分片权威恢复失败：${authorityRestoreError.message}`;
+        }
+      } else {
+        atomicWrite(withinRoot(root, target.relativePath), target.afterContent);
+      }
     });
     error.message += "\n回滚失败，已恢复回滚前状态。";
     throw error;

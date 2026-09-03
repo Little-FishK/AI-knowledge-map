@@ -9,11 +9,15 @@
  * 数据（节点/大区/学习路径）变动后重跑即可，无需浏览器。
  */
 "use strict";
-const fs = require("fs");
 const path = require("path");
+const {
+  prepareGraphAuthorityWrite,
+  writeGraphAuthority,
+} = require("./graph/shadow");
 
-const ROOT = path.join(__dirname, "..");
+const ROOT = path.resolve(process.env.GRAPH_ROOT || path.join(__dirname, ".."));
 const GRAPH_FILE = path.join(ROOT, "data", "graph.js");
+const graphBaseline = prepareGraphAuthorityWrite(ROOT);
 
 const w = {};
 global.window = w;
@@ -115,20 +119,11 @@ if (finalReport.sameDomainOverlaps.length || finalReport.occlusionViolations.len
   process.exit(1);
 }
 
-// 写回 data/graph.js 的 positions 块
-let block = "  positions: {\n";
-G.nodes.forEach((n, i) => {
-  const v = out[n.id];
-  block += `    ${JSON.stringify(n.id)}: [${v[0]}, ${v[1]}]${i < G.nodes.length - 1 ? "," : ""}\n`;
+const nextGraph = JSON.parse(JSON.stringify(G));
+nextGraph.positions = out;
+const graphAuthority = writeGraphAuthority(ROOT, nextGraph, {
+  expectedPreviousDigest: graphBaseline.sourceDigest,
 });
-block += "  },";
-
-const srcLines = fs.readFileSync(GRAPH_FILE, "utf8").split("\n");
-let start = -1;
-let end = -1;
-for (let i = 0; i < srcLines.length; i++) { if (/^\s*positions:\s*\{/.test(srcLines[i])) { start = i; break; } }
-for (let i = start + 1; i < srcLines.length; i++) { if (/^\s*\},?\s*$/.test(srcLines[i])) { end = i; break; } }
-if (start < 0 || end < 0) { console.error("未在 data/graph.js 中找到 positions 块"); process.exit(1); }
-const next = srcLines.slice(0, start).concat(block.split("\n")).concat(srcLines.slice(end + 1));
-fs.writeFileSync(GRAPH_FILE, next.join("\n"));
-console.log(`✓ 已写回 ${G.nodes.length} 个节点坐标（同区重叠 0，遮挡 0）`);
+console.log(
+  `✓ 已通过权威分片写入 ${G.nodes.length} 个节点坐标（同区重叠 0，遮挡 0；${graphAuthority.status}）`,
+);

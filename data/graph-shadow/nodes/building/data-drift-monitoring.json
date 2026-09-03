@@ -1,0 +1,30 @@
+{
+  "id": "data-drift-monitoring",
+  "title": "数据漂移与持续监控",
+  "aliases": [
+    "Data Drift",
+    "Concept Drift",
+    "Model Monitoring",
+    "数据漂移"
+  ],
+  "maturity": "stable",
+  "domain": "building",
+  "heat": 0.56,
+  "summary": "上线后的输入、用户与目标会变化，持续监控负责发现模型质量随环境悄悄退化。",
+  "body": "**是什么**\n\n数据漂移是线上输入分布变化；概念漂移是输入与正确输出之间的关系变化。持续监控把这些变化与质量、成本和安全指标联系起来。\n\n**为什么离线高分仍会失效**\n\n用户语言、产品政策、攻击方式和知识都在变化，静态测试集无法永久代表未来流量。\n\n**它连接什么**\n\n[[observability]] 记录发生了什么，[[evaluation]] 判断好不好；漂移监控负责发现什么时候需要重新评测、改提示、更新检索或重新训练。\n\n**怎么应对**\n\n建立分布与任务指标基线，按用户群和场景切片，设置报警后触发人工诊断，而不是看到漂移就自动重训。",
+  "cases": [
+    {
+      "title": "政策更新后的静默退化",
+      "text": "退款规则变了，旧模型仍流畅回答旧政策；输入没报错，但业务正确率已经下降。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Learning under Concept Drift (2018)",
+      "ref": "https://arxiv.org/abs/2004.05785"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

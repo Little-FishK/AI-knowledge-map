@@ -1,0 +1,38 @@
+{
+  "id": "post-training",
+  "title": "后训练 Post-training",
+  "aliases": [
+    "Post-training",
+    "后训练",
+    "模型后训练"
+  ],
+  "maturity": "evolving",
+  "domain": "foundations",
+  "heat": 0.92,
+  "summary": "在预训练之后，用指令、偏好与可验证反馈把基座模型塑造成可用助手。",
+  "body": "**是什么**\n\n[[pretraining]] 先让模型学会语言与通用模式；后训练则在这个基座上继续优化，让它遵循指令、表达偏好、使用工具并在特定任务上更可靠。常见阶段包括监督微调、[[rlhf]]/DPO、拒绝采样和可验证奖励训练。\n\n**为什么需要**\n\n预训练目标只要求预测数据中的下一个 token，不会自动给出产品所需的帮助性、安全边界和推理策略。模型规模变大也不等于更会理解用户意图，因此必须用更贴近目标行为的数据和反馈再塑形。\n\n**它连接了什么**\n\n它是 [[pretraining]]、[[fine-tuning]]、[[alignment]]、[[synthetic-data]] 与 [[reasoning-models]] 之间的总枢纽：前者提供能力底座，后训练决定能力如何被调用和呈现。\n\n**边界与风险**\n\n后训练通常重分配已有能力，不保证凭空注入可靠事实；偏好数据会带来标注偏差，奖励信号还可能诱发 [[reward-hacking]]。必须用独立评测监控能力增益与回归。",
+  "cases": [
+    {
+      "title": "从基座到助手",
+      "text": "同一份预训练权重经过指令示范和偏好优化后，才会稳定回答问题、拒绝高风险请求并按格式调用工具。"
+    },
+    {
+      "title": "推理行为也来自后训练",
+      "text": "推理模型不仅是预训练更大，还会用可验证任务和反馈学习怎样分配 [[test-time-compute]]。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "InstructGPT (2022)",
+      "ref": "https://arxiv.org/abs/2203.02155"
+    },
+    {
+      "type": "url",
+      "title": "Direct Preference Optimization (2023)",
+      "ref": "https://arxiv.org/abs/2305.18290"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

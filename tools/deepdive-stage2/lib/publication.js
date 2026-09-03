@@ -10,6 +10,12 @@ const {
 } = require("../../deepdive/runtime/standalone-page-source");
 const { transformGraph } = require("../../video-ingest/node-application");
 const { graphFingerprint } = require("../../video-ingest/shadow-review");
+const {
+  prepareGraphAuthorityWrite,
+  renderGraphSource,
+  writeGraphAuthority,
+} = require("../../graph/shadow");
+const { parseGraphSource } = require("../../graph/diagnostics");
 
 function createPublication(options) {
   const {
@@ -63,7 +69,7 @@ function createPublication(options) {
   }
 
   function applyCoreMembership(graphSource, id) {
-    const marker = /(\bcore\s*:\s*\[)/;
+    const marker = /((?:"core"|\bcore)\s*:\s*\[)/;
     const match = marker.exec(graphSource);
     if (!match) throw new Error("data/graph.js 缺少 core 数组");
     const start = graphSource.indexOf("[", match.index);
@@ -132,6 +138,7 @@ function createPublication(options) {
       const manifest = { ...clone(record.integration), deepDive: page };
       graphContent = transformGraph(graphContent, manifest);
       if (manifest.core && manifest.core.requested) graphContent = applyCoreMembership(graphContent, id);
+      graphContent = renderGraphSource(parseGraphSource(graphContent));
       targets.push(targetRecord(root, "data/graph.js", graphContent));
       const sourceDirectory = path.join(root, "data", "deepdive");
       const sourcePageCount = fs.readdirSync(sourceDirectory).filter(file => file.endsWith(".js")).length;
@@ -179,6 +186,10 @@ function createPublication(options) {
   }
 
   function writePublicationTargets(root, record, targets, options = {}) {
+    const writesGraph = targets.some(target => target.relativePath === "data/graph.js");
+    const graphBaseline = writesGraph ? prepareGraphAuthorityWrite(root) : null;
+    let currentShadowDigest = graphBaseline && graphBaseline.sourceDigest;
+    let graphAuthority = null;
     const written = [];
     const changeMessage = options.changeMessage || "正式目标在暂行发布前变化";
     const failureMessage = options.failureMessage || "暂行发布后集成检查失败";
@@ -190,7 +201,16 @@ function createPublication(options) {
         if (sha256(current) !== target.beforeHash) {
           throw new Error(`${changeMessage}：${target.relativePath}`);
         }
-        atomicWrite(file, target.afterContent);
+        if (target.relativePath === "data/graph.js") {
+          graphAuthority = writeGraphAuthority(
+            root,
+            parseGraphSource(target.afterContent),
+            { expectedPreviousDigest: currentShadowDigest },
+          );
+          currentShadowDigest = graphAuthority.sourceDigest;
+        } else {
+          atomicWrite(file, target.afterContent);
+        }
         written.push(target);
       });
       const validatorFactory = options.validators || (() => [
@@ -201,9 +221,24 @@ function createPublication(options) {
       const validators = validatorFactory();
       const failed = validators.find(result => !result.passed);
       if (failed) throw new Error(`${failureMessage}：${failed.script}\n${failed.output}`);
-      return { targets, validators };
+      return { targets, validators, graphAuthority };
     } catch (error) {
-      written.reverse().forEach(target => restoreTarget(root, target));
+      written.reverse().forEach(target => {
+        if (target.relativePath === "data/graph.js") {
+          try {
+            const restored = writeGraphAuthority(
+              root,
+              parseGraphSource(target.beforeContent),
+              { expectedPreviousDigest: currentShadowDigest },
+            );
+            currentShadowDigest = restored.sourceDigest;
+          } catch (authorityRestoreError) {
+            error.message += `\n图分片权威恢复失败：${authorityRestoreError.message}`;
+          }
+        } else {
+          restoreTarget(root, target);
+        }
+      });
       error.message += `\n${restoreMessage}`;
       throw error;
     }
@@ -235,6 +270,13 @@ function createPublication(options) {
         afterHash: target.afterHash,
       })),
       validators: (result.validators || []).map(item => ({ script: item.script, passed: item.passed })),
+      graphAuthority: result.graphAuthority && {
+        status: result.graphAuthority.status,
+        previousSourceDigest: result.graphAuthority.previousSourceDigest,
+        sourceDigest: result.graphAuthority.sourceDigest,
+        writeAuthority: result.graphAuthority.writeAuthority,
+        deepEqualAfterReload: result.graphAuthority.deepEqualAfterReload,
+      },
     };
     receipt.receiptHash = sha256(receipt);
     return receipt;
@@ -264,6 +306,13 @@ function createPublication(options) {
         afterHash: target.afterHash,
       })),
       validators: (result.validators || []).map(item => ({ script: item.script, passed: item.passed })),
+      graphAuthority: result.graphAuthority && {
+        status: result.graphAuthority.status,
+        previousSourceDigest: result.graphAuthority.previousSourceDigest,
+        sourceDigest: result.graphAuthority.sourceDigest,
+        writeAuthority: result.graphAuthority.writeAuthority,
+        deepEqualAfterReload: result.graphAuthority.deepEqualAfterReload,
+      },
     };
     receipt.receiptHash = sha256(receipt);
     return receipt;

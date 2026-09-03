@@ -1,0 +1,39 @@
+{
+  "id": "test-time-compute",
+  "title": "推理时计算与验证器",
+  "aliases": [
+    "Test-time Compute",
+    "Inference-time Scaling",
+    "Verifier",
+    "测试时缩放"
+  ],
+  "maturity": "evolving",
+  "domain": "frontier",
+  "heat": 0.9,
+  "summary": "在回答阶段投入更多候选、搜索、验证和工具计算，以成本与延迟换取成功率。",
+  "body": "**是什么**\n\n同一模型在推理时可以生成更长轨迹、采样多个候选、搜索解空间、调用工具，或让验证器筛选结果；这形成区别于预训练规模的第二条计算轴。\n\n**为什么有效**\n\n一次生成可能走错路径；更多候选提高覆盖，验证器把计算集中到更可能正确的答案，代码执行和数学检查还能提供外部反馈。\n\n**与思维链的区别**\n\n[[cot]] 是生成中间步骤的一种方式；推理时计算还包括 [[self-consistency]]、[[tree-of-thoughts]]、搜索、奖励模型和工具闭环。原始轨迹也可以不展示。\n\n**边界**\n\n收益通常递减，弱验证器会选中看似合理的错误答案；比较模型时必须把 token、候选数、工具与延迟预算一起报告。",
+  "cases": [
+    {
+      "title": "代码候选 + 测试",
+      "text": "模型生成 20 个补丁并运行测试，验证器筛掉失败者；成功率提高来自更多尝试和客观反馈，不只是答案写得更长。"
+    },
+    {
+      "title": "验证器也会被骗",
+      "text": "若验证器只偏好格式完整或解释冗长，搜索会优化这些表面特征而不是正确性，形成 [[reward-hacking]]。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Let's Verify Step by Step (2023)",
+      "ref": "https://arxiv.org/abs/2305.20050"
+    },
+    {
+      "type": "url",
+      "title": "Self-Consistency (2022)",
+      "ref": "https://arxiv.org/abs/2203.11171"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

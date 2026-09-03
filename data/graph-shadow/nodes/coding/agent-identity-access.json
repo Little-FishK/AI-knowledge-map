@@ -1,0 +1,39 @@
+{
+  "id": "agent-identity-access",
+  "title": "Agent 身份、权限与密钥管理",
+  "aliases": [
+    "Agent Identity",
+    "Agent Authorization",
+    "Secrets Management",
+    "智能体权限"
+  ],
+  "maturity": "evolving",
+  "domain": "coding",
+  "heat": 0.84,
+  "summary": "明确 Agent 代表谁、能访问什么、凭什么执行，并隔离密钥与高风险权限。",
+  "body": "**是什么**\n\nAgent 接入外部系统时必须有可验证身份、授权范围和凭证生命周期。模型可以建议行动，但执行器只能在明确主体和权限边界内产生副作用。\n\n**为什么是核心安全边界**\n\n[[prompt-injection]] 能操纵模型输出，却不该自动获得数据库、邮箱或云账户权限。真正的硬边界位于模型之外的认证、授权与密钥系统。\n\n**关键机制**\n\n使用短期、任务范围凭证，按用户委托而非共享超级密钥执行；高风险动作结合 [[human-in-the-loop]]、审计日志和资源级策略。\n\n**常见失败**\n\n把长期 API key 放进提示、多个 Agent 共用管理员账户、只校验工具参数格式却不校验资源归属，都会把模型错误放大成真实事故。",
+  "cases": [
+    {
+      "title": "能发邮件不等于能发所有邮件",
+      "text": "Agent 应使用当前用户委托的短期令牌，只能操作指定草稿或收件人；不能持有整个组织的共享管理员密钥。"
+    },
+    {
+      "title": "提示注入被权限截断",
+      "text": "即使网页诱导 Agent 读取工资表，执行器也应因当前任务凭证无权限而拒绝。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "NIST Zero Trust Architecture",
+      "ref": "https://csrc.nist.gov/pubs/sp/800/207/final"
+    },
+    {
+      "type": "url",
+      "title": "OAuth 2.0 Security Best Current Practice",
+      "ref": "https://www.rfc-editor.org/rfc/rfc9700"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

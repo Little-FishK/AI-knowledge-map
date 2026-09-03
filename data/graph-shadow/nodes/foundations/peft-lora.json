@@ -1,0 +1,36 @@
+{
+  "id": "peft-lora",
+  "title": "参数高效微调 PEFT / LoRA",
+  "aliases": [
+    "PEFT",
+    "LoRA",
+    "QLoRA",
+    "Low-Rank Adaptation",
+    "参数高效微调"
+  ],
+  "maturity": "stable",
+  "domain": "foundations",
+  "heat": 0.76,
+  "summary": "冻结大部分基础权重，只训练少量适配参数，以更低显存和存储成本定制模型。",
+  "body": "**是什么**\n\nPEFT 是只更新少量参数的微调家族。LoRA 冻结原矩阵 W，把更新写成低秩乘积 BA，只训练 A、B；QLoRA 再把冻结的基础模型量化。\n\n**为什么有效**\n\n许多下游适配所需的权重变化具有较低内在秩，不必为每个任务复制整套模型参数。\n\n**使什么成为可能**\n\n它降低 [[fine-tuning]] 的显存和存储门槛，可为多个任务保存小型适配器，并与 [[quantization]]、[[deployment]] 结合。\n\n**边界**\n\n省可训练参数不等于训练免费；激活、数据和评测仍有成本。低秩约束也可能限制大幅能力迁移，多个适配器合并还会互相干扰。",
+  "cases": [
+    {
+      "title": "一底座多适配器",
+      "text": "同一个基础模型可挂客服、代码、法律等不同 LoRA，部署时按任务加载，而不用保存多份完整权重。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "LoRA (2021)",
+      "ref": "https://arxiv.org/abs/2106.09685"
+    },
+    {
+      "type": "url",
+      "title": "QLoRA (2023)",
+      "ref": "https://arxiv.org/abs/2305.14314"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

@@ -1,0 +1,36 @@
+{
+  "id": "optimizer-schedule",
+  "title": "优化器与学习率调度",
+  "aliases": [
+    "Optimizer",
+    "Adam",
+    "AdamW",
+    "Learning Rate Schedule",
+    "学习率"
+  ],
+  "maturity": "stable",
+  "domain": "foundations",
+  "heat": 0.66,
+  "summary": "决定拿到梯度后怎样更新参数、每一步走多远，直接影响训练速度与稳定性。",
+  "body": "**是什么**\n\n[[backprop]] 算出梯度，优化器决定如何把它变成参数更新；学习率调度决定不同训练阶段的步长。SGD 直接沿梯度走，Adam 用一阶和二阶矩的滑动估计自适应缩放。\n\n**为什么不是细枝末节**\n\n步长太大可能发散，太小则训练极慢；大模型常需要预热、衰减、梯度裁剪和权重衰减共同稳定训练。\n\n**它约束什么**\n\n同样的数据与模型，优化配方不同会得到不同质量。[[scaling-law]] 的算力预算只有被稳定转化成有效更新才有意义。\n\n**怎么应对**\n\n记录有效批量、峰值学习率、预热比例和梯度范数，用小规模实验验证配方后再扩展。",
+  "cases": [
+    {
+      "title": "预热",
+      "text": "训练初期统计量尚不稳定，直接使用峰值学习率容易破坏权重；先从小步长逐渐升高能降低风险。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Adam (2014)",
+      "ref": "https://arxiv.org/abs/1412.6980"
+    },
+    {
+      "type": "url",
+      "title": "Decoupled Weight Decay Regularization (2017)",
+      "ref": "https://arxiv.org/abs/1711.05101"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}

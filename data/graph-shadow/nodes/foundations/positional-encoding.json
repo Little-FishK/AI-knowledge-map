@@ -1,0 +1,35 @@
+{
+  "id": "positional-encoding",
+  "title": "位置编码与 RoPE",
+  "aliases": [
+    "Positional Encoding",
+    "Position Embedding",
+    "RoPE",
+    "旋转位置编码"
+  ],
+  "maturity": "stable",
+  "domain": "foundations",
+  "heat": 0.7,
+  "summary": "把顺序和相对距离注入注意力，否则 Transformer 无法区分 token 的先后。",
+  "body": "**是什么**\n\n不带位置信息的 [[attention]] 对排列等变，知道有哪些 token，却不知道谁在前谁在后。位置编码给每个 token 注入绝对位置或相对距离信息。\n\n**为什么 RoPE 常见**\n\nRoPE 按位置旋转 Query 和 Key，使点积自然包含相对位置信息；它能与因果注意力高效结合，因此成为许多现代 [[transformer]] 的常用方案。\n\n**约束什么**\n\n位置表示会影响顺序建模、训练长度之外的外推和长 [[context-window]] 表现。把窗口参数调大，不代表模型就学会了利用那些新位置。\n\n**怎么应对**\n\n设计长上下文系统时要同时检查位置方案、训练长度和检索表现，不能只看厂商标称窗口。",
+  "cases": [
+    {
+      "title": "交换主客体",
+      "text": "「甲打乙」与「乙打甲」token 相同、顺序不同；没有位置表示时注意力机制本身无法表达差异。"
+    }
+  ],
+  "sources": [
+    {
+      "type": "url",
+      "title": "Attention Is All You Need (2017)",
+      "ref": "https://arxiv.org/abs/1706.03762"
+    },
+    {
+      "type": "url",
+      "title": "RoFormer / RoPE (2021)",
+      "ref": "https://arxiv.org/abs/2104.09864"
+    }
+  ],
+  "createdAt": "2026-07-21",
+  "updatedAt": "2026-07-21"
+}
