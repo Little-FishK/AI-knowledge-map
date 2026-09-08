@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="app.title.graph">AI 知识地图</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/reading.css">
+<meta name="description" content="面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"><link rel="canonical" href="https://little-fishk.github.io/AI-knowledge-map/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AI 知识地图","url":"https://little-fishk.github.io/AI-knowledge-map/","inLanguage":["zh-Hans","en"],"description":"面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"}</script></head>
+<body><a class="preview-skip" href="#stage">跳到地图 / Skip to map</a>
+
+<div id="app">
+
+  <!-- 顶栏 -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver"></span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-reset" class="btn" title="重置视图" data-i18n="controls.reset" data-i18n-title="controls.reset">重置</button>
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="locale-fallback-banner" class="locale-fallback-banner hidden" role="status" data-i18n="i18n.contentFallback">
+    知识内容的英文翻译仍在准备中；未翻译的内容将显示中文原文。
+  </div>
+
+  <div id="main">
+
+    <!-- 左侧控制栏 -->
+    <aside id="controls">
+      <section class="ctl-group">
+        <h3 data-i18n="controls.view.title">视图</h3>
+        <p class="ctl-hint" data-i18n="controls.view.hint">默认只显示各大区的骨干概念；点任一节点会揭开它的邻居</p>
+        <div class="seg">
+          <button data-scope="core" class="on" data-i18n="controls.scope.core">核心</button>
+          <button data-scope="all" data-i18n="controls.scope.all">全部</button>
+        </div>
+        <div id="scope-status" class="scope-status"></div>
+        <button id="scope-collapse" class="mini wide" data-i18n="controls.scope.collapse">收起已展开的</button>
+      </section>
+
+      <section class="ctl-group">
+        <h3 data-i18n="controls.domains">大区</h3>
+        <div id="domain-list"></div>
+      </section>
+
+      <section class="ctl-group learning-panel" aria-labelledby="learning-heading">
+        <h3 id="learning-heading" data-i18n="learning.title">学习</h3>
+        <div class="learning-overview">
+          <div><strong id="learning-done-count">0</strong><span id="learning-total-count"> / 0 个节点</span></div>
+          <span id="learning-percent">0%</span>
+        </div>
+        <div class="learning-progress" aria-hidden="true"><span id="learning-progress-bar"></span></div>
+        <button id="official-path-toggle" class="official-path-toggle" type="button" aria-pressed="false">
+          <span data-i18n="learning.official">✦ 官方推荐</span><em>130 节点 · 9 层</em>
+        </button>
+        <p id="official-path-note" class="official-path-note hidden" data-i18n="learning.official.note">圆心数字表示知识层级，与大区无关。学完某个整数及其全部小数节点，才进入下一个整数层级。</p>
+        <details class="learning-group" open>
+          <summary><span data-i18n="learning.done">已学习</span> <em id="learning-done-label">0</em></summary>
+          <div id="learning-done-list" class="learning-node-list"></div>
+        </details>
+        <details class="learning-group">
+          <summary><span data-i18n="learning.todo">未学习</span> <em id="learning-todo-label">0</em></summary>
+          <div id="learning-todo-list" class="learning-node-list"></div>
+        </details>
+        <p class="ctl-hint learning-storage-note" data-i18n="learning.storage">进度保存在当前浏览器</p>
+      </section>
+
+      <section class="ctl-group">
+        <h3 class="ctl-toggle-heading">
+          <button id="edge-section-toggle" type="button" aria-expanded="true" aria-controls="edge-section-content">
+            <span data-i18n="controls.relationships">关系类型</span><span class="ctl-chevron" aria-hidden="true">⌄</span>
+          </button>
+        </h3>
+        <div id="edge-section-content">
+          <p class="ctl-hint" data-i18n="controls.relationships.hint">跨领域的联系是这张图的重点</p>
+          <div class="edge-actions">
+            <button class="mini" id="edge-all" data-i18n="controls.selectAll">全选</button>
+            <button class="mini" id="edge-none" data-i18n="controls.selectNone">全不选</button>
+            <button class="mini" id="edge-key" data-i18n="controls.keyOnly">只看关键</button>
+          </div>
+          <div id="edge-list"></div>
+        </div>
+      </section>
+
+      <section class="ctl-group">
+        <h3 data-i18n="controls.focus.title">聚焦</h3>
+        <p class="ctl-hint" data-i18n="controls.focus.hint">点节点后只显示其邻域</p>
+        <label class="chk"><input type="checkbox" id="focus-on" checked> <span data-i18n="controls.focus.mode">聚焦模式</span></label>
+        <label class="range"><span data-i18n="controls.focus.hops">跳数</span> <input type="range" id="focus-hops" min="1" max="3" value="1"><b id="hops-val">1</b></label>
+      </section>
+    </aside>
+
+    <button id="controls-toggle" class="controls-toggle" type="button"
+            aria-controls="controls" aria-expanded="true" aria-label="收起左侧栏" title="收起左侧栏"
+            data-i18n-aria-label="controls.sidebar.collapse" data-i18n-title="controls.sidebar.collapse">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5-5 5.5 5 5.5"></path></svg>
+    </button>
+
+    <!-- 图 -->
+    <main id="stage" tabindex="-1">
+      <div id="cy"></div>
+      <div id="map-zoom" class="map-zoom" role="group" aria-label="地图缩放" data-i18n-aria-label="map.zoom">
+        <button id="map-zoom-out" type="button" title="缩小地图（&lt;）" aria-label="缩小地图" data-i18n-title="map.zoom.outTitle" data-i18n-aria-label="map.zoom.out">−</button>
+        <output id="map-zoom-level" aria-live="polite">100%</output>
+        <button id="map-zoom-in" type="button" title="放大地图（&gt;）" aria-label="放大地图" data-i18n-title="map.zoom.inTitle" data-i18n-aria-label="map.zoom.in">+</button>
+      </div>
+      <div id="legend"></div>
+      <div id="empty-hint" class="hidden" data-i18n="map.empty">没有符合当前筛选的节点</div>
+      <div id="software-view" class="hidden"></div>
+      <div id="library-view" class="hidden"></div>
+    </main>
+
+    <!-- 右侧详情 -->
+    <aside id="detail" class="closed">
+      <button id="detail-close" title="关闭" data-i18n-title="common.close" data-i18n-aria-label="common.close">×</button>
+      <div id="detail-body"></div>
+    </aside>
+
+  </div>
+
+  <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <!-- 理解原理（深读页）全屏阅读视图 -->
+  <div id="deepdive" class="hidden">
+    <header class="dd-top">
+      <button id="dd-back" class="dd-back" data-i18n="deepdive.back">← 返回详情</button>
+      <span id="dd-top-name" class="dd-top-name"></span>
+      <button id="dd-close" class="dd-x" title="关闭" data-i18n-title="common.close" data-i18n-aria-label="common.close">×</button>
+    </header>
+    <div class="dd-scroll"><article id="dd-article"></article></div>
+  </div>
+</div>
+
+<!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
+<script defer src="assets/vendor/cytoscape.min.js"></script>
+<script defer src="data/graph.js"></script>
+<!-- 国际化基础：默认语言随首页加载，其他语言资源按需加载。 -->
+<script defer src="data/locales/manifest.js"></script>
+<script defer src="data/locales/zh-Hans/ui.js"></script>
+<script defer src="assets/app/i18n.js"></script>
+<script defer src="assets/app/content-i18n.js"></script>
+<!-- 理解原理深读页：每个概念一个文件，注册到 window.DEEPDIVE[nodeId] -->
+<!-- 只加载清单；具体页面按需动态注入。 -->
+<script defer src="data/deepdive-runtime/manifest.js"></script>
+<script defer src="assets/layout-quality.js"></script>
+<!-- 软件目录 / 专业资料库 / 使用教程数据不在首屏加载，切到对应视图时按需注入。 -->
+<script defer src="assets/app/shared.js"></script>
+<script defer src="assets/app/runtime-loader.js"></script>
+<script defer src="assets/app/graph-view.js"></script>
+<script defer src="assets/app/learning-view.js"></script>
+<script defer src="assets/app/deepdive-view.js"></script>
+<script defer src="assets/reading.js"></script>
+<script defer src="assets/concept-pages.js"></script>
+<script defer src="assets/app/software-view.js"></script>
+<script defer src="assets/app/library-view.js"></script>
+<script defer src="assets/router.js"></script>
+<script defer src="assets/app.js"></script>
+<script defer src="assets/release-navigation.js"></script></body>
+</html>
