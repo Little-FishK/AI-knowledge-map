@@ -33,6 +33,12 @@
     }
     function stateKey(owner = state.owner) { return owner === 'guest' ? GUEST_KEY : ACCOUNT_PREFIX + owner + '.v1'; }
     function persist() { return safeSet(stateKey(), JSON.stringify(state)); }
+    function finishImport() {
+      const decision=state.guestImportDecision;
+      if(!decision?.pendingKeys)return;
+      if(decision.pendingKeys.some(key=>state.conflicts[key]||state.pending.some(op=>model.key(op.nodeId,op.field)===key)))return;
+      state.guestImportDecision={completedAt:new Date().toISOString()};
+    }
     function snapshot() { return {state: JSON.parse(JSON.stringify(state)), session, error:lastError, loading, importPreview:JSON.parse(JSON.stringify(guestImportPreview))}; }
     function emit() { const value = snapshot(); listeners.forEach(listener => listener(value)); }
     function operationId() {
@@ -65,6 +71,7 @@
             const response = await adapter.apply(op);
             if (sessionGeneration !== generation) return snapshot();
             state = model.acknowledge(state, owner, op.operationId, response);
+            finishImport();
             persist(); emit();
           } catch (error) {
             if (sessionGeneration === generation && state.owner === owner) { lastError = error; persist(); emit(); }
@@ -78,7 +85,7 @@
     async function refresh() {
       if(!adapter||state.owner==='guest')return snapshot();
       const generation=sessionGeneration;
-      try { const rows=await adapter.load();if(generation!==sessionGeneration)return snapshot();state=model.receive(state,rows);lastError=null;persist();emit();return flush(); }
+      try { const rows=await adapter.load();if(generation!==sessionGeneration)return snapshot();state=model.receive(state,rows);guestImportPreview=state.guestImportDecision?[]:model.importPreview(load(GUEST_KEY,'guest'),state);lastError=null;persist();emit();return flush(); }
       catch(error){if(generation===sessionGeneration){lastError=error;emit();}return snapshot();}
     }
     async function switchAccount(nextSession) {
@@ -116,7 +123,7 @@
       adapter.onAuthChange((_event, nextSession) => {
         switchAccount(nextSession).catch(error => { lastError = error; emit(); });
       });
-      options.eventTarget?.addEventListener?.('online', () => { flush().catch(() => {}); });
+      options.eventTarget?.addEventListener?.('online', () => { refresh().catch(() => {}); });
       options.eventTarget?.addEventListener?.('storage', event => {
         if(event.key!==stateKey()||!event.newValue)return;
         if(state.owner!=='guest'){refresh().catch(()=>{});return;}
@@ -137,18 +144,21 @@
     }
     async function resolveConflict(nodeId, field, choice) {
       state = model.resolve(state,nodeId,field,choice,operationId());
+      finishImport();
       lastError = null;persist();emit();
       return flush();
     }
     async function completeGuestImport(choices) {
       if (state.owner==='guest') throw Error('Sign in before importing');
+      if(state.guestImportDecision)return flush();
       const allowed=new Set(guestImportPreview.map(item=>item.key));
       for(const [key,choice] of Object.entries(choices||{}))if(!allowed.has(key)||!['local','remote'].includes(choice))throw Error('Invalid import choice');
+      let candidate=state;const pendingKeys=[];
       for(const item of guestImportPreview) {
         const choice=choices?.[item.key]||'remote';
-        if(choice==='local')state=model.change(state,item.local.nodeId,item.local.field,item.local.value,operationId(),item.local.contentRevision);
+        if(choice==='local'){candidate=model.change(candidate,item.local.nodeId,item.local.field,item.local.value,operationId(),item.local.contentRevision);pendingKeys.push(item.key);}
       }
-      state.guestImportDecision={completedAt:new Date().toISOString()};guestImportPreview=[];lastError=null;persist();emit();
+      state=candidate;state.guestImportDecision={pendingKeys};finishImport();guestImportPreview=[];lastError=null;persist();emit();
       return flush();
     }
     function exportData() { return JSON.stringify({exportVersion:1,exportedAt:new Date().toISOString(),progress:snapshot().state},null,2); }

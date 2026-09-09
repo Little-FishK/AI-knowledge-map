@@ -71,7 +71,8 @@
       <div class="progress-fields" role="group" aria-label="${text('本页学习进度','Progress for this page')}">
         ${[['read','读过','Read'],['understood','自认为理解','I understand'],['practiced','完成自测','Self-test done']].map(([field,zh,en]) =>
           `<button type="button" data-progress-field="${field}" aria-pressed="${recordValue(id,field)}"${snapshot.state.pending.some(op=>op.nodeId===id&&op.field===field)?' disabled':''}>${recordValue(id,field)?'✓ ':''}${text(zh,en)}</button>`).join('')}
-      </div>${conflictHtml(id)}`;
+      </div>${snapshot.error?`<button type="button" data-progress-retry>${text('重试同步','Retry sync')}</button>`:''}${conflictHtml(id)}`;
+    card.querySelector('[data-progress-retry]')?.addEventListener('click',()=>runtime.refresh().catch(()=>{}));
     card.querySelectorAll('[data-progress-field]').forEach(button => button.addEventListener('click', () => {
       const field = button.dataset.progressField;
       runtime.change(id, field, !recordValue(id, field)).catch(() => {});
