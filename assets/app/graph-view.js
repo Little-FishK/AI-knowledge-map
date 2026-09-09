@@ -271,6 +271,11 @@
     }
 
     function restorePresetLayout() {
+      clearTimeout(localLayoutTimer);
+      localLayoutEpoch++;
+      cy.nodes().stop(true, false);
+      mapPositions = null;
+      localLayoutEngaged = false;
       cy.elements().removeClass("hidden");
       if (!ALL_PINNED) {
         const missing = G.nodes.filter(node => !POS[node.id]).map(node => node.id);
@@ -398,10 +403,84 @@
       if (btn) btn.disabled = state.scope !== "core" || state.revealed.size === 0;
     }
 
+    // Local-layout prototype: positions only; graph records and Cytoscape styles stay intact.
+    let localLayoutTimer = null;
+    let localLayoutEpoch = 0;
+    let mapPositions = null;
+    let localLayoutEngaged = false;
+    const supervisedOffsets = {
+      'self-supervised-learning': [-270, -170],
+      'unsupervised-learning': [-290, 90],
+      'decision-tree': [0, -280],
+      'kernel-methods': [250, -210],
+      'fine-tuning': [300, 45],
+      'alignment': [180, 270],
+      'overfitting': [-120, 280]
+    };
+
+    function updateLocalLayout() {
+      const epoch = ++localLayoutEpoch;
+      clearTimeout(localLayoutTimer);
+      const active = state.focus && state.selected === 'supervised-learning'
+        && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
+      const reduced = global.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const duration = reduced ? 0 : 650;
+      if (!active) {
+        if (mapPositions && localLayoutEngaged) {
+          cy.nodes().stop(true, false);
+          const saved = mapPositions;
+          localLayoutEngaged = false;
+          cy.nodes().forEach(node => {
+            if (saved[node.id()]) node.animate({position: saved[node.id()]}, {duration, queue: false, easing: 'ease-in-out-cubic'});
+          });
+        }
+        return;
+      }
+      cy.nodes().stop(true, false);
+      if (!mapPositions) {
+        mapPositions = {};
+        cy.nodes().forEach(node => { mapPositions[node.id()] = {...node.position()}; });
+      }
+      localLayoutEngaged = true;
+      const saved = mapPositions;
+      localLayoutTimer = setTimeout(() => {
+        if (epoch !== localLayoutEpoch) return;
+        cy.resize();
+        const origin = saved['supervised-learning'];
+        const highlighted = cy.nodes('.hl').not('.hidden');
+        const extra = highlighted.filter(n => n.id() !== 'supervised-learning' && !supervisedOffsets[n.id()]).map(n => n.id());
+        const targets = {};
+        highlighted.forEach(node => {
+          let offset = supervisedOffsets[node.id()] || [0, 0];
+          const index = extra.indexOf(node.id());
+          if (index >= 0) {
+            const angle = index * 2 * Math.PI / extra.length;
+            const radius = Math.max(550, extra.length * 45);
+            offset = [Math.cos(angle) * radius, Math.sin(angle) * radius];
+          }
+          targets[node.id()] = {x: origin.x + offset[0], y: origin.y + offset[1]};
+        });
+        cy.nodes().forEach(node => {
+          const position = targets[node.id()] || saved[node.id()];
+          if (position) node.animate({position}, {duration, queue: false, easing: 'ease-in-out-cubic'});
+        });
+        const points = Object.values(targets);
+        if (!points.length) return;
+        const x1 = Math.min(...points.map(p => p.x)) - 105;
+        const x2 = Math.max(...points.map(p => p.x)) + 105;
+        const y1 = Math.min(...points.map(p => p.y)) - 70;
+        const y2 = Math.max(...points.map(p => p.y)) + 70;
+        const zoom = Math.max(cy.minZoom(), Math.min(1.25, cy.maxZoom(), (cy.width() - 50) / (x2 - x1), (cy.height() - 50) / (y2 - y1)));
+        cy.stop(true, false);
+        cy.animate({zoom, pan: {x: cy.width() / 2 - (x1 + x2) / 2 * zoom, y: cy.height() / 2 - (y1 + y2) / 2 * zoom}}, {duration, queue: false, easing: 'ease-in-out-cubic'});
+      }, reduced ? 0 : 360);
+    }
+
     function applyFocus() {
       const previouslyFocused = cy.elements(".dim, .hl");
       if (!state.focus || !state.selected) {
         if (previouslyFocused.length) previouslyFocused.removeClass("dim hl");
+        updateLocalLayout();
         return;
       }
 
@@ -420,6 +499,7 @@
         hood.addClass("hl");
         hoodEdges.addClass("hl");
       });
+      updateLocalLayout();
     }
 
 
