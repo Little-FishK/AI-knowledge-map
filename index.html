@@ -6,7 +6,8 @@
 <title data-i18n="app.title.graph">AI 知识地图</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/reading.css">
-<meta name="description" content="面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"><link rel="canonical" href="https://little-fishk.github.io/AI-knowledge-map/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AI 知识地图","url":"https://little-fishk.github.io/AI-knowledge-map/","inLanguage":["zh-Hans","en"],"description":"面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"}</script></head>
+  <link rel="stylesheet" href="assets/progress.css">
+<meta name="description" content="面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"><link rel="canonical" href="https://ai-knowledge-map.com/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AI 知识地图","url":"https://ai-knowledge-map.com/","inLanguage":["zh-Hans","en"],"description":"面向 AI 初学者和非技术读者的 AI 全貌、基础概念与底层逻辑知识地图。"}</script></head>
 <body><a class="preview-skip" href="#stage">跳到地图 / Skip to map</a>
 
 <div id="app">
@@ -185,6 +186,11 @@
 
 <!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
 <script defer src="assets/vendor/cytoscape.min.js"></script>
+<script defer src="assets/vendor/supabase-2.115.0.min.js"></script>
+<script defer src="assets/progress-model.js"></script>
+<script defer src="assets/progress-supabase.js"></script>
+<script defer src="assets/progress-runtime.js"></script>
+<script defer src="assets/progress-ui.js"></script>
 <script defer src="data/graph.js"></script>
 <!-- 国际化基础：默认语言随首页加载，其他语言资源按需加载。 -->
 <script defer src="data/locales/manifest.js"></script>
