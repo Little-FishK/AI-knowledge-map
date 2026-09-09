@@ -417,11 +417,28 @@
       'alignment': [180, 270],
       'overfitting': [-120, 280]
     };
+    const neuralOffsets = {
+      'rnn': [-230, -360],
+      'transformer': [30, -430],
+      'batch-norm': [290, -320],
+      'vanishing-gradient': [-90, -210],
+      'gradient-descent': [410, -70],
+      'cnn': [380, 170],
+      'gan': [220, 360],
+      'vae': [-40, 410],
+      'kernel-methods': [-290, 330],
+      'decision-tree': [-420, 130],
+      'interpretability': [-440, -90],
+      'adversarial-robustness': [-410, -290]
+    };
+    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets};
 
     function updateLocalLayout() {
       const epoch = ++localLayoutEpoch;
       clearTimeout(localLayoutTimer);
-      const active = state.focus && state.selected === 'supervised-learning'
+      const selectedId = state.selected;
+      const offsets = localLayouts[selectedId];
+      const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
       const reduced = global.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const duration = reduced ? 0 : 650;
@@ -446,12 +463,12 @@
       localLayoutTimer = setTimeout(() => {
         if (epoch !== localLayoutEpoch) return;
         cy.resize();
-        const origin = saved['supervised-learning'];
+        const origin = saved[selectedId];
         const highlighted = cy.nodes('.hl').not('.hidden');
-        const extra = highlighted.filter(n => n.id() !== 'supervised-learning' && !supervisedOffsets[n.id()]).map(n => n.id());
+        const extra = highlighted.filter(n => n.id() !== selectedId && !offsets[n.id()]).map(n => n.id());
         const targets = {};
         highlighted.forEach(node => {
-          let offset = supervisedOffsets[node.id()] || [0, 0];
+          let offset = offsets[node.id()] || [0, 0];
           const index = extra.indexOf(node.id());
           if (index >= 0) {
             const angle = index * 2 * Math.PI / extra.length;
