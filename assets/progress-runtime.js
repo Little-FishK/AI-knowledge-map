@@ -19,6 +19,7 @@
     let flushPromise = null;
     let guestImportPreview = [];
     let sessionGeneration = 0;
+    let loading = false;
 
     function safeGet(key) { try { return storage?.getItem(key) || ''; } catch (_) { return ''; } }
     function safeSet(key, value) { try { storage?.setItem(key, value); return true; } catch (_) { return false; } }
@@ -32,7 +33,7 @@
     }
     function stateKey(owner = state.owner) { return owner === 'guest' ? GUEST_KEY : ACCOUNT_PREFIX + owner + '.v1'; }
     function persist() { return safeSet(stateKey(), JSON.stringify(state)); }
-    function snapshot() { return {state: JSON.parse(JSON.stringify(state)), session, error:lastError, importPreview:JSON.parse(JSON.stringify(guestImportPreview))}; }
+    function snapshot() { return {state: JSON.parse(JSON.stringify(state)), session, error:lastError, loading, importPreview:JSON.parse(JSON.stringify(guestImportPreview))}; }
     function emit() { const value = snapshot(); listeners.forEach(listener => listener(value)); }
     function operationId() {
       if (options.randomUUID) return options.randomUUID();
@@ -81,22 +82,28 @@
       catch(error){if(generation===sessionGeneration){lastError=error;emit();}return snapshot();}
     }
     async function switchAccount(nextSession) {
+      const owner = nextSession?.user?.id || 'guest';
+      // Auth emits SIGNED_IN before verifyOtp resolves, and can emit it again
+      // for the same session. Do not restart the in-flight progress read.
+      if (owner !== 'guest' && session?.user?.id === owner && state.owner === owner) {
+        session=nextSession;return snapshot();
+      }
       const generation=++sessionGeneration;
       session = nextSession;
-      const owner = nextSession?.user?.id || 'guest';
+      loading=owner!=='guest';
       if (owner === 'guest') { state = load(GUEST_KEY, 'guest');guestImportPreview=[]; }
       else {
         state = load(stateKey(owner), owner);
         guestImportPreview=[];lastError=null;emit();
         let rows;
         try { rows=await adapter.load(); }
-        catch(error){if(generation!==sessionGeneration)return snapshot();throw error;}
+        catch(error){if(generation!==sessionGeneration)return snapshot();loading=false;lastError=error;persist();emit();return snapshot();}
         if(generation!==sessionGeneration)return snapshot();
         state = model.receive(state, rows);
         const guest=load(GUEST_KEY,'guest');
         guestImportPreview=state.guestImportDecision?[]:model.importPreview(guest,state);
       }
-      lastError = null; persist(); emit();
+      loading=false;lastError = null; persist(); emit();
       if (owner !== 'guest') await flush();
       return snapshot();
     }

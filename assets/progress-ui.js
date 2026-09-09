@@ -45,6 +45,7 @@
   }
   function recordValue(id, field) { return snapshot.state.records[model.key(id, field)]?.value === true; }
   function statusCopy() {
+    if(snapshot.loading)return text('已登录，正在读取云端进度…','Signed in. Loading cloud progress…');
     if (Object.keys(snapshot.state.conflicts).length) return text('发现同步冲突，请选择保留哪个版本', 'Sync conflict: choose which version to keep.');
     if (snapshot.error) return text('同步失败，记录保留在本机，可稍后重试', 'Sync failed. Your change remains on this device.');
     if (snapshot.state.pending.length) return text('正在同步…', 'Syncing…');
@@ -55,7 +56,7 @@
   function renderCard(article) {
     const id = nodeIdFor(article);
     if (!id) return;
-    const signature = [snapshot.state.owner, Boolean(snapshot.error), snapshot.state.pending.some(op=>op.nodeId===id),
+    const signature = [snapshot.state.owner, Boolean(snapshot.error), Boolean(snapshot.loading), snapshot.state.pending.some(op=>op.nodeId===id),
       JSON.stringify(Object.values(snapshot.state.conflicts).filter(item=>item.local.nodeId===id)),
       ...['read','understood','practiced'].map(field=>recordValue(id,field))].join('|');
     let card = article.querySelector(':scope > .progress-card');
@@ -149,6 +150,7 @@
       actions.querySelector('[data-change-email]').onclick=()=>{if(authBusy)return;codeForm.classList.add('hidden');emailForm.classList.remove('hidden');codeForm.querySelector('input').value='';setDialogMessage('');emailForm.querySelector('input').focus();};
       codeForm.addEventListener('submit',async event=>{
         event.preventDefault();if(authBusy)return;
+        if(snapshot.state.owner!=='guest'){closeDialog();return;}
         const token=codeForm.querySelector('input').value.trim();busy(true);setDialogMessage(text('正在验证…','Verifying…'));
         try{await runtime.verifyCode(loginEmail,token);if(active())closeDialog();}
         catch(error){if(active())showAuthError(error);}finally{busy(false);}
@@ -157,7 +159,13 @@
     overlay.querySelector('input,button')?.focus();
   }
   function closeDialog(){dialog().classList.add('hidden');}
-  runtime.subscribe(value=>{snapshot=value;refreshCards();});
+  runtime.subscribe(value=>{
+    snapshot=value;refreshCards();
+    // Authentication is complete before cloud progress finishes loading.
+    // Never leave the one-time-code form open after a session is established.
+    const overlay=document.getElementById('progress-account-overlay');
+    if(value.state.owner!=='guest'&&overlay?.querySelector('[data-code-form]'))overlay.classList.add('hidden');
+  });
   const observer=new MutationObserver(refreshCards);observer.observe(document.body,{childList:true,subtree:true});
   runtime.start().catch(error=>console.error('Progress initialization failed',error));
   refreshCards();
