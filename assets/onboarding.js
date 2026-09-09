@@ -6,6 +6,7 @@
   const count = lessons.length;
   let storage = null, storageFailed = false, returnFocus = null, previousTitle = document.title;
   let state = model.normalize(null, count);
+  let view = 'map';
   try {
     storage = global.localStorage;
     state = model.normalize(JSON.parse(storage.getItem(model.key)), count);
@@ -50,15 +51,21 @@
   function render(focus = false) {
     const lesson = lessons[state.cursor];
     const last = state.cursor === count - 1;
-    document.title = `${lesson.title}｜新手导览 · AI 知识地图`;
+    const isMap = view === 'map';
+    document.title = `${isMap ? '新手地图' : lesson.title}｜新手导览 · AI 知识地图`;
+    root.setAttribute('aria-labelledby', isMap ? 'onboarding-title' : 'onboarding-lesson-title');
     root.innerHTML = `<div class="onboarding-shell">
       <header class="onboarding-top"><div class="onboarding-brand"><span aria-hidden="true">◈</span>AI 知识地图</div>
         <button class="onboarding-skip" type="button" data-skip>${model.unlocked(state, count) ? (english() ? '返回地图 / Back to map' : '返回地图') : (english() ? '我已熟悉AI基础用法 / Skip introduction' : '我已熟悉AI基础用法')}</button></header>
-      <div class="onboarding-intro"><div class="dd-eyebrow">你的第一张地图</div><h1 id="onboarding-title" tabindex="-1">快速认识AI世界</h1>
+      ${isMap ? `<div class="onboarding-intro"><div class="dd-eyebrow">你的第一张地图</div><h1 id="onboarding-title" tabindex="-1">快速认识AI世界</h1>
         <p>从一件身边的小事出发，走过6站，再进入完整知识地图。</p><p>每站约3–4分钟 · 无需编程或注册 · 点“读过”继续，也可以随时回来。</p>
-        ${english() ? '<p class="onboarding-fallback" lang="en">This beginner guide is currently in Chinese. You can skip it and explore the map in English.</p>' : ''}</div>
+        ${english() ? '<p class="onboarding-fallback" lang="en">This beginner guide is currently in Chinese. You can skip it and explore the map in English.</p>' : ''}</div>` : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
       <p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>
-      <article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
+      ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
+        const locked = index > state.read;
+        const read = index < state.read;
+        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true">${read ? '✓' : index + 1}</span><span class="onboarding-node-name">${escape(item.short)}</span><span class="onboarding-node-status">${read ? '已读过 · 再看看' : locked ? '读过上一站后解锁' : '点击开始阅读'}</span></button></li>`;
+      }).join('')}</ol><p class="onboarding-map-hint">点击亮起的节点开始。每读过一站，就解锁下一站；走完六站，开启完整知识地图。</p>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
       ${lesson.sections.map(([title, html], index) => `<section class="dd-sec"><h2><span class="dd-n" aria-hidden="true">${index + 1}</span>${escape(title)}</h2>${html}${index === 1 ? figure(lesson) : ''}</section>`).join('')}
@@ -67,11 +74,10 @@
       <footer class="dd-src">参考与继续阅读 · 本页为本站原创入门讲解<ul>${lesson.sources.map(([label, url]) => `<li><a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a></li>`).join('')}</ul></footer>
       <div class="onboarding-footer"><button class="onboarding-prev" type="button" data-prev ${state.cursor === 0 ? 'disabled' : ''}>← 上一站</button>
         <button class="onboarding-next" type="button" data-next>${last ? '读过，进入完整地图' : state.cursor < state.read ? '下一站 →' : '读过，下一站 →'}</button></div>
-      </article><p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p></div>`;
+      </article>`}<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p></div>`;
     if (focus) {
-      root.querySelector('#onboarding-lesson-title').focus({preventScroll: true});
-      const reader = root.querySelector('.onboarding-reader');
-      root.scrollTop = reader.offsetTop - 20;
+      root.querySelector(isMap ? '#onboarding-title' : '#onboarding-lesson-title').focus({preventScroll: true});
+      root.scrollTop = 0;
     }
   }
   function open() {
@@ -80,6 +86,7 @@
     previousTitle = document.title;
     app.inert = true;
     root.hidden = false;
+    view = 'map';
     persist();
     render();
     root.scrollTop = 0;
@@ -102,6 +109,13 @@
     if (button.hasAttribute('data-skip')) {
       if (!model.unlocked(state, count)) state = {...state, skipped: true};
       persist(); close();
+    } else if (button.hasAttribute('data-map')) {
+      view = 'map'; render(true);
+    } else if (button.hasAttribute('data-visit')) {
+      const index = Number(button.dataset.visit);
+      if (!Number.isInteger(index) || index < 0 || index >= count || index > state.read) return;
+      state = model.visit(state, index, count); persist();
+      view = 'reader'; render(true);
     } else if (button.hasAttribute('data-next')) {
       const last = state.cursor === count - 1;
       state = model.advance(state, count); persist();

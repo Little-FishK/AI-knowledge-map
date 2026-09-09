@@ -11,6 +11,30 @@
 .onboarding-intro h1 { font-size: clamp(25px, 4vw, 34px); margin: 8px 0 10px; }
 .onboarding-intro p { color: var(--fg-dim); font-size: 14px; line-height: 1.8; margin: 6px 0; }
 .onboarding-status { font-size: 13px; color: var(--fg-dim); margin: 12px 0; }
+.onboarding-route { display: flex; list-style: none; margin: 70px 0 48px; padding: 0; }
+.onboarding-route li { flex: 1; min-width: 0; position: relative; }
+.onboarding-route li:not(:last-child)::after { content: ''; position: absolute; top: 38px; left: 50%; width: 100%; height: 2px; background: var(--line); }
+.onboarding-route li.is-read::after { background: var(--accent); }
+.onboarding-route button { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; border: 0; padding: 0 4px; background: transparent; color: var(--fg); font: inherit; cursor: pointer; }
+.onboarding-dot { display: grid; place-items: center; box-sizing: border-box; width: 78px; height: 78px; border: 2px solid var(--accent); border-radius: 50%; background: var(--bg); color: var(--accent); font-size: 27px; }
+.is-current .onboarding-dot { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 12%, transparent); }
+.is-read .onboarding-dot { background: var(--bg-panel); }
+.onboarding-node-name { font-size: 17px; }
+.onboarding-node-status { color: var(--fg-dim); font-size: 12px; }
+.onboarding-route button:disabled { cursor: default; color: var(--fg-dim); }
+.is-locked .onboarding-dot { border: 1px dashed var(--line); color: var(--fg-dim); }
+.onboarding-map-hint { text-align: center; color: var(--fg-dim); font-size: 14px; line-height: 1.9; margin-bottom: 60px; }
+.onboarding-reader-nav { margin: 24px 0; }
+@media (max-width: 760px) {
+  .onboarding-route { flex-direction: column; margin: 32px auto; max-width: 360px; gap: 0; }
+  .onboarding-route li { min-height: 104px; }
+  .onboarding-route li:not(:last-child)::after { top: 32px; left: 31px; width: 2px; height: 100%; }
+  .onboarding-route button { display: grid; grid-template-columns: 64px 1fr; text-align: left; column-gap: 24px; row-gap: 6px; padding: 0; }
+  .onboarding-dot { grid-row: 1 / 3; width: 64px; height: 64px; }
+  .onboarding-node-name { align-self: end; }
+  .onboarding-node-status { align-self: start; }
+  .onboarding-map-hint { margin: 0 0 28px; }
+}
 .onboarding-reader { max-width: 780px; margin: 0 auto; padding: 28px 28px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-panel); }
 .onboarding-reader .dd-h1 { font-size: clamp(23px, 3vw, 30px); line-height: 1.5; }
 .onboarding-reader .dd-sec { margin-top: 28px; }
