@@ -19,7 +19,22 @@
   const runtime = runtimeFactory.create({model, adapter, storage:global.localStorage,eventTarget:global,
     legacyKey:'ai-knowledge-map.learned.v1', randomUUID:()=>global.crypto.randomUUID()});
   let snapshot = runtime.get();
-  let loginEmail = '';
+  let authBusy = false;
+  const lastCodeSent = new Map();
+
+  function authErrorMessage(error) {
+    if (error.code === 'otp_expired') return text('验证码无效或已过期。服务端未区分具体原因，请核对邮箱与最新邮件中的验证码，或重新发送。','The code is invalid or expired. The server did not distinguish the cause. Check the email address and latest email, or resend the code.');
+    if (['over_email_send_rate_limit','over_request_rate_limit'].includes(error.code) || error.status === 429) return text('请求过于频繁，请稍后再试。若已收到邮件，请使用最新邮件中的验证码。','Too many requests. Try again later. If an email has arrived, use the code from the latest email.');
+    if (error.name === 'AuthRetryableFetchError' || error.code === 'request_timeout' || error instanceof TypeError) return text('未能连接登录服务或请求超时，请检查网络后重试。','Could not reach the sign-in service or the request timed out. Check your connection and retry.');
+    if (['validation_failed','email_address_invalid'].includes(error.code)) return text('邮箱或验证码格式不正确，请检查输入。','Check the format of your email address and code.');
+    return text('登录服务暂时无法完成请求，请稍后重试。','The sign-in service could not complete the request. Please try again later.');
+  }
+  function showAuthError(error) {
+    setDialogMessage(authErrorMessage(error),true);
+    const node=dialog().querySelector('.progress-account-message');
+    // Keep the machine-readable category for diagnosis, never the email or OTP.
+    if(node)node.dataset.errorCode=/^[a-z_]+$/.test(error.code||'')?error.code:'unknown';
+  }
 
   function nodeIdFor(article) {
     if (article?.dataset.conceptId) return article.dataset.conceptId;
@@ -96,7 +111,7 @@
     document.body.append(overlay); overlay.querySelector('.progress-account-backdrop').onclick=closeDialog;overlay.querySelector('.progress-account-close').onclick=closeDialog;
     overlay.addEventListener('keydown',event=>{if(event.key==='Escape')closeDialog();});return overlay;
   }
-  function setDialogMessage(message,error=false){const node=dialog().querySelector('.progress-account-message');if(node){node.textContent=message;node.classList.toggle('is-error',error);}}
+  function setDialogMessage(message,error=false){const node=dialog().querySelector('.progress-account-message');if(node){node.textContent=message;node.classList.toggle('is-error',error);delete node.dataset.errorCode;}}
   function openDialog(){const overlay=dialog(),content=overlay.querySelector('.progress-account-content');overlay.classList.remove('hidden');
     if(snapshot.state.owner!=='guest') {
       const imports=snapshot.importPreview||[];
@@ -107,8 +122,38 @@
       content.querySelector('[data-delete]').onclick=async()=>{if(!global.confirm(text('删除账号会永久删除云端学习进度。确认继续？','Deleting your account permanently removes cloud progress. Continue?')))return;try{await runtime.deleteAccount();closeDialog();}catch(error){setDialogMessage(error.message,true);}};
     }
     else content.innerHTML=`<form data-email-form><label>${text('邮箱','Email')}<input type="email" required autocomplete="email"></label><button type="submit">${text('发送验证码','Send code')}</button></form><form data-code-form class="hidden"><label>${text('六位验证码','Six-digit code')}<input inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"></label><button type="submit">${text('登录','Sign in')}</button></form><p class="progress-account-message" role="status"></p>`;
-    content.querySelector('[data-email-form]')?.addEventListener('submit',async event=>{event.preventDefault();if(!adapter)return setDialogMessage(text('账号服务暂不可用','Account service is unavailable'),true);const emailForm=event.currentTarget,codeForm=content.querySelector('[data-code-form]');loginEmail=emailForm.querySelector('input').value.trim();try{await runtime.sendCode(loginEmail);emailForm.classList.add('hidden');codeForm.classList.remove('hidden');setDialogMessage(text('验证码已发送，请检查邮箱','Code sent. Check your email.'));codeForm.querySelector('input').focus();}catch(error){setDialogMessage(error.message,true);}});
-    content.querySelector('[data-code-form]')?.addEventListener('submit',async event=>{event.preventDefault();try{await runtime.verifyCode(loginEmail,event.currentTarget.querySelector('input').value.trim());closeDialog();}catch(error){setDialogMessage(error.message,true);}});
+    const emailForm=content.querySelector('[data-email-form]'),codeForm=content.querySelector('[data-code-form]');
+    if(emailForm) {
+      let loginEmail='';
+      const recipient=document.createElement('p');recipient.dataset.codeRecipient='';codeForm.prepend(recipient);
+      const actions=document.createElement('div');actions.className='progress-account-actions';
+      actions.innerHTML=`<button type="button" data-resend-code>${text('重新发送验证码','Resend code')}</button><button type="button" data-change-email>${text('更换邮箱','Change email')}</button>`;codeForm.append(actions);
+      const active=()=>emailForm.isConnected;
+      const busy=value=>{authBusy=value;content.querySelectorAll('input,button').forEach(node=>{node.disabled=value;});};
+      const send=async email=>{
+        if(authBusy)return;
+        if(!adapter)return setDialogMessage(text('账号服务暂不可用','Account service is unavailable'),true);
+        const remaining=Math.ceil((60000-(Date.now()-(lastCodeSent.get(email.toLowerCase())||0)))/1000);
+        if(remaining>0)return setDialogMessage(text(`请等待 ${remaining} 秒后重新发送。`,`Wait ${remaining} seconds before resending.`),true);
+        busy(true);setDialogMessage(text('正在发送验证码…','Sending code…'));
+        try {
+          await runtime.sendCode(email);lastCodeSent.set(email.toLowerCase(),Date.now());
+          if(!active())return;
+          loginEmail=email;recipient.textContent=text('验证码发送至：','Code sent to: ')+email;
+          emailForm.classList.add('hidden');codeForm.classList.remove('hidden');codeForm.querySelector('input').value='';
+          setDialogMessage(text('验证码已发送，请使用最新邮件中的六位验证码。','Code sent. Use the six-digit code in the latest email.'));
+        }catch(error){if(active())showAuthError(error);}finally{busy(false);if(active()&&!codeForm.classList.contains('hidden'))codeForm.querySelector('input').focus();}
+      };
+      emailForm.addEventListener('submit',event=>{event.preventDefault();send(emailForm.querySelector('input').value.trim());});
+      actions.querySelector('[data-resend-code]').onclick=()=>send(loginEmail);
+      actions.querySelector('[data-change-email]').onclick=()=>{if(authBusy)return;codeForm.classList.add('hidden');emailForm.classList.remove('hidden');codeForm.querySelector('input').value='';setDialogMessage('');emailForm.querySelector('input').focus();};
+      codeForm.addEventListener('submit',async event=>{
+        event.preventDefault();if(authBusy)return;
+        const token=codeForm.querySelector('input').value.trim();busy(true);setDialogMessage(text('正在验证…','Verifying…'));
+        try{await runtime.verifyCode(loginEmail,token);if(active())closeDialog();}
+        catch(error){if(active())showAuthError(error);}finally{busy(false);}
+      });
+    }
     overlay.querySelector('input,button')?.focus();
   }
   function closeDialog(){dialog().classList.add('hidden');}
