@@ -4,6 +4,7 @@ window.AI_LOCALES.en = Object.freeze({
   locale: "en",
   revision: "2026-09-03-stage4",
   messages: Object.freeze({
+    "onboarding.open": "Beginner guide",
     "app.title.graph": "AI Knowledge Map",
     "app.title.library": "Professional Library",
     "app.title.software": "AI Software Directory",

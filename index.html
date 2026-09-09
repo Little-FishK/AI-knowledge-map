@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/reading.css">
   <link rel="stylesheet" href="assets/progress.css">
+  <link rel="stylesheet" href="assets/onboarding.css">
 <title>AI 全貌与基础原理 · AI 知识地图</title>
 <meta name="description" content="面向 AI 初学者和非技术读者的免费知识项目，通过知识地图、概念解释和学习进度记录，认识 AI 世界的全貌与基础逻辑。">
 <meta name="robots" content="index, follow">
@@ -31,7 +32,7 @@
 </head>
 <body><a class="preview-skip" href="#stage">跳到地图 / Skip to map</a>
 
-<div id="app">
+<div id="app" inert>
 
   <!-- 顶栏 -->
   <header id="topbar">
@@ -51,6 +52,7 @@
       <div id="search-results"></div>
     </div>
     <div class="topbar-actions">
+      <button id="btn-onboarding" class="btn" type="button" data-i18n="onboarding.open">新手导览</button>
       <button id="btn-reset" class="btn" title="重置视图" data-i18n="controls.reset" data-i18n-title="controls.reset">重置</button>
       <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
               aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
@@ -206,6 +208,9 @@
 </div>
 
 <!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
+<script defer src="assets/onboarding-content.js"></script>
+<script defer src="assets/onboarding-model.js"></script>
+<script defer src="assets/onboarding.js"></script>
 <script defer src="assets/vendor/cytoscape.min.js"></script>
 <script defer src="assets/vendor/supabase-2.115.0.min.js"></script>
 <script defer src="assets/progress-model.js"></script>

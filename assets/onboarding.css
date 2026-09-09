@@ -1,0 +1,53 @@
+/* Standalone welcome route. Existing reader typography and figure classes are shared. */
+.onboarding-pending #app { visibility: hidden; }
+#onboarding[hidden] { display: none; }
+#onboarding { position: fixed; inset: 0; z-index: 100; overflow-y: auto; background: var(--bg); color: var(--fg); overscroll-behavior: contain; }
+.onboarding-shell { max-width: 1020px; margin: auto; padding: 24px 32px 64px; }
+.onboarding-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.onboarding-brand { color: var(--fg-dim); font-size: 14px; }
+.onboarding-brand span { color: var(--accent); margin-right: 10px; }
+.onboarding-skip { font: inherit; font-size: 13px; background: transparent; color: var(--fg-dim); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+.onboarding-intro { margin: 28px 0 24px; }
+.onboarding-intro h1 { font-size: clamp(25px, 4vw, 34px); margin: 8px 0 10px; }
+.onboarding-intro p { color: var(--fg-dim); font-size: 14px; line-height: 1.8; margin: 6px 0; }
+.onboarding-status { font-size: 13px; color: var(--fg-dim); margin: 12px 0; }
+.onboarding-reader { max-width: 780px; margin: 0 auto; padding: 28px 28px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-panel); }
+.onboarding-reader .dd-h1 { font-size: clamp(23px, 3vw, 30px); line-height: 1.5; }
+.onboarding-reader .dd-sec { margin-top: 28px; }
+.onboarding-reader .dd-sec p, .onboarding-reader .dd-sec li { font-size: 16px; line-height: 1.9; }
+.onboarding-reader .dd-sec h2 { font-size: 20px; }
+.onboarding-reader .dd-fig svg { width: 100%; max-width: 610px; }
+.onboarding-reader .dd-fig figcaption { font-size: 13px; }
+.onboarding-reader .dd-thesis { font-size: 15px; }
+.onboarding-example { margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; line-height: 1.85; color: var(--fg); background: var(--bg); }
+.onboarding-example p:last-child { margin-bottom: 0; }
+.onboarding-reader details { border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin: 24px 0; }
+.onboarding-reader summary { cursor: pointer; color: var(--accent); line-height: 1.7; }
+.onboarding-reader details p { font-size: 15px; line-height: 1.85; color: var(--fg-dim); }
+.onboarding-footer { display: flex; align-items: center; gap: 16px; justify-content: space-between; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+.onboarding-next, .onboarding-prev { border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; font: inherit; font-size: 14px; cursor: pointer; }
+.onboarding-next { background: var(--accent); color: #101822; font-weight: 650; }
+.onboarding-prev { background: transparent; color: var(--fg-dim); }
+.onboarding-prev:disabled { opacity: .4; cursor: default; }
+.onboarding-reader .dd-src { font-size: 13px; line-height: 1.8; margin-top: 24px; }
+.onboarding-storage { color: #e4b85d; font-size: 13px; line-height: 1.8; }
+#onboarding :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+#onboarding h1:focus, #onboarding h2:focus { outline: none; }
+.onboarding-fallback { font-size: 13px; color: var(--fg-dim); }
+@media (max-width: 620px) {
+  /* The legacy mobile header hid all actions, including the way back to this guide. */
+  #topbar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
+  #topbar .search-wrap { order: 2; flex-basis: 100%; max-width: none; }
+  #topbar .topbar-actions { display: flex; order: 3; flex-basis: 100%; flex-wrap: wrap; gap: 8px; }
+  #topbar .topbar-actions #btn-settings,
+  #topbar .topbar-actions #btn-reset:not(.hidden) { display: inline-flex; align-items: center; }
+}
+@media (max-width: 600px) {
+  .onboarding-shell { padding: 16px 14px 36px; }
+  .onboarding-top { align-items: flex-start; }
+  .onboarding-brand { max-width: 100px; line-height: 1.7; }
+  .onboarding-skip { max-width: 200px; line-height: 1.5; padding: 9px; }
+  .onboarding-reader { padding: 20px 16px; }
+  .onboarding-footer { gap: 8px; }
+  .onboarding-next, .onboarding-prev { padding: 12px; }
+}

@@ -144,7 +144,12 @@
     const { sourceLocale, defaultLocale } = validateManifest(manifest);
     const registry = config.registry || {};
     const documentRef = config.document || (typeof document !== "undefined" ? document : null);
-    const storage = config.storage || (typeof localStorage !== "undefined" ? localStorage : null);
+    let storage = config.storage || null;
+    // Some browser privacy settings throw even when accessing the storage getter.
+    if (!storage) {
+      try { storage = typeof localStorage !== "undefined" ? localStorage : null; }
+      catch (_) { storage = null; }
+    }
     const storageKey = config.storageKey || manifest.storageKey || "ai-knowledge-map.locale.v1";
     const listeners = new Set();
     const loads = new Map();

@@ -16,7 +16,9 @@
     });
     adapter = adapterFactory.create(client);
   }
-  const runtime = runtimeFactory.create({model, adapter, storage:global.localStorage,eventTarget:global,
+  let localProgressStorage = null;
+  try { localProgressStorage = global.localStorage; } catch (_) {}
+  const runtime = runtimeFactory.create({model, adapter, storage:localProgressStorage,eventTarget:global,
     legacyKey:'ai-knowledge-map.learned.v1', randomUUID:()=>global.crypto.randomUUID()});
   let snapshot = runtime.get();
   let authBusy = false;

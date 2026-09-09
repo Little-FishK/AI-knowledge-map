@@ -4,6 +4,9 @@
 (async function () {
   "use strict";
 
+  // Keep the existing map and deep links dormant until the local introduction ends.
+  if (window.AI_ONBOARDING) await window.AI_ONBOARDING.ready;
+
   const G = window.GRAPH;
   const ROUTER = window.APP_ROUTER;
   const APP = window.AIMap;
@@ -103,7 +106,7 @@
     navigate: goToRoute,
     onShowNode: (id, jumped) => showNodeOnMap(id, jumped),
     onSelectionChange: id => syncMapSelectionUrl(id),
-    isActive: () => mode === "graph",
+    isActive: () => mode === "graph" && !window.AI_ONBOARDING?.isOpen(),
     t,
     content,
   });
