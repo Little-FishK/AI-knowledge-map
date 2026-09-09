@@ -1,0 +1,31 @@
+"use strict";
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(process.argv[2]||'site-release');
+const read=name=>fs.readFileSync(path.join(root,name),'utf8');
+const manifest=JSON.parse(read('release-manifest.json'));
+assert.equal(manifest.mode,'production');
+assert.deepEqual(manifest.pages.map(p=>({id:p.id,locale:p.locale,eligible:p.eligible})),[{id:'supervised-learning',locale:'zh',eligible:true}]);
+assert.equal(manifest.excluded.length,129);
+const home=read('index.html'),concept=read('zh/concepts/supervised-learning/index.html'),search=read('search/index.html'),notFound=read('404.html');
+assert.equal(manifest.siteUrl,'https://ai-knowledge-map.com/');
+assert.equal(read('CNAME').trim(),'ai-knowledge-map.com');
+assert(home.includes('<link rel="canonical" href="https://ai-knowledge-map.com/">'));
+assert(home.includes('application/ld+json'));assert(!home.includes('noindex'));
+assert(concept.includes('<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/supervised-learning/">'));
+assert(!concept.includes('hreflang="en"'));assert(!concept.includes('本地构建预览'));assert(!concept.includes('noindex'));
+assert(search.includes('<link rel="canonical" href="https://ai-knowledge-map.com/search/">'));assert(!search.includes('noindex'));
+assert(notFound.includes('noindex, nofollow'));assert(!notFound.includes('本地预览：'));
+assert(!fs.existsSync(path.join(root,'en','concepts')));
+const sitemap=read('sitemap.xml');
+for(const url of ['https://ai-knowledge-map.com/','https://ai-knowledge-map.com/search/','https://ai-knowledge-map.com/zh/concepts/supervised-learning/'])assert(sitemap.includes(`<loc>${url}</loc>`));
+assert.equal((sitemap.match(/<url>/g)||[]).length,manifest.seoPages?manifest.seoPages.filter(p=>p.indexable).length:3);
+if(manifest.seoPages?.some(p=>p.kind==='AboutPage')){
+  const about=read('about/index.html');assert(about.includes('LittleFishK'));assert(about.includes('CC BY 4.0'));assert(about.includes('/licenses/MIT.txt'));assert(home.includes('href="/about/"'));
+}
+const navigation={};vm.runInNewContext(read('assets/concept-pages.js'),{window:navigation});
+assert.deepEqual(Object.keys(navigation.AI_STATIC_CONCEPTS),['supervised-learning']);
+assert.deepEqual(Object.keys(navigation.AI_STATIC_CONCEPTS['supervised-learning']),['zh-Hans']);
+const searchIndex=JSON.parse(read('assets/site-search-index.json'));
+assert.equal(searchIndex.filter(item=>item.kind==='中文理解页').length,1);
+assert.equal(searchIndex.some(item=>item.kind==='English reading'),false);
+console.log('PASS: qualified single-page release, canonical/schema/sitemap, no fake English, production copy and 404 indexing policy');

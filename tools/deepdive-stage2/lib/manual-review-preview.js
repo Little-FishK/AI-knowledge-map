@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const fs = require("fs");
 const { loadDeepDivePages: loadDeepDivePagesFromDisk } = require("../../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
 
@@ -70,6 +71,14 @@ function createManualReviewPreviewServices(dependencies) {
       const publishedPage = loadDeepDivePages(resolvedRoot)[id];
       if (!publishedPage) throw new Error(`页面 ${id} 没有正式正文可供比较`);
       const candidatePage = candidateRecord.page;
+      const evaluation = record.qualityEvaluation;
+      const labels = {pass:'通过',fail:'未通过',complete:'完整','not-tested':'未做真实读者测试','targeted-review-only':'仅完成定向复验','not-established':'尚未建立结论'};
+      const valueLabel = value => escapePreviewHtml(labels[value] || value || '待检查');
+      const evaluationMarkup = evaluation?.pageHash === pageContentHash(candidatePage) && evaluation?.records?.status
+        ? `<p>规则版本：${escapePreviewHtml(evaluation.policyVersion)} · <span class="hash">${escapePreviewHtml(evaluation.policyHash)}</span></p>`
+          + `<ul><li>准确性：${valueLabel(evaluation.accuracy)}</li><li>讲解效果（专家审核）：${valueLabel(evaluation.teaching?.expertReview)}</li>`
+          + `<li>真实初学者验证：${valueLabel(evaluation.teaching?.learnerValidation)}</li><li>审核记录：${valueLabel(evaluation.records.status)}</li></ul>`
+        : '<p>尚无当前候选版本的完整v4评价；历史审核不自动升级。</p>';
       const publishedSections = previewSections(publishedPage.html);
       const candidateSections = previewSections(candidatePage.html);
       const sectionCount = Math.max(publishedSections.length, candidateSections.length);
@@ -121,6 +130,10 @@ function createManualReviewPreviewServices(dependencies) {
       }).join("");
       const processMarkup = `<div class="table-scroll"><table class="process-table"><thead><tr><th>轮次</th><th>审查缺陷</th><th>改动内容</th></tr></thead>`
         + `<tbody>${processRows}<tr class="final-row"><th>最终状态</th><td colspan="2">${escapePreviewHtml(finalStatus)}</td></tr></tbody></table></div>`;
+      const authorizedRepairMarkup = (record.authorizedRepairHistory || []).map(receipt =>
+        `<div class="panel"><h3>另行授权的限定修复</h3><p>${escapePreviewHtml(receipt.authorization)}</p>`
+        + `<p>${escapePreviewHtml(receipt.createdAt)}</p><p class="hash">${escapePreviewHtml(receipt.beforeHash)} → ${escapePreviewHtml(receipt.afterHash)}</p>`
+        + `<p>补充来源：${escapePreviewHtml(receipt.sourceUrl)}</p></div>`).join('');
       const blockerMarkup = (record.blockers || []).length
         ? `<ol>${record.blockers.map(blocker => (
           `<li><code>${escapePreviewHtml(blocker.code || blocker.type || "blocker")}</code>`
@@ -165,7 +178,8 @@ function createManualReviewPreviewServices(dependencies) {
   <div>${escapePreviewHtml(candidatePage.subtitle || "")}</div>
   <p class="muted">状态：manual-review · 候选哈希</p><div class="hash">${escapePreviewHtml(pageContentHash(candidatePage))}</div></header>
   <nav><a href="#process">流程展示表</a><a href="#candidate">最终候选</a><a href="#blockers">当前阻断项</a><a href="#fields">字段差异</a><a href="#sections">章节差异</a></nav>
-  <section id="process" class="panel"><h2>两轮审查与改进</h2>${processMarkup}</section>
+  <section id="process" class="panel"><h2>两轮审查与改进</h2>${processMarkup}${authorizedRepairMarkup}</section>
+  <section class="panel"><h2>三项独立评价</h2>${evaluationMarkup}<p>专家审核通过不等于真实初学者已经学会，也不等于候选已经发布。</p></section>
   <section id="candidate" class="panel"><h2>最终候选页面</h2><div class="candidate"><p>${sanitizePreviewHtml(candidatePage.thesis || "")}</p>${sanitizePreviewHtml(candidatePage.html)}</div></section>
   <section id="blockers" class="panel"><h2>当前控制器阻断项（${(record.blockers || []).length}）</h2>${blockerMarkup}</section>
   <section id="fields" class="panel"><h2>字段差异</h2>${fieldMarkup}</section>
@@ -173,11 +187,23 @@ function createManualReviewPreviewServices(dependencies) {
   </main></body></html>`;
       const relativePath = `.stage2/previews/${id}.html`;
       atomicWrite(withinRoot(resolvedRoot, relativePath), preview);
+      let localPreviewUrlPath = null;
+      if (input.localBrowserPreview === true) {
+        const browserFile = path.join(resolvedRoot, '.tmp', 'website-preview', 'pages', 'zh', 'concepts', id, 'index.html');
+        let current = resolvedRoot;
+        for (const part of path.relative(resolvedRoot,browserFile).split(path.sep)) {
+          current=path.join(current,part);
+          if(fs.existsSync(current)&&fs.lstatSync(current).isSymbolicLink())throw Error('Preview path contains symlink');
+        }
+        atomicWrite(browserFile,preview);
+        localPreviewUrlPath = `/preview/zh/concepts/${id}/`;
+      }
       return {
         status: "ready",
         pageId: id,
         state: record.state,
         previewPath: relativePath,
+        ...(localPreviewUrlPath ? {localPreviewUrlPath} : {}),
         candidateHash: pageContentHash(candidatePage),
         publishedHash: pageContentHash(publishedPage),
         changedFields,

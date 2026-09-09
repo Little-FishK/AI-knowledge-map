@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { applyEditorialErrata } = require("./editorial-errata");
 const { loadDeepDivePages } = require("../../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
 const {
@@ -193,10 +194,15 @@ function createEditorialCandidateImport(options) {
       if (reason.length < 3) throw new Error("候选导入原因至少需要 3 个字符");
       const publishedPage = loadDeepDivePages(resolvedRoot)[id];
       if (!publishedPage) throw new Error(`无法读取页面 ${id} 的当前正式版本`);
+      if (input.errata && (input.page || input.useContentGenerationOutput || input.removedSectionTitles)) {
+        throw new Error("Errata cannot be combined with a page, generation or section removal");
+      }
+      const errata = input.errata ? applyEditorialErrata(id, publishedPage, input.errata,
+        process.env.STAGE2_EDITORIAL_ERRATA_HASH, record.errataReceipts || []) : null;
       const generatedCandidate = input.useContentGenerationOutput === true
         ? buildEditorialPageFromContentGeneration(resolvedRoot, record, publishedPage)
         : null;
-      const page = generatedCandidate ? generatedCandidate.page : clone(input.page);
+      const page = errata ? errata.page : generatedCandidate ? generatedCandidate.page : clone(input.page);
       if (page && typeof page === "object") delete page.publication;
       const pageErrors = validatePage(id, page);
       pageErrors.push(...editorialContentPolicyGaps(page));
@@ -205,10 +211,13 @@ function createEditorialCandidateImport(options) {
       if (narrativeBlockers.length) {
         throw new Error(`人工候选触发模板化叙事阻断：${narrativeBlockers.map(item => item.message).join("；")}`);
       }
-      const removedSectionTitles = Array.isArray(input.removedSectionTitles)
+      const removedSectionTitles = errata ? [] : Array.isArray(input.removedSectionTitles)
         ? input.removedSectionTitles
         : defaultRemovedSectionTitles;
-      let preservation = editorialPreservationReport(publishedPage, page, removedSectionTitles);
+      // Errata changes are constructed solely from the exact authorized spans.
+      // Compare against that expected result, never a caller-supplied full page.
+      let preservation = editorialPreservationReport(errata ? errata.page : publishedPage, page, removedSectionTitles);
+      if (errata) preservation.authorizedErrataHash = errata.receipt.packetHash;
       if (generatedCandidate && !preservation.passed
         && (preservation.missingFigureCount || preservation.missingTableCount)) {
         const originalSections = sectionRecordsForPreservation(publishedPage.html);
@@ -251,7 +260,7 @@ function createEditorialCandidateImport(options) {
         page,
         pageHash,
         preservation,
-        source: generatedCandidate ? generatedCandidate.source : { type: "inline-page" },
+        source: errata ? errata.receipt : generatedCandidate ? generatedCandidate.source : { type: "inline-page" },
       };
       const publication = {
         schemaVersion: 1,
@@ -299,7 +308,7 @@ function createEditorialCandidateImport(options) {
         reason: reason.slice(0, 500),
         publishedAt: now,
         preservation,
-        source: generatedCandidate ? generatedCandidate.source : { type: "inline-page" },
+        source: errata ? errata.receipt : generatedCandidate ? generatedCandidate.source : { type: "inline-page" },
         previousRecord,
         targets: (publicationResult.targets || []).map(target => ({
           relativePath: target.relativePath,
@@ -348,6 +357,7 @@ function createEditorialCandidateImport(options) {
         record.provisionalReceipt = null;
         record.completionReceipt = null;
         record.updatedAt = now;
+        if (errata) record.errataReceipts = [...(record.errataReceipts || []), { ...errata.receipt, acceptedAt: now }];
         saveState(resolvedRoot, state);
       } catch (error) {
         const targets = publicationResult.targets || [];

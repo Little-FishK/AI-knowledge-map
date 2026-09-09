@@ -1,8 +1,25 @@
 "use strict";
 
 const path = require("path");
+const { inventoryPageAssets } = require('./lib/page-asset-inventory');
 const {
   ROOT,
+  buildWebsite,
+  inspectAuditUpgrade,
+  queueAuditUpgrade,
+  applyInformationTheoryAuthorizedRepair,
+  diagnoseCandidateGate,
+  createReadinessCheckpoint,
+  loadState,
+  registerSourceHumanConfirmation,
+  translationPublication,
+  translationQuality,
+  translationBatch,
+  translationDeepSeek,
+  exportTranslationSnapshot,
+  readTranslationSnapshot,
+  prepareTranslationTask,
+  checkTranslationSnapshot,
   backfillStateV2Objects,
   buildStateV2Shadow,
   claimTask,
@@ -46,13 +63,93 @@ const provisionalPublishAuthorized = /^(?:1|true|yes)$/i.test(
 const restrictedWorkerProfile = capabilityProfile === "audit"
   || capabilityProfile === "repair"
   || capabilityProfile === "content-generation";
-const pageLockedProfile = restrictedWorkerProfile || capabilityProfile === "controller";
+const qualityProfiles = ["translation-quality", "translation-review", "translation-repair", "translation-publication", "translation-static", "translation-deepseek", "human-confirmation"];
+const pageLockedProfile = restrictedWorkerProfile || capabilityProfile === "controller" || capabilityProfile === "translation" || capabilityProfile === "translation-batch" || qualityProfiles.includes(capabilityProfile);
 let buffer = "";
 let claimAttempted = false;
 let submitAttempted = false;
 let claimedLease = null;
+let qualityDelivery = null;
+let qualitySubmitted = false;
 
 const allTools = [
+  {name:'stage2_build_website',description:'控制器构建独立网站产物；中文独立于翻译，预览保留未核验标记，生产要求当前人工批准与完整审核；不部署、不改变内容状态。',inputSchema:{type:'object',required:['siteUrl','mode'],properties:{siteUrl:{type:'string'},mode:{type:'string',enum:['preview','production']}},additionalProperties:false}},
+  ...[
+    ["stage2_build_deepseek_translation", "离线生成独立 DeepSeek 单页计划；必须明确模型、账号标签、峰时价格、预算和推理强度，不上传。", { snapshotId: { type: "string" }, config: { type: "object", additionalProperties: false,
+      required: ["model", "accountId", "contextWindow", "maxOutputTokens", "reasoningEffort", "inputUsdPerMillion", "outputUsdPerMillion", "priceBasis", "budgetUsd", "maxAttempts", "requestTimeoutMs"],
+      properties: { model: { type: "string", enum: ["deepseek-v4-pro"] }, accountId: { type: "string", pattern: "^[A-Za-z0-9_-]{3,80}$" },
+        contextWindow: { type: "integer", minimum: 1, maximum: 1000000 }, maxOutputTokens: { type: "integer", minimum: 1, maximum: 384000 },
+        reasoningEffort: { type: "string", enum: ["none", "low", "high", "max"] }, inputUsdPerMillion: { type: "number", exclusiveMinimum: 0 },
+        outputUsdPerMillion: { type: "number", exclusiveMinimum: 0 }, priceBasis: { type: "string", enum: ["peak-cache-miss"] },
+        budgetUsd: { type: "number", exclusiveMinimum: 0 }, maxAttempts: { type: "integer", minimum: 1, maximum: 3 },
+        requestTimeoutMs: { type: "integer", minimum: 1000, maximum: 600000 } } } }, ["snapshotId", "config"]],
+    ["stage2_inspect_deepseek_translation", "只读 DeepSeek 章节进度和费用预留，不返回正文。", { planId: { type: "string" } }, ["planId"]],
+    ["stage2_run_deepseek_translation", "精确计划和独立凭据获授权后只调用下一章；逐章保存，失败重试须明确要求，不明确结果禁止重发。", { planId: { type: "string" }, retry: { type: "boolean" } }, ["planId"]],
+    ["stage2_preview_translation", "重组冻结译文并返回版本绑定的候选及待验收项，不发布。", { reviewId: { type: "string" }, offset: { type: "integer", minimum: 0 }, maxChars: { type: "integer", minimum: 1, maximum: 12000 } }, ["reviewId"]],
+    ["stage2_build_static_translation", "从当前已批准中英版本构建双语静态样板，不部署；页锁定并核对接受回执。", { reviewId: { type: "string" }, artifactHash: { type: "string" }, siteUrl: { type: "string" } }, ["reviewId", "artifactHash", "siteUrl"]],
+    ["stage2_publish_translation", "仅发布全部门禁及人工验收通过的精确英文候选；启动环境必须授权该摘要。", { reviewId: { type: "string" }, artifactHash: { type: "string" }, acceptance: { type: "object" } }, ["reviewId", "artifactHash", "acceptance"]],
+    ["stage2_begin_translation_quality", "从指定提供方已收齐的译文建立独立检查记录，不发布；默认 openai。", { planId: { type: "string" }, provider: { type: "string", enum: ["openai", "deepseek"] } }, ["planId"]],
+    ["stage2_inspect_translation_quality", "检查九项门禁的真实状态；浏览器和资源未验证时保持待完成。", { reviewId: { type: "string" } }, ["reviewId"]],
+    ["stage2_read_translation_quality_packet", "按调度策略和顺序分页读取当前角色材料；首审 medium、返修 high、返修后复验 low。", { reviewId: { type: "string" }, reasoningEffort: { type: "string", enum: ["low", "medium", "high"] }, offset: { type: "integer", minimum: 0 }, maxChars: { type: "integer", minimum: 1, maximum: 12000 } }, ["reviewId", "reasoningEffort"]],
+    ["stage2_submit_translation_review", "独立审查角色提交逐单元证据与整页结论，不允许修改译文。", { reviewId: { type: "string" }, revision: { type: "string" }, evidence: { type: "object" } }, ["reviewId", "revision", "evidence"]],
+    ["stage2_repair_translation_units", "返修角色仅修改已定位缺陷的英文单元；最多两轮，之后重新审查。", { reviewId: { type: "string" }, revision: { type: "string" }, replacements: { type: "object", additionalProperties: { type: "string" } } }, ["reviewId", "revision", "replacements"]],
+  ].map(([name, description, properties, required]) => ({ name, description, inputSchema: { type: "object", additionalProperties: false,
+    required: ["pageId", ...required], properties: { pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, ...properties } } })),
+  ...[
+    ["stage2_build_translation_batch", "仅本地构建整页 Batch 计划与费用估算，不上传。模型、价格和预算必须明确提供。", { snapshotId: { type: "string" }, config: { type: "object", additionalProperties: false,
+      required: ["model", "projectId", "contextWindow", "maxOutputTokens", "reasoningEffort", "inputUsdPerMillion", "outputUsdPerMillion", "budgetUsd", "maxAttempts"], properties: {
+        model: { type: "string" }, projectId: { type: "string" }, contextWindow: { type: "integer", minimum: 1 }, maxOutputTokens: { type: "integer", minimum: 1 },
+        reasoningEffort: { type: "string", enum: ["high"] },
+        inputUsdPerMillion: { type: "number", exclusiveMinimum: 0 }, outputUsdPerMillion: { type: "number", exclusiveMinimum: 0 }, budgetUsd: { type: "number", exclusiveMinimum: 0 }, maxAttempts: { type: "integer", minimum: 1, maximum: 3 },
+      } } }, ["snapshotId", "config"]],
+    ["stage2_inspect_translation_batch", "只读本地 Batch 进度、失败章节和费用记录，不返回正文。", { planId: { type: "string" } }, ["planId"]],
+    ["stage2_submit_translation_batch", "仅在环境授权精确计划后，计数、上传并提交 Batch；不明确的提交禁止重发。", { planId: { type: "string" }, retry: { type: "boolean" } }, ["planId"]],
+    ["stage2_reconcile_translation_batch", "核对不明确的远端批次；找不到唯一匹配时继续阻止重复付费。", { planId: { type: "string" } }, ["planId"]],
+    ["stage2_collect_translation_batch", "查询远端状态并保存输出/错误，按请求编号接收未审译文；不发布。", { planId: { type: "string" } }, ["planId"]],
+  ].map(([name, description, properties, required]) => ({ name, description, inputSchema: { type: "object", additionalProperties: false,
+    required: ["pageId", ...required], properties: { pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, ...properties } } })),
+  ...[
+    ["stage2_register_source_human_confirmation", "登记维护者对当前中文版本的明确确认；仅写独立凭证，不改变正文、机器审计或发布状态。必须使用绑定页面及完整内容摘要的专用授权进程。", {
+      expectedSourceHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      expectedContentHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+      humanConfirmed: { type: "boolean", const: true }, statement: { type: "string", minLength: 1, maxLength: 4000 }
+    }, ["expectedSourceHash", "expectedContentHash", "humanConfirmed", "statement"]],
+    ["stage2_export_translation_snapshot", "冻结当前发布中文页及术语表，仅写独立翻译快照，不改中文审核状态。", { expectedSourceHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" } }, ["expectedSourceHash"]],
+    ["stage2_read_translation_snapshot", "分页读取本页完整翻译快照，包含既有自测；不读取私有审计。", { snapshotId: { type: "string" }, offset: { type: "integer", minimum: 0 }, maxChars: { type: "integer", minimum: 1, maximum: 12000 } }, ["snapshotId"]],
+    ["stage2_prepare_translation_task", "分页返回冻结章节的翻译提示词、术语与精确输出合同；无 API 调用和发布。", { snapshotId: { type: "string" }, chapterId: { type: "string" }, offset: { type: "integer", minimum: 0 }, maxChars: { type: "integer", minimum: 1, maximum: 12000 } }, ["snapshotId", "chapterId"]],
+    ["stage2_check_translation_snapshot", "核对原文、术语、资源和批准标记是否变化；不会自动发布。", { snapshotId: { type: "string" } }, ["snapshotId"]],
+  ].map(([name, description, properties, required]) => ({ name, description,
+    inputSchema: { type: "object", additionalProperties: false,
+      required: ["pageId", ...required], properties: { pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, ...properties } } })),
+  {
+    name: "stage2_inventory_pages",
+    description: "只读列出理解页工作流及发布状态元数据，不返回正文、私有审核结论或租约令牌；状态不代表已核验构建资格。",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {name:'stage2_inspect_audit_upgrade',description:'只读检查当前候选的合同版本与三维评价，不返回正文或私有审查答案。',
+    inputSchema:{type:'object',required:['pageId'],properties:{pageId:{type:'string',pattern:'^[a-z0-9-]+$'}},additionalProperties:false}},
+  {name:'stage2_queue_audit_upgrade',description:'完整控制器保存旧页、审核与状态快照，将哈希匹配页面排入v4独立补审；不重置返修预算、不改现有发布状态。',
+    inputSchema:{type:'object',required:['pageId','expectedCandidateHash','reason'],properties:{pageId:{type:'string',pattern:'^[a-z0-9-]+$'},expectedCandidateHash:{type:'string',pattern:'^sha256:[a-f0-9]{64}$'},reason:{type:'string',minLength:3,maxLength:500}},additionalProperties:false}},
+  {
+    name: "stage2_diagnose_candidate_gate",
+    description: "仅供完整控制器重跑候选机械门禁，返回净化类别；可在临时夹具预检参照摘要更新，不改正式基准、正文、状态或发布资格。",
+    inputSchema: { type: "object", required: ["pageId"], properties: { pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, referenceUpdatePreview: {type: "boolean"} }, additionalProperties: false },
+  },
+  {
+    name: "stage2_apply_information_theory_authorized_repair",
+    description: "执行用户已确认的信息论限定修复：当前锁定候选第8节SVG下标及第7节Hugging Face来源。只写候选并排入独立审核，不发布。",
+    inputSchema: {type:"object",required:["expectedCandidateHash"],properties:{expectedCandidateHash:{type:"string",pattern:"^sha256:[a-f0-9]{64}$"}},additionalProperties:false},
+  },
+  {
+    name: "stage2_create_readiness_checkpoint",
+    description: "完整控制器创建本机项目与受控运行材料的隔离备份，逐文件验证独立恢复；不返回正文或私有文件名，不改正式状态，活动租约期间拒绝。",
+    inputSchema: {type:"object",properties:{},additionalProperties:false},
+  },
+  {
+    name: "stage2_inventory_page_assets",
+    description: "完整控制器只读列出当前网页各页来源摘要、图表编号摘要、外链与英文文件存在性，不返回正文或审核答案，不验证质量或发布资格。",
+    inputSchema: {type:"object",properties:{},additionalProperties:false},
+  },
   {
     name: "stage2_status",
     description: "查看串行理解原理页队列的汇总状态；不返回页面正文。",
@@ -187,6 +284,7 @@ const allTools = [
         pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
         page: { type: "object" },
         useContentGenerationOutput: { type: "boolean" },
+        errata: { type: "object", description: "Exact source-bound change packet; requires trusted launcher STAGE2_EDITORIAL_ERRATA_HASH authorization." },
         reason: { type: "string", minLength: 3, maxLength: 500 },
         summary: { type: "string", maxLength: 500 },
         removedSectionTitles: {
@@ -198,6 +296,7 @@ const allTools = [
       anyOf: [
         { required: ["page"] },
         { properties: { useContentGenerationOutput: { const: true } }, required: ["useContentGenerationOutput"] },
+        { required: ["errata"] },
       ],
       additionalProperties: false,
     },
@@ -258,6 +357,7 @@ const allTools = [
           },
         },
         finalStatus: { type: "string", maxLength: 200 },
+        localBrowserPreview: {type:"boolean",description:"把同一人工复核预览写入本地预览服务器允许目录；不改正式页面。"},
       },
       additionalProperties: false,
     },
@@ -512,7 +612,17 @@ if (provisionalPublishAuthorized) {
 }
 
 const capabilityTools = {
-  full: new Set(allTools.map(tool => tool.name)),
+  'website-build': new Set(['stage2_build_website']),
+  "human-confirmation": new Set(["stage2_register_source_human_confirmation"]),
+  "translation-deepseek": new Set(["stage2_build_deepseek_translation", "stage2_inspect_deepseek_translation", "stage2_run_deepseek_translation"]),
+  "translation-static": new Set(["stage2_build_static_translation"]),
+  "translation-publication": new Set(["stage2_preview_translation", "stage2_publish_translation"]),
+  "translation-quality": new Set(["stage2_begin_translation_quality", "stage2_inspect_translation_quality"]),
+  "translation-review": new Set(["stage2_read_translation_quality_packet", "stage2_submit_translation_review"]),
+  "translation-repair": new Set(["stage2_read_translation_quality_packet", "stage2_repair_translation_units"]),
+  "translation-batch": new Set(["stage2_build_translation_batch", "stage2_inspect_translation_batch", "stage2_submit_translation_batch", "stage2_reconcile_translation_batch", "stage2_collect_translation_batch"]),
+  translation: new Set(["stage2_export_translation_snapshot", "stage2_read_translation_snapshot", "stage2_prepare_translation_task", "stage2_check_translation_snapshot"]),
+  full: new Set(allTools.map(tool => tool.name).filter(name => !["stage2_register_source_human_confirmation", "stage2_submit_translation_review", "stage2_repair_translation_units", "stage2_publish_translation", "stage2_build_static_translation"].includes(name))),
   controller: controllerTools,
   audit: new Set([
     "stage2_claim_task",
@@ -542,6 +652,12 @@ if (!Object.hasOwn(capabilityTools, capabilityProfile)) {
 }
 if (pageLockedProfile && !/^[a-z0-9][a-z0-9-]*$/.test(lockedPageId)) {
   throw new Error(`STAGE2_MCP_PAGE_ID is required for the ${capabilityProfile} capability profile`);
+}
+if (capabilityProfile === "human-confirmation" && process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== "hold") {
+  throw new Error("Human confirmation requires explicit manual-review action hold; publication is outside this capability");
+}
+if (["translation-review", "translation-repair"].includes(capabilityProfile) && !String(process.env.STAGE2_MCP_WORKER_ID || "").trim()) {
+  throw new Error("Translation review/repair requires an explicit independent STAGE2_MCP_WORKER_ID");
 }
 
 const allowedToolNames = capabilityTools[capabilityProfile];
@@ -602,7 +718,7 @@ function compactClaimResult(value) {
   return compact;
 }
 
-function handle(message) {
+async function handle(message) {
   const { id, method, params } = message;
   if (method === "notifications/initialized") return;
   if (method === "initialize") {
@@ -620,11 +736,111 @@ function handle(message) {
     if (!allowedToolNames.has(name)) {
       return response(id, restrictedError(`Tool ${name} is not available in the ${capabilityProfile} capability profile`));
     }
-    if (capabilityProfile === "controller" && args.pageId && args.pageId !== lockedPageId) {
+    if (["controller", "translation", "translation-batch", ...qualityProfiles].includes(capabilityProfile) && args.pageId && args.pageId !== lockedPageId) {
       return response(id, restrictedError(`This controller process is locked to page ${lockedPageId}`));
     }
     try {
+      if (name === "stage2_register_source_human_confirmation") {
+        if (args.pageId !== lockedPageId || !/^sha256:[a-f0-9]{64}$/.test(String(process.env.STAGE2_HUMAN_CONFIRMATION_HASH || ""))
+          || process.env.STAGE2_HUMAN_CONFIRMATION_HASH !== args.expectedContentHash) throw new Error("Exact source human confirmation authorization required");
+        if (submitAttempted) throw new Error("One human confirmation attempt per process");
+        submitAttempted = true;
+        return response(id, toolResult(registerSourceHumanConfirmation(root, args.pageId, args)));
+      }
+      if (name === "stage2_build_deepseek_translation") return response(id, toolResult(translationDeepSeek.buildDeepSeekTranslation(root, args.pageId, args.snapshotId, args.config)));
+      if (name === "stage2_inspect_deepseek_translation") return response(id, toolResult(translationDeepSeek.inspectDeepSeekTranslation(root, args.pageId, args.planId)));
+      if (name === "stage2_run_deepseek_translation") return response(id, toolResult(await translationDeepSeek.runDeepSeekTranslation(root, args.pageId, args.planId, args.retry)));
+      if (name === "stage2_preview_translation") {
+        const text = JSON.stringify(translationPublication.previewTranslation(root, args.pageId, args.reviewId));
+        const offset = args.offset ?? 0, maxChars = args.maxChars ?? 12000;
+        if (!Number.isInteger(offset) || offset < 0 || offset > text.length || !Number.isInteger(maxChars) || maxChars < 1 || maxChars > 12000) throw new Error("Invalid pagination");
+        const content = text.slice(offset, offset + maxChars), nextOffset = offset + content.length;
+        return response(id, toolResult({ content, nextOffset, done: nextOffset === text.length, totalChars: text.length }));
+      }
+      if (name === "stage2_build_static_translation") {
+        if (submitAttempted) throw new Error("One static build per process");
+        if (process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== "hold") throw new Error("Static build requires manual-review hold");
+        submitAttempted = true;
+        return response(id, toolResult(translationPublication.buildStaticTranslation(root, args.pageId, args.reviewId, args.artifactHash, args.siteUrl)));
+      }
+      if (name === "stage2_publish_translation") {
+        if (submitAttempted) throw new Error("One publication attempt per process");
+        submitAttempted = true;
+        return response(id, toolResult(translationPublication.publishTranslation(root, args.pageId, args.reviewId, args.artifactHash, args.acceptance)));
+      }
+      if (name === "stage2_begin_translation_quality") return response(id, toolResult(translationQuality.beginTranslationQuality(root, args.pageId, args.planId, args.provider)));
+      if (name === "stage2_inspect_translation_quality") return response(id, toolResult(translationQuality.inspectTranslationQuality(root, args.pageId, args.reviewId)));
+      if (name === "stage2_read_translation_quality_packet") {
+        const role = capabilityProfile === "translation-repair" ? "repair" : "review";
+        const packet = translationQuality.translationQualityPacket(root, args.pageId, args.reviewId, role);
+        if (args.reasoningEffort !== packet.schedule.reasoningEffort) throw new Error(`Scheduled reasoning effort is ${packet.schedule.reasoningEffort}`);
+        const text = JSON.stringify(packet), offset = args.offset ?? 0, maxChars = args.maxChars ?? 12000;
+        if (!Number.isInteger(offset) || offset < 0 || offset > text.length || !Number.isInteger(maxChars) || maxChars < 1 || maxChars > 12000) throw new Error("Invalid pagination");
+        if (!qualityDelivery) {
+          if (offset !== 0) throw new Error("Read packet from offset zero");
+          qualityDelivery = { reviewId: args.reviewId, revision: packet.revision, reasoningEffort: args.reasoningEffort, nextOffset: 0, done: false };
+        }
+        if (qualityDelivery.reviewId !== args.reviewId || qualityDelivery.revision !== packet.revision || qualityDelivery.reasoningEffort !== args.reasoningEffort || qualityDelivery.nextOffset !== offset) throw new Error("Packet revision, schedule or read order changed; start a fresh role process");
+        const content = text.slice(offset, offset + maxChars), nextOffset = offset + content.length;
+        Object.assign(qualityDelivery, { nextOffset, done: nextOffset === text.length });
+        return response(id, toolResult({ reviewId: args.reviewId, revision: packet.revision, content, nextOffset, totalChars: text.length, done: qualityDelivery.done }));
+      }
+      if (["stage2_submit_translation_review", "stage2_repair_translation_units"].includes(name)) {
+        if (!qualityDelivery?.done || qualityDelivery.reviewId !== args.reviewId || qualityDelivery.revision !== args.revision || qualitySubmitted) throw new Error("Complete current packet first; only one submission per role process");
+        qualitySubmitted = true;
+        const result = name === "stage2_submit_translation_review"
+          ? translationQuality.submitTranslationReview(root, args.pageId, args.reviewId, args.revision, args.evidence, lockedWorkerId)
+          : translationQuality.repairTranslationUnits(root, args.pageId, args.reviewId, args.revision, args.replacements, lockedWorkerId);
+        return response(id, toolResult(result));
+      }
+      if (name === "stage2_build_translation_batch") return response(id, toolResult(translationBatch.buildTranslationBatch(root, args.pageId, args.snapshotId, args.config)));
+      if (name === "stage2_inspect_translation_batch") return response(id, toolResult(translationBatch.inspectTranslationBatch(root, args.pageId, args.planId)));
+      if (name === "stage2_submit_translation_batch") return response(id, toolResult(await translationBatch.submitTranslationBatch(root, args.pageId, args.planId, args.retry)));
+      if (name === "stage2_reconcile_translation_batch") return response(id, toolResult(await translationBatch.reconcileTranslationBatch(root, args.pageId, args.planId)));
+      if (name === "stage2_collect_translation_batch") return response(id, toolResult(await translationBatch.collectTranslationBatch(root, args.pageId, args.planId)));
+      if (name === "stage2_export_translation_snapshot") {
+        return response(id, toolResult(exportTranslationSnapshot(root, args.pageId, args.expectedSourceHash)));
+      }
+      if (name === "stage2_read_translation_snapshot") {
+        return response(id, toolResult(readTranslationSnapshot(root, args.pageId, args.snapshotId, args.offset, args.maxChars)));
+      }
+      if (name === "stage2_check_translation_snapshot") {
+        return response(id, toolResult(checkTranslationSnapshot(root, args.pageId, args.snapshotId)));
+      }
+      if (name === "stage2_prepare_translation_task") {
+        const task = prepareTranslationTask(root, args.pageId, args.snapshotId, args.chapterId);
+        const offset = args.offset ?? 0, maxChars = args.maxChars ?? 12000;
+        const text = JSON.stringify(task);
+        if (!Number.isInteger(offset) || offset < 0 || offset > text.length || !Number.isInteger(maxChars) || maxChars < 1 || maxChars > 12000) throw new Error("Invalid pagination");
+        const content = text.slice(offset, offset + maxChars), nextOffset = offset + content.length;
+        return response(id, toolResult({ taskId: task.taskId, snapshotId: args.snapshotId, content, nextOffset, totalChars: text.length, done: nextOffset === text.length }));
+      }
       if (name === "stage2_status") return response(id, toolResult(status(root)));
+      if (name === "stage2_diagnose_candidate_gate") return response(id, toolResult(diagnoseCandidateGate(root,args.pageId,{referenceUpdatePreview:args.referenceUpdatePreview === true})));
+      if(name==='stage2_inspect_audit_upgrade')return response(id,toolResult(inspectAuditUpgrade(root,args.pageId)));
+      if(name==='stage2_queue_audit_upgrade'){
+        if(process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION!=='hold')throw Error('Audit migration requires hold');
+        return response(id,toolResult(queueAuditUpgrade(root,args.pageId,args.expectedCandidateHash,args.reason)));
+      }
+      if (name === "stage2_apply_information_theory_authorized_repair") {
+        if(process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== 'hold')throw Error('Authorized repair requires hold');
+        return response(id,toolResult(applyInformationTheoryAuthorizedRepair(root,args.expectedCandidateHash)));
+      }
+      if (name === "stage2_create_readiness_checkpoint") return response(id, toolResult(createReadinessCheckpoint(root)));
+      if (name === 'stage2_build_website') {
+        if (process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== 'hold') throw Error('Website builds require manual-review hold');
+        if (submitAttempted) throw Error('One website build per controller process');
+        submitAttempted=true;
+        return response(id,toolResult(buildWebsite(root,args)));
+      }
+      if (name === "stage2_inventory_page_assets") return response(id, toolResult(inventoryPageAssets(root)));
+      if (name === "stage2_inventory_pages") {
+        const state = loadState(root);
+        const pages = Object.entries(state.pages).map(([pageId, record]) => ({ pageId,
+          workflowState: record.state, publicationStatus: record.publication?.status || null,
+          reviewStatus: record.publication?.reviewStatus || null, active: Boolean(record.lease) }));
+        return response(id, toolResult({ total: pages.length, pages, eligibilityVerified: false }));
+      }
       if (name === "stage2_state_storage_report") {
         return response(id, toolResult(stateStorageReport(root)));
       }
@@ -799,7 +1015,7 @@ process.stdin.on("data", chunk => {
     buffer = buffer.slice(newline + 1);
     if (!line) continue;
     try {
-      handle(JSON.parse(line));
+      handle(JSON.parse(line)).catch(error => failure(null, -32603, error.message));
     } catch (error) {
       failure(null, -32700, `JSON 解析失败：${error.message}`);
     }

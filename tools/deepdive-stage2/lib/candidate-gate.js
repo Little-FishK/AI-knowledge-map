@@ -9,6 +9,29 @@ const { loadDeepDivePages: loadDeepDivePagesFromDisk } = require("../../deepdive
 const { transformGraph: transformGraphSource } = require("../../video-ingest/node-application");
 const { graphFingerprint: fingerprintGraph } = require("../../video-ingest/shadow-review");
 const { standaloneLayoutSource } = require("../../deepdive/runtime/standalone-page-source");
+const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
+const {evaluateAudit}=require('../../deepdive/quality/audit-evaluation');
+const {sha256}=require('./state-store');
+const {createEditorialCandidateValidation}=require('./editorial-candidate-validation');
+const {editorialContentPolicyGaps}=createEditorialCandidateValidation({sha256,isConfiguredRemovedSectionTitle:()=>false});
+
+function previewReferenceBenchmark(benchmark, id, candidateHash) {
+  if (benchmark?.reference?.id !== id) throw new Error(`只能预检已登记参照页：${benchmark?.reference?.id || '未登记'}；本次候选为${id}`);
+  if (!/^sha256:[a-f0-9]{64}$/.test(candidateHash)) throw new Error('候选摘要无效');
+  const copy = JSON.parse(JSON.stringify(benchmark));
+  copy.reference.pageHash = candidateHash;
+  return copy;
+}
+
+function sanitizedGateDiagnostic(r) {
+  return {script:r.script,passed:r.passed,
+    referenceHashDrift:r.output.includes('L3 参照页哈希漂移'),
+    missingReference:r.output.includes('L3 参照页不存在'),
+    exceptionType:(r.output.match(/\b(TypeError|ReferenceError|SyntaxError|RangeError):/)||[])[1]||null,
+    missingFile:(r.output.match(/ENOENT[^\n]*[\\/]([^\\/'"\r\n]+)['"]?/)||[])[1]||null,
+    missingModule:(r.output.match(/Cannot find module ['"]([^'"\r\n]+)['"]/)||[])[1]?.split(/[\\/]/).pop()||null,
+    propertyName:(r.output.match(/Cannot read properties of (?:undefined|null) \(reading '([A-Za-z0-9_]+)'\)/)||[])[1]||null};
+}
 
 function createCandidateGate(dependencies) {
   const {
@@ -131,6 +154,16 @@ function createCandidateGate(dependencies) {
   }
 
   function gateDefects(result, id) {
+    // A stale reference is a controller maintenance issue, not a teaching gap.
+    // Keep the gate blocked and give repair workers an actionable stop reason.
+    if (sanitizedGateDiagnostic(result).referenceHashDrift) {
+      return [{
+        type: "gate",
+        gate: result.script,
+        code: "reference-hash-drift",
+        message: "L3参照页内容与已登记基准摘要不一致；需要控制器维护流程审查基准版本。保持阻断，不通过正文返修、删除章节或降低评分门槛解决。",
+      }];
+    }
     const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const issuePattern = new RegExp(`^\\s*-\\s+${escapedId}:\\s+([A-Za-z0-9._-]+)\\s*$`, "gm");
     const issues = [...result.output.matchAll(issuePattern)].map(match => match[1]);
@@ -175,16 +208,36 @@ function createCandidateGate(dependencies) {
     });
   }
 
-  function evaluateCandidate(root, record, page, audit) {
+  function evaluateCandidate(root, record, page, audit, options = {}) {
     const fixture = copyFixture(root);
     try {
       stageCandidateInFixture(fixture, record, page, audit);
+      if(audit?.schemaVersion >= 3 || record.auditPolicyVersion === 4) {
+        const findings=record.editorialWorkflow?.initialBlockingFindings||[];
+        const evaluation=evaluateAudit(record.id,page,audit,{schemaVersion:4,mode:audit?.mode||'full',
+          verificationFindings:findings,verificationScopeHash:sha256(findings)});
+        const structural=runGate(root,fixture,toolScripts.deepDiveValidator);
+        const formatBlockers=record.editorialWorkflow ? editorialContentPolicyGaps(page).map(message=>({type:'format-policy',code:'forbidden-section',message})) : [];
+        return {passed:structural.passed&&evaluation.passed&&!formatBlockers.length,results:[structural],evaluation,
+          blockers:[...(!structural.passed?gateDefects(structural,record.id):[]),...evaluation.blockers,...formatBlockers]};
+      }
+      let referenceUpdatePreview = null;
+      if (options.referenceUpdatePreview === true) {
+        const benchmarkPath = path.join(fixture, 'docs', 'deepdive-l3-benchmark.json');
+        const benchmark = JSON.parse(fs.readFileSync(benchmarkPath, 'utf8'));
+        const candidateHash = pageContentHash(page);
+        const proposed = previewReferenceBenchmark(benchmark, record.id, candidateHash);
+        fs.writeFileSync(benchmarkPath, JSON.stringify(proposed));
+        referenceUpdatePreview = { pageId: record.id, oldReferenceHash: benchmark.reference.pageHash,
+          candidateHash, scope: 'temporary-fixture-only', published: false, standardsChanged: false };
+      }
       const results = [
         runGate(root, fixture, toolScripts.deepDiveValidator),
         runGate(root, fixture, toolScripts.deepDiveL2Audit, ["--require-candidate", record.id]),
         runGate(root, fixture, toolScripts.deepDiveL3Audit, ["--require-benchmark", record.id]),
       ];
       return {
+        ...(referenceUpdatePreview ? {referenceUpdatePreview} : {}),
         passed: results.every(result => result.passed),
         results,
         blockers: results.filter(result => !result.passed)
@@ -210,6 +263,7 @@ function createCandidateGate(dependencies) {
       const page = currentPage(resolvedRoot, record);
       const gate = evaluateCandidate(resolvedRoot, record, page, audit);
       record.blockers = clone(gate.blockers || []);
+      if(gate.evaluation)record.qualityEvaluation=clone(gate.evaluation);
       record.updatedAt = new Date().toISOString();
       saveState(resolvedRoot, state);
       appendEvent(resolvedRoot, "blockers-refreshed", {
@@ -228,13 +282,32 @@ function createCandidateGate(dependencies) {
     }
   }
 
+  // Controller-only diagnostics: expose machine failures, never audit text or process output.
+  function diagnoseCandidateGate(root = defaultRoot, id, options = {}) {
+    const resolvedRoot = path.resolve(root);
+    const release = acquireLock(resolvedRoot);
+    try {
+    const state = loadState(resolvedRoot), record = state.pages[id];
+    if (!record) throw new Error(`不存在页面状态：${id}`);
+    if (Object.values(state.pages).some(p=>p.lease)) throw new Error('活动租约期间不执行门禁诊断');
+    if (!record.auditFile) throw new Error('没有可复用的独立审计');
+    const audit = readJson(withinRoot(resolvedRoot, record.auditFile));
+    const gate = evaluateCandidate(resolvedRoot, record, currentPage(resolvedRoot, record), audit, options);
+    return {pageId:id,passed:gate.passed,
+      ...(gate.evaluation?{evaluation:gate.evaluation}:{}),
+      ...(gate.referenceUpdatePreview ? {referenceUpdatePreview:gate.referenceUpdatePreview} : {}),
+      blockers:clone(gate.blockers),diagnostics:gate.results.map(sanitizedGateDiagnostic)};
+    } finally { release(); }
+  }
+
   return {
     evaluateCandidate,
     gateDefects,
     refreshBlockers,
+    diagnoseCandidateGate,
     runGate,
     stageCandidateInFixture,
   };
 }
 
-module.exports = { createCandidateGate };
+module.exports = { createCandidateGate, sanitizedGateDiagnostic, previewReferenceBenchmark };

@@ -3,6 +3,8 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const {sha256}=require('./state-store');
+const {AUDIT_POLICY_HASH}=require('../../deepdive/quality/audit-policy');
 const { loadDeepDivePages } = require("../../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
 const { scanNarrativeTemplates } = require("../../deepdive/quality/deepdive-narrative-audit");
@@ -54,6 +56,8 @@ function createTaskOrchestration(dependencies) {
     if (!record) throw new Error("任务包续读对应的活动租约不存在");
     if (record.lease.token !== leaseToken) throw new Error("任务包续读的租约令牌无效");
     if (Date.parse(record.lease.expiresAt) <= Date.now()) throw new Error("任务包续读的租约已经过期");
+    if(record.lease.role==='audit' && record.lease.pageHash && record.lease.pageHash!==pageContentHash(currentPage(root,record)))throw Error('审核期间候选变化，租约需释放并重新领取');
+    if(record.lease.auditPolicyHash && record.lease.auditPolicyHash!==AUDIT_POLICY_HASH)throw Error('审核期间规则快照变化，不能继续旧租约');
     return record;
   }
 
@@ -129,6 +133,7 @@ function createTaskOrchestration(dependencies) {
   }
 
   function auditContract(record = null) {
+    const version = record?.lease?.auditSchemaVersion || record?.auditPolicyVersion || auditSchemaVersion;
     const verificationFindings = record && record.editorialWorkflow
       && record.editorialWorkflow.auditMode === "verification"
       ? clone(record.editorialWorkflow.initialBlockingFindings || [])
@@ -139,8 +144,9 @@ function createTaskOrchestration(dependencies) {
       ? "human"
       : "machine";
     return {
-      schemaVersion: auditSchemaVersion,
-      legacyCompatible: Boolean(record && !record.editorialWorkflow),
+      schemaVersion: version,
+      legacyCompatible: version === 2 || (version===3 && !record?.editorialWorkflow),
+      ...(version === 4 ? {policyId:'whole-page-teaching-v4',policyHash:AUDIT_POLICY_HASH,verificationScopeHash:sha256(verificationFindings)} : {}),
       mode,
       decisionPolicy: {
         type: "binary",
@@ -156,6 +162,21 @@ function createTaskOrchestration(dependencies) {
       nonBlockingSignals: clone(nonBlockingSignals),
       verificationFindings,
       verificationSource,
+      findingShape: {
+        code: '<blockingCriteria 中的代码>',
+        concept: '<core-concept-*-missing 时填写对应核心概念名称>',
+        sections: [1],
+        claim: '<具体问题>',
+        evidence: '<所列章节中的一段逐字正文>',
+        rationale: '<为何构成阻断>',
+        acceptanceCriteria: '<可验证的修复完成条件>',
+        sourceUrls: ['<source-support-blocked 时必须提供核验使用的 HTTPS 来源>'],
+        ...(mode === 'verification' ? {findingId:'<首次审查中的原 findingId>'} : {}),
+      },
+      warningShape: {code:'<nonBlockingSignals 中的代码>',message:'<不阻断理解的具体改进建议>'},
+      evidenceCoverage: version === 4 && mode === 'full'
+        ? '每个章节至少有一条被 coreConcepts 或 pageChecks 引用且精确命中的证据；仅列 reviewedSections 不算覆盖。证据必须足以支撑判断，不设机械字数下限。正文存在公式或数值计算时必须实际检查；明确公式标记会拒绝 formulas=not-applicable，没有标记不代表没有数学内容。'
+        : null,
       sourcePolicy: {
         internetAllowed: true,
         preferredSources: ["原始研究论文", "官方技术文档或标准", "大学与权威机构材料"],
@@ -166,9 +187,9 @@ function createTaskOrchestration(dependencies) {
         ? (verificationSource === "human"
           ? "这是人工退回修改后的定向验证。只验证 verificationFindings 中人工指出的问题，不发现新问题、不重新生成核心概念清单。逐项输出 resolved；完成后无论结果如何都直接回到人工审查。"
           : "这是唯一一轮机器返修后的定向复核。只验证 verificationFindings 中首次机器审查指出的问题，不发现新问题、不重新生成核心概念清单。逐项输出 resolved；全部 resolved 才能 pass。无论结果如何，控制器都进入人工审查，不再自动返修。")
-        : "一个审查 Agent完成整页审查。先自行识别本页核心概念，主要依据标题、核心命题和主要教学内容，不把顺带术语、来源列表、概念依赖与延伸学习中的名称升级为核心概念。逐个核心概念检查：是什么、解决什么问题、适用边界。核心机制暂不作为独立硬性要求。同时审查知识/公式/术语/数值事实、跨章节有害重复、术语一致性和图文关系。只阻断严重模板化、语义残缺和明显影响理解的问题；章节依赖顺序、标题正文匹配、术语是否首次使用前解释不属于本合同。最终区分 blocker 与 warning，只有 blocker 导致 fail。",
+        : version === 4 ? "独立完成整页审查，先识别标题、核心命题及主要教学内容中的核心概念，不把顺带术语都升级为核心概念。逐概念检查定义、解决的问题、输入输出、机制与因果链、结果解释、适用边界；证据可以分布在多个相关章节，不要求每章重复六项。输入输出、机制、结果解释只有在概念确实不适用时可标 not-applicable，必须给出 applicabilityReason 和正文定位，不能用不适用掩盖缺失。适用但未讲清的要素以对应 core-concept-*-missing 阻断。每项提供 evidence 数组，逐条写 section 和原文 quote，以及 rationale。reviewedSections 覆盖所有章节；pageChecks 分别审查事实、公式数值、图表、来源与全页一致性，提供定位证据，不以链接可访问代替来源支持。事实错误、损害理解的重复、语义残缺、图文矛盾必须阻断，轻微表达建议仅 warning。专家判断不代替真实初学者测试。" : "按历史v3合同独立审查整页核心概念的定义、问题与边界，以及事实、公式、数值、图文一致性；不把历史通过升级为v4。",
       outputShape: {
-        schemaVersion: auditSchemaVersion,
+        schemaVersion: version,
         pageId: "<page-id>",
         pageHash: "sha256:...",
         reviewedAt: "YYYY-MM-DD",
@@ -176,12 +197,15 @@ function createTaskOrchestration(dependencies) {
         decision: "pass",
         blockingFindings: [],
         warnings: [],
+        ...(version === 4 ? {policyId:'whole-page-teaching-v4',policyHash:AUDIT_POLICY_HASH,
+          ...(mode==='full' ? {reviewedSections:[1],pageChecks:Object.fromEntries(['facts','formulas','figures','sources','consistency'].map(part=>[part,{status:'pass',evidence:[{section:1,quote:''}],rationale:''}]))} : {verificationScopeHash:sha256(verificationFindings)})} : {}),
         coreConcepts: mode === "full" ? [{
           name: "",
           sections: [1],
           definition: { status: "pass", evidence: "", rationale: "" },
           problem: { status: "pass", evidence: "", rationale: "" },
           boundary: { status: "pass", evidence: "", rationale: "" },
+          ...(version===4 ? Object.fromEntries(['definition','problem','inputOutput','mechanism','interpretation','boundary'].map(part=>[part,{status:'pass',evidence:[{section:1,quote:''}],rationale:''}])) : {}),
         }] : [],
         verificationResults: mode === "verification"
           ? verificationFindings.map(finding => ({ findingId: finding.findingId, resolved: true, evidence: "", rationale: "" }))
@@ -220,7 +244,9 @@ function createTaskOrchestration(dependencies) {
     if (part === "contract") {
       const packet = buildPacket(resolvedRoot, record, record.lease.role);
       delete packet.page;
-      const pageMetadata = clone(page);
+      const pageMetadata = record.lease.role === 'audit' && auditContract(record).schemaVersion === 4
+        ? auditReaderPage(page)
+        : clone(page);
       delete pageMetadata.html;
       return {
         status: "ok",
@@ -253,6 +279,12 @@ function createTaskOrchestration(dependencies) {
       done: nextOffset >= html.length,
       content: html.slice(offset, nextOffset),
     };
+  }
+
+  function auditReaderPage(page) {
+    // Page quality metadata can contain former authors' answers and audit hints.
+    // A v4 reviewer receives only the reader-visible fields bound by pageContentHash.
+    return Object.fromEntries(['title','subtitle','thesis','html'].map(key=>[key,clone(page[key] || '')]));
   }
 
   function buildPacket(root, record, role) {
@@ -302,7 +334,7 @@ function createTaskOrchestration(dependencies) {
     if (role === "audit") {
       return {
         ...common,
-        page: clone(page),
+        page: auditContract(record).schemaVersion === 4 ? auditReaderPage(page) : clone(page),
         auditContract: auditContract(record),
         projectReadOnly: {
           tools: ["stage2_search_project", "stage2_read_project_file"],
@@ -311,20 +343,26 @@ function createTaskOrchestration(dependencies) {
             leaseToken: record.lease.token,
           },
           suggestedPaths: [...new Set([
-            ...(record.sourcePaths || []),
+            ...(auditContract(record).schemaVersion === 4 ? [] : (record.sourcePaths || [])),
             "AGENTS.md",
             "docs/DEEPDIVE.md",
             "docs/DEEPDIVE_QUALITY_GATE.md",
             "docs/DEEPDIVE_GATE_ERROR_CATALOG.md",
-            toolScripts.deepDiveL3Audit,
-            toolScripts.deepDiveL2Audit,
+            ...(auditContract(record).schemaVersion === 4 ? [
+              'tools/deepdive/quality/audit-policy.js',
+              'tools/deepdive/quality/audit-evaluation.js',
+              'tools/deepdive-stage2/lib/audit-rules.js',
+            ] : [toolScripts.deepDiveL3Audit, toolScripts.deepDiveL2Audit]),
             "tools/deepdive/quality/deepdive-audit-contracts.js",
             toolScripts.deepDiveValidator,
           ])],
           blocked: [
             ".git/",
             ".stage2/",
+            ".tmp/、临时快照及备份目录（含嵌套副本与链接目标）",
             "docs/deepdive-audits/",
+            "docs/deepdive-reviews/、历史生成回复与旧任务材料",
+            ...(auditContract(record).schemaVersion === 4 ? ['data/deepdive/ 与 data/deepdive-runtime/ 原始文件含旧答案元数据；正文只通过当前任务包及其分段续读取得'] : []),
             "node_modules/",
             "环境变量、密钥与凭据文件",
             "二进制文件和超过 512 KiB 的文件",
@@ -432,6 +470,9 @@ function createTaskOrchestration(dependencies) {
         taskId,
         token,
         role,
+        auditSchemaVersion: selected.auditPolicyVersion || auditSchemaVersion,
+        ...(role==='audit'?{auditPolicyHash:(selected.auditPolicyVersion||auditSchemaVersion)===4?AUDIT_POLICY_HASH:null,
+          pageHash:pageContentHash(currentPage(resolvedRoot,selected))}:{}),
         workerId: String(workerId || "codex-scheduled").slice(0, 120),
         claimedAt: now.toISOString(),
         expiresAt: new Date(now.getTime() + state.policy.leaseMinutes * 60_000).toISOString(),

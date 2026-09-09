@@ -119,6 +119,19 @@ try {
     path: ".stage2/state.json",
   }), /禁止访问/);
 
+  const hiddenPaths = ['.tmp/clean-name.txt','.tmp/website-preview/repair-packet.json','copy/backups/runtime/results/alpha/audit.private.json','assets/nested/.stage2/answer.json','docs/deepdive-audits/alpha.json','docs/deepdive-reviews/alpha-agent-responses.md','docs/audit.private.json'];
+  for (const relative of hiddenPaths) {
+    const target=path.join(root,relative);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,'private-isolation-fixture');
+    assert.throws(()=>access.readAuditProjectFile(root,{taskId:'audit-task',leaseToken:'lease-token',path:relative}),/禁止访问/);
+  }
+  assert.throws(()=>access.readAuditProjectFile(root,{taskId:'audit-task',leaseToken:'lease-token',path:'docs/../.tmp/website-preview/repair-packet.json'}),/禁止访问/);
+  assert.throws(()=>access.searchAuditProject(root,{taskId:'audit-task',leaseToken:'lease-token',query:'private-isolation-fixture',pathPrefix:'docs/../.tmp'}),/禁止搜索/);
+  assert.deepStrictEqual(access.searchAuditProject(root,{taskId:'audit-task',leaseToken:'lease-token',query:'private-isolation-fixture'}).matches,[]);
+  const linkedDirectory=path.join(root,'linked-private-directory');
+  fs.symlinkSync(path.join(root,'.tmp'),linkedDirectory,process.platform==='win32'?'junction':'dir');
+  assert.throws(()=>access.readAuditProjectFile(root,{taskId:'audit-task',leaseToken:'lease-token',path:'linked-private-directory/clean-name.txt'}),/禁止访问链接目标/);
+  assert.deepStrictEqual(access.searchAuditProject(root,{taskId:'audit-task',leaseToken:'lease-token',query:'private-isolation-fixture'}).matches,[]);
+
   const rendered = renderEditorialMarkdown([
     "**核心**与 √(x + 1)",
     "",

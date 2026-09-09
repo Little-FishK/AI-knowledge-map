@@ -1,6 +1,7 @@
 "use strict";
 
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
+const {AUDIT_POLICY_HASH}=require('../../deepdive/quality/audit-policy');
 const {
   TEMPLATE_FAMILIES,
   plainText,
@@ -166,7 +167,7 @@ function createAuditRules(options) {
   }
 
   function auditGaps(id, page, audit, contract = null) {
-    if (audit && audit.schemaVersion === 2 && (!contract || contract.schemaVersion === 2 || contract.legacyCompatible)) {
+    if (audit && audit.schemaVersion === 2 && (!contract || contract.schemaVersion === 2 || (contract.schemaVersion===3&&contract.legacyCompatible))) {
       return legacyAuditGaps(id, page, audit);
     }
     const gaps = [];
@@ -176,10 +177,26 @@ function createAuditRules(options) {
     const sectionCount = (String(page.html || "").match(/<section\b/gi) || []).length;
     const rawLatexSections = visibleRawLatexSections(page);
     if (!audit || typeof audit !== "object") return ["独立审查结果缺失"];
-    if (audit.schemaVersion !== schemaVersion) gaps.push(`独立审查 schemaVersion 必须为 ${schemaVersion}`);
+    const requiredVersion = expected.schemaVersion || schemaVersion;
+    const unified = requiredVersion === 4;
+    if (audit.schemaVersion !== requiredVersion) gaps.push(`独立审查 schemaVersion 必须为 ${requiredVersion}；旧审核需补审，不能改版本号迁移`);
     if (audit.pageId !== id) gaps.push("独立审查 pageId 不匹配");
     if (audit.pageHash !== pageContentHash(page)) gaps.push("独立审查 pageHash 与当前正文不匹配");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(audit.reviewedAt || "")) gaps.push("独立审查日期无效");
+    if (audit.reviewedAt > new Date().toISOString().slice(0,10)) gaps.push('独立审查日期不得晚于当前日期');
+    const sectionTexts = [...String(page.html || '').matchAll(/<section\b[\s\S]*?<\/section>/gi)].map(m=>plainText(m[0]));
+    const evidencedSections = new Set();
+    function locatedEvidence(items, allowed, label) {
+      if(!Array.isArray(items)||!items.length){gaps.push(`${label} 必须提供章节与逐字证据`);return;}
+      if (!Array.isArray(allowed)) {gaps.push(`${label} 缺少有效章节范围`);return;}
+      for(const item of items) {
+        if(!item || !Number.isInteger(item.section)||!allowed.includes(item.section)
+          ||!plainText(item.quote||'')||!sectionTexts[item.section-1]?.includes(plainText(item.quote)))gaps.push(`${label} 证据不在指定章节`);
+        else evidencedSections.add(item.section);
+      }
+    }
+    if(unified && audit.policyId !== 'whole-page-teaching-v4')gaps.push('审核 policyId 不匹配');
+    if(unified && audit.policyHash !== AUDIT_POLICY_HASH)gaps.push('审核规则快照摘要不匹配');
     if (audit.mode !== mode) gaps.push(`独立审查 mode 必须为 ${mode}`);
     if (!["pass", "fail"].includes(audit.decision)) gaps.push("独立审查 decision 必须是 pass 或 fail");
     const findings = Array.isArray(audit.blockingFindings) ? audit.blockingFindings : null;
@@ -205,6 +222,7 @@ function createAuditRules(options) {
       if (!sections.length || sections.some(section => !Number.isInteger(section) || section < 1 || section > sectionCount)) {
         gaps.push(`blockingFindings[${index}].sections 必须包含有效章节序号`);
       }
+      if(unified && evidence && !sections.some(n=>sectionTexts[n-1]?.includes(evidence)))gaps.push(`blockingFindings[${index}] 证据不在所列章节`);
       if (finding.code === "source-support-blocked") {
         const urls = Array.isArray(finding.sourceUrls) ? finding.sourceUrls : [];
         if (!urls.length || urls.some(url => !/^https:\/\//.test(String(url)))) {
@@ -232,8 +250,9 @@ function createAuditRules(options) {
       if (!Array.isArray(audit.coreConcepts) || !audit.coreConcepts.length) {
         gaps.push("完整审查必须自行识别至少一个核心概念");
       } else {
-        const names = new Set();
+          const names = new Set();
         audit.coreConcepts.forEach((concept, index) => {
+          if(!concept || typeof concept!=='object' || Array.isArray(concept)){gaps.push(`coreConcepts[${index}] 必须是对象`);return;}
           const name = String(concept && concept.name || "").trim();
           if (!name) gaps.push(`coreConcepts[${index}].name 缺失`);
           if (names.has(name)) gaps.push(`coreConcepts[${index}] 核心概念重复：${name}`);
@@ -242,13 +261,17 @@ function createAuditRules(options) {
             || concept.sections.some(section => !Number.isInteger(section) || section < 1 || section > sectionCount)) {
             gaps.push(`coreConcepts[${index}].sections 必须包含有效章节序号`);
           }
-          for (const part of ["definition", "problem", "boundary"]) {
+          for (const part of (unified ? sixQuestions : ["definition", "problem", "boundary"])) {
             const check = concept && concept[part];
-            if (!check || !["pass", "fail"].includes(check.status)) {
+            const optional = unified && ['inputOutput','mechanism','interpretation'].includes(part);
+            if (!check || !(optional ? ['pass','fail','not-applicable'] : ['pass','fail']).includes(check.status)) {
               gaps.push(`coreConcepts[${index}].${part}.status 必须是 pass 或 fail`);
               continue;
             }
-            if (!String(check.evidence || "").trim() || !visibleText.includes(plainText(check.evidence))) {
+            if(unified) {
+              locatedEvidence(check.evidence,concept.sections||[],`coreConcepts[${index}].${part}`);
+              if(check.status==='not-applicable'&&!String(check.applicabilityReason||'').trim())gaps.push(`coreConcepts[${index}].${part} 不适用必须说明理由`);
+            } else if (!String(check.evidence || "").trim() || !visibleText.includes(plainText(check.evidence))) {
               gaps.push(`coreConcepts[${index}].${part}.evidence 必须来自当前正文`);
             }
             if (!String(check.rationale || "").trim()) gaps.push(`coreConcepts[${index}].${part}.rationale 缺失`);
@@ -262,7 +285,25 @@ function createAuditRules(options) {
         });
       }
       if (Array.isArray(audit.verificationResults) && audit.verificationResults.length) gaps.push("完整审查不得提交 verificationResults");
+      if(unified) {
+        const sections=Array.from({length:sectionCount},(_,i)=>i+1);
+        if(!Array.isArray(audit.reviewedSections)||JSON.stringify([...audit.reviewedSections].sort((a,b)=>a-b))!==JSON.stringify(sections))gaps.push('reviewedSections 必须恰好覆盖全部章节');
+        for(const part of ['facts','formulas','figures','sources','consistency']) {
+          const check=audit.pageChecks?.[part];
+          const optional=['formulas','figures'].includes(part);
+          if(!check || !(optional?['pass','fail','not-applicable']:['pass','fail']).includes(check.status)){gaps.push(`pageChecks.${part} 缺失或状态无效`);continue;}
+          if(!String(check.rationale||'').trim())gaps.push(`pageChecks.${part}.rationale 缺失`);
+          if(check.status!=='not-applicable')locatedEvidence(check.evidence,sections,`pageChecks.${part}`);
+          if(check.status==='not-applicable' && part==='figures' && /<(svg|img|table)\b/i.test(page.html))gaps.push('正文存在图表，figures 不能标不适用');
+          const explicitMath = /<math\b|\bdata-formula-id\s*=|\bclass\s*=\s*["'][^"']*\bdd-formula\b/i.test(page.html);
+          if(check.status==='not-applicable' && part==='formulas' && explicitMath)gaps.push('正文存在明确公式标记，formulas 不能标不适用');
+          if(check.status==='fail' && !(findings||[]).length)gaps.push(`pageChecks.${part} 失败必须提交阻断`);
+        }
+        const uncovered = sections.filter(section => !evidencedSections.has(section));
+        if (uncovered.length) gaps.push(`全文审核缺少第 ${uncovered.join('、')} 章的检查证据；仅列 reviewedSections 不足以证明覆盖`);
+      }
     } else {
+      if(unified && (!expected.verificationScopeHash || audit.verificationScopeHash!==expected.verificationScopeHash))gaps.push('定向复核的首次缺陷绑定不匹配');
       if (Array.isArray(audit.coreConcepts) && audit.coreConcepts.length) gaps.push("定向复核不得重新生成核心概念清单");
       const expectedFindings = expected.verificationFindings || [];
       const results = Array.isArray(audit.verificationResults) ? audit.verificationResults : [];
@@ -270,6 +311,7 @@ function createAuditRules(options) {
       const actualIds = results.map(result => result && result.findingId).sort();
       if (JSON.stringify(expectedIds) !== JSON.stringify(actualIds)) gaps.push("定向复核必须逐项覆盖首轮全部阻断问题且不得增加新问题");
       results.forEach((result, index) => {
+        if(!result || typeof result!=='object'){gaps.push(`verificationResults[${index}] 必须是对象`);return;}
         if (typeof result.resolved !== "boolean") gaps.push(`verificationResults[${index}].resolved 必须是布尔值`);
         if (!String(result.evidence || "").trim() || !visibleText.includes(plainText(result.evidence))) {
           gaps.push(`verificationResults[${index}].evidence 必须来自返修后的当前正文`);

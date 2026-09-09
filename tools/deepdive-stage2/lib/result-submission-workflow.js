@@ -3,6 +3,8 @@
 const path = require("path");
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
 const { narrativeTemplateBlockers } = require("../../deepdive/quality/deepdive-narrative-audit");
+const { figureRepairBaseline } = require("./editorial-figure-repair");
+const {evaluateAudit}=require('../../deepdive/quality/audit-evaluation');
 
 function createResultSubmissionWorkflow(dependencies) {
   const {
@@ -99,8 +101,11 @@ function createResultSubmissionWorkflow(dependencies) {
         gaps.push("返修不得添加、删除或替换页面来源");
       }
       if (record.lease.role === "repair") {
-        const preservation = editorialPreservationReport(originalPage, page, []);
-        if (!preservation.passed) gaps.push("返修不得删除或改写已有图表");
+        try {
+          const permitted = figureRepairBaseline(record, originalPage, page, process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION);
+          const preservation = editorialPreservationReport(permitted.baseline, page, []);
+          if (!preservation.passed) gaps.push("返修不得删除或改写未获授权的图表");
+        } catch (error) { gaps.push(error.message); }
         const rawLatexSections = visibleRawLatexSections(page);
         if (rawLatexSections.length) {
           gaps.push(`返修后第 ${rawLatexSections.map(item => item.section).join("、")} 节仍显示原始 LaTeX 命令`);
@@ -134,6 +139,7 @@ function createResultSubmissionWorkflow(dependencies) {
       if (!record) throw new Error("任务不存在、租约已过期或已经提交");
       if (record.lease.token !== input.leaseToken) throw new Error("租约令牌无效");
       const role = record.lease.role;
+      if(role==='audit')authorizeTaskLease(resolvedRoot,input.taskId,input.leaseToken);
       const result = input.result || {};
       if (role === "content-generation") {
         const material = contentGenerationReviewMaterial(resolvedRoot, record);
@@ -196,6 +202,7 @@ function createResultSubmissionWorkflow(dependencies) {
       }
       if (role !== "audit") {
         const previousPage = currentPage(resolvedRoot, record);
+        let figureRepairReceipt = null;
         const pageErrors = validatePage(record.id, result.page);
         if (record.editorialWorkflow) {
           pageErrors.push(...editorialContentPolicyGaps(result.page));
@@ -203,8 +210,10 @@ function createResultSubmissionWorkflow(dependencies) {
             pageErrors.push("返修不得添加、删除或替换页面来源");
           }
           if (role === "repair") {
-            const preservation = editorialPreservationReport(previousPage, result.page, []);
-            if (!preservation.passed) pageErrors.push("返修不得删除或改写已有图表");
+            const permitted = figureRepairBaseline(record, previousPage, result.page, process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION);
+            figureRepairReceipt = permitted.receipt;
+            const preservation = editorialPreservationReport(permitted.baseline, result.page, []);
+            if (!preservation.passed) pageErrors.push("返修不得删除或改写未获授权的图表");
           }
         }
         if (pageErrors.length) throw new Error(pageErrors.join("\n"));
@@ -240,6 +249,7 @@ function createResultSubmissionWorkflow(dependencies) {
           summary: String(result.summary || "").slice(0, 500),
           page: clone(result.page),
           pageHash: pageContentHash(result.page),
+          ...(figureRepairReceipt ? { figureRepairReceipt } : {}),
         };
         const relative = candidateRelativePath(record.id);
         writeJson(withinRoot(resolvedRoot, relative), candidate);
@@ -247,6 +257,7 @@ function createResultSubmissionWorkflow(dependencies) {
         record.contentHash = candidate.pageHash;
         record.auditHash = null;
         record.auditFile = null;
+        if(record.auditPolicyVersion===4)record.qualityEvaluation={policyVersion:4,pageHash:candidate.pageHash,status:'pending-independent-review',learnerValidation:'not-tested'};
         record.blockers = [];
         if (role === "repair") {
           record.repairAttempts += 1;
@@ -257,6 +268,7 @@ function createResultSubmissionWorkflow(dependencies) {
               summary: candidate.summary,
               pageHash: candidate.pageHash,
               submittedAt: candidate.createdAt,
+              ...(figureRepairReceipt ? { figureRepairReceipt } : {}),
             };
           }
         }
@@ -304,6 +316,7 @@ function createResultSubmissionWorkflow(dependencies) {
         record.lease = null;
         record.state = "audit-queued";
         record.finalReview = null;
+        if(activeAuditContract.schemaVersion===4)record.qualityEvaluation={policyVersion:4,pageHash:pageContentHash(page),status:'invalid-submission',learnerValidation:'not-tested'};
         record.updatedAt = new Date().toISOString();
         saveState(resolvedRoot, state);
         appendEvent(resolvedRoot, "audit-rejected", {
@@ -324,12 +337,20 @@ function createResultSubmissionWorkflow(dependencies) {
           uiCleanup: archiveCurrentTaskDirective("本次审计不符合提交合同，页面已重新排队等待新的独立审计"),
         };
       }
-      const privateRelative = privateAuditRelativePath(record.id);
+      const privateRelative = audit.schemaVersion===4 ? `.stage2/results/${record.id}/audit-${sha256(audit).slice(7)}.json` : privateAuditRelativePath(record.id);
       writeJson(withinRoot(resolvedRoot, privateRelative), audit || {});
+      if(audit.schemaVersion===4) {
+        record.auditPolicyVersion=4;
+        record.qualityEvaluation=evaluateAudit(record.id,page,audit,activeAuditContract);
+        record.auditReceipts=[...(record.auditReceipts||[]),{auditFile:privateRelative,auditHash:sha256(audit),pageHash:pageContentHash(page),
+          policyVersion:4,mode:audit.mode,reviewer:record.lease.workerId,taskId:record.lease.taskId,acceptedAt:new Date().toISOString()}];
+      }
       const editorial = Boolean(record.editorialWorkflow && record.editorialWorkflow.requiresHumanReview);
-      const evaluator = options.evaluateCandidate || (editorial ? evaluateEditorialCandidate : evaluateCandidate);
+      const evaluator = options.evaluateCandidate || (editorial && audit.schemaVersion!==4 ? evaluateEditorialCandidate : evaluateCandidate);
       const explicitBlockers = auditBlockers(audit);
-      const automaticNarrativeBlockers = activeAuditContract.mode === "verification"
+      // v4 relies on the independent, evidenced whole-page judgment shared with CI.
+      // Preserve the historical sentence-pattern gate only for historical contracts.
+      const automaticNarrativeBlockers = activeAuditContract.schemaVersion === 4 || activeAuditContract.mode === "verification"
         ? []
         : narrativeTemplateBlockers(page, audit);
       const policyBlockers = [
@@ -408,7 +429,7 @@ function createResultSubmissionWorkflow(dependencies) {
         };
       }
 
-      if (record.editorialWorkflow && record.editorialWorkflow.requiresHumanReview) {
+      if (editorial || audit.schemaVersion===4) {
         record.auditHash = sha256(audit);
         record.auditFile = privateRelative;
         record.contentHash = pageContentHash(page);
@@ -416,9 +437,11 @@ function createResultSubmissionWorkflow(dependencies) {
         record.editorialWarnings = clone(gate.editorialWarnings || []);
         record.state = "manual-review";
         record.lease = null;
-        record.editorialWorkflow.status = "human-review-pending";
-        record.editorialWorkflow.auditMode = "complete";
-        record.editorialWorkflow.machineAuditPassedAt = new Date().toISOString();
+        if(editorial) {
+          record.editorialWorkflow.status = "human-review-pending";
+          record.editorialWorkflow.auditMode = "complete";
+          record.editorialWorkflow.machineAuditPassedAt = new Date().toISOString();
+        }
         record.finalReview = {
           status: "manual-review",
           completedAt: new Date().toISOString(),
@@ -426,7 +449,7 @@ function createResultSubmissionWorkflow(dependencies) {
           machineAuditPassed: true,
         };
         record.editorialWarnings = clone(audit.warnings || []);
-        refreshEditorialDraftPublication(
+        if(editorial) refreshEditorialDraftPublication(
           resolvedRoot,
           record,
           page,

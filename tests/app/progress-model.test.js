@@ -1,0 +1,37 @@
+'use strict';
+const assert = require('node:assert/strict');
+const m = require('../../assets/progress-model');
+let guest = m.migrateLegacy(m.empty(), ['supervised-learning', 'retired-node']);
+assert.equal(guest.records['retired-node/legacyLearned'].value, true);
+assert.equal(Object.keys(guest.records).length, 2);
+assert(!guest.records['supervised-learning/understood']);
+guest = m.change(guest, 'supervised-learning', 'legacyLearned', false, 'guest-edit');
+assert.equal(m.migrateLegacy(guest, ['supervised-learning']).records['supervised-learning/legacyLearned'].value, false);
+assert.equal(guest.pending.length, 0);
+let a = m.change(m.empty('account-a'), 'supervised-learning', 'read', true, 'op-1');
+const row = {nodeId: 'supervised-learning', field: 'read', value: true, version: 1, contentRevision: null};
+assert.deepEqual(m.acknowledge(a, 'account-b', 'op-1', {status:'applied', record:row}), a);
+assert.throws(() => m.change(a, row.nodeId, 'read', false, 'op-2'), /pending/);
+// A fetch after a lost response cannot discard the operation before receipt replay.
+a = m.receive(a, [row]);
+assert.equal(a.pending.length, 1);
+a = m.acknowledge(a, 'account-a', 'op-1', {status:'applied', record:row});
+assert.equal(a.pending.length, 0);
+assert.deepEqual(m.acknowledge(a, 'account-a', 'op-1', {status:'applied', record:row}), a);
+// Another device changed the same field before this device's cancellation arrived.
+a = m.change(a, row.nodeId, 'read', false, 'op-2');
+a = m.acknowledge(a, 'account-a', 'op-2', {status:'conflict', record:{...row,version:3}});
+assert.equal(a.conflicts['supervised-learning/read'].local.value, false);
+a = m.resolve(a, row.nodeId, 'read', 'local', 'op-3');
+assert.equal(a.pending[0].expectedVersion, 3);
+assert.equal(a.pending[0].value, false);
+a = m.acknowledge(a, 'account-a', 'op-3', {status:'applied', record:{...row,version:4,value:false}});
+assert.equal(a.records['supervised-learning/read'].value, false);
+assert.equal(Object.keys(a.conflicts).length, 0);
+assert.throws(() => m.change(a, '__proto__', 'read', true, 'bad'));
+assert.throws(() => m.change(a, row.nodeId, 'passed', true, 'bad'));
+const preview = m.importPreview(guest, a);
+assert.equal(preview.length, 2);
+assert.equal(preview.find(x => x.local.nodeId === 'retired-node').remote, null);
+assert.equal(JSON.parse(JSON.stringify(a)).schemaVersion, 1);
+console.log('PASS: historical markers, archived IDs, explicit cancellation, idempotent receipts, stale account responses, conflict resolution, import preview');

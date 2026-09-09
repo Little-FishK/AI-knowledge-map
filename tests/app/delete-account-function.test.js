@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../../supabase/functions/delete-account/index.ts'),'utf8');
+assert(source.includes("request.method!=='POST'"));
+assert(source.includes("body?.confirmation!=='delete-account'"));
+assert(source.includes("userClient.auth.getUser()"));
+assert(source.includes("admin.auth.admin.deleteUser(data.user.id)"));
+assert(source.includes("SUPABASE_SERVICE_ROLE_KEY"));
+assert(!/service[^\n]{0,80}(?:localStorage|window|document)/.test(source));
+console.log('PASS: delete function requires POST/current user and keeps admin deletion server-side');

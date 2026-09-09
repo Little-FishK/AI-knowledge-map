@@ -1,0 +1,61 @@
+/* Independent reading surface; preserve the existing map's visual language. */
+html:has(body.concept-preview) { height: auto; overflow: auto; font-size: 100%; }
+body.concept-preview { height: auto; min-height: 100vh; overflow: visible; font-size: 1rem; }
+.concept-preview a { color: var(--accent); text-underline-offset: .2em; }
+.concept-preview :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.preview-skip { position: absolute; top: -8rem; left: 1rem; background: var(--bg-panel); padding: .75rem; z-index: 2; }
+.preview-skip:focus { top: .5rem; }
+.preview-header { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; padding: 1.1rem max(1.25rem, calc((100% - 1120px)/2)); border-bottom: 1px solid var(--line); background: var(--bg-panel); }
+.preview-brand { color: var(--fg) !important; font-weight: 650; text-decoration: none; }
+.preview-label { color: var(--fg-dim); font-size: .875rem; }
+.preview-map { margin-left: auto; font-size: .9375rem; }
+.concept-preview #dd-article { max-width: 860px; padding: 3rem 1.5rem 4rem; }
+.concept-preview .dd-h1 { font-size: clamp(2rem, 6vw, 2.7rem); }
+.concept-preview .dd-sub { font-size: 1.125rem; margin: .75rem 0; }
+.concept-preview .dd-ali, .concept-preview .dd-metabar { font-size: .875rem; }
+.concept-preview .dd-eyebrow { font-size: .875rem; }
+.concept-preview .dd-sec p, .concept-preview .dd-goals li, .concept-preview .dd-note,
+.concept-preview .dd-thesis, .concept-preview .dd-steps li, .concept-preview .dd-chain li,
+.concept-preview .dd-quiz li, .concept-preview .dd-answers li { font-size: 1.0625rem; line-height: 1.95; }
+.concept-preview .dd-sec h2 { font-size: 1.4rem; }
+.concept-preview .dd-sec h3 { font-size: 1.125rem; }
+.concept-preview .dd-lead { font-size: 1rem !important; }
+.concept-preview .dd-badge { font-size: .8125rem; }
+.concept-preview .dd-formula-note { font-size: .875rem !important; }
+.concept-preview #dd-article code { font-size: .9375em; overflow-wrap: anywhere; }
+.concept-preview .dd-fig figcaption, .concept-preview .dd-src { font-size: .9375rem; }
+.concept-preview .dd-answers summary { font-size: 1rem; padding: .5rem 0; }
+.concept-preview .dd-table { font-size: .9375rem; }
+.concept-preview .dd-table-wrap { max-width: 100%; }
+.concept-preview .dd-sec > .dd-table { display: block; overflow-x: auto; }
+.concept-preview .dd-formula { max-width: 100%; }
+.concept-preview .dd-src a { overflow-wrap: anywhere; }
+.preview-next { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--line); padding-top: 1.5rem; margin-top: 2rem; }
+.preview-next a { display: inline-block; padding: .5rem 0; }
+/* English preview: keep diagram text readable and move long captions into a legend. */
+html[lang="en"] .concept-preview .dd-fig { text-align: left; }
+.preview-diagram-scroll { overflow-x: auto; max-width: 100%; }
+.preview-diagram-hint { display: none; }
+html[lang="en"] .concept-preview .dd-fig svg { width: 100%; min-width: 560px; max-width: none; display: block; }
+html[lang="en"] .concept-preview .dd-fig:has(.preview-split-legend) svg[viewBox="0 0 560 96"] text:nth-of-type(n+4) { display: none; }
+.preview-split-legend { margin: .75rem 0; font-size: 1rem; line-height: 1.6; text-align: left; }
+.preview-split-legend > div { display: grid; grid-template-columns: 10rem 1fr; gap: .5rem 1rem; padding: .5rem 0; }
+.preview-split-legend dt { font-weight: 600; color: var(--fg); }
+.preview-split-legend dd { margin: 0; color: var(--fg-dim); }
+html[lang="en"] .concept-preview .dd-table { min-width: 620px; }
+html[lang="en"] .concept-preview .dd-table th,
+html[lang="en"] .concept-preview .dd-table td { overflow-wrap: normal; word-break: normal; }
+html[lang="en"] .concept-preview .dd-sec > .dd-table { min-width: 0; }
+html[lang="en"] .concept-preview .dd-sec > .dd-table th,
+html[lang="en"] .concept-preview .dd-sec > .dd-table td { min-width: 9rem; }
+@media (max-width: 600px) {
+  .preview-split-legend > div { grid-template-columns: 1fr; gap: .125rem; }
+  .concept-preview .dd-sec .preview-diagram-hint { display: block; font-size: .875rem; line-height: 1.6; color: var(--fg-faint); margin: .5rem 0; }
+  html[lang="en"] .concept-preview .dd-table-wrap::before { content: "Scroll horizontally to read all columns."; display: block; font-size: .875rem; color: var(--fg-faint); margin-bottom: .5rem; }
+}
+@media (max-width: 600px) {
+  .preview-header { gap: .75rem 1rem; }
+  .preview-map { margin-left: 0; width: 100%; }
+  .concept-preview #dd-article { padding: 1.75rem 1rem 3rem; }
+  .concept-preview .dd-note, .concept-preview .dd-goals { padding: .875rem; }
+}

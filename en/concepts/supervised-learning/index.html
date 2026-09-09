@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supervised Learning · AI Knowledge Map</title>
+<meta name="description" content="Learn from &#39;input + target&#39; samples and make reliable predictions on unseen data">
+<link rel="canonical" href="https://little-fishk.github.io/AI-knowledge-map/en/concepts/supervised-learning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://little-fishk.github.io/AI-knowledge-map/zh/concepts/supervised-learning/">
+<link rel="alternate" hreflang="en" href="https://little-fishk.github.io/AI-knowledge-map/en/concepts/supervised-learning/">
+<link rel="stylesheet" href="/AI-knowledge-map/assets/style.css"><link rel="stylesheet" href="/AI-knowledge-map/assets/concept-preview.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Supervised Learning","description":"Learn from 'input + target' samples and make reliable predictions on unseen data","inLanguage":"en","url":"https://little-fishk.github.io/AI-knowledge-map/en/concepts/supervised-learning/","learningResourceType":"Concept explanation","isAccessibleForFree":true}</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header class="preview-header"><a class="preview-brand" href="/AI-knowledge-map/?lang=en#/map">◈ AI Knowledge Map</a>
+<span>English</span><a class="preview-map" lang="zh-Hans" href="/AI-knowledge-map/zh/concepts/supervised-learning/">简体中文</a></header>
+<main id="main-content" tabindex="-1"><article id="dd-article">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Supervised Learning</h1>
+<p class="dd-sub">Learn from &#39;input + target&#39; samples and make reliable predictions on unseen data</p>
+<p class="dd-ali">Supervised Learning · Supervised Learning</p>
+<p class="dd-metabar">Suggested 25–35 minutes · Foundational · Requires: basic concepts of functions and vectors</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Supervised learning learns a function from input to output from a large number of &#39;input + target value (label)&#39; samples. The real goal is not to memorize the training set, but to remain reliable on unseen data from the target scenario. Labels are the supervision signal used during training; they may be close to the true target, or they may contain noise, disagreement, or proxy bias.</div></header>
+<!-- source-body:start -->
+<div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer the following yourself:</div>
+  <ul>
+    <li><b>What it is</b>—where “supervision” comes from, and why labels are not necessarily the absolute truth.</li>
+    <li><b>Two types of tasks</b>—the difference between classification and regression, and what their answers look like.</li>
+    <li><b>What learning actually learns</b>—abstractly speaking, what training is doing.</li>
+    <li><b>Success criteria</b>—why getting the training set entirely correct is not success.</li>
+    <li><b>Its limitations</b>—how the labeling bottleneck gave rise to unsupervised and self-supervised learning.</li>
+    <li><b>Its place today</b>—in the era of large models, why we still cannot do without it.</li>
+  </ul>
+</div>
+
+<div class="dd-note key">
+  <b>The minimal example used throughout this page</b>　teach the model to recognize <b>spam email</b>: each sample is an email (input), paired with a human-labeled answer (label: spam / normal). After seeing tens of thousands of such labeled emails, it should learn to judge whether <b>new </b>emails are spam. The whole page revolves around this example.
+</div>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">1</span>What is supervised learning?<span class="dd-badge intuition">Intuition</span></h2>
+  <p class="dd-lead">This section answers: What is the most direct way to make a machine “learn” something?</p>
+  <p>The most direct approach is somewhat similar to using worked examples to teach someone to summarize patterns: give the model many <b>inputs and corresponding targets</b>, so that its predictions gradually get closer to these targets. The target values recorded here are called <b>labels</b>; “supervision” means that during training, every input has a comparable target signal, rather than having a teacher watching in real time.</p>
+  <p>Therefore, supervised learning can be understood as <b>using “input–target” samples to learn a prediction rule</b>. It needs to solve: when faced with a new email not seen during training, how to make a checkable judgment based on past samples. During training, the <b>input </b>is the email content and its corresponding label; the <b>output </b>is a model that can produce a categorical or numerical prediction for new emails.</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Element</th><th>In the spam email example</th></tr></thead>
+    <tbody>
+      <tr><td>Input x (feature)</td><td>the content of an email</td></tr>
+      <tr><td>Label y (training target)</td><td>“spam” or “normal” recorded in the data</td></tr>
+      <tr><td>Training set</td><td>tens of thousands of “email → label” samples</td></tr>
+      <tr><td>Goal</td><td>Learn a rule so that, on <b>new, unlabeled emails, </b>it also judges accurately</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note warn"><b>Labels are not the truth</b> Mail may be mislabeled, annotators may disagree, and business logs may record only a proxy target. The model will carefully learn the patterns in these signals, and will also carefully learn the errors and biases within them.</div>
+  <div class="dd-note intuition"><b>The key is in the last row</b> The value of supervised learning is not in memorizing the emails you have seen, but in <b>generalizing to unseen emails</b>. This point runs through the entire page, and Section 4 will cover it specifically.</div>
+  <p>Its basic process is to first have the model predict the training samples, then compare the predictions with the labels, and then adjust the rule based on the error and repeat. The model giving a new email a “spam probability 0.8” indicates that under the current rule it leans more toward the spam category; it does not prove that the label is absolutely correct, nor does it guarantee that it will remain reliable when switching to a different source of emails.</p>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">2</span>Two Types of Tasks: Classification and Regression<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+  <p class="dd-lead">The label in the previous section was “spam/normal.” But the answer is not always this kind of “one of several choices.” What the answer looks like divides supervised learning into two broad categories.</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Task</th><th>What the answer is</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><b>Classification</b></td><td>Discrete categories (choose one of several)</td><td>spam/normal, cat/dog/bird, positive/negative reviews</td></tr>
+      <tr><td><b>Regression</b></td><td>Continuous numeric values</td><td>house prices, tomorrow’s temperature, product sales</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 220" role="img" aria-label="Classification is drawing a boundary, regression is fitting a line">
+      <g>
+        <rect x="20" y="20" width="250" height="180" rx="8" fill="none" stroke="#2c313b"/>
+        <text x="145" y="42" text-anchor="middle" class="svg-t">Classification: draw a boundary</text>
+        <g fill="#6b8cbe"><circle cx="70" cy="80" r="5"/><circle cx="95" cy="110" r="5"/><circle cx="60" cy="140" r="5"/><circle cx="110" cy="150" r="5"/><circle cx="85" cy="165" r="5"/></g>
+        <g fill="#cf6f6f"><circle cx="200" cy="70" r="5"/><circle cx="220" cy="100" r="5"/><circle cx="180" cy="120" r="5"/><circle cx="225" cy="140" r="5"/><circle cx="195" cy="160" r="5"/></g>
+        <line x1="150" y1="55" x2="140" y2="190" stroke="#4f9d78" stroke-width="2"/>
+      </g>
+      <g>
+        <rect x="290" y="20" width="250" height="180" rx="8" fill="none" stroke="#2c313b"/>
+        <text x="415" y="42" text-anchor="middle" class="svg-t">Regression: fit a line</text>
+        <line x1="315" y1="185" x2="315" y2="60" stroke="#2c313b"/><line x1="315" y1="185" x2="520" y2="185" stroke="#2c313b"/>
+        <g fill="#6b8cbe"><circle cx="340" cy="170" r="5"/><circle cx="375" cy="150" r="5"/><circle cx="410" cy="140" r="5"/><circle cx="440" cy="110" r="5"/><circle cx="480" cy="95" r="5"/><circle cx="505" cy="75" r="5"/></g>
+        <line x1="325" y1="180" x2="515" y2="70" stroke="#d3a05a" stroke-width="2"/>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1　Both tasks predict outputs from inputs: classification learns a class-separating <b>boundary</b>, while regression learns a data-fitting <b>trend line</b>. Whether the answer is discrete or continuous determines which type to use and which loss to pair with it.</figcaption>
+  </figure>
+  <p>Classification and regression describe <b>the two basic forms of supervised learning output</b>, used to avoid mixing up categories, probabilities, and continuous values.</p>
+  <p>Given sample features and training targets, classification outputs a category or probabilities for each category, while regression outputs a continuous numeric value. During training, both first produce a prediction, then use a task-matched loss to compare the prediction with the target, and finally adjust the model.</p>
+  <div class="dd-note warn"><b>How to interpret and boundaries</b>　Classification results indicate which predefined category the sample matches better, and regression results indicate the numerical magnitude estimated by the model. When categories have an order, numerical values need to be binned, or the answer contains multiple structures at the same time, you cannot mechanically decide the task type just by whether it “looks like a number or text”; you must also consider what the business is predicting and the cost of errors.</div>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">3</span>What Exactly Does "Learning" Learn?<span class="dd-badge math">Math</span></h2>
+  <p class="dd-lead">Classification and regression look different, but abstracted into mathematics, what training is doing is <b>the same thing</b>. What is it?</p>
+  <p>Treat the rule to be learned as a <b>function with parameters</b> <code>f_θ</code>: feed in an input <code>x</code>, and it outputs a prediction <code>f_θ(x)</code>. Where <code>θ</code> is the set of parameters the model needs to learn,<code>n</code> is the total number of training samples,<code>i</code> is the sample index,<code>xᵢ</code> and <code>yᵢ</code> are the input and label of the i-th sample, respectively. Learning means finding a set of parameters <code>θ</code>, so that the model's average error on the training samples is as small as possible:</p>
+  <div class="dd-formula">Find θ such that &nbsp; (1/n) Σᵢ L( f_θ(xᵢ) , yᵢ ) &nbsp; is as small as possible</div>
+  <p class="dd-formula-note"><code>L</code> is the loss function, which turns the inconsistency between a single prediction and its label into a number. Here, first understand its role; for the specific loss, see 1.2, and for how parameters are updated, see 1.3 "Gradient Descent".</p>
+  <p>Here, "learning" refers to <b>finding a set of parameters from the candidates that has a relatively small average loss</b>. The input consists of training samples, current parameters, and the loss rule; the output is the updated parameters and the prediction function determined by them. Training first uses the current parameters to compute predictions, then computes the loss for each sample, then aggregates the batch average and updates the parameters; after repeating over many batches, independent data are used to judge whether the rule has actually improved.</p>
+  <h3>3.1 Hand-computing a Binary Classification Batch</h3>
+  <p>First, unify the notation: let <code>y=1</code> denote spam, <code>y=0</code> denote non-spam; the model always outputs the same quantity <code>p=P(y=1|x)</code>, which is the probability that "this email is spam". Now consider a mini-batch with only two emails:</p>
+  <ul class="dd-steps">
+    <li>The first is actually spam (<code>y=1</code>), and the model outputs <code>p=0.80</code>, so the probability it assigns to the true class is <code>q=0.80</code>.</li>
+    <li>The second is actually non-spam (<code>y=0</code>), and the model outputs <code>p=0.30</code>; the probability of non-spam is <code>1-p</code>, so the true-class probability is <code>q=0.70</code>.</li>
+  </ul>
+  <p>The full form of binary cross-entropy is:</p>
+  <div class="dd-formula">L(y,p) = −[ y ln(p) + (1−y) ln(1−p) ]</div>
+  <p>When <code>y=1</code> is true, the second term becomes 0, and the loss is <code>−ln(p)</code>; when <code>y=0</code> is true, the first term becomes 0, and the loss is <code>−ln(1−p)</code>. In other words, both cases can be written uniformly as <code>−ln(q)</code>, where <code>q</code> is the model-assigned <b>true class</b> probability.</p>
+  <table class="dd-table"><thead><tr><th>Sample</th><th>Model output p: spam probability</th><th>True-class probability q</th><th>Loss −ln(q)</th></tr></thead><tbody><tr><td>Spam, y=1</td><td>0.80</td><td>q=p=0.80</td><td>0.223</td></tr><tr><td>Non-spam, y=0</td><td>0.30</td><td>q=1−p=0.70</td><td>0.357</td></tr><tr><td>Batch average</td><td>—</td><td>—</td><td><code>(0.223+0.357)/2=0.290</code></td></tr></tbody></table>
+  <div class="dd-note math"><b>Why use the negative logarithm?</b>　Because <code>q</code> gets closer to 1, <code>−ln(q)</code> gets closer to 0; the smaller the probability assigned to the true class, the faster the penalty grows. For example, <code>q=0.9</code> gives a loss of about 0.105, while <code>q=0.1</code> gives a loss of about 2.303. It especially penalizes predictions that are "very confident but wrong," while also being a continuous and optimization-friendly function.</div>
+  <div class="dd-note intuition"><b>Don't worry about computing gradients yet.</b>　This section only establishes the connection "probability → loss." In 1.2 you will systematically learn loss functions, and in 1.3 you will learn how to use the loss to adjust parameters. Neural networks, decision trees, and support vector machines are models; supervised learning describes the paradigm of training models using input–target samples.</div>
+  <p>A decrease in average loss indicates that the model, under the current samples and loss definition, is closer to the labels, but it does not mean every sample is predicted correctly, nor does it automatically imply that it can generalize. Parameter update methods vary by model; the binary classification mini-batch in this section only explains "how probability becomes loss" and cannot replace subsequent gradient derivation or test set validation.</p>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">4</span>Success criterion: not memorization, but generalization<span class="dd-badge intuition">Intuition</span><span class="dd-badge eng">Engineering</span></h2>
+  <p class="dd-lead">Since training is "making predictions close to labels", does getting all the labels in the training set right mean success?</p>
+  <div class="dd-note warn"><b>Quite the opposite</b> When a model has enough parameters, it can <b>memorize the training set by rote</b>—it scores 100 on the training set, but fails on new emails. What we really want is accuracy on <b>data it has not seen</b>, which is called <b>generalization</b>.</div>
+  <p>So the standard approach is to split the data into three parts, each with its own role:</p>
+  <figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 96" role="img" aria-label="Data divided into training, validation, and test sets">
+      <rect x="20" y="30" width="330" height="34" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="185" y="52" text-anchor="middle" class="svg-tn" font-size="13">Training set</text>
+      <rect x="356" y="30" width="90" height="34" rx="5" fill="#21252d" stroke="#4f9d78"/><text x="401" y="52" text-anchor="middle" class="svg-t">Validation set</text>
+      <rect x="452" y="30" width="88" height="34" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="496" y="52" text-anchor="middle" class="svg-t">Test set</text>
+      <text x="185" y="82" text-anchor="middle" class="svg-t">Used to tune parameters</text>
+      <text x="401" y="82" text-anchor="middle" class="svg-t">Used to select model/hyperparameters</text>
+      <text x="496" y="82" text-anchor="middle" class="svg-t">Final acceptance check once</text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><dl class="preview-split-legend" data-presentation-only="true"><div><dt>Training set</dt><dd>Used to tune parameters</dd></div><div><dt>Validation set</dt><dd>Used to select model/hyperparameters</dd></div><div><dt>Test set</dt><dd>Final acceptance check once</dd></div></dl>
+    <figcaption>Figure 2  The training set tunes parameters, the validation set helps select the model and hyperparameters, and the test set is reserved for final acceptance after the approach is frozen. Once test results are used to guide changes, they have effectively participated in development and can no longer serve as an unbiased final test.</figcaption>
+  </figure>
+  <div class="dd-note intuition"><b>Same thing as overfitting</b> When training error keeps decreasing but validation error starts rising, that is a sign of <b>overfitting</b>—the model is memorizing, not learning. The full set of tools to combat it (regularization, early stopping, more data) is covered in the "Overfitting" and "Regularization" nodes.</div>
+  <h3>4.1 Metrics must correspond to error costs</h3>
+  <p>Suppose only 100 out of 10,000 emails are spam. A model that labels every email as "normal" still has 99% accuracy, but it misses all spam. Therefore acceptance cannot only ask "how many were correct overall"; we must also look separately at:</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Metric</th><th>What it answers in the spam email task</th><th>Main risk</th></tr></thead>
+    <tbody>
+      <tr><td>Precision</td><td>Of the emails that are blocked, how many are actually spam?</td><td>Low precision misclassifies normal emails</td></tr>
+      <tr><td>Recall</td><td>Of all spam emails, how many are successfully blocked?</td><td>Low recall misses spam emails</td></tr>
+      <tr><td>Per-scenario slices</td><td>Does the model perform reliably on emails from new senders, emails in different languages, and phishing emails?</td><td>Overall averages can hide failures in key subgroups</td></tr>
+    </tbody>
+  </table></div>
+  <p>The model outputs probabilities; to finally divide into "spam/normal" we still need to choose a threshold. The lower the threshold, the more it usually blocks, and the more it misclassifies; the actually appropriate threshold depends on the business cost of the two types of errors.</p>
+  <p>Generalization evaluation describes <b>whether the model is still effective on data that did not participate in training and selection</b>, and it solves the problem that training performance cannot represent real-world effectiveness.</p>
+  <p>The inputs to evaluation are the frozen model, independent samples and their targets; the outputs are acceptance evidence such as loss, precision, recall and business slices. The specific method: first fit parameters on the training set, then use the validation set to select the approach, and finally use the test set only after the approach is frozen.</p>
+  <p>Validation error starting to rise while training error continues to fall indicates the model is more like memorizing training details. But a single high test score is still affected by sample representativeness, temporal changes, and data leakage, and cannot prove reliability in all future scenarios.</p>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">5</span>The Cost of Supervision: Annotation Bottleneck<span class="dd-badge eng">Engineering</span></h2>
+  <p class="dd-lead">Where does such a direct and effective method fall short? The answer lies in the word "supervised".</p>
+  <p>The fuel for supervised learning is <b>data with target values</b>. Targets may come from manual annotation, or from transaction outcomes, sensor measurements, user behavior, or rule systems. The real difficulty is not merely scaling up label counts, but obtaining data that is consistent with true targets, covers deployment scenarios, and has verifiable quality:</p>
+  <ul class="dd-steps">
+    <li><b>Expensive, slow</b>: Large-scale annotation is a massive human effort, and many domains require experts (medical imaging, law).</li>
+    <li><b>Targets may be proxies</b>: Clicks do not necessarily equal liking, and historical approval outcomes may replicate old biases.</li>
+    <li><b>Noisy and ambiguous</b>: Some tasks are difficult for humans themselves to label consistently, and automatic logs may also record errors.</li>
+    <li><b>The distribution shifts</b>: Training emails come from the past, while attack methods, users, and language keep changing.</li>
+  </ul>
+  <div class="dd-note key"><b>This bottleneck is important</b>　Manual annotation being expensive is only one part; the more general limitation is the scarcity of reliable supervisory signals. Self-supervised learning constructs training targets from the data itself, thereby reducing dependence on human labels and enabling models to leverage large-scale unlabeled data.</div>
+  <p>“Annotation bottleneck” captures <b>the limitations of reliable target signals in cost, quality, and coverage</b>, used to judge whether a supervised approach can support real deployment.</p>
+  <p>During evaluation, input annotation sources, sampling scope, consistency results, and deployment scenarios; output usable label volume, noisy slices, coverage gaps, and priorities for further collection.</p>
+  <p>The practice is not to merely count total labels, but to first sample and review annotation consistency, then compare coverage across different populations, times, and sources, and then check whether labels align with true business targets. A high consistency rate indicates that annotation rules are relatively stable, not that the target itself is without bias; automatic logs being cheap does not mean they are trustworthy, and domain-expert review is more accurate but may be expensive and slow.</p>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">6</span>It’s Not the Only Paradigm: Four Ways to Learn<span class="dd-badge intuition">Intuition</span></h2>
+  <p class="dd-lead">If there are no externally provided target values, what signals can machines still learn from? Put supervised learning into the bigger map.</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Paradigm</th><th>What it learns from</th><th>Typical tasks</th></tr></thead>
+    <tbody>
+      <tr><td><b>Supervised Learning</b></td><td>Labeled samples</td><td>Classification, regression</td></tr>
+      <tr><td>Unsupervised Learning</td><td>Unlabeled, finds structure on its own</td><td>Clustering (automatic grouping), dimensionality reduction (using a few coordinates to summarize many features, for compression or observation)</td></tr>
+      <tr><td>Self-supervised Learning</td><td>No manual labeling needed; it constructs the answer from the data itself.</td><td>Pre-training large models (predicting the next word)</td></tr>
+      <tr><td>Reinforcement Learning</td><td>Trial and error in an environment, using reward signals.</td><td>Game playing, robotics, RLHF in alignment.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="dd-note intuition"><b>How to understand the classification of self-supervised learning</b>　From the computational form, it also constructs “input–target–loss”; from the data source, it does not rely on external human labels, so many textbooks place it under unsupervised representation learning. There is no need to settle on one classification; the key is to see clearly <b>where the supervision signal comes from</b>: for example, a language model uses the actual subsequent token in the text to construct the prediction target.</div>
+  <p>This comparison table describes <b>where the training signal comes from, and what is produced after learning</b>, used to choose an appropriate paradigm when there are no human labels.</p>
+  <p>The inputs are the data available for the task, the form of feedback, and the interaction conditions; the output is a choice among supervised, unsupervised, self-supervised, or reinforcement learning routes, along with the corresponding model, structural representation, or policy.</p>
+  <p>When deciding, first check whether there is an external target value; then check whether the data can construct its own targets; finally check whether the problem requires obtaining delayed rewards through actions. The classification result indicates the main supervision source, not that an algorithm can belong to only one traditional category; self-supervised learning can be computationally similar to supervised training, and RLHF also combines supervised fine-tuning, reward models, and reinforcement learning, so boundaries may be combined.</p>
+</section>
+
+<section class="dd-sec" data-section-role="core">
+  <h2><span class="dd-n">7</span>In the era of large models, is it still important?<span class="dd-badge eng">Engineering</span><span class="dd-badge intuition">Synthesis</span></h2>
+  <p class="dd-lead">Since large models rely on self-supervised pre-training, why still study supervised learning?</p>
+  <p>Because it is the <b>common language</b> of the entire building, and today it is still everywhere:</p>
+  <ul class="dd-steps">
+    <li><b>Turning a base model into an assistant</b>: Instruction fine-tuning (SFT) is supervised learning—"instruction" is the input, "ideal response" is the label (see the "Fine-tuning" deep-dive page).</li>
+    <li><b>Many downstream tasks</b>: Classification, scoring, and extraction in vertical domains are often still most economical and stable when done with labeled data and supervised learning.</li>
+    <li><b>Evaluation philosophy</b>: Evaluation sets with reference answers follow the idea of held-out testing; but evaluating a model on a dataset does not mean the model has undergone supervised training on that dataset.</li>
+  </ul>
+  <div class="dd-note key"><b>One-sentence positioning</b>　Large models have changed the way representations and knowledge are acquired on a large scale, but <b>have not replaced</b> supervised learning: SFT and many downstream adaptations still directly use input–target samples; evaluation, meanwhile, borrows the principle of using held-out data to test generalization.</div>
+  <p>The role of supervised learning in the large model era can be understood as <b>using high-quality target signals to constrain the specific behavior of general-purpose models</b>. It solves the problem that pre-trained capabilities are broad but may not answer according to task requirements.</p>
+  <p>Inputs can be instructions and ideal responses, domain samples and labels; outputs are supervised fine-tuned models or task-specific predictors.</p>
+  <p>When applying it, first define the behavior you want the model to exhibit, then collect representative input–target pairs, then minimize the loss between predictions and targets, and validate on an independent slice. Higher downstream scores indicate the model is better suited to the current objective and distribution, but this does not imply that foundational knowledge has comprehensively increased; when demonstration data are narrow, labels are biased, or deployment tasks change, supervised adaptation can still fail.</p>
+</section>
+
+<section class="dd-sec" data-section-role="synthesis">
+  <h2><span class="dd-n">8</span>Connecting the Entire Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+  <p class="dd-lead">From human labels to reliable predictions on unseen samples, how is the chain of evidence built step by step?</p>
+  <ol class="dd-chain">
+    <li>Give the model “input + target value” examples, and let it learn the rule from input to output—that is supervised learning. Target values may have noise, so data quality is also part of the mechanism.<span>(§1)</span></li>
+    <li>If the answer is discrete, it is classification; if continuous, it is regression.<span>(§2)</span></li>
+    <li>Abstractly, training = adjusting parameters to make “predictions” approach “labels,” i.e., minimizing loss.<span>(§3)</span></li>
+    <li>The criterion for success is not memorizing the training set, but being accurate on unseen data (generalization); therefore, you need to split into training/validation/test.<span>(§4)</span></li>
+    <li>Its fuel is human labels, and labeling is expensive, slow, and limited—that is its ceiling.<span>(§5)</span></li>
+    <li>To bypass the labeling bottleneck, unsupervised learning, self-supervised learning, and reinforcement learning emerged; self-supervised learning lets data create its own labels, and that is what underpinned large models.<span>(§6)</span></li>
+    <li>In the era of large models, it has not been replaced; instead, it has shifted to calibrating behavior (SFT), adapting to downstream tasks, and doing evaluation.<span>(§7)</span></li>
+  </ol>
+  <div class="dd-note key"><b>Passing Criterion</b>　If you can clearly explain “why supervised learning pursues generalization rather than memorizing the training set,” and can compare the sources and boundaries of external labels and the data's own supervision signals, you have grasped its core.</div>
+</section>
+
+<section class="dd-sec" data-section-role="reference">
+  <h2><span class="dd-n">9</span>Common Misconceptions<span class="dd-badge intuition">Intuition</span></h2>
+  <p class="dd-lead">This section only disambiguates: which statements sound reasonable but can directly lead to incorrect data, training, or acceptance decisions?</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Misconception</th><th>More Accurate Understanding</th></tr></thead>
+    <tbody>
+      <tr><td>Supervised learning = neural networks</td><td>It is a <b>training approach</b>; neural networks, decision trees, and SVMs can all be trained with it.</td></tr>
+      <tr><td>If the training set is accurate, it's a success.</td><td>The goal is <b>to generalize </b>to new data; a perfect score on the training set may just be overfitting.</td></tr>
+      <tr><td>Labels are objective truth.</td><td>Labels are training targets; they may have noise, disagreement, or be just business proxies.</td></tr>
+      <tr><td>More data is always better.</td><td>The data's <b>quality, representativeness, and target consistency </b>cannot be replaced by quantity.</td></tr>
+      <tr><td>It is outdated in the era of large models.</td><td>Pre-training makes heavy use of self-supervised learning; SFT and many downstream adaptations still use supervised learning, while evaluation borrows held-out test principles.</td></tr>
+      <tr><td>Self-supervised learning merely automatically generates human labels.</td><td>It constructs supervision signals from data structure; the computational form may resemble supervised training, but the paradigm classification and learning objectives are more complex.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="dd-sec" data-section-role="assessment">
+  <h2><span class="dd-n">10</span>Check whether you truly understand<span class="dd-badge intuition">Self-test</span></h2>
+  <p class="dd-lead">The questions progress step by step from definitions to real acceptance; every scenario question uses only concepts already established on this page.</p>
+  <ol class="dd-quiz">
+    <li>Where does “supervision” come from? Why do labels not necessarily equal objective truth?</li>
+    <li>What is the fundamental difference between classification and regression? Give an example of each.</li>
+    <li>Explain in one sentence: abstractly speaking, what does supervised learning do during training?</li>
+    <li>Why does “predicting everything correctly on the training set” not mean the model is successful? How should it be evaluated correctly?</li>
+    <li>The data bottleneck of supervised learning is not just that “manual labeling is expensive.” What other problems are involved?</li>
+    <li>What are the connections and differences between self-supervised learning and supervised learning in terms of computational form and source of supervision signal?</li>
+    <li>In the era of large models, in which stages does supervised learning still play a role?</li>
+    <li>Among 10,000 emails, only 100 are spam. The model predicts all as normal; what is the accuracy? Why does this result not show that the model is effective?</li>
+    <li>You find that duplicate copies of the same email appear in both the training set and the test set. Why do test scores become inflated? How should the data be re-split?</li>
+    <li>Design three acceptance slices for the spam model, and for each slice explain the errors or metrics to observe.</li>
+  </ol>
+  <details class="dd-answers"><summary>Reference answers</summary>
+    <ol>
+      <li>Supervision comes from the target values paired with inputs in the training samples; labels are used to calculate the loss and adjust the model, but they may contain mislabeling, subjective disagreement, measurement error, or proxy bias, so they do not inherently equal objective truth.</li>
+      <li>If the answer is a discrete category, it is classification (spam/normal); if it is a continuous value, it is regression (house price).</li>
+      <li>Adjust the model parameters so that its predictions on the training samples are as close as possible to the labels, that is, minimize the loss.</li>
+      <li>Because with enough parameters the model may memorize the training set without generalizing; you should use a validation set to select the model and hyperparameters, and after the plan is frozen, use a test set that was not involved in selection for acceptance. If test results are used to continue making changes, new independent test data will be needed afterward.</li>
+      <li>It also includes label noise and ambiguity, targets that are only business proxies, insufficient data coverage, and drift over time between the training distribution and the deployment distribution. Methods such as self-supervised, unsupervised, semi-supervised, and weakly supervised learning all reduce reliance on high-quality human labels from different angles.</li>
+      <li>In computational form, both may construct inputs and targets and minimize a loss; the difference is that ordinary supervised learning uses externally provided targets, while self-supervised learning constructs supervision signals from the structure of the data itself. This allows large models to leverage massive amounts of data that have not been manually labeled for pre-training.</li>
+      <li>Typical stages include using demonstration data for supervised fine-tuning (SFT), and using domain labels to adapt classification, extraction, or scoring tasks. Evaluations with reference answers borrow the held-out test principle of supervised learning, but evaluation itself is not training.</li>
+      <li>The accuracy is 99%, because 9,900 normal emails are predicted correctly; but all 100 spam emails are missed, so spam recall is 0%. You should report spam recall and precision for intercepted emails at the same time, and choose the threshold based on the cost of false positives and missed detections.</li>
+      <li>Duplicate samples make the test set no longer representative of unseen data; the model may get inflated scores by memorization. You should first deduplicate by original email or email thread, then split using email source, thread, or time as grouping units, ensuring that variants from the same origin fall into only one set.</li>
+      <li>You can design: ① slice by true class, examining spam recall and normal-email false-positive rate separately; ② slice by source and language, checking precision/recall on new senders, different domains, and different languages; ③ slice by time, using newer emails to test performance after attack patterns have changed. A high-risk phishing email miss rate should have an independent upper limit and must not be offset by high accuracy on ordinary emails.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="dd-sec" data-section-role="reference">
+  <h2><span class="dd-n">11</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Roadmap</span></h2>
+  <p class="dd-lead">As page 1 of the official path, what content must be mastered now, and what only needs to be seen first and left to later nodes to unfold?</p>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Learning level</th><th>Related concepts</th></tr></thead>
+    <tbody>
+      <tr><td>Before this page</td><td>You only need to know that a function means 'input goes through rules to produce output'; a vector can for now be understood as a set of numbers.</td></tr>
+      <tr><td><b>Core of this page</b></td><td>Labels, classification and regression, generalization, training/validation/test, the four learning paradigms</td></tr>
+      <tr><td>Next step</td><td>Information theory, loss functions, gradient descent; the cross-entropy and parameter updates on this page will be formally developed in those nodes.</td></tr>
+      <tr><td>Immediate extensions</td><td>Overfitting, regularization, unsupervised learning, reinforcement learning; self-supervised learning will continue to be developed in the model architecture stage.</td></tr>
+      <tr><td>Further ahead</td><td>Pre-training, fine-tuning and instruction fine-tuning, large language models, evaluation.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://www.deeplearningbook.org/contents/ml.html" target="_blank" rel="noopener">Deep Learning, Chapter 5: Machine Learning Basics</a>: supervised learning, empirical risk, generalization, and training/validation/test boundaries.</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>: classification, regression, model selection, and statistical learning framework.</li><li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf" target="_blank" rel="noopener">Stanford CS229 Lecture Notes</a>: input–target, hypothesis function, classification/regression, and loss optimization.</li><li><a href="https://arxiv.org/abs/2007.08199" target="_blank" rel="noopener">Learning from Noisy Labels with Deep Neural Networks: A Survey</a>: how label noise affects generalization and its evaluation boundaries.</li><li><a href="https://arxiv.org/abs/2301.05712" target="_blank" rel="noopener">A Survey on Self-supervised Learning</a>: the sources of self-supervised signals and how self-supervised learning is classified in relation to unsupervised learning.</li><li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Training Language Models to Follow Instructions with Human Feedback</a>: instances of supervised fine-tuning of large models and subsequent reinforcement learning stages.</li></ul><div class="dd-src-date">Date accessed: 2026-07-25</div></div>
+<!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/AI-knowledge-map/?lang=en#/map/supervised-learning">Explore connections on the map</a><a href="/AI-knowledge-map/zh/concepts/supervised-learning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main></body></html>

@@ -7,7 +7,7 @@
     "leaseMinutes": 45
   },
   "createdAt": "2026-07-29T02:06:57.064Z",
-  "updatedAt": "2026-09-02T15:50:10.573Z",
+  "updatedAt": "2026-09-08T20:33:06.774Z",
   "pages": {
     "constrained-decoding": {
       "id": "constrained-decoding",
@@ -13411,22 +13411,195 @@
       "sourcePaths": [
         "data/deepdive/information-theory.js"
       ],
-      "state": "audit-queued",
-      "attempt": 6,
-      "repairAttempts": 0,
-      "contentHash": "sha256:490468ce089e6f9d8f58921ae9208a93826ce482794cf987fa99bad3a0732e48",
-      "auditHash": null,
+      "state": "manual-review",
+      "attempt": 12,
+      "repairAttempts": 2,
+      "contentHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+      "auditHash": "sha256:57def13026a03311db5e51bca18e13cb062a4fe85ccdec5b61fd92f5ecffa7a0",
       "blockers": [],
-      "editorialWarnings": [],
-      "candidateFile": ".stage2/results/information-theory/candidate.json",
-      "auditFile": null,
+      "editorialWarnings": [
+        {
+          "code": "minor-image-caption",
+          "sections": [
+            8
+          ],
+          "evidence": "图 1　同一组 P、Q 依次产生熵、交叉熵、KL 和 PPL。P 负责加权，Q 负责代价。",
+          "message": "图1图注提到 PPL，但 SVG 只画到 KL；PPL 计算在随后步骤中提供。图中数值及因果关系正确，属于图注覆盖范围稍宽，不阻断。"
+        },
+        {
+          "code": "minor-readability",
+          "sections": [
+            7
+          ],
+          "evidence": "PPL 越低只说明模型给实际 token 的平均几何平均概率更高。",
+          "message": "“平均几何平均概率”重复使用“平均”，读起来不顺；结合交叉熵定义和等效分支解释，仍可辨认是在说真实 token 概率的几何平均，不阻断。"
+        }
+      ],
+      "candidateFile": ".stage2/results/information-theory/authorized-repair-14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9.json",
+      "auditFile": ".stage2/results/information-theory/audit-57def13026a03311db5e51bca18e13cb062a4fe85ccdec5b61fd92f5ecffa7a0.json",
       "integration": null,
       "lease": null,
       "published": true,
-      "updatedAt": "2026-09-02T01:34:13.174Z",
-      "reviewHistory": [],
-      "finalReview": null,
-      "completionReceipt": null
+      "updatedAt": "2026-09-08T15:52:50.456Z",
+      "reviewHistory": [
+        {
+          "round": 1,
+          "auditedAt": "2026-09-08T13:58:27.854Z",
+          "pageHash": "sha256:490468ce089e6f9d8f58921ae9208a93826ce482794cf987fa99bad3a0732e48",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "factual-error",
+              "section": 7,
+              "message": "将 Q=P 错写成困惑度等于模型自身预测熵指数的必要条件。：Q=P 是充分条件，但不是必要条件。反例取 P=(0.75,0.25)、Q=(0.5,0.5)：两事件在 Q 下的损失均为 1 bit，因此 H(P,Q)=1，H(Q)=1，PPL=2=2^H(Q)，同时 P≠Q。这可直接由现有来源 Deep Learning 第 3 章的熵与交叉熵定义推出，原句会使读者误判数值相等是否意味着分布匹配。"
+            }
+          ],
+          "improvement": {
+            "summary": "修正第7节将Q=P误作必要条件的表述，区分交叉熵与Q自身熵的加权分布，并补充均匀Q、非均匀P的反例。",
+            "pageHash": "sha256:91c155d089a7fe2654b371317ee48b2bb384bf24dce4511c89c854ba470207ee",
+            "submittedAt": "2026-09-08T13:59:56.553Z"
+          },
+          "nextState": "repair-queued"
+        },
+        {
+          "round": 2,
+          "auditedAt": "2026-09-08T14:03:25.264Z",
+          "pageHash": "sha256:91c155d089a7fe2654b371317ee48b2bb384bf24dce4511c89c854ba470207ee",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "formula-error",
+              "section": 8,
+              "message": "图 1 在 SVG text 内使用 HTML sub，导致 KL 公式与后续结果文字脱离 SVG。：当前候选在 SVG 的 text 元素中直接嵌入 <sub>。按 WHATWG HTML foreign-content 解析规则，sub 会使解析器弹出 SVG 上下文并按 HTML 重新处理，右侧公式在图内只剩 D；(P||Q)、约 0.1038 bit 和底部说明不能按原 SVG 坐标显示。这是公式显示完整性缺陷，非下标外观偏好。核验规范：https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inforeign"
+            },
+            {
+              "code": "source-support-blocked",
+              "section": 7,
+              "message": "现有来源未支持核心困惑度定义及跨 tokenizer 比较口径。：已打开现有三个链接并核查内容。Shannon 论文支持熵及编码，Deep Learning 第三章支持交叉熵与 KL，Stanford 笔记支持编码、KL 和经验似然；三者均未出现 perplexity，后两项也未出现 token，未给出本节关于语言模型困惑度命名、tokenizer 比较和替代评估单位的论述。数学上可从对数损失推出指数化和单位变化，但现有来源不足以支撑本页作为核心概念教授的标准语言模型评价口径。此发现仅报告来源支持缺口，不提出任何来源列表变更。"
+            }
+          ],
+          "improvement": null,
+          "nextState": "repair-queued"
+        },
+        {
+          "round": 3,
+          "auditedAt": "2026-09-08T14:48:48.566Z",
+          "pageHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "pass",
+          "defects": [
+            {
+              "code": "reference-hash-drift",
+              "section": null,
+              "message": "L3参照页内容与已登记基准摘要不一致；需要控制器维护流程审查基准版本。保持阻断，不通过正文返修、删除章节或降低评分门槛解决。"
+            }
+          ],
+          "improvement": null,
+          "nextState": "manual-review"
+        }
+      ],
+      "finalReview": {
+        "status": "manual-review",
+        "completedAt": "2026-09-08T15:52:50.456Z",
+        "blockerCount": 0,
+        "machineAuditPassed": true
+      },
+      "completionReceipt": null,
+      "authorizedRepairHistory": [
+        {
+          "type": "human-authorized-limited-repair",
+          "beforeHash": "sha256:91c155d089a7fe2654b371317ee48b2bb384bf24dce4511c89c854ba470207ee",
+          "afterHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+          "authorization": "用户确认：第8节SVG下标标记及第7节Hugging Face官方来源；独立审核后再评估发布。",
+          "sections": [
+            7,
+            8
+          ],
+          "sourceUrl": "https://huggingface.co/docs/transformers/perplexity",
+          "createdAt": "2026-09-08T14:45:50.749Z",
+          "previousCandidateFile": ".stage2/results/information-theory/candidate.json",
+          "previousAuditFile": ".stage2/results/information-theory/audit.private.json",
+          "findings": [
+            {
+              "type": "content-audit",
+              "code": "formula-error",
+              "findingId": "sha256:eab3749d3ca44a9a5",
+              "section": 8,
+              "sections": [
+                8
+              ],
+              "concept": null,
+              "message": "图 1 在 SVG text 内使用 HTML sub，导致 KL 公式与后续结果文字脱离 SVG。：当前候选在 SVG 的 text 元素中直接嵌入 <sub>。按 WHATWG HTML foreign-content 解析规则，sub 会使解析器弹出 SVG 上下文并按 HTML 重新处理，右侧公式在图内只剩 D；(P||Q)、约 0.1038 bit 和底部说明不能按原 SVG 坐标显示。这是公式显示完整性缺陷，非下标外观偏好。核验规范：https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inforeign",
+              "evidence": "D<sub>KL</sub>(P||Q)",
+              "acceptanceCriteria": "在实际 HTML 解析后，右侧完整 KL 公式、约 0.1038 bit 结果和底部说明都保留于图内正确位置，且不存在使 SVG 解析提前结束的标记。",
+              "sourceUrls": []
+            },
+            {
+              "type": "content-audit",
+              "code": "source-support-blocked",
+              "findingId": "sha256:3f72dd7557ef4f92a",
+              "section": 7,
+              "sections": [
+                7
+              ],
+              "concept": null,
+              "message": "现有来源未支持核心困惑度定义及跨 tokenizer 比较口径。：已打开现有三个链接并核查内容。Shannon 论文支持熵及编码，Deep Learning 第三章支持交叉熵与 KL，Stanford 笔记支持编码、KL 和经验似然；三者均未出现 perplexity，后两项也未出现 token，未给出本节关于语言模型困惑度命名、tokenizer 比较和替代评估单位的论述。数学上可从对数损失推出指数化和单位变化，但现有来源不足以支撑本页作为核心概念教授的标准语言模型评价口径。此发现仅报告来源支持缺口，不提出任何来源列表变更。",
+              "evidence": "不同 tokenizer 会改变预测单位和序列长度，所以 token 级 PPL 通常不能跨 tokenizer 直接比较，跨分词器时可考虑统一语料上的 bits-per-byte 或 bits-per-character。",
+              "acceptanceCriteria": "须能在当前保留来源中定位支持困惑度定义及跨分词器评价口径的具体内容；在不能建立支持时保持阻断，审查及返修 Agent 不修改来源列表。",
+              "sourceUrls": [
+                "https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf",
+                "https://www.deeplearningbook.org/contents/prob.html",
+                "https://web.stanford.edu/class/stats311/OldSyllabi/full_notes.pdf"
+              ]
+            }
+          ]
+        }
+      ],
+      "auditUpgrades": [
+        {
+          "snapshot": ".stage2/results/information-theory/upgrade-79aaadd249209e68a79e1f16965b1f3ed863f94438b34616abd1c206100b29b2.json",
+          "fromVersion": 3,
+          "toVersion": 4,
+          "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+          "sourceHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+          "reason": "用户授权统一审核机制，按v4独立补审；保留旧发布、记录和返修预算"
+        }
+      ],
+      "auditPolicyVersion": 4,
+      "qualityEvaluation": {
+        "policyId": "whole-page-teaching-v4",
+        "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+        "policyVersion": 4,
+        "pageId": "information-theory",
+        "pageHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+        "auditVersion": 4,
+        "accuracy": "pass",
+        "teaching": {
+          "expertReview": "pass",
+          "learnerValidation": "not-tested"
+        },
+        "records": {
+          "status": "complete",
+          "scope": "full",
+          "auditHash": "sha256:57def13026a03311db5e51bca18e13cb062a4fe85ccdec5b61fd92f5ecffa7a0"
+        },
+        "passed": true,
+        "blockers": []
+      },
+      "auditReceipts": [
+        {
+          "auditFile": ".stage2/results/information-theory/audit-57def13026a03311db5e51bca18e13cb062a4fe85ccdec5b61fd92f5ecffa7a0.json",
+          "auditHash": "sha256:57def13026a03311db5e51bca18e13cb062a4fe85ccdec5b61fd92f5ecffa7a0",
+          "pageHash": "sha256:14690cb121c6fd4c1afeb8a24f338fa8e2978a81bfe30197f640f63d4e3381d9",
+          "policyVersion": 4,
+          "mode": "full",
+          "reviewer": "stage2-audit-information-theory-v4",
+          "taskId": "information-theory:audit:12:28696d90",
+          "acceptedAt": "2026-09-08T15:52:48.002Z"
+        }
+      ]
     },
     "kernel-methods": {
       "id": "kernel-methods",
@@ -15397,75 +15570,149 @@
       "sourcePaths": [
         "data/deepdive/neural-network.js"
       ],
-      "state": "published-approved",
-      "attempt": 1,
-      "repairAttempts": 0,
-      "contentHash": "sha256:a4d79eb958b621e6c315e6b89caba864bc84023f247509ad8a48dffb1dd402e5",
-      "auditHash": "sha256:de9906731d6c6a4dd7cc032a9ee5da4f7b8cd886876fc8c6e33011529701cc70",
-      "blockers": [],
+      "state": "manual-review",
+      "attempt": 6,
+      "repairAttempts": 1,
+      "contentHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+      "auditHash": null,
+      "blockers": [
+        {
+          "type": "content-audit",
+          "code": "factual-error",
+          "findingId": "sha256:a96f3ea870fd4251c",
+          "section": 4,
+          "sections": [
+            4
+          ],
+          "concept": null,
+          "message": "把所有隐藏层不含非线性，直接等同于包含输出变换的整个网络必为仿射函数。：该结论漏掉输出层条件。即使所有隐藏层均为仿射，输出Sigmoid仍可得到σ(Ax+c)，整体并非仿射函数；其二分类固定阈值边界可以仍是超平面。这直接混淆隐藏表示的表达限制、最终数值函数和决策边界，且与本节随后允许Sigmoid/Softmax输出的解释冲突。现有Google模块的线性坍缩示例明确同时检查输出层为线性。",
+          "evidence": "如果所有隐藏层都没有非线性，无论层数多少，网络最终仍会退化成一个仿射变换。",
+          "acceptanceCriteria": "将可合并为单一仿射变换的对象限定准确，明确输出若含Sigmoid/Softmax则最终概率映射不是仿射；保持隐藏层不含非线性不会获得新的非线性表示能力这一正确结论。",
+          "sourceUrls": [
+            "https://developers.google.com/machine-learning/crash-course/neural-networks/nodes-hidden-layers",
+            "https://developers.google.com/machine-learning/crash-course/neural-networks/activation-functions"
+          ]
+        },
+        {
+          "type": "content-audit",
+          "code": "factual-error",
+          "findingId": "sha256:f951f40accdc0e89e",
+          "section": 13,
+          "sections": [
+            13
+          ],
+          "concept": null,
+          "message": "将全部权重设零，无条件概括为同层节点在整个训练中始终学习相同内容。：第2节已明确权重与偏置是不同参数；仅全部权重相同不足以保证完整节点置换对称。可直接反例验证：输入1、两个ReLU隐藏节点入向权重均0、偏置1和2，线性输出权重均0、偏置0，目标1，半平方损失，学习率0.1。第一步输出权重变成0.1和0.2、输出偏置0.1；下一步输出0.6，两隐藏入向权重梯度分别-0.04和-0.08，因此会分化。该无条件总结还撤掉第7、10节明确解释的偏置、下游连接、优化器状态和更新对称条件，会让读者形成错误初始化规则。",
+          "evidence": "理解初始化后，才能解释为什么全部权重设为零会让同层节点始终学习相同内容，也能理解过大或过小初值为何导致数值问题。",
+          "acceptanceCriteria": "第13节总结与第7、10节的条件一致：相同响应和持续相同更新必须建立在相关参数、连接及更新规则保持对称的前提上；全零权重只说明可能产生对称或梯度受阻的风险，不能一概断言永久相同。",
+          "sourceUrls": [
+            "https://cs231n.github.io/neural-networks-2/"
+          ]
+        }
+      ],
       "editorialWarnings": [
         {
+          "code": "minor-terminology-style",
+          "message": "多节展示公式仍使用y-hat、^((1))、odot及反斜杠范数等文本记法，表格却使用ŷ、W₂等数学符号。页面视图直接插入HTML，未进行这些文本的数学排版转换。现有文字和手算足以还原含义，建议统一预测符号、上下标、逐元素乘法和分数显示，提高公式可读性。"
+        },
+        {
+          "code": "minor-image-caption",
+          "message": "第7节图4的几个示意点与绘出的贝塞尔损失曲线略有偏离，最低点文字基线y=228超出viewBox高度220。建议调整示意点和文字位置，使其更直观地落在曲线上且完整可见；不影响正文对负梯度和局部性的解释。"
+        },
+        {
+          "code": "minor-image-caption",
+          "message": "第11节图5验证曲线最低点约在SVG横坐标237.28，而“早停点”画在300，可能表示耐心等待后的停止时刻。正文已区分最佳检查点与耐心停止，建议图中也区分这两个位置，并使图注的“一开始回升就确定在背、那一刻即停止”表述与正文的噪声、耐心和诊断边界一致。"
+        },
+        {
+          "code": "minor-repetition",
+          "message": "第1、3、4、5、12、13节多次重述仿射层坍缩和前向—损失—反向—更新。各处仍有推导、手算或综合功能，未达到损害理解的重复；可压缩末尾两节与前文章末小结重合的段落。"
+        },
+        {
           "code": "minor-readability",
-          "sections": [
-            6,
-            9
-          ],
-          "message": "第 6 节输出层公式把下标显示为“ext{out}”，第 9 节把逐元素乘法符号显示为文字“odot”；上下文仍明确给出输出层与逐元素乘法的含义，因此不构成公式结论错误，但数学排版可读性应改善。"
+          "message": "第7节“原文提到没有唯一的‘下降最慢方向’”留下对未呈现原文的编辑性指代。该段随后的点积解释完整，可直接进入解释，使独立阅读更自然。"
         }
       ],
       "candidateFile": ".stage2/results/neural-network/candidate.json",
-      "auditFile": "docs/deepdive-audits/neural-network.json",
+      "auditFile": ".stage2/results/neural-network/audit-d070f7a91bdd09df72a33f822ace3aa3ce49601c271ff37430f5e3fbae08c62f.json",
       "integration": null,
       "lease": null,
       "published": true,
-      "updatedAt": "2026-08-12T22:16:11.153Z",
+      "updatedAt": "2026-09-08T16:38:40.305Z",
       "finalReview": {
-        "status": "published-approved",
-        "completedAt": "2026-08-12T22:16:11.153Z",
-        "blockerCountAtApproval": 0,
-        "machineBlockers": [],
-        "humanApproved": true,
-        "reason": "Human reviewer approved the complete website-formatted neural-network candidate page."
+        "status": "manual-review",
+        "completedAt": "2026-09-08T16:38:40.305Z",
+        "blockerCount": 2
       },
-      "completionReceipt": ".stage2/results/neural-network/completion.json",
+      "completionReceipt": "../../AppData/Local/ai-knowledge-map/stage2/results/neural-network/completion.json",
       "publication": {
         "schemaVersion": 1,
         "status": "published-approved",
         "reviewStatus": "human-approved",
-        "pageHash": "sha256:a4d79eb958b621e6c315e6b89caba864bc84023f247509ad8a48dffb1dd402e5",
-        "publishedAt": "2026-08-12T22:16:11.153Z",
+        "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+        "publishedAt": "2026-09-08T04:05:35.109Z",
         "machineBlockerCountAtApproval": 0
       },
       "editorialWorkflow": {
         "schemaVersion": 1,
         "source": "human-curated-candidate",
-        "status": "human-approved",
+        "status": "human-review-blocked",
         "auditMode": "complete",
         "verificationSource": "machine",
         "maxRepairAttempts": 1,
-        "initialBlockingFindings": [],
-        "requiresHumanReview": true,
-        "importedAt": "2026-08-12T22:05:00.374Z",
-        "removedSectionTitles": [
-          "常见误解",
-          "检查你是否真的理解"
+        "initialBlockingFindings": [
+          {
+            "type": "content-audit",
+            "code": "factual-error",
+            "findingId": "sha256:a96f3ea870fd4251c",
+            "section": 4,
+            "sections": [
+              4
+            ],
+            "concept": null,
+            "message": "把所有隐藏层不含非线性，直接等同于包含输出变换的整个网络必为仿射函数。：该结论漏掉输出层条件。即使所有隐藏层均为仿射，输出Sigmoid仍可得到σ(Ax+c)，整体并非仿射函数；其二分类固定阈值边界可以仍是超平面。这直接混淆隐藏表示的表达限制、最终数值函数和决策边界，且与本节随后允许Sigmoid/Softmax输出的解释冲突。现有Google模块的线性坍缩示例明确同时检查输出层为线性。",
+            "evidence": "如果所有隐藏层都没有非线性，无论层数多少，网络最终仍会退化成一个仿射变换。",
+            "acceptanceCriteria": "将可合并为单一仿射变换的对象限定准确，明确输出若含Sigmoid/Softmax则最终概率映射不是仿射；保持隐藏层不含非线性不会获得新的非线性表示能力这一正确结论。",
+            "sourceUrls": [
+              "https://developers.google.com/machine-learning/crash-course/neural-networks/nodes-hidden-layers",
+              "https://developers.google.com/machine-learning/crash-course/neural-networks/activation-functions"
+            ]
+          },
+          {
+            "type": "content-audit",
+            "code": "factual-error",
+            "findingId": "sha256:f951f40accdc0e89e",
+            "section": 13,
+            "sections": [
+              13
+            ],
+            "concept": null,
+            "message": "将全部权重设零，无条件概括为同层节点在整个训练中始终学习相同内容。：第2节已明确权重与偏置是不同参数；仅全部权重相同不足以保证完整节点置换对称。可直接反例验证：输入1、两个ReLU隐藏节点入向权重均0、偏置1和2，线性输出权重均0、偏置0，目标1，半平方损失，学习率0.1。第一步输出权重变成0.1和0.2、输出偏置0.1；下一步输出0.6，两隐藏入向权重梯度分别-0.04和-0.08，因此会分化。该无条件总结还撤掉第7、10节明确解释的偏置、下游连接、优化器状态和更新对称条件，会让读者形成错误初始化规则。",
+            "evidence": "理解初始化后，才能解释为什么全部权重设为零会让同层节点始终学习相同内容，也能理解过大或过小初值为何导致数值问题。",
+            "acceptanceCriteria": "第13节总结与第7、10节的条件一致：相同响应和持续相同更新必须建立在相关参数、连接及更新规则保持对称的前提上；全零权重只说明可能产生对称或梯度受阻的风险，不能一概断言永久相同。",
+            "sourceUrls": [
+              "https://cs231n.github.io/neural-networks-2/"
+            ]
+          }
         ],
+        "requiresHumanReview": true,
+        "importedAt": "2026-09-08T02:54:44.633Z",
+        "removedSectionTitles": [],
         "preservation": {
           "passed": true,
           "originalFigures": 5,
           "candidateFigures": 5,
           "originalRetainedTables": 12,
-          "allowedRemovedTables": 1,
+          "allowedRemovedTables": 0,
           "candidateTables": 12,
           "missingFigureCount": 0,
           "missingTableCount": 0,
-          "removedSectionTitles": [
-            "常见误解",
-            "检查你是否真的理解"
-          ],
-          "stillPresentRemovedSections": []
+          "removedSectionTitles": [],
+          "stillPresentRemovedSections": [],
+          "authorizedErrataHash": "sha256:9b738f3c0146e1e18bf3d5261e4822a37bde0336abee32f3bd1aefebcf02b21a"
         },
-        "machineAuditPassedAt": "2026-08-12T22:09:30.933Z"
+        "lastAuditedAt": "2026-09-08T16:38:40.305Z",
+        "candidateUpdatedAt": "2026-09-08T03:33:35.458Z",
+        "machineAuditPassedAt": "2026-09-08T03:35:32.863Z"
       },
       "editorialReceipt": ".stage2/results/neural-network/editorial-publication.json",
       "provisionalReceipt": null,
@@ -15489,8 +15736,266 @@
             "submittedAt": "2026-08-12T21:14:53.736Z"
           },
           "nextState": "repair-queued"
+        },
+        {
+          "round": 2,
+          "auditedAt": "2026-09-08T03:00:28.503Z",
+          "pageHash": "sha256:02185c4c52d3d50891bcec5332b9ad4d195441a494354fef10b9ebdd86dce25f",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "image-text-mismatch",
+              "section": 4,
+              "message": "图3把Sigmoid与tanh各画成多条分离曲线，不能表示正文所定义的单值激活函数。：当前SVG中Sigmoid组同时绘制M30,150…110,50和M35,145…110,60两条可见path，在局部x=110处分别给出y=50和60。tanh组同时保留带translate(0,45) scale(1,0.9)的旧path及完整S形path，在局部x=110处分别到达y=94.5和100。每组同一横坐标对应两个输出，且Sigmoid曲线进入横轴下方，与0到1范围及正文公式冲突。这是函数图像关系错误，不只是图注风格；Google原有神经网络模块的Activation functions材料也给出单条函数曲线及对应范围。"
+            },
+            {
+              "code": "factual-error",
+              "section": 10,
+              "message": "仅本层节点入向权重与偏置相同，不足以推出反向梯度相同和后续永远重复。：正文第2节将节点权重定义为它的入向权重。相同入向参数只保证当前前向响应相同；下游权重不同时，链式法则返回的敏感度可以不同。可直接验证：x=1，两个ReLU隐藏节点均w=1、b=0，线性输出连接为v1=1、v2=2，目标0，L=ŷ²/2。此时两个隐藏输出均1、ŷ=3，但两个入向权重梯度分别为3和6，一次普通梯度更新后即分开。故本段缺少整个相关连接及更新规则保持置换对称的条件，错误地把同层相同初始化充分条件扩大。第7节也有同类概括。"
+            }
+          ],
+          "improvement": {
+            "summary": "修正图3为逐函数单值曲线并标明坐标；补足第7、10节初始化的下游对称条件与反例。",
+            "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+            "submittedAt": "2026-09-08T03:33:35.458Z",
+            "figureRepairReceipt": {
+              "authorization": {
+                "pageId": "neural-network",
+                "candidateHash": "sha256:02185c4c52d3d50891bcec5332b9ad4d195441a494354fef10b9ebdd86dce25f",
+                "findingId": "sha256:552b3cd13ab140ad8",
+                "section": 4
+              },
+              "authorizationHash": "sha256:ed696499483bfd6b4db2d4a886cbb639a88693aab849b198ff31d9f4210e0b2d",
+              "beforeFigureHash": "sha256:2adc237f85e48e4ac07907c70c14b8d6ef6b3c1a9a576bbaeb65ec033ca7d27a",
+              "afterFigureHash": "sha256:fb5710682a25354c808b6e3b3d595f745f8768e50bccb2e6657dd57bc688b55f"
+            }
+          },
+          "nextState": "repair-queued"
+        },
+        {
+          "round": 3,
+          "auditedAt": "2026-09-08T16:23:52.132Z",
+          "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "factual-error",
+              "section": 4,
+              "message": "把所有隐藏层没有非线性直接推成整个网络是仿射变换，遗漏输出层可能保留Sigmoid或Softmax这一条件。：隐藏层均仿射只能推出输出变换之前的logits可合并为仿射映射。保留Sigmoid时整体是σ(Ax+c)，通常不是仿射函数；其二分类决策边界仍可为超平面。正文就在同章说明输出层可用Sigmoid/Softmax，当前断言会混淆函数非线性、分类边界和隐藏表示的表达能力。Google模块对仿射合并的例子明确同时要求输出节点也是线性计算。"
+            },
+            {
+              "code": "factual-error",
+              "section": 13,
+              "message": "末章把全部权重为零无条件概括为同层节点始终学习相同内容，重新遗漏偏置、下游连接与更新过程保持对称的条件。：第7、10章已正确限制对称性条件，但第13章的总结没有这些限制。反例：x=1，两个ReLU隐藏节点初始输入权重均为0、偏置为1和2，输出权重均为0、输出偏置0；目标1、平方误差的一半、学习率0.1。第一步输出权重变为0.1和0.2，第二步两个入向权重梯度分别为−0.04和−0.08，节点随即分化。因此全部权重为零本身并不蕴含始终相同，这会把前文教清的条件在延伸总结中改错。"
+            },
+            {
+              "code": "source-support-blocked",
+              "section": 11,
+              "message": "现有四项页面来源没有为L2正则化与解耦权重衰减在Adam中不等价这一关键算法边界提供可定位支持。：实际打开四个既有来源并核对神经网络模块的节点与激活子页：它们支持基本非线性、反向传播、梯度下降、过拟合及Dropout，但未给出Adam中正则项经自适应梯度处理与解耦衰减不等价的论证或说明。该事实可由Decoupled Weight Decay Regularization原论文直接核实，说明事实本身正确；然而外部核验材料不会自动成为当前页面的来源支持。该边界直接决定读者对正则化与优化器组合的理解，不能以现有链接可访问代替支持。"
+            }
+          ],
+          "improvement": null,
+          "nextState": "manual-review"
+        },
+        {
+          "round": 4,
+          "auditedAt": "2026-09-08T16:38:40.305Z",
+          "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "factual-error",
+              "section": 4,
+              "message": "把所有隐藏层不含非线性，直接等同于包含输出变换的整个网络必为仿射函数。：该结论漏掉输出层条件。即使所有隐藏层均为仿射，输出Sigmoid仍可得到σ(Ax+c)，整体并非仿射函数；其二分类固定阈值边界可以仍是超平面。这直接混淆隐藏表示的表达限制、最终数值函数和决策边界，且与本节随后允许Sigmoid/Softmax输出的解释冲突。现有Google模块的线性坍缩示例明确同时检查输出层为线性。"
+            },
+            {
+              "code": "factual-error",
+              "section": 13,
+              "message": "将全部权重设零，无条件概括为同层节点在整个训练中始终学习相同内容。：第2节已明确权重与偏置是不同参数；仅全部权重相同不足以保证完整节点置换对称。可直接反例验证：输入1、两个ReLU隐藏节点入向权重均0、偏置1和2，线性输出权重均0、偏置0，目标1，半平方损失，学习率0.1。第一步输出权重变成0.1和0.2、输出偏置0.1；下一步输出0.6，两隐藏入向权重梯度分别-0.04和-0.08，因此会分化。该无条件总结还撤掉第7、10节明确解释的偏置、下游连接、优化器状态和更新对称条件，会让读者形成错误初始化规则。"
+            }
+          ],
+          "improvement": null,
+          "nextState": "manual-review"
         }
-      ]
+      ],
+      "errataReceipts": [
+        {
+          "type": "human-authorized-errata",
+          "packetHash": "sha256:9b738f3c0146e1e18bf3d5261e4822a37bde0336abee32f3bd1aefebcf02b21a",
+          "sourceHash": "sha256:a4d79eb958b621e6c315e6b89caba864bc84023f247509ad8a48dffb1dd402e5",
+          "candidateHash": "sha256:02185c4c52d3d50891bcec5332b9ad4d195441a494354fef10b9ebdd86dce25f",
+          "packet": {
+            "schemaVersion": 1,
+            "pageId": "neural-network",
+            "sourceHash": "sha256:a4d79eb958b621e6c315e6b89caba864bc84023f247509ad8a48dffb1dd402e5",
+            "changes": [
+              {
+                "issueId": "S1",
+                "start": 1212,
+                "end": 3256,
+                "before": "<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 640 260\" role=\"img\" aria-label=\"线性边界无法分开同心环，曲线可以\">\n      <g transform=\"translate(0,0)\">\n        <rect x=\"20\" y=\"20\" width=\"280\" height=\"210\" rx=\"8\" fill=\"none\" stroke=\"#2c313b\"/>\n        <text x=\"160\" y=\"44\" text-anchor=\"middle\" class=\"svg-t\">一条直线：分不开</text>\n        <!-- outer ring (class B, red) -->\n        <g fill=\"#cf6f6f\">\n          <circle cx=\"160\" cy=\"150\" r=\"4\"/><circle cx=\"100\" cy=\"120\" r=\"4\"/><circle cx=\"220\" cy=\"120\" r=\"4\"/>\n          <circle cx=\"110\" cy=\"185\" r=\"4\"/><circle cx=\"210\" cy=\"185\" r=\"4\"/><circle cx=\"160\" cy=\"95\" r=\"4\"/>\n          <circle cx=\"80\" cy=\"150\" r=\"4\"/><circle cx=\"240\" cy=\"150\" r=\"4\"/>\n        </g>\n        <!-- inner cluster (class A, blue) -->\n        <g fill=\"#6b8cbe\"><circle cx=\"160\" cy=\"150\" r=\"4\" fill=\"#6b8cbe\" opacity=\"0\"/>\n          <circle cx=\"150\" cy=\"145\" r=\"4\"/><circle cx=\"170\" cy=\"150\" r=\"4\"/><circle cx=\"160\" cy=\"135\" r=\"4\"/><circle cx=\"158\" cy=\"160\" r=\"4\"/>\n        </g>\n        <line x1=\"55\" y1=\"215\" x2=\"265\" y2=\"70\" stroke=\"#d3a05a\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/>\n      </g>\n      <g transform=\"translate(320,0)\">\n        <rect x=\"20\" y=\"20\" width=\"280\" height=\"210\" rx=\"8\" fill=\"none\" stroke=\"#2c313b\"/>\n        <text x=\"160\" y=\"44\" text-anchor=\"middle\" class=\"svg-t\">一条曲线：分得开</text>\n        <g fill=\"#cf6f6f\">\n          <circle cx=\"160\" cy=\"150\" r=\"4\"/><circle cx=\"100\" cy=\"120\" r=\"4\"/><circle cx=\"220\" cy=\"120\" r=\"4\"/>\n          <circle cx=\"110\" cy=\"185\" r=\"4\"/><circle cx=\"210\" cy=\"185\" r=\"4\"/><circle cx=\"160\" cy=\"95\" r=\"4\"/>\n          <circle cx=\"80\" cy=\"150\" r=\"4\"/><circle cx=\"240\" cy=\"150\" r=\"4\"/>\n        </g>\n        <g fill=\"#6b8cbe\">\n          <circle cx=\"150\" cy=\"145\" r=\"4\"/><circle cx=\"170\" cy=\"150\" r=\"4\"/><circle cx=\"160\" cy=\"135\" r=\"4\"/><circle cx=\"158\" cy=\"160\" r=\"4\"/>\n        </g>\n        <ellipse cx=\"160\" cy=\"150\" rx=\"42\" ry=\"38\" fill=\"none\" stroke=\"#4f9d78\" stroke-width=\"2\"/>\n      </g>\n    </svg>\n    <figcaption>图 1　左：内圈一类、外圈一类，任何直线都会同时切错两边。右：一条闭合曲线才能把它们分开。神经网络要造的，正是这种弯曲的边界。</figcaption>\n  </figure>",
+                "after": "<figure class=\"dd-fig\">\n    <svg viewBox=\"0 0 640 260\" role=\"img\" aria-label=\"一条直线无法完全分开内部蓝点和外围红点，图中的闭合曲线可以\">\n      <g transform=\"translate(0,0)\">\n        <rect x=\"20\" y=\"20\" width=\"280\" height=\"210\" rx=\"8\" fill=\"none\" stroke=\"#2c313b\"/>\n        <text x=\"160\" y=\"44\" text-anchor=\"middle\" class=\"svg-t\">一条直线：分不开</text>\n        <!-- outer ring (class B, red) -->\n        <g fill=\"#cf6f6f\">\n          <circle cx=\"160\" cy=\"205\" r=\"4\"/><circle cx=\"100\" cy=\"120\" r=\"4\"/><circle cx=\"220\" cy=\"120\" r=\"4\"/>\n          <circle cx=\"110\" cy=\"185\" r=\"4\"/><circle cx=\"210\" cy=\"185\" r=\"4\"/><circle cx=\"160\" cy=\"95\" r=\"4\"/>\n          <circle cx=\"80\" cy=\"150\" r=\"4\"/><circle cx=\"240\" cy=\"150\" r=\"4\"/>\n        </g>\n        <!-- inner cluster (class A, blue) -->\n        <g fill=\"#6b8cbe\"><circle cx=\"160\" cy=\"150\" r=\"4\" fill=\"#6b8cbe\" opacity=\"0\"/>\n          <circle cx=\"150\" cy=\"145\" r=\"4\"/><circle cx=\"170\" cy=\"150\" r=\"4\"/><circle cx=\"160\" cy=\"135\" r=\"4\"/><circle cx=\"158\" cy=\"160\" r=\"4\"/>\n        </g>\n        <line x1=\"55\" y1=\"215\" x2=\"265\" y2=\"70\" stroke=\"#d3a05a\" stroke-width=\"2\" stroke-dasharray=\"5 4\"/>\n      </g>\n      <g transform=\"translate(320,0)\">\n        <rect x=\"20\" y=\"20\" width=\"280\" height=\"210\" rx=\"8\" fill=\"none\" stroke=\"#2c313b\"/>\n        <text x=\"160\" y=\"44\" text-anchor=\"middle\" class=\"svg-t\">一条曲线：分得开</text>\n        <g fill=\"#cf6f6f\">\n          <circle cx=\"160\" cy=\"205\" r=\"4\"/><circle cx=\"100\" cy=\"120\" r=\"4\"/><circle cx=\"220\" cy=\"120\" r=\"4\"/>\n          <circle cx=\"110\" cy=\"185\" r=\"4\"/><circle cx=\"210\" cy=\"185\" r=\"4\"/><circle cx=\"160\" cy=\"95\" r=\"4\"/>\n          <circle cx=\"80\" cy=\"150\" r=\"4\"/><circle cx=\"240\" cy=\"150\" r=\"4\"/>\n        </g>\n        <g fill=\"#6b8cbe\">\n          <circle cx=\"150\" cy=\"145\" r=\"4\"/><circle cx=\"170\" cy=\"150\" r=\"4\"/><circle cx=\"160\" cy=\"135\" r=\"4\"/><circle cx=\"158\" cy=\"160\" r=\"4\"/>\n        </g>\n        <ellipse cx=\"160\" cy=\"150\" rx=\"42\" ry=\"38\" fill=\"none\" stroke=\"#4f9d78\" stroke-width=\"2\"/>\n      </g>\n    </svg>\n    <figcaption>图 1　左：蓝色点集中在内部，红色点分布在外围，一条直线无法将两类完全分开。右：图中的闭合曲线将蓝色点包围在内、红色点留在外。神经网络能够学习这样的非线性分类边界。</figcaption>\n  </figure>"
+              },
+              {
+                "issueId": "S2",
+                "start": 19795,
+                "end": 19861,
+                "before": "ReLU 流行的原因包括形式简单、计算便宜，而且在正半轴上的梯度为 1，不会像 Sigmoid 那样在很大的正负输入处自然趋近于零。",
+                "after": "ReLU 形式简单、计算便宜。在正半轴上，它的导数为 1，不会因正输入增大而像 Sigmoid 那样进入梯度接近零的饱和区；但在负半轴上，它的输出和导数都为 0。"
+              },
+              {
+                "issueId": "S3",
+                "start": 22361,
+                "end": 22411,
+                "before": "输出层的变换当然也具有数学上的非线性，但这里选择它的首要原因是匹配任务语义，而不是继续构造隐藏表示。",
+                "after": "输出层可以采用线性映射，也可以采用 Sigmoid、Softmax 等非线性变换。选择哪一种，首先取决于任务所需的输出范围和含义。"
+              },
+              {
+                "issueId": "S4",
+                "start": 26949,
+                "end": 26979,
+                "before": "z=W_{ ext{out}}h+b_{ ext{out}}",
+                "after": "z = W<sub>out</sub>h + b<sub>out</sub>"
+              },
+              {
+                "issueId": "S5-a",
+                "start": 40295,
+                "end": 40358,
+                "before": "如果这些因子长期小于 1，连乘后可能接近零，早期层几乎得不到训练信号；如果因子长期大于 1，连乘结果可能变得极大，引发不稳定。",
+                "after": "在标量链式乘积的简化情形中，若每个局部导数的绝对值都不超过某个小于 1 的常数，连乘的幅度会随层数增加而衰减；持续的放大也可能使梯度变得很大。实际网络涉及雅可比矩阵的连乘及多条路径，因此还取决于权重、激活状态和梯度传播方向。"
+              },
+              {
+                "issueId": "S6",
+                "start": 43083,
+                "end": 43125,
+                "before": "<p>输出偏置对 <code>z_2</code> 的局部导数为 1，所以：</p>",
+                "after": "<p>输出层原始分数 <code>z_2</code> 对输出偏置 <code>b_2</code> 的局部导数为 1，所以：</p>"
+              },
+              {
+                "issueId": "S5-b",
+                "start": 46466,
+                "end": 46492,
+                "before": "如果这些因子大多小于 1，经过多层连乘后可能接近零。",
+                "after": "当反向传播沿相关方向经过各层时持续受到压缩，传到早期层的梯度可能很小。用标量乘积作直观说明，就是多个幅度小于 1 的因子连续相乘；真实网络还要考虑矩阵与多条路径的共同作用。"
+              },
+              {
+                "issueId": "S5-c",
+                "start": 46965,
+                "end": 46984,
+                "before": "深层链式乘积里很多小于 1 的导数连乘",
+                "after": "深层链式传播沿相关方向持续缩小梯度幅度（标量直观例子：多个绝对值小于 1 的因子连乘）"
+              },
+              {
+                "issueId": "S7",
+                "start": 53937,
+                "end": 53978,
+                "before": "减少层数、节点数或参数共享方式，可以降低模型记忆训练细节的能力，也节省计算和存储。",
+                "after": "减少层数或节点数，通常可以减少参数和计算量；在适合任务的结构中共享参数，也可以减少独立参数数量和存储需求。这些调整会改变模型的表达能力，但并不保证泛化更好。"
+              }
+            ]
+          },
+          "acceptedAt": "2026-09-08T02:54:44.633Z"
+        }
+      ],
+      "auditUpgrades": [
+        {
+          "snapshot": ".stage2/results/neural-network/upgrade-5a03b4a618989a5033585aa7a11dc59785de4dbf03efdc4c0bd36c26c9d9bc02.json",
+          "fromVersion": 3,
+          "toVersion": 4,
+          "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+          "sourceHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "reason": "用户授权统一审核机制，按v4独立补审；保留旧发布、记录和返修预算"
+        },
+        {
+          "snapshot": ".stage2/results/neural-network/upgrade-91df1ef3d04c6757de0d79960855185d1b6dde572c200185ece043e497b47dfa.json",
+          "fromVersion": 4,
+          "toVersion": 4,
+          "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+          "sourceHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "reason": "用户授权统一审核机制，按v4独立补审；保留旧发布、记录和返修预算"
+        }
+      ],
+      "auditPolicyVersion": 4,
+      "qualityEvaluation": {
+        "policyId": "whole-page-teaching-v4",
+        "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+        "policyVersion": 4,
+        "pageId": "neural-network",
+        "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+        "auditVersion": 4,
+        "accuracy": "fail",
+        "teaching": {
+          "expertReview": "fail",
+          "learnerValidation": "not-tested"
+        },
+        "records": {
+          "status": "complete",
+          "scope": "full",
+          "auditHash": "sha256:d070f7a91bdd09df72a33f822ace3aa3ce49601c271ff37430f5e3fbae08c62f"
+        },
+        "passed": false,
+        "blockers": [
+          {
+            "type": "content-audit",
+            "code": "factual-error",
+            "findingId": "sha256:a96f3ea870fd4251c",
+            "section": 4,
+            "sections": [
+              4
+            ],
+            "concept": null,
+            "message": "把所有隐藏层不含非线性，直接等同于包含输出变换的整个网络必为仿射函数。：该结论漏掉输出层条件。即使所有隐藏层均为仿射，输出Sigmoid仍可得到σ(Ax+c)，整体并非仿射函数；其二分类固定阈值边界可以仍是超平面。这直接混淆隐藏表示的表达限制、最终数值函数和决策边界，且与本节随后允许Sigmoid/Softmax输出的解释冲突。现有Google模块的线性坍缩示例明确同时检查输出层为线性。",
+            "evidence": "如果所有隐藏层都没有非线性，无论层数多少，网络最终仍会退化成一个仿射变换。",
+            "acceptanceCriteria": "将可合并为单一仿射变换的对象限定准确，明确输出若含Sigmoid/Softmax则最终概率映射不是仿射；保持隐藏层不含非线性不会获得新的非线性表示能力这一正确结论。",
+            "sourceUrls": [
+              "https://developers.google.com/machine-learning/crash-course/neural-networks/nodes-hidden-layers",
+              "https://developers.google.com/machine-learning/crash-course/neural-networks/activation-functions"
+            ]
+          },
+          {
+            "type": "content-audit",
+            "code": "factual-error",
+            "findingId": "sha256:f951f40accdc0e89e",
+            "section": 13,
+            "sections": [
+              13
+            ],
+            "concept": null,
+            "message": "将全部权重设零，无条件概括为同层节点在整个训练中始终学习相同内容。：第2节已明确权重与偏置是不同参数；仅全部权重相同不足以保证完整节点置换对称。可直接反例验证：输入1、两个ReLU隐藏节点入向权重均0、偏置1和2，线性输出权重均0、偏置0，目标1，半平方损失，学习率0.1。第一步输出权重变成0.1和0.2、输出偏置0.1；下一步输出0.6，两隐藏入向权重梯度分别-0.04和-0.08，因此会分化。该无条件总结还撤掉第7、10节明确解释的偏置、下游连接、优化器状态和更新对称条件，会让读者形成错误初始化规则。",
+            "evidence": "理解初始化后，才能解释为什么全部权重设为零会让同层节点始终学习相同内容，也能理解过大或过小初值为何导致数值问题。",
+            "acceptanceCriteria": "第13节总结与第7、10节的条件一致：相同响应和持续相同更新必须建立在相关参数、连接及更新规则保持对称的前提上；全零权重只说明可能产生对称或梯度受阻的风险，不能一概断言永久相同。",
+            "sourceUrls": [
+              "https://cs231n.github.io/neural-networks-2/"
+            ]
+          }
+        ]
+      },
+      "auditReceipts": [
+        {
+          "auditFile": ".stage2/results/neural-network/audit-d34cf7386bdc104439a353e0534b45abcbc374f5fe42f82a47a584762f6efaa2.json",
+          "auditHash": "sha256:d34cf7386bdc104439a353e0534b45abcbc374f5fe42f82a47a584762f6efaa2",
+          "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "policyVersion": 4,
+          "mode": "full",
+          "reviewer": "neural-network-v4-independent-audit",
+          "taskId": "neural-network:audit:5:da7dc257",
+          "acceptedAt": "2026-09-08T16:23:52.132Z"
+        },
+        {
+          "auditFile": ".stage2/results/neural-network/audit-d070f7a91bdd09df72a33f822ace3aa3ce49601c271ff37430f5e3fbae08c62f.json",
+          "auditHash": "sha256:d070f7a91bdd09df72a33f822ace3aa3ce49601c271ff37430f5e3fbae08c62f",
+          "pageHash": "sha256:9f9de748c5e8018636c422411537209e5d664dec14d948b5f434049936f3af2c",
+          "policyVersion": 4,
+          "mode": "full",
+          "reviewer": "codex-scheduled",
+          "taskId": "neural-network:audit:6:e4f96d23",
+          "acceptedAt": "2026-09-08T16:38:40.304Z"
+        }
+      ],
+      "auditUpgradePublicationHold": true
     },
     "normalization": {
       "id": "normalization",
@@ -20084,22 +20589,121 @@
       "sourcePaths": [
         "data/deepdive/supervised-learning.js"
       ],
-      "state": "audit-queued",
-      "attempt": 0,
-      "repairAttempts": 0,
-      "contentHash": "sha256:b7a899a7ff3b1ba0ecb44e7f81895c0ad3e86c942deb90a4c65d66da9c540292",
-      "auditHash": null,
+      "state": "published-approved",
+      "attempt": 5,
+      "repairAttempts": 1,
+      "contentHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+      "auditHash": "sha256:7be9568b31de3baad08bc740e492396bda72579a9c0654e2500a8ba8bc4a6b43",
       "blockers": [],
       "editorialWarnings": [],
-      "candidateFile": null,
-      "auditFile": null,
+      "candidateFile": ".stage2/results/supervised-learning/candidate.json",
+      "auditFile": "docs/deepdive-audits/supervised-learning.json",
       "integration": null,
       "lease": null,
       "published": true,
-      "updatedAt": "2026-09-02T01:34:45.562Z",
-      "finalReview": null,
-      "reviewHistory": [],
-      "completionReceipt": null
+      "updatedAt": "2026-09-08T20:33:06.774Z",
+      "finalReview": {
+        "status": "published-approved",
+        "completedAt": "2026-09-08T20:33:06.774Z",
+        "blockerCount": 0,
+        "reusedAudit": true,
+        "reason": "维护者已接受该独立样本；当前候选通过v4完整独立审核且无阻断，登记人工终审并发布精确候选版本"
+      },
+      "reviewHistory": [
+        {
+          "round": 1,
+          "auditedAt": "2026-09-08T13:20:38.463Z",
+          "pageHash": "sha256:b7a899a7ff3b1ba0ecb44e7f81895c0ad3e86c942deb90a4c65d66da9c540292",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "fail",
+          "defects": [
+            {
+              "code": "factual-error",
+              "section": 8,
+              "message": "综合因果链把监督学习的数据来源限定为人工标签，与本页已经建立的目标信号定义冲突。：第5节明确允许交易结果、传感器测量、用户行为和规则系统产生目标值；监督学习依赖输入与目标配对，并不以人工标注为必要条件。第8节作为最终因果总结却重新给出排他的人工标签结论，会导致读者错误排除具有自然观测目标的监督任务。"
+            },
+            {
+              "code": "source-support-blocked",
+              "section": 8,
+              "message": "将无监督、自监督、强化学习的出现统一归因于绕开标注瓶颈，现有来源不能支持这一关键因果断言。：现列自监督综述支持自监督减少人工标注依赖，但不能据此推导三种范式具有同一历史成因。现列CS229强化学习章节讨论的是正确动作难以直接示范时，按奖励学习序贯决策；InstructGPT论文展示监督微调与强化学习组合，也不支持三种范式均为绕开人工标注而出现。总结把不同学习问题写成一条未经支持的历史因果链，超出了现有来源的证据边界。"
+            }
+          ],
+          "improvement": {
+            "summary": "仅修订第8节开场与两条总结：明确目标值不限于人工标签，区分无监督、自监督与强化学习的信号及目标，删除共同历史成因断言。保留图表、来源和质量元数据。",
+            "pageHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+            "submittedAt": "2026-09-08T13:23:06.358Z"
+          },
+          "nextState": "repair-queued"
+        },
+        {
+          "round": 2,
+          "auditedAt": "2026-09-08T13:26:28.844Z",
+          "pageHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+          "auditDecision": "fail",
+          "reportedAuditDecision": "pass",
+          "defects": [
+            {
+              "code": "gate",
+              "section": null,
+              "message": "tools/deepdive/quality/audit-deepdive-benchmark.js 未通过；读者可见缺口必须融入原有教学过程。"
+            }
+          ],
+          "improvement": null,
+          "nextState": "repair-queued"
+        }
+      ],
+      "completionReceipt": "../../AppData/Local/ai-knowledge-map/stage2/results/supervised-learning/completion.json",
+      "auditUpgrades": [
+        {
+          "snapshot": ".stage2/results/supervised-learning/upgrade-b8c1a2f477dbc5df4550bb870ea032b41fac0e12daafea2077bd6e0aff13f160.json",
+          "fromVersion": 3,
+          "toVersion": 4,
+          "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+          "sourceHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+          "reason": "用户授权统一审核机制，按v4独立补审；保留旧发布、记录和返修预算"
+        }
+      ],
+      "auditPolicyVersion": 4,
+      "qualityEvaluation": {
+        "policyId": "whole-page-teaching-v4",
+        "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+        "policyVersion": 4,
+        "pageId": "supervised-learning",
+        "pageHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+        "auditVersion": 4,
+        "accuracy": "pass",
+        "teaching": {
+          "expertReview": "pass",
+          "learnerValidation": "not-tested"
+        },
+        "records": {
+          "status": "complete",
+          "scope": "full",
+          "auditHash": "sha256:7be9568b31de3baad08bc740e492396bda72579a9c0654e2500a8ba8bc4a6b43"
+        },
+        "passed": true,
+        "blockers": []
+      },
+      "auditReceipts": [
+        {
+          "auditFile": ".stage2/results/supervised-learning/audit-7be9568b31de3baad08bc740e492396bda72579a9c0654e2500a8ba8bc4a6b43.json",
+          "auditHash": "sha256:7be9568b31de3baad08bc740e492396bda72579a9c0654e2500a8ba8bc4a6b43",
+          "pageHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+          "policyVersion": 4,
+          "mode": "full",
+          "reviewer": "unified_v4_supervised",
+          "taskId": "supervised-learning:audit:5:cbeb8f76",
+          "acceptedAt": "2026-09-08T16:04:15.956Z"
+        }
+      ],
+      "publication": {
+        "schemaVersion": 1,
+        "status": "published-approved",
+        "reviewStatus": "human-approved",
+        "pageHash": "sha256:90880e40ce6ede4d86f9014f1e93154426695ff04078ba0a0fa9af5877fb8dfd",
+        "publishedAt": "2026-09-08T20:33:06.774Z"
+      },
+      "provisionalReceipt": null
     },
     "synthetic-data": {
       "id": "synthetic-data",

@@ -1,16 +1,29 @@
 # 理解原理页第二阶段：串行隔离自动化
 
+2026-09-08审核机制升级：新任务采用[统一审核v4](UNIFIED_AUDIT_V4.md)，整页概念审核补充适用的六项教学要素、逐章节证据和三项独立评价。任务合同、候选门禁与发布验证使用同一规则版本；历史v2/v3记录保留且升级须独立补审。下文历史自动发布及章节门禁描述仅适用于对应旧合同；v4普通页面也先进入manual-review。内容生成固定提示词与单页隔离、唯一返修和人工终审约束保持有效。
+
+英文翻译准备使用独立的 `translation` MCP 能力配置，不复用中文任务租约或内容生成权限。阶段 4—6 的快照、准入、章节合同和隔离测试见 [DEEPDIVE_TRANSLATION_PREPARATION.md](DEEPDIVE_TRANSLATION_PREPARATION.md)。该配置目前没有 Batch 调用、审核提交和发布能力。
+
 ## 1. 结论
+
+DeepSeek V4 Pro 使用独立逐章调用适配层，复用翻译检查与发布门禁，不冒充 OpenAI 托管 Batch。接口、预算和独立授权见 [DEEPDIVE_TRANSLATION_DEEPSEEK.md](DEEPDIVE_TRANSLATION_DEEPSEEK.md)。
+
+英文阶段 9 的重组、前端回退、独立发布权限及用户参与清单见 [DEEPDIVE_TRANSLATION_PUBLICATION.md](DEEPDIVE_TRANSLATION_PUBLICATION.md)。英文发布不能替代中文 L3 或人工批准。
 
 第二阶段不是同时常驻六个 Agent，也不是把 130 页重新写一遍。系统每次只启动一个全新 Codex 任务，只处理一页的一个阶段：
 
 ```mermaid
 flowchart LR
   A["已有页面"] --> B["audit 独立审计"]
-  B -->|通过| P["控制器运行门禁并发布"]
-  B -->|缺陷| R["repair 按净化缺陷返修"]
-  R --> B
-  B -->|两次返修后仍有阻断| M["manual-review"]
+  B -->|通过| G["控制器核对版本、证据及结构"]
+  G --> M["manual-review 人工终审"]
+  B -->|有缺陷且仍有返修额度| R["repair 按净化缺陷返修"]
+  R --> V["新的独立复验：整理稿仅验证首轮问题"]
+  V -->|通过| G
+  V -->|整理稿或额度已用完仍未通过| M
+  V -->|普通页仍有返修额度| R
+  B -->|返修额度已用完| M
+  M -->|明确人工确认并满足对应发布条件| P["控制器发布并保留回执"]
   M -->|本次启动明确授权| PP["控制器暂行覆盖并写红色标记"]
   N["新节点材料"] --> W["write 从零写"]
   W --> B
@@ -267,6 +280,16 @@ Agent 提交的内容只进入本机 `stage2/results/`。状态文件继续记�
 
 ### 8.0 人工整理候选导入
 
+已获人工采用的原文勘误可走精确片段入口：
+
+```powershell
+node tools/run-stage2-editorial-controller.js errata --page <id> --packet <project-relative-json> --hash <approved-packet-sha256> --reason "人工采用的勘误方案"
+```
+
+包为`{schemaVersion:1,pageId,sourceHash,changes:[{issueId,start,end,before,after}]}`，偏移是源HTML的JavaScript字符偏移。来源必须是MCP提供的版本；授权摘要由可信启动方绑定到已采用的精确包，通过`STAGE2_EDITORIAL_ERRATA_HASH`传入。服务器在源锁内核对页面、源哈希、有序不重叠片段及原文精确匹配，拒绝与完整page或删节参数混用。它只按获准片段构造候选，可修正指定图表；普通导入的图表保留检查不变。后续仍走内容校验、失败回滚、红色待审草稿、独立审核与人工最终确认。
+
+控制器在候选/发布回执中保存完整勘误包，并在页面状态的errataReceipts保存摘要、父源、候选与接受时间；回滚不释放已消费授权。旧英文因源变化失效，不能借此清零英文返修次数或累计费用。此入口只处理中文原文，不迁移或批准英文译文。
+
 控制器客户端只通过页锁定 MCP 接口导入完整候选，不能直接改正式页面：
 
 ```powershell
@@ -343,3 +366,7 @@ node tools/run-deepdive-stage2.js rollback-provisional <page-id> --hash <sha256:
 - 全量回归：`npm run quality:all`
 
 不要手改租约、状态或私有结果。`release` 只用于工具故障等没有产生有效提交的异常恢复；`refresh-blockers` 只由可信控制器读取私有审计并生成不含答案的返修缺陷。若某页进入 `manual-review`，控制器先按启动时的必选策略完成“暂行发布或保持待人工”的收尾；之后人工再决定修正文、材料还是门禁，需要复审时用 `retry` 重新排队。暂行发布不会妨碍后续复审，也不会改变失败结论。
+
+### 人工候选的单图授权返修
+
+普通editorial repair继续保护原图表。用户明确授权修复首次审核的image-text-mismatch时，可信页锁定启动器可传入STAGE2_REPAIR_FIGURE_AUTHORIZATION（pageId、candidateHash、findingId、section）。只适用于maxRepairAttempts=1且repairAttempts=0的当前repair租约；缺陷须属于initialBlockingFindings，对应章节须仅有一幅dd-fig。只替换该图，其他图表保留，拒绝活动标记与源hash变化。预检和提交使用同一范围校验，候选和返修记录保存授权摘要及图形前后hash；下一步仍为针对首次问题的独立复核与显式人工最终确认。此授权不增加返修次数、不重新导入、不赋予审核者写正文权限。

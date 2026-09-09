@@ -19,7 +19,7 @@ const {
   editorialContentPolicyGaps,
   finalizeManualReview,
   gateDefects,
-  initialize,
+  initialize: initializeController,
   importEditorialCandidate,
   inspectPublicationCandidate,
   loadState,
@@ -44,6 +44,14 @@ const {
 } = require("../../tools/deepdive-stage2/core");
 const { pageContentHash } = require("../../tools/deepdive/quality/deepdive-audit-contracts");
 const { scanNarrativeTemplates } = require("../../tools/deepdive/quality/deepdive-narrative-audit");
+// Historical v2/v3 regression suite; current v4 is exercised in unified-audit.test.js.
+function initialize(root,...args) {
+  const result=initializeController(root,...args);
+  const state=loadState(root);
+  for(const record of Object.values(state.pages))record.auditPolicyVersion=3;
+  fs.writeFileSync(path.join(root,'.stage2/state.json'),JSON.stringify(state));
+  return result;
+}
 
 const renderedEditorialMarkdown = renderEditorialMarkdown([
   "y = γ(x − μ) / √(σ² + ε) + β",
@@ -837,7 +845,7 @@ try {
     result: secondIncompleteAudit,
   }).nextState, "manual-review");
 
-  const preview = createManualReviewPreview(previewFixture, "alpha");
+  const preview = createManualReviewPreview(previewFixture, "alpha", {localBrowserPreview:true});
   assert.strictEqual(preview.status, "ready");
   assert.strictEqual(preview.state, "manual-review");
   assert.deepStrictEqual(preview.changedFields, ["thesis"]);
@@ -849,6 +857,8 @@ try {
   assert(preview.processRounds[1].defects.length > 0);
   assert.strictEqual(preview.finalStatus, "manual-review");
   const previewHtml = fs.readFileSync(path.join(previewFixture, preview.previewPath), "utf8");
+  assert.strictEqual(preview.localPreviewUrlPath, '/preview/zh/concepts/alpha/');
+  assert.strictEqual(fs.readFileSync(path.join(previewFixture,'.tmp/website-preview/pages/zh/concepts/alpha/index.html'),'utf8'),previewHtml);
   assert.match(previewHtml, /未发布候选/);
   assert.match(previewHtml, /两轮审查与改进/);
   assert.match(previewHtml, /第 1 轮/);
@@ -938,6 +948,7 @@ try {
   }).nextState, "manual-review");
 
   const inspection = inspectPublicationCandidate(provisionalFixture, "alpha");
+  assert.strictEqual(inspection.formatPolicyApplies, false);
   assert.strictEqual(inspection.workflowState, "manual-review");
   assert.strictEqual(inspection.canPublishProvisional, true);
   assert.throws(
@@ -1015,11 +1026,48 @@ const appSource = [fs.readFileSync(path.join(frontendRoot, "app.js"), "utf8")]
   .join("\n");
 const styleSource = fs.readFileSync(path.join(PROJECT_ROOT, "assets", "style.css"), "utf8");
 assert.match(appSource, /published-provisional/);
-assert.match(appSource, /未通过审计/);
+assert.match(appSource, /t\("deepdive\.provisional\.label"\)/);
+const chineseUiSource = fs.readFileSync(path.join(PROJECT_ROOT, "data", "locales", "zh-Hans", "ui.js"), "utf8");
+assert.match(chineseUiSource, /"deepdive\.provisional\.label":\s*"未通过审计 · 暂行版本"/);
 assert.match(styleSource, /dd-h1-provisional/);
 console.log("✓ Stage 2 暂行发布：人工否决、红色标题标记、哈希绑定与回滚测试通过");
 
 const editorialFixture = copyFixture().fixture;
+const errataFixture = copyFixture().fixture;
+const previousErrataGrant = process.env.STAGE2_EDITORIAL_ERRATA_HASH;
+try {
+  const { errataDigest } = require("../../tools/deepdive-stage2/lib/editorial-errata");
+  const original = { title: "Alpha", subtitle: "Subtitle", thesis: "Thesis", html: '<section class="dd-sec"><h2>正文</h2><figure class="dd-fig"><svg></svg><figcaption>bad figure</figcaption></figure><table class="dd-table"><tr><td>bad table</td></tr></table><p>untouched paragraph</p></section>' };
+  const file = path.join(errataFixture, "data/deepdive/alpha.js");
+  fs.writeFileSync(file, `window.DEEPDIVE={alpha:${JSON.stringify(original)}};`);
+  initialize(errataFixture);
+  const statePath = path.join(errataFixture, ".stage2/state.json");
+  const state = loadState(errataFixture); state.pages.alpha.state = "l3-auto-passed";
+  fs.writeFileSync(statePath, JSON.stringify(state));
+  const packet = { schemaVersion: 1, pageId: "alpha", sourceHash: pageContentHash(original), changes: ["bad figure", "bad table"].map((before, i) => ({ issueId: "S" + i, start: original.html.indexOf(before), end: original.html.indexOf(before) + before.length, before, after: "correct " + i })) };
+  process.env.STAGE2_EDITORIAL_ERRATA_HASH = errataDigest(packet);
+  const candidate = { ...original, html: original.html.replace("bad figure", "correct 0").replace("bad table", "correct 1") };
+  assert.throws(() => importEditorialCandidate(errataFixture, "alpha", { page: candidate, reason: "ordinary import must retain figures" }), /图表保留/);
+  assert.throws(() => importEditorialCandidate(errataFixture, "alpha", { errata: packet, page: candidate, reason: "mixed input refused" }), /combined/);
+  const before = fs.readFileSync(file, "utf8");
+  assert.throws(() => importEditorialCandidate(errataFixture, "alpha", { errata: packet, reason: "failure rollback" }, { validators: () => [{ script: "fixture", passed: false }] }));
+  assert.equal(fs.readFileSync(file, "utf8"), before);
+  assert.equal((loadState(errataFixture).pages.alpha.errataReceipts || []).length, 0);
+  const imported = importEditorialCandidate(errataFixture, "alpha", { errata: packet, reason: "approved exact errata" }, { validators: () => [{ script: "fixture", passed: true }] });
+  assert.equal(imported.status, "published-editorial-draft");
+  assert.equal(loadState(errataFixture).pages.alpha.errataReceipts[0].packetHash, errataDigest(packet));
+  assert.equal(loadState(errataFixture).pages.alpha.editorialWorkflow.requiresHumanReview, true);
+  assert.match(fs.readFileSync(file, "utf8"), /untouched paragraph/);
+  const { rollbackEditorialCandidate } = require("../../tools/deepdive-stage2/core");
+  rollbackEditorialCandidate(errataFixture, "alpha", imported.pageHash, "human requested rollback");
+  assert.equal(fs.readFileSync(file, "utf8"), before);
+  assert.throws(() => importEditorialCandidate(errataFixture, "alpha", { errata: packet, reason: "cannot replay after rollback" }), /consumed/);
+} finally {
+  if (previousErrataGrant === undefined) delete process.env.STAGE2_EDITORIAL_ERRATA_HASH;
+  else process.env.STAGE2_EDITORIAL_ERRATA_HASH = previousErrataGrant;
+  fs.rmSync(errataFixture, { recursive: true, force: true });
+}
+console.log("✓ Stage 2 勘误：限定图表替换、普通导入仍保留图表、失败回滚、授权历史与重复拒绝");
 try {
   const originalPage = {
     title: "Alpha",
@@ -1099,6 +1147,42 @@ try {
 console.log("✓ Stage 2 人工候选：图表保留、待审覆盖、机器审查与人工放行顺序测试通过");
 
 const editorialRepairFixture = copyFixture().fixture;
+const figureFixture = copyFixture().fixture;
+const priorFigureGrant = process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION;
+try {
+  initialize(figureFixture);
+  const initial = loadState(figureFixture); initial.pages.alpha.state = "l3-auto-passed";
+  fs.writeFileSync(path.join(figureFixture, ".stage2/state.json"), JSON.stringify(initial));
+  const page = { title: "Alpha", subtitle: "Subtitle", thesis: "Thesis", html: '<section class="dd-sec"><h2>One</h2><p>body explains Alpha clearly</p><figure class="dd-fig"><svg><path d="old"/></svg><figcaption>bad curve</figcaption></figure></section>' };
+  importEditorialCandidate(figureFixture, "alpha", { page, reason: "fixture editorial import" }, { validators: () => [{ script: "fixture", passed: true }] });
+  const draftWriter = (_root, _record, targets) => ({ targets, validators: [] });
+  const auditTask = claimTask(figureFixture, "fixture-figure-auditor");
+  const audit = completeEditorialAudit("alpha", auditTask.task.contentHash, "body explains Alpha");
+  audit.decision = "fail";
+  audit.blockingFindings = [{ code: "image-text-mismatch", sections: [1], claim: "图形曲线错误", evidence: "bad curve", rationale: "曲线未表达正文关系，需要修正。", acceptanceCriteria: "修正图形以匹配正文关系。" }];
+  submitResult(figureFixture, { taskId: auditTask.task.taskId, leaseToken: auditTask.task.leaseToken, result: audit }, { evaluateCandidate: () => ({ passed: true, blockers: [] }), publishEditorialDraft: draftWriter });
+  const record = loadState(figureFixture).pages.alpha;
+  const finding = record.editorialWorkflow.initialBlockingFindings[0];
+  const repair = claimTask(figureFixture, "fixture-figure-repairer");
+  const result = { page: { ...repair.task.page, html: repair.task.page.html.replace('d="old"', 'd="new"') }, summary: "修正本次授权曲线" };
+  const input = { taskId: repair.task.taskId, leaseToken: repair.task.leaseToken, result };
+  delete process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION;
+  assert.equal(validatePageResult(figureFixture, input).status, "invalid");
+  process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION = JSON.stringify({ pageId: "alpha", candidateHash: repair.task.contentHash, findingId: finding.findingId, section: 1 });
+  assert.equal(validatePageResult(figureFixture, input).status, "valid");
+  assert.equal(submitResult(figureFixture, input, { publishEditorialDraft: draftWriter }).status, "accepted");
+  const after = loadState(figureFixture).pages.alpha;
+  assert.equal(after.repairAttempts, 1);
+  assert.equal(after.editorialWorkflow.initialBlockingFindings[0].findingId, finding.findingId);
+  const verification = claimTask(figureFixture, "fixture-figure-verifier");
+  assert.equal(verification.task.auditContract.mode, "verification");
+  assert.equal(verification.task.auditContract.verificationFindings.length, 1);
+} finally {
+  if (priorFigureGrant === undefined) delete process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION;
+  else process.env.STAGE2_REPAIR_FIGURE_AUTHORIZATION = priorFigureGrant;
+  fs.rmSync(figureFixture, { recursive: true, force: true });
+}
+console.log("✓ Stage 2 图形返修：精确首次缺陷授权、保留唯一返修计数与定向复核合同");
 try {
   initialize(editorialRepairFixture);
   const statePath = path.join(editorialRepairFixture, ".stage2", "state.json");

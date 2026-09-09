@@ -11,6 +11,7 @@ function usage() {
   throw new Error([
     "用法：",
     "  node tools/run-stage2-editorial-controller.js import --page <id> --candidate <js> --reason <文本>",
+    "  node tools/run-stage2-editorial-controller.js errata --page <id> --packet <json> --hash <sha256:...> --reason <文本>",
     "  node tools/run-stage2-editorial-controller.js finalize --page <id> --reason <文本>",
     "  node tools/run-stage2-editorial-controller.js return --page <id> --issues <json> --reason <文本>",
     "  node tools/run-stage2-editorial-controller.js rollback --page <id> --hash <sha256:...> --reason <文本>",
@@ -65,6 +66,7 @@ function callMcp(pageId, toolName, toolArgs) {
       STAGE2_MCP_PAGE_ID: pageId,
       STAGE2_MCP_WORKER_ID: `editorial-controller-${pageId}`,
       STAGE2_MCP_ALLOW_PROVISIONAL_PUBLISH: "0",
+      STAGE2_MCP_MANUAL_REVIEW_ACTION: "hold",
     },
     input: request,
     encoding: "utf8",
@@ -87,7 +89,17 @@ const reason = String(input.reason || "").trim();
 if (!/^[a-z0-9][a-z0-9-]*$/.test(pageId) || reason.length < 3) usage();
 
 let result;
-if (input.command === "import") {
+if (input.command === "errata") {
+  if (!input.packet || !/^sha256:[a-f0-9]{64}$/.test(input.hash || "")) usage();
+  const absolute = path.resolve(root, input.packet), relative = path.relative(root, absolute);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("勘误文件必须位于当前项目内");
+  const packet = JSON.parse(fs.readFileSync(absolute, "utf8"));
+  const { errataDigest } = require("./deepdive-stage2/lib/editorial-errata");
+  if (errataDigest(packet) !== input.hash) throw new Error("勘误文件与授权摘要不一致");
+  process.env.STAGE2_EDITORIAL_ERRATA_HASH = input.hash;
+  result = callMcp(pageId, "stage2_import_editorial_candidate", { pageId, errata: packet, reason,
+    summary: input.summary || "人工采用的精确原文勘误，等待独立审核与最终确认" });
+} else if (input.command === "import") {
   if (!input.candidate) usage();
   result = callMcp(pageId, "stage2_import_editorial_candidate", {
     pageId,

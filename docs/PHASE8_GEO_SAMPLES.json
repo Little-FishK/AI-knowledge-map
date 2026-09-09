@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "siteUrl": "https://ai-knowledge-map.com/",
+  "samplingRules": {
+    "session": "Each question uses a fresh session with no project context or supplied site content; record whether web search is enabled.",
+    "repeat": "Record the exact provider, visible model label, date/time, locale and question. Do not infer an unavailable model version.",
+    "measures": [
+      "brandMention",
+      "citedSourceUrl",
+      "descriptionAccuracy",
+      "actualReferralVisits"
+    ],
+    "separation": "Discovery questions and questions explicitly naming the domain are reported separately. A citation is not a visit, and no mention is not an indexing diagnosis.",
+    "traffic": "Use first-party analytics only when configured; referral visits are currently unmeasured.",
+    "cadence": "Suggested manual baseline and post-release repeats; no automation has been scheduled."
+  },
+  "questions": [
+    {
+      "id": "zh-brand",
+      "language": "zh-Hans",
+      "kind": "brand-discovery",
+      "prompt": "AI 知识地图是什么？适合哪些人使用？"
+    },
+    {
+      "id": "en-brand",
+      "language": "en",
+      "kind": "brand-discovery",
+      "prompt": "What is AI Knowledge Map, and who is it for?"
+    },
+    {
+      "id": "zh-domain",
+      "language": "zh-Hans",
+      "kind": "explicit-domain",
+      "prompt": "请核实 ai-knowledge-map.com 的项目目的、是否收费以及内容维护方式，并给出来源。"
+    },
+    {
+      "id": "en-domain",
+      "language": "en",
+      "kind": "explicit-domain",
+      "prompt": "Verify the purpose, pricing and maintenance approach of ai-knowledge-map.com and cite your sources."
+    },
+    {
+      "id": "zh-supervised",
+      "language": "zh-Hans",
+      "kind": "concept-discovery",
+      "prompt": "监督学习是什么？请用初学者能理解的例子解释，并推荐可以继续阅读的来源。"
+    },
+    {
+      "id": "en-supervised",
+      "language": "en",
+      "kind": "concept-discovery",
+      "prompt": "What is supervised learning? Explain with a beginner-friendly example and suggest sources for further reading."
+    },
+    {
+      "id": "zh-labels",
+      "language": "zh-Hans",
+      "kind": "concept-discovery",
+      "prompt": "监督学习中的标签是什么，标签错误会带来什么影响？请说明适用边界并给出来源。"
+    },
+    {
+      "id": "en-labels",
+      "language": "en",
+      "kind": "concept-discovery",
+      "prompt": "What are labels in supervised learning, and what can go wrong with incorrect labels? Explain the limits and cite sources."
+    },
+    {
+      "id": "zh-path",
+      "language": "zh-Hans",
+      "kind": "learning-path",
+      "prompt": "我不会编程，想先认识 AI 世界的全貌和基本原理，有哪些免费学习入口？",
+      "stage2Dependent": true
+    },
+    {
+      "id": "en-path",
+      "language": "en",
+      "kind": "learning-path",
+      "prompt": "I do not code and want an overview of AI and its basic principles. What free learning resources should I start with?",
+      "stage2Dependent": true
+    }
+  ],
+  "observations": [
+    {
+      "date": "2026-09-09",
+      "channel": "web search tool",
+      "kind": "search-discovery-check",
+      "queries": [
+        "\"AI 知识地图\" \"ai-knowledge-map.com\"",
+        "\"AI Knowledge Map\" \"ai-knowledge-map.com\"",
+        "site:ai-knowledge-map.com supervised-learning"
+      ],
+      "result": "No results returned by this tool for these queries.",
+      "limits": "Not a Google/Bing URL Inspection result, not an independent AI answer sample, and not proof that the site is unindexed everywhere."
+    },
+    {
+      "date": "2026-09-09",
+      "channel": "Bing Webmaster Tools AI Performance",
+      "sourceScope": "Microsoft Copilots and Partners",
+      "range": {
+        "from": "2026-06-08",
+        "to": "2026-09-07"
+      },
+      "displayedTotalCitations": 0,
+      "displayedAverageCitedPages": 0,
+      "queryReport": "No data available",
+      "limits": "The reporting period ends before the September 9 release. This is a provider-limited historical baseline, not proof of zero current citations across AI systems. Citation counts are not referral visits."
+    },
+    {
+      "date": "2026-09-09",
+      "questionId": "zh-brand",
+      "channel": "Perplexity web UI",
+      "webSearchEnabled": true,
+      "modelLabel": "not disclosed",
+      "session": "Fresh conversation; no project context; logged out",
+      "url": "https://www.perplexity.ai/search/0bbda7fa-fdfc-4ebb-b290-584892d3d3af",
+      "status": "blocked-login-required",
+      "answerProduced": false,
+      "brandMention": null,
+      "citedSourceUrl": null,
+      "descriptionAccuracy": null,
+      "actualReferralVisits": null,
+      "limits": "The service requested registration; this is an access failure, not a negative brand-discovery result. No new account was created."
+    }
+  ],
+  "aiAnswerBaselineStatus": "question-set-ready; independent-answer-sampling-blocked-by-login",
+  "referralTrafficStatus": "not_measured"
+}

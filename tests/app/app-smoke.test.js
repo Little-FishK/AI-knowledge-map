@@ -102,6 +102,118 @@ async function exerciseApp(browser, baseUrl, label) {
 
   try {
     await page.goto(`${baseUrl}#/map`, { waitUntil: "load" });
+    await page.locator("#controls-toggle").click();
+    if (await page.locator("#controls-toggle").getAttribute("aria-expanded") !== "false") {
+      throw new Error(`${label}：左侧栏无法收起`);
+    }
+    if (!await page.locator("#app").evaluate(element => element.classList.contains("controls-collapsed"))) {
+      throw new Error(`${label}：左侧栏收起状态没有写入页面`);
+    }
+    await page.locator("#controls-toggle").click();
+    if (await page.locator("#controls-toggle").getAttribute("aria-expanded") !== "true") {
+      throw new Error(`${label}：左侧栏无法重新展开`);
+    }
+
+    await page.locator("#btn-settings").click();
+    await page.locator("#settings-dialog").waitFor();
+    if (await page.locator("#btn-settings").getAttribute("aria-expanded") !== "true") {
+      throw new Error(`${label}：设置面板没有正确打开`);
+    }
+    if (await page.locator("html").getAttribute("lang") !== "zh-Hans") {
+      throw new Error(`${label}：页面语言代码没有初始化为 zh-Hans`);
+    }
+    const languageSelect = page.locator("#settings-language-select");
+    if (await languageSelect.inputValue() !== "zh-Hans") {
+      throw new Error(`${label}：设置面板没有显示当前语言`);
+    }
+    if (await languageSelect.locator("option").count() !== 2
+        || await languageSelect.locator('option[value="en"]').isDisabled()) {
+      throw new Error(`${label}：可用语言没有被正确列出`);
+    }
+    await languageSelect.selectOption("en");
+    await page.waitForFunction(() => document.documentElement.lang === "en");
+    if (await page.locator('[data-mode="graph"]').textContent() !== "Node Map") {
+      throw new Error(`${label}：切换英文后界面没有原地更新`);
+    }
+    if (await page.locator("#domain-list .domain-label").first().textContent() !== "Foundations / Shared") {
+      throw new Error(`${label}：英文图谱大区内容没有加载`);
+    }
+    if (!String(await page.locator("#edge-list .chk").first().textContent()).includes("Is a")) {
+      throw new Error(`${label}：英文关系类型内容没有加载`);
+    }
+    if (String(await page.locator('[data-learning-goto="llm"]').textContent()).trim() !== "Large Language Model (LLM)") {
+      throw new Error(`${label}：已发布的英文核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="fine-tuning"]').textContent()).trim() !== "Fine-tuning") {
+      throw new Error(`${label}：阶段 7 的英文核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="rag"]').textContent()).trim() !== "Retrieval-Augmented Generation (RAG)") {
+      throw new Error(`${label}：阶段 8 的英文核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="tool-calling"]').textContent()).trim() !== "Tool Calling") {
+      throw new Error(`${label}：阶段 9 的英文核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="diffusion"]').textContent()).trim() !== "Diffusion Models") {
+      throw new Error(`${label}：阶段 10 的英文核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="supervised-learning"]').textContent()).trim() !== "Supervised Learning") {
+      throw new Error(`${label}：阶段 11 的英文非核心节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="kernel-methods"]').textContent()).trim() !== "Kernel Methods and SVMs") {
+      throw new Error(`${label}：阶段 12 的英文基础节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="clip"]').textContent()).trim() !== "CLIP (Contrastive Language–Image Pre-training)") {
+      throw new Error(`${label}：完整架构阶段的英文节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="distillation"]').textContent()).trim() !== "Knowledge Distillation") {
+      throw new Error(`${label}：模型训练阶段的英文节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="model-families"]').textContent()).trim() !== "Major Model Families") {
+      throw new Error(`${label}：基础模型训练阶段没有完成英文覆盖`);
+    }
+    if (String(await page.locator('[data-learning-goto="sampling-params"]').textContent()).trim() !== "Sampling and Decoding Parameters") {
+      throw new Error(`${label}：推理与上下文阶段的新英文节点没有进入学习列表`);
+    }
+    if (String(await page.locator('[data-learning-goto="inference-optimization"]').textContent()).trim() !== "LLM Inference Optimization") {
+      throw new Error(`${label}：推理与上下文阶段的连续英文覆盖没有扩展到第 15 个节点`);
+    }
+    if (String(await page.locator('[data-learning-goto="model-selection"]').textContent()).trim() !== "Model Selection and Cost") {
+      throw new Error(`${label}：推理与上下文阶段没有完成英文覆盖`);
+    }
+    if (String(await page.locator('[data-learning-goto="observability"]').textContent()).trim() !== "LLM Observability and Tracing") {
+      throw new Error(`${label}：检索与生产阶段的连续英文覆盖没有扩展到第 11 个节点`);
+    }
+    if (String(await page.locator('[data-learning-goto="guardrails"]').textContent()).trim() !== "AI Guardrails") {
+      throw new Error(`${label}：检索与应用工程阶段没有完成英文覆盖`);
+    }
+    if (String(await page.locator('[data-learning-goto="planning"]').textContent()).trim() !== "Planning and Task Decomposition") {
+      throw new Error(`${label}：推理策略与规划阶段没有完成英文覆盖`);
+    }
+    if (String(await page.locator('[data-learning-goto="mcp-architecture"]').textContent()).trim() !== "MCP Architecture") {
+      throw new Error(`${label}：Agent 与工具阶段的英文覆盖没有扩展到第 7 个节点`);
+    }
+    if (String(await page.locator('[data-learning-goto="coding-tools"]').textContent()).trim() !== "AI Coding Tools") {
+      throw new Error(`${label}：Agent 与工具阶段没有完成英文覆盖`);
+    }
+    if (String(await page.locator('[data-learning-goto="video-generation"]').textContent()).trim() !== "Video Generation") {
+      throw new Error(`${label}：生成媒体阶段的连续英文覆盖没有扩展到第 9 个节点`);
+    }
+    if (String(await page.locator('[data-learning-goto="speech"]').textContent()).trim() !== "Speech Recognition and Synthesis") {
+      throw new Error(`${label}：语音节点没有显示英文`);
+    }
+    if (await page.evaluate(() => localStorage.getItem("ai-knowledge-map.locale.v1")) !== "en") {
+      throw new Error(`${label}：英文选择没有保存`);
+    }
+    if (await page.locator("#locale-fallback-banner").evaluate(element => element.classList.contains("hidden"))) {
+      throw new Error(`${label}：英文内容回退提示没有显示`);
+    }
+    await languageSelect.selectOption("zh-Hans");
+    await page.waitForFunction(() => document.documentElement.lang === "zh-Hans");
+    await page.keyboard.press("Escape");
+    if (!await page.locator("#settings-overlay").evaluate(element => element.classList.contains("hidden"))) {
+      throw new Error(`${label}：设置面板无法通过 Escape 关闭`);
+    }
+
     const firstDomainToggle = page.locator("[data-domain-toggle]").first();
     await firstDomainToggle.click();
     if (await firstDomainToggle.getAttribute("aria-expanded") !== "true") {

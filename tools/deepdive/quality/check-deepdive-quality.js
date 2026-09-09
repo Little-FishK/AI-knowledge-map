@@ -18,18 +18,9 @@ function run(script, args = []) {
 }
 
 run(path.join(root, "tools", "validators", "deepdives.js"));
-run(path.join(__dirname, "audit-deepdive-gold.js"), [
-  "--summary",
-  "--changed",
-  "--baseline",
-  "docs/deepdive-quality-baseline.json",
-]);
-run(path.join(__dirname, "audit-deepdive-benchmark.js"), [
-  "--summary",
-  "--changed",
-  "--baseline",
-  "docs/deepdive-l3-baseline.json",
-]);
+// Versioned audit evidence is the publication gate. Historical L2/L3 tools remain
+// explicitly available for archival diagnostics and never reinterpret v4 records.
+run(path.join(__dirname, "audit-deepdive-unified.js"), ["--changed"]);
 run(path.join(__dirname, "audit-deepdive-browser.js"), ["--changed"]);
 
 const l4At = process.argv.indexOf("--l4-certified");
@@ -44,7 +35,7 @@ if (certifiedAt >= 0) {
   if (legacyAt >= 0 && l4At < 0) {
     console.warn("⚠ --certified 已更名为 --l4-certified；本次仍按 L4 兼容执行");
   }
-  run(path.join(__dirname, "audit-deepdive-benchmark.js"), ["--require-benchmark", id]);
+  run(path.join(__dirname, "audit-deepdive-unified.js"), ["--page", id]);
   run(path.join(__dirname, "review-deepdive-quality.js"), ["--require-current", id]);
 } else {
   run(path.join(__dirname, "review-deepdive-quality.js"));

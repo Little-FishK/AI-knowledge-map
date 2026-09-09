@@ -253,7 +253,8 @@ function createPublication(options) {
       validators: () => [
         runGate(root, root, toolScripts.graphValidator),
         runGate(root, root, toolScripts.deepDiveValidator),
-        runGate(root, root, toolScripts.deepDiveL3Audit, ["--require-benchmark", record.id]),
+        runGate(root, root, audit?.schemaVersion===4 ? 'tools/deepdive/quality/audit-deepdive-unified.js' : toolScripts.deepDiveL3Audit,
+          audit?.schemaVersion===4 ? ['--page',record.id] : ["--require-benchmark", record.id]),
         runGate(root, root, toolScripts.videoApplicationValidator),
       ],
     });
@@ -377,6 +378,11 @@ function createPublication(options) {
   }
 
   function refreshEditorialDraftPublication(root, record, page, reviewStatus, blockerCount, options = {}) {
+    // An audit-policy migration reviews a candidate without republishing it.
+    // An existing human-approved page also stays approved until explicit finalization.
+    if (record.auditUpgradePublicationHold || (record.auditPolicyVersion === 4 && record.publication?.status === 'published-approved')) {
+      return clone(record.publication || null);
+    }
     const publication = editorialDraftMetadata(record, page, reviewStatus, blockerCount);
     const draftPage = { ...clone(page), publication };
     const targets = provisionalPublishedTargets(root, record, draftPage, null)

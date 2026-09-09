@@ -9,6 +9,11 @@ const AUDIT_READABLE_EXTENSIONS = new Set([
 ]);
 const AUDIT_READ_MAX_BYTES = 512 * 1024;
 const AUDIT_SEARCH_MAX_FILES = 6000;
+const AUDIT_PRIVATE_DIRECTORIES = new Set([
+  '.git', '.stage2', '.translation', '.tmp', 'tmp', 'temp', '.codex', '.agents',
+  'node_modules', 'backup', 'backups', 'snapshot', 'snapshots',
+  'deepdive-audits', 'deepdive-reviews',
+]);
 
 function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
   function authorizeAuditProjectRead(root, taskId, leaseToken) {
@@ -23,23 +28,20 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
     return record;
   }
 
-  function auditPathDenied(relativePath) {
-    const normalized = String(relativePath || "").replace(/\\/g, "/").replace(/^\.\//, "");
+  function auditPathDenied(relativePath, auditVersion = 0) {
+    const raw = String(relativePath || "").replace(/\\/g, "/");
+    const normalized = path.posix.normalize(raw).replace(/^\.\//, "");
     const lower = normalized.toLowerCase();
     const basename = path.posix.basename(lower);
     return (
-      !normalized
+      !raw || normalized === '.' || normalized === '..' || normalized.startsWith('../')
+      || (auditVersion === 4 && /(?:^|\/)data\/deepdive(?:-runtime)?(?:\/|$)/.test(lower))
+      || normalized.includes(':')
+      || lower.split('/').some(part => AUDIT_PRIVATE_DIRECTORIES.has(part) || /[. ]$/.test(part))
+      || /(?:^|[-_.])(?:audit|repair|task)[-_.]?packet(?:[-_.]|$)/.test(basename)
+      || /(?:audit\.private|agent-responses|section-text-review)/.test(basename)
+      || /^(?:audit|upgrade)-[a-f0-9]{64}\.json$/.test(basename)
       || normalized.startsWith("/")
-      || /^[a-z]:\//i.test(normalized)
-      || lower === ".git"
-      || lower.startsWith(".git/")
-      || lower === ".stage2"
-      || lower.startsWith(".stage2/")
-      || lower === "node_modules"
-      || lower.startsWith("node_modules/")
-      || lower.includes("/node_modules/")
-      || lower === "docs/deepdive-audits"
-      || lower.startsWith("docs/deepdive-audits/")
       || basename === ".env"
       || basename.startsWith(".env.")
       || /\.(key|pem|pfx|p12|keystore)$/i.test(basename)
@@ -47,9 +49,9 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
     );
   }
 
-  function resolveAuditReadableFile(root, relativePath) {
-    const normalized = String(relativePath || "").replace(/\\/g, "/").replace(/^\.\//, "");
-    if (auditPathDenied(normalized)) throw new Error(`审计只读接口禁止访问：${relativePath}`);
+  function resolveAuditReadableFile(root, relativePath, auditVersion) {
+    const normalized = path.posix.normalize(String(relativePath || "").replace(/\\/g, "/")).replace(/^\.\//, "");
+    if (auditPathDenied(normalized, auditVersion)) throw new Error(`审计只读接口禁止访问：${relativePath}`);
     if (!AUDIT_READABLE_EXTENSIONS.has(path.extname(normalized).toLowerCase())) {
       throw new Error(`审计只读接口不支持该文件类型：${relativePath}`);
     }
@@ -63,6 +65,7 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
     if (!realRelative || realRelative.startsWith("..") || path.isAbsolute(realRelative)) {
       throw new Error(`项目文件通过链接越出根目录：${relativePath}`);
     }
+    if (auditPathDenied(realRelative, auditVersion)) throw new Error(`审计只读接口禁止访问链接目标：${relativePath}`);
     const size = fs.statSync(realFile).size;
     if (size > AUDIT_READ_MAX_BYTES) {
       throw new Error(`项目文件超过审计只读上限：${relativePath}`);
@@ -77,7 +80,7 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
       input.taskId,
       input.leaseToken,
     );
-    const target = resolveAuditReadableFile(resolvedRoot, input.path);
+    const target = resolveAuditReadableFile(resolvedRoot, input.path, record.lease.auditSchemaVersion || record.auditPolicyVersion);
     const lines = fs.readFileSync(target.file, "utf8").split(/\r?\n/);
     const startLine = Math.max(1, Number(input.startLine) || 1);
     const requestedEnd = Number(input.endLine) || startLine + 399;
@@ -94,7 +97,7 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
     };
   }
 
-  function collectAuditReadableFiles(root) {
+  function collectAuditReadableFiles(root, auditVersion) {
     const files = [];
     const visit = directory => {
       if (files.length >= AUDIT_SEARCH_MAX_FILES) return;
@@ -104,7 +107,7 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
         if (files.length >= AUDIT_SEARCH_MAX_FILES) break;
         const absolute = path.join(directory, entry.name);
         const relative = path.relative(root, absolute).replace(/\\/g, "/");
-        if (auditPathDenied(relative) || entry.isSymbolicLink()) continue;
+        if (auditPathDenied(relative, auditVersion) || entry.isSymbolicLink()) continue;
         if (entry.isDirectory()) {
           visit(absolute);
           continue;
@@ -135,11 +138,12 @@ function createAuditProjectAccess({ defaultRoot, loadState, withinRoot }) {
       throw new Error("项目搜索词长度必须为 2–160 个字符");
     }
     const prefix = String(input.pathPrefix || "").replace(/\\/g, "/").replace(/^\.\//, "");
-    if (prefix && auditPathDenied(prefix)) throw new Error(`审计只读接口禁止搜索：${prefix}`);
+    const auditVersion=record.lease.auditSchemaVersion || record.auditPolicyVersion;
+    if (prefix && auditPathDenied(prefix, auditVersion)) throw new Error(`审计只读接口禁止搜索：${prefix}`);
     const maximum = Math.min(50, Math.max(1, Number(input.maxResults) || 20));
     const needle = query.toLocaleLowerCase();
     const matches = [];
-    for (const relative of collectAuditReadableFiles(resolvedRoot)) {
+    for (const relative of collectAuditReadableFiles(resolvedRoot, auditVersion)) {
       if (prefix && relative !== prefix && !relative.startsWith(`${prefix.replace(/\/$/, "")}/`)) {
         continue;
       }

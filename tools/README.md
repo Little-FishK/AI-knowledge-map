@@ -3,6 +3,14 @@
 `tools/` contains executable project workflows. Implementations are grouped by
 domain; commands should use their canonical domain paths directly.
 
+## Local website
+
+Double-click `启动网站.cmd` in the repository root to start the site on a
+loopback-only HTTP address and open it in the default browser. The launcher
+reuses the project server when it is already running, otherwise it selects an
+available port starting at 8940. Use `tools/start-local-site.ps1 -NoOpen` when
+the server should start without opening a browser window.
+
 ## Directories
 
 - `shared/`: project-wide path and process helpers with no domain state.

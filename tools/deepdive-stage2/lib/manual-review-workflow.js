@@ -5,6 +5,7 @@ const path = require("path");
 const { loadDeepDivePages } = require("../../deepdive/runtime/deepdive-loader");
 const { pageContentHash } = require("../../deepdive/quality/deepdive-audit-contracts");
 const { narrativeTemplateBlockers } = require("../../deepdive/quality/deepdive-narrative-audit");
+const {evaluateAudit}=require('../../deepdive/quality/audit-evaluation');
 
 function createManualReviewWorkflow(options) {
   const {
@@ -53,6 +54,12 @@ function createManualReviewWorkflow(options) {
       if (!fs.existsSync(auditPath)) throw new Error(`独立审计文件不存在：${record.auditFile}`);
       const audit = readJson(auditPath);
       const page = currentPage(resolvedRoot, record);
+      if(audit.schemaVersion===4) {
+        const findings=record.editorialWorkflow?.initialBlockingFindings||[];
+        const evaluation=evaluateAudit(record.id,page,audit,{schemaVersion:4,mode:audit.mode,verificationFindings:findings,verificationScopeHash:sha256(findings)});
+        if(evaluation.records.status!=='complete')throw Error('当前版本审核记录不完整或规则摘要失效；不能将其作为人工终审依据');
+        record.qualityEvaluation=evaluation;
+      }
       if (record.editorialWorkflow && record.editorialWorkflow.requiresHumanReview) {
         const approvedPage = clone(page);
         delete approvedPage.publication;
@@ -66,6 +73,7 @@ function createManualReviewWorkflow(options) {
         record.contentHash = pageContentHash(approvedPage);
         record.blockers = [];
         record.state = "published-approved";
+        delete record.auditUpgradePublicationHold;
         record.published = true;
         record.publication = {
           schemaVersion: 1,
@@ -106,7 +114,7 @@ function createManualReviewWorkflow(options) {
       }
       const gaps = auditGaps(record.id, page, audit, auditContract(record));
       const explicitBlockers = gaps.length ? [] : auditBlockers(audit);
-      const automaticNarrativeBlockers = narrativeTemplateBlockers(page, audit);
+      const automaticNarrativeBlockers = audit.schemaVersion === 4 ? [] : narrativeTemplateBlockers(page, audit);
       const policyBlockers = [
         ...automaticNarrativeBlockers,
         ...gaps.map(message => ({ type: "coverage", message })),
@@ -145,18 +153,19 @@ function createManualReviewWorkflow(options) {
       record.contentHash = pageContentHash(page);
       record.blockers = [];
       record.editorialWarnings = clone(gate.editorialWarnings || []);
-      record.state = "l3-auto-passed";
+      record.state = audit.schemaVersion===4 ? "published-approved" : "l3-auto-passed";
+      delete record.auditUpgradePublicationHold;
       record.published = true;
       record.publication = {
         schemaVersion: 1,
         status: "published-approved",
-        reviewStatus: "l3-auto-passed",
+        reviewStatus: audit.schemaVersion===4 ? "human-approved" : "l3-auto-passed",
         pageHash: pageContentHash(approvedPage),
         publishedAt: new Date().toISOString(),
       };
       record.provisionalReceipt = null;
       record.finalReview = {
-        status: "l3-auto-passed",
+        status: record.state,
         completedAt: new Date().toISOString(),
         blockerCount: 0,
         reusedAudit: true,
@@ -172,7 +181,7 @@ function createManualReviewWorkflow(options) {
         auditHash: record.auditHash,
       });
       return {
-        status: "l3-auto-passed",
+        status: record.state,
         pageId: record.id,
         pageHash: record.contentHash,
         auditHash: record.auditHash,
@@ -256,7 +265,11 @@ function createManualReviewWorkflow(options) {
     if (!record) throw new Error(`不存在页面状态：${id}`);
     const candidate = currentPage(resolvedRoot, record);
     const published = loadDeepDivePages(resolvedRoot)[id] || null;
-    const formatGaps = candidate ? editorialContentPolicyGaps(candidate) : [];
+    const detectedFormatGaps = candidate ? editorialContentPolicyGaps(candidate) : [];
+    // The removal contract belongs to the new editorial/content-generation workflow.
+    // Existing human-authored pages may intentionally retain misconceptions and self-tests.
+    const formatPolicyApplies = Boolean(record.editorialWorkflow);
+    const formatGaps = formatPolicyApplies ? detectedFormatGaps : [];
     return {
       status: "ready",
       pageId: id,
@@ -269,7 +282,9 @@ function createManualReviewWorkflow(options) {
       publishedHash: published ? pageContentHash(published) : null,
       blockerCount: (record.blockers || []).length,
       blockers: clone(record.blockers || []),
+      formatPolicyApplies,
       formatGaps,
+      legacyFormatObservations: formatPolicyApplies ? [] : detectedFormatGaps,
       canPublishProvisional: Boolean(
         candidate
         && !record.lease
@@ -300,7 +315,7 @@ function createManualReviewWorkflow(options) {
       if (publishReason.length < 3) throw new Error("暂行发布原因至少需要 3 个字符");
       const candidate = currentPage(resolvedRoot, record);
       if (!candidate) throw new Error(`页面 ${id} 没有可发布正文`);
-      const formatGaps = editorialContentPolicyGaps(candidate);
+      const formatGaps = record.editorialWorkflow ? editorialContentPolicyGaps(candidate) : [];
       if (formatGaps.length) throw new Error(`候选页仍有格式缺陷：${formatGaps.join("；")}`);
       const candidateHash = pageContentHash(candidate);
       if (expectedCandidateHash !== candidateHash) {

@@ -1,0 +1,87 @@
+'use strict';
+const assert=require('node:assert/strict'),path=require('node:path'),os=require('node:os'),{spawn}=require('node:child_process');
+const {chromium}=require(require.resolve('playwright',{paths:[path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node')]}));
+const root=path.resolve(__dirname,'../..');
+(async()=>{
+  const child=spawn(process.execPath,[path.join(root,'tools/run-public-site-preview.js'),'0'],{cwd:root,windowsHide:true,stdio:['ignore','pipe','pipe']});
+  let browser;
+  try {
+    const origin=await new Promise((resolve,reject)=>{let buffer='';child.stdout.on('data',chunk=>{buffer+=chunk;if(buffer.includes('\n'))resolve(new URL(JSON.parse(buffer.trim()).url).origin);});child.on('error',reject);});
+    browser=await chromium.launch({channel:'msedge',headless:true});
+    const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),errors=[];
+    let sends=0,verifies=0,verifyError='otp_expired',verifiedEmail='';
+    await context.route('https://jjmihlewnbkfwpfgtfqi.supabase.co/auth/v1/otp',route=>{sends++;return route.fulfill({status:200,contentType:'application/json',body:'{}'});});
+    await context.route('https://jjmihlewnbkfwpfgtfqi.supabase.co/auth/v1/verify',async route=>{
+      verifies++;verifiedEmail=route.request().postDataJSON().email;
+      await new Promise(resolve=>setTimeout(resolve,100));
+      if(!verifyError){
+        const exp=Math.floor(Date.now()/1000)+3600;
+        const token=Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'browser-account',exp})).toString('base64url')+'.test';
+        return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:token,refresh_token:'test-refresh',token_type:'bearer',expires_in:3600,expires_at:exp,user:{id:'browser-account',email:verifiedEmail}})});
+      }
+      await route.fulfill({status:verifyError==='otp_expired'?403:429,contentType:'application/json',body:JSON.stringify({code:403,error_code:verifyError,msg:'Token has expired or is invalid'})});
+    });
+    page.on('pageerror',error=>errors.push(error.message));
+    await page.goto(origin+'/AI-knowledge-map/?lang=zh-Hans#/concept/supervised-learning');
+    await page.locator('#dd-article h1').waitFor();
+    const card=page.locator('.progress-card[data-progress-for="supervised-learning"]');
+    await card.waitFor();
+    const account=page.locator('.dd-top [data-progress-account-button]');
+    await account.waitFor();assert(await account.isVisible(),'mobile account entry must remain visible');
+    const read=card.locator('[data-progress-field="read"]'),understood=card.locator('[data-progress-field="understood"]');
+    assert.equal(await read.getAttribute('aria-pressed'),'false');
+    await read.click();assert.equal(await read.getAttribute('aria-pressed'),'true');
+    assert.equal(await understood.getAttribute('aria-pressed'),'false','progress fields must remain independent');
+    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('ai-knowledge-map.progress.guest.v1')));
+    assert.equal(stored.records['supervised-learning/read'].value,true);assert.equal(stored.owner,'guest');
+    await page.reload();await page.locator('.progress-card[data-progress-for="supervised-learning"]').waitFor();
+    assert.equal(await page.locator('[data-progress-field="read"]').getAttribute('aria-pressed'),'true');
+    const second=await context.newPage();second.on('pageerror',error=>errors.push(error.message));
+    await second.goto(origin+'/AI-knowledge-map/?lang=zh-Hans#/concept/supervised-learning');await second.locator('.progress-card').waitFor();
+    await page.locator('[data-progress-field="understood"]').click();
+    await second.locator('[data-progress-field="understood"][aria-pressed="true"]').waitFor();
+    await account.click();assert(await page.locator('.progress-account-dialog').isVisible());
+    await page.locator('[data-email-form] input').fill('browser-test@example.com');
+    await page.locator('[data-email-form] button').click();
+    await page.locator('[data-code-form]:not(.hidden)').waitFor();
+    assert.match(await page.locator('.progress-account-message').textContent(),/验证码已发送/);
+    assert.match(await page.locator('[data-code-recipient]').textContent(),/browser-test@example.com/);
+    await page.locator('[data-code-form] input').fill('123456');
+    await page.locator('[data-code-form]').evaluate(form=>{form.requestSubmit();form.requestSubmit();});
+    await page.locator('[data-error-code="otp_expired"]').waitFor();
+    assert.equal(verifies,1,'duplicate verification must be suppressed');
+    assert.equal(verifiedEmail,'browser-test@example.com');
+    assert.match(await page.locator('.progress-account-message').textContent(),/无效或已过期.*未区分具体原因/);
+    assert(await page.locator('[data-code-form] input').isEnabled());
+    await page.locator('[data-resend-code]').click();
+    assert.match(await page.locator('.progress-account-message').textContent(),/请等待/);
+    assert.equal(sends,1,'resend cooldown prevents invalidating a just-sent code');
+    await page.clock.install();await page.clock.fastForward(61000);
+    await page.locator('[data-resend-code]').click();
+    await page.waitForFunction(()=>document.querySelector('.progress-account-message').textContent.includes('验证码已发送'));
+    assert.equal(sends,2);assert.equal(await page.locator('[data-code-form] input').inputValue(),'');
+    verifyError='over_request_rate_limit';await page.locator('[data-code-form] input').fill('123456');await page.locator('[data-code-form] button[type="submit"]').click();
+    await page.locator('[data-error-code="over_request_rate_limit"]').waitFor();
+    assert.match(await page.locator('.progress-account-message').textContent(),/请求过于频繁/);
+    await page.locator('[data-change-email]').click();assert(await page.locator('[data-email-form] input').isVisible());
+    await second.close();
+    let releaseProgress,progressRecovered=false;const progressHeld=new Promise(resolve=>{releaseProgress=resolve;});
+    await context.route('https://jjmihlewnbkfwpfgtfqi.supabase.co/rest/v1/learning_progress*',async route=>{
+      await progressHeld;await route.fulfill({status:progressRecovered?200:403,contentType:'application/json',body:progressRecovered?'[]':JSON.stringify({message:'Test progress unavailable'})});
+    });
+    await page.locator('[data-email-form] input').fill('another@example.com');await page.locator('[data-email-form] button').click();
+    await page.locator('[data-code-form]:not(.hidden)').waitFor();verifyError=null;
+    await page.locator('[data-code-form] input').fill('123456');await page.locator('[data-code-form] button[type="submit"]').click();
+    await page.locator('#progress-account-overlay.hidden').waitFor({state:'attached'});
+    assert.match(await account.textContent(),/账号已登录/);
+    assert.match(await card.textContent(),/正在读取云端进度/,'login closes before progress request completes');
+    releaseProgress();await page.waitForFunction(()=>document.querySelector('.progress-card').textContent.includes('同步失败'));
+    assert.match(await account.textContent(),/账号已登录/,'progress failure must not undo authentication');
+    progressRecovered=true;await page.locator('[data-progress-retry]').click();
+    await page.waitForFunction(()=>document.querySelector('.progress-card').textContent.includes('已同步到账号'));
+    await account.click();assert.equal(await page.locator('[data-code-form]').count(),0,'signed-in account must not expose a reusable OTP form');
+    assert(await page.locator('[data-import-form]').isVisible(),'retry after initial cloud failure must recover guest import preview');
+    assert.equal(errors.length,0,errors.join('\n'));
+    console.log('PASS: mobile account entry, guest persistence, independent fields and cross-tab updates');
+  } finally {if(browser)await browser.close();child.kill();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

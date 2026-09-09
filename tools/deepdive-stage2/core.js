@@ -1,8 +1,11 @@
 "use strict";
 
 const fs = require("fs");
+const {createAuthorizedRepair}=require('./lib/information-theory-authorized-repair');
+const {createAuditUpgrade}=require('./lib/audit-upgrade');
 const path = require("path");
 const vm = require("vm");
+const { createReadinessCheckpoint } = require('./lib/readiness-checkpoint');
 const { createAuditProjectAccess } = require("./lib/audit-project-access");
 const { createAuditRules } = require("./lib/audit-rules");
 const { createCandidateGate } = require("./lib/candidate-gate");
@@ -24,6 +27,11 @@ const { createStateV2Cutover } = require("./lib/state-v2-cutover");
 const { createStateV2DualRead } = require("./lib/state-v2-dual-read");
 const { createStateV2Shadow } = require("./lib/state-v2-shadow");
 const { createTaskOrchestration } = require("./lib/task-orchestration");
+const { createTranslationPreparation } = require("./lib/translation-preparation");
+const { createTranslationBatch } = require("./lib/translation-batch");
+const { createTranslationDeepSeek } = require("./lib/translation-deepseek");
+const { createTranslationQuality } = require("./lib/translation-quality");
+const { createTranslationPublication } = require("./lib/translation-publication");
 const {
   renderEditorialMarkdown,
 } = require("./lib/editorial-markdown");
@@ -61,6 +69,49 @@ const { loadState: loadLegacyState } = createStateStore({
   defaultRoot: ROOT,
   schemaVersion: 1,
   localDataRoot: resolveLocalDataRoot(),
+});
+const translationStorageDirectory = root => path.resolve(root) === path.resolve(ROOT)
+  ? path.join(resolveLocalDataRoot(), "deepdive-translation")
+  : path.join(path.resolve(root), ".translation");
+const {
+  registerSourceHumanConfirmation,
+  exportTranslationSnapshot,
+  readTranslationSnapshot,
+  prepareTranslationTask,
+  checkTranslationSnapshot,
+  withCurrentTranslationSnapshot,
+} = createTranslationPreparation({
+  defaultRoot: ROOT,
+  acquireLock,
+  loadState,
+  storageDirectory: translationStorageDirectory,
+});
+const translationBatch = createTranslationBatch({
+  storageDirectory: translationStorageDirectory,
+  readTranslationSnapshot,
+  prepareTranslationTask,
+  checkTranslationSnapshot,
+});
+const translationQuality = createTranslationQuality({
+  storageDirectory: translationStorageDirectory,
+  translationReviewMaterial: (root, pageId, planId, provider = "openai") => {
+    if (provider === "deepseek") return translationDeepSeek.translationReviewMaterial(root, pageId, planId);
+    if (provider === "openai") return translationBatch.translationReviewMaterial(root, pageId, planId);
+    throw new Error("Unknown translation provider");
+  },
+  readTranslationSnapshot,
+  checkTranslationSnapshot,
+});
+const translationDeepSeek = createTranslationDeepSeek({
+  storageDirectory: translationStorageDirectory,
+  readTranslationSnapshot,
+  prepareTranslationTask,
+  checkTranslationSnapshot,
+});
+const translationPublication = createTranslationPublication({
+  storageDirectory: translationStorageDirectory,
+  withTranslationQualityMaterial: translationQuality.withTranslationQualityMaterial,
+  withCurrentTranslationSnapshot,
 });
 const { stateStorageReport } = createStateDiagnostics({
   defaultRoot: ROOT,
@@ -145,7 +196,7 @@ const {
   loadState,
   withinRoot,
 });
-const AUDIT_SCHEMA_VERSION = 3;
+const {AUDIT_SCHEMA_VERSION,AUDIT_POLICY_ID,SIX_QUESTIONS,L3_BLOCKING_CRITERIA,L3_NON_BLOCKING_SIGNALS,L3_BLOCKER_CODES,L3_WARNING_CODES,LEGACY_BLOCKER_CODES}=require("../deepdive/quality/audit-policy");
 const CONTENT_GENERATION_PROMPT = [
   "把当前章节解析并改写为可直接用于“理解原理页”的完整教学正文。",
   "自然讲清本节的核心概念是什么、解决什么问题、输入与输出、关键机制与因果链、公式或示例中每一步的含义、结果应如何解释，以及适用条件和边界。将这些内容融入连贯叙述，不要使用固定的模板或审计清单。",
@@ -153,38 +204,6 @@ const CONTENT_GENERATION_PROMPT = [
   "公式使用可直接显示的 Unicode 数学符号，例如 ∂、×、ε、≤、→，不得输出带反斜杠的 LaTeX 命令。",
   "不要生成“常见误解”、自测、答案或额外总结章节；不要出现“以下是解析”“本节主要介绍”等元话语。避免重复、空泛类比和模板化表达。输出只包含可以直接采用的章节正文。",
 ].join("\n\n");
-const SIX_QUESTIONS = [
-  "definition",
-  "problem",
-  "inputOutput",
-  "mechanism",
-  "interpretation",
-  "boundary",
-];
-const L3_BLOCKING_CRITERIA = [
-  { code: "factual-error", category: "fact", label: "知识事实错误" },
-  { code: "formula-error", category: "fact", label: "公式、推导或符号关系错误" },
-  { code: "terminology-error", category: "fact", label: "术语含义使用错误" },
-  { code: "numeric-error", category: "fact", label: "数值、计算或量级错误" },
-  { code: "source-support-blocked", category: "fact", label: "现有来源不能支持关键事实；来源列表不得由返修 Agent 修改" },
-  { code: "core-concept-definition-missing", category: "concept", label: "核心概念没有解释是什么" },
-  { code: "core-concept-problem-missing", category: "concept", label: "核心概念没有解释解决什么问题" },
-  { code: "core-concept-boundary-missing", category: "concept", label: "核心概念没有解释适用边界" },
-  { code: "harmful-repetition", category: "whole-page", label: "跨章节存在明显损害阅读的重复" },
-  { code: "terminology-inconsistent", category: "whole-page", label: "同一术语或符号前后不一致" },
-  { code: "image-text-mismatch", category: "whole-page", label: "正文与图表表达矛盾或引用错位" },
-  { code: "harmful-template-expression", label: "大量模板化表达明显损害教学叙事" },
-  { code: "semantic-fragment", label: "语义残缺或明显无法理解" },
-];
-const L3_NON_BLOCKING_SIGNALS = [
-  { code: "minor-repetition", label: "轻微重复但不影响理解" },
-  { code: "minor-terminology-style", label: "术语写法可统一但含义没有冲突" },
-  { code: "minor-image-caption", label: "图注或衔接可改善但图文没有矛盾" },
-  { code: "minor-readability", label: "表达可以更顺畅但不存在语义残缺" },
-];
-const L3_BLOCKER_CODES = new Set(L3_BLOCKING_CRITERIA.map(item => item.code));
-const L3_WARNING_CODES = new Set(L3_NON_BLOCKING_SIGNALS.map(item => item.code));
-const LEGACY_BLOCKER_CODES = new Set([...L3_BLOCKER_CODES, "critical-factual-error"]);
 const QUEUE_BY_ROLE = {
   audit: "audit-queued",
   write: "write-queued",
@@ -384,6 +403,7 @@ const {
 });
 const {
   evaluateCandidate,
+  diagnoseCandidateGate,
   gateDefects,
   refreshBlockers,
   runGate,
@@ -600,6 +620,18 @@ function nextRecommendedPage(root = ROOT, startOrder = "1.3") {
 }
 
 module.exports = {
+  buildWebsite: require('./lib/website-build').createWebsiteBuild({acquireLock,loadState,readJson,withinRoot}),
+  ...createAuditUpgrade({acquireLock,loadState,currentPage,readJson,withinRoot,writeJson,saveState,clone,sha256}),
+  applyInformationTheoryAuthorizedRepair: createAuthorizedRepair({acquireLock,loadState,currentPage,writeJson,withinRoot,saveState}),
+  registerSourceHumanConfirmation,
+  translationQuality,
+  translationPublication,
+  translationBatch,
+  translationDeepSeek,
+  exportTranslationSnapshot,
+  readTranslationSnapshot,
+  prepareTranslationTask,
+  checkTranslationSnapshot,
   ROOT,
   CONTENT_GENERATION_PROMPT,
   SIX_QUESTIONS,
@@ -635,6 +667,8 @@ module.exports = {
   readContentGenerationSection,
   readTaskPacketPart,
   refreshBlockers,
+  diagnoseCandidateGate,
+  createReadinessCheckpoint: (root = ROOT) => createReadinessCheckpoint({root,runtimeDirectory,acquireLock,loadState}),
   releaseLease,
   renderEditorialMarkdown,
   resetManualReview,
