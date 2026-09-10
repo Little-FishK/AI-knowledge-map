@@ -317,6 +317,9 @@
         { selector: 'edge.batch-relation.sl-output-edge[source = "overfitting"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
+        { selector: 'edge.batch-relation.sl-output-edge[source = "curse-of-dimensionality"][type = "threatens"]', style: {
+          'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
+        } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
           'source-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'none' : 'triangle',
           'target-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'triangle' : 'none',
@@ -708,6 +711,21 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'regularization': {
+        support: ['gradient-descent', 'batch-norm', 'kernel-methods'], peer: [], risk: [],
+        output: ['overfitting', 'fine-tuning', 'quantization'],
+        offsets: {'gradient-descent': [-150, -130], 'batch-norm': [-210, 0], 'kernel-methods': [-150, 130], 'overfitting': [350, -140], 'fine-tuning': [620, 0], 'quantization': [360, 140]}
+      },
+      'dimensionality-reduction': {
+        support: ['unsupervised-learning'], peer: [], risk: [],
+        output: ['embedding', 'curse-of-dimensionality'],
+        offsets: {'unsupervised-learning': [-180, 0], 'embedding': [300, -135], 'curse-of-dimensionality': [520, 30]}
+      },
+      'curse-of-dimensionality': {
+        support: ['dimensionality-reduction', 'embedding', 'kernel-methods'], peer: [], risk: [],
+        output: ['clustering', 'retrieval', 'adversarial-robustness'],
+        offsets: {'dimensionality-reduction': [-150, -130], 'embedding': [-210, 0], 'kernel-methods': [-150, 130], 'clustering': [340, -150], 'retrieval': [620, 0], 'adversarial-robustness': [370, 145]}
+      },
       'unsupervised-learning': {
         support: [], peer: ['supervised-learning', 'self-supervised-learning'], risk: [],
         output: ['clustering', 'dimensionality-reduction', 'pretraining'],
