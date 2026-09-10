@@ -320,6 +320,9 @@
         { selector: 'edge.batch-relation.sl-output-edge[source = "curse-of-dimensionality"][type = "threatens"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
+        { selector: 'edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"]', style: {
+          'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
+        } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
           'source-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'none' : 'triangle',
           'target-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'triangle' : 'none',
@@ -711,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'backprop': {
+        support: ['loss-function'], peer: [], risk: ['vanishing-gradient'], output: ['gradient-descent', 'optimizer-schedule', 'rnn'],
+        offsets: {'loss-function': [-185, 0], 'vanishing-gradient': [0, 210], 'optimizer-schedule': [350, -160], 'gradient-descent': [610, 0], 'rnn': [370, 145]}
+      },
+      'vanishing-gradient': {
+        support: ['backprop', 'residual-connection', 'attention', 'batch-norm', 'normalization'], peer: [], risk: [], output: ['neural-network', 'rnn'],
+        offsets: {'backprop': [-100, -170], 'residual-connection': [-180, -90], 'attention': [-210, 0], 'batch-norm': [-180, 90], 'normalization': [-100, 170], 'neural-network': [330, -135], 'rnn': [570, 0]}
+      },
+      'batch-norm': {
+        support: [], peer: ['normalization', 'transformer'], risk: [], output: ['neural-network', 'residual-connection', 'regularization', 'vanishing-gradient'],
+        offsets: {'normalization': [220, -280], 'transformer': [410, -210], 'residual-connection': [450, -90], 'neural-network': [650, 0], 'regularization': [500, 100], 'vanishing-gradient': [330, 185]}
+      },
       'decision-tree': {
         support: ['supervised-learning'], peer: ['neural-network', 'kernel-methods'], risk: [], output: [],
         offsets: {'supervised-learning': [-180, 0], 'neural-network': [250, -150], 'kernel-methods': [460, 0]}
