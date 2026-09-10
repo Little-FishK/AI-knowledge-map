@@ -275,6 +275,14 @@
                    "text-rotation": "autorotate" }
         },
         { selector: "node.hl", style: { "opacity": 1, "text-opacity": 1 } },
+        { selector: 'node.sl-main, node.sl-peer', style: {width: 72, height: 72} },
+        { selector: 'node.sl-support', style: {width: 36, height: 36, 'background-image': 'none', 'background-color': '#32d6b0', 'background-opacity': 1, 'border-width': 0} },
+        { selector: 'node.sl-output', style: {width: 58, height: 58} },
+        { selector: 'node.sl-risk', style: {width: 50, height: 50} },
+        { selector: 'edge.sl-peer-edge', style: {'line-color': '#ffffff', 'source-arrow-shape': 'none', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '对比训练目标的来源与设置'} },
+        { selector: 'edge.sl-support-edge', style: {'line-color': '#32d6b0', 'source-arrow-shape': 'none', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '可用于分类或回归'} },
+        { selector: 'edge.sl-output-edge', style: {'source-arrow-shape': 'triangle', 'source-arrow-color': '#8fb87f', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '支持监督微调（SFT）'} },
+        { selector: 'edge.sl-risk-edge', style: {'line-color': '#ee6677', 'target-arrow-color': '#ee6677', 'source-arrow-shape': 'none', 'target-arrow-shape': 'triangle', 'curve-style': 'straight', label: '可能损害泛化'} },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -327,6 +335,14 @@
         ringContext.save();
         ringContext.globalAlpha = Number(node.style('opacity'));
         ringContext.translate(p.x, p.y);
+        if (node.hasClass('sl-support')) {
+          const green = ringContext.createRadialGradient(-size * 0.12, -size * 0.14, 0, 0, 0, size * 0.4);
+          green.addColorStop(0, '#9af7d8'); green.addColorStop(1, '#19af8d');
+          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.38, 0, Math.PI * 2);
+          ringContext.fillStyle = green; ringContext.fill();
+          if (hovered) { ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.045; ringContext.stroke(); }
+          ringContext.restore(); return;
+        }
         if (node.hasClass('official-path-node')) {
           // Keep the official order and gold/black hierarchy stationary while
           // reusing the same domain ring as the ordinary map.
@@ -552,13 +568,13 @@
     let mapPositions = null;
     let localLayoutEngaged = false;
     const supervisedOffsets = {
-      'self-supervised-learning': [-270, -170],
-      'unsupervised-learning': [-290, 90],
-      'decision-tree': [0, -280],
-      'kernel-methods': [250, -210],
+      'self-supervised-learning': [500, -180],
+      'unsupervised-learning': [270, -150],
+      'decision-tree': [-250, -85],
+      'kernel-methods': [-250, 95],
       'fine-tuning': [300, 45],
-      'alignment': [180, 270],
-      'overfitting': [-120, 280]
+      'alignment': [490, 175],
+      'overfitting': [0, 245]
     };
     const neuralOffsets = {
       'rnn': [-230, -360],
@@ -583,6 +599,21 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge');
+      if (active && selectedId === 'supervised-learning') {
+        cy.getElementById(selectedId).addClass('sl-main');
+        ['self-supervised-learning', 'unsupervised-learning'].forEach(id => cy.getElementById(id).addClass('sl-peer'));
+        ['decision-tree', 'kernel-methods'].forEach(id => cy.getElementById(id).addClass('sl-support'));
+        ['fine-tuning', 'alignment'].forEach(id => cy.getElementById(id).addClass('sl-output'));
+        cy.getElementById('overfitting').addClass('sl-risk');
+        cy.edges('.hl').forEach(edge => {
+          const a = edge.source(), b = edge.target();
+          if ((a.hasClass('sl-peer') || a.hasClass('sl-main')) && (b.hasClass('sl-peer') || b.hasClass('sl-main'))) edge.addClass('sl-peer-edge');
+          if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
+          if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
+          if (a.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
+        });
+      }
       const reduced = global.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const duration = reduced ? 0 : 650;
       if (!active) {
@@ -616,7 +647,9 @@
           if (index >= 0) {
             const angle = index * 2 * Math.PI / extra.length;
             const radius = Math.max(550, extra.length * 45);
-            offset = [Math.cos(angle) * radius, Math.sin(angle) * radius];
+            offset = selectedId === 'supervised-learning'
+              ? [760 + Math.floor(index / 4) * 220, (index % 4 - 1.5) * 180]
+              : [Math.cos(angle) * radius, Math.sin(angle) * radius];
           }
           targets[node.id()] = {x: origin.x + offset[0], y: origin.y + offset[1]};
         });
