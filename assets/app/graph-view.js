@@ -284,6 +284,10 @@
         { selector: 'edge.sl-output-edge', style: {'source-arrow-shape': 'triangle', 'source-arrow-color': '#8fb87f', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '支持监督微调（SFT）'} },
         { selector: 'edge.sl-risk-edge', style: {'line-color': '#ee6677', 'target-arrow-color': '#ee6677', 'source-arrow-shape': 'none', 'target-arrow-shape': 'triangle', 'curve-style': 'straight', label: '可能损害泛化'} },
         { selector: 'edge.sl-peripheral-edge', style: {opacity: 0, events: 'no'} },
+        { selector: 'edge.nn-relation.sl-peer-edge', style: {label: 'data(label)'} },
+        { selector: 'edge.nn-relation.sl-support-edge', style: {label: ele => ele.source().id() === 'batch-norm' ? '可选的训练稳定组件' : '常用参数优化方法'} },
+        { selector: 'edge.nn-relation.sl-output-edge', style: {label: '基于神经网络'} },
+        { selector: 'edge.nn-relation.sl-risk-edge', style: {label: 'data(label)'} },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -578,19 +582,20 @@
       'overfitting': [0, 245]
     };
     const neuralOffsets = {
-      'rnn': [-230, -360],
-      'transformer': [30, -430],
-      'batch-norm': [290, -320],
-      'vanishing-gradient': [-90, -210],
-      'gradient-descent': [410, -70],
-      'cnn': [380, 170],
-      'gan': [220, 360],
-      'vae': [-40, 410],
-      'kernel-methods': [-290, 330],
-      'decision-tree': [-420, 130],
-      'interpretability': [-440, -90],
-      'adversarial-robustness': [-410, -290]
+      'rnn': [680, 165],
+      'transformer': [780, 15],
+      'batch-norm': [-290, 120],
+      'vanishing-gradient': [225, 310],
+      'gradient-descent': [-290, -120],
+      'cnn': [700, -125],
+      'gan': [830, 345],
+      'vae': [670, 465],
+      'kernel-methods': [470, -310],
+      'decision-tree': [275, -425],
+      'interpretability': [305, 530],
+      'adversarial-robustness': [-25, 460]
     };
+    Object.keys(neuralOffsets).forEach(id => { neuralOffsets[id] = neuralOffsets[id].map(value => value * 0.8); });
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets};
 
     function updateLocalLayout() {
@@ -600,15 +605,17 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge');
-      if (active && selectedId === 'supervised-learning') {
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation');
+      if (active) {
+        const neural = selectedId === 'neural-network';
         cy.getElementById(selectedId).addClass('sl-main');
-        ['self-supervised-learning', 'unsupervised-learning'].forEach(id => cy.getElementById(id).addClass('sl-peer'));
-        ['decision-tree', 'kernel-methods'].forEach(id => cy.getElementById(id).addClass('sl-support'));
-        ['fine-tuning', 'alignment'].forEach(id => cy.getElementById(id).addClass('sl-output'));
-        cy.getElementById('overfitting').addClass('sl-risk');
+        (neural ? ['decision-tree', 'kernel-methods'] : ['self-supervised-learning', 'unsupervised-learning']).forEach(id => cy.getElementById(id).addClass('sl-peer'));
+        (neural ? ['gradient-descent', 'batch-norm'] : ['decision-tree', 'kernel-methods']).forEach(id => cy.getElementById(id).addClass('sl-support'));
+        (neural ? ['cnn', 'rnn', 'transformer', 'gan', 'vae'] : ['fine-tuning', 'alignment']).forEach(id => cy.getElementById(id).addClass('sl-output'));
+        (neural ? ['vanishing-gradient', 'interpretability', 'adversarial-robustness'] : ['overfitting']).forEach(id => cy.getElementById(id).addClass('sl-risk'));
         cy.edges('.hl').forEach(edge => {
           const a = edge.source(), b = edge.target();
+          if (neural) edge.addClass('nn-relation');
           if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
             edge.addClass('sl-peripheral-edge');
             return;
@@ -652,7 +659,7 @@
           if (index >= 0) {
             const angle = index * 2 * Math.PI / extra.length;
             const radius = Math.max(550, extra.length * 45);
-            offset = selectedId === 'supervised-learning'
+            offset = localLayouts[selectedId]
               ? [760 + Math.floor(index / 4) * 220, (index % 4 - 1.5) * 180]
               : [Math.cos(angle) * radius, Math.sin(angle) * radius];
           }
