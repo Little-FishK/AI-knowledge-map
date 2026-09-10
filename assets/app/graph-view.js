@@ -314,6 +314,9 @@
           'target-arrow-shape': ele => ele.target().hasClass('sl-main') ? 'triangle' : 'none',
           'source-arrow-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
+        { selector: 'edge.batch-relation.sl-output-edge[source = "overfitting"]', style: {
+          'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
+        } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
           'source-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'none' : 'triangle',
           'target-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'triangle' : 'none',
@@ -705,6 +708,21 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'unsupervised-learning': {
+        support: [], peer: ['supervised-learning', 'self-supervised-learning'], risk: [],
+        output: ['clustering', 'dimensionality-reduction', 'pretraining'],
+        offsets: {'supervised-learning': [220, -240], 'self-supervised-learning': [385, -165], 'clustering': [610, 0], 'dimensionality-reduction': [470, 105], 'pretraining': [290, 190]}
+      },
+      'reinforcement-learning': {
+        support: ['world-models'], peer: ['agent'], risk: ['reward-hacking'],
+        output: ['rlhf', 'alignment'],
+        offsets: {'world-models': [-190, 0], 'agent': [280, -200], 'rlhf': [580, 0], 'alignment': [390, 145], 'reward-hacking': [0, 210]}
+      },
+      'overfitting': {
+        support: ['regularization', 'loss-function'], peer: [], risk: [],
+        output: ['supervised-learning', 'fine-tuning', 'evaluation', 'privacy'],
+        offsets: {'regularization': [-180, -85], 'loss-function': [-180, 85], 'supervised-learning': [300, -170], 'fine-tuning': [520, -80], 'evaluation': [680, 0], 'privacy': [390, 160]}
+      },
       'information-theory': {
         support: [], peer: [], risk: [],
         output: ['loss-function', 'llm', 'sampling-params', 'rlhf', 'distillation'],
