@@ -544,9 +544,9 @@
           + (center.y - (p.y + q.y) / 2) * ny;
         const outer = (Math.hypot(p.x - center.x, p.y - center.y)
           + Math.hypot(q.x - center.x, q.y - center.y)) / (2 * radius);
-        // Quadratic bow grows with both endpoints' radial depth. Cap its
-        // midpoint before the center to avoid overshooting into the far side.
-        const bend = Math.sign(towardCenter) * Math.min(length * 0.65 * outer ** 2, Math.abs(towardCenter) * 1.5);
+        // User-corrected orientation: arc bulges outward, concave side faces
+        // the center. Preserve the previous radial strength and offset cap.
+        const bend = -Math.sign(towardCenter) * Math.min(length * 0.65 * outer ** 2, Math.abs(towardCenter) * 1.5);
         edge.data('overviewBend', bend);
         edge.toggleClass('overview-curve', Math.abs(bend) > 0.5);
       }));
