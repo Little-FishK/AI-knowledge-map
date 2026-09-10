@@ -179,7 +179,7 @@
             "label": "data(label)",
             "background-color": ele => NODE_ART[ele.data("domain")] || "#888",
             "background-image": ele => NODE_ART[ele.data("domain")]
-              ? new URL(`assets/node-art/${ele.data("domain")}.png`, document.baseURI).href : "none",
+              ? new URL(`assets/node-art/${ele.data("domain")}.png?v=2`, document.baseURI).href : "none",
             "background-fit": "contain",
             "background-width": "100%",
             "background-height": "100%",
