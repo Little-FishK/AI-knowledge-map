@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'rnn': {
+        support: ['neural-network', 'backprop'], peer: ['transformer', 'state-space-models'], risk: ['vanishing-gradient'], output: [],
+        offsets: {'neural-network': [-180, -85], 'backprop': [-180, 85], 'transformer': [250, -170], 'state-space-models': [490, 0], 'vanishing-gradient': [0, 210]}
+      },
+      'tokenization': {
+        support: [], peer: [], risk: [], output: ['llm', 'context-window'],
+        offsets: {'llm': [500, -45], 'context-window': [310, 150]}
+      },
+      'embedding': {
+        support: ['contrastive-learning'], peer: ['knowledge-graph'], risk: [],
+        output: ['image-generation', 'clip', 'multimodal', 'transformer', 'retrieval', 'vector-db', 'rag', 'clustering', 'dimensionality-reduction', 'curse-of-dimensionality'],
+        offsets: {'contrastive-learning': [-190, 0], 'knowledge-graph': [220, -350], 'image-generation': [420, -300], 'clip': [560, -230], 'multimodal': [680, -150], 'transformer': [720, -75], 'retrieval': [850, 0], 'vector-db': [750, 75], 'rag': [630, 145], 'clustering': [500, 210], 'dimensionality-reduction': [360, 265], 'curse-of-dimensionality': [220, 300]}
+      },
       'optimizer-schedule': {
         support: ['gradient-descent', 'backprop', 'loss-function'], peer: [], risk: [], output: ['distributed-training', 'pretraining', 'fine-tuning'],
         offsets: {'gradient-descent': [-150, -130], 'backprop': [-210, 0], 'loss-function': [-150, 130], 'distributed-training': [350, -140], 'pretraining': [620, 0], 'fine-tuning': [380, 140]}
