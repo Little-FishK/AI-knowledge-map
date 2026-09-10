@@ -25,6 +25,11 @@
     const content = options.content;
     const EVOLVING = "#d3a05a";
     const STABLE_RING = "#3a4150";
+    // User-approved six-color artwork. Presentation only: graph records stay intact.
+    const NODE_ART = {
+      foundations: "#81a8df", coding: "#ff922b", building: "#39ddb5",
+      generation: "#b383bd", frontier: "#bfc0c4", safety: "#ff315f"
+    };
     const KEY_EDGES = ["mitigates", "threatens", "constrains", "contrast"];
     let officialPathActive = false;
 
@@ -32,7 +37,8 @@
 
     function localizedDomain(id) {
       const source = DOMAINS[id] || { label: id, color: "#888", emoji: "" };
-      return content ? content.resolveGraphDomain(id, source, G.meta).record : source;
+      const record = content ? content.resolveGraphDomain(id, source, G.meta).record : source;
+      return Object.assign({}, record, { color: NODE_ART[id] || record.color });
     }
 
     function localizedEdgeType(id) {
@@ -171,8 +177,14 @@
           selector: "node",
           style: {
             "label": "data(label)",
-            "background-color": ele => DOMAINS[ele.data("domain")] ? DOMAINS[ele.data("domain")].color : "#888",
-            "border-width": ele => ele.data("maturity") === "evolving" ? 3 : 2,
+            "background-color": ele => NODE_ART[ele.data("domain")] || "#888",
+            "background-image": ele => NODE_ART[ele.data("domain")]
+              ? new URL(`assets/node-art/${ele.data("domain")}.png`, document.baseURI).href : "none",
+            "background-fit": "contain",
+            "background-width": "100%",
+            "background-height": "100%",
+            "background-opacity": 0,
+            "border-width": ele => ele.data("maturity") === "evolving" ? 2 : 0,
             "border-color": ele => ele.data("maturity") === "evolving" ? EVOLVING : STABLE_RING,
             "border-style": ele => ele.data("maturity") === "evolving" ? "dashed" : "solid",
             "border-opacity": 0.9,
@@ -199,19 +211,21 @@
             "target-arrow-color": ele => ETYPES[ele.data("type")] ? ETYPES[ele.data("type")].color : "#888",
             "target-arrow-shape": ele => ele.data("directed") ? "triangle" : "none",
             "arrow-scale": 0.85,
-            "curve-style": "bezier",
+            "curve-style": "straight",
             "opacity": 0.5,
             "transition-property": "opacity, width",
             "transition-duration": "160ms"
           }
         },
-        { selector: "node.dim", style: { "opacity": 0.12, "text-opacity": 0.15 } },
+        { selector: "node.dim", style: { "opacity": 0.42, "text-opacity": 0.5 } },
         { selector: "edge.dim", style: { "opacity": 0.04 } },
-        { selector: "node.sel", style: { "border-width": 5, "border-color": "#eaeef5" } },
+        { selector: "node.sel", style: { "border-width": 2, "border-color": "#eaeef5" } },
         {
           selector: "node.official-path-node",
           style: {
             "label": "data(officialOrder)",
+            "background-image": "none",
+            "background-opacity": 1,
             "width": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
             "height": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
             "background-color": ele => String(ele.data("officialOrder")).includes(".")
