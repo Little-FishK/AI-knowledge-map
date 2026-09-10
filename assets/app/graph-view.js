@@ -218,6 +218,7 @@
           }
         },
         { selector: "node.dim", style: { "opacity": 0.42, "text-opacity": 0.5 } },
+        { selector: "node.motion-art", style: { "background-image-opacity": 0 } },
         { selector: "edge.dim", style: { "opacity": 0.04 } },
         {
           selector: "edge.overview-curve",
@@ -274,6 +275,110 @@
       ],
       layout: { name: "preset" }
     });
+
+    // Animate artwork only, never node coordinates or labels. Keep the existing
+    // texture as a fallback until every sprite has loaded successfully.
+    const ringCanvas = document.createElement('canvas');
+    ringCanvas.id = 'node-ring-motion';
+    ringCanvas.setAttribute('aria-hidden', 'true');
+    ringCanvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:3';
+    cy.container().appendChild(ringCanvas);
+    const ringContext = ringCanvas.getContext('2d');
+    const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
+    const ringSprites = {};
+    const ringStates = new Map();
+    let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
+    let ringDisposed = false, ringActive = false;
+
+    function renderRings(time = performance.now()) {
+      if (!ringReady || ringDisposed) return;
+      const container = cy.container();
+      const w = container.clientWidth, h = container.clientHeight;
+      const dpr = Math.min(global.devicePixelRatio || 1, 1.5);
+      if (ringCanvas.width !== Math.round(w * dpr) || ringCanvas.height !== Math.round(h * dpr)) {
+        ringCanvas.width = Math.round(w * dpr); ringCanvas.height = Math.round(h * dpr);
+        ringCanvas.style.width = w + 'px'; ringCanvas.style.height = h + 'px';
+      }
+      ringContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ringContext.clearRect(0, 0, w, h);
+      const active = isActive() && !document.hidden && !officialPathActive;
+      if (ringActive !== active) {
+        ringActive = active;
+        cy.nodes().toggleClass('motion-art', active);
+      }
+      const dt = Math.min(0.1, Math.max(0, (time - (ringLastTime || time)) / 1000));
+      ringLastTime = time;
+      if (!active) { hoveredRing = null; return; }
+      cy.nodes().not('.hidden').forEach(node => {
+        const sprite = ringSprites[node.data('domain')];
+        if (!sprite) return;
+        const p = node.renderedPosition(), size = node.width() * cy.zoom();
+        if (p.x < -size || p.y < -size || p.x > w + size || p.y > h + size) return;
+        let motion = ringStates.get(node.id());
+        if (!motion) { motion = { angle: 0, emphasis: 0 }; ringStates.set(node.id(), motion); }
+        const hovered = hoveredRing === node.id();
+        motion.emphasis += ((hovered ? 1 : 0) - motion.emphasis) * Math.min(1, dt * 12);
+        if (!motionPreference.matches) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
+        const scale = 1 + 0.18 * motion.emphasis;
+        ringContext.save();
+        ringContext.globalAlpha = Number(node.style('opacity'));
+        ringContext.translate(p.x, p.y);
+        ringContext.drawImage(sprite.face, -size / 2, -size / 2, size, size);
+        // White band starts exactly at the face's radius (38% of icon size).
+        if (motion.emphasis > 0.005) {
+          ringContext.save();
+          ringContext.globalAlpha *= motion.emphasis;
+          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.395, 0, Math.PI * 2);
+          ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.03;
+          ringContext.stroke(); ringContext.restore();
+        }
+        ringContext.rotate(motion.angle);
+        ringContext.drawImage(sprite.ring, -size * scale / 2, -size * scale / 2, size * scale, size * scale);
+        ringContext.restore();
+      });
+    }
+
+    function ringTick(time) {
+      if (ringDisposed) return;
+      if (time - ringLastTime >= 1000 / 30) renderRings(time);
+      ringFrame = requestAnimationFrame(ringTick);
+    }
+    function hoverRing(event) {
+      if (event.pointerType === 'touch' || event.buttons || officialPathActive) { hoveredRing = null; return; }
+      const box = cy.container().getBoundingClientRect();
+      const x = event.clientX - box.left, y = event.clientY - box.top;
+      let nearest = Infinity;
+      hoveredRing = null;
+      cy.nodes().not('.hidden').forEach(node => {
+        const p = node.renderedPosition(), distance = Math.hypot(p.x - x, p.y - y);
+        if (distance <= node.width() * cy.zoom() / 2 && distance < nearest) {
+          nearest = distance; hoveredRing = node.id();
+        }
+      });
+    }
+    cy.container().addEventListener('pointermove', hoverRing);
+    cy.container().addEventListener('pointerleave', () => { hoveredRing = null; });
+    cy.container().addEventListener('pointerdown', () => { hoveredRing = null; });
+    cy.on('render', () => renderRings());
+    cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
+    Promise.all(Object.keys(NODE_ART).map(domain => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const makeSprite = ring => {
+          const canvas = document.createElement('canvas'); canvas.width = canvas.height = img.naturalWidth;
+          const ctx = canvas.getContext('2d'), half = canvas.width / 2;
+          ctx.beginPath(); ctx.arc(half, half, canvas.width * (ring ? 0.5 : 0.38), 0, Math.PI * 2);
+          if (ring) ctx.arc(half, half, canvas.width * 0.40, 0, Math.PI * 2, true);
+          ctx.clip(); ctx.drawImage(img, 0, 0); return canvas;
+        };
+        ringSprites[domain] = { face: makeSprite(false), ring: makeSprite(true) }; resolve();
+      };
+      img.onerror = reject;
+      img.src = new URL(`assets/node-art/${domain}.png?v=2`, document.baseURI).href;
+    }))).then(() => {
+      if (ringDisposed) return;
+      ringReady = true; renderRings(); ringFrame = requestAnimationFrame(ringTick);
+    }).catch(() => { ringCanvas.remove(); });
 
     function enforceLayoutQuality() {
       if (!window.LAYOUT_QUALITY) return;
