@@ -300,6 +300,12 @@
           'source-arrow-shape': 'triangle', 'source-arrow-color': '#ee6677', 'target-arrow-shape': 'none',
           label: ele => ele.target().id() === 'context-window' ? '长序列增加计算开销' : '长上下文的信息利用风险'
         } },
+        { selector: 'edge.llm-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.llm-relation.sl-output-edge', style: {
+          'source-arrow-shape': ele => ele.source().id() === 'llm' ? 'none' : 'triangle',
+          'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
+          'target-arrow-color': '#8fb87f'
+        } },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -621,7 +627,29 @@
       'context-window': [2, 230],
       'lost-in-middle': [118, 194]
     };
-    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets};
+    const llmOffsets = {
+      'scaling-law': [-200, -360],
+      'pretraining': [-330, -285],
+      'transformer': [-450, -210],
+      'tokenization': [-560, -115],
+      'loss-function': [-620, -10],
+      'information-theory': [-550, 100],
+      'sampling-params': [-440, 195],
+      'fine-tuning': [-325, 265],
+      'alignment': [-200, 315],
+      'multimodal': [340, -300],
+      'reasoning-models': [475, -210],
+      'rag': [610, -125],
+      'agent': [745, -45],
+      'code-generation': [720, 65],
+      'prompt-engineering': [600, 160],
+      'in-context-learning': [465, 235],
+      'streaming': [330, 295],
+      'context-window': [-80, 185],
+      'prompt-injection': [60, 240],
+      'jailbreak': [195, 265]
+    };
+    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets};
 
     function updateLocalLayout() {
       const epoch = ++localLayoutEpoch;
@@ -630,19 +658,21 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation');
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation');
       if (active) {
         const neural = selectedId === 'neural-network';
         const attention = selectedId === 'attention';
+        const llm = selectedId === 'llm';
         cy.getElementById(selectedId).addClass('sl-main');
-        (attention ? ['state-space-models'] : neural ? ['decision-tree', 'kernel-methods'] : ['self-supervised-learning', 'unsupervised-learning']).forEach(id => cy.getElementById(id).addClass('sl-peer'));
-        (attention ? ['positional-encoding', 'inference-optimization'] : neural ? ['gradient-descent', 'batch-norm'] : ['decision-tree', 'kernel-methods']).forEach(id => cy.getElementById(id).addClass('sl-support'));
-        (attention ? ['transformer', 'reranking', 'prompt-caching', 'interpretability', 'vanishing-gradient'] : neural ? ['cnn', 'rnn', 'transformer', 'gan', 'vae'] : ['fine-tuning', 'alignment']).forEach(id => cy.getElementById(id).addClass('sl-output'));
-        (attention ? ['context-window', 'lost-in-middle'] : neural ? ['vanishing-gradient', 'interpretability', 'adversarial-robustness'] : ['overfitting']).forEach(id => cy.getElementById(id).addClass('sl-risk'));
+        (llm ? [] : attention ? ['state-space-models'] : neural ? ['decision-tree', 'kernel-methods'] : ['self-supervised-learning', 'unsupervised-learning']).forEach(id => cy.getElementById(id).addClass('sl-peer'));
+        (llm ? ['scaling-law', 'pretraining', 'transformer', 'tokenization', 'loss-function', 'information-theory', 'sampling-params', 'fine-tuning', 'alignment'] : attention ? ['positional-encoding', 'inference-optimization'] : neural ? ['gradient-descent', 'batch-norm'] : ['decision-tree', 'kernel-methods']).forEach(id => cy.getElementById(id).addClass('sl-support'));
+        (llm ? ['multimodal', 'reasoning-models', 'rag', 'agent', 'code-generation', 'prompt-engineering', 'in-context-learning', 'streaming'] : attention ? ['transformer', 'reranking', 'prompt-caching', 'interpretability', 'vanishing-gradient'] : neural ? ['cnn', 'rnn', 'transformer', 'gan', 'vae'] : ['fine-tuning', 'alignment']).forEach(id => cy.getElementById(id).addClass('sl-output'));
+        (llm ? ['context-window', 'prompt-injection', 'jailbreak'] : attention ? ['context-window', 'lost-in-middle'] : neural ? ['vanishing-gradient', 'interpretability', 'adversarial-robustness'] : ['overfitting']).forEach(id => cy.getElementById(id).addClass('sl-risk'));
         cy.edges('.hl').forEach(edge => {
           const a = edge.source(), b = edge.target();
           if (neural) edge.addClass('nn-relation');
           if (attention) edge.addClass('attention-relation');
+          if (llm) edge.addClass('llm-relation');
           if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
             edge.addClass('sl-peripheral-edge');
             return;
@@ -651,7 +681,7 @@
           if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
           if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
           if (a.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
-          if (attention && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
+          if ((attention || llm) && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
           if (attention && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
         });
       }
