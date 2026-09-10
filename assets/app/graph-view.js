@@ -628,26 +628,26 @@
       'lost-in-middle': [118, 194]
     };
     const llmOffsets = {
-      'scaling-law': [-200, -360],
-      'pretraining': [-330, -285],
-      'transformer': [-450, -210],
-      'tokenization': [-560, -115],
-      'loss-function': [-620, -10],
-      'information-theory': [-550, 100],
-      'sampling-params': [-440, 195],
-      'fine-tuning': [-325, 265],
-      'alignment': [-200, 315],
-      'multimodal': [340, -300],
-      'reasoning-models': [475, -210],
-      'rag': [610, -125],
-      'agent': [745, -45],
-      'code-generation': [720, 65],
-      'prompt-engineering': [600, 160],
-      'in-context-learning': [465, 235],
-      'streaming': [330, 295],
-      'context-window': [-80, 185],
-      'prompt-injection': [60, 240],
-      'jailbreak': [195, 265]
+      'scaling-law': [-36, -197],
+      'pretraining': [-102, -174],
+      'transformer': [-157, -128],
+      'tokenization': [-191, -69],
+      'loss-function': [-210, 0],
+      'information-theory': [-190, 65],
+      'sampling-params': [-152, 127],
+      'fine-tuning': [-110, 171],
+      'alignment': [-45, 196],
+      'multimodal': [272, -272],
+      'reasoning-models': [517, -213],
+      'rag': [558, -115],
+      'agent': [837, -18],
+      'code-generation': [718, 51],
+      'prompt-engineering': [549, 104],
+      'in-context-learning': [491, 182],
+      'streaming': [395, 225],
+      'context-window': [26, 288],
+      'prompt-injection': [78, 221],
+      'jailbreak': [162, 179]
     };
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets};
 
