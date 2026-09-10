@@ -573,13 +573,13 @@
     let mapPositions = null;
     let localLayoutEngaged = false;
     const supervisedOffsets = {
-      'self-supervised-learning': [500, -180],
-      'unsupervised-learning': [270, -150],
-      'decision-tree': [-250, -85],
-      'kernel-methods': [-250, 95],
-      'fine-tuning': [300, 45],
-      'alignment': [490, 175],
-      'overfitting': [0, 245]
+      'self-supervised-learning': [356, -120],
+      'unsupervised-learning': [274, -240],
+      'decision-tree': [-308, -104],
+      'kernel-methods': [-308, 118],
+      'fine-tuning': [518, -2],
+      'alignment': [634, 168],
+      'overfitting': [296, 218]
     };
     const neuralOffsets = {
       'rnn': [680, 165],
