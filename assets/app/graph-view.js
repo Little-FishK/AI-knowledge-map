@@ -757,6 +757,16 @@
           }
           targets[node.id()] = {x: origin.x + offset[0], y: origin.y + offset[1]};
         });
+        // Keep the leftmost risk directly below the selected node on a short vertical branch.
+        const firstRisk = cy.nodes('.sl-risk').filter(node => targets[node.id()])
+          .sort((a, b) => targets[a.id()].x - targets[b.id()].x).first();
+        if (firstRisk.length) {
+          targets[firstRisk.id()] = {x: origin.x, y: origin.y + 210};
+          cy.nodes('.sl-risk').forEach(node => {
+            const target = targets[node.id()];
+            if (target && node.id() !== firstRisk.id()) target.x = Math.max(target.x, origin.x + 75);
+          });
+        }
         cy.nodes().forEach(node => {
           const position = targets[node.id()] || saved[node.id()];
           if (position) node.animate({position}, {duration, queue: false, easing: 'ease-in-out-cubic'});
