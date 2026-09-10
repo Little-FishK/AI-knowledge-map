@@ -610,16 +610,16 @@
     };
     Object.keys(neuralOffsets).forEach(id => { neuralOffsets[id] = neuralOffsets[id].map(value => value * 0.8); });
     const attentionOffsets = {
-      'positional-encoding': [-260, -100],
-      'inference-optimization': [-260, 110],
-      'state-space-models': [280, -300],
-      'transformer': [590, -200],
-      'reranking': [690, -90],
-      'prompt-caching': [660, 30],
-      'interpretability': [680, 170],
-      'vanishing-gradient': [530, 280],
-      'context-window': [0, 260],
-      'lost-in-middle': [210, 270]
+      'positional-encoding': [-265, -102],
+      'inference-optimization': [-265, 112],
+      'state-space-models': [290, -284],
+      'transformer': [453, -171],
+      'reranking': [578, -74],
+      'prompt-caching': [710, -6],
+      'interpretability': [568, 94],
+      'vanishing-gradient': [472, 155],
+      'context-window': [2, 230],
+      'lost-in-middle': [118, 194]
     };
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets};
 
