@@ -200,7 +200,7 @@
             "text-outline-color": "#14161a",
             "text-outline-width": 2.5,
             "transition-property": "opacity, border-width",
-            "transition-duration": "160ms"
+            "transition-duration": "450ms"
           }
         },
         {
@@ -214,12 +214,12 @@
             "curve-style": "straight",
             "opacity": 0.5,
             "transition-property": "opacity, width",
-            "transition-duration": "160ms"
+            "transition-duration": "450ms"
           }
         },
-        { selector: "node.dim", style: { "opacity": 0.42, "text-opacity": 0.5 } },
+        { selector: "node.dim", style: { "opacity": 0, "events": "no" } },
         { selector: "node.motion-art", style: { "background-image-opacity": 0 } },
-        { selector: "edge.dim", style: { "opacity": 0.04 } },
+        { selector: "edge.dim", style: { "opacity": 0, "events": "no" } },
         {
           selector: "edge.overview-curve",
           style: {
@@ -364,7 +364,7 @@
       const x = event.clientX - box.left, y = event.clientY - box.top;
       let nearest = Infinity;
       hoveredRing = null;
-      cy.nodes().not('.hidden').forEach(node => {
+      cy.nodes().not('.hidden').not('.dim').forEach(node => {
         const p = node.renderedPosition(), distance = Math.hypot(p.x - x, p.y - y);
         if (distance <= node.width() * cy.zoom() / 2 && distance < nearest) {
           nearest = distance; hoveredRing = node.id();
