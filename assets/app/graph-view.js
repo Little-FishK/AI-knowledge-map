@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'positional-encoding': {
+        support: [], peer: [], risk: ['lost-in-middle'], output: ['attention', 'transformer', 'context-window'],
+        offsets: {'attention': [350, -130], 'transformer': [600, 0], 'context-window': [400, 120], 'lost-in-middle': [0, 210]}
+      },
+      'normalization': {
+        support: [], peer: ['batch-norm'], risk: [], output: ['residual-connection', 'transformer', 'vanishing-gradient'],
+        offsets: {'batch-norm': [230, -230], 'residual-connection': [420, -90], 'transformer': [630, 0], 'vanishing-gradient': [350, 150]}
+      },
+      'transformer': {
+        support: ['neural-network', 'embedding', 'attention', 'positional-encoding', 'residual-connection', 'normalization'],
+        peer: ['rnn', 'state-space-models', 'batch-norm'], risk: [], output: ['moe', 'pretraining', 'llm', 'multimodal', 'diffusion', 'speech', 'scaling-law'],
+        offsets: {'neural-network': [-85, -190], 'embedding': [-170, -125], 'attention': [-215, -40], 'positional-encoding': [-215, 45], 'residual-connection': [-170, 130], 'normalization': [-85, 190], 'rnn': [220, -360], 'state-space-models': [410, -300], 'batch-norm': [550, -245], 'moe': [390, -120], 'pretraining': [570, -85], 'llm': [790, 0], 'multimodal': [660, 90], 'diffusion': [530, 165], 'speech': [390, 220], 'scaling-law': [230, 260]}
+      },
       'rnn': {
         support: ['neural-network', 'backprop'], peer: ['transformer', 'state-space-models'], risk: ['vanishing-gradient'], output: [],
         offsets: {'neural-network': [-180, -85], 'backprop': [-180, 85], 'transformer': [250, -170], 'state-space-models': [490, 0], 'vanishing-gradient': [0, 210]}
