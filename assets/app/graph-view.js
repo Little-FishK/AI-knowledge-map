@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'state-space-models': {
+        support: ['rnn'], peer: ['attention', 'transformer'], risk: [], output: ['context-window', 'model-families'],
+        offsets: { 'rnn': [-195, -30], 'attention': [220, -240], 'transformer': [405, -150], 'context-window': [610, 0], 'model-families': [365, 145] }
+      },
+      'self-supervised-learning': {
+        support: [], peer: ['unsupervised-learning', 'supervised-learning'], risk: [],
+        output: ['pretraining', 'scaling-law', 'diffusion', 'synthetic-data'],
+        offsets: { 'unsupervised-learning': [205, -260], 'supervised-learning': [400, -190], 'pretraining': [670, 0], 'scaling-law': [465, -75], 'diffusion': [505, 100], 'synthetic-data': [305, 175] }
+      },
+      'contrastive-learning': {
+        support: [], peer: [], risk: [], output: ['embedding', 'clip', 'multimodal', 'retrieval'],
+        offsets: { 'embedding': [290, -165], 'clip': [475, -85], 'multimodal': [675, 0], 'retrieval': [390, 140] }
+      },
       'positional-encoding': {
         support: [], peer: [], risk: ['lost-in-middle'], output: ['attention', 'transformer', 'context-window'],
         offsets: {'attention': [350, -130], 'transformer': [600, 0], 'context-window': [400, 120], 'lost-in-middle': [0, 210]}
