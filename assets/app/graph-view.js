@@ -288,6 +288,18 @@
         { selector: 'edge.nn-relation.sl-support-edge', style: {label: ele => ele.source().id() === 'batch-norm' ? '可选的训练稳定组件' : '常用参数优化方法'} },
         { selector: 'edge.nn-relation.sl-output-edge', style: {label: '基于神经网络'} },
         { selector: 'edge.nn-relation.sl-risk-edge', style: {label: 'data(label)'} },
+        { selector: 'edge.attention-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.attention-relation.sl-output-edge', style: {
+          'source-arrow-shape': ele => ele.source().id() === 'attention' ? 'none' : 'triangle',
+          'target-arrow-shape': ele => ele.source().id() === 'attention' ? 'triangle' : 'none',
+          'target-arrow-color': '#8fb87f',
+          label: ele => ({'transformer': '核心组件', 'reranking': '用于交叉编码', 'prompt-caching': '复用 KV', 'interpretability': '提供分析线索（非因果解释）', 'vanishing-gradient': '可缩短梯度传播路径'})[ele.source().id() === 'attention' ? ele.target().id() : ele.source().id()]
+        } },
+        { selector: 'edge.attention-relation.sl-support-edge', style: {label: ele => ele.source().id() === 'positional-encoding' ? '提供位置信息' : '优化计算与内存开销'} },
+        { selector: 'edge.attention-relation.sl-risk-edge', style: {
+          'source-arrow-shape': 'triangle', 'source-arrow-color': '#ee6677', 'target-arrow-shape': 'none',
+          label: ele => ele.target().id() === 'context-window' ? '长序列增加计算开销' : '长上下文的信息利用风险'
+        } },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -597,7 +609,19 @@
       'adversarial-robustness': [1, 367]
     };
     Object.keys(neuralOffsets).forEach(id => { neuralOffsets[id] = neuralOffsets[id].map(value => value * 0.8); });
-    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets};
+    const attentionOffsets = {
+      'positional-encoding': [-260, -100],
+      'inference-optimization': [-260, 110],
+      'state-space-models': [280, -300],
+      'transformer': [590, -200],
+      'reranking': [690, -90],
+      'prompt-caching': [660, 30],
+      'interpretability': [680, 170],
+      'vanishing-gradient': [530, 280],
+      'context-window': [0, 260],
+      'lost-in-middle': [210, 270]
+    };
+    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets};
 
     function updateLocalLayout() {
       const epoch = ++localLayoutEpoch;
@@ -606,17 +630,19 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation');
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation');
       if (active) {
         const neural = selectedId === 'neural-network';
+        const attention = selectedId === 'attention';
         cy.getElementById(selectedId).addClass('sl-main');
-        (neural ? ['decision-tree', 'kernel-methods'] : ['self-supervised-learning', 'unsupervised-learning']).forEach(id => cy.getElementById(id).addClass('sl-peer'));
-        (neural ? ['gradient-descent', 'batch-norm'] : ['decision-tree', 'kernel-methods']).forEach(id => cy.getElementById(id).addClass('sl-support'));
-        (neural ? ['cnn', 'rnn', 'transformer', 'gan', 'vae'] : ['fine-tuning', 'alignment']).forEach(id => cy.getElementById(id).addClass('sl-output'));
-        (neural ? ['vanishing-gradient', 'interpretability', 'adversarial-robustness'] : ['overfitting']).forEach(id => cy.getElementById(id).addClass('sl-risk'));
+        (attention ? ['state-space-models'] : neural ? ['decision-tree', 'kernel-methods'] : ['self-supervised-learning', 'unsupervised-learning']).forEach(id => cy.getElementById(id).addClass('sl-peer'));
+        (attention ? ['positional-encoding', 'inference-optimization'] : neural ? ['gradient-descent', 'batch-norm'] : ['decision-tree', 'kernel-methods']).forEach(id => cy.getElementById(id).addClass('sl-support'));
+        (attention ? ['transformer', 'reranking', 'prompt-caching', 'interpretability', 'vanishing-gradient'] : neural ? ['cnn', 'rnn', 'transformer', 'gan', 'vae'] : ['fine-tuning', 'alignment']).forEach(id => cy.getElementById(id).addClass('sl-output'));
+        (attention ? ['context-window', 'lost-in-middle'] : neural ? ['vanishing-gradient', 'interpretability', 'adversarial-robustness'] : ['overfitting']).forEach(id => cy.getElementById(id).addClass('sl-risk'));
         cy.edges('.hl').forEach(edge => {
           const a = edge.source(), b = edge.target();
           if (neural) edge.addClass('nn-relation');
+          if (attention) edge.addClass('attention-relation');
           if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
             edge.addClass('sl-peripheral-edge');
             return;
@@ -625,6 +651,8 @@
           if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
           if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
           if (a.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
+          if (attention && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
+          if (attention && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
         });
       }
       const reduced = global.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
