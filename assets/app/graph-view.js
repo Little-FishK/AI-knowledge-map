@@ -219,6 +219,15 @@
         },
         { selector: "node.dim", style: { "opacity": 0.42, "text-opacity": 0.5 } },
         { selector: "edge.dim", style: { "opacity": 0.04 } },
+        {
+          selector: "edge.overview-curve",
+          style: {
+            "curve-style": "unbundled-bezier",
+            "control-point-distances": "data(overviewBend)",
+            "control-point-weights": 0.5,
+            "edge-distances": "node-position"
+          }
+        },
         { selector: "node.sel", style: { "border-width": 2, "border-color": "#eaeef5" } },
         {
           selector: "node.official-path-node",
@@ -507,7 +516,53 @@
       }, reduced ? 0 : 360);
     }
 
+    // Layer 1 only. Use the whole map, not the filtered viewport, as the
+    // reference circle so filtering and zooming cannot flip an edge's bend.
+    function updateOverviewEdges() {
+      const overview = !state.selected && !officialPathActive;
+      if (!overview) {
+        cy.edges('.overview-curve').removeClass('overview-curve');
+        return;
+      }
+      const points = cy.nodes().map(n => n.position());
+      const center = {
+        x: (Math.min(...points.map(p => p.x)) + Math.max(...points.map(p => p.x))) / 2,
+        y: (Math.min(...points.map(p => p.y)) + Math.max(...points.map(p => p.y))) / 2
+      };
+      const radius = Math.max(1, ...points.map(p => Math.hypot(p.x - center.x, p.y - center.y)));
+      cy.batch(() => cy.edges().forEach(edge => {
+        const a = edge.source(), b = edge.target();
+        if (CORE.has(a.id()) && CORE.has(b.id())) {
+          edge.removeClass('overview-curve');
+          return;
+        }
+        const p = a.position(), q = b.position();
+        const dx = q.x - p.x, dy = q.y - p.y, length = Math.hypot(dx, dy);
+        if (length < 1) { edge.removeClass('overview-curve'); return; }
+        const nx = -dy / length, ny = dx / length;
+        const towardCenter = (center.x - (p.x + q.x) / 2) * nx
+          + (center.y - (p.y + q.y) / 2) * ny;
+        const outer = (Math.hypot(p.x - center.x, p.y - center.y)
+          + Math.hypot(q.x - center.x, q.y - center.y)) / (2 * radius);
+        // Quadratic bow grows with both endpoints' radial depth. Cap its
+        // midpoint before the center to avoid overshooting into the far side.
+        const bend = Math.sign(towardCenter) * Math.min(length * 0.65 * outer ** 2, Math.abs(towardCenter) * 1.5);
+        edge.data('overviewBend', bend);
+        edge.toggleClass('overview-curve', Math.abs(bend) > 0.5);
+      }));
+    }
+
+    let overviewFrame = null;
+    cy.on('position', 'node', () => {
+      if (overviewFrame !== null || state.selected) return;
+      overviewFrame = requestAnimationFrame(() => {
+        overviewFrame = null;
+        updateOverviewEdges();
+      });
+    });
+
     function applyFocus() {
+      updateOverviewEdges();
       const previouslyFocused = cy.elements(".dim, .hl");
       if (!state.focus || !state.selected) {
         if (previouslyFocused.length) previouslyFocused.removeClass("dim hl");
@@ -683,7 +738,7 @@
       state.selected = id;
       cy.nodes(".sel").removeClass("sel");
       node.addClass("sel");
-      if (state.focus) applyFocus();
+      applyFocus();
       const detailWasClosed = detail.classList.contains("closed");
       openDetail(id);
       centerOnNode(node, detailWasClosed);
