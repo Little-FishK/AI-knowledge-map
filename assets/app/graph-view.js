@@ -302,6 +302,12 @@
         } },
         { selector: 'edge.llm-relation', style: {label: 'data(label)'} },
         { selector: 'edge.context-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.multimodal-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.multimodal-relation.sl-output-edge', style: {
+          'source-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'none' : 'triangle',
+          'target-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'triangle' : 'none',
+          'target-arrow-color': '#8fb87f'
+        } },
         { selector: 'edge.context-relation.sl-output-edge', style: {
           'source-arrow-shape': ele => ele.source().id() === 'context-window' ? 'none' : 'triangle',
           'target-arrow-shape': ele => ele.source().id() === 'context-window' ? 'triangle' : 'none',
@@ -674,7 +680,18 @@
       'lost-in-middle': [40, 200],
       'video-generation': [150, 230]
     };
-    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets};
+    const multimodalOffsets = {
+      'llm': [-110, -170],
+      'transformer': [-190, -95],
+      'embedding': [-215, 0],
+      'clip': [-190, 95],
+      'contrastive-learning': [-110, 170],
+      'image-generation': [350, -180],
+      'computer-use': [570, -90],
+      'agent': [750, 0],
+      'speech': [400, 170]
+    };
+    const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     function updateLocalLayout() {
       const epoch = ++localLayoutEpoch;
@@ -683,14 +700,18 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation context-relation');
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation context-relation multimodal-relation');
       if (active) {
         const neural = selectedId === 'neural-network';
         const attention = selectedId === 'attention';
         const llm = selectedId === 'llm';
         const context = selectedId === 'context-window';
+        const multimodal = selectedId === 'multimodal';
         cy.getElementById(selectedId).addClass('sl-main');
-        if (context) {
+        if (multimodal) {
+          ['llm', 'transformer', 'embedding', 'clip', 'contrastive-learning'].forEach(id => cy.getElementById(id).addClass('sl-support'));
+          ['image-generation', 'computer-use', 'agent', 'speech'].forEach(id => cy.getElementById(id).addClass('sl-output'));
+        } else if (context) {
           ['tokenization', 'positional-encoding', 'inference-optimization', 'context-compaction', 'context-engineering', 'state-space-models'].forEach(id => cy.getElementById(id).addClass('sl-support'));
           ['llm', 'rag', 'chunking', 'in-context-learning', 'agent-memory', 'multi-agent', 'agent-loop', 'cot'].forEach(id => cy.getElementById(id).addClass('sl-output'));
           ['attention', 'lost-in-middle', 'video-generation'].forEach(id => cy.getElementById(id).addClass('sl-risk'));
@@ -706,6 +727,7 @@
           if (attention) edge.addClass('attention-relation');
           if (llm) edge.addClass('llm-relation');
           if (context) edge.addClass('context-relation');
+          if (multimodal) edge.addClass('multimodal-relation');
           if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
             edge.addClass('sl-peripheral-edge');
             return;
@@ -714,7 +736,7 @@
           if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
           if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
           if (a.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
-          if ((attention || llm || context) && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
+          if ((attention || llm || context || multimodal) && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
           if (attention && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
         });
       }
