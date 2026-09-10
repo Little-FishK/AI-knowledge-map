@@ -714,6 +714,20 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'fine-tuning': {
+        support: ['llm', 'supervised-learning', 'optimizer-schedule', 'regularization'],
+        peer: ['rag', 'prompt-engineering', 'in-context-learning', 'model-merging'], risk: ['overfitting'],
+        output: ['peft-lora', 'post-training', 'alignment', 'rlhf', 'controllable-generation', 'voice-cloning'],
+        offsets: { 'llm': [-145, -165], 'supervised-learning': [-215, -55], 'optimizer-schedule': [-215, 65], 'regularization': [-145, 170], 'rag': [220, -390], 'prompt-engineering': [400, -335], 'in-context-learning': [565, -275], 'model-merging': [720, -215], 'peft-lora': [460, -80], 'post-training': [840, 0], 'alignment': [685, 90], 'rlhf': [540, 155], 'controllable-generation': [400, 205], 'voice-cloning': [260, 245], 'overfitting': [0, 210] }
+      },
+      'peft-lora': {
+        support: ['fine-tuning', 'quantization'], peer: [], risk: [], output: ['deployment', 'model-merging'],
+        offsets: { 'fine-tuning': [-185, -90], 'quantization': [-185, 90], 'model-merging': [360, -120], 'deployment': [610, 10] }
+      },
+      'distillation': {
+        support: ['information-theory', 'synthetic-data'], peer: ['pretraining', 'quantization'], risk: [], output: [],
+        offsets: { 'information-theory': [-185, -90], 'synthetic-data': [-185, 90], 'pretraining': [315, -130], 'quantization': [505, 75] }
+      },
       'clip': {
         support: ['embedding', 'contrastive-learning'], peer: [], risk: [], output: ['multimodal', 'image-generation'],
         offsets: { 'embedding': [-185, -90], 'contrastive-learning': [-185, 90], 'multimodal': [380, -120], 'image-generation': [605, 15] }
