@@ -283,6 +283,7 @@
         { selector: 'edge.sl-support-edge', style: {'line-color': '#32d6b0', 'source-arrow-shape': 'none', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '可用于分类或回归'} },
         { selector: 'edge.sl-output-edge', style: {'source-arrow-shape': 'triangle', 'source-arrow-color': '#8fb87f', 'target-arrow-shape': 'none', 'curve-style': 'straight', label: '支持监督微调（SFT）'} },
         { selector: 'edge.sl-risk-edge', style: {'line-color': '#ee6677', 'target-arrow-color': '#ee6677', 'source-arrow-shape': 'none', 'target-arrow-shape': 'triangle', 'curve-style': 'straight', label: '可能损害泛化'} },
+        { selector: 'edge.sl-peripheral-edge', style: {opacity: 0, events: 'no'} },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -599,7 +600,7 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge');
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge');
       if (active && selectedId === 'supervised-learning') {
         cy.getElementById(selectedId).addClass('sl-main');
         ['self-supervised-learning', 'unsupervised-learning'].forEach(id => cy.getElementById(id).addClass('sl-peer'));
@@ -608,6 +609,10 @@
         cy.getElementById('overfitting').addClass('sl-risk');
         cy.edges('.hl').forEach(edge => {
           const a = edge.source(), b = edge.target();
+          if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
+            edge.addClass('sl-peripheral-edge');
+            return;
+          }
           if ((a.hasClass('sl-peer') || a.hasClass('sl-main')) && (b.hasClass('sl-peer') || b.hasClass('sl-main'))) edge.addClass('sl-peer-edge');
           if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
           if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
