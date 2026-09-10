@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'clip': {
+        support: ['embedding', 'contrastive-learning'], peer: [], risk: [], output: ['multimodal', 'image-generation'],
+        offsets: { 'embedding': [-185, -90], 'contrastive-learning': [-185, 90], 'multimodal': [380, -120], 'image-generation': [605, 15] }
+      },
+      'pretraining': {
+        support: ['self-supervised-learning', 'unsupervised-learning', 'transformer', 'gradient-descent', 'optimizer-schedule', 'distributed-training', 'scaling-law', 'training-data-governance'],
+        peer: ['distillation'], risk: ['data-poisoning', 'bias-fairness'], output: ['llm', 'post-training'],
+        offsets: { 'self-supervised-learning': [-65, -245], 'unsupervised-learning': [-145, -195], 'transformer': [-205, -125], 'gradient-descent': [-235, -45], 'optimizer-schedule': [-235, 45], 'distributed-training': [-205, 130], 'scaling-law': [-145, 205], 'training-data-governance': [-65, 255], 'distillation': [295, -225], 'llm': [675, -5], 'post-training': [440, 125], 'data-poisoning': [0, 210], 'bias-fairness': [120, 185] }
+      },
+      'post-training': {
+        support: ['pretraining', 'fine-tuning', 'rlhf', 'synthetic-data'], peer: [], risk: [], output: ['alignment', 'reasoning-models'],
+        offsets: { 'pretraining': [-130, -170], 'fine-tuning': [-205, -60], 'rlhf': [-205, 60], 'synthetic-data': [-130, 170], 'reasoning-models': [365, -125], 'alignment': [610, 10] }
+      },
       'state-space-models': {
         support: ['rnn'], peer: ['attention', 'transformer'], risk: [], output: ['context-window', 'model-families'],
         offsets: { 'rnn': [-195, -30], 'attention': [220, -240], 'transformer': [405, -150], 'context-window': [610, 0], 'model-families': [365, 145] }
