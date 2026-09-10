@@ -711,6 +711,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'decision-tree': {
+        support: ['supervised-learning'], peer: ['neural-network', 'kernel-methods'], risk: [], output: [],
+        offsets: {'supervised-learning': [-180, 0], 'neural-network': [250, -150], 'kernel-methods': [460, 0]}
+      },
+      'clustering': {
+        support: ['embedding'], peer: [], risk: ['curse-of-dimensionality'], output: ['unsupervised-learning'],
+        offsets: {'embedding': [-185, 0], 'unsupervised-learning': [410, 0], 'curse-of-dimensionality': [0, 210]}
+      },
+      'kernel-methods': {
+        support: ['regularization'], peer: ['neural-network', 'decision-tree'], risk: [], output: ['supervised-learning', 'curse-of-dimensionality'],
+        offsets: {'regularization': [-180, 0], 'neural-network': [240, -220], 'decision-tree': [420, -130], 'supervised-learning': [600, 0], 'curse-of-dimensionality': [360, 155]}
+      },
       'regularization': {
         support: ['gradient-descent', 'batch-norm', 'kernel-methods'], peer: [], risk: [],
         output: ['overfitting', 'fine-tuning', 'quantization'],
