@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'optimizer-schedule': {
+        support: ['gradient-descent', 'backprop', 'loss-function'], peer: [], risk: [], output: ['distributed-training', 'pretraining', 'fine-tuning'],
+        offsets: {'gradient-descent': [-150, -130], 'backprop': [-210, 0], 'loss-function': [-150, 130], 'distributed-training': [350, -140], 'pretraining': [620, 0], 'fine-tuning': [380, 140]}
+      },
+      'residual-connection': {
+        support: ['batch-norm', 'normalization'], peer: [], risk: [], output: ['cnn', 'transformer', 'vanishing-gradient'],
+        offsets: {'batch-norm': [-180, -90], 'normalization': [-180, 90], 'cnn': [380, -145], 'transformer': [620, 0], 'vanishing-gradient': [400, 145]}
+      },
+      'cnn': {
+        support: ['neural-network', 'residual-connection'], peer: [], risk: [], output: ['diffusion'],
+        offsets: {'neural-network': [-180, -90], 'residual-connection': [-180, 90], 'diffusion': [500, 0]}
+      },
       'backprop': {
         support: ['loss-function'], peer: [], risk: ['vanishing-gradient'], output: ['gradient-descent', 'optimizer-schedule', 'rnn'],
         offsets: {'loss-function': [-185, 0], 'vanishing-gradient': [0, 210], 'optimizer-schedule': [350, -160], 'gradient-descent': [610, 0], 'rnn': [370, 145]}
