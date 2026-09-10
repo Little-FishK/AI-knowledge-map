@@ -239,14 +239,14 @@
             "width": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
             "height": ele => String(ele.data("officialOrder")).includes(".") ? 64 : 72,
             "background-color": ele => String(ele.data("officialOrder")).includes(".")
-              ? "#202733"
+              ? "#17130b"
               : "#e4b85d",
             "border-width": ele => String(ele.data("officialOrder")).includes(".") ? 3 : 6,
             "border-color": ele => String(ele.data("officialOrder")).includes(".")
               ? "#a99667"
               : "#fff0b8",
             "color": ele => String(ele.data("officialOrder")).includes(".")
-              ? "#f4dfa8"
+              ? "#e4b85d"
               : "#17130b",
             "font-family": '"Bahnschrift SemiBold", "Aptos Display", "Segoe UI Variable Display", "Arial", sans-serif',
             "font-size": ele => {
@@ -263,6 +263,10 @@
           }
         },
         { selector: "node.official-path-muted", style: { "opacity": 0.14, "text-opacity": 0.16 } },
+        {
+          selector: "node.official-path-node.motion-art",
+          style: { "background-opacity": 0, "border-width": 0, "text-opacity": 0 }
+        },
         {
           selector: "edge.hl",
           style: { "opacity": 1, "width": 2.6, "label": "data(label)",
@@ -301,7 +305,7 @@
       }
       ringContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       ringContext.clearRect(0, 0, w, h);
-      const active = isActive() && !document.hidden && !officialPathActive;
+      const active = isActive() && !document.hidden;
       if (ringActive !== active) {
         ringActive = active;
         cy.nodes().toggleClass('motion-art', active);
@@ -323,7 +327,18 @@
         ringContext.save();
         ringContext.globalAlpha = Number(node.style('opacity'));
         ringContext.translate(p.x, p.y);
-        ringContext.drawImage(sprite.face, -size / 2, -size / 2, size, size);
+        if (node.hasClass('official-path-node')) {
+          // Keep the official order and gold/black hierarchy stationary while
+          // reusing the same domain ring as the ordinary map.
+          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.38, 0, Math.PI * 2);
+          ringContext.fillStyle = node.style('background-color'); ringContext.fill();
+          ringContext.fillStyle = node.style('color');
+          ringContext.font = `${node.style('font-weight')} ${parseFloat(node.style('font-size')) * cy.zoom()}px ${node.style('font-family')}`;
+          ringContext.textAlign = 'center'; ringContext.textBaseline = 'middle';
+          ringContext.fillText(String(node.data('officialOrder')), 0, 0, size * 0.70);
+        } else {
+          ringContext.drawImage(sprite.face, -size / 2, -size / 2, size, size);
+        }
         // White band starts exactly at the face's radius (38% of icon size).
         if (motion.emphasis > 0.005) {
           ringContext.save();
@@ -344,7 +359,7 @@
       ringFrame = requestAnimationFrame(ringTick);
     }
     function hoverRing(event) {
-      if (event.pointerType === 'touch' || event.buttons || officialPathActive) { hoveredRing = null; return; }
+      if (event.pointerType === 'touch' || event.buttons) { hoveredRing = null; return; }
       const box = cy.container().getBoundingClientRect();
       const x = event.clientX - box.left, y = event.clientY - box.top;
       let nearest = Infinity;
@@ -624,7 +639,7 @@
     // Layer 1 only. Use the whole map, not the filtered viewport, as the
     // reference circle so filtering and zooming cannot flip an edge's bend.
     function updateOverviewEdges() {
-      const overview = !state.selected && !officialPathActive;
+      const overview = !state.selected || officialPathActive;
       if (!overview) {
         cy.edges('.overview-curve').removeClass('overview-curve');
         return;
