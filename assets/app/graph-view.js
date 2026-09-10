@@ -343,8 +343,8 @@
         if (motion.emphasis > 0.005) {
           ringContext.save();
           ringContext.globalAlpha *= motion.emphasis;
-          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.395, 0, Math.PI * 2);
-          ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.03;
+          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.4025, 0, Math.PI * 2);
+          ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.045;
           ringContext.stroke(); ringContext.restore();
         }
         ringContext.rotate(motion.angle);
