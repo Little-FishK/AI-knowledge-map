@@ -303,6 +303,17 @@
         { selector: 'edge.llm-relation', style: {label: 'data(label)'} },
         { selector: 'edge.context-relation', style: {label: 'data(label)'} },
         { selector: 'edge.multimodal-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.batch-relation', style: {label: 'data(label)'} },
+        { selector: 'edge.batch-relation.sl-output-edge', style: {
+          'source-arrow-shape': ele => ele.source().hasClass('sl-main') ? 'none' : 'triangle',
+          'target-arrow-shape': ele => ele.source().hasClass('sl-main') ? 'triangle' : 'none',
+          'target-arrow-color': '#8fb87f'
+        } },
+        { selector: 'edge.batch-relation.sl-risk-edge', style: {
+          'source-arrow-shape': ele => ele.source().hasClass('sl-main') ? 'triangle' : 'none',
+          'target-arrow-shape': ele => ele.target().hasClass('sl-main') ? 'triangle' : 'none',
+          'source-arrow-color': '#ee6677', 'target-arrow-color': '#ee6677'
+        } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
           'source-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'none' : 'triangle',
           'target-arrow-shape': ele => ele.source().id() === 'multimodal' ? 'triangle' : 'none',
@@ -693,6 +704,25 @@
     };
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
+    const batchLayouts = {
+      'information-theory': {
+        support: [], peer: [], risk: [],
+        output: ['loss-function', 'llm', 'sampling-params', 'rlhf', 'distillation'],
+        offsets: {'loss-function': [280, -200], 'llm': [500, -100], 'sampling-params': [680, 0], 'rlhf': [490, 115], 'distillation': [300, 205]}
+      },
+      'loss-function': {
+        support: ['information-theory'], peer: ['evaluation'], risk: ['overfitting', 'reward-hacking'],
+        output: ['gradient-descent', 'backprop', 'llm', 'optimizer-schedule'],
+        offsets: {'information-theory': [-190, 0], 'evaluation': [280, -250], 'gradient-descent': [480, -140], 'backprop': [660, 0], 'llm': [500, 100], 'optimizer-schedule': [340, 185], 'overfitting': [0, 210], 'reward-hacking': [125, 200]}
+      },
+      'gradient-descent': {
+        support: ['loss-function', 'backprop'], peer: [], risk: [],
+        output: ['regularization', 'optimizer-schedule', 'neural-network', 'pretraining'],
+        offsets: {'loss-function': [-180, -90], 'backprop': [-180, 90], 'regularization': [320, -180], 'optimizer-schedule': [450, -90], 'neural-network': [660, 0], 'pretraining': [460, 110]}
+      }
+    };
+    Object.entries(batchLayouts).forEach(([id, config]) => { localLayouts[id] = config.offsets; });
+
     function updateLocalLayout() {
       const epoch = ++localLayoutEpoch;
       clearTimeout(localLayoutTimer);
@@ -700,15 +730,18 @@
       const offsets = localLayouts[selectedId];
       const active = state.focus && offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
-      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation context-relation multimodal-relation');
+      cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation context-relation multimodal-relation batch-relation');
       if (active) {
         const neural = selectedId === 'neural-network';
         const attention = selectedId === 'attention';
         const llm = selectedId === 'llm';
         const context = selectedId === 'context-window';
         const multimodal = selectedId === 'multimodal';
+        const batch = batchLayouts[selectedId];
         cy.getElementById(selectedId).addClass('sl-main');
-        if (multimodal) {
+        if (batch) {
+          ['support', 'peer', 'output', 'risk'].forEach(role => batch[role].forEach(id => cy.getElementById(id).addClass('sl-' + role)));
+        } else if (multimodal) {
           ['llm', 'transformer', 'embedding', 'clip', 'contrastive-learning'].forEach(id => cy.getElementById(id).addClass('sl-support'));
           ['image-generation', 'computer-use', 'agent', 'speech'].forEach(id => cy.getElementById(id).addClass('sl-output'));
         } else if (context) {
@@ -728,6 +761,7 @@
           if (llm) edge.addClass('llm-relation');
           if (context) edge.addClass('context-relation');
           if (multimodal) edge.addClass('multimodal-relation');
+          if (batch) edge.addClass('batch-relation');
           if (!a.hasClass('sl-main') && !b.hasClass('sl-main') && !(a.hasClass('sl-peer') && b.hasClass('sl-peer'))) {
             edge.addClass('sl-peripheral-edge');
             return;
@@ -736,7 +770,8 @@
           if ((a.hasClass('sl-support') && b.hasClass('sl-main')) || (b.hasClass('sl-support') && a.hasClass('sl-main'))) edge.addClass('sl-support-edge');
           if (a.hasClass('sl-output') && b.hasClass('sl-main')) edge.addClass('sl-output-edge');
           if (a.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
-          if ((attention || llm || context || multimodal) && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
+          if ((attention || llm || context || multimodal || batch) && a.hasClass('sl-main') && b.hasClass('sl-output')) edge.addClass('sl-output-edge');
+          if (batch && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
           if (attention && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
         });
       }
