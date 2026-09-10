@@ -581,19 +581,20 @@
       'alignment': [634, 168],
       'overfitting': [296, 218]
     };
+    // User reference: proposals/local-relationship-layout.md. Balance branches around the main node.
     const neuralOffsets = {
-      'rnn': [680, 165],
-      'transformer': [780, 15],
-      'batch-norm': [-290, 120],
-      'vanishing-gradient': [225, 310],
-      'gradient-descent': [-290, -120],
-      'cnn': [700, -125],
-      'gan': [830, 345],
-      'vae': [670, 465],
-      'kernel-methods': [470, -310],
-      'decision-tree': [275, -425],
-      'interpretability': [305, 530],
-      'adversarial-robustness': [-25, 460]
+      'rnn': [760, -11],
+      'transformer': [892, -106],
+      'batch-norm': [-310, 128],
+      'vanishing-gradient': [295, 311],
+      'gradient-descent': [-310, -128],
+      'cnn': [808, -206],
+      'gan': [939, 244],
+      'vae': [878, 379],
+      'kernel-methods': [473, -294],
+      'decision-tree': [314, -447],
+      'interpretability': [167, 351],
+      'adversarial-robustness': [1, 367]
     };
     Object.keys(neuralOffsets).forEach(id => { neuralOffsets[id] = neuralOffsets[id].map(value => value * 0.8); });
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets};
