@@ -320,7 +320,7 @@
         { selector: 'edge.batch-relation.sl-output-edge[source = "curse-of-dimensionality"][type = "threatens"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
-        { selector: 'edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "rag"], edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "context-window"], edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"], edge.batch-relation.sl-output-edge[source = "privacy"][target = "deployment"]', style: {
+        { selector: 'edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "rag"], edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "context-window"], edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"], edge.batch-relation.sl-output-edge[source = "privacy"][target = "deployment"], edge.batch-relation.sl-output-edge[source = "prompt-injection"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'prompt-injection': {
+        support: ['red-teaming', 'guardrails', 'agent-identity-access'], peer: ['jailbreak', 'data-poisoning'], risk: [], output: ['mcp-architecture', 'llm', 'agent', 'computer-use', 'tool-calling'],
+        offsets: { 'red-teaming': [-155, -150], 'guardrails': [-215, 0], 'agent-identity-access': [-155, 150], 'jailbreak': [235, -305], 'data-poisoning': [445, -235], 'mcp-architecture': [350, -115], 'llm': [540, -65], 'agent': [800, 0], 'computer-use': [550, 85], 'tool-calling': [350, 155] }
+      },
+      'guardrails': {
+        support: ['human-in-the-loop', 'governance', 'red-teaming', 'uncertainty-calibration'], peer: [], risk: ['streaming'], output: ['privacy', 'prompt-injection', 'hallucination', 'agent', 'tool-calling', 'code-execution', 'jailbreak'],
+        offsets: { 'human-in-the-loop': [-150, -150], 'governance': [-205, -55], 'red-teaming': [-205, 55], 'uncertainty-calibration': [-150, 150], 'privacy': [330, -220], 'prompt-injection': [500, -150], 'hallucination': [625, -75], 'agent': [830, 0], 'tool-calling': [625, 80], 'code-execution': [500, 155], 'jailbreak': [330, 220], 'streaming': [0, 210] }
+      },
+      'reasoning-models': {
+        support: ['tree-of-thoughts', 'synthetic-data', 'cot', 'post-training', 'model-evaluation', 'test-time-compute'], peer: ['model-families', 'model-selection', 'scaling-law', 'llm'], risk: [], output: [],
+        offsets: { 'tree-of-thoughts': [-110, -205], 'synthetic-data': [-190, -125], 'cot': [-220, -40], 'post-training': [-220, 50], 'model-evaluation': [-190, 135], 'test-time-compute': [-110, 210], 'model-families': [235, -310], 'model-selection': [435, -250], 'scaling-law': [540, -130], 'llm': [720, -55] }
+      },
       'hallucination': {
         support: ['rag', 'prompt-engineering', 'cot', 'citations', 'logprobs', 'self-consistency', 'code-execution', 'react', 'interpretability', 'guardrails', 'uncertainty-calibration'], peer: ['privacy'], risk: ['sampling-params', 'reward-hacking', 'super-resolution', 'code-generation', 'reflection'], output: [],
         offsets: { 'rag': [-100, -340], 'prompt-engineering': [-180, -300], 'cot': [-245, -245], 'citations': [-300, -180], 'logprobs': [-340, -95], 'self-consistency': [-355, 0], 'code-execution': [-340, 95], 'react': [-300, 180], 'interpretability': [-245, 245], 'guardrails': [-180, 300], 'uncertainty-calibration': [-100, 340], 'privacy': [315, -330], 'sampling-params': [0, 210], 'reward-hacking': [105, 205], 'super-resolution': [200, 180], 'code-generation': [290, 135], 'reflection': [365, 75] }
