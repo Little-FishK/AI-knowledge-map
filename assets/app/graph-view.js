@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'reranking': {
+        support: ['attention', 'vector-db'], peer: [], risk: [], output: ['retrieval', 'rag', 'lost-in-middle'],
+        offsets: { 'attention': [-185, -95], 'vector-db': [-185, 95], 'retrieval': [345, -140], 'rag': [610, 0], 'lost-in-middle': [385, 140] }
+      },
+      'advanced-rag': {
+        support: ['retrieval', 'knowledge-graph', 'agent'], peer: ['rag'], risk: [], output: [],
+        offsets: { 'retrieval': [-155, -150], 'knowledge-graph': [-215, 0], 'agent': [-155, 150], 'rag': [410, -30] }
+      },
+      'knowledge-graph': {
+        support: [], peer: ['embedding'], risk: [], output: ['rag', 'advanced-rag'],
+        offsets: { 'embedding': [240, -205], 'rag': [595, 0], 'advanced-rag': [365, 140] }
+      },
       'retrieval': {
         support: ['embedding', 'contrastive-learning', 'vector-db', 'chunking', 'reranking'], peer: [], risk: ['curse-of-dimensionality'], output: ['advanced-rag', 'rag', 'agent-memory', 'lost-in-middle'],
         offsets: { 'embedding': [-115, -195], 'contrastive-learning': [-195, -100], 'vector-db': [-220, 0], 'chunking': [-195, 105], 'reranking': [-115, 200], 'advanced-rag': [335, -190], 'rag': [685, 0], 'agent-memory': [515, 105], 'lost-in-middle': [330, 180], 'curse-of-dimensionality': [0, 210] }
