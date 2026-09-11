@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'distributed-training': {
+        support: ['optimizer-schedule'], peer: ['deployment'], risk: [], output: ['pretraining', 'scaling-law'],
+        offsets: { 'optimizer-schedule': [-200, -25], 'deployment': [275, -205], 'pretraining': [610, 0], 'scaling-law': [370, 135] }
+      },
+      'synthetic-data': {
+        support: ['world-models', 'self-supervised-learning', 'training-data-governance'], peer: [], risk: [],
+        output: ['distillation', 'reasoning-models', 'post-training', 'scaling-law'],
+        offsets: { 'world-models': [-155, -145], 'self-supervised-learning': [-215, 0], 'training-data-governance': [-155, 145], 'distillation': [340, -160], 'reasoning-models': [505, -85], 'post-training': [700, 0], 'scaling-law': [430, 140] }
+      },
+      'quantization': {
+        support: [], peer: ['distillation', 'regularization'], risk: [], output: ['inference-optimization', 'deployment', 'peft-lora'],
+        offsets: { 'distillation': [220, -260], 'regularization': [415, -190], 'inference-optimization': [475, -65], 'deployment': [690, 10], 'peft-lora': [410, 145] }
+      },
       'fine-tuning': {
         support: ['llm', 'supervised-learning', 'optimizer-schedule', 'regularization'],
         peer: ['rag', 'prompt-engineering', 'in-context-learning', 'model-merging'], risk: ['overfitting'],
