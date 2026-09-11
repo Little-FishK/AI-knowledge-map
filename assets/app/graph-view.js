@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'mcp': {
+        support: ['mcp-architecture', 'agent-identity-access'], peer: [], risk: [], output: ['tool-calling'],
+        offsets: { 'mcp-architecture': [-185, -95], 'agent-identity-access': [-185, 95], 'tool-calling': [660, 0] }
+      },
+      'agent-frameworks': {
+        support: [], peer: [], risk: [], output: ['agent'],
+        offsets: { 'agent': [660, 0] }
+      },
+      'agent-memory': {
+        support: ['rag', 'chunking', 'retrieval'], peer: ['context-compaction'], risk: ['context-window'], output: ['agent'],
+        offsets: { 'rag': [-155, -150], 'chunking': [-215, 0], 'retrieval': [-155, 150], 'context-compaction': [245, -235], 'agent': [670, 0], 'context-window': [0, 210] }
+      },
       'tool-calling': {
         support: ['structured-output', 'guardrails', 'agent-identity-access'], peer: ['mcp', 'code-execution'], risk: ['prompt-injection'], output: ['mcp-architecture', 'agent-skills', 'agent-loop', 'agent', 'workflow-orchestration', 'react', 'multi-agent'],
         offsets: { 'structured-output': [-155, -150], 'guardrails': [-215, 0], 'agent-identity-access': [-155, 150], 'mcp': [235, -315], 'code-execution': [445, -245], 'mcp-architecture': [335, -145], 'agent-skills': [500, -95], 'agent-loop': [655, -45], 'agent': [820, 0], 'workflow-orchestration': [650, 55], 'react': [495, 110], 'multi-agent': [330, 165], 'prompt-injection': [0, 210] }
