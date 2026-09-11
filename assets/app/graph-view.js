@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'agent-skills': {
+        support: ['tool-calling', 'context-engineering'], peer: ['context-compaction'], risk: [], output: ['agent'],
+        offsets: { 'tool-calling': [-175, -95], 'context-engineering': [-175, 95], 'context-compaction': [250, -225], 'agent': [660, 0] }
+      },
+      'workflow-orchestration': {
+        support: ['tool-calling', 'model-routing'], peer: ['agent', 'multi-agent'], risk: [], output: [],
+        offsets: { 'tool-calling': [-175, -95], 'model-routing': [-175, 95], 'agent': [270, -235], 'multi-agent': [590, -80] }
+      },
+      'multi-agent': {
+        support: ['agent', 'tool-calling'], peer: ['workflow-orchestration', 'agent-loop'], risk: ['context-window'], output: [],
+        offsets: { 'agent': [-175, -95], 'tool-calling': [-175, 95], 'workflow-orchestration': [260, -235], 'agent-loop': [590, -80], 'context-window': [0, 210] }
+      },
       'mcp': {
         support: ['mcp-architecture', 'agent-identity-access'], peer: [], risk: [], output: ['tool-calling'],
         offsets: { 'mcp-architecture': [-185, -95], 'agent-identity-access': [-185, 95], 'tool-calling': [660, 0] }
