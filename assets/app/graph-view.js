@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'sampling-params': {
+        support: ['llm', 'information-theory', 'logprobs', 'constrained-decoding'], peer: [], risk: ['hallucination'], output: ['self-consistency'],
+        offsets: { 'llm': [-130, -175], 'information-theory': [-205, -60], 'logprobs': [-205, 60], 'constrained-decoding': [-130, 175], 'self-consistency': [480, -65], 'hallucination': [0, 210] }
+      },
+      'logprobs': {
+        support: ['sampling-params'], peer: [], risk: [], output: ['interpretability', 'uncertainty-calibration', 'human-in-the-loop', 'hallucination'],
+        offsets: { 'sampling-params': [-200, 0], 'interpretability': [300, -165], 'uncertainty-calibration': [470, -85], 'human-in-the-loop': [660, 0], 'hallucination': [390, 145] }
+      },
+      'prompt-engineering': {
+        support: ['llm', 'in-context-learning', 'system-prompt', 'prompt-caching'], peer: ['fine-tuning', 'rag'], risk: [], output: ['cot', 'structured-output', 'context-engineering', 'hallucination'],
+        offsets: { 'llm': [-130, -175], 'in-context-learning': [-205, -60], 'system-prompt': [-205, 60], 'prompt-caching': [-130, 175], 'fine-tuning': [225, -275], 'rag': [425, -190], 'cot': [445, -65], 'context-engineering': [710, 0], 'structured-output': [535, 105], 'hallucination': [340, 185] }
+      },
       'model-families': {
         support: ['state-space-models', 'reasoning-models'], peer: [], risk: [], output: ['deployment', 'model-selection'],
         offsets: { 'state-space-models': [-185, -100], 'reasoning-models': [-185, 100], 'deployment': [365, -120], 'model-selection': [610, 15] }
