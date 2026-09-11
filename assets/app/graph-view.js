@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'image-generation': {
+        support: ['diffusion', 'embedding', 'clip', 'flow-matching'], peer: ['image-editing', 'super-resolution', 'controllable-generation'], risk: ['content-detection'], output: ['multimodal'],
+        offsets: { 'diffusion': [-125, -185], 'embedding': [-205, -65], 'clip': [-205, 65], 'flow-matching': [-125, 185], 'image-editing': [235, -335], 'super-resolution': [430, -255], 'controllable-generation': [590, -165], 'multimodal': [720, 0], 'content-detection': [0, 210] }
+      },
+      'controllable-generation': {
+        support: ['fine-tuning'], peer: ['image-editing'], risk: [], output: ['voice-cloning', 'image-generation'],
+        offsets: { 'fine-tuning': [-195, 0], 'image-editing': [245, -245], 'voice-cloning': [420, -125], 'image-generation': [680, 0] }
+      },
+      'image-editing': {
+        support: [], peer: ['controllable-generation'], risk: [], output: ['image-generation'],
+        offsets: { 'controllable-generation': [245, -235], 'image-generation': [660, 0] }
+      },
       'vae': {
         support: ['neural-network'], peer: ['gan'], risk: [], output: ['diffusion', 'flow-matching'],
         offsets: { 'neural-network': [-195, 0], 'gan': [245, -245], 'diffusion': [420, -125], 'flow-matching': [680, 0] }
