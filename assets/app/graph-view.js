@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'test-time-compute': {
+        support: ['cot', 'self-consistency', 'tree-of-thoughts', 'reflection', 'code-execution'], peer: ['scaling-law'], risk: ['reward-hacking'], output: ['reasoning-models'],
+        offsets: { 'cot': [-115, -190], 'self-consistency': [-195, -100], 'tree-of-thoughts': [-220, 0], 'reflection': [-195, 100], 'code-execution': [-115, 190], 'scaling-law': [245, -245], 'reasoning-models': [675, 0], 'reward-hacking': [0, 210] }
+      },
+      'reflection': {
+        support: [], peer: ['self-consistency'], risk: ['hallucination'], output: ['agent-loop', 'react', 'test-time-compute'],
+        offsets: { 'self-consistency': [245, -235], 'agent-loop': [370, -105], 'test-time-compute': [680, 0], 'react': [390, 135], 'hallucination': [0, 210] }
+      },
+      'planning': {
+        support: [], peer: ['cot', 'agent-loop'], risk: [], output: ['agent'],
+        offsets: { 'cot': [235, -240], 'agent-loop': [445, -160], 'agent': [680, 0] }
+      },
       'cot': {
         support: [], peer: ['prompt-engineering', 'planning', 'self-consistency', 'tree-of-thoughts'], risk: ['context-window'], output: ['reasoning-models', 'test-time-compute', 'react', 'hallucination'],
         offsets: { 'prompt-engineering': [230, -320], 'planning': [420, -270], 'self-consistency': [575, -190], 'tree-of-thoughts': [690, -95], 'reasoning-models': [470, -70], 'test-time-compute': [780, 0], 'react': [490, 90], 'hallucination': [320, 165], 'context-window': [0, 210] }
