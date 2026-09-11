@@ -320,7 +320,7 @@
         { selector: 'edge.batch-relation.sl-output-edge[source = "curse-of-dimensionality"][type = "threatens"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
-        { selector: 'edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "rag"], edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "context-window"], edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"]', style: {
+        { selector: 'edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "rag"], edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "context-window"], edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"], edge.batch-relation.sl-output-edge[source = "privacy"][target = "deployment"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'hallucination': {
+        support: ['rag', 'prompt-engineering', 'cot', 'citations', 'logprobs', 'self-consistency', 'code-execution', 'react', 'interpretability', 'guardrails', 'uncertainty-calibration'], peer: ['privacy'], risk: ['sampling-params', 'reward-hacking', 'super-resolution', 'code-generation', 'reflection'], output: [],
+        offsets: { 'rag': [-100, -340], 'prompt-engineering': [-180, -300], 'cot': [-245, -245], 'citations': [-300, -180], 'logprobs': [-340, -95], 'self-consistency': [-355, 0], 'code-execution': [-340, 95], 'react': [-300, 180], 'interpretability': [-245, 245], 'guardrails': [-180, 300], 'uncertainty-calibration': [-100, 340], 'privacy': [315, -330], 'sampling-params': [0, 210], 'reward-hacking': [105, 205], 'super-resolution': [200, 180], 'code-generation': [290, 135], 'reflection': [365, 75] }
+      },
+      'uncertainty-calibration': {
+        support: ['logprobs', 'model-evaluation'], peer: [], risk: [], output: ['guardrails', 'hallucination', 'human-in-the-loop'],
+        offsets: { 'logprobs': [-185, -95], 'model-evaluation': [-185, 95], 'guardrails': [345, -155], 'hallucination': [455, -70], 'human-in-the-loop': [690, 0] }
+      },
+      'privacy': {
+        support: ['guardrails', 'agent-identity-access', 'training-data-governance'], peer: ['hallucination'], risk: ['overfitting', 'voice-cloning'], output: ['deployment'],
+        offsets: { 'guardrails': [-155, -150], 'agent-identity-access': [-215, 0], 'training-data-governance': [-155, 150], 'hallucination': [270, -245], 'deployment': [660, 0], 'overfitting': [0, 210], 'voice-cloning': [120, 195] }
+      },
       'observability': {
         support: [], peer: ['evaluation'], risk: [], output: ['prompt-caching', 'agent-loop', 'data-drift-monitoring'],
         offsets: { 'evaluation': [245, -225], 'prompt-caching': [365, -105], 'agent-loop': [665, 0], 'data-drift-monitoring': [385, 145] }
