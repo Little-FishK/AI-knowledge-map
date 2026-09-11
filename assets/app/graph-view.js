@@ -714,6 +714,19 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'moe': {
+        support: ['transformer'], peer: ['model-routing'], risk: [], output: ['scaling-law'],
+        offsets: { 'transformer': [-195, 0], 'model-routing': [300, -160], 'scaling-law': [560, 35] }
+      },
+      'model-merging': {
+        support: ['peft-lora', 'evaluation'], peer: ['fine-tuning'], risk: [], output: [],
+        offsets: { 'peft-lora': [-185, -90], 'evaluation': [-185, 90], 'fine-tuning': [400, -30] }
+      },
+      'scaling-law': {
+        support: ['self-supervised-learning', 'transformer', 'distributed-training', 'moe', 'synthetic-data', 'training-data-governance'],
+        peer: ['reasoning-models', 'test-time-compute'], risk: [], output: ['pretraining', 'llm'],
+        offsets: { 'self-supervised-learning': [-90, -210], 'transformer': [-180, -130], 'distributed-training': [-220, -40], 'moe': [-220, 55], 'synthetic-data': [-175, 145], 'training-data-governance': [-90, 220], 'reasoning-models': [255, -240], 'test-time-compute': [455, -155], 'pretraining': [665, 0], 'llm': [420, 140] }
+      },
       'distributed-training': {
         support: ['optimizer-schedule'], peer: ['deployment'], risk: [], output: ['pretraining', 'scaling-law'],
         offsets: { 'optimizer-schedule': [-200, -25], 'deployment': [275, -205], 'pretraining': [610, 0], 'scaling-law': [370, 135] }
