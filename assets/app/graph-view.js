@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'structured-output': {
+        support: ['prompt-engineering', 'prefilling', 'constrained-decoding'], peer: ['streaming'], risk: [], output: ['tool-calling', 'agent', 'citations'],
+        offsets: { 'prompt-engineering': [-155, -150], 'prefilling': [-215, 0], 'constrained-decoding': [-155, 150], 'streaming': [245, -235], 'tool-calling': [435, -85], 'agent': [665, 0], 'citations': [405, 145] }
+      },
+      'streaming': {
+        support: ['llm'], peer: ['structured-output'], risk: ['guardrails'], output: [],
+        offsets: { 'llm': [-195, -15], 'structured-output': [400, -100], 'guardrails': [0, 210] }
+      },
+      'prefilling': {
+        support: [], peer: ['system-prompt', 'constrained-decoding'], risk: ['jailbreak'], output: ['structured-output'],
+        offsets: { 'system-prompt': [205, -250], 'constrained-decoding': [405, -155], 'structured-output': [615, 0], 'jailbreak': [0, 210] }
+      },
       'system-prompt': {
         support: ['in-context-learning'], peer: ['prefilling'], risk: ['jailbreak'], output: ['prompt-engineering', 'context-engineering'],
         offsets: { 'in-context-learning': [-195, -20], 'prefilling': [255, -210], 'prompt-engineering': [390, -80], 'context-engineering': [625, 20], 'jailbreak': [0, 210] }
