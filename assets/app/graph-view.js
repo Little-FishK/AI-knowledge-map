@@ -320,7 +320,7 @@
         { selector: 'edge.batch-relation.sl-output-edge[source = "curse-of-dimensionality"][type = "threatens"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
-        { selector: 'edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"]', style: {
+        { selector: 'edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "rag"], edge.batch-relation.sl-output-edge[source = "lost-in-middle"][target = "context-window"], edge.batch-relation.sl-output-edge[source = "vanishing-gradient"], edge.batch-relation.sl-output-edge[source = "backprop"][target = "rnn"]', style: {
           'line-color': '#ee6677', 'target-arrow-color': '#ee6677'
         } },
         { selector: 'edge.multimodal-relation.sl-output-edge', style: {
@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'model-families': {
+        support: ['state-space-models', 'reasoning-models'], peer: [], risk: [], output: ['deployment', 'model-selection'],
+        offsets: { 'state-space-models': [-185, -100], 'reasoning-models': [-185, 100], 'deployment': [365, -120], 'model-selection': [610, 15] }
+      },
+      'lost-in-middle': {
+        support: ['attention', 'positional-encoding', 'retrieval', 'reranking', 'context-engineering'], peer: [], risk: [], output: ['context-window', 'rag', 'jailbreak'],
+        offsets: { 'attention': [-115, -195], 'positional-encoding': [-195, -100], 'retrieval': [-220, 0], 'reranking': [-195, 105], 'context-engineering': [-115, 200], 'context-window': [360, -145], 'rag': [615, 0], 'jailbreak': [385, 145] }
+      },
+      'in-context-learning': {
+        support: ['llm'], peer: ['fine-tuning'], risk: ['context-window'], output: ['prompt-engineering', 'system-prompt'],
+        offsets: { 'llm': [-195, -20], 'fine-tuning': [260, -205], 'prompt-engineering': [610, 0], 'system-prompt': [385, 130], 'context-window': [0, 210] }
+      },
       'moe': {
         support: ['transformer'], peer: ['model-routing'], risk: [], output: ['scaling-law'],
         offsets: { 'transformer': [-195, 0], 'model-routing': [300, -160], 'scaling-law': [560, 35] }
