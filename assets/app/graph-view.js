@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'retrieval': {
+        support: ['embedding', 'contrastive-learning', 'vector-db', 'chunking', 'reranking'], peer: [], risk: ['curse-of-dimensionality'], output: ['advanced-rag', 'rag', 'agent-memory', 'lost-in-middle'],
+        offsets: { 'embedding': [-115, -195], 'contrastive-learning': [-195, -100], 'vector-db': [-220, 0], 'chunking': [-195, 105], 'reranking': [-115, 200], 'advanced-rag': [335, -190], 'rag': [685, 0], 'agent-memory': [515, 105], 'lost-in-middle': [330, 180], 'curse-of-dimensionality': [0, 210] }
+      },
+      'vector-db': {
+        support: ['embedding'], peer: [], risk: [], output: ['retrieval', 'rag', 'reranking'],
+        offsets: { 'embedding': [-195, 0], 'retrieval': [350, -140], 'rag': [610, 0], 'reranking': [385, 140] }
+      },
+      'chunking': {
+        support: [], peer: [], risk: ['context-window'], output: ['retrieval', 'rag', 'agent-memory'],
+        offsets: { 'retrieval': [335, -155], 'rag': [620, 0], 'agent-memory': [400, 125], 'context-window': [0, 210] }
+      },
       'model-selection': {
         support: ['model-families', 'model-evaluation', 'evaluation', 'deployment', 'prompt-caching'], peer: ['reasoning-models'], risk: [], output: ['agent', 'model-routing'],
         offsets: { 'model-families': [-115, -195], 'model-evaluation': [-195, -100], 'evaluation': [-220, 0], 'deployment': [-195, 105], 'prompt-caching': [-115, 200], 'reasoning-models': [285, -200], 'model-routing': [640, 0], 'agent': [400, 140] }
