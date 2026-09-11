@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'prompt-caching': {
+        support: ['attention', 'inference-optimization', 'observability'], peer: [], risk: [], output: ['prompt-engineering', 'model-selection', 'agent', 'agent-loop'],
+        offsets: { 'attention': [-155, -150], 'inference-optimization': [-215, 0], 'observability': [-155, 150], 'prompt-engineering': [320, -170], 'model-selection': [490, -90], 'agent': [690, 0], 'agent-loop': [420, 145] }
+      },
+      'context-compaction': {
+        support: ['context-engineering'], peer: ['agent-skills'], risk: [], output: ['context-window', 'agent-loop', 'agent-memory'],
+        offsets: { 'context-engineering': [-195, 0], 'agent-skills': [245, -235], 'context-window': [405, -85], 'agent-loop': [650, 0], 'agent-memory': [400, 145] }
+      },
+      'inference-optimization': {
+        support: ['prompt-caching', 'quantization'], peer: [], risk: [], output: ['attention', 'context-window', 'deployment'],
+        offsets: { 'prompt-caching': [-185, -95], 'quantization': [-185, 95], 'attention': [350, -145], 'deployment': [615, 0], 'context-window': [385, 140] }
+      },
       'structured-output': {
         support: ['prompt-engineering', 'prefilling', 'constrained-decoding'], peer: ['streaming'], risk: [], output: ['tool-calling', 'agent', 'citations'],
         offsets: { 'prompt-engineering': [-155, -150], 'prefilling': [-215, 0], 'constrained-decoding': [-155, 150], 'streaming': [245, -235], 'tool-calling': [435, -85], 'agent': [665, 0], 'citations': [405, 145] }
