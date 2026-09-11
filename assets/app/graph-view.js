@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'cot': {
+        support: [], peer: ['prompt-engineering', 'planning', 'self-consistency', 'tree-of-thoughts'], risk: ['context-window'], output: ['reasoning-models', 'test-time-compute', 'react', 'hallucination'],
+        offsets: { 'prompt-engineering': [230, -320], 'planning': [420, -270], 'self-consistency': [575, -190], 'tree-of-thoughts': [690, -95], 'reasoning-models': [470, -70], 'test-time-compute': [780, 0], 'react': [490, 90], 'hallucination': [320, 165], 'context-window': [0, 210] }
+      },
+      'self-consistency': {
+        support: ['sampling-params'], peer: ['cot', 'reflection'], risk: [], output: ['hallucination', 'test-time-compute'],
+        offsets: { 'sampling-params': [-195, 0], 'cot': [235, -240], 'reflection': [435, -165], 'hallucination': [380, 135], 'test-time-compute': [665, 0] }
+      },
+      'tree-of-thoughts': {
+        support: ['evaluation'], peer: ['cot', 'reasoning-models'], risk: [], output: ['test-time-compute'],
+        offsets: { 'evaluation': [-195, 0], 'cot': [235, -240], 'reasoning-models': [440, -165], 'test-time-compute': [670, 0] }
+      },
       'prompt-injection': {
         support: ['red-teaming', 'guardrails', 'agent-identity-access'], peer: ['jailbreak', 'data-poisoning'], risk: [], output: ['mcp-architecture', 'llm', 'agent', 'computer-use', 'tool-calling'],
         offsets: { 'red-teaming': [-155, -150], 'guardrails': [-215, 0], 'agent-identity-access': [-155, 150], 'jailbreak': [235, -305], 'data-poisoning': [445, -235], 'mcp-architecture': [350, -115], 'llm': [540, -65], 'agent': [800, 0], 'computer-use': [550, 85], 'tool-calling': [350, 155] }
