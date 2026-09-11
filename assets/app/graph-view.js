@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'citations': {
+        support: ['structured-output'], peer: [], risk: [], output: ['rag', 'hallucination'],
+        offsets: { 'structured-output': [-195, 0], 'rag': [545, -20], 'hallucination': [340, 140] }
+      },
+      'evaluation': {
+        support: ['observability', 'data-drift-monitoring'], peer: ['loss-function', 'model-evaluation', 'red-teaming'], risk: ['overfitting', 'reward-hacking'], output: ['model-merging', 'model-selection', 'model-routing', 'rag', 'tree-of-thoughts'],
+        offsets: { 'observability': [-185, -95], 'data-drift-monitoring': [-185, 95], 'loss-function': [215, -325], 'model-evaluation': [410, -265], 'red-teaming': [590, -195], 'model-merging': [400, -80], 'model-selection': [795, 0], 'model-routing': [640, 95], 'rag': [490, 170], 'tree-of-thoughts': [330, 225], 'overfitting': [0, 210], 'reward-hacking': [120, 190] }
+      },
+      'model-evaluation': {
+        support: [], peer: ['evaluation', 'red-teaming'], risk: [], output: ['reasoning-models', 'model-selection', 'code-generation', 'uncertainty-calibration'],
+        offsets: { 'evaluation': [210, -270], 'red-teaming': [410, -195], 'reasoning-models': [455, -65], 'model-selection': [700, 0], 'code-generation': [525, 110], 'uncertainty-calibration': [320, 190] }
+      },
       'reranking': {
         support: ['attention', 'vector-db'], peer: [], risk: [], output: ['retrieval', 'rag', 'lost-in-middle'],
         offsets: { 'attention': [-185, -95], 'vector-db': [-185, 95], 'retrieval': [345, -140], 'rag': [610, 0], 'lost-in-middle': [385, 140] }
