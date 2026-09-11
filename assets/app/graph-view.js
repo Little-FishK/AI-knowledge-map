@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'model-selection': {
+        support: ['model-families', 'model-evaluation', 'evaluation', 'deployment', 'prompt-caching'], peer: ['reasoning-models'], risk: [], output: ['agent', 'model-routing'],
+        offsets: { 'model-families': [-115, -195], 'model-evaluation': [-195, -100], 'evaluation': [-220, 0], 'deployment': [-195, 105], 'prompt-caching': [-115, 200], 'reasoning-models': [285, -200], 'model-routing': [640, 0], 'agent': [400, 140] }
+      },
+      'model-routing': {
+        support: ['model-selection', 'evaluation', 'data-drift-monitoring'], peer: ['moe'], risk: [], output: ['deployment', 'workflow-orchestration'],
+        offsets: { 'model-selection': [-155, -150], 'evaluation': [-215, 0], 'data-drift-monitoring': [-155, 150], 'moe': [260, -205], 'deployment': [625, 0], 'workflow-orchestration': [385, 145] }
+      },
+      'rag': {
+        support: ['llm', 'embedding', 'vector-db', 'chunking', 'retrieval', 'reranking', 'citations', 'evaluation'], peer: ['fine-tuning', 'prompt-engineering'], risk: ['context-window', 'lost-in-middle', 'data-poisoning'], output: ['knowledge-graph', 'advanced-rag', 'agent', 'agent-memory', 'hallucination'],
+        offsets: { 'llm': [-65, -245], 'embedding': [-145, -195], 'vector-db': [-205, -125], 'chunking': [-235, -45], 'retrieval': [-235, 45], 'reranking': [-205, 130], 'citations': [-145, 205], 'evaluation': [-65, 255], 'fine-tuning': [235, -335], 'prompt-engineering': [460, -245], 'knowledge-graph': [350, -120], 'advanced-rag': [550, -70], 'agent': [840, 0], 'agent-memory': [640, 110], 'hallucination': [430, 190], 'context-window': [0, 210], 'lost-in-middle': [110, 195], 'data-poisoning': [215, 155] }
+      },
       'prompt-caching': {
         support: ['attention', 'inference-optimization', 'observability'], peer: [], risk: [], output: ['prompt-engineering', 'model-selection', 'agent', 'agent-loop'],
         offsets: { 'attention': [-155, -150], 'inference-optimization': [-215, 0], 'observability': [-155, 150], 'prompt-engineering': [320, -170], 'model-selection': [490, -90], 'agent': [690, 0], 'agent-loop': [420, 145] }
