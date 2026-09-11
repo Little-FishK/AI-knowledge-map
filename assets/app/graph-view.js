@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'system-prompt': {
+        support: ['in-context-learning'], peer: ['prefilling'], risk: ['jailbreak'], output: ['prompt-engineering', 'context-engineering'],
+        offsets: { 'in-context-learning': [-195, -20], 'prefilling': [255, -210], 'prompt-engineering': [390, -80], 'context-engineering': [625, 20], 'jailbreak': [0, 210] }
+      },
+      'context-engineering': {
+        support: ['prompt-engineering', 'system-prompt', 'context-compaction'], peer: [], risk: ['context-window'], output: ['agent-skills', 'agent-loop', 'code-generation', 'lost-in-middle'],
+        offsets: { 'prompt-engineering': [-150, -150], 'system-prompt': [-215, 0], 'context-compaction': [-150, 150], 'agent-skills': [305, -200], 'agent-loop': [500, -115], 'code-generation': [700, 0], 'lost-in-middle': [440, 130], 'context-window': [0, 210] }
+      },
+      'constrained-decoding': {
+        support: ['sampling-params'], peer: ['prefilling'], risk: [], output: ['structured-output'],
+        offsets: { 'sampling-params': [-195, 0], 'prefilling': [280, -155], 'structured-output': [555, 35] }
+      },
       'sampling-params': {
         support: ['llm', 'information-theory', 'logprobs', 'constrained-decoding'], peer: [], risk: ['hallucination'], output: ['self-consistency'],
         offsets: { 'llm': [-130, -175], 'information-theory': [-205, -60], 'logprobs': [-205, 60], 'constrained-decoding': [-130, 175], 'self-consistency': [480, -65], 'hallucination': [0, 210] }
