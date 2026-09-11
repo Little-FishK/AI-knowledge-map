@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'coding-tools': {
+        support: ['code-generation', 'agent-loop', 'code-execution'], peer: [], risk: [], output: [],
+        offsets: { 'code-generation': [-155, -150], 'agent-loop': [-215, 0], 'code-execution': [-155, 150] }
+      },
+      'agent-identity-access': {
+        support: ['human-in-the-loop'], peer: [], risk: [], output: ['agent', 'tool-calling', 'mcp', 'prompt-injection', 'privacy'],
+        offsets: { 'human-in-the-loop': [-195, 0], 'tool-calling': [315, -205], 'mcp': [505, -115], 'agent': [720, 0], 'privacy': [505, 115], 'prompt-injection': [315, 205] }
+      },
+      'diffusion': {
+        support: ['transformer', 'self-supervised-learning', 'vae', 'cnn'], peer: ['gan', 'flow-matching'], risk: [], output: ['image-generation', 'audio-generation', 'video-generation'],
+        offsets: { 'transformer': [-125, -185], 'self-supervised-learning': [-205, -65], 'vae': [-205, 65], 'cnn': [-125, 185], 'gan': [245, -305], 'flow-matching': [455, -220], 'image-generation': [430, -105], 'audio-generation': [720, 0], 'video-generation': [430, 125] }
+      },
       'human-in-the-loop': {
         support: ['logprobs', 'agent-identity-access', 'uncertainty-calibration'], peer: [], risk: [], output: ['guardrails', 'agent'],
         offsets: { 'logprobs': [-155, -150], 'agent-identity-access': [-215, 0], 'uncertainty-calibration': [-155, 150], 'guardrails': [390, -135], 'agent': [680, 0] }
