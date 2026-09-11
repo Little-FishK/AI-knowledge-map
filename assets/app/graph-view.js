@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'observability': {
+        support: [], peer: ['evaluation'], risk: [], output: ['prompt-caching', 'agent-loop', 'data-drift-monitoring'],
+        offsets: { 'evaluation': [245, -225], 'prompt-caching': [365, -105], 'agent-loop': [665, 0], 'data-drift-monitoring': [385, 145] }
+      },
+      'deployment': {
+        support: ['model-families', 'quantization', 'inference-optimization', 'peft-lora'], peer: ['distributed-training', 'model-selection'], risk: ['privacy'], output: ['model-routing', 'data-drift-monitoring'],
+        offsets: { 'model-families': [-150, -150], 'quantization': [-205, -55], 'inference-optimization': [-205, 55], 'peft-lora': [-150, 150], 'distributed-training': [245, -285], 'model-selection': [455, -205], 'model-routing': [680, 0], 'data-drift-monitoring': [385, 145], 'privacy': [0, 210] }
+      },
+      'data-drift-monitoring': {
+        support: ['observability', 'evaluation'], peer: [], risk: [], output: ['model-routing', 'deployment'],
+        offsets: { 'observability': [-185, -95], 'evaluation': [-185, 95], 'model-routing': [365, -135], 'deployment': [635, 0] }
+      },
       'citations': {
         support: ['structured-output'], peer: [], risk: [], output: ['rag', 'hallucination'],
         offsets: { 'structured-output': [-195, 0], 'rag': [545, -20], 'hallucination': [340, 140] }
