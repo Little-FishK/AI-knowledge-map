@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'super-resolution': {
+        support: [], peer: ['image-generation'], risk: ['hallucination'], output: [],
+        offsets: { 'image-generation': [245, -235], 'hallucination': [0, 210] }
+      },
+      'video-generation': {
+        support: ['diffusion', 'flow-matching'], peer: ['world-models'], risk: ['context-window'], output: [],
+        offsets: { 'diffusion': [-175, -95], 'flow-matching': [-175, 95], 'world-models': [245, -235], 'context-window': [0, 210] }
+      },
+      'speech': {
+        support: ['transformer'], peer: ['audio-generation'], risk: ['content-detection'], output: ['voice-cloning', 'multimodal'],
+        offsets: { 'transformer': [-195, 0], 'audio-generation': [245, -245], 'voice-cloning': [420, -125], 'multimodal': [680, 0], 'content-detection': [0, 210] }
+      },
       'image-generation': {
         support: ['diffusion', 'embedding', 'clip', 'flow-matching'], peer: ['image-editing', 'super-resolution', 'controllable-generation'], risk: ['content-detection'], output: ['multimodal'],
         offsets: { 'diffusion': [-125, -185], 'embedding': [-205, -65], 'clip': [-205, 65], 'flow-matching': [-125, 185], 'image-editing': [235, -335], 'super-resolution': [430, -255], 'controllable-generation': [590, -165], 'multimodal': [720, 0], 'content-detection': [0, 210] }
