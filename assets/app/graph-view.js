@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'human-in-the-loop': {
+        support: ['logprobs', 'agent-identity-access', 'uncertainty-calibration'], peer: [], risk: [], output: ['guardrails', 'agent'],
+        offsets: { 'logprobs': [-155, -150], 'agent-identity-access': [-215, 0], 'uncertainty-calibration': [-155, 150], 'guardrails': [390, -135], 'agent': [680, 0] }
+      },
+      'computer-use': {
+        support: ['multimodal'], peer: ['agent-loop'], risk: ['prompt-injection'], output: ['agent'],
+        offsets: { 'multimodal': [-195, 0], 'agent-loop': [245, -235], 'agent': [660, 0], 'prompt-injection': [0, 210] }
+      },
+      'code-generation': {
+        support: ['llm', 'context-engineering'], peer: ['code-execution'], risk: ['hallucination'], output: ['model-evaluation', 'coding-tools'],
+        offsets: { 'llm': [-175, -95], 'context-engineering': [-175, 95], 'code-execution': [250, -245], 'model-evaluation': [400, -135], 'coding-tools': [680, 0], 'hallucination': [0, 210] }
+      },
       'agent-skills': {
         support: ['tool-calling', 'context-engineering'], peer: ['context-compaction'], risk: [], output: ['agent'],
         offsets: { 'tool-calling': [-175, -95], 'context-engineering': [-175, 95], 'context-compaction': [250, -225], 'agent': [660, 0] }
