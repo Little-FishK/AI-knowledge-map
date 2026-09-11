@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'agent': {
+        support: ['tool-calling', 'llm', 'rag', 'human-in-the-loop', 'code-execution', 'advanced-rag', 'multimodal', 'guardrails', 'model-selection', 'structured-output', 'prompt-caching', 'agent-frameworks', 'agent-identity-access'], peer: ['workflow-orchestration', 'reinforcement-learning'], risk: ['prompt-injection'], output: ['computer-use', 'agent-skills', 'agent-loop', 'planning', 'agent-memory', 'multi-agent'],
+        offsets: { 'tool-calling': [-90, -390], 'llm': [-175, -355], 'rag': [-245, -300], 'human-in-the-loop': [-300, -235], 'code-execution': [-335, -160], 'advanced-rag': [-355, -80], 'multimodal': [-360, 0], 'guardrails': [-355, 80], 'model-selection': [-335, 160], 'structured-output': [-300, 235], 'prompt-caching': [-245, 300], 'agent-frameworks': [-175, 355], 'agent-identity-access': [-90, 390], 'workflow-orchestration': [245, -365], 'reinforcement-learning': [465, -295], 'computer-use': [355, -185], 'agent-skills': [555, -110], 'agent-loop': [850, 0], 'planning': [625, 90], 'agent-memory': [470, 165], 'multi-agent': [330, 230], 'prompt-injection': [0, 210] }
+      },
+      'agent-loop': {
+        support: ['tool-calling', 'context-compaction', 'coding-tools', 'observability', 'reflection', 'context-engineering', 'prompt-caching'], peer: ['planning', 'computer-use', 'react', 'multi-agent'], risk: ['context-window'], output: ['agent'],
+        offsets: { 'tool-calling': [-105, -235], 'context-compaction': [-175, -175], 'coding-tools': [-215, -95], 'observability': [-225, 0], 'reflection': [-215, 95], 'context-engineering': [-175, 175], 'prompt-caching': [-105, 235], 'planning': [235, -330], 'computer-use': [430, -265], 'react': [575, -175], 'multi-agent': [675, -80], 'agent': [820, 0], 'context-window': [0, 210] }
+      },
+      'react': {
+        support: ['reflection', 'cot', 'tool-calling'], peer: ['agent-loop'], risk: [], output: ['hallucination'],
+        offsets: { 'reflection': [-155, -150], 'cot': [-215, 0], 'tool-calling': [-155, 150], 'agent-loop': [245, -235], 'hallucination': [660, 0] }
+      },
       'test-time-compute': {
         support: ['cot', 'self-consistency', 'tree-of-thoughts', 'reflection', 'code-execution'], peer: ['scaling-law'], risk: ['reward-hacking'], output: ['reasoning-models'],
         offsets: { 'cot': [-115, -190], 'self-consistency': [-195, -100], 'tree-of-thoughts': [-220, 0], 'reflection': [-195, 100], 'code-execution': [-115, 190], 'scaling-law': [245, -245], 'reasoning-models': [675, 0], 'reward-hacking': [0, 210] }
