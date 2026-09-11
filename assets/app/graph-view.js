@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'tool-calling': {
+        support: ['structured-output', 'guardrails', 'agent-identity-access'], peer: ['mcp', 'code-execution'], risk: ['prompt-injection'], output: ['mcp-architecture', 'agent-skills', 'agent-loop', 'agent', 'workflow-orchestration', 'react', 'multi-agent'],
+        offsets: { 'structured-output': [-155, -150], 'guardrails': [-215, 0], 'agent-identity-access': [-155, 150], 'mcp': [235, -315], 'code-execution': [445, -245], 'mcp-architecture': [335, -145], 'agent-skills': [500, -95], 'agent-loop': [655, -45], 'agent': [820, 0], 'workflow-orchestration': [650, 55], 'react': [495, 110], 'multi-agent': [330, 165], 'prompt-injection': [0, 210] }
+      },
+      'code-execution': {
+        support: ['guardrails'], peer: ['code-generation', 'tool-calling'], risk: [], output: ['coding-tools', 'agent', 'test-time-compute', 'hallucination'],
+        offsets: { 'guardrails': [-195, 0], 'code-generation': [235, -260], 'tool-calling': [445, -190], 'coding-tools': [350, -80], 'agent': [690, 0], 'test-time-compute': [455, 90], 'hallucination': [310, 165] }
+      },
+      'mcp-architecture': {
+        support: [], peer: ['mcp'], risk: ['prompt-injection'], output: ['tool-calling'],
+        offsets: { 'mcp': [245, -235], 'tool-calling': [660, 0], 'prompt-injection': [0, 210] }
+      },
       'agent': {
         support: ['tool-calling', 'llm', 'rag', 'human-in-the-loop', 'code-execution', 'advanced-rag', 'multimodal', 'guardrails', 'model-selection', 'structured-output', 'prompt-caching', 'agent-frameworks', 'agent-identity-access'], peer: ['workflow-orchestration', 'reinforcement-learning'], risk: ['prompt-injection'], output: ['computer-use', 'agent-skills', 'agent-loop', 'planning', 'agent-memory', 'multi-agent'],
         offsets: { 'tool-calling': [-90, -390], 'llm': [-175, -355], 'rag': [-245, -300], 'human-in-the-loop': [-300, -235], 'code-execution': [-335, -160], 'advanced-rag': [-355, -80], 'multimodal': [-360, 0], 'guardrails': [-355, 80], 'model-selection': [-335, 160], 'structured-output': [-300, 235], 'prompt-caching': [-245, 300], 'agent-frameworks': [-175, 355], 'agent-identity-access': [-90, 390], 'workflow-orchestration': [245, -365], 'reinforcement-learning': [465, -295], 'computer-use': [355, -185], 'agent-skills': [555, -110], 'agent-loop': [850, 0], 'planning': [625, 90], 'agent-memory': [470, 165], 'multi-agent': [330, 230], 'prompt-injection': [0, 210] }
