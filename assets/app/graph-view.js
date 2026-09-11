@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'vae': {
+        support: ['neural-network'], peer: ['gan'], risk: [], output: ['diffusion', 'flow-matching'],
+        offsets: { 'neural-network': [-195, 0], 'gan': [245, -245], 'diffusion': [420, -125], 'flow-matching': [680, 0] }
+      },
+      'gan': {
+        support: ['neural-network'], peer: ['content-detection', 'vae', 'diffusion'], risk: [], output: [],
+        offsets: { 'neural-network': [-195, 0], 'content-detection': [220, -310], 'vae': [420, -230], 'diffusion': [630, -90] }
+      },
+      'flow-matching': {
+        support: ['vae'], peer: ['diffusion'], risk: [], output: ['image-generation', 'video-generation'],
+        offsets: { 'vae': [-195, 0], 'diffusion': [245, -245], 'image-generation': [420, -125], 'video-generation': [680, 0] }
+      },
       'coding-tools': {
         support: ['code-generation', 'agent-loop', 'code-execution'], peer: [], risk: [], output: [],
         offsets: { 'code-generation': [-155, -150], 'agent-loop': [-215, 0], 'code-execution': [-155, 150] }
