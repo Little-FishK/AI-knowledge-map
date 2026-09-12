@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'voice-cloning': {
+        support: ['fine-tuning', 'content-detection'], peer: [], risk: ['privacy'], output: ['speech', 'controllable-generation'],
+        offsets: { 'fine-tuning': [-175, -95], 'content-detection': [-175, 95], 'speech': [420, -125], 'controllable-generation': [680, 0], 'privacy': [0, 210] }
+      },
+      'audio-generation': {
+        support: ['diffusion'], peer: ['speech'], risk: [], output: [],
+        offsets: { 'diffusion': [-195, 0], 'speech': [245, -235] }
+      },
+      'world-models': {
+        support: ['reinforcement-learning'], peer: ['video-generation'], risk: [], output: ['synthetic-data'],
+        offsets: { 'reinforcement-learning': [-195, 0], 'video-generation': [245, -235], 'synthetic-data': [660, 0] }
+      },
       'super-resolution': {
         support: [], peer: ['image-generation'], risk: ['hallucination'], output: [],
         offsets: { 'image-generation': [245, -235], 'hallucination': [0, 210] }
