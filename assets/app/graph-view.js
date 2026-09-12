@@ -510,36 +510,42 @@
 
     const zoomUi = {
       root: document.getElementById("map-zoom"),
-      out: document.getElementById("map-zoom-out"),
+      slider: document.getElementById("map-zoom-slider"),
       level: document.getElementById("map-zoom-level"),
-      in: document.getElementById("map-zoom-in")
     };
-    const ZOOM_FACTOR = 1.2;
+    [zoomUi.slider, zoomUi.level].forEach(input => {
+      input.min = String(Math.ceil(cy.minZoom() * 100));
+      input.max = String(Math.floor(cy.maxZoom() * 100));
+    });
 
     function updateZoomUi() {
       const zoom = cy.zoom();
-      zoomUi.level.value = `${Math.round(zoom * 100)}%`;
-      zoomUi.level.textContent = zoomUi.level.value;
-      zoomUi.out.disabled = zoom <= cy.minZoom() + 0.001;
-      zoomUi.in.disabled = zoom >= cy.maxZoom() - 0.001;
+      zoomUi.level.value = String(Math.round(zoom * 100));
+      zoomUi.slider.value = zoomUi.level.value;
     }
 
-    function changeMapZoom(direction) {
+    function setMapZoom(percent) {
       const current = cy.zoom();
       const target = Math.max(
         cy.minZoom(),
-        Math.min(cy.maxZoom(), current * (direction > 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR))
+        Math.min(cy.maxZoom(), Math.round(percent) / 100)
       );
-      if (Math.abs(target - current) < 0.001) return;
+      if (!Number.isFinite(target)) { updateZoomUi(); return; }
       cy.stop(true, false);
       cy.zoom({
         level: target,
         renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
       });
+      updateZoomUi();
     }
 
-    zoomUi.out.addEventListener("click", () => changeMapZoom(-1));
-    zoomUi.in.addEventListener("click", () => changeMapZoom(1));
+    zoomUi.slider.addEventListener("input", () => setMapZoom(zoomUi.slider.valueAsNumber));
+    zoomUi.level.addEventListener("change", () => setMapZoom(zoomUi.level.valueAsNumber));
+    zoomUi.level.addEventListener("blur", updateZoomUi);
+    zoomUi.level.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); setMapZoom(zoomUi.level.valueAsNumber); }
+      if (e.key === "Escape") { e.preventDefault(); updateZoomUi(); }
+    });
     cy.on("zoom", updateZoomUi);
     updateZoomUi();
 
@@ -553,7 +559,7 @@
       if (isEditing || !isActive() || deepDiveOpen || e.ctrlKey || e.metaKey || e.altKey) return;
       if (!zoomOut && !zoomIn) return;
       e.preventDefault();
-      changeMapZoom(zoomIn ? 1 : -1);
+      setMapZoom(Math.round(cy.zoom() * 100) + (zoomIn ? 1 : -1));
     });
 
     /* ───────────────────────── 过滤 ───────────────────────── */
