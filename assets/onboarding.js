@@ -4,6 +4,7 @@
   const model = global.AI_ONBOARDING_MODEL;
   const app = document.getElementById('app');
   const count = lessons.length;
+  const nodeArtwork = ['foundations', 'building', 'coding', 'generation', 'safety', 'frontier'];
   let storage = null, storageFailed = false, returnFocus = null, previousTitle = document.title;
   let state = model.normalize(null, count);
   let view = 'map';
@@ -53,19 +54,18 @@
     const last = state.cursor === count - 1;
     const isMap = view === 'map';
     document.title = `${isMap ? '新手地图' : lesson.title}｜新手导览 · AI 知识地图`;
-    root.setAttribute('aria-labelledby', isMap ? 'onboarding-title' : 'onboarding-lesson-title');
-    root.innerHTML = `<div class="onboarding-shell">
-      <header class="onboarding-top"><div class="onboarding-brand"><span aria-hidden="true">◈</span>AI 知识地图</div>
-        <button class="onboarding-skip" type="button" data-skip>${model.unlocked(state, count) ? (english() ? '返回地图 / Back to map' : '返回地图') : (english() ? '我已熟悉AI基础用法 / Skip introduction' : '我已熟悉AI基础用法')}</button></header>
-      ${isMap ? `<div class="onboarding-intro"><div class="dd-eyebrow">你的第一张地图</div><h1 id="onboarding-title" tabindex="-1">快速认识AI世界</h1>
-        <p>从一件身边的小事出发，走过6站，再进入完整知识地图。</p><p>每站约3–4分钟 · 无需编程或注册 · 点“读过”继续，也可以随时回来。</p>
-        ${english() ? '<p class="onboarding-fallback" lang="en">This beginner guide is currently in Chinese. You can skip it and explore the map in English.</p>' : ''}</div>` : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
-      <p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>
+    root.removeAttribute(isMap ? 'aria-labelledby' : 'aria-label');
+    root.setAttribute(isMap ? 'aria-label' : 'aria-labelledby', isMap ? '六站新手地图' : 'onboarding-lesson-title');
+    root.innerHTML = `<div class="onboarding-shell${isMap ? ' is-map' : ''}">
+      <header class="onboarding-top">${isMap ? '' : '<div class="onboarding-brand"><span aria-hidden="true">◈</span>AI 知识地图</div>'}
+        <button class="onboarding-skip" type="button" data-skip>${english() ? '返回地图 / Back to map' : '返回地图'}</button></header>
+      ${isMap ? '' : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
+      ${isMap ? '' : `<p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>`}
       ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
         const locked = index > state.read;
         const read = index < state.read;
-        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true">${read ? '✓' : index + 1}</span><span class="onboarding-node-name">${escape(item.short)}</span><span class="onboarding-node-status">${read ? '已读过 · 再看看' : locked ? '读过上一站后解锁' : '点击开始阅读'}</span></button></li>`;
-      }).join('')}</ol><p class="onboarding-map-hint">点击亮起的节点开始。每读过一站，就解锁下一站；走完六站，开启完整知识地图。</p>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
+        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><img class="onboarding-dot" src="assets/node-art/${nodeArtwork[index]}.png?v=2" alt="" aria-hidden="true" width="96" height="96"><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
+      }).join('')}</ol>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
       ${lesson.sections.map(([title, html], index) => `<section class="dd-sec"><h2><span class="dd-n" aria-hidden="true">${index + 1}</span>${escape(title)}</h2>${html}${index === 1 ? figure(lesson) : ''}</section>`).join('')}
@@ -74,9 +74,9 @@
       <footer class="dd-src">参考与继续阅读 · 本页为本站原创入门讲解<ul>${lesson.sources.map(([label, url]) => `<li><a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a></li>`).join('')}</ul></footer>
       <div class="onboarding-footer"><button class="onboarding-prev" type="button" data-prev ${state.cursor === 0 ? 'disabled' : ''}>← 上一站</button>
         <button class="onboarding-next" type="button" data-next>${last ? '读过，进入完整地图' : state.cursor < state.read ? '下一站 →' : '读过，下一站 →'}</button></div>
-      </article>`}<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p></div>`;
+      </article>`}${isMap ? '' : '<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p>'}</div>`;
     if (focus) {
-      root.querySelector(isMap ? '#onboarding-title' : '#onboarding-lesson-title').focus({preventScroll: true});
+      root.querySelector(isMap ? '[data-skip]' : '#onboarding-lesson-title').focus({preventScroll: true});
       root.scrollTop = 0;
     }
   }
@@ -90,7 +90,7 @@
     persist();
     render();
     root.scrollTop = 0;
-    root.querySelector('#onboarding-title').focus({preventScroll: true});
+    root.querySelector('[data-skip]').focus({preventScroll: true});
     document.documentElement.classList.remove('onboarding-pending');
   }
   function close() {
