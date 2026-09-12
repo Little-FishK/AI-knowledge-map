@@ -20,4 +20,5 @@ deviceScaleFactor 2 and reduced motion on/off; ring canvas resolution assertion;
 cached drag redraw performs zero canvas rotations; pause/resume, hover, edge
 fade/restore and interrupted gestures pass. Built artifact verification passes.
 
-Status: local preview only, pending publication authorization.
+Published with explicit user authorization as `1478002` on `gh-pages`.
+The live release manifest and renderer hash match the verified build.
