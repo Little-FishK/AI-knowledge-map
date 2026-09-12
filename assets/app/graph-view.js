@@ -331,6 +331,8 @@
           'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
           'target-arrow-color': '#8fb87f'
         } },
+        { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '160ms'} },
+        { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -350,6 +352,40 @@
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
     let ringDisposed = false, ringActive = false;
     let ringDirty = true;
+    let viewportDragging = false, edgeFadeTimer = null;
+    const heldPointers = new Set();
+    function beginViewportDrag() {
+      if (viewportDragging || !heldPointers.size) return;
+      viewportDragging = true;
+      hoveredRing = null;
+      ringStates.forEach(motion => { motion.emphasis = 0; });
+      ringLastTime = performance.now(); ringDirty = true;
+      cy.edges().addClass('viewport-drag-fade');
+      clearTimeout(edgeFadeTimer);
+      edgeFadeTimer = setTimeout(() => {
+        if (viewportDragging) cy.edges().addClass('viewport-drag-hidden');
+      }, 180);
+    }
+    function finishViewportDrag() {
+      heldPointers.clear();
+      if (!viewportDragging) return;
+      viewportDragging = false;
+      clearTimeout(edgeFadeTimer);
+      cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
+      ringLastTime = performance.now(); ringDirty = true;
+    }
+    const holdPointer = event => { heldPointers.add(event.pointerId); };
+    const releasePointer = event => {
+      heldPointers.delete(event.pointerId);
+      if (!heldPointers.size) finishViewportDrag();
+    };
+    const visibilityChanged = () => { if (document.hidden) finishViewportDrag(); };
+    cy.container().addEventListener('pointerdown', holdPointer, true);
+    global.addEventListener('pointerup', releasePointer, true);
+    global.addEventListener('pointercancel', releasePointer, true);
+    global.addEventListener('blur', finishViewportDrag);
+    document.addEventListener('visibilitychange', visibilityChanged);
+    cy.on('pan', beginViewportDrag);
 
     function renderRings(time = performance.now()) {
       if (!ringReady || ringDisposed) return;
@@ -379,7 +415,7 @@
         if (!motion) { motion = { angle: 0, emphasis: 0 }; ringStates.set(node.id(), motion); }
         const hovered = hoveredRing === node.id();
         motion.emphasis += ((hovered ? 1 : 0) - motion.emphasis) * Math.min(1, dt * 12);
-        if (!motionPreference.matches) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
+        if (!viewportDragging && !motionPreference.matches) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
         const scale = 1 + 0.18 * motion.emphasis;
         ringContext.save();
         ringContext.globalAlpha = Number(node.style('opacity'));
@@ -422,7 +458,7 @@
       if (ringDisposed) return;
       // Viewport renders only invalidate this layer. All painting happens here,
       // so bursts of map renders cannot paint the rings repeatedly in one frame.
-      if (ringDirty || time - ringLastTime >= 1000 / 30) {
+      if (ringDirty || (!viewportDragging && time - ringLastTime >= 1000 / 30)) {
         ringDirty = false;
         renderRings(time);
       }
@@ -446,6 +482,13 @@
     cy.container().addEventListener('pointerdown', () => { hoveredRing = null; });
     cy.on('render', () => { ringDirty = true; });
     cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
+    cy.on('destroy', () => {
+      clearTimeout(edgeFadeTimer);
+      global.removeEventListener('pointerup', releasePointer, true);
+      global.removeEventListener('pointercancel', releasePointer, true);
+      global.removeEventListener('blur', finishViewportDrag);
+      document.removeEventListener('visibilitychange', visibilityChanged);
+    });
     Promise.all(Object.keys(NODE_ART).map(domain => new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {

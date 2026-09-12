@@ -41,6 +41,25 @@ const {chromium} = require(require.resolve('playwright', {paths:[path.join(os.ho
       assert.equal(hovered.face,b.face);assert(await page.locator('#detail').evaluate(el=>el.classList.contains('closed')),'hover never opens detail');
       fs.mkdirSync('.tmp/ring-motion-qa',{recursive:true});await page.screenshot({path:`.tmp/ring-motion-qa/${official?'official-':''}hover-${reduced}.png`});
       await page.mouse.move(10,10);await page.waitForTimeout(800);assert((await pixels()).white<5,'white emphasis clears');
+      const dragStart=await page.evaluate(()=>{const r=__cy.container().getBoundingClientRect();return{x:r.left+r.width/2,y:r.bottom-45};});
+      const initialPan=await page.evaluate(()=>({...__cy.pan()}));
+      await page.mouse.move(dragStart.x,dragStart.y);await page.mouse.down();
+      await page.mouse.move(dragStart.x+65,dragStart.y-25,{steps:8});
+      await page.waitForFunction(()=>__cy.edges('.viewport-drag-hidden').length>0);
+      assert.notDeepEqual(await page.evaluate(()=>({...__cy.pan()})),initialPan,'actual background drag pans map');
+      const heldA=await pixels();await page.waitForTimeout(300);const heldB=await pixels();
+      assert.deepEqual(heldA.ringPixels,heldB.ringPixels,'decorative ring freezes while dragging');
+      await page.mouse.up();
+      await page.waitForTimeout(550);
+      assert.equal(await page.evaluate(()=>__cy.edges('.viewport-drag-fade, .viewport-drag-hidden').length),0,'edges restored on release');
+      const resumedA=await pixels();await page.waitForTimeout(300);const resumedB=await pixels();
+      if(!reduced)assert.notDeepEqual(resumedA.ringPixels,resumedB.ringPixels,'rotation resumes after drag');
+      // A cancelled gesture must not strand hidden edges.
+      await page.mouse.move(dragStart.x,dragStart.y);await page.mouse.down();await page.mouse.move(dragStart.x+35,dragStart.y-15,{steps:4});
+      await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.mouse.up();
+      assert.equal(await page.evaluate(()=>__cy.edges('.viewport-drag-fade, .viewport-drag-hidden').length),0);
+      const currentCenter=await page.evaluate(()=>{const p=__cy.getElementById('llm').renderedPosition(),r=__cy.container().getBoundingClientRect();return{x:p.x+r.left,y:p.y+r.top};});
+      center.x=currentCenter.x;center.y=currentCenter.y;
       await page.mouse.click(center.x,center.y);await page.waitForTimeout(500);assert(!await page.locator('#detail').evaluate(el=>el.classList.contains('closed')),'click still works');
       if(official){
         await page.locator('#official-path-toggle').click();
