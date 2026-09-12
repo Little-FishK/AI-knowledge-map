@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'adversarial-robustness': {
+        support: ['curse-of-dimensionality'], peer: ['jailbreak'], risk: [], output: ['neural-network'],
+        offsets: { 'curse-of-dimensionality': [-195, 0], 'jailbreak': [245, -235], 'neural-network': [660, 0] }
+      },
+      'bias-fairness': {
+        support: ['pretraining', 'rlhf', 'training-data-governance'], peer: [], risk: [], output: ['alignment'],
+        offsets: { 'pretraining': [-155, -150], 'rlhf': [-215, 0], 'training-data-governance': [-155, 150], 'alignment': [660, 0] }
+      },
+      'reward-hacking': {
+        support: ['loss-function', 'constitutional-ai', 'test-time-compute'], peer: [], risk: [], output: ['alignment', 'reinforcement-learning', 'evaluation', 'rlhf', 'hallucination'],
+        offsets: { 'loss-function': [-155, -150], 'constitutional-ai': [-215, 0], 'test-time-compute': [-155, 150], 'alignment': [315, -205], 'reinforcement-learning': [505, -115], 'evaluation': [720, 0], 'rlhf': [505, 115], 'hallucination': [315, 205] }
+      },
       'jailbreak': {
         support: ['alignment', 'red-teaming', 'guardrails', 'lost-in-middle', 'prefilling'], peer: ['prompt-injection', 'adversarial-robustness'], risk: [], output: ['system-prompt', 'llm'],
         offsets: { 'alignment': [-115, -190], 'red-teaming': [-195, -100], 'guardrails': [-220, 0], 'lost-in-middle': [-195, 100], 'prefilling': [-115, 190], 'prompt-injection': [235, -315], 'adversarial-robustness': [440, -230], 'system-prompt': [430, -100], 'llm': [700, 0] }
