@@ -20,4 +20,5 @@ coordinates; preserve relationship selection when toggling introduction; desktop
 mobile and onboarding regression; ordinary/official ring and reduced-motion tests.
 Artifact verification passes. No device-specific FPS improvement is claimed.
 
-Status: local preview only. Explicit authorization is required before publication.
+Published with explicit user authorization as `00b0d91` on `gh-pages`.
+The live manifest, renderer and stylesheet hashes match the verified build.
