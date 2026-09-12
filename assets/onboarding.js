@@ -83,7 +83,6 @@
   function render(focus = false) {
     stopNodeMotion();
     const lesson = lessons[state.cursor];
-    const last = state.cursor === count - 1;
     const isMap = view === 'map';
     document.title = `${isMap ? '新手地图' : lesson.title}｜新手导览 · AI 知识地图`;
     root.removeAttribute(isMap ? 'aria-labelledby' : 'aria-label');
@@ -106,7 +105,7 @@
       <aside class="dd-thesis">${escape(lesson.takeaway)}</aside>
       <footer class="dd-src">参考与继续阅读 · 本页为本站原创入门讲解<ul>${lesson.sources.map(([label, url]) => `<li><a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a></li>`).join('')}</ul></footer>
       <div class="onboarding-footer"><button class="onboarding-prev" type="button" data-prev ${state.cursor === 0 ? 'disabled' : ''}>← 上一站</button>
-        <button class="onboarding-next" type="button" data-next>${last ? '读过，进入完整地图' : state.cursor < state.read ? '下一站 →' : '读过，下一站 →'}</button></div>
+        <button class="onboarding-next" type="button" data-read>已读</button></div>
       </article>`}${isMap ? '' : '<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p>'}</div>`;
     if (isMap) startNodeMotion();
     if (focus) {
@@ -151,10 +150,9 @@
       if (!Number.isInteger(index) || index < 0 || index >= count || index > state.read) return;
       state = model.visit(state, index, count); persist();
       view = 'reader'; render(true);
-    } else if (button.hasAttribute('data-next')) {
-      const last = state.cursor === count - 1;
+    } else if (button.hasAttribute('data-read')) {
       state = model.advance(state, count); persist();
-      if (last) close(); else render(true);
+      view = 'map'; render(true);
     } else if (button.hasAttribute('data-prev')) {
       state = model.visit(state, state.cursor - 1, count); persist(); render(true);
     }
