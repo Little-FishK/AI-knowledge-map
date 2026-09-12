@@ -1509,6 +1509,7 @@
       }
 
       detailBody.innerHTML = h;
+      detail.classList.remove("collapsed");
       detail.classList.remove("closed");
       detailBody.scrollTop = 0;
       // 内联链接由 detailBody 的委托监听统一处理

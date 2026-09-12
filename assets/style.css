@@ -513,6 +513,15 @@ html, body {
 }
 #detail-close:hover { color: var(--fg); }
 #detail-body { padding: 20px 22px 40px; }
+#detail.graph-detail #detail-close { display: none; }
+#detail.graph-detail.collapsed { width: 0; flex-basis: 0; border: 0; overflow: hidden; }
+#detail.graph-detail.collapsed #detail-body { visibility: hidden; }
+.detail-toggle { position: absolute; top: 88px; z-index: 35; width: 26px; height: 54px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-right: 0; border-radius: 8px 0 0 8px; background: var(--bg-panel); color: var(--fg-faint); cursor: pointer; }
+.detail-toggle.hidden { display: none; }
+.detail-toggle:hover { color: var(--fg); border-color: var(--accent); }
+.detail-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.detail-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.detail-toggle[aria-expanded="false"] svg { transform: rotate(180deg); }
 
 .d-domain { font-size: 11px; letter-spacing: .1em; margin-bottom: 8px; }
 .mat-tag {

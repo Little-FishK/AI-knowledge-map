@@ -310,8 +310,31 @@
     t,
   });
 
+  const detailToggle = document.getElementById("detail-toggle");
+  function syncDetailToggle() {
+    const expanded = !detail.classList.contains("collapsed");
+    const visible = mode === "graph" && !detail.classList.contains("closed");
+    detailToggle.classList.toggle("hidden", !visible);
+    detailToggle.setAttribute("aria-expanded", String(expanded));
+    const label = language.getLocale() === "en"
+      ? (expanded ? "Collapse introduction" : "Expand introduction")
+      : (expanded ? "收起基础介绍" : "展开基础介绍");
+    detailToggle.title = label;
+    detailToggle.setAttribute("aria-label", label);
+    detailToggle.style.right = (visible ? detail.getBoundingClientRect().width : 0) + "px";
+    detail.inert = visible && !expanded;
+  }
+  function toggleIntroduction() {
+    detail.classList.toggle("collapsed");
+    syncDetailToggle();
+    cy.resize();
+  }
+  detailToggle.addEventListener("click", toggleIntroduction);
+  new MutationObserver(syncDetailToggle).observe(detail, {attributes:true, attributeFilter:['class']});
+  new ResizeObserver(syncDetailToggle).observe(detail);
+  language.subscribe(syncDetailToggle);
   document.getElementById("detail-close").addEventListener("click", () => {
-    if (mode === "graph") clearGraphSelection();
+    if (mode === "graph") toggleIntroduction();
     else goToRoute({ name: mode === "software" ? "software" : "library" });
   });
 
@@ -341,6 +364,8 @@
     const isSW = m === "software";
     const isLibrary = m === "library";
     const isGraph = m === "graph";
+    detail.classList.toggle("graph-detail", isGraph);
+    detail.classList.remove("collapsed");
     document.getElementById("cy").classList.toggle("hidden", !isGraph);
     document.getElementById("legend").classList.toggle("hidden", !isGraph);
     graphView.zoomRoot.classList.toggle("hidden", !isGraph);
