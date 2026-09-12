@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'jailbreak': {
+        support: ['alignment', 'red-teaming', 'guardrails', 'lost-in-middle', 'prefilling'], peer: ['prompt-injection', 'adversarial-robustness'], risk: [], output: ['system-prompt', 'llm'],
+        offsets: { 'alignment': [-115, -190], 'red-teaming': [-195, -100], 'guardrails': [-220, 0], 'lost-in-middle': [-195, 100], 'prefilling': [-115, 190], 'prompt-injection': [235, -315], 'adversarial-robustness': [440, -230], 'system-prompt': [430, -100], 'llm': [700, 0] }
+      },
+      'red-teaming': {
+        support: ['model-evaluation'], peer: ['evaluation'], risk: [], output: ['data-poisoning', 'jailbreak', 'prompt-injection', 'guardrails'],
+        offsets: { 'model-evaluation': [-195, 0], 'evaluation': [245, -285], 'data-poisoning': [350, -165], 'jailbreak': [520, -80], 'guardrails': [700, 0], 'prompt-injection': [390, 145] }
+      },
+      'data-poisoning': {
+        support: ['red-teaming', 'training-data-governance'], peer: ['prompt-injection'], risk: [], output: ['pretraining', 'rag'],
+        offsets: { 'red-teaming': [-175, -95], 'training-data-governance': [-175, 95], 'prompt-injection': [245, -265], 'pretraining': [420, -125], 'rag': [680, 0] }
+      },
       'content-detection': {
         support: [], peer: ['gan'], risk: ['image-generation', 'speech'], output: ['voice-cloning', 'governance'],
         offsets: { 'gan': [245, -285], 'voice-cloning': [410, -120], 'governance': [690, 0], 'image-generation': [0, 210], 'speech': [135, 185] }
