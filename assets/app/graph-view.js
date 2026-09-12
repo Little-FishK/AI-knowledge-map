@@ -726,6 +726,10 @@
         support: [], peer: [], risk: [], output: ['pretraining', 'synthetic-data', 'data-poisoning', 'privacy', 'bias-fairness', 'scaling-law'],
         offsets: { 'pretraining': [300, -230], 'synthetic-data': [480, -150], 'data-poisoning': [620, -75], 'privacy': [760, 0], 'bias-fairness': [500, 110], 'scaling-law': [320, 190] }
       },
+      'governance': {
+        support: ['content-detection'], peer: [], risk: [], output: ['constitutional-ai', 'alignment', 'interpretability', 'guardrails'],
+        offsets: { 'content-detection': [-195, 0], 'constitutional-ai': [290, -220], 'alignment': [475, -115], 'interpretability': [700, 0], 'guardrails': [390, 145] }
+      },
       'adversarial-robustness': {
         support: ['curse-of-dimensionality'], peer: ['jailbreak'], risk: [], output: ['neural-network'],
         offsets: { 'curse-of-dimensionality': [-195, 0], 'jailbreak': [245, -235], 'neural-network': [660, 0] }
