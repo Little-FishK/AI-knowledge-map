@@ -349,6 +349,7 @@
     const ringStates = new Map();
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
     let ringDisposed = false, ringActive = false;
+    let ringDirty = true;
 
     function renderRings(time = performance.now()) {
       if (!ringReady || ringDisposed) return;
@@ -419,7 +420,12 @@
 
     function ringTick(time) {
       if (ringDisposed) return;
-      if (time - ringLastTime >= 1000 / 30) renderRings(time);
+      // Viewport renders only invalidate this layer. All painting happens here,
+      // so bursts of map renders cannot paint the rings repeatedly in one frame.
+      if (ringDirty || time - ringLastTime >= 1000 / 30) {
+        ringDirty = false;
+        renderRings(time);
+      }
       ringFrame = requestAnimationFrame(ringTick);
     }
     function hoverRing(event) {
@@ -438,7 +444,7 @@
     cy.container().addEventListener('pointermove', hoverRing);
     cy.container().addEventListener('pointerleave', () => { hoveredRing = null; });
     cy.container().addEventListener('pointerdown', () => { hoveredRing = null; });
-    cy.on('render', () => renderRings());
+    cy.on('render', () => { ringDirty = true; });
     cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
     Promise.all(Object.keys(NODE_ART).map(domain => new Promise((resolve, reject) => {
       const img = new Image();
@@ -456,7 +462,7 @@
       img.src = new URL(`assets/node-art/${domain}.png?v=2`, document.baseURI).href;
     }))).then(() => {
       if (ringDisposed) return;
-      ringReady = true; renderRings(); ringFrame = requestAnimationFrame(ringTick);
+      ringReady = true; ringDirty = true; ringFrame = requestAnimationFrame(ringTick);
     }).catch(() => { ringCanvas.remove(); });
 
     function enforceLayoutQuality() {
