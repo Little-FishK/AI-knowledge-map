@@ -20,4 +20,5 @@ curtain screenshot inspection; ordinary/official rings with reduced motion on/of
 background press starts fading without changing pan, edges remain in the fade
 phase at 200 ms, actual drag and release recover correctly. Artifact verified.
 
-Status: local preview; not yet published.
+Published with explicit user authorization as `69e86b4` on `gh-pages`.
+Live manifest, renderer and stylesheet hashes match the verified build.
