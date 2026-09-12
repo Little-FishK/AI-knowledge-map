@@ -510,42 +510,36 @@
 
     const zoomUi = {
       root: document.getElementById("map-zoom"),
-      slider: document.getElementById("map-zoom-slider"),
+      out: document.getElementById("map-zoom-out"),
       level: document.getElementById("map-zoom-level"),
+      in: document.getElementById("map-zoom-in")
     };
-    [zoomUi.slider, zoomUi.level].forEach(input => {
-      input.min = String(Math.ceil(cy.minZoom() * 100));
-      input.max = String(Math.floor(cy.maxZoom() * 100));
-    });
+    const ZOOM_FACTOR = 1.2;
 
     function updateZoomUi() {
       const zoom = cy.zoom();
-      zoomUi.level.value = String(Math.round(zoom * 100));
-      zoomUi.slider.value = zoomUi.level.value;
+      zoomUi.level.value = `${Math.round(zoom * 100)}%`;
+      zoomUi.level.textContent = zoomUi.level.value;
+      zoomUi.out.disabled = zoom <= cy.minZoom() + 0.001;
+      zoomUi.in.disabled = zoom >= cy.maxZoom() - 0.001;
     }
 
-    function setMapZoom(percent) {
+    function changeMapZoom(direction) {
       const current = cy.zoom();
       const target = Math.max(
         cy.minZoom(),
-        Math.min(cy.maxZoom(), Math.round(percent) / 100)
+        Math.min(cy.maxZoom(), current * (direction > 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR))
       );
-      if (!Number.isFinite(target)) { updateZoomUi(); return; }
+      if (Math.abs(target - current) < 0.001) return;
       cy.stop(true, false);
       cy.zoom({
         level: target,
         renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
       });
-      updateZoomUi();
     }
 
-    zoomUi.slider.addEventListener("input", () => setMapZoom(zoomUi.slider.valueAsNumber));
-    zoomUi.level.addEventListener("change", () => setMapZoom(zoomUi.level.valueAsNumber));
-    zoomUi.level.addEventListener("blur", updateZoomUi);
-    zoomUi.level.addEventListener("keydown", e => {
-      if (e.key === "Enter") { e.preventDefault(); setMapZoom(zoomUi.level.valueAsNumber); }
-      if (e.key === "Escape") { e.preventDefault(); updateZoomUi(); }
-    });
+    zoomUi.out.addEventListener("click", () => changeMapZoom(-1));
+    zoomUi.in.addEventListener("click", () => changeMapZoom(1));
     cy.on("zoom", updateZoomUi);
     updateZoomUi();
 
@@ -559,7 +553,7 @@
       if (isEditing || !isActive() || deepDiveOpen || e.ctrlKey || e.metaKey || e.altKey) return;
       if (!zoomOut && !zoomIn) return;
       e.preventDefault();
-      setMapZoom(Math.round(cy.zoom() * 100) + (zoomIn ? 1 : -1));
+      changeMapZoom(zoomIn ? 1 : -1);
     });
 
     /* ───────────────────────── 过滤 ───────────────────────── */
