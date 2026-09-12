@@ -1,0 +1,42 @@
+'use strict';
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const os = require('node:os');
+const {chromium} = require(require.resolve('playwright', {paths:[path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node')]}));
+(async () => {
+  const browser = await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+  try {
+    const page = await browser.newPage({viewport:{width:1440,height:1000}});
+    page.setDefaultTimeout(15000);
+    await page.route('https://**/*', route => route.abort());
+    await page.addInitScript(() => localStorage.setItem('ai-knowledge-map.onboarding.v1', JSON.stringify({version:1,skipped:true,read:0,cursor:0})));
+    await page.goto((process.argv[2] || 'http://127.0.0.1:1386/') + '?lang=zh-Hans#/map');
+    await page.waitForFunction(() => window.__cy?.nodes().length > 0);
+    console.log('Map loaded');
+    await page.evaluate(() => { __cy.zoom(1.5); __cy.center(__cy.getElementById('llm')); });
+    await page.waitForFunction(() => __cy.nodes('.viewport-occluded').length > 0);
+    await page.evaluate(() => __cy.getElementById('llm').emit('tap'));
+    await page.waitForFunction(() => document.getElementById('map-side-curtains').hidden && !__cy.elements('.viewport-occluded').length);
+    console.log('Secondary curtain and culling disabled');
+    await page.waitForTimeout(1000);
+    const rect = await page.locator('#cy').boundingBox();
+    const x = rect.x + rect.width - 50, y = rect.y + rect.height - 30;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.waitForTimeout(750);
+    assert.equal(await page.evaluate(() => __cy.edges('.viewport-drag-fade, .viewport-drag-hidden').length), 0, 'secondary background press keeps edges');
+    await page.mouse.move(x - 60, y - 35, {steps:5});
+    await page.waitForTimeout(750);
+    assert.equal(await page.evaluate(() => __cy.edges('.viewport-drag-fade, .viewport-drag-hidden').length), 0, 'secondary pan keeps edges');
+    await page.mouse.up();
+    assert.equal(await page.evaluate(() => __cy.nodes('.sel').length), 1, 'pan retains secondary view');
+    await page.evaluate(() => __cy.emit('tap'));
+    await page.waitForFunction(() => !document.getElementById('map-side-curtains').hidden && !__cy.nodes('.sel').length);
+    await page.waitForTimeout(300);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.waitForFunction(() => __cy.edges('.viewport-drag-fade').length > 0);
+    await page.mouse.up();
+    console.log('PASS secondary view disables curtain/culling and edge fade; overview restores effects');
+  } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

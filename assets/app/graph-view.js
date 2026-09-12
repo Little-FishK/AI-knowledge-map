@@ -354,6 +354,11 @@
     function updateCurtainCulling() {
       if (!cullingDirty) return;
       cullingDirty = false;
+      curtains.hidden = Boolean(state.selected);
+      if (state.selected) {
+        cy.elements('.viewport-occluded').removeClass('viewport-occluded');
+        return;
+      }
       const width = cy.container().clientWidth;
       const height = cy.container().clientHeight;
       if (!width || !height) return;
@@ -403,10 +408,11 @@
       hoveredRing = null;
       ringStates.forEach(motion => { motion.emphasis = 0; });
       ringLastTime = performance.now(); ringDirty = true;
+      if (state.selected) return;
       cy.edges().addClass('viewport-drag-fade');
       clearTimeout(edgeFadeTimer);
       edgeFadeTimer = setTimeout(() => {
-        if (viewportDragging) cy.edges().addClass('viewport-drag-hidden');
+        if (viewportDragging && !state.selected) cy.edges().addClass('viewport-drag-hidden');
       }, 650);
     }
     function finishViewportDrag() {
@@ -1503,6 +1509,10 @@
     });
 
     function applyFocus() {
+      if (state.selected) finishViewportDrag();
+      cullingDirty = true;
+      updateCurtainCulling();
+      ringDirty = true;
       updateOverviewEdges();
       const previouslyFocused = cy.elements(".dim, .hl");
       if (officialPathActive || !state.selected) {
