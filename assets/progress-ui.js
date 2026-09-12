@@ -22,6 +22,7 @@
     legacyKey:'ai-knowledge-map.learned.v1', randomUUID:()=>global.crypto.randomUUID()});
   let snapshot = runtime.get();
   let authBusy = false;
+  let accountReturnFocus = null;
   const lastCodeSent = new Map();
 
   function authErrorMessage(error) {
@@ -90,7 +91,7 @@
     }).join('');
   }
   function refreshCards() { document.querySelectorAll('#dd-article').forEach(renderCard); refreshAccountButton(); }
-  function accountHosts() { return [...document.querySelectorAll('#topbar .topbar-actions, .preview-header, .dd-top')]; }
+  function accountHosts() { return [...document.querySelectorAll(document.getElementById('settings-account') ? '#settings-account' : '.preview-header, .dd-top')]; }
   function ensureAccountButtons() {
     return accountHosts().map((host,index) => {
       let button=host.querySelector(':scope > [data-progress-account-button]');
@@ -104,19 +105,29 @@
     });
   }
   function refreshAccountButton() {
-    const label=snapshot.state.owner==='guest'?text('登录同步','Sign in to sync'):text('账号已登录','Signed in');
+    const label=text('账户','Account');
     ensureAccountButtons().forEach(button=>{if(button.textContent!==label)button.textContent=label;});
   }
   function dialog() {
     let overlay=document.getElementById('progress-account-overlay');
     if(overlay)return overlay;
     overlay=document.createElement('div');overlay.id='progress-account-overlay';overlay.className='progress-account-overlay hidden';
-    overlay.innerHTML=`<button class="progress-account-backdrop" type="button" aria-label="${text('关闭','Close')}"></button><section class="progress-account-dialog" role="dialog" aria-modal="true" aria-labelledby="progress-account-title"><button class="progress-account-close" type="button" aria-label="${text('关闭','Close')}">×</button><h2 id="progress-account-title">${text('账号与同步','Account and sync')}</h2><div class="progress-account-content"></div></section>`;
+    overlay.innerHTML=`<button class="progress-account-backdrop" type="button" aria-label="${text('关闭','Close')}"></button><section class="progress-account-dialog" role="dialog" aria-modal="true" aria-labelledby="progress-account-title"><button class="progress-account-close" type="button" aria-label="${text('关闭','Close')}">×</button><h2 id="progress-account-title">${text('账户','Account')}</h2><div class="progress-account-content"></div></section>`;
     document.body.append(overlay); overlay.querySelector('.progress-account-backdrop').onclick=closeDialog;overlay.querySelector('.progress-account-close').onclick=closeDialog;
-    overlay.addEventListener('keydown',event=>{if(event.key==='Escape')closeDialog();});return overlay;
+    overlay.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){event.preventDefault();closeDialog();}
+      if(event.key==='Tab'){
+        const nodes=[...overlay.querySelectorAll('section button:not(:disabled), section input:not(:disabled)')].filter(n=>n.getClientRects().length);
+        const first=nodes[0],last=nodes.at(-1);
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      }
+    });return overlay;
   }
   function setDialogMessage(message,error=false){const node=dialog().querySelector('.progress-account-message');if(node){node.textContent=message;node.classList.toggle('is-error',error);delete node.dataset.errorCode;}}
   function openDialog(){const overlay=dialog(),content=overlay.querySelector('.progress-account-content');overlay.classList.remove('hidden');
+    accountReturnFocus=document.activeElement;
+    const settings=document.getElementById('settings-overlay');if(settings)settings.inert=true;
     if(snapshot.state.owner!=='guest') {
       const imports=snapshot.importPreview||[];
       content.innerHTML=`<p>${text('你已登录，学习进度会跨设备同步。','You are signed in. Progress syncs across devices.')}</p>${imports.length?`<form data-import-form><fieldset><legend>${text('导入登录前保存在此浏览器的进度','Import progress saved in this browser before sign-in')}</legend>${imports.map((item,index)=>{const label=`${item.local.nodeId} · ${item.local.field}`,local=`${text('本机','This device')}: ${item.local.value?'✓':'—'}`,remote=item.remote?`${text('云端','Cloud')}: ${item.remote.value?'✓':'—'}`:text('云端没有记录','No cloud record');return `<div class="progress-import-row"><strong>${label}</strong><label><input type="radio" name="import-${index}" value="local" ${item.conflict?'':'checked'}>${local}</label><label><input type="radio" name="import-${index}" value="remote" ${item.conflict?'checked':''}>${remote}</label></div>`;}).join('')}<button type="submit">${text('应用选择','Apply choices')}</button></fieldset></form>`:''}<p class="progress-account-message"></p><div class="progress-account-actions"><button type="button" data-export>${text('导出进度','Export progress')}</button><button type="button" data-sign-out>${text('退出登录','Sign out')}</button><button type="button" class="progress-delete-account" data-delete>${text('删除账号','Delete account')}</button></div>`;
@@ -161,13 +172,13 @@
     }
     overlay.querySelector('input,button')?.focus();
   }
-  function closeDialog(){dialog().classList.add('hidden');}
+  function closeDialog(){dialog().classList.add('hidden');const settings=document.getElementById('settings-overlay');if(settings)settings.inert=false;accountReturnFocus?.focus();}
   runtime.subscribe(value=>{
     snapshot=value;refreshCards();
     // Authentication is complete before cloud progress finishes loading.
     // Never leave the one-time-code form open after a session is established.
     const overlay=document.getElementById('progress-account-overlay');
-    if(value.state.owner!=='guest'&&overlay?.querySelector('[data-code-form]'))overlay.classList.add('hidden');
+    if(value.state.owner!=='guest'&&overlay?.querySelector('[data-code-form]')&&!overlay.classList.contains('hidden'))closeDialog();
   });
   const observer=new MutationObserver(refreshCards);observer.observe(document.body,{childList:true,subtree:true});
   runtime.start().catch(error=>console.error('Progress initialization failed',error));

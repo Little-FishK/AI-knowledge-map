@@ -89,7 +89,7 @@
     root.setAttribute(isMap ? 'aria-label' : 'aria-labelledby', isMap ? '六站新手地图' : 'onboarding-lesson-title');
     root.innerHTML = `<div class="onboarding-shell${isMap ? ' is-map' : ''}">
       <header class="onboarding-top">${isMap ? '' : '<div class="onboarding-brand"><span aria-hidden="true">◈</span>AI 知识地图</div>'}
-        <button class="onboarding-skip" type="button" data-skip>${english() ? '返回地图 / Back to map' : '返回地图'}</button></header>
+        <button class="onboarding-skip btn" type="button" data-skip>${english() ? 'Back to map' : '返回地图'}</button><button class="btn icon-btn" type="button" data-settings aria-label="设置" aria-haspopup="dialog" aria-controls="settings-dialog">${document.getElementById('btn-settings').innerHTML}</button></header>
       ${isMap ? '' : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
       ${isMap ? '' : `<p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>`}
       ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
@@ -108,11 +108,23 @@
         <button class="onboarding-next" type="button" data-read>已读</button></div>
       </article>`}${isMap ? '' : '<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p>'}</div>`;
     if (isMap) startNodeMotion();
+    syncToolbar();
     if (focus) {
       root.querySelector(isMap ? '[data-skip]' : '#onboarding-lesson-title').focus({preventScroll: true});
       root.scrollTop = 0;
     }
   }
+  function syncToolbar() {
+    for (const [source, target] of [['btn-onboarding','[data-skip]'],['btn-settings','[data-settings]']]) {
+      const button=root.querySelector(target);
+      if (!button) continue;
+      const rect=document.getElementById(source).getBoundingClientRect();
+      Object.assign(button.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',zIndex:'2'});
+    }
+  }
+  const toolbarObserver=new ResizeObserver(syncToolbar);
+  ['topbar','btn-onboarding','btn-settings'].forEach(id=>toolbarObserver.observe(document.getElementById(id)));
+  global.addEventListener('resize',syncToolbar);
   function open() {
     if (isOpen()) return;
     returnFocus = document.activeElement;
@@ -140,7 +152,9 @@
   root.addEventListener('click', event => {
     const button = event.target.closest('button');
     if (!button || button.disabled) return;
-    if (button.hasAttribute('data-skip')) {
+    if (button.hasAttribute('data-settings')) {
+      global.AI_SETTINGS?.open();
+    } else if (button.hasAttribute('data-skip')) {
       if (!model.unlocked(state, count)) state = {...state, skipped: true};
       persist(); close();
     } else if (button.hasAttribute('data-map')) {

@@ -5,7 +5,7 @@
   "use strict";
 
   // Keep the existing map and deep links dormant until the local introduction ends.
-  if (window.AI_ONBOARDING) await window.AI_ONBOARDING.ready;
+
 
   const G = window.GRAPH;
   const ROUTER = window.APP_ROUTER;
@@ -38,6 +38,114 @@
     console.error(error);
     await language.setLocale(I18N_MANIFEST.sourceLocale);
   }
+  const settingsButton = document.getElementById("btn-settings");
+  const settingsOverlay = document.getElementById("settings-overlay");
+  const settingsDialog = document.getElementById("settings-dialog");
+  const settingsClose = document.getElementById("settings-close");
+  const settingsBackdrop = document.getElementById("settings-backdrop");
+  const languageSelect = document.getElementById("settings-language-select");
+  const languageStatus = document.getElementById("settings-language-status");
+  const topbar = document.getElementById("topbar");
+  const main = document.getElementById("main");
+  let settingsReturnFocus = null;
+  document.body.append(settingsOverlay);
+
+  function renderLanguageSettings() {
+    language.localize(settingsButton);
+    language.localize(settingsOverlay);
+    const currentLocale = language.getLocale();
+    const unavailableSuffix = language.t("settings.language.unavailableSuffix");
+    const fragment = document.createDocumentFragment();
+    language.getSupportedLocales().forEach(locale => {
+      const meta = I18N_MANIFEST.locales[locale];
+      const option = document.createElement("option");
+      option.value = locale;
+      option.disabled = meta.selectable === false;
+      option.textContent = meta.selectable === false
+        ? `${meta.nativeLabel} — ${unavailableSuffix}`
+        : meta.nativeLabel;
+      fragment.appendChild(option);
+    });
+    languageSelect.replaceChildren(fragment);
+    languageSelect.value = currentLocale;
+  }
+
+  languageSelect.addEventListener("change", async () => {
+    const requested = languageSelect.value;
+    if (!requested || requested === language.getLocale()) return;
+    languageSelect.disabled = true;
+    languageStatus.textContent = language.t("settings.language.changing");
+    try {
+      await content.ensureLocale(requested);
+      await language.setLocale(requested);
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("lang")) {
+        url.searchParams.set("lang", language.getLocale());
+        window.history.replaceState(null, "", url.href);
+      }
+      languageStatus.textContent = "";
+    } catch (error) {
+      languageSelect.value = language.getLocale();
+      languageStatus.textContent = language.t("settings.language.error");
+      console.error(error);
+    } finally {
+      languageSelect.disabled = false;
+    }
+  });
+
+  function openSettings() {
+    if (!settingsOverlay.classList.contains("hidden")) return;
+    settingsReturnFocus = document.activeElement;
+    settingsOverlay.classList.remove("hidden");
+    settingsOverlay.setAttribute("aria-hidden", "false");
+    settingsButton.setAttribute("aria-expanded", "true");
+    topbar.inert = true;
+    main.inert = true;
+    document.getElementById("onboarding").inert = true;
+    settingsClose.focus();
+  }
+
+  function closeSettings() {
+    if (settingsOverlay.classList.contains("hidden")) return;
+    settingsOverlay.classList.add("hidden");
+    settingsOverlay.setAttribute("aria-hidden", "true");
+    settingsButton.setAttribute("aria-expanded", "false");
+    topbar.inert = false;
+    main.inert = false;
+    document.getElementById("onboarding").inert = false;
+    if (settingsReturnFocus && typeof settingsReturnFocus.focus === "function") settingsReturnFocus.focus();
+    settingsReturnFocus = null;
+  }
+
+  settingsButton.addEventListener("click", openSettings);
+  settingsClose.addEventListener("click", closeSettings);
+  settingsBackdrop.addEventListener("click", closeSettings);
+  settingsOverlay.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeSettings();
+      return;
+    }
+    if (event.key === "Tab") {
+      const focusable = settingsDialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  window.AI_SETTINGS = {open: openSettings, close: closeSettings};
+  renderLanguageSettings();
+  language.subscribe(() => { language.localize(document); renderLanguageSettings(); });
+  if (window.AI_ONBOARDING) await window.AI_ONBOARDING.ready;
+
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
 
@@ -207,37 +315,6 @@
     else goToRoute({ name: mode === "software" ? "software" : "library" });
   });
 
-  const settingsButton = document.getElementById("btn-settings");
-  const settingsOverlay = document.getElementById("settings-overlay");
-  const settingsDialog = document.getElementById("settings-dialog");
-  const settingsClose = document.getElementById("settings-close");
-  const settingsBackdrop = document.getElementById("settings-backdrop");
-  const languageSelect = document.getElementById("settings-language-select");
-  const languageStatus = document.getElementById("settings-language-status");
-  const topbar = document.getElementById("topbar");
-  const main = document.getElementById("main");
-  let settingsReturnFocus = null;
-
-  function renderLanguageSettings() {
-    language.localize(settingsButton);
-    language.localize(settingsOverlay);
-    const currentLocale = language.getLocale();
-    const unavailableSuffix = language.t("settings.language.unavailableSuffix");
-    const fragment = document.createDocumentFragment();
-    language.getSupportedLocales().forEach(locale => {
-      const meta = I18N_MANIFEST.locales[locale];
-      const option = document.createElement("option");
-      option.value = locale;
-      option.disabled = meta.selectable === false;
-      option.textContent = meta.selectable === false
-        ? `${meta.nativeLabel} — ${unavailableSuffix}`
-        : meta.nativeLabel;
-      fragment.appendChild(option);
-    });
-    languageSelect.replaceChildren(fragment);
-    languageSelect.value = currentLocale;
-  }
-
   function applyCurrentLanguage() {
     language.localize(document);
     renderLanguageSettings();
@@ -258,75 +335,6 @@
 
   applyCurrentLanguage();
   language.subscribe(applyCurrentLanguage);
-
-  languageSelect.addEventListener("change", async () => {
-    const requested = languageSelect.value;
-    if (!requested || requested === language.getLocale()) return;
-    languageSelect.disabled = true;
-    languageStatus.textContent = language.t("settings.language.changing");
-    try {
-      await content.ensureLocale(requested);
-      await language.setLocale(requested);
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("lang")) {
-        url.searchParams.set("lang", language.getLocale());
-        window.history.replaceState(null, "", url.href);
-      }
-      languageStatus.textContent = "";
-    } catch (error) {
-      languageSelect.value = language.getLocale();
-      languageStatus.textContent = language.t("settings.language.error");
-      console.error(error);
-    } finally {
-      languageSelect.disabled = false;
-    }
-  });
-
-  function openSettings() {
-    if (!settingsOverlay.classList.contains("hidden")) return;
-    settingsReturnFocus = document.activeElement;
-    settingsOverlay.classList.remove("hidden");
-    settingsOverlay.setAttribute("aria-hidden", "false");
-    settingsButton.setAttribute("aria-expanded", "true");
-    topbar.inert = true;
-    main.inert = true;
-    settingsClose.focus();
-  }
-
-  function closeSettings() {
-    if (settingsOverlay.classList.contains("hidden")) return;
-    settingsOverlay.classList.add("hidden");
-    settingsOverlay.setAttribute("aria-hidden", "true");
-    settingsButton.setAttribute("aria-expanded", "false");
-    topbar.inert = false;
-    main.inert = false;
-    if (settingsReturnFocus && typeof settingsReturnFocus.focus === "function") settingsReturnFocus.focus();
-    settingsReturnFocus = null;
-  }
-
-  settingsButton.addEventListener("click", openSettings);
-  settingsClose.addEventListener("click", closeSettings);
-  settingsBackdrop.addEventListener("click", closeSettings);
-  settingsOverlay.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeSettings();
-      return;
-    }
-    if (event.key === "Tab") {
-      const focusable = settingsDialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])');
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  });
 
   async function setMode(m) {
     mode = m;

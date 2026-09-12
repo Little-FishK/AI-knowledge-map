@@ -81,14 +81,11 @@
       if (active) {
         officialPathRestore = {
           scope: state.scope,
-          focus: state.focus,
           domains: Object.assign({}, state.domains)
         };
         officialPathActive = true;
         state.scope = "all";
-        state.focus = false;
         Object.keys(state.domains).forEach(key => { state.domains[key] = true; });
-        document.getElementById("focus-on").checked = false;
         syncControls();
         applyFilters();
         addOfficialPathMarkers();
@@ -104,10 +101,8 @@
       removeOfficialPathMarkers();
       if (officialPathRestore) {
         state.scope = officialPathRestore.scope;
-        state.focus = officialPathRestore.focus;
         Object.assign(state.domains, officialPathRestore.domains);
       }
-      document.getElementById("focus-on").checked = state.focus;
       officialPathRestore = null;
       syncControls();
       applyFilters();
@@ -125,8 +120,6 @@
       // 而且新读者面对一张糊住的网不知从哪看起
       scope: CORE.size ? "core" : "all",   // core | all
       revealed: new Set(),                  // 核心视图下被点开而揭示出来的节点
-      focus: true,                          // 默认开聚焦，配合核心视图逐层揭开
-      hops: 1,
       selected: null
     };
 
@@ -1235,7 +1228,7 @@
       clearTimeout(localLayoutTimer);
       const selectedId = state.selected;
       const offsets = localLayouts[selectedId];
-      const active = state.focus && offsets
+      const active = offsets
         && !cy.getElementById(state.selected).hasClass('hidden') && !officialPathActive;
       cy.elements().removeClass('sl-main sl-peer sl-support sl-output sl-risk sl-peer-edge sl-support-edge sl-output-edge sl-risk-edge sl-peripheral-edge nn-relation attention-relation llm-relation context-relation multimodal-relation batch-relation');
       if (active) {
@@ -1395,7 +1388,7 @@
     function applyFocus() {
       updateOverviewEdges();
       const previouslyFocused = cy.elements(".dim, .hl");
-      if (!state.focus || !state.selected) {
+      if (officialPathActive || !state.selected) {
         if (previouslyFocused.length) previouslyFocused.removeClass("dim hl");
         updateLocalLayout();
         return;
@@ -1407,7 +1400,7 @@
         if (!root.length || root.hasClass("hidden")) return;
 
         let hood = root;
-        for (let i = 0; i < state.hops; i++) {
+        for (let i = 0; i < 1; i++) {
           hood = hood.union(hood.connectedEdges().not(".hidden").connectedNodes().not(".hidden"));
         }
         const hoodEdges = hood.edgesWith(hood).not(".hidden");
@@ -1687,14 +1680,9 @@
       const t = e.target;
       if (t.dataset.domain) { state.domains[t.dataset.domain] = t.checked; applyFilters(); }
       if (t.dataset.edge)   { state.edges[t.dataset.edge] = t.checked; applyFilters(); }
-      if (t.id === "focus-on") { state.focus = t.checked; applyFocus(); }
     });
 
-    document.getElementById("focus-hops").addEventListener("input", e => {
-      state.hops = +e.target.value;
-      document.getElementById("hops-val").textContent = state.hops;
-      applyFocus();
-    });
+
 
     function setEdges(pred) {
       Object.keys(ETYPES).forEach(k => { state.edges[k] = pred(k); });
@@ -1757,7 +1745,7 @@
       controlsToggle.title = tr(expanded ? "controls.sidebar.collapse" : "controls.sidebar.expand");
       controls.setAttribute("aria-hidden", String(!expanded));
       controls.inert = !expanded;
-      setTimeout(() => cy.resize(), 210);
+
     }
 
     controlsToggle.addEventListener("click", () => {
