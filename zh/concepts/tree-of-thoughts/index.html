@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>思维树 ToT：在多个中间方案间搜索与回溯 · AI 知识地图</title>
+<meta name="description" content="理解状态、候选生成、价值评估、BFS/DFS、剪枝和搜索预算，并区分探索空间扩大与答案正确。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/tree-of-thoughts/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="思维树 ToT：在多个中间方案间搜索与回溯">
+<meta property="og:description" content="理解状态、候选生成、价值评估、BFS/DFS、剪枝和搜索预算，并区分探索空间扩大与答案正确。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/tree-of-thoughts/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="思维树 ToT：在多个中间方案间搜索与回溯">
+<meta name="twitter:description" content="理解状态、候选生成、价值评估、BFS/DFS、剪枝和搜索预算，并区分探索空间扩大与答案正确。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/tree-of-thoughts/#page","name":"思维树 ToT：在多个中间方案间搜索与回溯","description":"理解状态、候选生成、价值评估、BFS/DFS、剪枝和搜索预算，并区分探索空间扩大与答案正确。","url":"https://ai-knowledge-map.com/zh/concepts/tree-of-thoughts/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"思维树 ToT：在多个中间方案间搜索与回溯","item":"https://ai-knowledge-map.com/zh/concepts/tree-of-thoughts/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">思维树 ToT：在多个中间方案间搜索与回溯</span></li></ol></nav><article id="dd-article" data-concept-id="tree-of-thoughts">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">思维树 ToT：在多个中间方案间搜索与回溯</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">理解状态、候选生成、价值评估、BFS/DFS、剪枝和搜索预算，并区分探索空间扩大与答案正确。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> ToT 把一次线性生成改成显式搜索：从状态扩展多个候选“思路”，由评估器选择、剪枝或回溯；质量来自<b>搜索空间、评估器和预算</b>，弱评估会更昂贵地保留错误路径。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>定义状态与 thought；区分 BFS/DFS；设计价值评估；控制分支和停止。</div>
+<ol class="dd-chain"><li>把问题表示为状态</li><li>生成多个候选扩展</li><li>评估可行性与价值</li><li>按 BFS/DFS/beam 保留</li><li>失败回溯或继续扩展</li><li>验证终态并比较搜索成本</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>线性路径为什么会卡死<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>当模型一步步往下生成时，每一步都以之前写出的 token 为前缀。线性思维链（Chain-of-Thought, CoT）正是这样的过程：早期某个选择一旦被生成，就固定在了前缀里，后续所有 token 都只能在这个前提条件下继续。于是问题就来了——如果前面某一步错了，后面还能靠继续生成把它修回来吗？答案是很难。线性生成没有返回的通道：模型可以在后文里圆场、补救，甚至嘴上推翻前文，但已经写下的前缀不会被替换，补救本身也只能沿着同一条路径往下走。错误的选择被当成了既定前提，路径从那一刻起被锁定。</p>
+<p>思维树（Tree-of-Thoughts, ToT）针对的正是这种路径锁定。它的做法是把中间结果从一段连续文本里拿出来，外化为多个并列的候选状态：每一步不是只保留一个当前答案，而是保存多个候选，同时记录它们之间的父子关系——哪个状态是由哪个状态扩展出来的。一旦某个分支走进死路，系统可以回到最近的分叉点，改走另一个候选分支。这种发现死路就回头的能力，使它适合规划、谜题求解、程序修复和组合搜索这类任务，这些任务的共同点是中间步骤多，而且早期决策往往要到很多步之后才会暴露其错误。</p>
+<p>这里的关键差异不在文字量。把推理写得更长，仍然是线性生成；真正改变性质的是两件事。第一，系统把没有选中的候选也保存下来，而不是生成一个就丢弃其余；第二，系统维护状态之间的父子关系，并且能够调用评估器来决定下一步先展开谁。有了这两点，展开顺序就不再由&quot;上一步生成了什么&quot;唯一决定，而是由外部的搜索状态控制。反过来看，如果所有候选仍然被拼成一段文本、一次性生成出来，那么即使文字里写了&quot;方案 A 不行，换方案 B&quot;，也没有真正的回溯——A 和 B 并不是系统可以独立保留、切换的状态，而只是文本里先后出现的句子。</p>
+<p>把思维树的接口摆出来会更清楚。它的输入包括：当前的问题状态、候选扩展方式（从一个状态如何生成若干子状态）、一个评估器（判断某个状态的价值高低）以及搜索预算（允许探索多少步）。它的输出是一棵带父子关系的搜索树，树中每个状态或者被保留、继续扩展，或者被剪枝丢弃，同时还要给出哪些状态通过了验证、到达了终态。有了这套输入输出，系统在早期选择出错之后，才能回到分叉点重走，而不是沿同一个前缀硬着头皮继续生成。</p>
+<p>边界同样明确：如果没有保存备选状态、没有真正的回溯动作，只是把思考写成多段文字，那就不构成思维树。判断标准不在于文本长短，而在于搜索是否由外部状态机控制：候选是否被显式存储、展开顺序是否可以被评估器改变、失败分支是否真的被舍弃并能回退。文字写得多，只是让线性路径更长；真正让搜索成为可能的是状态与父子关系的外部化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>搜索问题的四要素<span class="dd-badge eng">建模</span></h2>
+<div class="dd-agent-response"><p>要把&quot;边想边找&quot;变成可搜索的过程，先要回答一个问题：什么才算一个可搜索的&quot;思路&quot;？一个思路不能是随意的想法，而必须被建模成可操作的状态。建模需要四样东西：状态表示、扩展操作、价值或可行性评分、终止条件。四者缺一不可，缺少任何一个，搜索就退化回无结构的试错。</p>
+<p>状态表示决定了&quot;一步之后我们站在哪里&quot;。状态只包含影响后续决策的事实与产物——已确认的事实、已验证的中间结果，以及这些事实对未来选择施加的约束。与后续决策无关的内容一律不进入状态，否则状态空间会被噪声撑大，搜索在无意义的差别之间反复跳跃。</p>
+<p>扩展操作定义了&quot;从这里可以走向哪些下一步&quot;。每一步扩展必须产生一个合法的候选：可能是执行一个合法动作，也可能是提出一个新的原因假设。扩展出来的候选必须是可执行的，而不是修辞性的愿望；它要能被验证、被比较，或被进一步展开。</p>
+<p>评分环节为每个候选估计可行性、收益、风险和剩余成本。可行性回答&quot;这个候选真的能做吗&quot;，收益回答&quot;做成之后问题能解决多少&quot;，风险与剩余成本回答&quot;继续投入是否划算&quot;。评分的作用不是给出最终答案，而是让搜索在有限的资源里优先展开最有希望的分支。</p>
+<p>终止条件由外部完成谓词决定，而不是由搜索过程自我宣布成功。所谓外部，是指有一个独立的、不属于搜索本身的判定标准：例如测试全部通过、诊断与症状吻合、产物通过独立验证器的检查。搜索不能自己给自己发毕业证，否则很容易在错误的分支上自我说服。</p>
+<p>四要素的粒度直接决定搜索的成败。粒度太细，每个微小差异都变成一个新状态，分支数量爆炸，搜索在成本上不可承受；粒度太粗，不同本质的处境被混成同一个状态，既无法定位错误发生的具体环节，也无法识别和复用真正相同的子状态。</p>
+<p>缓存案例里的状态是一个直观例子。它不应该是&quot;我认为可能是缓存问题&quot;这样的散文句子——这种句子无法比较、无法去重、也无法验证。正确的状态是结构化的事实集合：已经运行过哪些测试、当前的代码 diff 是什么、仍然存活的原因假设有哪些、剩余预算还剩多少。这样的状态才能被哈希去重、被回放，并被交给独立验证器检验。</p>
+<p>从建模角度看，搜索的输入是任务事实、已验证的产物、合法动作、评分维度和完成谓词；输出则是状态表示、扩展操作、价值评估与终止条件这四要素的完整定义。状态只保留影响后续决策的事实，扩展产生可执行的候选，评分把硬可行性与软价值分开，终态由外部条件确认。粒度过细会爆炸，过粗会掩盖错误并妨碍去重，合适的粒度是让&quot;相同的处境落在同一个状态上&quot;。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>BFS、DFS 与 beam<span class="dd-badge math">搜索</span></h2>
+<div class="dd-agent-response"><p>状态、扩展、评分、终止这四要素确定之后，下一个问题是在有限预算下先走深还是先铺开。三种经典的访问顺序给出三种不同的答案：广度优先搜索（BFS）、深度优先搜索（DFS）和束搜索（beam search）。</p>
+<p>BFS 的规则是先覆盖同一层，把当前深度的所有兄弟节点都展开完，再进入下一层。它的优势在于：如果存在浅层解，BFS 一定最先找到，而且找到的解在深度上最短。代价是内存——同层所有状态都要同时保存，层越深，同时存活的状态越多，内存压力随宽度迅速上升。</p>
+<p>DFS 的规则相反：选定一个分支一路向下钻到底，遇到死路再回溯。它的内存占用小，只需要保存当前路径上的状态；同时它能最快地给出一个深解，让人先看到一个&quot;有头有尾&quot;的完整方案。但 DFS 的风险在于，预算可能全部耗在错误的第一个分支上——如果第一选择就是死胡同，深入的过程不产生任何可用成果，回溯之后可能已经没钱展开真正有希望的分支了。</p>
+<p>beam search 是质量与成本的折中：每一层只保留 b 个评分最高的候选状态，其余全部剪掉。b 就是束宽度。它把 BFS 的&quot;每层全铺开&quot;和&quot;按分数筛选&quot;结合起来，用固定大小的束控制内存和展开成本，代价是可能剪掉暂时低分但最终通向最优解的分支。</p>
+<p>无论选哪种顺序，剪枝都不是可选项，而是数学上的必然。设分支数为 k、深度为 d，则深度 d 处的叶子数为 kᵈ，整棵树的总节点数为 (k^(d+1)−1)/(k−1)。这意味着节点数随 k 和 d 指数增长：分支数稍大、深度稍深，完整枚举的节点量就大到无法承受。任何现实规模的搜索都必须在某处剪枝，问题只是在哪里剪、按什么标准剪。</p>
+<p>选择哪种策略，应当匹配验证成本。如果验证某个候选很便宜——例如一条静态规则就能排除明显错误——就可以广搜，用便宜的证据快速铺开、淘汰大量分支。如果验证很昂贵——例如必须真实执行一次任务才能知道结果——就应当先用静态证据筛选出少数候选，再投入昂贵的执行验证。反过来，用昂贵验证去铺开每一层，或用便宜验证只服务于单一路径，都会造成成本的错配。</p>
+<p>策略分数还有一个不可逾越的边界：它不能绕过高风险动作的权限与真实执行门。某个分支评分再高，只要它涉及高风险动作，就不能仅凭分数直接执行，必须经过权限检查和真实的执行确认。评分是排序工具，不是授权工具。</p>
+<p>总结这层的输入与输出：输入是分支数 k、深度 d、束宽度 b、内存约束和验证成本；输出是 BFS、DFS 或 beam 的访问顺序与候选上限。BFS 先铺同层，DFS 先深入，beam 每层只留 b 个高分状态；完整树的节点数随 k 和 d 指数增长，因此剪枝不可避免；而任何策略分数都不能绕过高风险动作的权限门和真实执行门。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>评估器决定剪谁<span class="dd-badge intuition">验证</span></h2>
+<div class="dd-agent-response"><p>搜索树里每一层都在问同一个问题：剪掉谁？回答这个问题的是评估器。评估器的可靠性决定了整棵树的质量——如果它把有希望的分支判了低分，剪枝就变成了自毁。</p>
+<p>评估器的实现有多种选择。可以是确定性的规则检查：例如语法检查、权限检查、约束校验；可以是环境执行：把候选真正跑一遍，用结果说话；可以是独立的另一个模型来评分；也可以是多次投票取共识。这些方式的可靠性并不相同。</p>
+<p>让生成器模型自己给自己打分，存在两个系统性问题。一是自信偏差：生成器倾向于高估自己刚写出的内容，因为生成过程本身就是一种隐含的自我认可。二是共享盲点：评估器和生成器如果是同一个模型或同一种训练分布，它们会共享相同的知识缺口和同样的错误模式，生成器漏掉的错误，评估器往往也看不见。因此，对于可验证的任务，应优先使用确定性检查——测试、规则、执行结果——而不是让模型自评。只有确实无法验证的维度，才退回到模型判断。</p>
+<p>评分还必须区分两种性质完全不同的东西：硬约束与软价值。硬约束是淘汰线：违反权限、违反语法、违反不可妥协约束的状态，无论其他方面看起来多好，都直接淘汰，没有商量的余地。软价值是排序依据：尚未验证但有潜力的状态，应保留其不确定性，按估计的收益、风险和剩余成本排序，而不是被武断地清零。把这两者压成一个数字是危险的——一个看似精确的 0.73 分既不能表达&quot;违反了权限所以必须淘汰&quot;，也不能表达&quot;还没验证所以只是有希望&quot;。硬淘汰用规则，软排序用分数，二者不能混在一个标尺上。</p>
+<p>评估器本身也需要校准，否则它给出的分数没有意义。校准的做法是：按分数区间统计实际终态成功率——打 0.8 到 0.9 分的候选最终真正成功的比例是多少？如果高分区间实际成功率远低于分数暗示的水平，评估器就是在系统性虚高。同时要检查评估器是否存在隐藏偏好：是否系统性地偏好更长的文本、熟悉的高频措辞、或者某个特定的生成位置（例如总是给列表末尾的候选更高分）。这些偏好与候选的真实质量无关，却会稳定地扭曲排序。</p>
+<p>从输入输出看：评估器接收候选状态、硬约束、证据、预计收益、风险、剩余成本和真实验证结果，输出四个可能的动作之一——淘汰、保留、调整优先级或终态确认。违反权限或语法的候选直接淘汰；证据不足但有潜力的状态保留不确定性；可执行的任务优先用测试与规则验证。核心边界在于：自评共享生成器的盲点，分数是排序工具而非真值，不能把一个 0.73 分伪装成客观事实。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>搜索会放大成本<span class="dd-badge eng">预算</span></h2>
+<div class="dd-agent-response"><p>搜索不是免费的。它扩大探索空间，但不保证收益；每一层铺开都在消耗预算。这一节的问题是：更多分支何时不再值得？</p>
+<p>先看成本由什么构成。每次扩展一个状态、每次评分一个候选、每次调用工具、每个消耗的 token，都是成本。还有两类容易被忽视的成本：一是墙钟延迟——状态序列化和真实工具调用会让整体延迟上升，串行等待的时间不会因为剪枝而消失；二是被剪掉的候选——它们没能进入最终结果，但生成和评分已经花掉了钱。搜索的成本不只来自最终保留下来的叶子，死掉的分支同样计费。</p>
+<p>因此，预算控制需要显式的停止条件。可以按价值差停止：新增分支带来的改进低于某个门槛就不再展开；可以按无进展停止：连续多轮扩展都没有让最优候选变好；可以按深度停止：超过设定深度不再深入；也可以按总预算停止：token、调用次数或墙钟时间耗尽即停。没有停止条件的搜索就是无限烧钱。</p>
+<p>启用搜索这件事本身也应分层。先用路由器判断任务难度，只在困难的切片上启用搜索，简单任务仍然直接生成。把搜索套在简单任务上，只会把本来一步能做完的事变成一场昂贵而毫无收益的枚举。</p>
+<p>判断&quot;是否继续&quot;的定量方法是比较边际收益与单位成本：每新增一个候选带来的成功率增益，对比它的成本。例如 beam 宽度从 2 增加到 4，成功率只提升 1 个百分点，但生成和评分调用翻了一倍——这个交易明显不划算。省下的预算应该转投到验证器上（让评估更准），或用于构造更好的初始状态（让搜索的起点更靠近解）。同样的钱，花在验证和起点上往往比花在更宽的束上回报更高。</p>
+<p>预算控制的输入是每次生成、评分、工具执行、token 与墙钟成本，边际成功增益和各停止上限；输出是继续扩展、剪枝、回溯或停止。核心结论：要记录包括被剪候选在内的全部消耗，只在困难切片上启用搜索，并在边际增益低于单位成本时把预算转给验证器或更好的初始状态。搜索扩大探索空间，不保证收益。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>与 Agent 规划的关系<span class="dd-badge intuition">边界</span></h2>
+<div class="dd-agent-response"><p>思维树搜索是否就等于真实世界里的 Agent？答案是：不。ToT 可以只在文本状态中搜索，Agent 规划还额外需要工具反馈、权限和动态环境，二者是不同的东西。</p>
+<p>ToT 的搜索空间可以是纯想象出来的：模型在文本里生成多个中间方案、给它们打分、剪枝、回溯，整个过程可以完全不接触外部世界。这种搜索的价值在于快速探索推理路径，但它的边界也很清楚——想象出的状态不能替代真实执行观察。模型可以在文本里&quot;想象&quot;一个测试通过了，也可以&quot;想象&quot;某个工具返回了预期结果，但想象的回执不是回执。真实执行会返回想象之外的信息：环境变了、权限不够、返回格式与预期不同、出现新的依赖。Agent 必须真正调用工具获得新事实，并在环境变化后重新规划；ToT 的文本状态搜索则没有这道硬性要求。</p>
+<p>第二个边界是：搜索不会创造缺失的知识。所有分支共享同一个模型和同一份上下文边界。如果一个事实根本不在模型的上下文或能力范围内，展开再多的分支也找不到它——每个分支能想到的内容都出自同一个知识池。搜索放大的是&quot;组合与选择&quot;的能力，而不是&quot;获取新知识&quot;的能力；获取新知识需要外部工具，这正是 Agent 比纯 ToT 多出来的那部分。</p>
+<p>从输入输出看：Agent 的边界输入是文本内想象状态、真实工具观察、当前权限和动态环境；输出是仅供规划的候选，以及可执行的受权动作。ToT 的输出是推理候选；Agent 的输出必须包括真正可执行的动作，而这些动作受到当前权限约束——想象中能做的动作，未必在权限范围内可执行。</p>
+<p>把两者连起来：ToT 是 Agent 规划的一个组件，负责在文本空间里生成和筛选候选；Agent 还需要真实工具反馈来修正计划、需要权限门来约束执行、需要动态环境模型来支持重规划。只做 ToT 而不接真实反馈的 Agent 会停留在想象里；只执行而不规划的系统则缺少对多步方案的选择能力。边界是清晰的：想象测试通过不能替代实际回执，搜索也不会创造模型上下文中缺失的知识。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>一次缓存修复怎样展开搜索树<span class="dd-badge math">运行示例</span></h2>
+<div class="dd-agent-response"><p>用一个具体故障把前面几层的抽象机制串起来：缓存隔离故障。问题现象是一个&quot;串值&quot;与预期不符，而它可能来自缓存键、命名空间或序列化三处中的任意一处。真正的约束是：如何在有限预算内探索这三个原因，而不是同时乱改三处——同时乱改会让验证失去意义，因为不知道是哪一处修好的。</p>
+<p>初始状态 S0 包含当前串值、已运行的测试和存活的原因假设。扩展产生三个原因分支：A 是缓存键缺 user_id，B 是命名空间串扰，C 是对象复用导致串值被共享。这就是&quot;思路&quot;的具体样子——不是一句&quot;可能是缓存问题&quot;，而是原因假设与可执行验证的组合：每个分支都能对应到一段具体的检查和修改动作。</p>
+<p>接下来是访问顺序的选择。预算假设为最多访问 4 个节点，三种策略走出三条轨迹：</p>
+
+<p>DFS 沿 A 一路向下，最快到达 A1 这一层的具体补丁，但如果 A 是错误首分支，深度就浪费了。BFS 先把 A、B、C 三个原因都铺开比较，但 4 个节点的预算只够看一层，来不及验证任何补丁。beam=2 每层保留 2 个高分状态：先比较后保留 A 和 C，再深入扩展 A 得到 A1。它兼顾了备选与深度，但排序质量全押在评分器上。</p>
+<p>在这个例子里，确定性测试更新状态价值，剪枝依据证据而非文字听起来是否合理：测试把 B（命名空间串扰）剪掉，并优先扩展 A；A1 给出复合键补丁，测试通过 4/4，成为终态。若 A1 失败，则回溯到保留下来的 C 继续验证。</p>
+<p>搜索的必要性可以用数字算出来。分支数 k=3、深度 d=4 的完整树，节点总数是 1+3+9+27+81=121，而不是只算叶子的 81——中间节点同样要生成和评分。若每个节点需要 800 token，完整搜索约需 96,800 token。beam=2 每层最多保留并扩展两个状态，粗略上限降到 1+4×(2×3)=25 个候选评估，成本下降一个数量级。注意这只是生成与评分的估算，真实工具执行（实际改代码、跑测试）仍需单独计费。</p>
+<p>还有一道防线是状态去重。两个文本分支若都得到相同的代码 diff 与测试结果，就应合并为同一状态——它们本质上是同一个处境。若不合并，同义改写会伪造搜索的多样性：树看起来枝繁叶茂，实际在重复花预算验证同一件事。</p>
+<p>这一层的输入是初始串值状态 S0、三个原因分支、最多四节点预算和测试证据；输出是搜索轨迹、补丁终态与回溯点。完整分支数 k=3、搜索深度 d=4 的节点总数 Nnodes=121，这个数字说明了为何必须剪枝：完整 k 叉树的节点总数按 (k^(d+1)−1)/(k−1) 增长，预算永远追不上它。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 280" role="img" aria-label="缓存隔离故障的三分支思维树经过测试评分、剪枝与回溯"><defs><marker id="tt1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="266" y="18" width="148" height="54" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="340" y="40" text-anchor="middle" class="svg-t">状态 S0：跨用户串值</text><text x="340" y="59" text-anchor="middle" class="svg-t" font-size="10">预算：最多验证 4 个节点</text><path d="M300,72 L132,116" stroke="#6b7484" marker-end="url(#tt1)"/><path d="M340,72 L340,116" stroke="#6b7484" marker-end="url(#tt1)"/><path d="M380,72 L548,116" stroke="#6b7484" marker-end="url(#tt1)"/><rect x="44" y="118" width="176" height="72" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="132" y="141" text-anchor="middle" class="svg-t">A：key 缺 user_id</text><text x="132" y="161" text-anchor="middle" class="svg-t" font-size="10">读代码 + 成对测试：2/2 支持</text><text x="132" y="179" text-anchor="middle" class="svg-t" font-size="10">价值 0.90，继续扩展</text><rect x="252" y="118" width="176" height="72" rx="8" fill="#21252d" stroke="#c77b72"/><text x="340" y="141" text-anchor="middle" class="svg-t">B：共享命名空间错误</text><text x="340" y="161" text-anchor="middle" class="svg-t" font-size="10">配置检查：租户空间已分离</text><text x="340" y="179" text-anchor="middle" class="svg-t" font-size="10">价值 0.10，剪枝</text><rect x="460" y="118" width="176" height="72" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="548" y="141" text-anchor="middle" class="svg-t">C：序列化复用对象</text><text x="548" y="161" text-anchor="middle" class="svg-t" font-size="10">尚无证据，验证成本高</text><text x="548" y="179" text-anchor="middle" class="svg-t" font-size="10">价值 0.45，候补</text><path d="M132,190 L132,220" stroke="#6b7484" marker-end="url(#tt1)"/><rect x="38" y="222" width="188" height="48" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="132" y="242" text-anchor="middle" class="svg-t">A1：复合键补丁</text><text x="132" y="259" text-anchor="middle" class="svg-t" font-size="10">隔离/命中测试 4/4 → 终态</text><path d="M226,246 C335,270 493,259 520,192" fill="none" stroke="#6b7484" stroke-dasharray="4 3" marker-end="url(#tt1)"/><text x="374" y="252" text-anchor="middle" class="svg-t" font-size="10">若 A1 失败，回溯到 C，而非沿 A 继续编故事</text></svg><figcaption>图 1　“思路”被表示成原因假设与可执行验证；确定性测试更新状态价值，剪枝依据证据而非文字听起来是否合理。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>策略</th><th>最多访问节点</th><th>本例轨迹</th><th>特点</th></tr></thead><tbody><tr><td>DFS</td><td>4</td><td>S0→A→A1</td><td>快速深入；若首分支错会浪费深度</td></tr><tr><td>BFS</td><td>4</td><td>S0→A,B,C</td><td>先比较原因，但预算不足以验证补丁</td></tr><tr><td>beam=2</td><td>4</td><td>保留 A,C→扩展 A1</td><td>兼顾备选与深度，依赖评分质量</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="完整 k 叉树的节点总数"><mi>Nnodes</mi><mo>=</mo><mfrac><mrow><msup><mi>k</mi><mrow><mi>d</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>评估器错误会怎样放大<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>搜索扩大了候选空间，但也把更大的权力交给了评估器。生成器负责提出可能性，评估器决定计算预算流向哪里。单次生成时评估失误只影响一个答案；搜索时评估失误会在每一层累积——这就是弱评估器可能比单次生成更危险的原因。</p>
+<p>如果评估器存在系统性偏好——偏爱详细措辞、偏爱短补丁、偏爱与自己观点相似的分支——beam 会在每一层稳定地把真正解淘汰掉。第一层给它低分，它就被剪掉；剪掉之后，第二层无论怎么扩展都不会再有它。搜索放大了评估器的偏差，而不是抵消它。</p>
+<p>应对之道是拆分评分维度，而不是输出一个混合总分。评分应拆成硬可行性、证据支持、预计收益、风险与验证成本五项，各自独立判断。能运行测试时优先使用测试——确定性验证比任何模型判断都可靠；不能验证时保留不确定性，而不是伪造一个精确分数。写不出证据的分支得&quot;未知&quot;，而不是&quot;0.43&quot;。</p>
+<p>具体失败模式可以按表现和缓解手段列成五类：</p>
+
+<p>过早剪枝的成因是证据时间差：正确分支在早期往往还没有积累足够的验证证据，若评分只认当前证据量，它会被低分淘汰。缓解办法是给探索留配额，或对证据不足的分支设不确定性上界，让它多活几轮。</p>
+<p>评分泄漏是评估器的输入污染：如果评估器能接触到参考答案的措辞，它给出的分数测的就不是方案质量，而是与答案的文本相似度。隔离评估数据、隐藏验证集是标准做法。</p>
+<p>分支同质化与状态去重相对：多个候选在文本上不同，在状态或动作上却完全相同，它们只是在分摊预算、制造虚假多样性。按状态和动作差异去重，把同义改写合并掉。</p>
+<p>模拟当事实是把想象的回执当回执：模型想象&quot;测试通过了&quot;就把节点标成终态。终态必须经真实环境验证——测试在真实环境跑过、通过结果真实返回，才算到达终点。</p>
+<p>循环回溯是回溯机制失灵：访问历史不清，两个状态之间反复切换，预算在环里耗尽。访问集、深度、预算和无进展四类终止条件共同兜底。</p>
+<p>把这些归因写完整：评估器失败分析的输入是各分支评分、被剪顺序、状态差异、真实测试和访问历史；输出是过早剪枝、评分泄漏、同质分支、模拟当事实或循环回溯的归因。缓解措施是拆分硬可行性、证据、收益、风险与成本五个维度，并保留探索配额和访问集；终态必须由环境验证。</p>
+<p>最后是适用边界：ToT 不适合每个任务。答案一步可验证、动作空间固定可用传统算法、或每次真实执行不可逆且昂贵时，盲目扩展分支只会增加成本和风险——搜索树在这种任务上把评估错误和真实代价同时放大，单次生成反而是更理性的选择。</p></div>
+<table class="dd-table"><thead><tr><th>失败</th><th>表现</th><th>缓解</th></tr></thead><tbody><tr><td>过早剪枝</td><td>正确分支初期证据少被淘汰</td><td>保留探索配额或不确定性上界</td></tr><tr><td>评分泄漏</td><td>评估器看到参考答案措辞</td><td>隔离数据与隐藏验证</td></tr><tr><td>分支同质化</td><td>多个候选只是同义改写</td><td>按状态/动作差异去重</td></tr><tr><td>模拟当事实</td><td>想象测试通过就标记终态</td><td>终态必须经真实环境验证</td></tr><tr><td>循环回溯</td><td>在两个状态间反复切换</td><td>访问集、深度、预算和无进展终止</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把各环节接起来，思维树搜索的运行逻辑是一条六步因果链。</p>
+<p>第一步，把问题表示为状态。状态只保留影响后续决策的事实与产物：已确认的证据、已验证的中间结果、仍存活的原因假设和剩余预算。这一步决定了后面每一步在哪个空间里进行，粒度错了，后续全都错。</p>
+<p>第二步，生成多个候选扩展。每个扩展必须产生可执行的候选——合法动作或原因假设——而不是修辞性的想法。候选之间要有实质差异，同义改写不增加探索能力。</p>
+<p>第三步，评估可行性与价值。把硬可行性与软价值分开：违反权限、语法或不可妥协约束的候选直接淘汰；其余候选按证据支持、预计收益、风险和验证成本排序。能确定性验证的维度优先用测试和规则，不能让模型自评冒充事实。</p>
+<p>第四步，按 BFS、DFS 或 beam 保留候选。BFS 先铺同层、DFS 先深入、beam 每层只留 b 个高分状态；选择取决于验证成本和内存预算。无论哪种策略，完整 k 叉树的节点数按 (k^(d+1)−1)/(k−1) 指数增长，剪枝不可避免。</p>
+<p>第五步，失败则回溯或继续扩展。回溯要受访问集、深度、预算和无进展四类终止条件约束，防止在两个状态之间循环空转。回溯后优先回到保留下来的备选分支，而不是从头再来。</p>
+<p>第六步，验证终态并比较搜索成本。终态必须经真实环境验证——想象的回执不算数。同时把搜索消耗与被剪候选的消耗一起计入，与边际成功增益比较：若 beam 从 2 增到 4 只带来 1 个百分点的提升却翻倍调用，预算应转给验证器或更好的初始状态，而不是更宽的束。</p>
+<p>这六步构成一个闭环：状态表示限制分支质量，评估器决定预算流向，访问顺序决定谁先被验证，回溯与终止防止预算空转，终态验证防止模拟当事实，成本比较决定搜索本身是否值得。任何一环失守，搜索就从&quot;扩大正确选择的概率&quot;退化为&quot;昂贵地放大同一个错误&quot;。搜索扩大探索空间，但不保证收益——它只有在每一步都受证据、权限和成本约束时，才真正优于单次生成。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2305.10601" target="_blank" rel="noopener">Tree of Thoughts</a>：显式思维搜索</li><li><a href="https://arxiv.org/abs/2308.09687" target="_blank" rel="noopener">Graph of Thoughts</a>：图结构推理</li><li><a href="https://arxiv.org/abs/2310.04406" target="_blank" rel="noopener">Language Agent Tree Search</a>：搜索与环境反馈</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/tree-of-thoughts">在地图中查看概念关系</a></nav>
+</article></main></body></html>

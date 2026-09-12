@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件 · AI 知识地图</title>
+<meta name="description" content="从条件概率和classifier-free guidance，到边缘、深度、姿态、分割、参考图、多条件冲突、控制强度与可验证控制。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/controllable-generation/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件">
+<meta property="og:description" content="从条件概率和classifier-free guidance，到边缘、深度、姿态、分割、参考图、多条件冲突、控制强度与可验证控制。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/controllable-generation/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件">
+<meta name="twitter:description" content="从条件概率和classifier-free guidance，到边缘、深度、姿态、分割、参考图、多条件冲突、控制强度与可验证控制。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/controllable-generation/#page","name":"可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件","description":"从条件概率和classifier-free guidance，到边缘、深度、姿态、分割、参考图、多条件冲突、控制强度与可验证控制。","url":"https://ai-knowledge-map.com/zh/concepts/controllable-generation/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件","item":"https://ai-knowledge-map.com/zh/concepts/controllable-generation/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件</span></li></ol></nav><article id="dd-article" data-concept-id="controllable-generation">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从条件概率和classifier-free guidance，到边缘、深度、姿态、分割、参考图、多条件冲突、控制强度与可验证控制。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 生成控制不是让模型完全服从一句提示，而是在采样分布中加入不同粒度的条件。文本约束语义，空间图约束几何，参考图约束外观或身份；控制越强，通常越牺牲多样性和自然度。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分语义、空间、身份和过程控制；手算classifier-free guidance组合；解释ControlNet式残差注入；诊断多条件冲突与控制泄漏；分别评测遵循、质量、多样性和保留。</div>
+<ol class="dd-chain"><li>把用户意图拆成语义、几何、身份和风格</li><li>为每个自由度选最合适条件表示</li><li>独立编码并按尺度注入基础生成器</li><li>检查多条件可行性与优先级</li><li>调最低满足约束的控制强度</li><li>消融各通道并检查信息泄漏</li><li>分开评测遵循、质量、多样性与保留</li><li>锁定完整模型/提取器版本并保存来源</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>“可控”必须先说清控制哪个自由度<span class="dd-badge intuition">定义</span></h2>
+<div class="dd-agent-response"><p>说某个生成模型“可控”，本身还不是一个可以执行的规格，因为“可控”没有指明到底控制的是输出的哪一个自由度。一句提示“红衣人在桥上”之所以无法固定人物位置和姿态，正是因为文本只能提供离散的语义约束：“桥上”这个词只排除了不在桥上的情形，却仍然允许人物站在桥的任意一侧、面向任意方向、摆出任意姿势，也允许桥本身有不同的角度、长度和光照。文本条件的信息量集中在“是什么”这一类语义上，对空间位置、朝向、姿态这类连续自由度的约束非常弱。</p>
+<p>要把控制目标落到实处，就必须先选定要约束的自由度，并选择携带相应信息的条件类型。不同的条件在不同自由度上的信息量和不确定性差别很大：边缘图锁定的是物体的轮廓，也就是形状边界；深度图锁定的是一点到镜头的相对距离，从而约束前后遮挡和空间层次；姿态骨架锁定的是关节位置，直接决定人物的姿势；分割图锁定的是区域类别，规定哪个像素属于哪一类对象；参考图则可能同时携带身份、风格、背景等多重信息，而且这些信息往往没有被显式声明。因此，同一句自然语言在换成不同的条件表示后，能约束的自由度完全不同。</p>
+<p>由此可以得到一条可操作的原则：控制目标应当被写成可测量的约束，而不是笼统的“更像”。具体而言，要能回答：目标对象是否出现；关键点的误差是多少；在那些没有被明确指定的区域里，模型是否被允许自由变化。只有当这些约束可以被检查、被量化时，“可控”才从一种主观感受变成一个可以验证和比较的工程目标。反过来，如果只停留在“更像参考图”这种表述上，就既无法判断模型是否满足了要求，也无法定位控制失败发生在哪一个自由度上。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>条件生成学习 p(x|c)，并不保证每个c都可满足<span class="dd-badge eng">概率机制</span></h2>
+<div class="dd-agent-response"><p>条件生成模型学习的是条件分布 p(x|c)，即在给定条件 c 的情况下样本 x 的分布。加入条件会缩小候选输出的范围，但学习 p(x|c) 本身并不保证每一个条件 c 都能被满足。一个直观的例子是：训练分布里从来没有出现过“四条腿的椅子悬浮在水下”，仅仅在推理时把这条作为控制条件输入，并不能让模型凭空生成出既符合物理常识又满足全部要求的图像。</p>
+<p>原因在于，模型无论接受了怎样的条件，其输出仍然受两个边界约束：一是训练数据对条件的支持范围，二是模型从数据中习得的生成先验。条件之间可能互相矛盾，例如要求同一物体同时出现在两个不相交的位置；控制图也可能携带训练数据中不存在的几何结构，例如超出姿态骨架正常活动范围的角度，或与物体物理结构不符的轮廓。当条件本身不可行时，强行服从只会产生伪影，比如肢体错位、纹理撕裂或物体悬浮的不自然构图；模型也常常会选择忽略部分条件，优先维持输出看起来自然。这两条路径都不是“像渲染器一样严格服从控制”，而是一种在服从与自然之间的妥协。</p>
+<p>这带来的工程结论是：可控生成系统不能默认每个输入条件都是可满足的。系统需要具备检测不可行或相互冲突条件的能力，并且在检测到之后允许三种处理方式——向用户询问澄清、自动放松某些约束、或者明确宣告失败——而不是承诺严格渲染出任意给定的控制图。把条件生成理解为“对候选分布的约束”而非“对输出的逐像素指令”，才能真正预期模型在条件与先验冲突时的行为。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>classifier-free guidance组合条件与无条件预测<span class="dd-badge math">手算</span></h2>
+<div class="dd-agent-response"><p>classifier-free guidance 是一种在采样时增强条件影响的方法，它不训练额外的判别器，而是直接组合同一个模型给出的两种预测：无条件预测 ε_u 和条件预测 ε_c。核心思路是，条件预测与无条件预测之间的差向量指向“条件让输出更符合 c”的方向，把这一差值放大，就能在采样过程中更强烈地把样本往条件方向上推。</p>
+<p>组合公式为 ε_guided = ε_u + w×(ε_c − ε_u)，其中 w 是指导强度。以无条件噪声预测为 0.8、条件预测为 0.2、指导强度为 3 为例，代入得到 ε_g = 0.8 + 3×(0.2 − 0.8) = −1.0。这个结果比两个原始预测都更极端，说明组合值已经沿着“偏离无条件”的方向外推出去。</p>
+<p>w 的不同取值对应不同的行为边界。当 w = 1 时，组合结果恰好退化为条件预测 ε_c，此时模型就是普通的条件生成；当 w &gt; 1 时，公式外推条件方向，输出对条件的遵循程度提高，但代价是可能出现颜色过饱和、局部细节重复以及整体多样性下降。w 越大，样本越集中在“高概率符合条件”的窄区域里，偏离数据分布自然的多样性。</p>
+<p>需要注意，公式中的 ε 在不同参数化下可以代表不同的量：在噪声预测参数化下它表示预测噪声，在其他参数化下它可能表示速度等。无论具体对象是什么，概念都一致：用 w 放大条件预测与无条件预测之间的差异，从而在采样时加强条件约束。这一机制的适用前提是模型能同时产出有条件和无条件两种预测，因此训练时通常需要以一定概率随机丢弃条件，让同一个网络学会两种行为。</p></div>
+<div class="dd-formula" data-formula-id="controllable-generation-formula-1" data-display="mathml"><math display="block" aria-label="ε_g = 0.8 + 3×(0.2−0.8) = −1.0"><mrow><mi>ε</mi><mo>_</mo><mi>g</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>0.8</mn><mspace width="0.35em"/><mo>+</mo><mspace width="0.35em"/><mn>3</mn><mo>×(</mo><mn>0.2</mn><mo>−</mo><mn>0.8</mn><mo>)</mo><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mo>−</mo><mn>1.0</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>完整示例：用姿态、深度和参考服装生成海报<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>考虑一个同时使用姿态、深度和参考服装三个条件来生成海报的完整流程，它能具体展示多条件控制在实践中应当如何分解与排错。任务的文本部分只负责定义人物、海报风格和背景这类语义内容，而不再描述姿态——因为姿态已经由姿态骨架明确给出；姿态骨架提供关节关键点，深度图提供物体之间的前后关系，参考图则被限定为只提供服装纹理，而不传递人物身份。这样，每个条件通道各司其职，避免了信息在多个通道间含糊重叠。</p>
+<p>当三个控制同时给出而结果失败时，要定位失败来自哪一路，正确顺序不是直接调参，而是先验证条件的兼容性，再逐层叠加。第一步是逐一进行单控制生成：只用姿态、只用深度、只用服装各生成一次，为每个通道建立“能否独立工作”的判断以及各自独立的指标。单通道都不能达标，说明问题在该通道自身的注入方式或强度；单通道都正常，问题才可能出现在多条件交互。</p>
+<p>第二步是双控再到三控的逐步组合。在这一阶段重点检查不同控制图之间是否矛盾，例如姿态骨架要求的手臂位置与深度图要求的遮挡关系是否冲突。若发现冲突，就需要给条件设定显式优先级，并用局部遮罩把不同条件限制到各自的生效区域，而不是让它们在整幅图上互相竞争。</p>
+<p>第三步是在强度维度上扫描：从较低的控制强度开始逐步增加，记录关键点误差、图像质量、多样性这三条曲线随强度的变化，找到三者折中的区间，而不是一次性拉到最大强度。同时还要检查参考图是否有信息被意外泄漏——例如参考图的背景或人脸被无意识地复制进了结果。</p>
+<p>整个过程中，固定随机种子做消融是区分“控制贡献”与“随机采样变化”的关键手段：只有种子固定时，输出的变化才能归因于控制条件的改变，而不是采样噪声。多控制调参之前先验证条件兼容性，能避免把条件冲突误判为模型能力不足。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：不同条件在采样网络中约束不同尺度<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>不同条件携带的信息作用在采样网络的不同尺度上，这是多条件控制中一个容易被忽略的结构事实。文本条件携带的是对象级的语义，姿态和深度携带的是几何与空间结构，参考外观携带的则是纹理与颜色。如果把所有这些控制信号简单地拼成一张图再喂给基础生成器，不同粒度的信息就会被强制压缩进同一条路径，互相污染：纹理级别的条件可能干扰几何结构，几何约束也可能扭曲语义内容。</p>
+<p>正确的做法是把不同粒度的控制信号独立编码，并按照尺度进行门控注入基础生成器。也就是说，每个条件先经过各自的编码器得到适合自己信息粒度的表示，再在采样网络的不同层有选择地注入——姿态和深度携带的几何信息在较浅、贴近像素的层塑造空间结构，文本携带的对象级语义在中间层负责全局理解，参考外观携带的纹理与颜色在较深的层发挥作用。这样，图 1 所表达的关系就可以归结为一句话：控制信号的粒度不同，最好独立编码并按尺度门控。</p>
+<p>这一结构带来的直接收益是各通道之间的独立性。当每个条件都在自己最擅长的尺度上施加影响，并且由门控决定注入强度时，调整某一路条件就不容易意外改动另一路已经满足的约束，这也为前文所述的单控、双控、三控逐层排错提供了实现基础。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 345" role="img" aria-label="文本、姿态深度和参考外观通过独立编码与门控注入基础生成器，不同层控制语义几何和纹理"><defs><marker id="cg32" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="22" y="35" width="125" height="58" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="84" y="69" text-anchor="middle" class="svg-t">文本语义</text><rect x="22" y="126" width="125" height="58" rx="9" fill="#21252d" stroke="#72b293"/><text x="84" y="160" text-anchor="middle" class="svg-t">姿态/深度</text><rect x="22" y="217" width="125" height="58" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="84" y="251" text-anchor="middle" class="svg-t">参考外观</text><path d="M147 64H205M147 155H205M147 246H205" stroke="#7f8b9d" marker-end="url(#cg32)"/><rect x="210" y="35" width="125" height="58" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="272" y="69" text-anchor="middle" class="svg-t">文本编码</text><rect x="210" y="126" width="125" height="58" rx="9" fill="#21252d" stroke="#72b293"/><text x="272" y="160" text-anchor="middle" class="svg-t">空间编码</text><rect x="210" y="217" width="125" height="58" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="272" y="251" text-anchor="middle" class="svg-t">身份/风格编码</text><path d="M335 64L400 120M335 155H400M335 246L400 190" stroke="#7f8b9d" marker-end="url(#cg32)"/><rect x="405" y="80" width="155" height="145" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="482" y="111" text-anchor="middle" class="svg-t">门控残差注入</text><text x="482" y="140" text-anchor="middle" class="svg-t" font-size="11">早层：几何</text><text x="482" y="165" text-anchor="middle" class="svg-t" font-size="11">中层：对象</text><text x="482" y="190" text-anchor="middle" class="svg-t" font-size="11">晚层：纹理</text><path d="M560 153H610" stroke="#7f8b9d" marker-end="url(#cg32)"/><rect x="615" y="80" width="125" height="145" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="677" y="111" text-anchor="middle" class="svg-t">基础生成器</text><text x="677" y="140" text-anchor="middle" class="svg-t" font-size="11">先验+条件</text><text x="677" y="169" text-anchor="middle" class="svg-t">冲突/权衡</text><text x="677" y="198" text-anchor="middle" class="svg-t">输出样本</text><text x="380" y="315" text-anchor="middle" class="svg-t">独立通道便于消融、加权和限制参考信息泄漏</text></svg><figcaption>图 1　控制信号的粒度不同，最好独立编码并按尺度门控。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>ControlNet式分支保留基础模型能力并学习空间残差<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>直接拿边缘图去重新训练一整个大模型并不划算：全量重训既昂贵，又容易让模型在适应新条件时遗忘原有的生成能力。ControlNet 式分支的思路是保留基础模型的权重，另建一条并行的分支来学习空间控制信号，并把该分支学到的内容作为残差加回到主干的中间特征上。</p>
+<p>具体做法是：复制或旁路基础网络的一部分模块作为控制分支，分支的输入是边缘图、深度图这类空间条件；分支与主干之间的连接用零初始化，也就是初始时这条连接的权重为零，使得控制特征对主干的贡献在训练起点严格为零。于是初始时刻整个网络的行为近似等同于原模型，随着训练推进，分支逐渐学会利用边缘或深度信息，把非零的空间残差注入主干。冻结主干只更新分支，既减少了数据需求，也降低了灾难性遗忘的风险。</p>
+<p>零初始化让训练起点安全，但并不保证训练过程永远安全。控制分支本身仍然可能过拟合到特定风格的边缘或深度图，也可能把训练数据中的信息泄漏进参数，或者与未来新版本的主干网络不兼容。因此控制分支需要与具体的主干版本绑定，并对版本升级做回归验证，否则一条为旧主干训练的 ControlNet 式分支在换到新主干后可能失效或产生意料之外的输出。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>控制强度形成遵循—质量—多样性的三角权衡<span class="dd-badge eng">权衡</span></h2>
+<div class="dd-agent-response"><p>控制强度并不是越高越好，遵循度、质量与多样性三者之间存在三角权衡，强化其中一个往往要牺牲另外两个。把关键点误差降到零是一个典型例子：强空间控制会迫使模型逐像素服从姿态骨架，模型失去了修正不自然骨架的自由，于是生成的人物虽然关键点完全吻合，却可能姿态僵硬、关节扭曲、肌肉走向怪异。同样地，过强的文本 guidance 会把样本分布压缩到高概率窄区，使输出在符合描述的同时损失多样性；过强的参考权重则会把参考图的背景甚至身份一起复制进来。</p>
+<p>这种权衡的根源在于，控制条件提供的是对输出的约束，而生成先验提供的是让输出自然、多样的能力，两者在同一批中间特征上相互争夺。降低控制强度等于把更多自由度还给先验，输出会恢复自然与多样，但也可能偏离用户的约束。因此不存在一个对任何任务都最优的强度值，只能在强度轴上扫描，画出一条多目标曲线，观察关键点误差、图像质量与多样性随强度如何变化，然后选择刚好满足硬约束的最低强度——既能保证必需的控制，又尽可能保留模型的先验自由。</p>
+<p>如果某项硬几何约束必须精确到不容任何偏差，那么生成模型可能不是合适工具，传统渲染或合成管线在这种场景下往往更可靠。可控生成的价值在于软约束与多样性并存的场景，而不是替代精确几何求解。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>多条件冲突需要显式优先级、遮罩和可行性检查<span class="dd-badge eng">冲突解析</span></h2>
+<div class="dd-agent-response"><p>当多个条件同时作用且彼此冲突时，模型不能靠随机折中来假装解决了问题。以“姿态要求手在头顶、深度却把手放在身体后方”为例，如果让模型在两个矛盾约束之间取平均，结果往往是手既不真正在头顶、也不真正在后方，变成一个既不符合姿态又不符合深度的糊状结构。正确的处理顺序是：先检查、再声明、后隔离或上报。</p>
+<p>第一步是在条件空间里做几何一致性检查，也就是在把条件注入生成网络之前，先比较骨架、深度、分割这几类空间条件是否互相一致。这一步发生在条件层面而非像素层面，成本低且能提前拦截大部分冲突。第二步是为每个条件显式声明它的作用区域、生效时间和优先级：作用区域规定条件在图像的哪一部分生效，优先级规定发生冲突时谁的约束更硬。第三步才是处理残留冲突——对局部条件可以用遮罩隔离，让不同条件各管自己的一块区域，避免在整图上竞争；如果冲突严重到无法用遮罩调和，就应当向用户报告，而不是默默输出一个两边都不满足的折中结果。</p>
+<p>训练中从未见过的条件组合还会引发控制纠缠：单独看每路条件都能工作，但组合在一起时各通道在共享的中间特征上互相干扰，导致某一方控制失效。要定位这种纠缠，需要用单控、成对、多控的阶梯评测逐层对比，并始终保留一个无控制基线作为参照，才能判断输出偏差究竟来自控制本身，还是来自多条件组合时的新增干扰。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>参考图条件可能携带超出声明的身份和版权信息<span class="dd-badge eng">泄漏边界</span></h2>
+<div class="dd-agent-response"><p>参考图是控制信号里最容易越界的一种，因为一张图片携带的信息远比用户声明的多。用户只想复制配色，输出却连人脸和背景都相似，根本原因在于图像编码器把颜色、纹理、身份、构图、背景等多种属性纠缠在同一个向量里，模型无法自动区分“只取配色”和“全盘照搬”。</p>
+<p>要抑制这种越界，需要在条件注入端和输出端同时设防。注入端的手段包括：只选择参考图的特定区域或特定特征层作为条件，使用身份专用或风格专用的编码器把要的属性从其他属性中分离出来，通过随机增强削弱对细节的过度依赖，以及施加负向约束明确排除某些属性。输出端则要做相似性检查，具体包括与数据源的近邻检索比对、脸部相似度检查、背景相似度检查和水印残留检查，确认生成结果没有无意复制参考图的身份或受保护内容。</p>
+<p>从产品角度看，界面必须明确“参考什么”——是姿态、布局、配色、材质还是身份——并记录相应的授权，而不能把“参考风格”默认扩大为复制参考图的全部内容。参考图条件的边界声明与事后检查，是可控生成在版权与身份合规上的必要组成部分，而不是可选的附加功能。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>训练数据的控制图质量决定可控性上限<span class="dd-badge eng">数据</span></h2>
+<div class="dd-agent-response"><p>控制模型的性能上限不是由网络结构单独决定的，而是被训练数据里控制图的质量所限制。实践中，控制图很少是人工逐像素标注的，它们大多由预训练检测器自动生成，属于伪标签。这些伪标签带着系统性的错误：边缘检测的阈值选取会决定轮廓的粗细和缺失程度，姿态估计会漏掉被遮挡的关节点，单目深度估计会存在尺度不一致。当这些有偏的控制图被当作训练信号时，控制模型学到的不再是真实几何，而是提取器本身的伪影。</p>
+<p>这意味着一个被忽略的风险：模型可能精确地学会了“检测器认为正确的边缘或深度”，而不是“世界真实的边缘或深度”。一旦上游提取器更换或升级，其输出分布就会漂移，原先训练好的控制模型在新提取器下可能表现异常。因此，训练时必须把生成器、控制提取器以及它们的版本一起保存，在抽样时做对齐，确保每张图与其控制图来自同一个提取器版本；数据覆盖上还要补齐稀有姿态、遮挡和复杂布局，避免模型只在常见样本上有效。更换提取器时，不能直接沿用旧模型，必须重新评估分布兼容性，并判断是否需要再训练。</p>
+<p>控制图质量决定了可控性的上限：无论网络设计得多好，如果训练信号本身与真实几何脱节，模型能学到的最多也只是那份有偏标签所表达的规律，而不是用户真正想控制的自由度。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>评测要用控制专属度量并检查未指定区域<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>控制生成不能用单一的文本相似度分数来评测，因为文本分数反映的是语义符合度，与空间控制的达成程度并不等同。CLIP 文本分数高，只能说明生成的图在对象和属性层面与文本描述匹配，并不能证明姿态和深度这些空间约束都得到了满足。正确的做法是为每一类控制条件配置专属的度量：文本条件用对象与属性的匹配度结合人工评价，姿态条件用关键点误差，深度条件用经过尺度对齐后的相关性，分割条件用交并比 IoU，边缘条件用结构距离，身份条件用经授权范围内的相似度。图像质量、真实性和多样性则作为独立维度分别测量，不与控制度量混在一起。</p>
+<p>除了测目标约束是否满足，还要专门检查“非目标区域”是否被误伤，也就是未指定的自由度有没有被意外固定。例如在只控制姿态时，背景是否也变得异常固定、丧失应有的变化；在只改变配色时，人物身份是否发生了漂移。如果只测量目标约束，模型完全可以通过“把所有未指定区域也锁定住”的偷懒方式来提高控制分，而这种副作用只有在单独评测未指定区域时才会暴露。因此控制评测必须同时覆盖“该控制的有没有控制住”和“不该控制的有没有保持自由”两个方向，否则只会奖励副作用。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>部署把控制模型、提取器和基础生成器作为一个版本单元<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>控制分支不能脱离它所依赖的基础生成器单独部署，因为两者之间存在大量隐式耦合。基础模型升级后，旧的 ControlNet 式分支未必能直接沿用：控制分支依赖主干的中间特征尺度、VAE 的潜空间表示以及文本编码器的输出，任何一个组件升级都可能改变这些接口，使旧分支静默失效——输出不再符合控制图，却不会报错，因为网络仍能正常产生图像。</p>
+<p>因此部署时应把控制模型、提取器和基础生成器作为一个不可拆分的版本单元管理。具体做法是锁定一份组合清单，明确记录主干版本、控制分支版本、文本编码器版本、VAE 版本以及控制提取器版本；任何组件变动后，都要在多个控制强度、多种分辨率和多条件组合下重新验证，而不是只在默认配置下跑一次。输入端的控制图在进入网络前要先做校验，包括尺寸、数值范围、坐标系统和隐私信息，避免非法输入造成静默偏差或合规问题。</p>
+<p>运行时还要设置资源上限和失败回退机制，防止异常输入拖垮服务。为了可复现，一次生成所涉及的提示、控制图、遮罩、强度权重、随机种子以及完整的模型组合都应当被保存下来，这样任何一次输出都能在事后被重建或排查。版本绑定与完整记录，是把可控生成从“能跑”推进到“可复现、可回归、可审计”的关键。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各环节串起来，可以看到一条从用户意图到可验证实践的完整因果链。</p>
+<p>起点是把用户意图拆成互不重叠的自由度：语义、几何、身份和风格，明确用户到底要控制哪一维。接着为每个自由度选择最合适的条件表示——文本承载语义，姿态骨架和深度承载几何，参考图承载身份与风格。不同粒度的条件被独立编码，并按尺度注入基础生成器的不同层，而不是挤在同一条路径上互相污染。</p>
+<p>在真正生成之前，先检查多条件之间是否可行、是否冲突，并声明优先级和作用区域；冲突无法调和时向用户报告而非随机折中。生成时把控制强度调到刚好满足硬约束的最低值，避免在遵循度、质量与多样性三者之间做过度的牺牲。完成后通过消融逐通道确认每路控制的真实贡献，同时检查参考图是否泄漏了未声明的身份或背景信息。</p>
+<p>评测阶段把遵循度、质量、多样性与未指定区域的保留分开测量，防止只测目标约束而奖励“把不该固定的也固定住”的副作用。最后把模型、提取器和基础生成器作为一个版本单元锁定，并保存每次生成的全部来源信息，保证可复现。</p>
+<p>这条链要能经得起验证，需要明确每一层在“可控生成：把&#39;像什么&#39;拆成语义、结构、身份与约束的多通道条件”中固定什么、观察什么证据。输入层固定同一批样本、相同的前处理流程与权限边界，记录输入哈希、切片标签和拒绝原因；机制层只改变一个核心变量而锁定其余配置，观察关键中间状态以及首次偏离预期的位置；输出层采用同一套验收规则与资源预算，比较质量、成本、延迟和失败率的分层差异；反证层保留不启用目标机制的对照组，确认收益是否跨样本与随机种子稳定复现。当输入、机制、输出、反证四层都能对齐时，控制生成就不再只是一次“看起来像”的巧合，而是一条可定位、可回归、可复现的因果路径。</p></div>
+<table class="dd-table"><thead><tr><th>验证层</th><th>在“可控生成：把“像什么”拆成语义、结构、身份与约束的多通道条件”中固定什么</th><th>观察什么证据</th></tr></thead><tbody>
+      <tr><td>输入</td><td>同一批样本、前处理与权限边界</td><td>输入哈希、切片标签和拒绝原因</td></tr>
+      <tr><td>机制</td><td>仅改变一个核心变量，其余配置锁定</td><td>关键中间状态及首次偏离预期的位置</td></tr>
+      <tr><td>输出</td><td>同一验收规则与资源预算</td><td>质量、成本、延迟和失败率的分层差异</td></tr>
+      <tr><td>反证</td><td>保留不启用目标机制的对照组</td><td>收益是否跨样本与随机种子稳定复现</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">Adding Conditional Control to Text-to-Image Diffusion Models</a>：ControlNet架构</li><li><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Classifier-Free Diffusion Guidance</a>：条件与无条件指导</li><li><a href="https://arxiv.org/abs/2302.08453" target="_blank" rel="noopener">T2I-Adapter</a>：可组合条件适配器</li><li><a href="https://arxiv.org/abs/2308.06721" target="_blank" rel="noopener">IP-Adapter</a>：图像提示与文本条件解耦</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/controllable-generation">在地图中查看概念关系</a></nav>
+</article></main></body></html>

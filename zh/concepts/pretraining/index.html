@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>预训练 · AI 知识地图</title>
+<meta name="description" content="在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/pretraining/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="预训练">
+<meta property="og:description" content="在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/pretraining/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="预训练">
+<meta name="twitter:description" content="在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/pretraining/#page","name":"预训练","description":"在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型","url":"https://ai-knowledge-map.com/zh/concepts/pretraining/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"预训练","item":"https://ai-knowledge-map.com/zh/concepts/pretraining/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">预训练</span></li></ol></nav><article id="dd-article" data-concept-id="pretraining">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">预训练</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">在海量无标注文本上自监督学习，一次性把「通用能力」灌进模型</p>
+<p class="dd-ali">Pre-training · 预训练</p>
+<p class="dd-metabar">建议 20–30 分钟 · 中级 · 需要：了解「自监督/监督学习」「大语言模型」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 预训练让模型从大规模数据中学习可迁移表示与生成规律，是基础模型能力的重要来源。自回归模型常做下一 token 预测，编码器也可用掩码预测，多模态模型还会混合对比、重建等目标。数据筛选、去重、配比与训练计算同样关键；后训练则进一步塑造指令遵循、偏好与安全行为。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>为什么「预」</b>——为什么不直接针对任务训练，而要先来一步「预」训练。</li>
+    <li><b>怎么训</b>——这份「通用底子」具体是怎么学出来的。</li>
+    <li><b>凭什么</b>——只是预测下一个 token，怎么就灌进了语言、常识、推理。</li>
+    <li><b>产出什么</b>——预训练完，得到的是能直接用的助手吗。</li>
+    <li><b>为什么贵</b>——为什么只有少数机构做得起预训练。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>针对任务直接训练又贵又窄，于是先学通用底子、再适配任务——这就是「预」训练。<span>（§1）</span></li>
+    <li>它用数据自身构造监督信号：自回归模型预测下一 token，其他架构也可用掩码、对比或重建目标，因此能利用大规模无标注数据。<span>（§2）</span></li>
+    <li>每个位置以 −ln p 贡献损失，整段文本自动产生密集监督；梯度让正确 token 的相对概率上升。<span>（§3）</span></li>
+    <li>预测目标迫使模型压缩许多可复用结构，但能力与数据、规模和任务分布共同决定。<span>（§4）</span></li>
+    <li>产出的是博学但不听话的基座，还需微调+对齐才成助手。<span>（§5）</span></li>
+    <li>预训练同时消耗数据、算力、通信与工程时间，所以多数团队复用基座再适配。<span>（§6）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>为什么要「预」训练<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>直接针对某个具体任务训练模型，表面上是最近的路，实际却要付出两笔高昂的代价。第一笔是数据：任务专属训练需要人工标注好的数据，标注成本高、数量有限。第二笔是能力的窄化：这样训练出来的参数只学会了这一小块任务的规律，换一个任务几乎要从头再来。预训练就是为了绕开这两笔代价而设计的两段式思路：先用海量通用数据训练出一个「通用底子」——让模型先学会语言是怎么使用的、世界大致是什么样；然后再针对具体任务做少量调整。「预」字的意义正在于此：在正式面对具体任务之前，先打好通用基础。</p>
+<p>把整个任务说完整：预训练的输入是两样东西——大规模通用数据，以及一个尚未学会任何任务规律的模型；输出是一份参数检查点，这份检查点可以直接用于后续微调，也可以直接用来做表示提取。训练过程中发生的机制循环很直接：模型反复从数据自身构造出预测目标，计算损失，再根据损失更新参数。这里值得留意的是「从数据自身构造目标」这个环节——通用数据本身并不携带人工标注的任务答案，目标是从原始数据里自动生成的，这也是预训练能利用海量无标注数据的关键。</p>
+<p>因果链的另一端是判断标准。训练损失下降只说明模型记住了训练数据，不能证明「通用底子」已经形成；真正要看的，是模型在训练中从未见过的留出集上的损失，以及多类能力评测的表现。只有当模型在没见过的数据上也能稳定预测、在多种能力上都有起色时，才能说这层通用基础立住了。</p>
+<p>这条路线有清晰的适用边界。当目标任务与预训练数据中蕴含的规律高度重合时，预训练积累的广泛规律可以被直接复用，收益最大；但如果目标领域与预训练数据相差很远，通用底子并不直接适用，这时需要做领域适配，甚至应该考虑换用针对该领域的专用模型，而不是硬套通用参数。</p>
+<p>用一句话概括这条因果链：先当通才，再当专才。就像人先接受多年通识教育，再做岗前专项培训——通识那一步最贵、最耗时，但只要一次做好，之后各种专项都能快速上手。预训练在整个流程中的地位与此完全一致：它是成本最高、周期最长的环节，也是后续一切专项能力得以廉价获得的前提。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>它具体怎么训<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>这份「通用底子」不是靠人工讲解灌进去的，而是从数据本身构造出监督信号，让模型自己学出来的。这是预训练与任务专属训练最本质的区别：不需要逐样本的人工标签，原始数据就是题目，数据自己携带的部分内容就是答案。</p>
+<p>构造信号的主流方式有三类，各自对应不同的输入构造方式、模型输出形式和适用方向。自回归模型做下一 token 预测：给定左侧已经出现的文本作为前缀，模型输出下一个 token 在整个词表上的概率分布，这类目标适合训练自回归生成模型。BERT 类编码器做掩码预测：把序列中的部分 token 遮住，模型输出这些被遮位置对应的词表概率，这类目标适合训练双向编码表示。多模态系统则常用对比或重建目标：输入是配对视图（比如图文对）或被破坏的样本，模型输出匹配分数或还原后的样本，这类目标适合训练视觉与多模态表示。三类目标都在回答同一个问题——怎样让原始数据自己提供学习目标——但它们是不同的算法，不能随意互换：目标决定了模型每一步能看见什么、输出什么，也决定了最终模型更擅长生成、编码还是跨模态匹配。</p>
+<p>以自回归训练为例看一次完整的参数更新循环：模型对前缀做完计算，得到下一个 token 的预测分布；用交叉熵衡量这个预测分布与真实的下一个 token 之间的差距——差距越大，损失越高；再对这个损失做梯度下降，把参数朝让预测更接近真实 token 的方向更新。这个循环在海量文本上重复执行，模型就逐步学会了文本序列的统计规律。</p>
+<p>「减少人工标签」带来的自由度并不是无限的，它的上限被数据质量卡住。高质量数据本身是稀缺资源：采集许可、清洗、去重、语言与领域的配比，每一个环节都会直接影响最终模型的能力分布、偏见倾向和记忆风险。数据选得差，自监督信号再多也学不出好的通用底子。</p>
+<p>验证环节同样要遵守目标与数据的一致性。必须使用与训练目标相符的留出数据来评估损失和表现，不能拿训练损失充数；同时还要额外检查数据泄漏、重复样本，以及训练目标与下游任务之间是否存在错位——目标练的是生成，下游却要求编码，这种错位会直接削弱评估结论的有效性。</p>
+<p>把整件事压缩成一句话：预训练，就是在尽可能多的文本上，反复做「预测下一个 token」这一个自监督任务。简单到反直觉，却是整座大厦的地基。</p></div>
+<table class="dd-table"><thead><tr><th>预训练目标</th><th>输入怎样构造</th><th>模型输出什么</th><th>适用重点</th></tr></thead><tbody><tr><td>下一 token 预测</td><td>给定左侧前缀</td><td>下一 token 的词表概率</td><td>自回归生成模型</td></tr><tr><td>掩码预测</td><td>遮住序列中的部分 token</td><td>被遮位置的词表概率</td><td>双向编码表示</td></tr><tr><td>对比或重建</td><td>配对视图，或被破坏的样本</td><td>匹配分数，或还原后的样本</td><td>视觉与多模态表示</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>手算一次 next-token 训练信号<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>上一节的循环可以在一句文本上完整地手算出来。取文本「猫 喜欢 鱼 &lt;EOS&gt;」（&lt;EOS&gt; 是序列结束符）。训练样本不是把这句文本当作一个整体，而是把序列右移一次、逐位错开：每个前缀都成为一个独立样本，样本的正确答案是紧跟其后的那个 token。于是这一句文本产生三个训练位置：看到前缀「猫」要预测「喜欢」，看到前缀「猫 喜欢」要预测「鱼」，看到前缀「猫 喜欢 鱼」要预测 &lt;EOS&gt;。</p>
+<p>假设模型在三个位置上分给正确 token 的概率依次为 0.50、0.25、0.80。每个位置的损失用负对数概率表示：−ln p。第一个位置是 −ln 0.50 ≈ 0.693，第二个位置是 −ln 0.25 ≈ 1.386，第三个位置是 −ln 0.80 ≈ 0.223。这里的直观含义是：概率越低，负对数越大，损失越重；模型最没把握的位置恰好贡献了最大的损失。</p>
+<p>把三个位置的损失平均，就得到整句的平均交叉熵：L̄ = (0.693 + 1.386 + 0.223) ÷ 3 ≈ 0.767。符号上，L̄ 表示三个预测位置的平均交叉熵，t 是位置编号，pₜ 是模型在位置 t 分给正确 token 的概率，ln 是自然对数。再把平均交叉熵做指数变换：PPL = exp(L̄) = e^0.767 ≈ 2.15。这里的 exp 是以自然常数 e 为底的指数函数，它把平均负对数损失换算回概率尺度——2.15 可以理解成：在评测数据上，模型平均每步预测下一个 token 时，感觉上像在约 2.15 个等可能候选中做选择。在相同分词器和相同数据上，PPL 越小，通常表示模型越会预测后续 token。</p>
+<p>损失算出来之后，参数怎么动？反向传播会同时调整模型中所有共享的参数，使得在相似上下文下，正确 token 的 logit 相对上升。回到第二个位置：如果一次更新后模型给「鱼」的概率从 0.25 升到 0.50，这个位置的损失就从 −ln 0.25 = 1.386 直接降到 −ln 0.50 = 0.693。一个位置的改善立刻反映为整句平均损失的下降，这正是梯度下降在文本序列上运作的最小单位。</p>
+<p>这个例子的真正价值在于它揭示了训练信号的密度。训练不是每段文本只提供一个标签，而是一个长度为 L 的序列通常贡献约 L 个 next-token 监督位置。一句十个 token 的文本，大约能切出十个训练样本。海量原始文本乘上这个密度，自动产生了密集到不需要人工标注的训练信号——这是预训练在数据层面能够成立的算术基础。</p>
+<p>最后要明确这个指标的边界。低困惑度并不等于事实更真，也不等于助手更好用。它只表示模型在评测文本的分布上更会预测 token。数据污染、死记硬背、只学会风格上的捷径，或者训练目标与真实任务错位，都可能让 PPL 与真实能力分离——指标下降，能力却未必同步提升。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="同一文本右移产生三个下一 token 训练目标"><defs><marker id="pre-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g class="svg-t"><text x="55" y="60">猫</text><text x="170" y="60">喜欢</text><text x="300" y="60">鱼</text><text x="405" y="60">&lt;EOS&gt;</text><text x="55" y="125">输入前缀逐步增长</text><text x="55" y="190">每个位置都有一个监督目标</text></g><g stroke-width="3" fill="none" marker-end="url(#pre-a)"><path d="M75 70C105 100 140 100 165 70" stroke="#8b5cf6"/><path d="M195 70C220 100 270 100 295 70" stroke="#0ea5e9"/><path d="M320 70C340 100 380 100 400 70" stroke="#10b981"/></g><g class="svg-t"><text x="105" y="145">预测“喜欢”</text><text x="255" y="145">预测“鱼”</text><text x="420" y="145">预测结束</text></g></svg><figcaption>训练不是每段文本只给一个标签；长度为 L 的序列通常贡献约 L 个 next-token 监督位置，因此大规模原始文本可自动产生密集训练信号。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>前缀</th><th>正确下一个 token</th><th>正确概率 p</th><th>损失 −ln p</th></tr></thead><tbody><tr><td>猫</td><td>喜欢</td><td>0.50</td><td>0.693</td></tr><tr><td>猫 喜欢</td><td>鱼</td><td>0.25</td><td>1.386</td></tr><tr><td>猫 喜欢 鱼</td><td>&lt;EOS&gt;</td><td>0.80</td><td>0.223</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="pretraining-cross-entropy-perplexity" data-display="mathml"><math display="block" aria-label="平均交叉熵等于三个位置负对数概率的平均，约为零点七六七；困惑度等于平均交叉熵的指数，约为二点一五"><mtable><mtr><mtd><mover><mi>L</mi><mo>¯</mo></mover><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mn>3</mn></munderover><mi>ln</mi><mo> </mo><msub><mi>p</mi><mi>t</mi></msub><mo>=</mo><mfrac><mrow><mn>0.693</mn><mo>+</mo><mn>1.386</mn><mo>+</mo><mn>0.223</mn></mrow><mn>3</mn></mfrac><mo>≈</mo><mn>0.767</mn></mtd></mtr><mtr><mtd><mi>PPL</mi><mo>=</mo><mi>exp</mi><mo>(</mo><mover><mi>L</mi><mo>¯</mo></mover><mo>)</mo><mo>=</mo><mi>exp</mi><mo>(</mo><mn>0.767</mn><mo>)</mo><mo>≈</mo><mn>2.15</mn></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>凭什么这一步能灌进这么多能力<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>最关键的疑问是：只是预测下一个 token，怎么就学到了语法、常识，甚至推理？答案在于预测任务对表示施加的约束强度。模型面对的是跨主题的海量样本，前缀无穷多、组合无穷多。为了在大量不同文本上同时降低预测误差，模型不能只靠死记——只背下某一句，无法解释无穷多从未见过的新前缀为什么也能预测准。唯一能让损失持续下降的出路，是形成可以复用的内部结构：语法的规律、语义的关联、代码的结构、事实之间的共现模式。于是训练的直接产出是更低的损失和一套更新后的内部表示；翻译、代码或推理成绩，则是这套表示被提示词和评测任务调用之后的外部表现。</p>
+<p>这里必须把「会续写推理文本」和「可靠推理」分开。模型可能真的复用了抽象规律，也可能只是记住了模板、利用了表面线索。判断标准要看泛化的证据强度：如果在新组合的题目、反事实的题目和分布外样本上仍然稳定答对，说明掌握的是可以迁移的规律；如果只在熟悉的格式上成功，就不能声称学到了通用算法。</p>
+<p>规模在这个因果链里的位置同样值得说清楚。增加参数量、数据量和算力，通常能平滑地降低预测损失，并可能让某些能力越过「可用」的阈值——这类经验关系被称为缩放定律。但缩放定律描述的是趋势，不是保证。规模不是充分条件：数据质量、训练目标的设计、模型结构、评测口径，任何一环的变化都会改变最终结果。「更大」不自动意味着事实更可靠，也不自动意味着对所有人更公平。规模提供的是潜力的上限，把潜力兑现成能力，仍取决于前面的每一个设计选择。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>产出的是「基座模型」<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>预训练跑完，是不是就得到了一个能直接使用的助手？还不是。这个阶段结束时得到的是一份基座模型检查点：知识渊博，但不听话。你问它一个问题，它可能顺着「文本通常怎么接下去」的惯性，续写出更多问题，而不是给出回答。原因在于训练目标本身——它只学了文本序列的概率规律，从没学过「被提问时应该回答」这条行为规范。</p>
+<p>要把基座模型变成能对话的助手，还需要后面两步训练：指令微调教它「被问就答」，偏好对齐教它答得既有用又安全（详见「微调」「对齐」两个深读页）。于是这一阶段的边界变得清晰：输入是预训练数据流，输出是基座模型检查点及其训练记录；「能续写、留出集损失低」说明语言建模目标取得了进展，并不说明模型已经会遵循指令。</p>
+<p>从海量文本到基座模型再到助手，这条链路的分工可以记成两句话。预训练负责灌进「知识与能力」，得到博学但不听话的基座；微调与对齐负责校准「行为」，把基座变成日常使用的助手。三步缺一不可。再压缩一步：预训练决定「会什么」，微调与对齐决定「怎么表现」——模型绝大部分知识和能力，都是在预训练这一步灌进去的。</p>
+<p>还要守住一条边界：后续训练可以改变模型的回答习惯和偏好，却不能保证事实正确。基座知识再多，也仍然是概率性的统计知识，不是经过验证的事实库。高风险用途必须依赖独立的评测、检索或工具验证，不能因为「这模型预训练数据很多」就免除核查。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 110" role="img" aria-label="从海量文本到基座模型再到助手">
+      <rect x="20" y="40" width="120" height="40" rx="8" fill="#21252d" stroke="#6b7484"/><text x="80" y="58" text-anchor="middle" class="svg-t" font-size="11">海量无标注文本</text><text x="80" y="73" text-anchor="middle" class="svg-t" font-size="10">近乎无限</text>
+      <line x1="140" y1="60" x2="175" y2="60" stroke="#6b7484" stroke-width="1.4" marker-end="url(#j1)"/>
+      <text x="200" y="47" text-anchor="middle" class="svg-t" font-size="10">预训练</text><text x="200" y="76" text-anchor="middle" class="svg-t" font-size="10">自监督</text>
+      <rect x="230" y="40" width="120" height="40" rx="8" fill="#21252d" stroke="#6b8cbe" stroke-width="2"/><text x="290" y="58" text-anchor="middle" class="svg-tn" font-size="11">基座模型</text><text x="290" y="73" text-anchor="middle" class="svg-t" font-size="10">博学 · 不听话</text>
+      <line x1="350" y1="60" x2="385" y2="60" stroke="#6b7484" stroke-width="1.4" marker-end="url(#j1)"/>
+      <text x="410" y="47" text-anchor="middle" class="svg-t" font-size="10">微调</text><text x="410" y="76" text-anchor="middle" class="svg-t" font-size="10">+对齐</text>
+      <rect x="440" y="40" width="110" height="40" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="495" y="58" text-anchor="middle" class="svg-tn" font-size="11">对话助手</text><text x="495" y="73" text-anchor="middle" class="svg-t" font-size="10">听话 · 安全</text>
+      <defs><marker id="j1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg>
+    <figcaption>图 1　预训练负责灌进「知识与能力」，得到博学但不听话的基座；微调与对齐负责校准「行为」，把基座变成你日常用的助手。三步缺一不可。</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>它为什么这么贵<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>预训练之所以关键，是因为它是能力的主要来源；它之所以贵，是因为把这份能力灌进去要同时烧掉四类资源。前沿通用模型的从头预训练要消耗大规模数据、加速器集群和长期工程投入，成本通常只有少数机构能承担——但要注意，「小模型预训练」并非绝对做不起，贵的是前沿规模的那一档，而不是预训练这件事本身。</p>
+<p>四类成本来源各有不同的增长逻辑。计算与显存：参数和 token 越多，需要的前向与反向计算就越多，这直接决定训练时长和加速器集群的规模。通信：多台设备必须不断同步梯度、参数或激活，网络一旦成为瓶颈，集群利用率就会被拖低，机器在等数据而不是在算。数据工程：采集、许可、过滤、去重和配比需要反复迭代，它不直接体现在算力账单上，却决定模型的污染程度、偏见倾向和长尾覆盖质量。失败与验证：硬件故障、数值异常、坏批次都会中断动辄数月的长训练，必须配套检查点、监控和恢复系统，否则一次中断可能损失大量已完成的训练进度。</p>
+<p>做预算规划时，输入端是目标模型规模、训练 token 数、硬件效率和数据方案，输出端是预计计算量、时间、成本以及可恢复的检查点计划。其中有一笔预算最容易被忽视：总训练预算要在参数量与 token 数之间合理分配。Chinchilla 等工作表明，只增加参数而训练数据不足，并非计算最优——模型够大但没看够数据，等于把算力花在了喂不饱的容量上。</p>
+<p>读训练过程的状态也要分清因果。实际吞吐低于理论峰值，不一定表示模型设计错误，也可能是通信或数据管线存在瓶颈；反过来，训练跑得飞快，也不代表数据和能力质量达标。速度快只说明工程效率，不说明模型学得好。</p>
+<p>既然从头预训练这么贵，绝大多数人不会自己重来一遍，而是站在别人预训练好的模型上做微调——这就是迁移学习：花很小的代价，借用了那份天价的通用底子（见「微调」深读页）。预训练与微调因此形成一种分工：一次昂贵的通才养成，配合无数次廉价的专才适配。在具体场景里选哪条路，要按数据量、任务差异和预算权衡：数据少、任务和预训练领域接近，直接微调最划算；数据多且领域特殊，小规模领域模型或继续预训练才值得考虑。</p></div>
+<table class="dd-table"><thead><tr><th>成本来源</th><th>为什么会增长</th><th>工程结果</th></tr></thead><tbody><tr><td>计算与显存</td><td>更多参数和 token 需要更多前向、反向计算</td><td>决定训练时长与加速器规模</td></tr><tr><td>通信</td><td>多设备要同步梯度、参数或激活</td><td>集群利用率可能被网络拖住</td></tr><tr><td>数据工程</td><td>采集、许可、过滤、去重和配比需反复迭代</td><td>决定污染、偏见和长尾覆盖</td></tr><tr><td>失败与验证</td><td>硬件故障、数值异常和坏批次会中断长训练</td><td>需要检查点、监控和恢复系统</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各环串起来，预训练整条因果链是连贯的。起点是一个经济判断：针对任务直接训练，又贵又窄，于是改成先学通用底子、再适配任务——「预」训练的两段式由此成立。</p>
+<p>通用底子怎么学？靠数据自身构造监督信号。自回归模型预测下一 token，其他架构可用掩码、对比或重建目标，总之不依赖人工标注就能从大规模无标注数据里获得学习信号。信号落在每个位置上：每个位置以 −ln p 贡献损失，一段文本右移一次就自动产生密集的监督位置；梯度下降再让正确 token 的相对概率逐次上升。微观的算术在宏观上积累出一个约束：预测目标迫使模型压缩出大量可复用的结构——语法、语义、代码结构与事实共现。但这一步不承诺结果自动变好，最终能力由数据、规模与任务分布共同决定。</p>
+<p>链的末端产出的是基座模型：博学但不听话，因为语言建模目标从没教过它「被问就答」。要成为助手，还需微调与对齐两步。而整条链的成本结构——数据、算力、通信与工程时间的多重消耗——解释了为什么多数团队不从头训练，而是复用现成基座再做适配。</p>
+<p>抓内核可以用两个问题自检：能不能讲清预训练为什么不用标注就能学到这么多；能不能说出基座模型和对话助手之间差的是哪两步。这两个问题都能答上来，这条链才算真正握在手里。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>进入预训练之前，有四块先修地基需要先站住：监督学习——它给出了「从数据构造损失、用梯度更新参数」的基本循环；自监督学习——它解释了如何从数据本身造出监督信号，这正是预训练的核心机制；大语言模型与 Transformer——它们决定了模型的结构、容量和序列建模方式。有了这些，预训练页的四个核心概念才落得下来：两段式（预训练→微调）的总体路线、自监督预测下一个词的具体目标、基座模型这一中间产物，以及通才与专才的能力分工。</p>
+<p>紧邻的延伸概念沿着链条两侧展开。往「训练之后」走是微调、指令微调与对齐：基座模型正是在这里被塑造成会听话、有用的助手。往「训练规模」走是缩放定律：它描述参数、数据、算力与损失之间的经验关系，是理解预训练为什么需要如此大规模投入的钥匙。更远的延伸则触及规模化应用与工程现实：合成数据补足高质量数据的稀缺，蒸馏把大模型的能力压缩进更小的模型，量化与部署则决定训练好的模型最终以什么代价跑到用户手里。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>监督学习、自监督学习、大语言模型、Transformer</td></tr>
+      <tr><td><b>本页核心</b></td><td>两段式（预训练→微调）、自监督预测下一个词、基座模型、通才 vs 专才</td></tr>
+      <tr><td>紧邻延伸</td><td>缩放定律、微调、对齐、指令微调</td></tr>
+      <tr><td>更远</td><td>合成数据、蒸馏、量化与部署</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., Language Models are Few-Shot Learners</a>：自回归预训练与上下文学习。</li>
+    <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">Devlin et al., BERT</a>：掩码语言建模说明预训练目标并不只有下一 token 预测。</li>
+    <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., Training Compute-Optimal Large Language Models</a>：模型规模与训练 token 数的计算最优权衡。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-21</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/pretraining">在地图中查看概念关系</a></nav>
+</article></main></body></html>

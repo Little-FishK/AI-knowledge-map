@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>PEFT / LoRA：冻结主干，只学习低秩权重增量 · AI 知识地图</title>
+<meta name="description" content="从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/peft-lora/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="PEFT / LoRA：冻结主干，只学习低秩权重增量">
+<meta property="og:description" content="从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/peft-lora/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PEFT / LoRA：冻结主干，只学习低秩权重增量">
+<meta name="twitter:description" content="从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/peft-lora/#page","name":"PEFT / LoRA：冻结主干，只学习低秩权重增量","description":"从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。","url":"https://ai-knowledge-map.com/zh/concepts/peft-lora/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"PEFT / LoRA：冻结主干，只学习低秩权重增量","item":"https://ai-knowledge-map.com/zh/concepts/peft-lora/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">PEFT / LoRA：冻结主干，只学习低秩权重增量</span></li></ol></nav><article id="dd-article" data-concept-id="peft-lora">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">PEFT / LoRA：冻结主干，只学习低秩权重增量</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> LoRA 假设任务适配所需的权重变化可由低秩矩阵近似，用两个小矩阵表示 ΔW，在冻结基座时减少梯度、优化器状态和检查点。它不会按同等比例减少<b>前向计算、训练激活或行为风险</b>，rank 与注入层决定表达上限。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>推导 LoRA 参数量和前向；区分训练状态与总显存；理解 rank/alpha/目标模块；安全合并、切换与评测适配器。</div>
+<ol class="dd-chain"><li>确定任务是否需参数适配</li><li>选择目标层/rank/alpha</li><li>冻结基座并训练 A/B</li><li>消融容量与数据覆盖</li><li>分离或按配方合并部署</li><li>回归目标/通用/安全并记录血缘</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>任务适配为什么可能是低秩变化<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>一个线性层里，基座权重 W 是一个 d×k 矩阵：它把 k 维输入变换成 d 维输出。微调这个层时，模型真正要学习的是权重的改变量 ΔW，微调后的权重等于 W + ΔW。如果直接微调，ΔW 的每一个元素都是独立可训练的参数，规模与 W 本身相同，也就是 d×k 个参数。</p>
+<p>关键问题在于：ΔW 真的需要那么多个彼此独立的自由度吗？矩阵的秩可以理解为它所包含的彼此独立的变化方向的数量。一个 d×k 的满秩矩阵拥有 min(d, k) 个独立方向，每个方向的调整互不牵制；而低秩矩阵的变化被压缩在少数几个方向上，其余方向只是这些方向的线性组合。如果新任务只需要沿少数方向调整，ΔW 的信息量就远小于它的尺寸，没有必要为 d×k 个元素分别存储独立的改变量。</p>
+<p>预训练模型在大量数据上已经学到了通用表示，适应新任务时往往不需要推翻这些表示，而只需沿少数方向调整注意力分布或特征组合。也就是说，任务相关的改变量 ΔW 很可能集中在一个低维子空间里。如果 ΔW 的有效秩是 r，且 r 远小于 d 和 k，它就可以分解为两个窄矩阵的乘积：ΔW = B·A，其中 B 是 d×r，A 是 r×k。这样需要存储和训练的参数从 d×k 个减少到 r×(d+k) 个，而变化方向的信息保留在秩 r 上。</p>
+<p>从层的输入输出接口看，一切都没有变化：输入仍然是原层的 k 维向量，输出仍然是 d 维向量。区别在于输出由两部分相加得到：冻结的基座照常计算 W·x，另外叠加一条低秩分支 B·A·x 作为任务相关的增量。基座提供稳定的通用能力，低秩分支承载任务专属的调整。</p>
+<p>需要明确，这是一个经验假设，而不是对所有任务都成立的定理。如果任务涉及复杂的领域迁移、多个任务之间互相冲突的调整方向，或者模型从未学习过的全新能力，ΔW 的有效秩可能并不低，此时需要更大的 r、把 LoRA 施加到更多层，甚至回到全量微调。低秩约束的是增量 ΔW，而不是基座 W：推理时仍然需要完整的 W 参与计算，LoRA 只是通过一个小分支改变它的输出。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>前向公式与缩放<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>LoRA 在前向传播中并不替换原线性层，而是在它旁边挂一条可训练的旁路，然后把两条路径的结果相加。对输入 x（k 维向量），输出 h 的计算为：</p>
+<p>h = W·x + (α/r)·B·A·x</p>
+<p>其中 W 是冻结的 d×k 基座权重，h 是 d 维输出。低秩分支由两个实数矩阵组成（ℝ 表示矩阵元素为实数）：A 是 r×k，B 是 d×r。数据流是先降后升——A 先把 k 维输入压缩到 r 维中间表示，B 再把 r 维展开回 d 维，因此该分支最终输出仍与基座输出同维，可以直接相加。r 是秩的上限，决定中间表示的宽度；α 是缩放系数，α/r 这个比例控制低秩分支相对基座分支的强度：同样的 α 下，r 越大，单位更新被摊得越薄。</p>
+<p>初始化的选择保证了训练开始时的行为一致性：A 通常随机初始化，B 初始化为零。这样在第一步之前 B·A = 0，ΔW = 0，模型输出与纯基座完全相同，学习是从“零增量”出发逐步展开的。这个零初始化还意味着 α/r 直接决定了每次参数更新的尺度；如果增大 rank 却不同步调整 α，增量的整体强度会随之改变，rank 与 α 必须作为一对参数来理解。dropout 同样可以只作用于 LoRA 分支，训练时随机丢弃部分旁路信号，作为针对增量的正则化手段。</p>
+<p>反向传播时 W 不更新，但梯度仍然要穿过 W 向前传播，才能到达更早层的适配器和本层的 A、B。也就是说冻结的只是参数，不是计算：基座的前向与反向激活开销原样保留。评估配置时也不能只看训练损失：如果目标任务的指标提高而通用能力下降，说明低秩分支确实改变了任务行为，但引入了对基座能力的回归，这类配置不应被训练损失选中。rank 更不是一个简单的“压缩比旋钮”——它改变的是可表达的增量子空间的宽度，必须与 α、施加的层数和训练数据一起做消融，才能判断某个取值是否真正合适。</p></div>
+<div class="dd-formula" data-formula-id="peft-lora-forward" data-display="mathml"><math display="block" aria-label="输出 h 等于基座权重 W 乘输入 x，加 alpha 除以秩 r 再乘 B A x；A 是 r 乘 k，B 是 d 乘 r"><mrow><mi>h</mi><mo>=</mo><mi>W</mi><mi>x</mi><mo>+</mo><mfrac><mi>α</mi><mi>r</mi></mfrac><mi>B</mi><mi>A</mi><mi>x</mi><mo>,</mo><mspace width="0.8em"/><mi>A</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>r</mi><mo>×</mo><mi>k</mi></mrow></msup><mo>,</mo><mspace width="0.5em"/><mi>B</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>d</mi><mo>×</mo><mi>r</mi></mrow></msup></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>运行示例：4096×4096 投影省多少可训练参数<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>以一个具体规模来算这笔账。取一个 d = k = 4096 的方阵作为基座权重 W：它包含 4096 × 4096 = 16,777,216 个参数，约 16.8M。全量微调意味着这 16.8M 个元素全部进入优化器；而 LoRA 只训练两个窄矩阵——A 的形状是 8×4096，B 的形状是 4096×8，二者合计 8 × 4096 × 2 = 65,536 个参数。65,536 约为 16.8M 的 0.391%，即两条低秩矩阵只训练了不到基座 0.4% 的参数，却能在基座输出上叠加出一个 4096×4096 的增量。关键代价在于：省下的是需要训练、存储和回传梯度的参数量，而不是前向计算量——完整的 4096×4096 基座矩阵仍然要参与每一次乘法。</p>
+<p>rank 在这个例子里扮演的是容量旋钮，三档取值对应的参数开销如下：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">rank</th><th class="dd-align-left">A+B 参数</th><th class="dd-align-left">相对 W 的比例</th><th class="dd-align-left">表达能力与代价</th></tr></thead><tbody><tr><td class="dd-align-left">4</td><td class="dd-align-left">32,768</td><td class="dd-align-left">0.195%</td><td class="dd-align-left">最省，增量子空间最窄，可能欠拟合</td></tr><tr><td class="dd-align-left">8</td><td class="dd-align-left">65,536</td><td class="dd-align-left">0.391%</td><td class="dd-align-left">常用示例起点</td></tr><tr><td class="dd-align-left">32</td><td class="dd-align-left">262,144</td><td class="dd-align-left">1.563%</td><td class="dd-align-left">容量更高，可表达状态更多</td></tr></tbody></table></div>
+<p>表里每一行都是 rank 乘以 2 × 4096 的结果：rank 每翻一倍，可训练参数和可表达增量子空间同步翻倍。rank=4 时参数只占 0.195%，代价最低，但方向数也最少，复杂任务可能因增量子空间过窄而欠拟合；rank=8 是示例的起点取值；rank=32 则给出 1.563% 的参数占比，容量明显更高。即便取到 32，训练参数仍只有全量微调的约 1/64，同时中间表示的维度更宽，能容纳更多独立的变化方向。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="4096乘4096基座矩阵通过4096乘8和8乘4096低秩矩阵产生增量"><rect x="20" y="65" width="170" height="120" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="105" y="92" text-anchor="middle" class="svg-t">冻结 W</text><text x="105" y="120" text-anchor="middle" class="svg-t">4096×4096</text><text x="105" y="148" text-anchor="middle" class="svg-t" font-size="11">16,777,216 参数</text><text x="105" y="170" text-anchor="middle" class="svg-t" font-size="11">仍参与前向</text><text x="240" y="128" class="svg-t">+</text><rect x="285" y="86" width="105" height="78" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="337" y="112" text-anchor="middle" class="svg-t">A: 8×4096</text><text x="337" y="139" text-anchor="middle" class="svg-t" font-size="11">32,768</text><text x="420" y="128" class="svg-t">→</text><rect x="455" y="86" width="105" height="78" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="507" y="112" text-anchor="middle" class="svg-t">B: 4096×8</text><text x="507" y="139" text-anchor="middle" class="svg-t" font-size="11">32,768</text><text x="590" y="128" class="svg-t">=</text><rect x="615" y="75" width="70" height="100" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="650" y="104" text-anchor="middle" class="svg-t">ΔW</text><text x="650" y="129" text-anchor="middle" class="svg-t" font-size="11">秩≤8</text><text x="650" y="151" text-anchor="middle" class="svg-t" font-size="11">65,536</text><text x="350" y="218" text-anchor="middle" class="svg-t">可训练比例 65,536 / 16,777,216 ≈ 0.391%</text></svg><figcaption>图 1　两个低秩矩阵只训练约 0.39% 参数，但完整基座矩阵仍要参与计算。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>rank</th><th>A+B 参数</th><th>相对 W</th><th>表达能力/代价</th></tr></thead><tbody><tr><td>4</td><td>32,768</td><td>.195%</td><td>最省，可能欠拟合</td></tr><tr><td>8</td><td>65,536</td><td>.391%</td><td>示例起点</td></tr><tr><td>32</td><td>262,144</td><td>1.563%</td><td>容量高、状态更多</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>省的是哪些内存，哪些仍然存在<span class="dd-badge eng">资源</span></h2>
+<div class="dd-agent-response"><p>训练参数降到基座的 0.39%，并不意味着显存也降到 0.39%。省下的部分集中在“优化器按参数记账”的那一类开销：冻结的 W 不再需要保存梯度，也不需要保存 Adam 的一阶和二阶矩状态，这两块在全量微调中通常和权重本身同样量级甚至更大；适配器的检查点也只有两条窄矩阵那么大。显存中仍然存在的部分则与“参数是否训练”无关：基座权重本身必须常驻，前向传播产生的激活、反向传播要回放或重算的中间值、以及矩阵乘法的临时工作区都原样保留。激活量随 batch 大小、序列长度和层数增长，在长序列训练中往往是显存的主导项，而这部分 LoRA 一点也没有减少。</p>
+<p>把训练资源逐项拆开，两类方案的差异如下：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">资源</th><th class="dd-align-left">全量微调</th><th class="dd-align-left">LoRA</th></tr></thead><tbody><tr><td class="dd-align-left">基座权重</td><td class="dd-align-left">需要</td><td class="dd-align-left">需要，且保持冻结</td></tr><tr><td class="dd-align-left">基座梯度</td><td class="dd-align-left">需要保存</td><td class="dd-align-left">通常不保存</td></tr><tr><td class="dd-align-left">基座优化器状态</td><td class="dd-align-left">需要</td><td class="dd-align-left">不需要</td></tr><tr><td class="dd-align-left">激活</td><td class="dd-align-left">需要</td><td class="dd-align-left">仍需要，可配合激活检查点</td></tr><tr><td class="dd-align-left">适配器状态</td><td class="dd-align-left">无</td><td class="dd-align-left">小，但需梯度与优化器状态</td></tr></tbody></table></div>
+<p>也就是说，LoRA 消除的是 W 及其优化器状态对应的梯度与矩内存，保留的是权重、激活与计算所需的一切中间存储。训练速度同样不会按参数比例加速：每一层最贵的运算是 W·x 这个大矩阵乘，它占据主要 FLOPs 且照常执行，低秩旁路只是额外叠加的一小笔计算。省得多的地方是参数存储、优化器内存和多任务切换成本，而不是前向与反向的基础算力。</p></div>
+<table class="dd-table"><thead><tr><th>资源</th><th>全量微调</th><th>LoRA</th></tr></thead><tbody><tr><td>基座权重</td><td>需要</td><td>需要且冻结</td></tr><tr><td>基座梯度</td><td>需要</td><td>通常不存</td></tr><tr><td>基座优化器状态</td><td>需要</td><td>不需要</td></tr><tr><td>激活</td><td>需要</td><td>仍需要，可检查点</td></tr><tr><td>适配器状态</td><td>无</td><td>小但需梯度/优化器</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>目标模块决定任务能改哪里<span class="dd-badge eng">调参</span></h2>
+<div class="dd-agent-response"><p>LoRA 挂在哪一层，任务数据就能改动哪一段计算。Transformer 的注意力机制由四组投影组成，各有分工：Q（查询）决定“要找谁”，K（键）决定“怎样匹配”，V（值）决定“取什么信息”，O（输出）决定“怎样把聚合结果送回主干”。紧随注意力的 MLP 是前馈特征变换层，常见实现拆成 gate、up、down 三个投影：gate 控制信息通过的强度，up 把维度升高以扩大表达空间，down 再把向量坐标数量降回主干维度。这里的降维只是向量坐标数从多变少，使 MLP 输出能回到与主干一致的维度；它并不是把样本特征压成平面图那类降维。对这些模块施加 LoRA，就是在显式选择：允许任务数据改写哪些计算环节。</p>
+<p>目标层的选择直接牵动容量与代价的权衡。只覆盖少数层（例如仅 Q、V）参数更省、行为更可控，但可能表达空间不足；覆盖更多层能提升适配能力，同时增加过拟合风险与部署开销。要在这两者间做选择，正确的做法是受控消融：固定数据与总训练 token 不变，横向比较“仅 QV”“全部注意力投影”“注意力+MLP”等方案，rank 也可以按层不同来分配。配置的输入是候选模块、rank 与相同的训练预算，输出不是训练损失，而是各方案在目标任务、通用能力、安全与未见分布上的指标。如果增加目标层后训练损失继续下降、但留出集收益停滞，应该解释为新增容量没有转化为泛化，而不是据此继续无条件扩层。</p>
+<p>工程上还有两个易踩的坑。模块命名随架构而异：同一组投影在不同实现里可能叫 q_proj、query、c_attn 之类的不同名字，配置时必须以目标实现的命名为准。若配置里的模块名与实际层路径对不上，框架可能匹配不到任何目标层，静默地训练了零个参数而照常报“训练完成”；因此启动时应打印可训练参数列表与命中的层路径，并对参数数量做断言，让这类错误在第一步就暴露出来。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>QLoRA 把冻结基座量化存储<span class="dd-badge eng">量化</span></h2>
+<div class="dd-agent-response"><p>QLoRA 把“冻结基座”与“量化存储”叠在一起：基座权重不是以原始精度常驻，而是被量化成低比特编码，只训练旁路的 LoRA 适配器。量化就是让每个权重从连续的高精度取值变成少数离散编码的近似，4-bit 意味着每个编码只有 2⁴ = 16 种取值；计算时编码会被还原成较高精度的近似值参与矩阵乘。基座参数本身不更新，但这次矩阵运算仍然要产生梯度，并把它继续传给本层的 A、B 以及更早层的适配器——冻结针对的是参数更新，梯度通路并没有被切断。</p>
+<p>QLoRA 的三个技术组件解决的是三个不同层面的问题，而不是同一种精度的三个别名。NF4 是一种为近似正态分布的权重设计的 4-bit 编码，处理的是权重本身的表示质量；double quantization 把量化所用的缩放尺度等元数据也再做一轮压缩，处理的是量化元数据的存储；paged optimizer 在显存紧张时把优化器状态分批迁移出去，处理的是训练过程的峰值内存。三者合起来才能把大模型训练塞进消费级硬件。</p>
+<p>从输入输出看，QLoRA 的输入是量化后的基座、LoRA 配置与任务数据，输出是训练好的适配器以及配套的量化训练配方。训练完成后有两条不同的部署路线：把适配器合并进高精度基座再重新量化，或者保持基座与适配器分离推理。二者不是同一个产物，量化误差与合并路径会把结果拉开差距；如果两种产物的指标不一致，应把差异归因到合并与再量化这一步，并对两条路线分别评测，而不是笼统地说“QLoRA 效果如何”。资源边界同样要分清楚：训练内存下降不等于训练 FLOPs 同比例下降，反量化与基座的前向、反向计算仍然照常发生，省的主要是基座参数的存储精度与优化器内存。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>合并与动态切换有不同工程边界<span class="dd-badge eng">部署</span></h2>
+<div class="dd-agent-response"><p>适配器训练完成后，有两种落地形态：把增量写回基座，或让分支始终独立存在。合并就是执行 W ← W + (α/r)·B·A，把 ΔW 折叠进权重本身。合并后的模型只有一份权重，推理时不再有旁路的额外矩阵乘，也不需要加载和装配适配器，适合固定使用单一适配器的场景。但它也付出了代价：那份“任务专属的增量”不再作为独立开关存在，想回到基座原状或换一个任务，就得重新准备合并前的文件；新产生的完整权重文件体积也和基座一样大。分离保存则相反——适配器只是两个窄矩阵的小文件，天然支持按租户、按任务切换和随时回滚，但推理多出分支算子的开销，调度上需要把使用相同适配器的请求批在一起执行，频繁换载不同适配器会让缓存抖动、吞吐下降。</p>
+<p>适配器也不是一个可以随意迁移的孤立文件。它必须与基座哈希、tokenizer、目标模块配置、rank、α、dtype 和训练数据版本绑定。形状相同但内容不同的基座会给出完全未经验证的行为，即使加载成功也不代表结果可信。合并顺序与量化顺序同样影响最终产物：先合并再量化与先量化再合并得到的不一定是同一个模型，因此产物必须记录完整配方。多适配器叠加是另一种探索能力组合的方式，但不同增量的尺度与方向会相互干扰，组合后的行为没有任何保证。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">形态</th><th class="dd-align-left">优势</th><th class="dd-align-left">风险</th></tr></thead><tbody><tr><td class="dd-align-left">分离</td><td class="dd-align-left">小文件、可切换与回滚</td><td class="dd-align-left">额外算子、批调度要求、基座错配</td></tr><tr><td class="dd-align-left">合并</td><td class="dd-align-left">单一权重、推理简单</td><td class="dd-align-left">生成新的完整大文件、失去独立开关</td></tr><tr><td class="dd-align-left">多适配器组合</td><td class="dd-align-left">可尝试能力组合</td><td class="dd-align-left">尺度与方向干扰，无保证</td></tr></tbody></table></div></div>
+<table class="dd-table"><thead><tr><th>形态</th><th>优势</th><th>风险</th></tr></thead><tbody><tr><td>分离</td><td>小文件、可切换/回滚</td><td>额外算子、批调度、错配</td></tr><tr><td>合并</td><td>单权重、推理简单</td><td>新大文件、失去独立开关</td></tr><tr><td>多适配器组合</td><td>尝试能力组合</td><td>尺度/方向干扰，无保证</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>小参数比例不代表小行为变化<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>参数占比小，不等于对模型行为的影响小。神经网络的输出由参数所指向的方向以及层层放大的链条决定，而不是与改动参数的数量成线性关系。一个只有 0.1% 参数的增量，若施加在多层网络里并作用于所有输入 token，每一次微小的方向调整都会沿各层传递并放大，最终显著重排输出 logits——这正是 LoRA 能教会模型新输出格式的原因。同样的机制也能反向起作用：如果训练数据里混入不安全样本，少量更新就足以破坏安全拒答；如果数据过窄，模型会过拟合特定措辞、遗忘通用能力，甚至对某些输入模式形成触发器。行为改变的程度取决于改动落在了哪些方向和哪些层上，而不是改动元素的个数。</p>
+<p>因此适配器的训练与分发都要按“影响行为”而不是“体积小”来治理。训练数据需要许可、去重和防投毒处理；第三方适配器应视为可执行的模型制品，加载前扫描来源、校验签名并评测行为。评测不能只盯目标任务：需要对目标、通用能力、长上下文、多语言、安全、工具调用和校准做回归，出现退化时用逐层、逐适配器的消融定位是哪个增量引起的。适配器的供应链风险恰恰来自它的轻便——小文件极易传播，也极易绕过对完整模型的审查流程；加载一个适配器的权限等级，应当等同于加载模型代码或权重本身。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>何时选 LoRA，何时选其他方案<span class="dd-badge intuition">决策</span></h2>
+<div class="dd-agent-response"><p>任务的性质决定适配手段，三种典型需求对应三条不同路线。如果任务主要需要的是频繁更新的新知识，模型参数并不是存放知识的合适位置——优先使用检索增强（RAG）或工具调用，让外部知识源承担时效性。如果只是少量输出格式或行为约束的改变，先尝试提示词与结构化约束，成本最低且无训练风险。LoRA 的优势场景是多租户任务适配与有限算力：多个任务共享一个冻结基座，各自持有小型适配器，训练、存储和切换的开销都低。而当任务需要广泛重塑模型能力、数据与资源又充分时，全量微调才是值得考虑的选项；端侧部署若还受体积约束，则要叠加蒸馏与量化。</p>
+<p>选择时不能只在“LoRA 行不行”上打转，而要拿同预算下的全部基线做横向比较：提示词、检索、LoRA、全量微调，以及直接换一个更强的模型。核算的是每成功任务的完整成本——训练、存储、适配器路由、推理延迟、评测与长期维护，而不是“GPU 能不能跑得动”这一项。这种比较也能给出扩容的停止条件：当增加 rank 或目标层数后，真实留出集的增益进入平台期，而通用能力与安全退化开始上升，就说明适配器容量已经超出了任务所需，应该停止扩容量，而不是继续加大配置。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>LoRA 的完整因果链从“是否需要动参数”这个问题出发。先用提示词、检索或约束试探：如果知识更新靠外部源就能解决，如果格式与行为改变几行约束就能覆盖，就不需要训练任何参数。只有当任务的适配必须写入模型的计算本身时，才进入参数适配这一步——而这一步的落点，正是下一环的选择依据。</p>
+<p>选定要改的环节后，配置目标是层、rank 与 α。目标层决定任务能改写哪些计算环节，rank 决定可表达增量子空间的宽度，α/r 决定增量相对基座的强度；三者共同约束了适配器的容量与代价。接着冻结基座，只训练 A 与 B：B 零初始化保证训练从“行为与基座完全一致”出发，梯度穿过冻结的 W 继续流向 A、B，训练结束时得到两条窄矩阵构成的 ΔW。</p>
+<p>得到适配器之后，验证工作从“训练损失下降”转向“容量是否真的转化为泛化”：固定数据与训练 token，对 rank、层数和数据覆盖做消融，观察留出集增益是否随容量同步上升，还是只带来了过拟合与通用能力退化。部署时在分离与合并之间按工程边界选择——分离适合多任务切换与回滚，合并适合固定单一适配器，无论哪种都按完整配方记录基座哈希、rank、α 与量化顺序。最后以回归收尾：对目标、通用、长上下文、多语言、安全、工具调用与校准逐项评测，并把训练数据版本、适配器血缘一并记录在案。每一步的产出都是下一步的输入，任何一环省略，都会让后续的判断失去依据。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA</a>：低秩权重适配</li><li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">QLoRA</a>：量化基座上的高效微调</li><li><a href="https://arxiv.org/abs/1902.00751" target="_blank" rel="noopener">Parameter-Efficient Transfer Learning for NLP</a>：Adapter 参数高效迁移</li><li><a href="https://arxiv.org/abs/2303.10512" target="_blank" rel="noopener">AdaLoRA</a>：自适应秩分配</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/peft-lora">在地图中查看概念关系</a></nav>
+</article></main></body></html>

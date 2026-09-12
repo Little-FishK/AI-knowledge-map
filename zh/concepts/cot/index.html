@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>思维链 CoT · AI 知识地图</title>
+<meta name="description" content="让模型先写出一步步推理，再给答案——复杂题上更准">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/cot/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="思维链 CoT">
+<meta property="og:description" content="让模型先写出一步步推理，再给答案——复杂题上更准">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/cot/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="思维链 CoT">
+<meta name="twitter:description" content="让模型先写出一步步推理，再给答案——复杂题上更准">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/cot/#page","name":"思维链 CoT","description":"让模型先写出一步步推理，再给答案——复杂题上更准","url":"https://ai-knowledge-map.com/zh/concepts/cot/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"思维链 CoT","item":"https://ai-knowledge-map.com/zh/concepts/cot/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">思维链 CoT</span></li></ol></nav><article id="dd-article" data-concept-id="cot">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">思维链 CoT</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">让模型先写出一步步推理，再给答案——复杂题上更准</p>
+<p class="dd-ali">Chain-of-Thought · CoT · 思维链</p>
+<p class="dd-metabar">建议 20–30 分钟 · 中级 · 需要：了解「大语言模型」怎样逐词生成</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 思维链提示用示例或指令诱导模型生成<b>中间推理步骤</b>，在部分多步任务上可提高准确率。它为自回归生成提供额外计算轨迹，但效果依赖模型规模、任务与提示；输出的解释不必忠实反映内部计算。现代推理系统还可能隐藏原始轨迹，只返回简短答案或摘要。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>是什么</b>——「写出推理再答」具体指什么。</li>
+    <li><b>为什么有效</b>——写出来和不写，凭什么差这么多。</li>
+    <li><b>怎么触发</b>——怎么让模型产生思维链。</li>
+    <li><b>进阶</b>——自洽性、思维树是怎么加强它的。</li>
+    <li><b>和推理模型的关系</b>——现在的「推理模型」和思维链什么关系。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>让模型先写推理再答，把「一步答难题」换成「一步步来」——这就是思维链。<span>（§1）</span></li>
+    <li>它有效，是因为模型一次一个 token、没有草稿；拆成小步后每步更易接对，且已写的步骤成了后面的上下文。<span>（§2）</span></li>
+    <li>触发靠 few-shot 示例（上下文学习）或一句「一步步思考」。<span>（§3）</span></li>
+    <li>可用自洽性（多次投票）、思维树（多分支择优）加强。<span>（§4）</span></li>
+    <li>推理模型通过后训练学习使用推理预算；它可产生隐藏轨迹，也可结合多候选、搜索、验证与工具，不只是思维链的“训练版”。<span>（§5）</span></li>
+    <li>代价是更慢更贵、占窗口、且不保证真对；简单题不必用。<span>（§6）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>什么是思维链<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>面对需要多步运算的问题，语言模型最容易暴露的弱点是不假思索：它倾向在一步之内直接给出最终答案，把本该拆开的中间计算全塞进一次隐式的“心算”里。一步答错的后果很直观——答案错了，用户却看不出错在哪一步。</p>
+<p>思维链针对的正是这个弱点，而办法出奇地简单：不让模型直接蹦出结论，而是要求它先把推理过程一步步写出来，最后再给答案。这就像考试时老师要求“写出解题步骤”，而不是只填一个得数。写出步骤之后，每一步推理都被摊在明面上，成为一个可以单独检查的局部状态。</p>
+<p>一个具体例子能看出差别。同一道“先求和、再相除”的题，同一个模型直接作答时给出的答案是 6，这是错的；一旦要求它把“先求和、再相除”的中间过程写出来，最后给出的答案就变成 7，也就是对的。差别不在模型，而在是否被要求把推理展开成文字。</p>
+<p>图 1 展示的就是这种对比：同一道题、同一个模型，直接答时容易在隐式的心算里翻车；把推理一步步写出来，等于把一道难题拆成几步简单运算，每一步都更不容易接错，正确率因此明显上升。</p>
+<p>由此可以得到思维链的定义：它让模型先写出一步步推理、最后再给结论，用于解决模型不假思索、一步就答错多步难题的问题。它的输入是一个多步问题，外加要求分步作答的指令或示例；它改变的是模型的计算路径——把“直接猜结论”替换成“逐步写出可检查的局部状态，再据此得出答案”；它的输出包含中间步骤与最终答案两部分。</p>
+<p>也要看到它的边界：写出步骤通常意味着难题被拆成了更容易接对的小步，但中间文字本身仍可能出错，也可能只是对结论的事后合理化。思维链提高了推理被看见、被检查的机会，并不保证每一步都真实正确。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 150" role="img" aria-label="直接答容易错，写出推理更准">
+      <g>
+        <rect x="20" y="30" width="240" height="90" rx="8" fill="none" stroke="#cf6f6f"/>
+        <text x="140" y="52" text-anchor="middle" class="svg-t">直接答</text>
+        <text x="140" y="78" text-anchor="middle" class="svg-tn" font-size="13">问 → 「6 人」</text>
+        <text x="140" y="104" text-anchor="middle" class="svg-t" fill="#cf6f6f" font-size="12">一步跳到答案，容易错 ✗</text>
+      </g>
+      <g>
+        <rect x="300" y="30" width="240" height="90" rx="8" fill="none" stroke="#4f9d78"/>
+        <text x="420" y="52" text-anchor="middle" class="svg-t">写出推理</text>
+        <text x="420" y="76" text-anchor="middle" class="svg-tn" font-size="12">23+5=28 → 28÷4=7</text>
+        <text x="420" y="104" text-anchor="middle" class="svg-t" fill="#4f9d78" font-size="12">拆成小步，每步更容易对 ✓</text>
+      </g>
+    </svg>
+    <figcaption>图 1　同一道题、同一个模型：直接答容易在心算里翻车；把推理一步步写出来，就把一道难题拆成了几步简单运算，正确率明显上升。</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>为什么它有效：逐步演算<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>写出来和不写出来，凭什么差这么多？模型不是本来就会推理吗？要回答这个问题，得先回忆大语言模型生成文本的基本方式：一次生成一个 token，整个过程没有一张全局草稿（详见「大语言模型」深读页）。这个事实决定了两种作答方式的差别。</p>
+<p>直接作答，等于要求模型一步就蹦出整道难题的最终答案。中间的多步推理全靠一次生成暗中完成：模型可以在内部“心算”，但没有任何机会把中间结果摆出来核对。多步推理中任何一步悄悄出错，最终答案就错了，而且没有纠正的余地。</p>
+<p>把推理写出来，等于把一道难题拆成一串小步。每一步只需要在前面的步骤基础上“接对下一步”：要做的不是一口气解完整道题，而是在给定的局部状态上往前推一小步，单步出错的概率天然更低。更重要的是，已经写出的步骤成了后续步骤的上下文——模型能“看着自己刚写的”继续往下推，而不是凭记忆重算一遍，因此稳得多。</p>
+<p>一句话概括：思维链可以类比为给模型一张外显草稿纸——增加中间 token，让后续 token 能条件化在已经生成的步骤上。需要注意，这是有用的直觉，不等于这些文字完整揭示了模型真实的内部计算。</p>
+<p>逐步演算的价值在于步骤可检查。以“23 人转来 5 人，平均分 4 组”为例，可以把它写成一组状态序列：初始 n₀ = 23；转来 5 人后 n₁ = 23 + 5 = 28；分成 4 组后每组 g = n₁ ÷ 4 = 7。最后还可以反向验算 7 × 4 = 28，确认分组结果与总人数一致。假如中间误写成 23 + 5 = 27，用户一眼就能看出错误出在第二步而不是最后一步——错误位置被步骤暴露出来。但也要承认，语言步骤本身仍可能写错：把 23 + 5 算成 27 的错误并不会因为写出来就自动消失。所以凡是可以交给机器精确计算的算术，最好交给计算器或代码验证，而不是依赖语言步骤的心算。</p>
+<p>把这些串起来：思维链之所以有效，可以理解为给模型提供了一张外显草稿纸，它回答的是“为什么写出来比不写更准”这一疑问。它的起点是“逐词生成、没有全局草稿”这一事实；做法是先把一步答难题拆成一串小步，再让已经写出的步骤成为后续生成的上下文；产出的是更稳的分步推理。可检查的中间步骤让错误位置能够被看见，但语言步骤本身仍可能写错——能算的最好交给计算器或代码验证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>怎么触发它<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>知道思维链有用之后，下一个问题是操作层面的：怎么让模型真的把中间步骤写出来，而不是继续直接蹦答案？常见做法有两种，差别只在于给不给示例。</p>
+<p>第一种是 few-shot 思维链：在提示里放一两个「带完整推理过程」的示例，先演示一遍“题目 → 分步推理 → 答案”的样子，再给出真正要解的问题。模型看到示例就会照着“先推理、再作答”的格式办。这种靠示例改变行为的能力就是上下文学习——模型并没有被重新训练，只是从提示里的演示中现学现用（详见「上下文学习」深读页）。</p>
+<p>第二种是 zero-shot：一个示例都不给，只在问题后面加一句“让我们一步一步思考”（Let&#39;s think step by step），也常常足以触发模型把步骤写出来。它不需要精心准备示例，代价小，效果则取决于模型本身对“逐步解答”这种格式的熟悉程度。</p>
+<p>无论哪种方式，本质上都是提示工程里的一招：思维链是“让它分步”这条提示套路的代表。它能靠示例触发，正是因为有上下文学习兜底——你在示例里演示“答案要带推理”，模型就照着做。所以这两个概念是同一机制的两个侧面：思维链描述的是想要的行为，上下文学习描述的是模型为什么会听从示例的演示（见「提示工程」「上下文学习」）。</p>
+<p>把触发方式归纳一下：它要解决的问题是如何稳定地引出中间步骤；它的输入是任务本身、模型能力、示例数量和输出要求；做法是先给一两个带步骤的示例让模型模仿，或者干脆只要求它逐步处理；输出既可能是直接答案，也可能是分步回答，取决于触发是否成功。需要提醒的是，能被示例触发只说明模型在做上下文学习，不等于每一步都可靠——高风险的结果仍要交给计算器、代码或来源核验。</p></div>
+<table class="dd-table">
+    <thead><tr><th>方式</th><th>怎么做</th></tr></thead>
+    <tbody>
+      <tr><td><b>few-shot 思维链</b></td><td>在提示里给一两个「带推理过程」的示例，模型照着「先推理再答」的样子办（这就是上下文学习，见其深读页）</td></tr>
+      <tr><td><b>zero-shot</b></td><td>不给示例，只加一句「<b>让我们一步一步思考</b>」，也常能触发它写出步骤</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>进阶变体<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>单条思维链偶尔会在某一步出错，整条链就跟着错到底。想更可靠，方向很明确：让模型多想几次，再用某种规则把多次思考合并起来。两个有代表性的变体分别对应“纵向多样”和“横向展开”两种思路。</p>
+<p>自洽性走的是纵向路线：同一道题，让模型独立地解多次。为了让多次解答彼此不同、覆盖更多可能的思路，采样时用较高的温度制造多样性；随后统计各条链给出的最终答案，取多数票作为结论。多数票天然能抵消个别链的偶然错误，因此比信任单条链更稳（见「自洽性」）。</p>
+<p>思维树 ToT 走的是横向路线：它和自洽性一样，靠“多生成几个候选、再合并择优”来补单条链的不足，差别只在候选的组织方式——不是把多条完整路径留到结尾再投票，而是把候选思路组织成树状结构、在比较中取舍。两者同属「多想几次再合并」这一思路，只是组织得更结构化（细节见「思维树 ToT」）。</p>
+<p>两个变体的共同点是都在“让模型多想、再合并”上做文章：一条链嫌单薄，就多来几条投票；一个方向嫌窄，就把多个候选摆在一起比较、择优。它们输入的除了单链结果，还有采样预算与合并候选的规则；自洽性把多次独立采样按最终答案投票，思维树则把多个候选组织成树状结构再取舍；前者输出投票后的答案，后者输出取舍后的思路与结论。</p>
+<p>代价与边界同样要看清：这些方法都是用更多计算换更稳的答案。多条路径得出同一结论通常表示答案更可信，但如果各条候选链高度相关——本质上是同一种错误的重复——那么“多想”仍可能一致地错，只是错得更有气势。</p></div>
+<table class="dd-table">
+    <thead><tr><th>变体</th><th>思路</th></tr></thead>
+    <tbody>
+      <tr><td><b>自洽性</b></td><td>同一题<b>独立解多次</b>（用较高温度制造多样），再对答案<b>取多数票</b>，比单条链更稳（见「自洽性」）</td></tr>
+      <tr><td><b>思维树</b></td><td>不走一条道，而是像搜索一样<b>展开多个分支、评估、回溯</b>，适合更难的规划类问题（见「思维树 ToT」）</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>和「推理模型」的关系<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>近两年出现了一类专门的「推理模型」，它们也以“想得多、算得久”著称，容易让人以为就是思维链的加强版。两者确实相关，但来源和形态不同。</p>
+<p>思维链最初是一种提示技巧：能力在模型里，靠指令或示例从外面把它引出来。你不加任何训练，只要换一种问法，模型就开始写中间步骤。</p>
+<p>推理模型走的是另一条路：通过专门的后训练，模型学会了如何使用更多的推理预算。所谓预算，指的是允许花费的额外计算量——它可能表现为更长的推理轨迹，也可能表现为生成多个候选、做搜索、调用验证器或工具。而且，这些原始的中间轨迹不一定向用户展示，用户看到的可能只是浓缩后的最终回答。</p>
+<p>所以两者不能画等号。可以把比较放在四个维度上看：能力从哪来——靠提示引出，还是靠后训练学得；预算怎么控制——由提问者临时约定，还是模型自己按任务分配；计算长什么样——线性地写步骤，还是可以搜索、多候选、调用工具；轨迹是否可见——思维链的中间步骤通常写在回答里，推理模型的原始轨迹则可以隐藏。比较的结论是：两者都用到更多推理，所以相关；但“写出长篇过程”不是推理模型的定义，把中间过程藏起来也完全符合推理模型的做法。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>代价<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>中间步骤不是免费的。多生成出来的每一步都在消耗真实资源，所以使用前值得先想清楚：这张“草稿纸”什么时候反而得不偿失？</p>
+<p>最直接的代价是更慢、更贵。写出推理意味着输出变长：同样的题目，模型要多生成一批 token，用户等待的时间随之拉长，按 token 计费的场景里费用也成比例上升。其次是窗口占用：长推理会挤占宝贵的上下文窗口预算，窗口被推理过程吃掉的部分，就不能再用来放更多背景材料或历史对话（见「上下文窗口」）。第三个代价最容易被忽视：不是所有题都需要它。简单问题本来一步就能答对，强行要求思维链只会让回答变得啰嗦，还把上面两项代价白白付掉。思维链的价值集中在真正多步推理的难题上——那里的收益足以覆盖成本。</p>
+<p>还有一个更微妙的提醒：模型“写出来的推理”不总等于它“真实的内部计算”。有时步骤看着合情合理，结论却是错的；有时结论恰好正确，步骤却是事后编出来的。思维链提升的是准确率，而不是正确率的保证；同样，这些文字也不该被当作对模型内部的可靠解释。</p>
+<p>把代价和取舍串起来，就得到一张使用前的决策清单：先判断题目是否真的多步、结果是否可以外部验证，再看延迟、费用、上下文预算和出错风险能否承受，然后才在“直接答”“分步生成”“转交给工具计算”之间做选择。输出变长通常意味着更慢更贵、还挤占窗口；简单题强行分步只会啰嗦。总结成一句：思维链既不保证正确，也不是可靠的可解释性证据——它是一张有用但有成本的草稿纸。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面几节串起来，思维链的完整因果链是这样的。</p>
+<p>模型一次只生成一个 token，整个生成过程没有一张全局草稿。在这个前提下，让模型直接作答，等于要求它一步蹦出整道难题的答案，中间推理全在暗中完成，错了也没机会纠正。思维链做的就是把「一步答难题」换成「一步步来」：先写推理、再给结论。</p>
+<p>为什么写出步骤就更准？因为拆成小步之后，每一步只需要在前面已写步骤的基础上接对下一小步，单步更容易做对；而且已经写出的步骤会成为后续生成的上下文，模型是看着自己的草稿往下推，而不是凭空重算。</p>
+<p>要触发它，可以给一两个带推理过程的示例——这靠的是上下文学习，模型从示例里现学「先推理再答」的样子；也可以一个示例都不给，只加一句「让我们一步一步思考」。</p>
+<p>一条链不够稳时，还可以加强：自洽性把同一题独立解多次，再对答案取多数票；思维树则不沿单条路走，而是展开多个分支、评估、回溯，像搜索一样择优。</p>
+<p>把视线拉远，专门的推理模型和思维链相关但不等同。推理模型通过后训练学会了如何使用更多推理预算——预算可以花在更长轨迹上，也可以花在多候选、搜索、验证器或工具上，而且原始轨迹可以不展示给用户。它不是思维链的「训练版」，而是另一条获得推理能力的路径。</p>
+<p>最后是代价：写出推理意味着输出变长、更慢更贵，还挤占上下文窗口；同时步骤本身不保证正确，简单题也不值得动用它。</p>
+<p>能从头到尾把这根链条讲通，才算真正抓住了思维链的内核：用「模型逐词生成、没有草稿」解释为什么写出推理会更准，并且说清思维链与推理模型的区别。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>思维链本身不复杂，但要真正理解它，需要先站住几个地基概念：大语言模型如何逐词生成、整个过程没有全局草稿——这是“为什么写出来更准”的全部解释来源；上下文学习解释了为什么给一两个示例模型就会照做；提示工程则提供了触发它的具体手法。缺少其中任何一个，思维链就只剩一句“多写步骤更准”的口号。</p>
+<p>本页自身的核心在于四件事：写出推理，把隐式心算变成可检查的中间步骤；拆解难题，把一道多步题切成一串小步；触发方式，用 few-shot 示例或一句分步指令引出步骤；代价，更慢、更贵、占窗口、且不保证正确。</p>
+<p>顺着这根线可以继续延伸。与本章紧邻的是它的加强版与近亲：自洽性和思维树 ToT 分别在“多投几次票”和“展开成一棵树”两个方向上加固单条链；推理模型是把推理能力从提示层面搬到训练层面之后的样子；上下文窗口则是衡量“草稿纸”空间成本时的前提概念。再往远处走，ReAct 把推理与行动交替起来，自我反思让模型审视自己刚写下的过程，评测则是检验这一切是否真的有效的最终尺度。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>大语言模型、逐词生成、上下文学习、提示工程</td></tr>
+      <tr><td><b>本页核心</b></td><td>写出推理、拆解难题、触发方式、代价</td></tr>
+      <tr><td>紧邻延伸</td><td>自洽性、思维树 ToT、推理模型、上下文窗口</td></tr>
+      <tr><td>更远</td><td>ReAct、自我反思、评测</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al., Chain-of-Thought Prompting</a>：思维链提示的原始实验与适用范围。</li>
+    <li><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al., Self-Consistency</a>：多条推理路径采样与答案聚合。</li>
+    <li><a href="https://openai.com/index/evaluating-chain-of-thought-monitorability/" target="_blank" rel="noopener">OpenAI, Evaluating chain-of-thought monitorability</a>：可见推理文本、内部过程与监控边界。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/cot">在地图中查看概念关系</a></nav>
+</article></main></body></html>

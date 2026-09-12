@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Agent 身份、权限与密钥管理 · AI 知识地图</title>
+<meta name="description" content="模型提出意图，受控执行层证明谁能对什么做哪件事">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/agent-identity-access/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="Agent 身份、权限与密钥管理">
+<meta property="og:description" content="模型提出意图，受控执行层证明谁能对什么做哪件事">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/agent-identity-access/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent 身份、权限与密钥管理">
+<meta name="twitter:description" content="模型提出意图，受控执行层证明谁能对什么做哪件事">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/agent-identity-access/#page","name":"Agent 身份、权限与密钥管理","description":"模型提出意图，受控执行层证明谁能对什么做哪件事","url":"https://ai-knowledge-map.com/zh/concepts/agent-identity-access/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Agent 身份、权限与密钥管理","item":"https://ai-knowledge-map.com/zh/concepts/agent-identity-access/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Agent 身份、权限与密钥管理</span></li></ol></nav><article id="dd-article" data-concept-id="agent-identity-access">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Agent 身份、权限与密钥管理</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">模型提出意图，受控执行层证明谁能对什么做哪件事</p>
+<p class="dd-ali">Agent IAM · Authorization · Delegation · Secrets Management</p>
+<p class="dd-metabar">建议 35–45 分钟 · 中高级 · 需要：Agent、工具调用、OAuth、零信任</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> Agent 的自然语言意图不是授权。安全系统必须把<b>用户、Agent 会话、执行服务和资源服务器</b>视为可区分主体，把每次动作还原为“谁代表谁、对哪个资源、做什么、在什么条件下”，再用显式委托、最小权限、短期窄范围凭证、逐请求策略与端到端审计限制错误和提示注入的爆炸半径。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>为什么模型说“用户允许了”不构成授权证据？</li><li>认证、授权、委托和审计分别回答什么？</li><li>一次用户任务怎样变成窄范围短期凭证？</li><li>为什么签名有效仍可能是错误令牌？</li><li>怎样让密钥永不进入模型上下文，并在工具侧再次强制权限？</li></ul></div>
+<ol class="dd-chain"><li>不可信评论可能让模型提出“访问 B、公开仓库、立即发布”。<span>（§1）</span></li><li>模型输出只是 Agent 会话的候选动作，不是用户签名的委托。<span>（§2–3）</span></li><li>执行网关把动作还原为主体、动作、资源和上下文，并求权限交集。<span>（§4）</span></li><li>仓库 B 和 admin 动作不在交集，立即拒绝；发布缺确认，暂停而非猜测。<span>（§4）</span></li><li>获准动作只取得短期、窄受众和窄 scope 凭证，资源服务再次验证。<span>（§5–6）</span></li><li>密钥从未进入模型，攻击文本无法直接复制凭证；审计链支持归因和撤销。<span>（§7）</span></li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>意图、身份、授权不是一件事<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>身份与访问控制的起点，是一个看似简单却极容易跳步的问题：一句自然语言“我代表用户”，为什么不能像门禁卡一样开门？</p>
+<p>门禁卡之所以能开门，是因为它携带了可验证的密码学凭证：它绑定了某个主体、明确了可进入的区域、并带有有效期。而“我代表用户”这句话完全不具备这些属性。模型的工作是解释内容并提出“下一步做什么”，它输出的是一份候选动作；身份系统的工作是用登录会话、证书或工作负载身份证明“这个请求到底来自谁”；授权系统的工作是依据策略判断“该主体现在能否对该对象执行该动作”。三者是三个独立的环节，各自回答不同的问题：意图回答“想做什么”，身份回答“你是谁”，授权回答“你被允许做什么”。</p>
+<p>自然语言之所以不能充当授权证据，是因为它可以被伪造、被转述、被他人复述，也可以被提示注入直接改写。一句话里没有密码学意义上的主体，没有明确指向的受众，也没有有效期：它既无法证明说话者是谁，也无法约束这句话只能作用于哪个资源、在什么时间范围内生效。因此，把模型生成的文本当作门禁凭证，等于把一个可以被任何人涂改的字条当成钥匙。</p>
+<p>最常见的危险跳步就发生在这里：从“用户希望修复 issue”直接推出“Agent 可以读取所有仓库”，再进一步推出“可以公开仓库并发布”。这三个命题分属三组不同的集合——业务目标是“用户想达成什么”，技术能力是“系统能做什么”，本次授权是“这次请求被允许做什么”。它们之间没有任何逻辑上的包含关系。“希望修复 issue”描述的是业务目标；“读取所有仓库”是远超该目标所必需的技术能力；“公开仓库并发布”则是一次具有外部后果的高风险动作，必须在授权集合中被显式允许才能执行。正确做法是把这三组集合逐次求交集，而不是默认它们彼此覆盖。</p>
+<p>身份与访问控制体系的价值，正在于把模型的意图与现实世界的执行权限分开。它的输入是：用户目标、可验证主体、候选动作、目标资源和上下文；输出只有三种：允许、拒绝或暂停。系统先认证“是谁”，再授权“能做什么”，最后针对本次委托求交集，得到本次请求实际被允许执行的动作。自然语言在这一链路中只能提出候选，永远不能成为门禁凭证本身。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>先画清四类主体与两条链<span class="dd-badge eng">架构</span></h2>
+<div class="dd-agent-response"><p>当一次请求要穿过多个服务时，真正的问题不再是“这是不是一个合法请求”，而是“在经过层层转发之后，谁代表谁的链条还能不能被追溯出来”。</p>
+<p>为了把这条链画清楚，需要先把参与请求的四类主体区分开：最终的人类用户、承载用户意图的 Agent 会话、实际发出网络调用并访问资源的执行工作负载，以及持有资源并做出最终裁决的资源服务器。四者并不等同，请求在它们之间传递时，每一步都发生一次身份的转移或约束。图 1 正是用两条链把这种关系显式表达出来：委托链说明“这个动作代表谁”——用户把意图委托给 Agent 会话，会话再把执行任务委托给工作负载；执行链说明“谁真正访问了资源”——实际触碰资源服务器的是执行工作负载，而不是最初发话的用户。两条链指向不同的主体，混淆它们就会在授权判断上出错。</p>
+<p>这种区分的必要性，在共享机器人账号这一常见做法上体现得最尖锐。很多系统让所有 Agent 共用一个名为“bot”的技术账号去调用 API，表面上看请求能通过认证，实际上却同时抹掉了这两条链：日志里只剩“bot 成功调用 API”，没人能说清这次调用是哪个用户发起、由哪个任务会话委托、由哪个工作负载执行。一旦共享账号出问题，撤销权限只能整体封禁，无法针对具体用户精准撤销；出现事故时无法归因到具体责任人；而为了保险，共享账号又往往被授予过宽的权限，违背最小权限原则。所以共享机器人账号在认证层面是合法的，在审计层面却是不可用的。</p>
+<p>一条可审计的日志，必须能回答六个问题：哪个用户、通过哪个任务会话、由哪个工作负载、调用哪个工具、访问哪个资源的哪个版本、结果是什么。只记录“bot 成功调用 API”没有审计价值，因为它缺少整条主体链上的关键环节。</p>
+<p>这条主体链的输入是用户、Agent 会话、执行工作负载和资源服务这四类主体，输出是可追踪的委托链与审计链。它的运作顺序是：用户先把意图委托给会话；执行网关在会话与工作负载之间交换范围更窄的凭证，把“用户拥有的一切权限”压缩成“这次任务真正需要的权限”；资源服务拿到窄凭证后做出最终裁决；最后把从主体到结果的完整路径写入日志。共享机器人账号之所以被排除在这套设计之外，是因为它只代表一个技术身份，无法解释谁代表谁，也无法支撑精准撤销。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 650 230" role="img" aria-label="用户委托 Agent 会话并由执行服务访问资源服务器"><defs><marker id="iam1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="22" y="55" width="112" height="58" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="78" y="80" text-anchor="middle" class="svg-t">最终用户</text><text x="78" y="99" text-anchor="middle" class="svg-t" font-size="10">拥有仓库 A</text><path d="M134,84 L190,84" stroke="#4f9d78" marker-end="url(#iam1)"/><text x="162" y="72" text-anchor="middle" class="svg-t" font-size="9">委托</text><rect x="192" y="55" width="118" height="58" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="251" y="80" text-anchor="middle" class="svg-t">Agent 会话</text><text x="251" y="99" text-anchor="middle" class="svg-t" font-size="10">任务级主体</text><path d="M310,84 L366,84" stroke="#6b7484" marker-end="url(#iam1)"/><text x="338" y="72" text-anchor="middle" class="svg-t" font-size="9">候选动作</text><rect x="368" y="42" width="126" height="84" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="431" y="68" text-anchor="middle" class="svg-t">执行网关</text><text x="431" y="88" text-anchor="middle" class="svg-t" font-size="10">策略 · 凭证交换</text><text x="431" y="105" text-anchor="middle" class="svg-t" font-size="10">秘密注入 · 审计</text><path d="M494,84 L550,84" stroke="#6b7484" marker-end="url(#iam1)"/><rect x="552" y="55" width="82" height="58" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="593" y="79" text-anchor="middle" class="svg-t">资源服务</text><text x="593" y="99" text-anchor="middle" class="svg-t" font-size="10">最终授权</text><path d="M593,126 C590,188 80,188 78,115" fill="none" stroke="#6b7484" marker-end="url(#iam1)"/><text x="335" y="181" text-anchor="middle" class="svg-t" font-size="10">审计链：用户 → 会话 → 动作 → 资源 → 结果</text><text x="335" y="205" text-anchor="middle" class="svg-t" font-size="10">授权链：委托范围 ∩ Agent 策略 ∩ 工具/资源策略</text></svg><figcaption>图 1　委托链说明“代表谁”，执行链说明“谁真正访问资源”。共享机器人账号会抹掉这两条链，使撤销、归因和最小权限同时失效。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>认证、授权、委托与审计<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>认证、授权、委托、审计这四个词经常被当作近义词混用，但它们各自回答一个独立的问题，各自缺失时会留下一种性质完全不同的漏洞。</p>
+<p>认证（Authentication）回答“你是谁”。它通过用户会话、执行服务工作负载身份等证据来确认请求主体，缺失时系统无法确认请求到底来自谁。授权（Authorization）回答“你能做什么”。它依据策略判断已登录主体能否对特定对象执行特定动作，比如只读 issue、写分支、禁止公开仓库；缺失时，一个已经通过认证的主体就可以越权执行它本不该执行的操作。委托（Delegation）回答“你代表谁、为何现在能做”。它限定服务是依据哪一次用户批准的任务、作用于哪个仓库、在什么有效期内行动；缺失时，服务自身的权限会被误当成用户同意了，服务可以借自己的身份去冒充用户同意。审计（Audit）回答“实际发生了什么”。它记录会话 ID、动作、资源、策略决定和结果；缺失时，即使出了事故也无法归因、无法调查、也无法针对具体主体精准撤销。</p>
+<p>在贯穿案例中，这四者的证据各不相同：认证的证据是用户会话与执行服务工作负载身份；授权的证据是“只读 issue、写分支，禁止公开仓库”这类策略；委托的证据是“用户批准的任务、仓库 A、有效期”；审计的证据是“会话 ID、动作、资源、策略决定、结果”。四者各自独立取证，正说明它们不能被彼此替代。</p>
+<p>有两个最常见的替代误区需要纠正。其一，认证成功只是进入授权判断的一个输入，而不是“通行所有资源”的凭证——确认了你是谁，绝不等于确认你能对每个资源做什么。其二，审计不能代替预防：事后能在日志里查到泄露，不等于泄露发生前有阻断机制拦住它。审计是回溯能力，预防是拦截能力，前者再完整也无法补偿后者的缺失。</p>
+<p>把这四条合起来，各自的输入输出是清晰的：认证的输入是主体证据，输出是认证结果；授权的输入是策略与主体，输出是授权决定；委托的输入是任务委托，输出是限定后的委托范围；审计的输入是发生的事件，输出是可追溯的记录。四者互补但不能相互替代，认证成功不等于通行全部资源，事后审计也不能代替事前阻断。</p></div>
+<table class="dd-table"><thead><tr><th>问题</th><th>安全机制</th><th>贯穿案例中的证据</th><th>缺失后果</th></tr></thead><tbody><tr><td>你是谁？</td><td>认证 Authentication</td><td>用户会话、执行服务工作负载身份</td><td>无法确认请求主体</td></tr><tr><td>你能做什么？</td><td>授权 Authorization</td><td>只读 issue、写分支，禁止公开仓库</td><td>已登录主体可越权</td></tr><tr><td>你代表谁、为何现在能做？</td><td>委托 Delegation</td><td>用户批准的任务、仓库 A、有效期</td><td>服务自身权限冒充用户同意</td></tr><tr><td>实际发生了什么？</td><td>审计 Audit</td><td>会话 ID、动作、资源、策略决定、结果</td><td>无法归因、调查和精准撤销</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>把权限写成可计算的交集<span class="dd-badge math">策略</span></h2>
+<div class="dd-agent-response"><p>“Agent 能做什么”不能用“管理员”“写权限”这样一个宽泛的角色名来回答，因为角色名只是一层笼统的标签，它掩盖了不同层次各自收紧的边界。真正可执行的授权，应当是一个可以被逐层求交、能被计算机直接判定的集合。</p>
+<p>有效权限 E 的定义是一个交集：</p>
+<p>E = 用户委托 ∩ Agent 策略 ∩ 工具策略 ∩ 资源策略 ∩ 上下文允许集合</p>
+<p>这个公式的约束规则是：每一层只能缩小，不能扩大上游委托。用户委托给出的是本次任务允许的上限，Agent 策略、工具策略、资源策略只能在这个上限之内进一步收窄；任何一层都无权凭空放大上一层的授权。上下文允许集合则把动态条件纳入计算，包括会话风险、目标仓库、目标分支、时间窗口、网络目的地、数据敏感级别，以及“是否有人确认过”这一人工确认状态。</p>
+<p>把这个交集套到具体动作上，可以看到五种典型结果。读仓库 A 的 issue：用户明确允许，资源集合锁定为 A、动作锁定为 read、且委托未过期，三层都满足，结果为允许。向仓库 A 新建修复分支：这是准备补丁所需，策略给出 write:branch 且禁止写 main，落在交集之内，结果为允许。读仓库 B：用户明确禁止，资源 B 不在资源集合里，结果为拒绝。公开仓库 A：这次委托里根本没有公开操作，admin 权限也不存在，结果为拒绝。发布修复：策略要求先询问用户，而本次缺少确认，结果为暂停——不是允许也不是拒绝，而是停下等待补充确认。</p>
+<p>这个交集模型还隐含一条默认拒绝原则。凡是无法唯一解析的资源、模型擅自增加的参数、或者从不可信内容中得来的目标域名，都不能“猜一个合理值”然后执行。原因在于，参数变化会改变授权对象：同一个动作，目标资源从 A 变成 B，就脱离了原交集，必须重新求交。因此交集为空或对象无法唯一解析时，默认结果就是拒绝，绝不能让模型替系统补一个看似合理的默认值。</p>
+<p>整个计算的输入是用户委托、Agent 策略、工具策略、资源策略和当前上下文，输出是落在这些集合交集之内的动作集合。每一层只能缩小上游范围，参数或资源一旦变化就必须重新求交，交集为空或对象无法唯一解析时默认拒绝。</p></div>
+<table class="dd-table"><thead><tr><th>候选动作</th><th>委托</th><th>策略交集</th><th>结果</th></tr></thead><tbody><tr><td>读仓库 A 的 issue</td><td>明确允许</td><td>资源=A，动作=read，未过期</td><td><b>允许</b></td></tr><tr><td>向仓库 A 新建修复分支</td><td>准备补丁所需</td><td>write:branch，不能写 main</td><td><b>允许</b></td></tr><tr><td>读仓库 B</td><td>明确禁止</td><td>不在资源集合</td><td><b>拒绝</b></td></tr><tr><td>公开仓库 A</td><td>未委托</td><td>admin 权限不存在</td><td><b>拒绝</b></td></tr><tr><td>发布修复</td><td>要求先询问</td><td>缺少本次确认</td><td><b>暂停</b></td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="agent-access-effective" data-display="mathml"><math display="block" aria-label="有效权限 E 等于用户委托、Agent 策略、工具策略、资源策略和上下文允许集合的交集"><mi>E</mi><mo>=</mo><mi>UserDelegation</mi><mo>∩</mo><mi>AgentPolicy</mi><mo>∩</mo><mi>ToolPolicy</mi><mo>∩</mo><mi>ResourcePolicy</mi><mo>∩</mo><mi>Context</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>运行示例：一次委托怎样变成令牌<span class="dd-badge eng">端到端示例</span></h2>
+<div class="dd-agent-response"><p>一次委托从用户点击确认到资源服务器真正执行，中间每一步都在做同一件事：防止权限在流转中被放大。以“修复仓库 A 的 issue”为例，可以沿时间顺序看到这条链路。</p>
+<p>第一步是建立任务。用户登录后选择仓库 A，明确授权“读 issue、写新分支”，并限定有效期 20 分钟；服务为这次任务记录一个不可变的任务 ID。这个 ID 是后续所有校验的共同锚点，委托范围和时限从此刻起就被固定下来。</p>
+<p>第二步是模型提议。Agent 输出一个结构化动作 create_branch(repo=A, name=fix-42)。注意这个输出本身不携带任何密钥，它只是候选动作，尚未获得执行资格。</p>
+<p>第三步是策略检查。网关把用户委托、动作、资源、会话风险和剩余有效期放在一起核对：动作是否落在委托范围内、目标仓库是否匹配、会话风险是否可接受、有效期是否还在。任何一项不满足，请求到此为止。</p>
+<p>第四步是凭证交换。网关据此取得一个短期令牌，这个令牌仅面向代码托管 API、仅含 repo:A:branch-write 这一个权限范围、且 5 分钟过期。令牌的 scope 被压到了最小，不继承用户的全部权限。</p>
+<p>第五步是工具执行。受信代码在请求真正发送出去的那一瞬间才注入令牌，而不是让令牌长期驻留在模型或会话上下文里。资源服务器收到后再次独立检查：签名是否有效、签发方是谁、受众是否匹配、scope 是否覆盖该动作、是否过期、仓库是否正确。</p>
+<p>第六步是记录与丢弃。日志只保存令牌指纹而非令牌值，同时记录策略版本和资源操作结果；令牌留在执行层，模型只能看到脱敏后的结果，永远接触不到令牌本身。</p>
+<p>这套机制的价值可以用爆炸半径的演算来量化。假设共享管理员密钥泄露，攻击者可访问 200 个仓库且长期有效；而任务令牌只覆盖 1 个仓库、1 类动作、5 分钟。权限资源面从 200 缩到 1，持续窗口从“直到人工轮换密钥”缩到 5 分钟。这并不把泄露风险降为零——令牌仍可能被盗——但它把最坏损失变成了一个可界定的量：最坏情况从“无限期访问 200 个仓库”收缩为“5 分钟内访问 1 个仓库的写分支能力”。</p>
+<p>整条链路的输入是仓库 A 的任务委托、结构化的建分支动作和会话风险，输出是仅面向目标 API、仓库和动作的五分钟令牌及审计结果。网关校验后交换凭证，执行时在最后一跳注入，资源服务再次检查。短期窄令牌缩小的是损失半径，它既不消除泄露风险，也不会因此授权发布之类的越界动作。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>签名有效，为什么仍可能拒绝<span class="dd-badge eng">令牌边界</span></h2>
+<div class="dd-agent-response"><p>一个签名有效的 OAuth 或 JWT 令牌，为什么仍然可能被资源服务器拒绝？因为签名验证只回答了一个问题：令牌内容有没有被未知的第三方篡改。它并不回答令牌是否适用于当前这个请求。签名有效只是前提，资源服务器还必须逐项核对令牌与当前请求之间的上下文是否匹配，任何一项不匹配都要拒绝。</p>
+<p>第一项是签发方（issuer）：确认令牌是否来自可信的授权服务器。如果只验签名不验签发方，攻击者可以自建一个签发方，用自己签发的合法令牌来冒充授权。第二项是受众（audience）：确认这个令牌是否确实发给当前这个 API。把发给服务 A 的令牌转手递给服务 B，签名依然有效，但受众不匹配，必须拒绝。第三项是范围（scope）：确认当前动作是否落在许可集合内。一个 read 令牌拿去写 main，签名没变，动作越界，同样拒绝。第四项是资源或租户：确认操作对象是否属于本次委托。为仓库 A 签发的令牌去访问仓库 B，对象不匹配，拒绝。第五项是时间与撤销：确认令牌是否已过期或已被取消。重放一个旧任务留下的令牌，即便内容未改，也会因过期或撤销而被拒。第六项是发送者或会话绑定：确认令牌是否被别的工作负载盗用。窃取一个不绑定发送者的 bearer token 后在异地调用，属于盗用，应当拒绝。</p>
+<p>这六项分别阻止六类问题：接受攻击者自建签发方、把 A 的令牌转给 B、用 read 令牌写 main、用仓库 A 令牌访问仓库 B、重放旧令牌、以及窃取 bearer token 异地调用。</p>
+<p>由此引出一条重要的禁止规则：令牌透传。把上游用户的令牌原样传给下游的未知服务，会同时破坏受众边界、泄露能力，并制造“困惑代理”——下游服务可能拿着上游令牌去访问本不该访问的资源，而资源服务器会误以为这是用户在直接请求。需要跨服务访问时，应使用明确的令牌交换，或让下游服务独立获得自己的授权，使每个资源服务器只收到发给自己的凭证，而不是上游的原始令牌。</p>
+<p>令牌验证的输入是签名、签发方、受众、scope、资源、时间和发送者绑定，输出只有接受或拒绝。签名只证明内容未被未知方篡改，不证明适用性；上游令牌也不能原样透传给未知下游。</p></div>
+<table class="dd-table"><thead><tr><th>检查</th><th>要阻止的问题</th><th>错误示例</th></tr></thead><tbody><tr><td>签发方 issuer</td><td>是否来自信任的授权服务器</td><td>接受攻击者自建签发方</td></tr><tr><td>受众 audience</td><td>令牌是否发给当前 API</td><td>把给服务 A 的令牌转给服务 B</td></tr><tr><td>范围 scope</td><td>动作是否在许可集合内</td><td>read 令牌拿去写 main</td></tr><tr><td>资源/租户</td><td>对象是否属于本次委托</td><td>仓库 A 令牌访问仓库 B</td></tr><tr><td>时间与撤销</td><td>是否过期或已被取消</td><td>重放旧任务留下的令牌</td></tr><tr><td>发送者/会话绑定</td><td>是否被别的工作负载盗用</td><td>窃取 bearer token 后异地调用</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>密钥为什么不能进入模型<span class="dd-badge eng">秘密管理</span></h2>
+<div class="dd-agent-response"><p>既然模型最终要调用 API，把 key 直接写进系统提示看起来最省事。但这条捷径之所以不可行，原因不在于“方便与否”，而在于密钥一旦进入模型上下文，就落进了系统无法再控制的范围。</p>
+<p>模型的输入输出管线里，提示、工具结果、错误栈和检索记忆都有可能被输出、被记录、被压缩，或被提示注入所影响。密钥一旦变成上下文中的一个 token，系统就很难保证它不会出现在回答文本里、不会被打进日志、不会被模型复制进另一个工具的参数里。也就是说，密钥进入上下文的那一刻，保密性就失去了保证。</p>
+<p>正确的路径是把密钥从模型的可见世界里彻底拿掉。密钥保存在专门的密钥管理器中；执行网关用工作负载身份按需读取；受信代码在网络请求的最后一跳注入密钥；模型自始至终只看到工具 schema 和脱敏后的响应，接触不到凭证本身。日志层面同样隔离：只保存凭证 ID、版本和指纹，不保存值。凭证还要按环境、租户、工具和任务隔离，不使用一把万能 key 到处共用。密钥管理还需支持轮换、撤销、异常频率与异常位置的监控，以及自动过期。错误消息也必须清理，删除其中可能泄露的 Authorization 头、cookie、签名 URL 和连接串。</p>
+<p>但必须分清两个层次。“把 key 隐藏起来”解决的只是保密性，它保证的是值不被泄露。而即使值从未泄露，如果执行网关本身过宽，模型仍然可能借网关的权限去做越权动作——比如网关拥有远超本次任务需要的写权限，模型就能在合法的凭证注入流程下触发不该发生的操作。因此秘密管理必须与动作授权同时存在：前者决定“凭证不泄露”，后者决定“凭证即便可用也只能做范围内的事”，两者缺一不可。</p>
+<p>秘密管理的输入是密钥标识、工作负载身份、目标工具和最小动作权限，输出是在受信执行器最后一跳注入的凭证。模型只看 schema 与脱敏结果，日志只记指纹和版本。秘密不进入上下文，能降低复制与泄露的风险；但过宽的执行网关仍可能被模型借用去越权，这一层必须靠动作授权来兜住。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>提示注入怎样被截断在执行层<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>当一段不可信的 issue 评论成功诱导了模型，让它提出“访问仓库 B、公开仓库、立即发布”时，安全系统还剩哪些独立防线？答案是：即使模型被完全操纵，后面还有一整条执行链在逐层截断它。</p>
+<p>第一道防线位于模型输出与真实委托之间。模型输出只是 Agent 会话提出的候选动作，而不是用户签名确认的委托，它本身没有任何执行资格。第二道防线在执行网关：网关把候选动作还原为主体、动作、资源和上下文四个字段，并代入权限交集去求值。第三道防线是交集计算本身：仓库 B 不在委托资源集合内、admin 动作不在交集内，立即拒绝；发布动作缺少本次确认，结果不是允许而是暂停——系统停下来等待，而不是替模型猜一个合理值。第四道防线在凭证层：即便动作获准，也只取得短期、窄受众、窄 scope 的凭证，资源服务器会再次验证。第五道防线在秘密层：密钥从未进入模型，攻击文本无法直接复制凭证，而审计链支撑事后归因和精准撤销。</p>
+<p>把这几道防线连起来看，安全目标从来不是“模型永不受骗”。模型会被不可信内容诱导，这是语言模型的本性，无法通过身份与访问控制根除。更现实的目标是：即使模型被不可信内容完全诱导，它仍然不能越过执行层的资源、动作、受众、时间和确认这五重边界。模型可以“想错”，但想错不能转化为越权的执行。</p>
+<p>提示注入防线的输入是被操纵的候选动作、用户委托、策略交集和资源侧检查，输出只有三种：越权动作被拒绝、需确认的动作被暂停、范围内动作以窄权限执行。它能够保证的是执行层不被诱导结果穿透。需要同时认清这条防线的边界：它只覆盖已经被配置好的策略，如果策略本身写错了——比如资源集合配得过宽、或某个高风险动作被遗漏——那么执行层会忠实地按错误策略放行。因此这些边界只能约束“已配置”的权限，错误策略本身必须依靠测试和审计去发现和修正。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener">NIST SP 800-207: Zero Trust Architecture</a>：逐请求验证、资源保护与最小权限原则。</li><li><a href="https://www.rfc-editor.org/rfc/rfc9700" target="_blank" rel="noopener">RFC 9700: OAuth 2.0 Security Best Current Practice</a>：令牌受众、客户端与授权安全。</li><li><a href="https://www.rfc-editor.org/rfc/rfc8693" target="_blank" rel="noopener">RFC 8693: OAuth 2.0 Token Exchange</a>：跨主体/服务委托与令牌交换语义。</li><li><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization" target="_blank" rel="noopener">MCP Specification 2025-11-25: Authorization</a>：MCP HTTP 授权要求与令牌受众约束。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/agent-identity-access">在地图中查看概念关系</a></nav>
+</article></main></body></html>

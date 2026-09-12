@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>位置编码与 RoPE：让注意力知道顺序和距离 · AI 知识地图</title>
+<meta name="description" content="从排列等变、正弦绝对位置、相对偏置到旋转位置编码，理解顺序怎样进入注意力，以及长上下文扩展为何不是改一个窗口数字。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/positional-encoding/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="位置编码与 RoPE：让注意力知道顺序和距离">
+<meta property="og:description" content="从排列等变、正弦绝对位置、相对偏置到旋转位置编码，理解顺序怎样进入注意力，以及长上下文扩展为何不是改一个窗口数字。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/positional-encoding/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="位置编码与 RoPE：让注意力知道顺序和距离">
+<meta name="twitter:description" content="从排列等变、正弦绝对位置、相对偏置到旋转位置编码，理解顺序怎样进入注意力，以及长上下文扩展为何不是改一个窗口数字。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/positional-encoding/#page","name":"位置编码与 RoPE：让注意力知道顺序和距离","description":"从排列等变、正弦绝对位置、相对偏置到旋转位置编码，理解顺序怎样进入注意力，以及长上下文扩展为何不是改一个窗口数字。","url":"https://ai-knowledge-map.com/zh/concepts/positional-encoding/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"位置编码与 RoPE：让注意力知道顺序和距离","item":"https://ai-knowledge-map.com/zh/concepts/positional-encoding/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">位置编码与 RoPE：让注意力知道顺序和距离</span></li></ol></nav><article id="dd-article" data-concept-id="positional-encoding">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">位置编码与 RoPE：让注意力知道顺序和距离</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从排列等变、正弦绝对位置、相对偏置到旋转位置编码，理解顺序怎样进入注意力，以及长上下文扩展为何不是改一个窗口数字。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 没有位置输入的自注意力对 token 排列是<b>等变</b>的：输入怎样重排，输出就对应重排，内容本身不能标明谁在第几位。位置方法把索引或距离注入表示与注意力分数；RoPE 通过按位置旋转查询和键，使点积显式依赖相对位移，但有效长度仍受训练分布、频率设计和任务利用能力约束。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>为什么无位置的自注意力是排列等变，而不是简单“排列不变”？</li><li>正弦位置编码为什么使用多组频率？</li><li>RoPE 怎样让查询—键点积只依赖位置差？</li><li>绝对位置、相对偏置、RoPE 与 ALiBi 各把信号加在哪里？</li><li>为什么配置支持 128K 不代表模型能可靠利用 128K？</li></ul></div>
+<ol class="dd-chain"><li>tokenizer 产生有顺序的离散序列，但内容嵌入本身不含坐标。</li><li>无位置自注意力只按内容关系计算，排列输入会对应排列输出。</li><li>绝对编码、相对偏置或 Q/K 旋转加入坐标结构。</li><li>RoPE 让 Q/K 点积同时依赖内容和相对相位。</li><li>训练长度分布教会模型怎样解释这些频率和距离。</li><li>缩放可把更多索引映射到可计算范围，但改变局部与远距分辨率。</li><li>KV cache 必须延续全序列 position ID 与相同旋转配置。</li><li>最终用长度×位置×任务矩阵验证有效利用，而非只看窗口声明。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>注意力只比较内容时缺少什么<span class="dd-badge intuition">动机</span></h2>
+<div class="dd-agent-response"><p>自注意力接收一组 token 表示，并分别从每个 token 的内容生成查询 Q、键 K 和值 V。查询与键的点积决定各位置之间如何分配注意力，再用这些权重混合 V，输出仍然是一组与输入位置一一对应的表示。问题在于：如果整个过程只看内容，模型就没有独立的坐标来区分“这个 token 在第 1 位”还是“它在第 7 位”。</p>
+<p>设想用同一个排列同时重排所有输入 token。由内容生成的 Q、K、V 会按相同方式重排行；注意力分数矩阵的行和列也会随之重排；最终对 V 的加权结果则按同一排列出现在输出中。也就是说，输入怎样同步换位，输出就怎样同步换位。这个性质叫排列等变：模型仍能保持每个输出与相应输入的对应关系，但仅凭这一机制，位置编号本身不会成为可用信息。</p>
+<p>排列等变不同于排列不变。排列不变意味着无论输入怎样重排，整体输出都完全相同，常见于把所有位置汇聚成单个结果的情形；排列等变则允许输出随输入一起重排。把无位置注意力称为排列不变，会忽略序列输出仍然保留的逐位置对应关系。</p>
+<p>位置向量、位置偏置和几何位置变换都能为注意力补上坐标信息，使相同内容处在不同位置时产生不同的交互。因果遮罩也会引入方向结构：一个位置只能看过去，不能看未来，所以自回归注意力并非严格意义上的完全无序系统。不过，“只能看过去”主要规定了可见范围，并不足以独立表达精确距离、周期或更细致的顺序模式；这些仍需要专门的位置机制。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>位置可以加到表示、分数或几何变换中<span class="dd-badge intuition">地图</span></h2>
+<div class="dd-agent-response"><p>“位置编码”并不只指一种附加向量，也不是单一的编码格式。它更准确地表示一类设计：把 token 的坐标、位置差或距离关系注入注意力计算。不同方法选择的注入位置不同，因此改变注意力的方式、擅长表达的关系以及向训练范围之外延伸时的边界也不同。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方法</th><th class="dd-align-left">注入位置</th><th class="dd-align-left">主要表达</th><th class="dd-align-left">外推特点</th></tr></thead><tbody><tr><td class="dd-align-left">学习绝对位置表</td><td class="dd-align-left">与 token 嵌入相加</td><td class="dd-align-left">每个位置索引对应一个独立向量</td><td class="dd-align-left">表外位置没有训练得到的参数</td></tr><tr><td class="dd-align-left">正弦绝对编码</td><td class="dd-align-left">与 token 嵌入相加</td><td class="dd-align-left">由多种频率共同组成的位置坐标</td><td class="dd-align-left">函数可以计算到表外位置，但模型未必学会使用这些范围</td></tr><tr><td class="dd-align-left">相对偏置 / ALiBi</td><td class="dd-align-left">加到注意力 logits</td><td class="dd-align-left">位置差，或随距离变化的惩罚</td><td class="dd-align-left">结构上更自然地延伸到更远距离</td></tr><tr><td class="dd-align-left">RoPE</td><td class="dd-align-left">旋转 Q 和 K</td><td class="dd-align-left">内容点积中携带的相对相位</td><td class="dd-align-left">旋转可继续计算，但会遇到未训练相位与频率分辨率问题</td></tr></tbody></table></div>
+<p>把位置加入 token 表示时，注意力接收的是“内容表示与位置表示的组合”。学习绝对位置表直接为每个索引保存一个向量，表达能力来自各索引的独立参数；一旦索引超出表的范围，就没有对应的训练参数。正弦绝对编码同样在表示层注入位置，但坐标由确定的多频函数计算，因此不受有限参数表的硬边界约束。可计算不等于可用：模型只在训练经历过的范围内学习了如何解释这些坐标，表外函数值存在，并不保证模型能正确利用。</p>
+<p>把位置加入注意力分数时，位置关系不必先混入 token 内容。相对偏置可以根据两个位置之差修正 logits，ALiBi 则以距离惩罚直接改变不同键被关注的倾向。它们的输入是位置关系，输出是对原始内容分数的增减，因此距离如何影响注意力在结构上是显式的，也更自然地延伸到更大的位置差。</p>
+<p>RoPE 选择第三条路径：不与嵌入相加，也不单独给 logits 加一个偏置，而是按位置旋转 Q 和 K。旋转后的向量再做点积时，内容相似性中会自然带上两个位置之间的相对相位。它的旋转公式可以用于训练范围以外的位置，但远处会出现训练未覆盖的相位组合，有限的频率分辨率也会限制可区分的距离。</p>
+<p>因此，判断一种位置机制时，需要同时看它把坐标注入哪里，以及这种注入怎样传到注意力结果。表示层注入、分数层注入和 Q/K 几何变换都能让注意力感知位置，但“公式能延伸到哪里”与“模型在延伸范围内仍能可靠解释什么”是两件不同的事。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 300" role="img" aria-label="四类位置机制进入注意力的不同位置"><defs><marker id="pos-arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g stroke="currentColor" stroke-width="2" fill="none"><rect x="35" y="105" width="120" height="72" rx="12" fill="#8b5cf6" opacity=".18"/><rect x="245" y="105" width="120" height="72" rx="12" fill="#0ea5e9" opacity=".18"/><rect x="455" y="105" width="120" height="72" rx="12" fill="#10b981" opacity=".18"/><rect x="640" y="105" width="90" height="72" rx="12" fill="#f59e0b" opacity=".18"/><path d="M155 141H245M365 141H455M575 141H640" marker-end="url(#pos-arr)"/><path d="M95 65V103" stroke="#8b5cf6" marker-end="url(#pos-arr)"/><path d="M305 65V103" stroke="#0ea5e9" marker-end="url(#pos-arr)"/><path d="M515 65V103" stroke="#10b981" marker-end="url(#pos-arr)"/></g><g class="svg-t" text-anchor="middle"><text x="95" y="135">token 表示</text><text x="95" y="159">+ 绝对位置</text><text x="305" y="135">生成 Q/K</text><text x="305" y="159">并做 RoPE</text><text x="515" y="135">QKᵀ 分数</text><text x="515" y="159">+ 相对偏置</text><text x="685" y="135">Softmax</text><text x="685" y="159">× V</text><text x="95" y="45">正弦 / 学习表</text><text x="305" y="45">旋转几何</text><text x="515" y="45">Shaw / ALiBi</text></g></svg><figcaption>位置不是一种固定“编码格式”，而是一类把坐标关系注入不同计算位置的设计。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>方法</th><th>注入位置</th><th>主要表达</th><th>外推特点</th></tr></thead><tbody><tr><td>学习绝对表</td><td>与 token 嵌入相加</td><td>每个索引独立向量</td><td>表外位置没有训练参数</td></tr><tr><td>正弦绝对编码</td><td>与 token 嵌入相加</td><td>多频坐标</td><td>函数可计算到表外，但模型未必会用</td></tr><tr><td>相对偏置 / ALiBi</td><td>注意力 logits</td><td>位置差或距离惩罚</td><td>结构上更自然地延伸距离</td></tr><tr><td>RoPE</td><td>旋转 Q/K</td><td>内容点积中的相对相位</td><td>可计算但会遇到未训练相位与频率分辨率</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>正弦编码为什么要一组快慢不同的钟<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>正弦位置编码把位置索引转换为一个可与 token 表示相加的多维向量。对第 i 组维度，它使用一对正弦和余弦坐标：</p>
+<p>PE(pos, 2i) = sin(pos / 10000^(2i/d))</p>
+<p>PE(pos, 2i + 1) = cos(pos / 10000^(2i/d))</p>
+<p>其中，PE 是位置向量，pos 是从 0 开始的 token 位置索引，d 是位置向量的总维数，i 表示第几组正弦—余弦维度；2i 和 2i + 1 是同一组的两个坐标。常数 10000 用来控制整组频率从快到慢覆盖的范围，并不表示序列的最大长度。</p>
+<p>固定 i 时，sin 和 cos 可以看成同一只圆形指针的两个坐标。pos 每增加 1，指针就沿圆周转过一个固定角度。较低维的分母较小，角度随位置变化得快，因而对局部位移更敏感；较高维的分母较大，变化得慢，能够提供更长尺度上的坐标信息。最终的位置向量不是一只指针的读数，而是一组转速不同的指针共同给出的“位置签名”。</p>
+<p>只用单一频率时，指针转完一周便回到相同坐标，彼此相隔一个或多个周期的位置就会混淆。多频组合让不同维度以不同速度重复：即使某个快速维度已经绕回原值，其他较慢维度通常仍处于不同相位。组合后的重复条件更难同时满足，因此位置混淆会被推到更远处。快速维度负责细粒度区分，慢速维度提供大尺度参照，两者共同承担定位。</p>
+<p>这种构造还带有可利用的平移结构。根据正弦和余弦的和差关系，把位置从 pos 平移到 pos + Δ 后，同一频率下的新 sin/cos 坐标可以由原来的两个坐标做线性组合得到；组合系数只依赖位移 Δ 和该维度的频率。于是，绝对坐标中隐含了相对位移的规则结构，模型有机会从中学习“两个位置相差多少”。</p>
+<p>边界在于，数学上能够计算任意 pos 的编码，只说明函数在训练长度之外仍有定义。它并不保证有限层网络能稳定提取所需的多频关系，也不保证有限训练数据已经教会模型解释未见过的位置范围。可计算的表外坐标和可靠的长度外推不能画等号。</p></div>
+<div class="dd-formula">PE(pos,2i)=sin(pos / 10000<sup>2i/d</sup>)；PE(pos,2i+1)=cos(pos / 10000<sup>2i/d</sup>)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>手算 RoPE：点积怎样只留下位置差<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>RoPE 不把位置作为一个独立向量加到内容上，而是按位置旋转查询 Q 和键 K。先只看二维中的一对维度：q 是查询的内容向量，k 是键的内容向量；m、n 分别是查询和键的位置索引；每前进一个位置，向量旋转 θ。用 R(α) 表示二维旋转矩阵后，位置 m 的查询为 R(mθ)q，位置 n 的键为 R(nθ)k。</p>
+<p>两者的点积可以写成：</p>
+<p>(R(mθ)q)ᵀ(R(nθ)k) = qᵀR(mθ)ᵀR(nθ)k = qᵀR(−mθ)R(nθ)k = qᵀR((n − m)θ)k</p>
+<p>第一步把转置作用到乘积上；旋转矩阵的转置等于反向旋转，所以 R(mθ)ᵀ = R(−mθ)；连续旋转的角度可以相加，于是 −mθ 与 nθ 合并为 (n − m)θ。查询和键共同拥有的那部分绝对旋转由此相消，点积中的位置因素只剩键相对查询多转了多少。</p>
+<p>取 q = k = (1, 0)，并令 θ = 60°。此时两个内容向量原本方向相同，点积就简化为：</p>
+<p>qᵀR((n − m)θ)k = cos((n − m)θ)</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-right">m</th><th class="dd-align-right">n</th><th class="dd-align-right">位置差 n − m</th><th class="dd-align-right">点积</th></tr></thead><tbody><tr><td class="dd-align-right">0</td><td class="dd-align-right">0</td><td class="dd-align-right">0</td><td class="dd-align-right">cos 0° = 1</td></tr><tr><td class="dd-align-right">0</td><td class="dd-align-right">1</td><td class="dd-align-right">1</td><td class="dd-align-right">cos 60° = 0.5</td></tr><tr><td class="dd-align-right">2</td><td class="dd-align-right">3</td><td class="dd-align-right">1</td><td class="dd-align-right">cos 60° = 0.5</td></tr><tr><td class="dd-align-right">0</td><td class="dd-align-right">2</td><td class="dd-align-right">2</td><td class="dd-align-right">cos 120° = −0.5</td></tr></tbody></table></div>
+<p>当 m = n = 0 时，相对旋转为 0°，两个向量完全同向，点积为 1。把键移到 n = 1 后，相对旋转为 60°，点积降为 0.5。查询和键同时向后平移两位，从 (m, n) = (0, 1) 变为 (2, 3)，虽然绝对位置都变了，但位置差仍为 1，因此点积仍是 0.5。若位置差增至 2，相对角度成为 120°，点积变为 −0.5。这里的数值展示了同一对维度如何按相对位移调制内容分数。</p>
+<p>这个例子使用 q = k = (1, 0)，只是为了让结果直接等于余弦值。真实 RoPE 会把高维 q、k 两两分组，每组按自己的频率旋转，并保留每组内容向量原有的方向关系。因此，实际点积不是单独由位置差决定；更准确地说，内容之间的匹配经过了由相对位置控制的旋转，而共同的绝对位移在每一组的点积中都会相消。</p></div>
+<table class="dd-table"><thead><tr><th>m</th><th>n</th><th>位置差 n−m</th><th>点积</th></tr></thead><tbody><tr><td>0</td><td>0</td><td>0</td><td><code>cos 0°=1</code></td></tr><tr><td>0</td><td>1</td><td>1</td><td><code>cos 60°=0.5</code></td></tr><tr><td>2</td><td>3</td><td>1</td><td><code>cos 60°=0.5</code></td></tr><tr><td>0</td><td>2</td><td>2</td><td><code>cos 120°=−0.5</code></td></tr></tbody></table>
+<div class="dd-formula">(R(mθ)q)ᵀ(R(nθ)k)=qᵀR((n−m)θ)k=cos((n−m)θ)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>RoPE 的几何图像：每对维度是一只指针<span class="dd-badge intuition">图像</span></h2>
+<div class="dd-agent-response"><p>把一对维度画成二维平面中的向量，RoPE 就表现为一只绕圆心转动的指针。位置索引决定旋转次数：从一个位置前进到下一个位置，向量按该维度对的固定角速度继续旋转。图中若依次画出三个位置，就会看到同一内容向量的三个箭头落在同一圆周上，方向随位置推进而变化。</p>
+<p>旋转保持向量长度不变。若原向量为 (x, y)，旋转后虽然两个坐标都会改变，但到原点的距离仍为 <math class="dd-inline-root" aria-label="根号 x² + y²"><msqrt><mtext>x² + y²</mtext></msqrt></math>。因此，RoPE 注入位置时改变的是向量的相位或方向，不是这对维度中向量的模长。对注意力而言，Q 与 K 的相对方向会影响点积，而共同旋转并不会凭空放大或缩小向量本身。</p>
+<p>高维向量会被拆成多对二维坐标，每一对都可以看作一只指针。不同维度对采用不同频率：快指针在较短位置变化内就产生明显相位差，慢指针则在更长距离上缓慢改变。注意力比较 Q 和 K 时，实际使用的是多只不同转速指针共同形成的相位关系，因此能同时携带不同距离尺度的信息。</p>
+<p>RoPE 通常施加到 Q 和 K 的部分或全部头维度，而不旋转 V。这样，位置通过 Q/K 点积影响“应该关注谁”，V 仍作为被加权汇合的内容。具体使用多少维度做旋转，以及怎样把高维坐标配成二维对，都属于模型定义的一部分。</p>
+<p>实现时不能只保证旋转公式看起来等价，还必须与训练权重使用的约定完全一致。旋转比例决定哪些头维度参与位置变换，基频决定各指针的转速范围，维度配对顺序决定哪些坐标共同构成二维平面，复数布局或实数布局则决定这些坐标在内存和计算中如何对应。任何一项错位，都可能让推理时施加的相位与训练时不同；即使向量长度仍被保持，注意力所解释的位置关系也已经改变。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 300" role="img" aria-label="二维向量在三个位置按固定角度旋转"><circle cx="210" cy="145" r="100" fill="none" stroke="currentColor" opacity=".25" stroke-width="2"/><line x1="90" y1="145" x2="330" y2="145" stroke="currentColor" opacity=".3"/><line x1="210" y1="25" x2="210" y2="265" stroke="currentColor" opacity=".3"/><g stroke-width="5"><line x1="210" y1="145" x2="305" y2="145" stroke="#8b5cf6"/><line x1="210" y1="145" x2="258" y2="63" stroke="#0ea5e9"/><line x1="210" y1="145" x2="163" y2="63" stroke="#10b981"/></g><g class="svg-t"><text x="315" y="148">位置 0</text><text x="266" y="56">位置 1</text><text x="105" y="56">位置 2</text><text x="390" y="95">同一内容向量</text><text x="390" y="125">按位置旋转</text><text x="390" y="170">两个位置的相对角</text><text x="390" y="200">进入 Q·K 分数</text></g><path d="M305 125 A95 95 0 0 0 258 63" fill="none" stroke="#ef4444" stroke-width="3"/></svg><figcaption>旋转保持向量长度；改变的是相位。不同频率对提供不同距离尺度，类似多只转速不同的指针。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>相对偏置与 ALiBi 在分数上直接表达距离<span class="dd-badge math">比较</span></h2>
+<div class="dd-agent-response"><p>当任务直接关心两个位置相隔多远时，可以把距离关系加到注意力的原始分数上，而不必先把位置混入 token 表示。一个常见形式是：</p>
+<p>score(i, j) = qᵢ · kⱼ / <math class="dd-inline-root" aria-label="根号 d"><msqrt><mtext>d</mtext></msqrt></math> + b(i − j)</p>
+<p>i 是发起注意的查询位置，j 是被查看的键位置；qᵢ 和 kⱼ 分别是这两个位置的查询向量与键向量；d 是键向量维数。qᵢ · kⱼ 衡量内容匹配程度，除以 <math class="dd-inline-root" aria-label="根号 d"><msqrt><mtext>d</mtext></msqrt></math> 用来控制点积的尺度。b(i − j) 则只由相对位置决定，用来在内容分数之外增加或减少某个位置对的得分。</p>
+<p>score(i, j) 是进入 softmax 之前的注意力 logits。偏置在 softmax 前生效，因此会直接改变不同键之间的相对竞争：较大的偏置提高相应位置获得注意力权重的倾向，较小或更负的偏置则压低它。内容项回答“这两个表示是否匹配”，位置项回答“这个相对距离应当怎样影响匹配”，两者相加后共同决定注意力分配。</p>
+<p>相对位置表示可以为每个距离学习偏置，也可以学习参与计算的相对位置向量。为了使参数和可用距离范围受控，距离还可以被截断：超过某个范围的位置差共享同一类表示。这里使用的是 i − j，而不是两个独立的绝对索引，因此整体同时平移查询和键时，相对位置项不变。</p>
+<p>ALiBi 进一步用线性距离惩罚表达这种关系。每个注意力头采用不同的斜率；在因果注意力中，越远的历史位置通常得到越负的偏置。斜率较陡的头更强地偏向近处，斜率较缓的头能够让较远位置保留更多竞争机会，于是不同头覆盖不同距离尺度。它不需要为每个绝对位置维护一张独立的向量表，距离规则也可以继续应用到更大的位置差。</p>
+<p>这种设计同时带入了明确的归纳偏好：距离越远，通常越不相关。若任务结构符合这一倾向，线性惩罚能给注意力提供直接而稳定的距离信号；若远距离关系不应天然受罚，或者相关性随距离呈现不同结构，这个偏好就未必合适。相对偏置和 ALiBi 的价值不是消除内容匹配，而是在内容 logits 上显式规定距离应怎样参与决策。</p></div>
+<div class="dd-formula">score(i,j)=qᵢ·kⱼ/<span class="dd-radical" role="math" aria-label="d 的平方根"><span class="dd-radicand">d</span></span> + b(i−j)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>长上下文缩放究竟改了什么<span class="dd-badge eng">外推</span></h2>
+<div class="dd-agent-response"><p>长上下文缩放要解决的不是“位置公式能否算出 64K”，而是怎样让 64K 位置产生的信号仍落在模型能够解释的范围内。若模型训练时只见到 8K 范围，直接把位置推进到 64K，会让 RoPE 的相位进入大量未训练区域。位置插值选择压缩坐标：在最简单的对应关系中，64K 的新范围被映射到原来的 8K 范围，相当于把新位置按 8 倍比例压缩后再计算旋转相位。</p>
+<p>压缩的收益是覆盖。最远的新位置不再对应完全超出训练范围的相位，模型看到的位置变化更接近训练时熟悉的区域。代价则是分辨率：原本分配给 8K 个位置的有限角度范围现在需要容纳 64K 个位置，相邻 token 之间的相位差会缩小。位置越密集，不同位置在旋转空间里就越难区分，因此短距离辨别能力与长距离覆盖之间存在直接权衡。</p>
+<p>并非所有缩放方法都统一压缩全部坐标。有的方法调整 RoPE 的基频，从源头改变各维度指针的转速；有的方法按维度分段缩放，让不同频率承担不同程度的扩展。它们改变的核心仍是“位置索引如何转成每对维度的旋转相位”。无论采用哪种形式，覆盖更长索引都不是免费增加坐标容量，而是在未训练相位、频率范围和位置分辨率之间重新分配。</p>
+<p>判断扩展是否成功，需要区分不同层面的证据：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">层面</th><th class="dd-align-left">“扩展成功”的证据</th><th class="dd-align-left">常见假阳性</th></tr></thead><tbody><tr><td class="dd-align-left">可运行</td><td class="dd-align-left">目标长度不报错、不越界</td><td class="dd-align-left">只修改配置中的最大长度</td></tr><tr><td class="dd-align-left">语言建模</td><td class="dd-align-left">困惑度随长度增加没有灾难性上升</td><td class="dd-align-left">大量容易的局部预测掩盖远距失败</td></tr><tr><td class="dd-align-left">检索</td><td class="dd-align-left">“针”放在不同深度时都能被找回</td><td class="dd-align-left">固定针或固定模板被模型记住</td></tr><tr><td class="dd-align-left">推理利用</td><td class="dd-align-left">多证据、顺序敏感任务在长度增加后仍保持稳定</td><td class="dd-align-left">只测试单点复制</td></tr></tbody></table></div>
+<p>困惑度衡量模型对下一个 token 的整体不确定性，通常越低表示语言建模越好。但长文本中许多 token 只依赖附近内容就能预测，这些容易位置会参与平均，使总体困惑度看起来正常，即使模型没有有效利用远处信息。因此，目标长度能够运行和困惑度没有明显恶化，只能说明扩展越过了较低层的门槛。</p>
+<p>更强的证据需要逐步排除捷径。检索测试应改变目标信息所在的深度，避免模型只适应固定模板；推理测试则要要求模型联合多个证据并利用顺序，使单点复制不足以完成任务。只有从可运行、语言建模、检索直到推理利用都得到相符结果，才能把“坐标范围扩展了”与“模型真正获得了可用的长上下文能力”区分开。</p></div>
+<table class="dd-table"><thead><tr><th>层面</th><th>“扩展成功”证据</th><th>常见假阳性</th></tr></thead><tbody><tr><td>可运行</td><td>目标长度不报错、不越界</td><td>只改配置最大长度</td></tr><tr><td>语言建模</td><td>困惑度随长度没有灾难性上升</td><td>大量容易的局部预测掩盖远距失败</td></tr><tr><td>检索</td><td>针在不同深度都能找回</td><td>固定针、固定模板被记住</td></tr><tr><td>推理利用</td><td>多证据、顺序敏感任务随长度稳定</td><td>只测单点复制</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>频率、混叠与注意力衰减怎样限制远距关系<span class="dd-badge math">边界</span></h2>
+<div class="dd-agent-response"><p>位置函数能为任意整数位置计算数值，只说明坐标系统在数学上没有立即越界，并不说明远距离关系仍然可分辨、注意力仍按训练时的方式工作。长距离质量退化的根源之一，是有限的一组频率必须同时承担局部区分和远程定位。</p>
+<p>快速频率每前进一个位置就产生较大的相位变化，适合分辨相邻或较近的位置；但距离拉长后，它会多次绕圈，不同位移可能落到相近相位，产生类似周期混叠的歧义。慢频率转动得少，能够跨越更远距离而不频繁重复，却对相邻位置不够敏感：两个近邻位置在慢频维度上的相位差可能很小。多频组合让快速与慢速分量相互补充，使多个位移同时在所有频率上混淆更困难，但不能无限消除有限频率表示的分辨率问题。</p>
+<p>模型还必须学会怎样组合这些频率。训练只覆盖有限的长度分布，因此注意力层是在有限范围内形成对相位组合、内容信号和距离模式的解释。超出这一分布后，即使每个频率都能继续计算，新的相位组合也可能没有被训练过；注意力模式、归一化尺度以及从大量候选内容中检索目标的行为都可能随之改变。结果可能表现为远处相关内容得分不足、错误位置获得相似分数，或原本在训练长度内有效的多频组合不再稳定。</p>
+<p>因此，“RoPE 支持多长”不是一个只由旋转公式决定的常数。基频决定各维度旋转的快慢范围，缩放规则改变位置到相位的映射，训练最大长度和长度采样决定模型见过哪些相位与距离组合，微调数据影响它是否学会在目标长度上利用信息，KV cache 实现则必须保证历史键的相位与当前位置一致。</p>
+<p>“支持”的判定标准也会改变答案。只要求目标长度能够运行，门槛最低；要求在长文本中找回信息，还要检验远距注意力和内容检索；要求完成依赖多个远处证据的推理，则需要更稳定的位置区分和组合能力。讨论长度上限时，必须同时说明模型配置、训练与缩放条件、缓存实现以及评测目标，否则一个孤立的长度数字无法代表实际可用能力。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>KV cache 为什么最容易出现位置静默错位<span class="dd-badge eng">推理</span></h2>
+<div class="dd-agent-response"><p>自回归生成不会在每一步重新计算全部历史 token，而是把已经得到的 K 和 V 缓存在 KV cache 中。生成下一个 token 时，只计算新 token 的表示，再让它的 Q 与缓存中的历史 K 做注意力，并用权重读取历史 V。这样，缓存内容是否对应正确位置就成为注意力计算的一部分。</p>
+<p>新 token 的 Q 和 K 必须使用它在完整序列中的位置索引，而不能直接采用当前小批张量里的局部索引。假设前缀已经占据若干位置，增量步骤的输入张量里虽然可能只有一个新 token，它的位置也不应重新从 0 开始。若 position ID 错一位，RoPE 会按错误角度旋转新 Q/K；它们与缓存中历史 K 的相对相位随之偏移，注意力 logits 表达的距离关系就不再对应真实序列。</p>
+<p>这种错误危险之处在于，它通常不会破坏张量形状。缓存的 K/V 数量、头维度和矩阵乘法仍然合法，程序可以继续生成，只是位置关系被静默改写，最终表现为质量下降。单看能否运行、缓存长度或输出形状，很难发现问题。</p>
+<p>前缀复用会让新序列从一个已有缓存长度继续计数；滑动窗口可能只保留部分历史，却不能随意把保留 token 的位置语义改成局部编号；分页缓存把逻辑连续的历史拆到不同物理块；左填充使批中有效 token 的起点与张量下标不同；批量样本长度不一致时，每个样本的下一个位置也不同。这些情形都会让“张量中的索引”与“完整序列中的 position ID”分离，因而最容易出现起点偏移。</p>
+<p>可靠的验收方法是比较两条等价计算路径：一条把完整序列一次性前向计算，另一条逐 token 前向并使用 cache。在相同模型和输入下，两者对应位置的 logits 应当数值接近。测试不能只覆盖单一短序列，还应改变序列长度、填充方向和缓存切块方式，使前缀复用、不同批量长度及分页或分块路径都受到检验。</p>
+<p>复现和排查时还需要同时记录 RoPE 基频、缩放类型、参与旋转的维度以及 position ID 的生成规则。只要其中一项在完整前向与缓存前向之间不一致，就可能得到形状正确但位置语义错误的结果。KV cache 的正确性因此不仅是“缓存了相同数值”，还要求每个缓存项和每个新 Q/K 都处在与训练及完整序列一致的坐标系统中。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>怎样评测模型是真的使用了位置<span class="dd-badge eng">实验</span></h2>
+<div class="dd-agent-response"><p>评测位置能力不能只问“模型在最长输入上答对过一次吗”，而要区分内容能力、位置变化和推理要求。一个有效的评测以同一任务在不同长度、不同证据位置和不同计算路径下的结果为输入，观察答案、成功率或 logits 怎样随这些因素变化。目标是确认模型的输出确实由位置与顺序信息驱动，而不是靠固定模板、局部线索或偶然命中。</p>
+<p>首先建立短长度基线。在模型熟悉的短上下文中验证它本来就能完成任务，可以避免把阅读、检索或推理能力本身的不足误判为长度外推失败。如果短长度也表现不佳，继续增加长度并不能单独说明位置机制有什么问题。</p>
+<p>随后要同时扫描总长度和证据深度。对相同内容，分别把关键证据放在开头、中间、结尾和随机位置；总长度也随测试变化。这样可以看出失败究竟随上下文变长发生，还是集中在特定位置区域。只把证据固定在一个深度，会把模型对该模板或位置的适应误当成普遍能力。</p>
+<p>顺序对照用于验证模型是否真正读取了关系。打乱多条证据的顺序，或交换陈述中的主体与客体，正确答案应随语义关系的改变而相应变化。如果输入的顺序或角色已经改变，模型却仍给出原答案，就说明它可能依赖内容关键词或回答偏好，而没有使用位置承载的结构。</p>
+<p>任务难度还应从复制逐级提升到组合。单针检索只要求找回一条远处信息；多针聚合要求同时提取多个位置的证据；时间顺序任务要求识别先后；跨段推理则要求把分散内容连接起来。逐级测试可以定位模型在哪一层失效：能够复制单点，并不等于能够利用长上下文完成顺序敏感或多证据推理。</p>
+<p>为了隔离位置因素，应控制内容难度。保持核心内容和问题不变，只改变填充长度或证据所在位置，输出差异才更可能来自位置处理，而不是不同样本本身的难度。同时需要比较全量前向与带 KV cache 的增量前向，使相同序列对应位置的 logits 对齐；若两条路径不一致，应先排查缓存与 position ID，而不是直接解释为模型能力变化。</p>
+<p>最终报告应给出分布，而不是只公布一个最大可用长度。按位置、总长度和任务类型分别统计成功率，并提供置信区间，能够展示性能退化发生在哪里以及结果有多稳定。只有短长度基线成立、位置与顺序对照产生预期变化、组合任务随长度保持可靠、全量与 cache 路径一致时，才有证据说明模型不仅能接收长输入，而且确实在使用其中的位置关系。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>位置能力从输入到可验证行为，要经过一条不能跳步的因果链：</p>
+<p>离散序列 → 坐标注入 → 带位置的注意力分数 → 训练中学会解释位置 → 长度扩展与正确推理实现 → 在远距任务中表现稳定</p>
+<p>tokenizer 首先把文本变成有先后顺序的离散 token 序列。顺序此时存在于序列排列中，但每个 token 的内容嵌入本身并不自动携带“我是第几个位置”的坐标。如果自注意力只从内容生成 Q、K、V，那么同步重排输入只会同步重排输出；模型可以匹配内容，却缺少区分绝对位置和精确距离的独立结构。</p>
+<p>位置机制把这个结构加入计算。绝对编码把位置坐标并入 token 表示；相对偏置直接根据位置差修改注意力 logits；RoPE 则按位置旋转 Q 和 K。对 RoPE 而言，旋转后的点积同时受内容方向和相对相位影响，共同的绝对旋转相消，使两个位置之间的位移进入内容匹配过程。到这一步，模型获得的是可以表达位置的计算结构，而不是已经掌握位置规律的保证。</p>
+<p>训练长度分布决定模型实际见过哪些频率、相位和距离组合。模型需要通过训练学会怎样把这些信号用于局部顺序、远距检索和跨位置关系。公式在更远索引上仍可计算，不代表模型已经学会解释那些区域；一种机制的潜在表达能力，必须通过相应的训练分布才能转化为可用行为。</p>
+<p>当上下文扩展到训练范围之外，缩放可以把更多位置索引映射到可计算或较熟悉的相位范围，但它会重新分配位置分辨率。压缩坐标增加覆盖，同时减小相邻位置的相位差；调整基频或分段缩放也会改变不同频率负责的距离尺度。因此，扩展窗口不是单纯放大一个上限，而是在局部区分、远距覆盖和未训练相位之间重新权衡。</p>
+<p>推理实现必须保持这套坐标系统不变。使用 KV cache 时，历史 K/V 被复用，新 token 的 Q/K 必须延续完整序列的 position ID，并采用与训练和完整前向相同的基频、缩放、旋转维度及布局。只要位置起点或旋转配置错位，张量计算仍可能正常运行，但注意力中的相对相位已经失真。</p>
+<p>最终证据来自长度 × 位置 × 任务的评测矩阵，而不是配置里声明的最大窗口。总长度要变化，证据要放在不同深度，任务要从单点检索扩展到多证据、顺序敏感和跨段推理，同时验证全量前向与 cache 前向的 logits 一致。只有坐标被正确注入、训练学会使用、扩展没有破坏关键分辨率、推理实现保持位置一致，并且多种远距任务都表现稳定，才能说模型真的会用远处信息。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>位置编码处在一条更大的知识链中：它接收 tokenizer 产生的离散序列，在自注意力的 Q/K 分数计算中发挥作用，嵌入 Transformer 的整体架构，并在 KV cache 与长上下文评测中接受实现和能力验证。沿这些依赖继续学习，可以把“位置公式”连接到模型从输入到输出的完整行为。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方向</th><th class="dd-align-left">接下来读</th><th class="dd-align-left">需要建立的联系</th></tr></thead><tbody><tr><td class="dd-align-left">序列怎样产生</td><td class="dd-align-left">Token 与分词</td><td class="dd-align-left">位置索引对应的离散单位是什么</td></tr><tr><td class="dd-align-left">分数怎样计算</td><td class="dd-align-left">自注意力</td><td class="dd-align-left">QK 点积与遮罩怎样形成信息流</td></tr><tr><td class="dd-align-left">整体架构</td><td class="dd-align-left">Transformer</td><td class="dd-align-left">位置、残差和前馈层怎样配合</td></tr><tr><td class="dd-align-left">长序列成本</td><td class="dd-align-left">KV Cache</td><td class="dd-align-left">缓存如何减少重复计算并保持位置一致</td></tr><tr><td class="dd-align-left">能力验证</td><td class="dd-align-left">模型评测</td><td class="dd-align-left">怎样避免长上下文测试的内容和位置混杂</td></tr></tbody></table></div>
+<p>“Token 与分词”决定位置轴上的基本单位。位置索引不是直接数自然语言中的字、词或句子，而是随 tokenizer 输出的离散 token 逐项推进。只有先明确序列是怎样切分和编号的，才能解释某个位置差在模型输入中实际跨越了什么。</p>
+<p>“自注意力”说明位置关系进入了哪一段计算。QK 点积产生内容匹配分数，遮罩限制每个查询可以看到哪些键，位置编码、相对偏置或旋转再为这些分数加入坐标结构。理解这三者的分工，才能区分内容相似、可见方向与精确距离分别来自哪里。</p>
+<p>“Transformer”把注意力放回完整网络。位置机制影响注意力的信息选择，但一层的输出还会经过残差连接和前馈层，并继续传给后续层。模型对顺序与距离的利用，是位置结构与整个网络共同作用的结果，不能只从某一条位置公式推断最终能力。</p>
+<p>“KV Cache”连接位置语义与推理成本。缓存历史 K/V 可以避免自回归生成中反复计算已有 token，但复用缓存时必须延续完整序列的 position ID，并保持旋转配置一致。计算被省略的部分仍属于原来的坐标系统，不能因为张量被切块、分页或复用就重新编号。</p>
+<p>“模型评测”用于判断这些机制最终是否转化为能力。长上下文测试要控制内容难度，同时改变长度、证据位置和任务结构，避免把样本内容差异误当成位置效应。可运行、可检索、顺序敏感和多证据推理是逐层增强的要求，任何单一指标都不足以替代完整验证。</p>
+<p>掌握这些联系后，应能够准确说明无位置自注意力为何是排列等变，能在二维中根据 Q/K 的旋转手算 RoPE 点积，并能为声称扩展上下文的模型设计验证矩阵。这个矩阵需要同时覆盖目标长度能否运行、远处内容能否检索、证据顺序改变时答案是否相应变化，以及模型能否组合多个远距证据完成推理。</p></div>
+<table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>序列怎样产生</td><td><a href="#" data-node="tokenization">Token 与分词</a></td><td>位置索引对应的离散单位是什么？</td></tr><tr><td>分数怎样计算</td><td><a href="#" data-node="self-attention">自注意力</a></td><td>QK 点积与遮罩怎样形成信息流？</td></tr><tr><td>整体架构</td><td><a href="#" data-node="transformer">Transformer</a></td><td>位置、残差和前馈层怎样配合？</td></tr><tr><td>长序列成本</td><td><a href="#" data-node="kv-cache">KV Cache</a></td><td>缓存如何减少重复计算并保持位置一致？</td></tr><tr><td>能力验证</td><td><a href="#" data-node="model-evaluation">模型评测</a></td><td>怎样避免长上下文测试的内容和位置混杂？</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a>：正弦位置编码与 Transformer。</li><li><a href="https://aclanthology.org/N18-2074/" target="_blank" rel="noopener">Self-Attention with Relative Position Representations</a>：相对位置表示。</li><li><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">RoFormer: Enhanced Transformer with Rotary Position Embedding</a>：RoPE。</li><li><a href="https://arxiv.org/abs/2108.12409" target="_blank" rel="noopener">Train Short, Test Long: Attention with Linear Biases</a>：ALiBi。</li><li><a href="https://arxiv.org/abs/2306.15595" target="_blank" rel="noopener">Extending Context Window of Large Language Models via Positional Interpolation</a>：位置插值。</li></ul><p>几何图、二维数值推导、工程故障链与评测矩阵均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/positional-encoding">在地图中查看概念关系</a></nav>
+</article></main></body></html>

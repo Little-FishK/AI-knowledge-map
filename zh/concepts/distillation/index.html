@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>知识蒸馏：让小学生逼近教师的条件分布与行为 · AI 知识地图</title>
+<meta name="description" content="从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/distillation/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="知识蒸馏：让小学生逼近教师的条件分布与行为">
+<meta property="og:description" content="从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/distillation/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="知识蒸馏：让小学生逼近教师的条件分布与行为">
+<meta name="twitter:description" content="从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/distillation/#page","name":"知识蒸馏：让小学生逼近教师的条件分布与行为","description":"从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。","url":"https://ai-knowledge-map.com/zh/concepts/distillation/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"知识蒸馏：让小学生逼近教师的条件分布与行为","item":"https://ai-knowledge-map.com/zh/concepts/distillation/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">知识蒸馏：让小学生逼近教师的条件分布与行为</span></li></ol></nav><article id="dd-article" data-concept-id="distillation">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">知识蒸馏：让小学生逼近教师的条件分布与行为</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 蒸馏用教师分布、表示或生成示范监督学生，使较小模型在目标数据上逼近教师。它不是把知识文件复制进小模型，而是在<b>学生容量、蒸馏数据和目标函数</b>限定下选择性保留行为，并可能继承教师错误与偏差。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>手算温度软标签与 KL 目标；区分 logit/特征/序列蒸馏；设计覆盖与教师查询策略；评测能力损失和系统收益。</div>
+<ol class="dd-chain"><li>定义学生需保留的能力切片</li><li>教师产生分布/表示/示范</li><li>独立验证并构造覆盖课程</li><li>学生联合拟合硬标签与教师信号</li><li>比较逐样本能力迁移与丢失</li><li>系统收益/风险联合门禁并保留升级</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>硬标签只给答案，软分布还给相对关系<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>知识蒸馏解决的核心问题是：把一个较大或较强模型的判断能力迁移给较小模型时，究竟应该传递什么信息。最朴素的传递方式只用硬标签——教师对每条输入只给出最终正确类别，例如一条退款案例的标签写作 refund=1、ask=0、reject=0。这种 one-hot 编码只传递了&quot;答案是 refund&quot;，其余类别的信息全部归零。</p>
+<p>看一个具体对照。两个教师处理同一条退款案例，最终答案都是 refund，但教师甲给 ask 类 35% 的概率，教师乙只给 1%。若只看硬标签，两者的标签完全相同，学生从二者身上学到的信号没有任何差别。然而这两个判断传达的事实完全不同：给 ask 35% 意味着该案例处在&quot;信息不足、应当先询问用户&quot;的决策边界附近，证据存在模糊地带；只给 1% 则意味着证据明确指向退款。软分布保留的正是这种类别之间的相对关系和边界信息，而硬标签把它们压成了单一的尖峰。</p>
+<p>知识蒸馏的机制是把教师的完整概率分布而不是单个答案交给学生。输入仍是同一条退款案例，教师输出 refund、ask、reject 三个类别各自的概率，构成一张概率表，学生模型以这张表为监督目标进行拟合。因果链是：教师对每个输入产生完整软分布 → 软分布携带类别相似性与决策边界信息 → 学生拟合整张分布而非孤点标签 → 学生获得比 one-hot 标签更平滑、样本效率更高的监督信号，因为每一条样本都传递了关于所有类别的梯度信息，而不再只有正确类别的信息。</p>
+<p>学生输出与教师分布越接近，只说明行为迁移成功，绝不说明教师的判断就是真值。教师自身的概率可能失准，&quot;更暗的知识&quot;不自动等于真理。因此硬真值与教师信号应当组合使用，并在真实标签上校准，让教师软分布补充而不是替代硬标签。</p>
+<p>蒸馏对象也不限于概率分布：可以拟合 logits、隐藏表示、注意力、序列示范、偏好或验证反馈。每一种可观察信息传递的内容不同，选哪种取决于学生需要继承教师行为中的哪一部分。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>温度把次优类别从接近零处拉出来<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>教师输出的软分布之所以比硬标签更有信息量，关键不在于教师答对的那一类概率有多高，而在于它答错时各类别之间仍然保留着差异。softmax 在 T=1 时会把最大的 logit 压成接近 1 的概率，其余类别被压到接近 0，学生几乎只看到&quot;答案&quot;，而看不到&quot;哪些错误更像正确答案&quot;。温度 T 的引入正是为了解决这个问题：第 i 类的温度化概率 pᵀᵢ 由 softmax 对 zᵢ/T 计算得到，其中 zᵢ 是类别 i 未经归一化的原始分数（logit），i 是类别编号，T 是温度；softmax 把 z/T 变成总和为 1 的概率分布。T&gt;1 时所有 logit 同时被缩小，类别之间的分数差距随之缩小，分布变得更平：原来被压到接近零的次优类别被&quot;拉出来&quot;，获得非零概率。学生于是能读到教师的相对偏好——某一错误类别概率略高，说明教师认为它与正确答案&quot;比较像&quot;；这些低概率类别也因此产生可学习的梯度，而不是停在近乎为零的概率位置上没有任何信号。训练结束后推理时通常恢复 T=1，让学生按原始 logit 尺度输出最终概率。</p>
+<p>温度带来的梯度尺度问题需要在损失函数中处理。学生的总训练损失 L 由两部分加权组成：L = α × L硬标签 + (1−α) × T² × KL(p教师 ∥ p学生)。L硬标签 衡量学生输出与人工真值之间的差距；α 取值在 0 到 1 之间，控制真值监督与教师监督的比例，α 越大学生越依赖硬标签，α 越小学生越依赖教师软分布。KL(p教师 ∥ p学生) 衡量学生软分布偏离教师软分布的程度。softmax 的导数会随温度升高而缩小，导致梯度尺度变小，乘上 T² 正是为了补偿这一效应。注意 KL 散度不是对称距离：p教师 ∥ p学生 与 p学生 ∥ p教师 是两回事，交换两边会改变惩罚的重点。经典方向对&quot;教师给出非零概率而学生漏掉&quot;的类别惩罚更明显，这鼓励学生覆盖教师的整个分布；反向 KL 则更容易让学生集中于少数高概率模式。因此报告蒸馏方案时不能只说&quot;用了 KL&quot;，必须说明方向和样本单位；生成式模型还可以改用序列级目标，方向与单位的选择就更不能省略。</p>
+<p>温度的作用边界同样要明确：它是训练信号的软化手段，不是校准修复。它不保证教师或学生在部署时的概率输出可信，校准与否需要另作处理。</p></div>
+<div class="dd-formula" data-formula-id="distillation-soft-target-loss" data-display="mathml"><math display="block" aria-label="温度 T 下第 i 类概率等于 softmax 对第 i 个 logit 除以 T；总损失等于 alpha 乘硬标签损失，加一减 alpha 乘 T 平方和教师学生软分布的 KL 散度"><mtable><mtr><mtd><msubsup><mi>p</mi><mi>i</mi><mi>T</mi></msubsup><mo>=</mo><msub><mi>softmax</mi><mi>i</mi></msub><mo>(</mo><mfrac><mi>z</mi><mi>T</mi></mfrac><mo>)</mo></mtd></mtr><mtr><mtd><mi>L</mi><mo>=</mo><mi>α</mi><msub><mi>L</mi><mtext>硬标签</mtext></msub><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><msup><mi>T</mi><mn>2</mn></msup><mo>·</mo><mi>KL</mi><mo>(</mo><msubsup><mi>p</mi><mtext>教师</mtext><mi>T</mi></msubsup><mo>∥</mo><msubsup><mi>p</mi><mtext>学生</mtext><mi>T</mi></msubsup><mo>)</mo></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>运行示例：三个退款动作的温度软化<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个客服场景把温度的作用落到具体数字上。教师面对三个退款动作 refund、ask、reject，输出的原始 logits 分别是 4、2、0。在 T=1 时直接套 softmax，三个动作的概率分别是 e⁴/Σ ≈ .867、e²/Σ ≈ .117、e⁰/Σ ≈ .016，其中 Σ = e⁴ + e² + e⁰。教师几乎把全部概率压给 refund，ask 与 reject 只各占约十分之一和不足百分之二，学生从这份分布里读不到太多&quot;次优选择&quot;的信息。当温度提高到 T=2 时，每个 logit 先除以 2 再进入 softmax，概率变成 e²/Σ&#39; ≈ .665、e¹/Σ&#39; ≈ .245、e⁰/Σ&#39; ≈ .090，其中 Σ&#39; = e² + e¹ + e⁰。对应图 1 的柱状图可以看到：温度 2 并没有改变三个动作的排序，refund 仍然最高、ask 其次、reject 最低，但 ask 的概率从 .117 升到 .245，reject 从 .016 升到 .090，两者与 refund 的差距明显缩小。温度软化后，ask/reject 的相对信息变得可见：reject 的概率低于 ask，说明在教师看来 reject 不如 ask 接近正确答案，这一关系在 T=1 时几乎被压平到看不见。</p>
+<p>这份软化分布对学生有什么实际好处，可以用学生的输出来比较。假设学生输出 [.60, .30, .10]，也就是给 ask 留了 30% 概率、给 reject 留了 10%。对照 T=2 的教师分布 .665/.245/.090，学生的分配方向与教师一致，只是在三个动作之间更平均，因此软分布损失会相当小，学生能得到明确的正向信号：为 ask 和 reject 保留概率是被鼓励的。如果只用硬标签训练，真值只有一个 refund，损失会持续推动学生把 refund 推向 1、把 ask 和 reject 压向 0，学生刚学会的相对关系反而会被当作错误惩罚掉。这就是同一份教师输出在两种训练信号下的差别：硬标签只奖励答案本身，软分布还奖励&quot;错法之间的差别&quot;。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="教师三个动作 logits 经温度一和温度二 softmax 后的概率柱状图"><rect x="30" y="40" width="290" height="170" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="175" y="66" text-anchor="middle" class="svg-t">T=1：尖锐</text><rect x="75" y="88" width="45" height="92" fill="#4f9d78"/><text x="97" y="198" text-anchor="middle" class="svg-t" font-size="11">refund .867</text><rect x="160" y="166" width="45" height="14" fill="#d3a05a"/><text x="182" y="198" text-anchor="middle" class="svg-t" font-size="11">ask .117</text><rect x="245" y="177" width="45" height="3" fill="#c77b72"/><text x="267" y="198" text-anchor="middle" class="svg-t" font-size="11">reject .016</text><rect x="380" y="40" width="290" height="170" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="525" y="66" text-anchor="middle" class="svg-t">T=2：软化</text><rect x="425" y="115" width="45" height="65" fill="#4f9d78"/><text x="447" y="198" text-anchor="middle" class="svg-t" font-size="11">refund .665</text><rect x="510" y="156" width="45" height="24" fill="#d3a05a"/><text x="532" y="198" text-anchor="middle" class="svg-t" font-size="11">ask .245</text><rect x="595" y="171" width="45" height="9" fill="#c77b72"/><text x="617" y="198" text-anchor="middle" class="svg-t" font-size="11">reject .090</text></svg><figcaption>图 1　温度 2 保持排序，却让 ask/reject 的相对信息更可见。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>动作</th><th>logit</th><th>e^z / Σ（T=1）</th><th>e^(z/2) / Σ（T=2）</th></tr></thead><tbody><tr><td>refund</td><td>4</td><td>.867</td><td>.665</td></tr><tr><td>ask</td><td>2</td><td>.117</td><td>.245</td></tr><tr><td>reject</td><td>0</td><td>.016</td><td>.090</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>logit、特征与关系蒸馏要求不同接口<span class="dd-badge eng">方法</span></h2>
+<div class="dd-agent-response"><p>当拿不到教师内部状态时，还能蒸馏什么，取决于教师愿意暴露哪一种信号。按信号所在层级可以分出四种：logit 是 softmax 之前的候选原始分数，即每个类别或词表条目未归一化的得分；特征 是教师中间层产生的向量；关系 是样本与样本之间、或层与层之间的相似结构；序列 是教师最终生成的一条完整回答。越靠内部的信号提供的信息越细，但越要求访问教师模型内部，两者之间存在明确的权衡。</p>
+<p>以四个层级逐一看：Logit/token 层拿到的是每个类别或词表的分布，学生可以直接对这份分布做回归或 KL 匹配，前提是能访问教师的 logits 且双方词表对齐，而公开 API 往往不开放全量 logits，这一前提常常不成立。Feature 层拿到的是隐藏层或注意力的向量，需要先建立层映射、再做维度投影才能让学生匹配，架构差异大时映射本身就很困难。Relation 层拿到的是样本间或层间的相似关系，通常靠批内对照学习来传递，目标间接，不直接给每个样本一个&quot;正确答案&quot;。Sequence 层拿到的是教师的回答、解释或偏好示范，只需要一个能生成文本的 API，几乎人人可用，但学生能观察到的只有教师最终采样出来的那一条路径。</p>
+<p>选择蒸馏方法的输入，是三个实际条件：可用的教师接口、学生的架构、以及想保留的能力；输出则是对应的概率、特征、关系或示范数据，外加配套的学生损失。大语言模型常用的就是序列蒸馏：让教师对多样化的提示各生成示范，再用监督微调或偏好训练学生。这种做法本质上更像行为克隆——学生模仿教师&quot;怎么说&quot;，却看不到教师对未采样 token 的概率分布，也就无法知道教师为什么没选另一个词；因此它容易连带复制教师的文风与冗长。一个可观察的症状是：学生在与示范风格高度一致的输入上表现良好，一旦换一种措辞就失败。此时应当解释为学生只复制了被采样的路径，而不是完整迁移了教师的分布。架构差异还会带来另一种限制：不同模型可能根本没有可直接一一对应的层，此时强行逐层匹配特征，反而会限制学生发展自己的表示方式，把蒸馏变成对教师结构的照搬。</p></div>
+<table class="dd-table"><thead><tr><th>层级</th><th>教师信号</th><th>要求</th><th>盲区</th></tr></thead><tbody><tr><td>Logit/token</td><td>每类/词表分布</td><td>可访问 logits、词表对齐</td><td>API 常不开放全量</td></tr><tr><td>Feature</td><td>隐藏层/注意力</td><td>层映射和维度投影</td><td>架构差异大</td></tr><tr><td>Relation</td><td>样本/层间相似关系</td><td>批内对照</td><td>目标间接</td></tr><tr><td>Sequence</td><td>回答/解释/偏好</td><td>只需生成 API</td><td>只见采样路径</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>学生容量与架构决定可保留上限<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>为什么教师的全部能力不能靠&quot;示范足够多&quot;就整体塞进学生？因为学生本身的参数规模、层数、上下文窗口、词表和计算深度，直接限制了它能表达的表示方式和算法。蒸馏不是无损搬运，而是学生在自身容量约束下对教师行为做有偏的拟合。训练目标会自然形成保留优先级：蒸馏数据会让学生优先保留高频出现的、容易拟合的、以及目标函数权重高的行为；相应地，罕见推理模式、长上下文能力、校准质量、对抗鲁棒性和工具恢复能力往往是先被丢掉的那一批——它们要么在数据里样本稀少，要么拟合代价高、对损失下降贡献小。</p>
+<p>容量不足时，继续增加教师样本并不会线性提升学生。收益会进入平台期：教师输出中超出学生表达范围的部分，再多样本也拟合不出来；而当不同任务的行为相互冲突时，样本堆叠甚至会产生干扰，让学生在两个方向之间来回拉扯。因此合理的预期管理是画出能力—参数—延迟的前沿曲线，明确在给定参数与延迟预算下能保留到什么程度，而不是把&quot;教师全能力复刻&quot;当作默认承诺。</p>
+<p>同一逻辑也解释了一个看似矛盾的现象：学生在某个基准上超过教师，并不等于它全面更强。超出部分可能来自学生训练中的正则化效应，可能来自学生恰好更匹配该基准的数据分布，也可能来自评测污染——基准题目或其变体进入了训练数据。单个数字无法支撑&quot;全面超越&quot;的结论，需要结合能力前沿和丢失项综合判断。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>数据覆盖比教师品牌更决定学生偏科<span class="dd-badge eng">数据</span></h2>
+<div class="dd-agent-response"><p>一个最强教师如果只在短英文 FAQ 上教学，会得到怎样的学生？答案很直接：学生会在短英文 FAQ 这个分布上逼近教师，但不会凭空获得长上下文、多语言、工具调用、拒答和故障恢复能力。蒸馏数据覆盖哪些行为，学生就学到哪些行为；数据没覆盖的，教师再强也传递不过去。学生的偏科由数据覆盖决定，而不是由教师品牌决定。</p>
+<p>因此蒸馏数据要按目标行为主动构造课程：引入真实流量分布、困难样本、高风险场景和对抗性集合，让教师在这些切片上输出。同时有一条反向纪律：对教师不确定的样本，或经验证失败的样本，保留人工真值，不强制学生模仿教师的错误。整个数据管线可以按顺序展开：先按目标切片抽取真实或合成提示，覆盖想保留的每一种行为；再让教师做多样化采样，并保留对应的输出概率、模型版本和提示，保证可追溯；接着用外部规则、执行器或人工验证筛掉教师回答中的错误；然后去重，并控制难度与教师风格，避免学生只学到一种口吻；最后在不含教师近邻的真实集合上验收——如果验证样本与训练样本高度相似，评测结果会高估迁移效果。</p>
+<p>教师查询本身有成本，所以采样不能均匀浪费。更经济的做法是主动选择：优先询问学生最不确定、而教师可能有增益的样本。学生在这些样本上最需要监督信号，教师的回答边际价值最高；对已经答得好的分布，重复询问教师带来的信息增量很小。主动选择把有限的教师预算集中在学生能力边界上。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>教师错误、偏见和拒答会一并传递<span class="dd-badge eng">风险</span></h2>
+<div class="dd-agent-response"><p>学生更小、更便宜，是否也自然更安全？不会。蒸馏传递的是教师行为，而不是过滤后的优点。序列示范中可能混入幻觉、隐私泄露、偏见或过度拒答，学生照样会学走；软分布同样会传递教师的偏好结构，包括不希望的偏好。另一个隐蔽的坑是验证器：如果教师和验证器同源——例如验证器本身就是教师模型或由教师数据训练而来——那么高通过率可能只是两者的共同盲点，验证并没有提供独立信息。因此对敏感任务，监督信号不能只来自教师一家，需要把硬标签、独立规则、多教师之间的分歧和人工审查组合起来使用。</p>
+<p>容量不足还会造成反向的安全问题。学生如果只学到表面的安全措辞，而没有学到什么时候该拒绝的条件判断，就会出现两种失效：对危险请求漏拒，或对正常请求全拒。前者是安全兜底失效，后者是可用性崩溃，两者都源于学生丢失了教师行为背后的条件结构。评估时应当按风险切片比较教师、学生与真实标签三方，而不是用&quot;学生与教师的一致率&quot;充当安全真值——与教师一致并不等于与正确的安全边界一致。</p>
+<p>蒸馏还可能洗掉不确定性。如果只用单一教师的贪心答案做示范，学生看到的是教师最终选定的那一条路径，看不到教师在其他回答上的概率质量，也就看不到问题本身的多模态分布。结果是学生在表述上比证据允许的更确定，把教师内部的犹豫抹平成斩钉截铁的语气。这种确定性的假象在开放问题上尤其危险，因为它把&quot;教师最可能的一种说法&quot;伪装成了&quot;唯一事实&quot;。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>蒸馏、量化、剪枝和 LoRA 在不同维度压缩<span class="dd-badge eng">组合</span></h2>
+<div class="dd-agent-response"><p>四种方法都说自己让模型&quot;更小&quot;，但它们改变的东西完全不同，收益和损失来源也各不一样。蒸馏改变的是行为主体：训练一个更小的学生去逼近教师行为，主要收益是参数量和 FLOPs 下降，主要损失源是学生容量与数据覆盖的缺口。量化改变的是数值位宽：把权重或激活从高精度表示压到低精度，主要收益是存储和带宽，主要损失源是舍入与截断误差。剪枝改变的是结构：直接移除权重或整个结构单元，主要收益是稀疏性与算力下降，主要损失源是误删了重要连接。LoRA 改变的不是原模型，而是任务增量：在旁路加低秩适配矩阵，主要收益是训练状态更小、任务间切换更快，主要损失源是适配容量有限和任务间干扰。四者的共同点是都降低部署成本，但压缩的维度互不相同，不能互相替代。</p>
+<p>它们可以叠加，例如先蒸馏得到小模型，再对这个小模型做量化。但叠加不等于误差简单相加：量化可能恰好加剧学生已经脆弱的能力切片——学生在某些分布上本来就拟合得很勉强，数值误差会让这些切片先崩；反过来，如果蒸馏用的教师本身是量化过的，教师输出的分布已经改变，学生学到的是被量化扭曲后的信号。因此任何组合方案都必须重新做端到端评测，不能拿单独验证过的蒸馏结果和单独验证过的量化结果拼出一个&quot;应该也成立&quot;的结论。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>改变</th><th>主要收益</th><th>主要损失源</th></tr></thead><tbody><tr><td>蒸馏</td><td>训练更小学生行为</td><td>参数/FLOPs</td><td>容量与覆盖</td></tr><tr><td>量化</td><td>数值位宽</td><td>存储/带宽</td><td>舍入/截断</td></tr><tr><td>剪枝</td><td>移除权重/结构</td><td>稀疏/算力</td><td>删去重要连接</td></tr><tr><td>LoRA</td><td>低秩任务增量</td><td>训练状态/切换</td><td>适配容量与干扰</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>部署证据是质量—容量—成本前沿<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>学生参数少 70%，怎样证明它不是&quot;更便宜但更常失败&quot;？不能靠单个基准分，而要同时报告两层证据。模型能力层要覆盖：逐 token 的 KL 散度或困惑度、目标任务本身、长上下文、多语言、工具调用、安全性、校准质量以及分布外切片；系统成本层要测量 TTFT/TPOT（首 token 与每输出 token 延迟）、吞吐、显存占用、能耗、人工接管率和每成功任务的成本。两层缺一不可：能力指标回答&quot;学得多好&quot;，系统指标回答&quot;省得是否真实&quot;。基线同样要选对——不是和教师比，而是和同预算下的强模型路由或量化方案比，这样比较的才是&quot;在这个成本点上我是否做出了最好的选择&quot;。</p>
+<p>逐样本对照可以定位损失的位置。把评估样本按结果分成 teacher-only-correct（教师对、学生错）、student-only-correct（学生对、教师错）、both-wrong（两者都错）三类，观察能力损失集中在哪些切片上。这里有一条记账纪律：教师本身答错的样本，不能算作学生&quot;未模仿失败&quot;——学生模仿了错误不算蒸馏失败，教师没有的能力本来就不在传递范围内。发布之后也不是终点：线上流量会漂移，出现训练时没有的分布，此时要么重新蒸馏，要么升级路由策略把困难请求送回更强模型。</p>
+<p>据此可以给出&quot;可接受压缩&quot;的判据：硬风险门槛全部通过；目标硬件上的收益是真实可测的，而不是纸面参数；被牺牲的能力是明确列出的，并且要么可路由到其他模型、要么可回退。三者同时满足，压缩才是可验收的；缺任何一条，都只是把成本转嫁到了未测量的地方。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把整条链连起来，可以看到知识蒸馏从一个模糊的&quot;把小模型变强&quot;愿望，落到一套有先后顺序的可验证流程上。第一步是定义能力切片：明确学生必须保留哪些能力——目标任务、长上下文、多语言、工具调用、安全行为、校准等，逐项列出。没有这一步，后面所有&quot;效果不错&quot;的说法都没有对照系。第二步是教师产生信号：教师针对这些切片输出分布、表示或示范，信号类型由可用接口决定。第三步是独立验证并构造覆盖课程：用规则、执行器或人工验证筛掉教师错误，按切片补齐真实流量、困难样本和对抗样本，保证数据覆盖与能力切片一一对应。第四步是学生联合拟合：在自身容量约束下同时拟合硬标签与教师信号，用温度与损失加权控制两者比例。第五步是逐样本比较：按 teacher-only-correct、student-only-correct、both-wrong 分类，定位能力迁移到哪、丢失在哪，教师答错的样本单独记账。第六步是系统收益与风险联合门禁：能力指标与 TTFT/TPOT、吞吐、显存、能耗、人工接管率等成本指标同时验收，被牺牲的能力必须明确列出且可路由或可回退，并保留升级路径应对发布后的流量漂移。六个步骤构成一条闭环：每个后续步骤都在检验前一步的承诺是否兑现，任何一环跳过，蒸馏的&quot;更便宜&quot;都可能只是把成本转移到了未测量的失败上。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Distilling the Knowledge in a Neural Network</a>：温度软标签与经典蒸馏</li><li><a href="https://arxiv.org/abs/1910.01108" target="_blank" rel="noopener">DistilBERT</a>：语言模型多目标蒸馏</li><li><a href="https://arxiv.org/abs/2306.08543" target="_blank" rel="noopener">MiniLLM</a>：生成式语言模型蒸馏目标</li><li><a href="https://arxiv.org/abs/1606.07947" target="_blank" rel="noopener">Sequence-Level Knowledge Distillation</a>：序列级示范蒸馏</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/distillation">在地图中查看概念关系</a></nav>
+</article></main></body></html>

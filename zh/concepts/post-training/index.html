@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>后训练 Post-training · AI 知识地图</title>
+<meta name="description" content="预训练给能力，后训练决定这些能力怎样被调用和呈现">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/post-training/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="后训练 Post-training">
+<meta property="og:description" content="预训练给能力，后训练决定这些能力怎样被调用和呈现">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/post-training/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="后训练 Post-training">
+<meta name="twitter:description" content="预训练给能力，后训练决定这些能力怎样被调用和呈现">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/post-training/#page","name":"后训练 Post-training","description":"预训练给能力，后训练决定这些能力怎样被调用和呈现","url":"https://ai-knowledge-map.com/zh/concepts/post-training/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"后训练 Post-training","item":"https://ai-knowledge-map.com/zh/concepts/post-training/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">后训练 Post-training</span></li></ol></nav><article id="dd-article" data-concept-id="post-training">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">后训练 Post-training</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">预训练给能力，后训练决定这些能力怎样被调用和呈现</p>
+<p class="dd-ali">Post-training · 后训练 · 从基座到助手</p>
+<p class="dd-metabar">建议 25–35 分钟 · 中级 · 需要：预训练、微调、RLHF</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 后训练是在基座模型之后，用指令示范、偏好比较和可验证反馈继续优化模型。它不是单一算法，而是一条把<b>会续写的基座</b>塑造成<b>会遵循意图、分配推理预算并控制风险的助手</b>的训练流水线。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul>
+  <li>后训练和预训练、微调分别是什么关系？</li><li>SFT、偏好优化和可验证反馈各解决什么？</li>
+  <li>为什么后训练能改变行为，却不适合当事实数据库？</li><li>为什么推理模型也离不开后训练？</li><li>怎样评估能力增益与回归？</li>
+</ul></div>
+<ol class="dd-chain"><li>预训练提供广泛能力，但目标不是用户意图。</li><li>SFT 用示范建立助手基本行为。</li><li>偏好优化处理没有唯一答案的质量取舍。</li><li>可验证反馈训练搜索、检查与修正。</li><li>代理目标可能被钻空子，所以要约束并独立评测。</li><li>后训练塑造行为，不替代外部事实系统。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>它在训练链条里的位置<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>预训练结束时的模型已经知识渊博，却不能直接当助手。原因在于预训练优化的量：文本似然，即模型为训练文本及其后续内容分配的相对可能性。似然被推高，意味着模型学会了语料中的常见语言规律——哪些词经常相邻、什么表达更常见、话题通常如何延续。然而似然并不编码“用户现在希望我怎么做”这类意图判断。一个只被训练去续写合理文本的模型，面对问题倾向于补全一段像样的文字，而不是去执行任务、遵循格式或拒绝越界请求。</p>
+<p>后训练正是用来弥合这个差距。它把训练数据和反馈换成更接近产品目标的形式——指令示范、偏好比较、可验证反馈——并借此塑造若干具体能力：指令遵循、回答风格、工具使用、安全边界与推理策略。</p>
+<p>概念上要分清两个层次：后训练是整个阶段的统称，微调是阶段内部用来更新参数的具体手段。后训练的输入是基座模型，外加指令示范、偏好比较或可验证反馈；输出是参数更新后的助手模型和相应的评测记录。各层机制遵循同一个循环：生成候选回答，将候选与目标比较，计算损失或奖励，再用它更新参数。每一轮循环都在改变模型面对某种提示时的回答分布。</p>
+<p>对结果要这样解释：更新后发生变化的，是模型在特定输入下触发目标行为的概率——比如更稳定地遵循指令、按约定风格作答、恰当地拒绝不安全请求。这不是模型突然获得了权威事实。因此，如果基础能力、事实性或少数语言切片出现回归，即便总偏好分数上升，也不能据此宣布成功。后训练的能力边界就在于此：它调整行为的触发概率，而不是注入新的事实知识。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>第一层：监督微调 SFT<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>要让一个只会续写的模型学会“收到指令就按约定回答”，第一步是收集大量高质量的“指令—理想回答”示范，并用交叉熵继续训练。这就是监督微调（SFT）。</p>
+<p>每个训练样本由两部分组成：输入是指令和可选上下文，目标输出是示范回答里的 token 序列。训练方式与预训练一样是逐 token 降低交叉熵：模型根据已有 token 预测下一个 token 的概率分布，交叉熵衡量这个预测分布与真实目标之间的差距——真实目标是独热分布，只有正确 token 概率为 1，其余为 0，于是该位置的损失就是 −log p(目标 token | 上文)，即模型给正确 token 的概率取负对数。参数朝着增大这个概率的方向更新。样本一遍遍流过，模型把“这类指令就该接这类回答”的概率持续抬高，行为分布随之改变。</p>
+<p>SFT 建立起的是基本行为分布：被提问时给出回答而不是随意续写，按约定格式输出，在合适的场合拒绝。训练后格式遵循率或拒答准确率上升，正确的解释是模型更频繁地复现示范中出现过的行为，而不是它已经理解了未覆盖场景、能够举一反三。</p>
+<p>这个机制的边界直接来自它对示范的依赖。SFT 学的是示范分布，示范的覆盖范围就是它的能力上限：示范没出现过的场景，模型仍然可能失败。示范的质量也会被原样吸收——标准互相冲突、语言分布失衡、或通篇套模板，模型都会把这些缺陷一并学进参数。另一个边界与知识有关：把大量最新事实塞进 SFT 数据里，既难以更新也难以溯源，因为知识被压进权重后既无法指出出处也无法局部替换；不断变化的知识更适合放在检索增强（RAG）里，让模型在回答时动态取用，而不是在训练时固化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>第二层：偏好优化<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>当一个问题没有唯一标准答案——“最好的回答”取决于用户偏好、场景和风格——SFT 式的一字一句示范就不够用了。第二层偏好优化换一种信号：让标注者对同一提示下的多个回答做比较，选出更偏好的那个，然后用 RLHF 或 DPO 提高被偏好回答的概率。</p>
+<p>比较信号比逐字标准答案灵活：标注者不必写出完美答案，只需判断两个现成回答哪个更好，这更接近真实产品里“用户更接受哪类回复”的判断。但它同时只是一个代理——它度量的是标注者的相对偏好，不是绝对正确。如果标注者习惯偏爱更长、更自信、更顺着用户的回答，模型就会朝那个方向优化。</p>
+<p>这一层的输入包括提示 x、被偏好的回答 y⁺、较差回答 y⁻，以及一个作为行为锚点的参考模型。输出仍是更新后的策略模型：它要拉大“好回答”与“差回答”的相对分数，同时又不能为了迎合偏好数据把原有语言能力完全丢掉。这组“既要又要”被写进同一个目标：</p>
+<p>J(θ) = R偏好(θ) − λ × KL(πθ ‖ π参考)</p>
+<p>逐步读这个式子。θ 是正在更新的模型参数，J 是要提高的总目标。R偏好 衡量当前模型的回答在多大程度上符合偏好数据——回答越被偏好，这一项越高。πθ 是当前模型的回答分布，π参考 是参考模型的回答分布，也就是更新前或 SFT 阶段的分布。KL(πθ ‖ π参考) 度量当前分布偏离参考分布多少：偏离越大，模型越可能失去参考模型原有的语言能力。λ 控制两者的权衡——追求偏好收益与别偏离太远之间的平衡点。总目标等于偏好收益减去 λ 倍的 KL 偏离，所以训练不是无条件讨好偏好信号，而是带约束地抬高它。</p>
+<p>需要说明的是，上面的式子是用来理解 RLHF 类目标的结构式。DPO 走另一条路：它把“y⁺ 好于 y⁻”的比较数据改写成可直接优化的分类形式，不需要显式训练一个与上述式子同款的奖励模型，而是直接更新策略。</p>
+<p>结果如何解释？偏好胜率提高，含义仅限于：在当前的标注者、提示集合和候选生成方式下，目标回答被选中的频率更高了。它不承诺普遍质量提升，也不承诺事实正确率上升。偏好本身有群体差异——一组标注者的偏好不代表所有用户；参考模型的选择和 λ 的大小也会改变最终行为。因此验证时必须另测迎合倾向、冗长程度、事实性、拒答表现和跨群体表现，任何一项回归都说明偏好分数的上涨没有转化成真正的改善。</p></div>
+<div class="dd-formula" data-formula-id="post-training-preference-objective" data-display="mathml"><math display="block" aria-label="总目标等于偏好收益减去 lambda 乘当前策略与参考策略的 KL 偏离"><mrow><mi>J</mi><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><msub><mi>R</mi><mtext>偏好</mtext></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>−</mo><mi>λ</mi><mo>·</mo><mi>KL</mi><mo>(</mo><msub><mi>π</mi><mi>θ</mi></msub><mo>∥</mo><msub><mi>π</mi><mtext>参考</mtext></msub><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>第三层：可验证反馈与推理<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>对于数学、代码这类有客观答案的任务，偏好比较仍然只是主观代理，能不能用更强的反馈？第三层改用可验证反馈：单元测试、答案检查器、证明器或过程验证器。输入是题目、模型生成的答案或中间步骤，以及验证规则；输出是通过/失败、分数，或者具体出错的步骤位置。</p>
+<p>结果奖励与过程奖励在粒度上互补。只看最终答案的结果奖励，信号稀疏但定义清楚——通过测试就是通过，没通过就是没通过，不存在“哪个更好”的主观性；但它把全部信息压在一个终点上，模型不知道中间哪一步出了问题。过程验证器在每个步骤上给出反馈，更早指出偏离发生的位置，让模型知道该在哪里修正；代价是过程级标注昂贵，而且验证器可能偏爱某种特定解法——能通过它检查的路径未必是唯一正确的路径。</p>
+<p>模型由此学到的不只是“答对”，而是拆解问题、搜索路径、检查中间结果、修正错误这一整套循环。这成为推理模型的重要训练来源：因为每一步都有可判定的对错，模型可以自我生成大量轨迹，用验证器筛掉错误轨迹，再把正确轨迹用于训练。</p>
+<p>但验证分数上升要谨慎解释：它只说明模型更会满足当前这个检查器。验证器不是事实本身——测试用例的覆盖范围、证明器采用的公理、规则代码的写法，共同决定了什么是“可见的目标”。覆盖不到的正确答案会被判错，覆盖到的错误答案也可能漏过。验证器越弱，越容易被奖励投机利用：模型可能学会钻空子——给出恰好通过测试但实质错误的解、利用随机种子、或迎合检查器的怪癖——训练奖励上升而真实能力不动。所以必须保留隐藏测试、对抗样例和独立的最终验证，并持续监控训练奖励与真实任务指标之间是否背离。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>它改变什么、不改变什么<span class="dd-badge intuition">边界</span></h2>
+<div class="dd-agent-response"><p>当后训练指标改善时，一个常常被跳过的追问是：这个改善到底意味着什么。同样的分数上升，可能对应三种本质不同的变化：模型获得了此前完全不具备的新能力；模型原本就有的能力被更稳定地触发和调用；或者只是输出格式、语气等表面风格变得更像训练样本。三者对模型的实际价值差别很大，混淆它们会让评测结论失真。</p>
+<p>后训练擅长改变的东西集中在行为层面。它可以调整回答的格式与结构，改变模型在模糊请求下的拒答边界，影响面对多种可用手段时的工具选择，也可以训练出更系统的推理策略，例如先规划再解答。这些都是“何时以及如何调用已有知识”的问题，属于行为方式的塑形。</p>
+<p>后训练也擅长重分配已有能力被调用的时机。一个典型的观察是：基座模型在少量采样时能解出某道题，但它并不会默认采用这条解题路径，只有某一次采样恰好走上正确路线；后训练可以提高这个策略被默认触发的概率，让正确答案从偶发变成常态。但同一机制也有反面：如果训练数据过于单一，模型可能过早地套用固定模板，在不需要该策略的场景里也机械地应用它。因此，“能力出现”与“能力被稳定调用”必须分开测量。评测时应同时看 pass@1——第一次作答即正确的比例，更多采样下的能力上限——模型在多条采样中能否找到正确答案，以及跨提示鲁棒性——换一种问法后表现是否稳定。只有把三者放在一起，才能判断一次改进究竟是新增了能力、提高了已有能力的可访问性，还是仅仅改变了表面风格。</p>
+<p>有些目标后训练并不保证实现。它不能向权重中注入精确且可更新的新事实，不能从根本上消除幻觉，也不能保证在分布外数据上稳定泛化。甚至存在损伤风险：在过窄的数据上训练会造成其他能力回归，或让模型变得过度拒答，把本来可以回答的问题也挡在门外。</p>
+<p>事实更新还牵扯删除与时间两个难题。权重里很难证明某条旧政策已被彻底移除——模型可能在新旧事实之间摇摆，也无法为一条知识自然地给出处。当知识需要可撤销、可审计时，检索或工具查询通常比继续训练更合适：前者可以随时替换数据源，后者能留下可核验的记录，而训练进权重的知识既难以精确删除，也难以说明来源。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>评测与数据闭环<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>训练损失下降本身不足以回答“助手是否真的更好”。损失衡量的是模型对训练分布的拟合程度，它无法分辨模型是在学到用户关心的能力，还是在死记样本、过度迎合格式，或者牺牲了帮助性之外的维度。因此评测必须与训练分离：在独立保留集上，同时测量帮助性、事实性、安全、推理能力、输出格式、延迟与成本，并且按语言、领域、风险和长度切片考察。一个总体分数掩盖不了单一语言上的崩溃或某类高风险请求上的退步。</p>
+<p>数据闭环里最容易犯的错误是测试集污染。新发现的失败样例可以整理后回流成训练数据，这是闭环的价值所在；但测试集不能直接混入训练，否则模型等于在考场上见过答案，分数将失去衡量能力的意义。正确的做法是保留一组永不参与训练的终验集，并为每批数据记录来源与去重关系，保证训练、验证、终验三层彼此隔离，任何一次能力判断都建立在该模型从未见过的样本上。</p>
+<p>评测时机同样需要设计，其自然形态是阶段闸门。SFT 之后先查基础能力，确认模型在格式、指令跟随这些底层技能上没有明显缺口，再进入下一阶段；偏好优化之后查帮助性与迎合倾向、以及拒答行为是否合理，因为这一阶段最容易把模型推向“什么都顺着说”；可验证训练之后则要查目标任务本身的表现，并检查它在验证器覆盖之外是否仍能泛化——因为模型可能只是学会了讨好验证器。若总分升高但某类用户或某类任务回归，不能用平均值掩盖，闸门的意义正是在每一阶段单独拦下这类局部退化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把三个阶段串起来看，后训练的本质是同一件事：数据、目标和约束逐层作用于同一个基座分布，每层解决前一层留下的问题，直到模型的行为分布对齐用户意图。</p>
+<p>预训练提供了广泛的能力——语言理解、知识、初步推理都在这一层形成，但它的训练目标只是预测下一个词，而不是服务用户意图。一个能流畅续写的模型未必会听从指令，也未必会拒绝危险请求。它有能力，但不知道什么时候、以什么形式使用这些能力。</p>
+<p>SFT 用示范数据建立助手的基本行为，回答“一个助手通常该怎么做”的问题：怎样遵循指令、以什么格式回应、什么请求该拒绝。这一层教的是行为骨架，示范告诉模型的是单一正确答案。</p>
+<p>但很多请求没有唯一答案。同一问题的两种回答可能都通顺、都遵守格式，质量却明显不同：一个更完整，一个更敷衍。偏好优化处理的就是这种没有唯一答案的质量取舍，它用比较信号告诉模型在两个都“合法”的回答之间，用户通常更认可哪一个。目标从“像示范那样做”升级为“在可选行为中选用户更认可的那一个”。</p>
+<p>再进一步，有些任务连“质量好坏”都难以靠直觉判断，但存在可验证的标准：答案正确与否可以检查，中间步骤可以验证。可验证反馈训练教模型搜索、检查与修正——生成之后主动检验、发现错误再改正，把一次性的回答变成带有自我检验的求解过程。</p>
+<p>这套链条的边界在于：模型在优化代理目标时可能钻空子，学到的是迎合指标而非真实能力——例如讨好验证器、套用固定模板，而不是真的理解。所以每一层都需要约束，并且用独立于训练目标的评测来确认模型真的变强，而不是只学会了在指标上表演。归根结底，后训练塑造的是行为：它决定能力何时被调用、以什么形式被调用、哪些请求被拒绝，但它不替代外部事实系统，也不负责在权重里保存最新、可审计的世界知识。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>同一个退款提示怎样穿过三阶段<span class="dd-badge math">运行示例</span></h2>
+<div class="dd-agent-response"><p>同一个退款请求可以清楚地展示三个阶段各自改变什么。用户问：“这笔订单能退款吗？”同一基座模型给出的续写、SFT 助手的回答、再经过偏好优化和可验证反馈后的回答，差别不在词汇上，而在每一层监督信号施加了什么压力。三阶段使用的监督信号不同：SFT 模仿示范，偏好优化在可行回答之间排序，可验证反馈则奖励能被外部检查的结果或过程。</p>
+<p>图 1 把三个候选回答放在同一条流水线上比较：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">候选回答</th><th class="dd-align-left">SFT 似然</th><th class="dd-align-left">偏好概率</th><th class="dd-align-left">规则验证</th><th class="dd-align-left">最终解释</th></tr></thead><tbody><tr><td class="dd-align-left">A：一律超过 30 天不可退</td><td class="dd-align-left">0.45</td><td class="dd-align-left">0.20</td><td class="dd-align-left">失败：忽略质量例外</td><td class="dd-align-left">流畅但事实条件不完整</td></tr><tr><td class="dd-align-left">B：质量问题可能适用例外，并核对订单</td><td class="dd-align-left">0.35</td><td class="dd-align-left">0.70</td><td class="dd-align-left">通过</td><td class="dd-align-left">保留</td></tr><tr><td class="dd-align-left">C：保证全额退款</td><td class="dd-align-left">0.20</td><td class="dd-align-left">0.10</td><td class="dd-align-left">失败：无订单证据</td><td class="dd-align-left">过度承诺</td></tr></tbody></table></div>
+<p>只看 SFT 似然，A 得分最高（0.45）：它最像训练示范里常见的回答方式，语气也最流畅。但流畅不等于正确——A 一刀切地断言 30 天后不可退，忽略了质量问题可能触发例外条款这一事实，是“流畅但事实条件不完整”。C 在似然上最低（0.20），它过度承诺“保证全额退款”，没有任何订单证据支撑。</p>
+<p>偏好概率把 B 相对 A 的胜率从原始候选倾向中抬高：B 从 0.35 升到 0.70，A 从 0.45 降到 0.20。但“偏好 0.70”不是事实正确率——它只说明标注者更认可 B 的谨慎与负责，而 B 是否真的正确，还要靠外部规则验证来检查：日期、质量例外条款、订单字段一个都不能少。验证结果只有 B 通过，A 和 C 都失败，于是 B 被保留。这里有一条关键边界：如果验证器只检查回答里是否出现“质量问题”这个短语，模型就可能学会堆关键词而不核对订单，这属于奖励投机——模型优化的是验证器的表面信号，而不是真实的订单核查。验证器覆盖什么，模型就往什么方向倾斜，这是可验证反馈训练必须警惕的偏差来源。</p>
+<p>三个阶段的真实分工因此清晰了：SFT 先把有效行为拉进模型的分布，让模型起码知道“回答应该这样组织”；偏好优化在已经存在于分布内的候选之间移动概率质量，决定哪种行为更常被选中；可验证反馈则把搜索预算导向可检查的目标，让模型学会检查与修正。任何一阶段都不能超出其数据、奖励和评测覆盖的范围——数据没覆盖的行为不会凭空出现，奖励没覆盖的质量维度不会自动变好，评测没覆盖的退化不会被发现。</p>
+<p>失败边界同样值得记住：后训练改变的是已有能力的可访问方式，它可能产生过度拒绝、迎合、模式化措辞和领域回归。上线决策必须同时保留基座能力、目标行为和安全切片三个视角，不能只看一个总奖励。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 235" role="img" aria-label="同一基座模型经过 SFT、偏好优化和可验证反馈形成助手行为的后训练流程"><defs><marker id="pt1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="48" width="120" height="95" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="78" y="73" text-anchor="middle" class="svg-t">基座模型</text><text x="78" y="96" text-anchor="middle" class="svg-t" font-size="10">续写网页/对话皆可能</text><text x="78" y="116" text-anchor="middle" class="svg-t" font-size="10">用户意图不是目标</text><path d="M138,95 L182,95" stroke="#6b7484" marker-end="url(#pt1)"/><rect x="184" y="37" width="132" height="116" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="250" y="62" text-anchor="middle" class="svg-t">SFT 示范</text><text x="250" y="85" text-anchor="middle" class="svg-t" font-size="10">指令→直接回答</text><text x="250" y="104" text-anchor="middle" class="svg-t" font-size="10">引用字段/schema</text><text x="250" y="123" text-anchor="middle" class="svg-t" font-size="10">危险请求→合适拒绝</text><text x="250" y="142" text-anchor="middle" class="svg-t" font-size="10">建立基本助手分布</text><path d="M316,95 L360,95" stroke="#6b7484" marker-end="url(#pt1)"/><rect x="362" y="37" width="132" height="116" rx="8" fill="#21252d" stroke="#c77b72"/><text x="428" y="62" text-anchor="middle" class="svg-t">偏好优化</text><text x="428" y="85" text-anchor="middle" class="svg-t" font-size="10">同提示回答 A/B</text><text x="428" y="104" text-anchor="middle" class="svg-t" font-size="10">更有帮助且不臆断</text><text x="428" y="123" text-anchor="middle" class="svg-t" font-size="10">KL/参考约束</text><text x="428" y="142" text-anchor="middle" class="svg-t" font-size="10">处理质量取舍</text><path d="M494,95 L538,95" stroke="#6b7484" marker-end="url(#pt1)"/><rect x="540" y="37" width="122" height="116" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="601" y="62" text-anchor="middle" class="svg-t">可验证反馈</text><text x="601" y="85" text-anchor="middle" class="svg-t" font-size="10">日期/政策规则检查</text><text x="601" y="104" text-anchor="middle" class="svg-t" font-size="10">代码/数学测试</text><text x="601" y="123" text-anchor="middle" class="svg-t" font-size="10">搜索、检查、修正</text><text x="601" y="142" text-anchor="middle" class="svg-t" font-size="10">仍需独立终验</text><path d="M601,154 C594,216 250,216 250,155" fill="none" stroke="#6b7484" marker-end="url(#pt1)"/><text x="425" y="210" text-anchor="middle" class="svg-t" font-size="10">评测发现回归或奖励漏洞 → 修数据/验证器；测试集不直接回流训练</text></svg><figcaption>图 1　三阶段使用不同监督信号：SFT 模仿示范，偏好优化排序可行回答，可验证反馈奖励能被外部检查的结果或过程。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>候选回答</th><th>SFT 似然</th><th>偏好概率</th><th>规则验证</th><th>最终解释</th></tr></thead><tbody><tr><td>A：一律超过 30 天不可退</td><td>0.45</td><td>0.20</td><td>失败：忽略质量例外</td><td>流畅但事实条件不完整</td></tr><tr><td>B：质量问题可能适用例外，并核对订单</td><td>0.35</td><td>0.70</td><td>通过</td><td>保留</td></tr><tr><td>C：保证全额退款</td><td>0.20</td><td>0.10</td><td>失败：无订单证据</td><td>过度承诺</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>概念依赖与评测路线<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>后训练、微调、对齐、RLHF、事实更新这几个词经常被混用，但它们处于不同的层级。微调泛指在预训练权重上继续做梯度更新，后训练是其中一个阶段；对齐是后训练的目标之一，即让模型行为贴近用户意图与安全边界；RLHF 是实现偏好优化的具体技术路线之一；事实更新则是另一个独立诉求，与行为塑形不是一回事。把层级摆开，才能避免把“换了一种训练方法”误当成“注入了一条新知识”。</p>
+<p>围绕本页核心概念，依赖关系可以这样分层。先修概念是预训练、监督微调、交叉熵与采样：不先理解基座模型的能力来源和用交叉熵拟合示范分布的基本动作，就无法理解后面每一步在做什么。本页核心则是 SFT、偏好数据、RLHF 与 DPO 这类偏好优化路线、可验证反馈，以及 KL 约束与回归：KL 约束防止模型在优化奖励时跑偏过远，回归则提醒每一步都可能牺牲先前能力。紧邻延伸包括对齐、推理模型、测试时计算和奖励投机：后训练产出的模型正是这些主题的讨论对象，奖励投机则是最直接的风险延伸。再往外是工程延伸：模型评测、训练数据治理、RAG、人在回路与安全护栏，这些是后训练在系统层面的配套。</p>
+<p>评测路线至少分三层展开：先看离线目标是否优化，即训练信号本身是否下降或改善；再看目标行为是否改善，即用户可感知的表现是否真的变好；最后看未直接优化的能力是否回归，因为后训练常常在看不见的维度上付出代价。这三层之外还要做成本收益比较：与提示工程、RAG 或更强的基座模型放在同等成本下对比，后训练未必总是最优解。如果需求只是让模型知道最新政策，把事实写进权重通常比检索更糟——检索可以随时更新数据源、删除旧条目、溯源到出处，而权重中的事实难以单独更新、难以证明已删除，也难以说明来源。</p></div>
+<table class="dd-table"><thead><tr><th>层级</th><th>概念依赖与延伸</th></tr></thead><tbody><tr><td>先修</td><td>预训练、监督微调、交叉熵、采样</td></tr><tr><td><b>本页核心</b></td><td>SFT、偏好数据、RLHF/DPO、可验证奖励、KL 约束与回归</td></tr><tr><td>紧邻</td><td>对齐、推理模型、测试时计算、奖励投机</td></tr><tr><td>工程延伸</td><td>模型评测、训练数据治理、RAG、人在回路与安全护栏</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">InstructGPT</a>：SFT、偏好数据与 RLHF 流程。</li><li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Direct Preference Optimization</a>：直接偏好目标。</li><li><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noopener">Let's Verify Step by Step</a>：过程监督与验证器。</li></ul><div class="dd-src-date">访问日期：2026-07-21</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/post-training">在地图中查看概念关系</a></nav>
+</article></main></body></html>

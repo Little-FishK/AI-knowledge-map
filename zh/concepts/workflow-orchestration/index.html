@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>工作流编排：用持久状态和确定性控制承载概率模型 · AI 知识地图</title>
+<meta name="description" content="从 DAG、状态机和持久执行，到幂等、重试、补偿、版本迁移与人工任务，建立可恢复、可审计的 AI 流程。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="工作流编排：用持久状态和确定性控制承载概率模型">
+<meta property="og:description" content="从 DAG、状态机和持久执行，到幂等、重试、补偿、版本迁移与人工任务，建立可恢复、可审计的 AI 流程。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="工作流编排：用持久状态和确定性控制承载概率模型">
+<meta name="twitter:description" content="从 DAG、状态机和持久执行，到幂等、重试、补偿、版本迁移与人工任务，建立可恢复、可审计的 AI 流程。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/#page","name":"工作流编排：用持久状态和确定性控制承载概率模型","description":"从 DAG、状态机和持久执行，到幂等、重试、补偿、版本迁移与人工任务，建立可恢复、可审计的 AI 流程。","url":"https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"工作流编排：用持久状态和确定性控制承载概率模型","item":"https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">工作流编排：用持久状态和确定性控制承载概率模型</span></li></ol></nav><article id="dd-article" data-concept-id="workflow-orchestration">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">工作流编排：用持久状态和确定性控制承载概率模型</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 DAG、状态机和持久执行，到幂等、重试、补偿、版本迁移与人工任务，建立可恢复、可审计的 AI 流程。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 当步骤和分支可预先描述时，流程控制应交给确定性编排器；LLM 是其中一个概率活动。可靠性来自<b>持久状态、幂等、超时和补偿</b>，不是让模型记住“做到哪”。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分 DAG、状态机与自主 Agent；推导至少一次执行下的幂等要求；设计补偿和人工暂停；用故障注入验证恢复与版本迁移。</div>
+<ol class="dd-chain"><li>把任务画成依赖与状态转换</li><li>定义版本化输入输出schema</li><li>标注副作用、幂等键和补偿</li><li>由编排器持久记录决定</li><li>工作者执行LLM或业务活动</li><li>按错误类型重试或升级</li><li>人工/外部事件持久等待</li><li>故障恢复、历史重放与版本迁移</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>确定性骨架把概率错误关在可观察节点<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>把一组模型调用组织成可靠流程，最直接的冲动是让 Agent 自己记住它做到哪一步了。这条路走不通。Agent 会话随时可能被截断、被压缩上下文，或者因为模型重新规划而偏离原计划。会话记忆不是事务状态，它既不能保证“下一步是什么”永远可追溯，也不能保证失败后能精确回到出错的那一步。把流程状态放进模型上下文，等于把可靠性押在一个不可复现、不可审计的载体上。</p>
+<p>工作流编排要解决的就是这个错位：模型负责产生结果，但模型不负责记住过程。编排器是一段确定性的控制逻辑，它持久记录每个节点的输入、当前状态、尝试次数和输出，并据此处理依赖关系、超时与恢复。这里的“持久”是关键——节点状态落在稳定存储里，而不是落在某个会话的内存里。这样，进程崩溃后重新启动，编排器读回的是上一次已提交的事实，而不是一段可能已经丢失的对话。</p>
+<p>概率活动被压缩到明确的节点内部。LLM 节点只完成分类、抽取、生成或判断这类局部任务，交付时使用版本化的 schema，把模型的自由文本输出收敛成结构化、可校验的结果。编排器对每个节点的输入输出都有完整记录，所以模型一旦出错，错误发生在哪个节点、输入是什么、产生了什么输出，都是可观察、可回放、可定位的。概率错误不再散落在整个流程里，而是被关进一个个有边界的节点。</p>
+<p>输入、输出与整体的因果链可以这样理解：输入是一组可描述的步骤、步骤之间的依赖、每个步骤的 schema，以及超时和恢复规则；编排器把这些编译成一条确定性的执行骨架，在每个节点处调用一次概率活动，把结果写回历史。输出是一个可重启、可审计的流程实例——它记录的不只是最终答案，还有每一步发生的事实。</p>
+<p>由此得到一条使用边界：固定路径用工作流，自主搜索只放在真正未知的局部。当流程步骤明确、依赖清楚时，用确定性骨架调度；只有当某一步面临真正开放、无法预先枚举的探索空间时，才在该局部嵌入受限 Agent。编排器保存事实和决定，LLM 只负责局部判断；模型上下文可以承载一次推理，但不能承载整个流程的事务状态。把这两层分开，是编排可靠性的起点。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>DAG 与状态机表达不同控制结构<span class="dd-badge eng">模型</span></h2>
+<div class="dd-agent-response"><p>编排骨架不是单一一种图，而是按流程的控制结构选择不同的表达。一个带条件循环的审核流程——例如“文档不通过就退回补材料，直到满足条件才继续”——如果硬画成一张有向无环图（DAG），就会立刻别扭：DAG 的边只能单向且不能回到祖先节点，而“退回重审”天然是一条回边，需要把节点重复展开成若干份才能勉强表示。控制模型选错了，清晰的流程会变成一堆复制粘贴出来的伪节点。</p>
+<p>选择控制模型的输入，是流程本身是否有环、是否有等待、是否会收到异步事件、是否存在事先未知的路径。输出则是 DAG、状态机、事件驱动或 Agent 子流程这四类结构中的一种或多种组合。</p>
+<p>DAG 擅长表达无环依赖、批处理和并行扇出：一批步骤先各自跑完、再汇聚，谁依赖谁一目了然，天然适合被并行调度。它的限制在于循环和等待表达笨重——任何需要“回到上一步”或“卡住等外部条件”的流程都会被强行摊平。</p>
+<p>状态机把“当前处于哪个状态、什么事件触发什么迁移”作为一等概念，因此条件分支、循环、超时和人工暂停都可以直接建模；审核退回、审批超时升级、订单等待付款，都是状态迁移。代价是当状态和迁移数量膨胀时，状态图本身会变得复杂难读。</p>
+<p>事件驱动结构擅长跨系统的异步反应：外部系统发来回调、消息或 Webhook 时触发对应处理。它的短板在于顺序和重复更难追踪——事件到达的次序未必确定，同一个事件还可能被投递多次，需要额外的幂等与去重机制来兜底。</p>
+<p>Agent 子流程适用于路径事先未知的局部任务，让模型在受限范围内自行决定下一步做什么。它的成本和终止性都不确定：模型可能探索很久，也可能永远不收敛，所以只能放在被明确界定的局部，并且要有超时和终止条件。</p>
+<p>这四类结构可以组合而非互斥。同一个系统里，可以用 DAG 组织大阶段之间的依赖，用状态机管理订单这类长生命周期的状态流转，用事件驱动触发外部回调，并在某个确定节点的内部调用一个受限 Agent 处理局部未知判断。组合的关键是让每一种结构只承载它最擅长的那部分控制，而不是把所有需求挤进同一种图。把有条件循环硬塞进 DAG，失去的正是清晰的状态表达——这正是选型时首先要避免的错误。</p></div>
+<table class="dd-table"><thead><tr><th>模型</th><th>适合</th><th>限制</th></tr></thead><tbody><tr><td>DAG</td><td>无环依赖、批处理、并行扇出</td><td>循环/等待表达笨重</td></tr><tr><td>状态机</td><td>条件、循环、超时、人工暂停</td><td>分支多时复杂</td></tr><tr><td>事件驱动</td><td>跨系统异步反应</td><td>顺序和重复更难追踪</td></tr><tr><td>Agent子流程</td><td>路径事先未知</td><td>成本和终止不确定</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：发票抽取—校验—审批—入账<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>把前面讲的原则放到一条真实链路里，最直观的例子是发票处理：从收到文件到最终入账，中间有概率性的抽取、确定性的校验、可能拖很久的人工审批，以及会与外部财务系统打交道的入账调用。这条链路里每一类风险都被安排到对应结构上。</p>
+<p>接收阶段以文件哈希作为流程 ID。同一份文件再次上传时哈希相同，就命中已有的流程实例，而不是新开一个。去重因此变成确定性的键匹配，重复提交不会制造重复流程。</p>
+<p>抽取阶段调用 LLM，让它输出版本化的 invoice schema——发票的供应商、金额、税额、日期等字段被约束进一个结构化契约。解析失败时只重试“抽取”这一个活动：前面接收已经落定，后面的校验还没发生，重试的代价被限制在单个节点内。模型输出的自由文本在这里第一次被收敛成可校验的结构。</p>
+<p>校验阶段是完全确定性的代码，检查金额合计是否对得上、供应商是否有效、是否与已有记录构成重复发票。它不依赖任何概率判断，因此任何一次校验结果都可以在任意时刻重新计算并得到同一答案。</p>
+<p>审批阶段针对高金额发票进入持久人工任务。审批人可能数天不响应，但这条流程实例不占工作进程——它被保存为等待中的状态，等人工动作或超时触发时才被唤醒。长等待与进程生命周期解耦，是状态机而非在线调用在承载这段控制。</p>
+<p>入账阶段调用财务 API，并携带幂等键 invoice_id。同一个 invoice_id 的多次调用在财务系统侧只产生一次入账效果。这样，即使调用超时、响应丢失，重试也不会造成重复入账。</p>
+<p>通知阶段只有在确认入账编号之后才发送。若通知本身失败，可以独立重试，因为入账事实已经确定，通知只是一次可重放的副作用。</p>
+<p>整条链路的关键性质体现在恢复上：流程重启后读取持久历史，不重复已经确认的活动。若入账结果未知——例如请求发出但没收到响应——正确的做法不是盲目重试，而是先查询财务系统，确认这张发票到底有没有入账，再决定是重试还是转人工调查。恢复的含义是从已确认的节点继续推进，而不是把未知的副作用直接再执行一遍。</p>
+<p>这条链路的输入是发票文件、版本化 schema、校验规则，以及审批和财务 API；输出是入账编号，或者一个带明确原因的暂停状态。用哈希去重挡住重复提交，抽取失败只重试该节点，人工审批持久等待，入账超时先查状态，每一步的失败都被限制在可观察、可恢复的边界内。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>至少一次执行意味着活动可能重复<span class="dd-badge math">执行语义</span></h2>
+<div class="dd-agent-response"><p>任何“至少一次执行”的语义都隐含一个推论：同一个活动可能被执行多次。理解这一点，要先看长链的一次成功率如何随步数下降。</p>
+<p>若三个独立步骤各自的一次成功率为 0.99，整条链无重试的一次成功率为 0.99³ ≈ 97.03%；如果链条有十步，就降到 0.99¹⁰ ≈ 90.44%。每增加一个独立步骤，整条链无重试的成功概率都是各步成功率的连乘。步骤越多，链条整体失败的概率越高，这不是某一步做得不够好，而是连乘本身的必然结果。</p>
+<p>重试是提高最终成功率的直接手段：某步失败了重来，最终成功的概率会显著高于单次。但重试的代价是同一活动可能被执行多次——第一次调用到底有没有生效，可能根本不知道。于是可用性提高的同时，重复执行的风险也被制造出来。要安全地重试，副作用就必须幂等：重复执行同一业务意图，只产生一次业务效果。</p>
+<p>幂等键 K 由三部分构成：流程标识、活动类型和逻辑尝试标识，即 K = workflowId ∥ activityType ∥ logicalAttempt。workflowId 标识具体的流程实例，activityType 标识活动的种类（例如“入账”而非“发通知”），logicalAttempt 标识同一次业务意图——重试同一个意图时它保持不变，换一次新意图时才改变。符号 ∥ 表示按无歧义编码拼接，不是数值相加。三者拼接后得到的键稳定且唯一，业务系统据此去重。</p>
+<p>由此可以澄清“精确一次”的真正含义。它通常是业务效果，而不是网络传输的保证：网络层仍然可能把同一请求投递多次，但只要接收方通过唯一键、去重表和状态查询，让重复请求只产生一次付款或一次写入，业务效果上就是精确一次。</p>
+<p>这一段逻辑的输入是流程 ID、活动类型和逻辑尝试标识，输出是一个稳定的幂等键，以及“重复请求只产生一次业务效果”的保证。要清楚它的边界：幂等只针对定义好的业务键，它不等于网络只传一次，也不能修复错误的业务参数——如果请求本身带了错误的金额或供应商，重试多少次、去重多彻底，都只会把错误固化下来。幂等解决的是“同一意图重复执行”的问题，而不是“意图本身错了”的问题。</p></div>
+<div class="dd-formula" data-formula-id="workflow-idempotency-key" data-display="mathml"><math display="block" aria-label="幂等键 K 由流程标识、活动类型和逻辑尝试标识组成"><mi>K</mi><mo>=</mo><mi>workflowId</mi><mo>∥</mo><mi>activityType</mi><mo>∥</mo><mi>logicalAttempt</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：持久历史把重启变成重放决定，而非重做副作用<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>进程崩溃之后，编排器如何知道哪些步骤已经完成、哪些正在半途、哪些还没开始？答案是它不靠记忆，而靠持久历史。历史里记录的不是会话里说过的话，而是每一次调度、开始、完成、失败、计时和审批事件——这些是事实和决定，而不是推理过程的中间产物。</p>
+<p>持久历史的核心作用，是让“重启”变成“重放决定”，而不是“重做副作用”。恢复时，编排器重放的是控制逻辑：从历史里读出每个节点已经发生的状态，判断下一步该走哪条边、该唤醒哪个等待、该对哪个失败发起重试或补偿。已经确认完成的活动不会再次执行，因为它们的结果已经作为事实写进历史。那些会产生外部副作用的活动，则依靠幂等键和状态查询来避免重做——重试同一个幂等键，外部系统只认一次效果；结果未知时先查询，而不是盲目再发一次。</p>
+<p>可以把这条机制理解为一条因果链。输入是持久历史中积累的事件：某活动在什么时间被调度、开始、完成、失败，某个人工审批在什么时间到达或超时。编排器在恢复时读取这些已记录的结果，重建出控制决策，输出可重放的控制流。业务活动自己则带上幂等键，并对不确定的外部结果发起状态查询，从而保证“重放决定”不会退化成“重做副作用”。</p>
+<p>这个结构有一个必须划清的边界：历史证明的是系统记录了某个事件，它不自动证明外部系统的事实是真实的。历史里写着“入账调用已发出”，不代表财务系统里真的入账成功；如果结果未知，仍然需要查询外部系统或转人工处理。持久历史给出的是可靠的本地事实和决定序列，它把恢复的确定性建立在“记录过什么”之上，而外部世界的真相仍需通过幂等与查询另行确认。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 325" role="img" aria-label="工作流编排器把决定写入持久历史并调度幂等活动，失败重试与补偿、人工等待都从历史恢复"><defs><marker id="wf28" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="105" width="140" height="100" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="90" y="134" text-anchor="middle" class="svg-t">编排器</text><text x="90" y="159" text-anchor="middle" class="svg-t" font-size="11">依赖 · 分支 · 超时</text><text x="90" y="182" text-anchor="middle" class="svg-t" font-size="11">只做确定性决定</text><path d="M160,155 L210,155" stroke="#788293" marker-end="url(#wf28)"/><rect x="215" y="75" width="160" height="160" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="295" y="105" text-anchor="middle" class="svg-t">持久事件历史</text><text x="295" y="132" text-anchor="middle" class="svg-t" font-size="11">Scheduled / Started</text><text x="295" y="155" text-anchor="middle" class="svg-t" font-size="11">Completed / Failed</text><text x="295" y="178" text-anchor="middle" class="svg-t" font-size="11">Timer / Approval</text><text x="295" y="207" text-anchor="middle" class="svg-t">重启后重放决定</text><path d="M375,125 L430,70" stroke="#788293" marker-end="url(#wf28)"/><path d="M375,155 L430,155" stroke="#788293" marker-end="url(#wf28)"/><path d="M375,185 L430,240" stroke="#788293" marker-end="url(#wf28)"/><rect x="435" y="35" width="140" height="70" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="505" y="62" text-anchor="middle" class="svg-t">LLM 活动</text><text x="505" y="84" text-anchor="middle" class="svg-t" font-size="11">schema输出 · 可重试</text><rect x="435" y="120" width="140" height="70" rx="9" fill="#21252d" stroke="#72b293"/><text x="505" y="147" text-anchor="middle" class="svg-t">业务副作用</text><text x="505" y="169" text-anchor="middle" class="svg-t" font-size="11">幂等键 · 状态查询</text><rect x="435" y="205" width="140" height="70" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="505" y="232" text-anchor="middle" class="svg-t">人工 / 外部事件</text><text x="505" y="254" text-anchor="middle" class="svg-t" font-size="11">持久等待 · SLA</text><path d="M575,70 L625,70" stroke="#788293" marker-end="url(#wf28)"/><path d="M575,155 L625,155" stroke="#788293" marker-end="url(#wf28)"/><path d="M575,240 L625,240" stroke="#788293" marker-end="url(#wf28)"/><rect x="630" y="72" width="87" height="166" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="673" y="105" text-anchor="middle" class="svg-t">结果</text><text x="673" y="132" text-anchor="middle" class="svg-t" font-size="11">完成</text><text x="673" y="155" text-anchor="middle" class="svg-t" font-size="11">重试</text><text x="673" y="178" text-anchor="middle" class="svg-t" font-size="11">补偿</text><text x="673" y="201" text-anchor="middle" class="svg-t" font-size="11">升级</text></svg><figcaption>图 1　历史记录的是事实和决定；恢复时重放控制逻辑，外部副作用靠幂等与查询避免重复。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>重试只适合瞬态失败，且必须有边界<span class="dd-badge eng">错误处理</span></h2>
+<div class="dd-agent-response"><p>重试是提高可用性的手段，但它只对一类失败有效：瞬态失败。LLM 持续输出非法字段时，指数退避并不能解决问题——那不是网络抖动，而是输出本身与 schema 不匹配。把重试用在错误的失败类型上，只会让同一个坏结果被反复生产和丢弃。</p>
+<p>瞬态失败与永久失败的边界，按错误类型划分。网络超时、限流和短暂不可用，属于可以重试的瞬态错误：问题通常会在短时间内自行消失，重试有真实的成功机会。而 schema 不兼容、权限拒绝和业务校验失败属于永久性错误，重试不会让它们变好，需要的是修数据、做迁移，或转人工处理。判断标准在于：这次失败是否可能在下一次尝试中自动消失。可能消失的才值得重试。</p>
+<p>即使失败类型适合重试，也必须设置边界。最大尝试次数、指数退避和抖动共同构成一条有上限的策略：每次失败后等待时间按指数增长，并加入随机抖动以避免大量客户端在同一时刻同时重试；尝试次数达到上限后，任务进入死信队列或人工队列，而不是无限重试。这条边界的目的是防止重试风暴放大下游故障——当下游已经过载时，无节制的重试只会把更多请求压过去，让局部故障变成全面雪崩。</p>
+<p>每次重试还要保留同一逻辑活动 ID 和不同的物理尝试号。逻辑活动 ID 表示这是同一次业务意图，供去重使用；物理尝试号区分具体的第几次物理执行，供诊断使用。两者分开，才能既保证重复请求在业务上只生效一次，又能精确追踪是哪一次物理执行出了问题。</p>
+<p>重试策略的输入是错误类型、已尝试次数、退避参数和最大时限；输出是四种处置之一：重试、进入死信、转人工处理或停止。网络超时和限流可以有界重试，schema、权限和业务规则错误必须修复。指数退避不能让永久错误变成瞬态错误，也不能放任重试风暴——它只是给瞬态失败一个有限且礼貌的等待节奏。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>跨系统事务靠补偿，不是假装原子提交<span class="dd-badge eng">Saga</span></h2>
+<div class="dd-agent-response"><p>跨多个外部系统的流程无法像单库事务那样“要么全成、要么全滚”。已经预订了酒店、但随后的支付失败，这时工作流不能假装什么都没发生——酒店系统里已经有一个真实存在的预订。长流程不可能长时间锁住多个外部系统等待一个原子提交，因此跨系统的一致性必须靠补偿来恢复，而不是靠数据库式的回滚。</p>
+<p>补偿的机制是：为每一个已经产生的成功副作用预定义对应的逆向动作。预订的逆向是取消预订，占用库存的逆向是退回库存，创建草稿的逆向是撤销草稿。当后续步骤失败时，工作流依次执行这些逆向动作，用新的业务动作把系统拉回一致状态。补偿本身也是普通的外部调用，所以它同样可能失败——因此补偿也需要幂等、重试和人工升级兜底。一个取消预订的请求超时了，不能假设取消一定成功，必须能安全重发，必要时转人工处理。</p>
+<p>这里有一个不可回避的边界：并非所有动作都可逆。已发送的邮件无法收回，只能追加一封更正说明。因此设计时要先把不可逆步骤减小，并尽量把它们后置到流程靠后的位置——越晚执行不可逆动作，前面失败时真正需要逆转的东西就越少，补偿链就越短、越可靠。</p>
+<p>由此引出一个初学者最易混淆的点：工作流“最终完成”不等于数据库式的全有或全无。一个流程可能停在部分完成、某个副作用结果未知、或补偿失败的状态，这些状态必须被显式定义并纳入可恢复模型，而不是假装它们不存在。</p>
+<p>补偿机制的输入是已完成的副作用、后续发生的失败，以及为每个副作用预定义的逆向动作；输出是三种状态之一：部分恢复、补偿失败、或需要人工升级。它用新的业务动作恢复跨系统一致性，而不是数据库原子回滚；补偿本身会失败，有些动作不可逆，所以不可逆步骤应当减小并后置。把这些约束想清楚，才能在现实世界的跨系统流程里维持真正可用的一致性。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>版本迁移要保护正在运行的旧实例<span class="dd-badge eng">演进</span></h2>
+<div class="dd-agent-response"><p>部署新代码最隐蔽的破坏，发生在那些早已启动、仍在运行的旧实例上。假设新版本删除了流程定义里的某个状态，而昨天启动的一条流程实例还停在这个状态上等待。当它恢复或重放时，新代码里找不到这个状态，重放就会失败或走错分支。版本迁移要解决的核心问题，就是让运行中的旧实例在新代码下仍能安全地继续推进。</p>
+<p>做法有两层。第一，工作流定义和活动 schema 都版本化。旧实例继续使用兼容分支，或者经过显式迁移把旧状态转换成新状态——迁移是明确、可审计的状态转换，而不是新代码里隐式假设“旧状态不存在”。第二，确定性重放要求相同的历史得到相同的控制决定。这意味着当前时间、随机数、外部查询的结果都不能直接参与编排逻辑：如果重放时重新取当前时间，昨天和今天的决定就会不同；如果重放时重新调外部查询，返回不同的值就会把流程引向另一条路。这些非确定值应当作为活动结果写入历史，让重放读取的是当时已经固定下来的值，而不是现场重新生成的值。</p>
+<p>把这两点合起来，重放才真正可复现：给定同一份持久历史，编排逻辑在任意时间重放，都得到同一组控制决定。非确定性的来源被隔离进历史记录，编排逻辑本身保持纯确定性。</p>
+<p>发布前还应当用生产历史的快照重放新代码：拿真实运行过的历史跑一遍新版本，观察控制决定是否与旧版本一致，发现不兼容就在灰度阶段拦住，而不是等到线上实例恢复时才发现迁移不成立。</p>
+<p>版本迁移的输入是运行中实例的历史、工作流代码和活动 schema 版本；输出是兼容分支或显式迁移后的状态。历史快照回放能显著降低不兼容的风险，但它有一个明确的边界：它不能证明所有未来的外部响应都兼容。快照只能覆盖已经发生过的历史，无法枚举外部系统将来可能返回的每一种结果。确定性重放保证的是“对已记录历史做出一致决定”，而未来外部世界的响应仍然要在运行时通过幂等、查询和补偿去处理。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>人工任务是可超时、可升级的持久状态<span class="dd-badge eng">人在回路</span></h2>
+<div class="dd-agent-response"><p>人工审批可能等上三天，甚至更久。这个等待不能靠“让进程挂着”来实现，否则一次部署、一次重启、一次扩容都会把等待中的任务丢掉；它也不能无期限悬挂，否则流程就永久卡死。人工任务必须被建模成一种可超时、可升级的持久状态。</p>
+<p>审批节点保存的不只是一个“待办”标记，而是完整的一组字段：负责人、资格、证据、SLA、提醒和升级路径。负责人和资格决定这个任务该派给谁、谁有权处理；证据是让审批人做判断所需的材料；SLA 和提醒定义任务什么时候该被催办；升级路径规定超时后交给谁、走什么流程。这些信息一起落进持久存储，工作进程在发出人工请求后就可以释放资源——它不需要为这次等待保留任何内存或线程。</p>
+<p>外部批准事件到达时，携带的是任务令牌。编排器用这个令牌把对应的流程实例从持久状态中唤醒，继续执行后续节点。等待因此与进程生命周期彻底解耦：进程可以崩溃、重启、扩容，只要持久状态和任务令牌还在，流程就不会丢。</p>
+<p>超时是这种设计里必须显式处理的路径。超时可以升级给更高级别的负责人、可以拒绝、可以取消，但绝不能静默自动通过——自动通过等于把人工把关的意图偷偷绕过去。审核结果和理由都要进入历史，保证事后可以审计“谁在什么时候基于什么理由做了决定”。敏感反馈则按保留策略处理，不能因为它进入了历史就永久留存所有内容。</p>
+<p>人工任务的输入是负责人、资格、证据、SLA、提醒和升级路径；输出是四种事件之一：批准、拒绝、超时升级或取消。它的两条边界要同时守住：等待持久化不代表审批可以无限期悬挂，超时不能静默自动通过，敏感理由仍受保留策略约束。持久化解决的是“不丢失”，超时和升级解决的是“不卡死”，两者缺一不可。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>评测要注入崩溃、重复和不确定结果<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>一条理想路径从头到尾跑通，不能说明系统可以上线。理想路径只验证了“没有故障时它能工作”，而编排系统的价值恰恰在故障发生时才体现：崩溃后能不能恢复、重复投递会不会产生重复副作用、补偿失败时怎么办。评测必须主动注入这些异常，才能证明可靠性不是运气。</p>
+<p>评测报告的指标应当是端到端成功、节点失败与重试、重复副作用、补偿成功、未知状态、队列积压、等待与执行时间、每成功任务的成本，以及人工 SLA。这些指标共同回答的不只是“流程能不能完成”，还有“失败被限制在哪里、恢复从哪里继续、资源有没有失控”。</p>
+<p>故障注入的清单对应前面每一章讨论过的机制：活动完成后回包丢失，验证入账这类外部调用在结果未知时是否正确查询而非盲目重做；编排器重启，验证持久历史能否让恢复从正确节点继续；外部回调重复，验证幂等去重是否真的挡住重复副作用；旧 schema，验证版本迁移对运行中实例的兼容；补偿失败，验证人工升级路径是否接得住；队列满载，验证背压和边界是否挡住重试风暴。</p>
+<p>验证的手段是检查事件历史。通过比对事件序列，确认恢复确实从正确的节点继续，而不是把已完成的活动重做一遍。事件历史是这次评测最直接的证据来源，它记录的是系统实际做了什么，而不是设计意图声称要做什么。</p>
+<p>评测还可以用来比较架构选择：把“确定性主干加 LLM 节点”的方案与全 Agent 方案放在同一组故障下，对比质量、成本和可诊断性。确定性主干的优势在于可重放、可定位，而全 Agent 方案在故障下往往更难解释它停在了哪里、为什么没继续。</p>
+<p>恢复评测的输入是理想任务与一组故障——崩溃、丢包、重复回调、旧 schema、补偿失败和队列满载；输出是端到端成功、重复副作用、补偿结果、积压、SLA 和恢复节点等观测值。要清楚它的边界：一次理想路径通过不能代表可上线，而故障注入也只能覆盖已经设计出来的场景。它证明的是系统对已知故障类别的韧性，不能保证对从未设想过的新故障同样成立。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>概率活动的结果必须入历史，不能在重放时重新生成<span class="dd-badge eng">确定性重放</span></h2>
+<div class="dd-agent-response"><p>恢复流程时再次调用同一个模型，结果可能走向另一个分支。原因在于模型调用本身是非确定的：模型版本、温度参数、服务端版本和采样随机性，都会让同一个输入产生不同输出。重放时如果重新生成一次，新输出可能与历史上记录的输出不同，流程就会沿着一条和上次不一样的路走下去。确定性重放对 LLM 节点因此失效——不是编排逻辑不确定，而是它依赖的概率结果被重新抽了一次样。</p>
+<p>解决办法是让概率活动的结果进入历史，而不是在重放时重新生成。编排器在第一次调用完成后，把输入版本、模型版本、输出和校验结果一起写入持久历史。重放控制逻辑时，读取的是这些已经记录下来的结果，不再二次调用模型。于是“上次走到哪个分支”由历史决定，而不是由新一轮随机采样决定，相同历史必然得到相同的控制分支。</p>
+<p>只有显式发起的新尝试，才产生新的活动事件。所谓显式新尝试，是指流程明确决定“用新的参数或新的输入再来一次”，而不是重放过程中无意间重新生成。新尝试会产生新的结果，同时旧结果仍然保留，供审计对比——历史里能看到每一次尝试各自输入了什么、得到了什么。</p>
+<p>对可缓存的只读活动，可以用内容哈希来避免重复计算。但缓存键必须包含提示、模型、工具与数据版本这四类要素。缺了任何一项，缓存就会把过期答案伪装成确定性：提示改了、模型升级了、工具行为变了、或者数据已经更新，缓存里的旧答案却仍然命中，流程于是用一个不再成立的旧事实继续推进。缓存的价值是省去重复的只读计算，而不是抹掉输入变化带来的影响。</p>
+<p>概率活动重放的输入，是已记录的模型输入版本、模型版本、输出和校验结果；输出是相同历史下相同的控制分支。恢复时读取旧结果而非再次生成，显式新尝试才创建新事件；内容哈希缓存也必须把提示、模型、工具和数据版本纳入键。把概率结果沉淀为历史事实，确定性骨架才能在包含模型调用的流程里依然成立。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面分散的机制串成一条因果链，可以看出这个概念如何从一个原始问题，一路落到可验证的工程实践上。</p>
+<p>起点是把任务画成依赖与状态转换。这一步决定流程是 DAG、状态机、事件驱动还是局部 Agent 子流程，也决定了循环、等待和未知路径各自由谁来承载。有了明确的控制结构，接着为每个节点定义版本化的输入输出 schema，让模型的自由文本被收敛成可校验、可迁移的结构。</p>
+<p>结构定下来之后，要标注每一个副作用，并为它配上幂等键和补偿动作。入账有幂等键，预订有取消动作，邮件这类不可逆步骤被减小并后置。这样，重复执行只产生一次业务效果，跨系统失败能用新的业务动作把系统拉回一致，而不是假装原子回滚。</p>
+<p>执行期间，编排器持久记录每一个决定——调度、开始、完成、失败、计时和审批事件都落进历史。工作者则负责执行具体的 LLM 或业务活动：概率活动的结果被写回历史，重放时读取旧结果而非重新生成。失败时按错误类型选择处置：瞬态错误有界重试，永久错误修复或升级，超过阈值进入死信或人工队列。人工与外部事件则作为持久等待建模，用任务令牌在事件到达后恢复，不占工作进程也不无限期悬挂。</p>
+<p>最后是验证环节：故障恢复、历史重放与版本迁移。通过注入崩溃、丢包、重复回调、旧 schema、补偿失败和队列满载，检查事件历史，确认恢复确实从正确节点继续，新代码重放旧历史得到一致的决定。整个链条因此闭合——从任务的图形表达，到 schema 与幂等，到持久历史与重放，再到可重复的故障评测，每一环都以前一环为基础，共同回答同一个问题：如何用持久状态和确定性控制，可靠地承载概率模型。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://www.omg.org/spec/BPMN/2.0/" target="_blank" rel="noopener">BPMN 2.0</a>：业务流程建模标准</li><li><a href="https://docs.temporal.io/temporal" target="_blank" rel="noopener">Temporal Durable Execution</a>：事件历史与持久执行概念</li><li><a href="https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf" target="_blank" rel="noopener">Saga Pattern</a>：长事务与补偿</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/workflow-orchestration">在地图中查看概念关系</a></nav>
+</article></main></body></html>

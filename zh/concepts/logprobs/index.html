@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Logprobs 与置信度：模型偏好不等于答案可信 · AI 知识地图</title>
+<meta name="description" content="从 token 对数概率、序列似然、校准和选择性预测理解何时 logprob 有用，以及分词与语义等价如何误导阈值。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/logprobs/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="Logprobs 与置信度：模型偏好不等于答案可信">
+<meta property="og:description" content="从 token 对数概率、序列似然、校准和选择性预测理解何时 logprob 有用，以及分词与语义等价如何误导阈值。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/logprobs/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Logprobs 与置信度：模型偏好不等于答案可信">
+<meta name="twitter:description" content="从 token 对数概率、序列似然、校准和选择性预测理解何时 logprob 有用，以及分词与语义等价如何误导阈值。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/logprobs/#page","name":"Logprobs 与置信度：模型偏好不等于答案可信","description":"从 token 对数概率、序列似然、校准和选择性预测理解何时 logprob 有用，以及分词与语义等价如何误导阈值。","url":"https://ai-knowledge-map.com/zh/concepts/logprobs/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Logprobs 与置信度：模型偏好不等于答案可信","item":"https://ai-knowledge-map.com/zh/concepts/logprobs/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Logprobs 与置信度：模型偏好不等于答案可信</span></li></ol></nav><article id="dd-article" data-concept-id="logprobs">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Logprobs 与置信度：模型偏好不等于答案可信</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 token 对数概率、序列似然、校准和选择性预测理解何时 logprob 有用，以及分词与语义等价如何误导阈值。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> logprob 是模型对某个 token 在当前上下文中的对数概率，可用于排序与诊断；它衡量<b>模型内部相对偏好</b>，不是事实正确率，必须经过任务级校准才能当置信信号。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>解释为何使用对数；计算序列 logprob；识别长度与分词偏差；设计校准与拒答阈值。</div>
+<ol class="dd-chain"><li>模型输出 token 概率</li><li>对数使序列分数可加</li><li>长度与分词影响聚合</li><li>独立数据映射到正确频率</li><li>阈值换取覆盖与风险</li><li>分布变化后持续重校准</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>概率为什么取对数<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>语言模型在每个位置上输出的不是一个 token，而是一个完整的概率分布：给定前面的 token 序列，词表中每个候选 token 都有一个条件概率。要评估一整段候选序列 x₁…xₙ 的可能性，最自然的做法是把每个位置的条件概率连乘起来：</p>
+<p>P(x₁…xₙ) = P(x₁) × P(x₂ | x₁) × … × P(xₙ | x₁…xₙ₋₁)</p>
+<p>这个式子形式正确，但直接按它计算会出问题。每个因子都是小于 1 的数，序列稍微一长，连乘结果就迅速缩小到计算机浮点数无法表示的量级，发生下溢，分数变成 0，不同候选序列之间从此无法比较；连乘形式也不方便增量累加，任何一处改动都要重新计算整条链。</p>
+<p>取自然对数可以同时解决这两点。对数把连乘变成求和：</p>
+<p>log P(x₁…xₙ) = Σₜ₌₁ⁿ log P(xₜ | x&lt;t)</p>
+<p>其中 P 是模型分配给某个事件的概率，log 是自然对数，xₜ 是位置 t 上的 token，x&lt;t 是它之前的前缀，n 是序列的 token 总数，t 是求和位置索引。这样，序列 logprob 的输入就是每个位置在既定前缀下的 token 概率，输出是整段候选序列可以相加比较的对数分数。概率永远落在 0 与 1 之间，所以每一项 log P(xₜ | x&lt;t) 都不大于 0：总 logprob 越接近 0，说明序列里各个 token 的生成概率整体越高，模型对整段序列的相对偏好越强；logprob 越负，说明某些位置上的 token 在模型看来概率很低。</p>
+<p>对数的价值到此为止：它把很多小概率的连乘稳定地变成可加可比的分数，缓解浮点下溢，让不同候选可以在同一把尺子上排序。它不负责判断内容真假。logprob 高只表示模型更偏好这段 token 序列，不能推出它在事实上更正确——偏好与正确性是两个不同的问题，前者由分数排序回答，后者需要模型之外的事实依据。</p></div>
+<div class="dd-formula" data-formula-id="logprobs-sequence"><math display="block" aria-label="序列 x 一到 x n 的对数概率等于各位置 t 的条件对数概率之和"><mrow><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>…</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>t</mi></munder><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>x</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>token 分数不等于答案分数<span class="dd-badge intuition">粒度</span></h2>
+<div class="dd-agent-response"><p>一个多 token 的答案在模型里并不存在单一的概率，只有每个位置上 token 的条件 logprob。要把它们变成“这句答案的置信度”，就必须做聚合：答案聚合的输入是多个 token 的 logprob，输出可以是总和、平均值、最弱位置，也可以是任务自定义的分数。不同的聚合方式隐含不同的假设，也各有缺陷。</p>
+<p>总和直接把所有 token 分数相加。由于每一项都不大于 0，token 越多，总和被扣得越多，分数随长度单调下降；这意味着总和天然偏爱短序列，长而正确的答案可能输给短而错误的答案。平均值用总分数除以 token 数，抵消了长度的影响，却可能掩盖关键 token：一句话里真正决定对错的往往只是一个低概率 token，比如答案里承载核心事实或否定含义的那个词，其余 token 概率都很高，平均之后那个危险信号被稀释，整句看起来仍然可信。最弱位置取整句中最小的 token logprob，恰好盯住这个危险点，但它对句子其余部分的整体概率又不敏感。</p>
+<p>没有哪一种聚合方式天生正确。正确的做法是先定义任务单位和候选规范：确定要打分的最小单位是 token、标签还是整句，确定候选集合是受控标签还是自由文本；然后用验证集实测不同聚合方式在该任务上的真实表现，再选定一种。对分类任务，受控标签只有少数固定选项，最好比较每个标签的完整 token 序列分数，而不是只比单个 token 的分数；对自由文本生成，同一意思存在多个语义等价表达，“答案是晴朗”与“晴”这类写法不同、意思相同的文本，分数可能相差很远，此时单一字符串分数的边界尤其明显——用某个具体字符串的分数代表“答案可信度”，本身就站不住脚。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>高概率也会自信地错<span class="dd-badge intuition">边界</span></h2>
+<div class="dd-agent-response"><p>语言模型的目标是复现训练语料的统计规律，不是验证事实。它完全可能以很高的 logprob 流利地说出一句错误的话。因此事实诊断的输入应该同时包含模型的高分回答和独立证据，输出则要把“语言偏好”与“事实正确性”两个判断分开，而不是用一个分数同时代表两者。</p>
+<p>至少三个机制会独立推高 logprob，哪怕命题本身是错的。第一是训练频率：训练数据里反复出现的常见说法——包括广为流传的错误说法——概率自然高。第二是提示暗示：问题的措辞、上下文里给出的线索会把模型引向某个答案，即使那个答案与事实相反，模型也会顺着暗示给出高分输出。第三是流畅模式：符合语法习惯、与前后文衔接顺畅的句子天然概率高，而“顺口”与“正确”是两回事。</p>
+<p>反过来，罕见但正确的答案可能拿到低分：一个正确但冷门的名字、一个少见却准确的表述，因为训练数据里出现得少，logprob 反而低。所以 logprob 衡量的是模型的语言偏好，不是命题的真值，不能当作事实验证器。要用 logprob 做事实判断，必须引入模型之外的证据：检索外部资料、调用工具核对，或由人来验证世界事实。独立证据与模型分数不一致时，事实以证据为准，而不是以分数为准。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>校准把分数映射到频率<span class="dd-badge math">校准</span></h2>
+<div class="dd-agent-response"><p>“置信度 0.8”要成为有经验含义的陈述，就必须回答一个问题：在所有被标为 0.8 的预测里，长期来看是不是约有 80% 真的正确。校准解决的就是这件事。校准的输入是模型的原始分数和独立数据上的真实标签，输出是从分数到经验正确率的映射。</p>
+<p>做法是把相近分数的预测放进同一个桶，统计每个桶里的真实正确率。若某个桶里样本的平均分数是 0.8，那么长期来看这个桶约八成应该正确；平均分数是 0.6 的桶约六成正确。如果一个桶实际只有一半正确，说明模型在这个区间过度自信，它的分数需要被映射回更低的经验频率，而不是继续按字面使用。</p>
+<p>映射可以用温度缩放、保序回归等方法在独立校准集上拟合。这里有一条必须记住的边界：拟合出的映射只在目标任务和该数据分布上成立。模型版本、提示写法或输入分布任何一项发生变化，原来的映射都可能失效，必须用新数据重新校准。校准把“模型给出的数字”翻译成“实际发生的频率”，但它不改变模型的知识，也不验证任何一条事实——它只保证在分布不变时，分数的统计含义与真实正确率一致。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>选择性预测<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>校准之后，系统面对低置信度的样本仍然必须做点什么：硬答可能出错，一概不答又浪费了能力。选择性预测处理的就是这个决策。它的输入是校准后的分数、错误代价和覆盖要求，输出是一个具体动作：自动回答、补检索、升级、澄清或拒答。</p>
+<p>核心机制是阈值。给分数设一个门槛：高于门槛的样本由模型直接回答；低于门槛的样本交给更安全的回退路径，比如补充检索后再答、升级到更强的模型、向用户请求澄清，或转人工处理。阈值越高，越多低分样本被送进安全回退，系统整体风险通常越低，但覆盖率随之下降——能自动处理的样本变少，产品可用性受损。</p>
+<p>因此阈值不能只按准确率来选。是否值得拒答，必须同时看错误代价和覆盖率：高代价的任务值得把阈值定高，宁可多拒答、多转人工；低代价的任务可以放松门槛，保住自动处理的比例。覆盖率—风险曲线和业务成本才是选择阈值的依据；只看“拒答之后准确率上升”，会漏掉覆盖率崩塌带来的代价。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>分词与接口陷阱<span class="dd-badge eng">实现</span></h2>
+<div class="dd-agent-response"><p>“是”和“否”看起来只是两个 token，实际上不能想当然地只读一个位置的分数。接口核验的输入必须是实际使用的 tokenizer、候选标签的完整文本和 API 返回的位置信息，输出是每个规范标签的完整序列分数。跳过这一步，比较就会建立在错误的可比范围上。</p>
+<p>三种情况会让单 token 假设失效。第一是切分：一个标签可能被拆成多个 token，比如带空格的标签或词表中不存在的字符串，“否”可能是单个 token，“不是”却可能被切成两个。第二是共享前缀：多个候选共享同一段前缀时，前缀部分的分数对所有候选相同，真正区分它们的是前缀之后的 token，只比开头位置的分数会把共享部分误当成差异。第三是空格与格式：API 返回的 token 文本可能带前导空格，同样一个词在不同位置可能对应不同 token，直接影响哪个分数属于哪个标签。</p>
+<p>接口返回值本身还有两个陷阱。top-k 里没有某个 token，只说明它没进前 k 名，不等于它的概率是零，要拿它的分数必须显式请求或重新计算。跨模型的原始 logprob 也没有共同刻度：词表不同、分词方式不同、训练分布不同，模型 A 的 −1.2 和模型 B 的 −1.2 不代表同一件事，不能直接比较。正确的做法始终是：用实际 tokenizer 把候选标签完整切分，汇总整条序列的分数，并确认 API 返回的确实是所需位置和候选集合。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>完整手算：概率、logprob 与序列分数怎样互换<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>一个由两个 token 组成的答案，若两个 token 的条件概率分别是 0.8 和 0.25，整段答案的联合概率是多少？手算的输入就是这两个条件概率，输出是联合概率、总 logprob、平均 logprob 和几何平均概率四个数，它们描述的是同一段序列的偏好，但用途不同。</p>
+<p>第一步，自回归地把条件概率相乘：P = 0.8 × 0.25 = 0.20。第二步，对每个概率取自然对数：log 0.8 ≈ −0.223，log 0.25 ≈ −1.386，相加得到总 logprob ≈ −1.609。第三步验证互换：对总 logprob 取 exp，exp(−1.609) ≈ 0.20，恢复了原来的联合概率。再把总 logprob 除以 token 数 2，得到平均 logprob −0.805；对它取 exp 得 exp(−0.805) ≈ 0.447，这就是几何平均概率——两个 token 各自概率的等权代表值。</p>
+<p>同一个序列，不同的聚合方式给出不同的数，也代表不同的偏好。总 logprob −1.609 衡量整段序列的偏好，但由于每一项都非正，它偏爱短序列。平均 logprob −0.805 衡量平均流畅度，却可能掩盖某个关键低概率 token。最小 token logprob −1.386 正对应那个 0.25 的 token，直接暴露最弱位置，但噪声大，容易受单个 token 的波动影响。</p>
+<p>这些数描述的都是“模型有多偏好这段序列”，而不是“答案有多正确”，不能混作正确率。比较候选之前必须先定义任务单位：标签分类与自由文本不应共用一个未经验证的聚合公式，否则手算再准，比较所用的尺子也是错的。</p></div>
+<table class="dd-table"><thead><tr><th>聚合</th><th>数值</th><th>偏好</th></tr></thead><tbody><tr><td>总logprob</td><td>−1.609</td><td>短序列</td></tr><tr><td>平均logprob</td><td>−0.805</td><td>平均流畅，但可掩盖关键低点</td></tr><tr><td>最小token logprob</td><td>−1.386</td><td>暴露最弱位置，噪声大</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>原创图：token信号必须经过任务校准才能触发行动<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>API 返回的只是每个位置的局部概率，它离“系统该怎么做”还隔着好几层。决策链把 token logprob 变成可审计的动作：输入包括 token logprobs、任务单位、校准数据和业务代价，输出是自动回答或回退动作。</p>
+<p>链条分三段。第一段是序列或语义聚合：把分散的 token logprob 按任务单位汇总成候选答案的分数，分类任务聚合完整标签序列，自由文本按语义单位聚合。第二段是独立校准：用独立校准数据把聚合分数映射到经验正确率，让 0.8 真的意味着约八成正确。第三段是风险阈值决策：结合错误代价与覆盖率，决定自动回答还是补检索、升级、澄清、转人工。</p>
+<p>整条链从左到右是：token logprob → 序列聚合 → 任务校准 → 风险阈值 → 系统动作。logprob 只是原始信号，聚合、校准和成本阈值共同决定可执行动作。因此链上任何一层发生变化——换模型、换提示、换聚合方式或换阈值——都必须整条链重放，重新验证每一层的输出。绝不能把原始局部概率直接展示成可信度：未经聚合和校准的 token 分数，既不是答案的正确率，也不是系统可以据此行动的决策依据。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 285" role="img" aria-label="token logprob经过序列聚合任务校准和风险阈值形成系统动作"><defs><marker id="lpa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="82" y="122" text-anchor="middle" class="svg-t">token logprobs</text><text x="82" y="147" text-anchor="middle" class="svg-t" font-size="11">分词/上下文条件</text><path d="M145,131 L195,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="200" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="262" y="122" text-anchor="middle" class="svg-t">任务聚合</text><text x="262" y="147" text-anchor="middle" class="svg-t" font-size="11">标签序列/语义簇</text><path d="M325,131 L375,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="380" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="442" y="122" text-anchor="middle" class="svg-t">独立校准</text><text x="442" y="147" text-anchor="middle" class="svg-t" font-size="11">分数→经验正确率</text><path d="M505,131 L555,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="560" y="65" width="150" height="132" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="635" y="94" text-anchor="middle" class="svg-t">风险策略</text><text x="635" y="122" text-anchor="middle" class="svg-t" font-size="11">自动回答</text><text x="635" y="147" text-anchor="middle" class="svg-t" font-size="11">检索/升级</text><text x="635" y="172" text-anchor="middle" class="svg-t" font-size="11">拒答/转人工</text><text x="367" y="245" text-anchor="middle" class="svg-t">模型或分布变化 → 重新校准整条链</text></svg><figcaption>图 1　logprob只是原始信号；聚合、校准和成本阈值共同决定可执行动作。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>候选标签必须比较完整序列概率<span class="dd-badge math">分词陷阱</span></h2>
+<div class="dd-agent-response"><p>“Yes”是一个 token，“No answer”是两个 token，直接比两者的首 token 分数显然不公平。候选比较的输入是共同提示和多个完整标签，输出是每个标签整段的条件 logprob。做法是：把所有候选共用的提示固定，然后用 teacher forcing 逐 token 累加——把候选标签逐 token 喂进去，记录每个 token 在“共同提示 + 已给出的前缀”条件下的对数概率，一直累加到标签末尾。不能只读首 token，因为候选可能共享前缀；也不能把 API top-k 之外没出现的候选当成概率 0。</p>
+<p>公式写出来就是：</p>
+<p>score(c) = Σₜ₌₁..|c| log p(cₜ | prompt, c&lt;t)</p>
+<p>其中 c 是一个完整候选标签，|c| 是它的 token 数，cₜ 是第 t 个候选 token，c&lt;t 是候选已给出的前缀，prompt 是所有候选共用的提示，p 是当前条件下的 token 概率，score(c) 是整段候选的总 logprob。每个候选都这样算一遍，比较才建立在相同的提示、相同的累加方式上。</p>
+<p>长度仍然是个问题：如果任务允许不同长度的表达，总和会偏爱短标签。这时要么预先规定规范标签，让所有候选长度一致；要么使用长度校正，并在验证集上确认校正有效。tokenizer 一旦改变，分段、序列长度和归一化空间全变，所有分数必须重新计算。跨模型就更彻底：不同 tokenizer 让原始分数没有共同刻度，做模型路由时应该分别校准各模型，再比较校准后的预期风险，而不是直接比较平均 logprob。</p></div>
+<div class="dd-formula" data-formula-id="logprobs-candidate-score"><math display="block" aria-label="候选 c 的分数等于从 t 等于一到候选长度的每个 token 条件对数概率之和"><mrow><mi>score</mi><mo>(</mo><mi>c</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mrow><mo>|</mo><mi>c</mi><mo>|</mo></mrow></munderover><mi>log</mi><mi>p</mi><mo>(</mo><msub><mi>c</mi><mi>t</mi></msub><mo>∣</mo><mi>prompt</mi><mo>,</mo><msub><mi>c</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>语义不确定性要先合并等价表达<span class="dd-badge eng">自由文本</span></h2>
+<div class="dd-agent-response"><p>自由生成时，同一个意思会被写成许多不同的字符串：“巴黎”“Paris”“法国首都巴黎”表面是三个答案，其实是一个意义。如果不合并，模型多次采样时会把概率分散到大量同义表述上，每个字符串单独看分数都很低，明明“模型认为答案是巴黎”的信号却被稀释了。语义聚合要解决的就是这个问题：它的输入是多次生成的字符串和任务等价判定器，输出是意义簇以及每个簇的累计概率。</p>
+<p>做法是先用等价判定器把字符串聚成意义簇，再把簇内所有表达的概率累加，得到簇间分布——这个分布才更接近任务真正的不确定性。不同任务需要不同的判定器：</p>
+<p>数学题把候选解析并代数化简，才能认出等价写法；代码题按测试行为归并，两个实现通过同一组测试算同簇；事实问答做实体规范化和蕴含判断，把别名、缩写归到同一实体；开放建议只能靠语义聚类，簇的边界本来就主观。</p>
+<p>判定器自身会犯错：误合并把不同意思并成一簇，误拆分把同义表达拆成两簇，别名归一化还可能丢失细节，测试不完备同样导致归并错误。所以聚类结果必须用人工标注验证，确认合并与拆分的边界符合任务语义之后，簇概率才有意义。</p></div>
+<table class="dd-table"><thead><tr><th>任务</th><th>等价判定</th><th>风险</th></tr></thead><tbody><tr><td>数学</td><td>解析并代数化简</td><td>格式/单位</td></tr><tr><td>代码</td><td>测试行为</td><td>测试不完备</td></tr><tr><td>事实问答</td><td>实体规范化/蕴含</td><td>别名与细节丢失</td></tr><tr><td>开放建议</td><td>语义聚类</td><td>边界主观</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>从分数到行动：覆盖率—风险曲线比单一阈值更重要<span class="dd-badge eng">选择性预测</span></h2>
+<div class="dd-agent-response"><p>把阈值从 −1.2 提高到 −0.5，系统不一定会更安全，可能只是答得更少。要判断阈值变化的效果，需要覆盖率—风险分析：输入验证集上的校准分数、真实标签和动作成本，输出每个阈值下的覆盖率、已接收错误率和期望成本。</p>
+<p>画曲线的方法是排序展开。在验证集上把样本按校准分数从高到低排序，从分数最高的样本开始逐步扩大自动回答集合，每个覆盖率点都计算已回答样本中的错误率，连起来就是覆盖率—风险曲线。曲线直接回答阈值的问题：提高阈值通常降低覆盖率，但风险未必单调下降；如果高分区域恰好混入模板化幻觉，曲线会在此处抬升，暴露这个切片上的校准失败——分数排序没有把风险排到低分端。反之，若阈值升高只降低覆盖却不降低风险，说明分数排序或校准在该切片上失效。</p>
+<p>产品决策不能只追求准确率，要比较期望成本。阈值 τ 下的期望成本为：</p>
+<p>E[cost(τ)] = Cerr × P(错误且接收) + Cabstain × P(拒答) + Cverify × P(升级验证)</p>
+<p>其中 E[cost(τ)] 是阈值 τ 下的平均业务成本，τ 是自动接收阈值；Cerr、Cabstain、Cverify 分别是错误接收、拒答和升级验证一次的代价；P 是验证集上对应动作事件的经验概率。所有项必须使用同一评测周期和任务切片计算，跨切片的成本没有可比性。</p>
+<p>不同切片必须单独画曲线，因为风险结构不同：短答案与长答案的聚合分数受长度影响，应分别归一化与校准；常见域与新域存在分布漂移，模型在新域容易过度自信，应先检索或转人工；低损失与高损失错误即便错误率相同，业务代价也完全不同，应采用不同阈值；模型或提示版本变化时分数刻度可能整体移动，需要版本级回放与重校准。</p>
+<p>上线后的监控同样不能只看一个平均数：要记录分数、动作、最终标签和切片，只监控平均 logprob 无法发现某一语言、任务或答案长度上的局部失准。真实标签往往延迟到达，可以先监控分数分布与拒答率的漂移，但这些信号只能触发调查，不能代替正确率回流。</p></div>
+<table class="dd-table"><thead><tr><th>切片</th><th>为何单独画曲线</th><th>建议动作</th></tr></thead><tbody><tr><td>短答案 / 长答案</td><td>长度改变聚合分数</td><td>分别归一化与校准</td></tr><tr><td>常见域 / 新域</td><td>分布漂移导致过度自信</td><td>新域先检索或转人工</td></tr><tr><td>低损失 / 高损失错误</td><td>相同错误率的业务代价不同</td><td>采用不同阈值</td></tr><tr><td>模型或提示版本</td><td>分数刻度可能整体移动</td><td>版本级回放与重校准</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="logprobs-expected-cost"><math display="block" aria-label="阈值 tau 下的期望成本等于错误接收成本乘错误且接收概率，加拒答成本乘拒答概率，加升级验证成本乘升级验证概率"><mrow><mi>E</mi><mo>[</mo><mi>cost</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>]</mo><mo>=</mo><msub><mi>C</mi><mi>err</mi></msub><mi>P</mi><mo>(</mo><mtext>错误且接收</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>abstain</mi></msub><mi>P</mi><mo>(</mo><mtext>拒答</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>verify</mi></msub><mi>P</mi><mo>(</mo><mtext>升级验证</mtext><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>从原始输出到可验证的实践，整条因果链可以一环扣一环地走通。</p>
+<p>模型在每个位置输出的只是 token 概率。这些概率需要跨整段序列合成一个分数，取对数让连乘变成求和，序列分数因此可加可比。但长度和分词会直接影响这个分数：序列越长、切分越碎，总和就越低，聚合方式的选择因此不是细节，而是决定分数含义的一部分。</p>
+<p>聚合出的分数表达的还只是语言偏好，不是正确率。要用独立数据做校准，把分数映射到真实发生的正确频率，0.8 才获得“约八成正确”的经验含义。有了校准分数，阈值决策才开始有意义：提高阈值用覆盖率换取风险，降低阈值用风险换取覆盖。</p>
+<p>最后，整条链都建立在特定分布之上。模型、提示或输入分布一旦变化，每一环的假设都可能失效，必须持续用新数据重校准，链才不会在某一环悄悄断掉。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1706.04599" target="_blank" rel="noopener">On Calibration of Modern Neural Networks</a>：温度缩放与校准</li><li><a href="https://arxiv.org/abs/1705.08500" target="_blank" rel="noopener">Selective Classification for Deep Neural Networks</a>：覆盖-风险权衡</li><li><a href="https://arxiv.org/abs/2302.09664" target="_blank" rel="noopener">Semantic Uncertainty</a>：语义等价答案下的不确定性</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/logprobs">在地图中查看概念关系</a></nav>
+</article></main></body></html>

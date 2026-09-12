@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>流式输出：把一次生成变成可取消、可恢复的事件协议 · AI 知识地图</title>
+<meta name="description" content="从 token、UTF-8 字节块与 SSE 事件，到 TTFT、背压、结构缓冲、安全审查和最终提交。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/streaming/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="流式输出：把一次生成变成可取消、可恢复的事件协议">
+<meta property="og:description" content="从 token、UTF-8 字节块与 SSE 事件，到 TTFT、背压、结构缓冲、安全审查和最终提交。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/streaming/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="流式输出：把一次生成变成可取消、可恢复的事件协议">
+<meta name="twitter:description" content="从 token、UTF-8 字节块与 SSE 事件，到 TTFT、背压、结构缓冲、安全审查和最终提交。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/streaming/#page","name":"流式输出：把一次生成变成可取消、可恢复的事件协议","description":"从 token、UTF-8 字节块与 SSE 事件，到 TTFT、背压、结构缓冲、安全审查和最终提交。","url":"https://ai-knowledge-map.com/zh/concepts/streaming/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"流式输出：把一次生成变成可取消、可恢复的事件协议","item":"https://ai-knowledge-map.com/zh/concepts/streaming/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">流式输出：把一次生成变成可取消、可恢复的事件协议</span></li></ol></nav><article id="dd-article" data-concept-id="streaming">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">流式输出：把一次生成变成可取消、可恢复的事件协议</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 token、UTF-8 字节块与 SSE 事件，到 TTFT、背压、结构缓冲、安全审查和最终提交。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 流式不会减少模型完成整段回答的总计算，它把结果分段送达，改善首字可见时间和交互控制。可靠实现必须把<b>字节、字符、token、事件和业务提交</b>分开，并处理取消、背压、重连、半截结果与副作用。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分字节块/token/事件；计算 TTFT 与完成时间；设计可恢复事件协议；处理背压、取消与安全提交。</div>
+<ol class="dd-chain"><li>为流分配 request id 与序号</li><li>增量解码 token/字节为类型化事件</li><li>客户端按背压安全渲染</li><li>取消沿链路传播并保护副作用</li><li>仅在 done+校验后提交最终结果</li><li>用故障注入和端到端指标回归</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>流式改善的是等待形状，不是总工作量<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>用户在第 400ms 就看见第一个字，服务器却仍然可能计算了整整 8 秒——这两个现象同时成立，是理解流式输出必须接受的起点。流式协议接收的输入是正在逐 token 生成的序列，以及整个请求的生命周期状态；输出则是随时间推进的增量事件，最终收束为完整结果或终止信号。它做的事情是把已经生成的部分尽早交给客户端，而不是把总计算量变小。</p>
+<p>非流式模式下，客户端拿到的是模型把整个答案全部生成完之后的一次性响应，在此之前屏幕上没有任何内容。流式模式改掉了这个等待的形状：只要下一个 token 或文本增量可用，就立即发出去，于是用户能提前开始阅读、能在中途决定取消、也能看到工具调用的进行过程。但模型仍然必须为完整答案生成全部 token，一次都不会少。除此之外，每次增量传输都是一次网络事件，前端还要对每个增量做解析和渲染，这些是流式引入的额外开销。因此流式可以缩短从请求发出到用户获得首个可见结果的时间，也可能让从请求到完整结果的时间变得更长——事件次数越多，每条路径上的固定成本累加得越多。</p>
+<p>这意味着必须把不同阶段的耗时分开测量，而不是用一个&quot;变快了&quot;的笼统结论代替。首字时间 TTFT 度量从请求发出到第一个可见 token 到达；token 间隔 TPOT 度量相邻两个 token 之间的延迟，反映的是增量是否均匀、是否被上游卡住；完整时间 E2E 度量从请求开始到整条响应结束，衡量总工作量与全部开销；取消生效时间度量用户停止请求后，实际生效需要多久。这四个量可以同时朝不同方向变化：流式通常让 TTFT 大幅下降，但如果每个 token 都单独触发一次完整的事件链路，E2E 可能高于非流式；如果一个答案注定半途失败，用户很可能已经看见了错误的前半部分。</p>
+<p>只用&quot;首字快&quot;来宣传流式会掩盖这些代价。它成立的三条边界应当始终保持在判断里：可见不等于完成，前 40 个 token 出现在屏幕上不代表第 400 个 token 已经生成；前缀合法不等于最终结果有效，前半句语法正确不代表整段答案通过了校验；客户端断开也不等于上游计算已停止，浏览器关掉页面后服务器可能仍在把剩余 token 算完。流式改变的是结果抵达用户的时间分布，而不是生成这个结果所需的模型工作量。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>token、字节块、字符和事件不是同一边界<span class="dd-badge eng">协议</span></h2>
+<div class="dd-agent-response"><p>一个网络 chunk 不能直接当成一个字符或一个模型 token，因为整条流式链路里至少有四种相互独立的&quot;边界&quot;，各自由不同的环节决定。增量解码的输入是模型 token、UTF-8 字节块和协议帧，输出则是完整字符与类型化事件；从 token 到字符、从字符到字节、从字节到网络分片、从分片到协议事件，每一步都可能把一个单位拆成两半，也可能把多个单位并进一个单位。</p>
+<p>先从源头看。模型产生的是 token，边界由 tokenizer 决定：一个 token 可能只是半个词，也可能是&quot;逗号加空格&quot;这样的结构片段，甚至可以只包含多字节字符的一部分。服务端把 token 解码成 UTF-8 字节，于是进入了第二个边界体系：一个中文字符在 UTF-8 里占 3 个字节，这些字节可能被拆进两个不同的网络 chunk；反过来，一个字节 chunk 通常装得下很多个字符。接下来，运行时和网络栈按缓冲策略把字节流切成 TCP chunk，这个切分只看传输便利，与字符、token 或业务含义都没有对应关系——TCP chunk 表示的只是&quot;这一次传输分片&quot;，绝不能当作 JSON 记录或业务提交的边界。最后是应用协议层，它把字节流组装成具有类型的帧或事件，边界由应用自己的 schema 决定；而 JSON 转义序列本身也可能横跨两次增量，比如一个被转义的换行符 &quot;\n&quot; 的四个字节可能分成两次到达。</p>
+<p>因此客户端解析流式响应时必须在每一层维护状态：用增量 UTF-8 解码器把连续到达的字节块合成完整字符，跨块保留尚未拼完的多字节序列；按协议事件而不是按 TCP chunk 去解析结构，任何一次网络分片都可能落在 JSON 字符串的正中间。把各层单位放在一起看，边界关系和能否作为提交边界是这样的：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">单位</th><th class="dd-align-left">由谁决定</th><th class="dd-align-left">可否作为提交边界</th></tr></thead><tbody><tr><td class="dd-align-left">token</td><td class="dd-align-left">模型 tokenizer</td><td class="dd-align-left">否，可能只是半个词或半个结构</td></tr><tr><td class="dd-align-left">字节 chunk</td><td class="dd-align-left">运行时/网络</td><td class="dd-align-left">否，可能把 UTF-8 字符拆开</td></tr><tr><td class="dd-align-left">字符/文本 delta</td><td class="dd-align-left">增量解码器</td><td class="dd-align-left">只适合展示，不构成完整业务单元</td></tr><tr><td class="dd-align-left">协议事件</td><td class="dd-align-left">应用 schema</td><td class="dd-align-left">按事件语义判断是否自包含</td></tr><tr><td class="dd-align-left">done + 校验</td><td class="dd-align-left">业务层</td><td class="dd-align-left">可以成为最终提交边界</td></tr></tbody></table></div>
+<p>这张表的因果链是单向的：tokenizer 的切分约束不了网络如何分片，网络分片也不能反过来决定 token 边界；只有走到最外层，收到表示结束的 done 事件并完成校验之后，累积起来的内容才升级为一个可以提交给业务层的完整结果。</p></div>
+<table class="dd-table"><thead><tr><th>单位</th><th>由谁决定</th><th>可否作为提交边界</th></tr></thead><tbody><tr><td>token</td><td>模型 tokenizer</td><td>否，可能半个词/结构</td></tr><tr><td>字节 chunk</td><td>运行时/网络</td><td>否，可能拆 UTF-8</td></tr><tr><td>字符/文本 delta</td><td>增量解码器</td><td>只适合展示</td></tr><tr><td>协议事件</td><td>应用 schema</td><td>按事件语义判断</td></tr><tr><td>done + 校验</td><td>业务层</td><td>可成为最终提交边界</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>事件协议要表达生命周期而非只发字符串<span class="dd-badge eng">设计</span></h2>
+<div class="dd-agent-response"><p>连接在中途断开时，客户端手里只有一堆已经收到的字节，它必须能回答一个问题：这条流到底是以正常结束收尾，是被用户取消了，还是出了错误？只发送字符串的协议回答不了这个问题，因为它把三种完全不同的终态都表现成了同一种现象——&quot;没有更多数据了&quot;。事件协议解决的就是这件事：让流本身携带生命周期信息。</p>
+<p>这样的协议接收的输入是请求状态，以及文本、工具调用、使用量和错误四类增量；输出是一条带 request id、递增 sequence、协议版本和终态标记的事件流。典型的事件集合包括：start 标志一条流开始，text_delta 携带一段文本增量，tool_delta 和 tool_complete 描述工具调用的进行与结束，usage 报告 token 使用量，error 表示出错，cancelled 表示用户主动取消，done 表示生成部分正常完成。每条流都用 request id 标识归属，用严格递增的 sequence 保证顺序，并带有协议版本号；可选的事件 id 则让客户端能够在重连后去重。</p>
+<p>客户端据此按序处理并维护自己的状态机：sequence 递增才接受，重复的事件被丢弃，只有收到显式的 done 并且最终校验也通过，整条流才标记为 completed。EOF 在这里没有特殊地位——它只表示连接关闭了。连接关闭的原因可能是网络抖动、代理超时、服务崩溃或用户取消，每一种都无法从&quot;连接断了&quot;这个事实本身推断出来；因此把已经收到的前缀自动当作完整答案，是把传输层现象误读成了应用层结论。EOF 不是 done，这是一个硬性区分。</p>
+<p>承载这个协议的传输方式有几种选择，各有代价。SSE 实现简单、浏览器支持好、断线后可以自动重连，但它是单向通道，客户端无法在同一连接上发送取消等反馈；WebSocket 是双向的，却带来连接管理、心跳和状态机的额外复杂度；HTTP 分块传输最通用，能穿透大多数代理，但分块本身只是字节边界，需要自己定义帧格式。选择哪一种取决于应用需要的交互程度，而不改变协议层的基本要求：无论跑在哪条传输上，都必须明确帧边界、保证顺序、约定幂等语义、给出可判定的终态。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：一次 40-token 回答的时间线<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个 40-token 的回答把前面的概念串成一条可计算的时间线。给定条件是：请求在队列里等 120ms，输入提示的预填充耗时 280ms，首 token 之后每个 token 平均解码 50ms。案例的输入就是这四个量——排队时间、预填充时间、输出 token 总数和 TPOT——输出则是三个用户可感知的量：TTFT、完整完成时间，以及取消时已经浪费掉的算力。</p>
+<p>先算用户何时看见第一个字。排队 120ms 加预填充 280ms 之后才开始解码第一个 token，首 token 的可见时间约在 120 + 280 = 400ms。这就是流式改写的体验：2.4 秒的单次等待被换成 0.4 秒开始阅读，但完整计算并未消失。用符号表示，首 token 时间 TTFT ≈ Q + P + D，其中 Q 是排队时间，P 是处理输入前缀的预填充时间，D 是第一步解码本身的时间。</p>
+<p>再看何时完成。完整时间 E ≈ TTFT + (N − 1) × TPOT + X，其中 N 是输出 token 总数，TPOT 是首 token 之后每个 token 的平均解码间隔，X 是网络传输与前端渲染的耗时。代入本例，N = 40、TPOT = 50ms，首 token 之后的 39 个 token 需要 39 × 50 = 1950ms，加上 400ms 得到 2350ms，再加上传输和渲染开销，完整时间接近 2.4 秒。这个公式是容量规划的近似：真实服务的批处理、事件抖动和负载波动都会让每一步的耗时偏离这些单值。</p>
+<p>取消场景显示的是流式与计算的另一层关系。若用户在 1 秒处按下取消，此时已经解码的 token 数约为 (1000 − 400) / 50 = 12 个。用户大约看见了一打 token 的开头，剩下的 28 个 token 是否继续算下去，取决于取消信号能不能到达模型服务：如果取消只停止了客户端的渲染而信号没有向上游传播，模型仍会把这 28 个 token 全部生成完，成本照常支出。所以取消生效时间不是用户点击的时间，而是信号穿过代理、网关、请求队列，最终让模型停止解码的时间；只有这条传播路径走通，&quot;已经浪费&quot;的部分才停在 28 个 token 以内。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 710 250" role="img" aria-label="流式请求的排队、预填充、首 token、增量、取消和完成时间线"><line x1="35" y1="128" x2="680" y2="128" stroke="#6b7484" stroke-width="2"/><rect x="35" y="92" width="90" height="36" fill="#c77b72"/><text x="80" y="84" text-anchor="middle" class="svg-t" font-size="11">排队 120ms</text><rect x="125" y="92" width="170" height="36" fill="#d3a05a"/><text x="210" y="84" text-anchor="middle" class="svg-t" font-size="11">prefill 280ms</text><circle cx="295" cy="128" r="7" fill="#4f9d78"/><text x="295" y="157" text-anchor="middle" class="svg-t" font-size="11">TTFT≈400ms</text><rect x="302" y="92" width="330" height="36" fill="#6b8cbe"/><text x="467" y="84" text-anchor="middle" class="svg-t" font-size="11">40 token × 50ms ≈ 2000ms</text><circle cx="632" cy="128" r="7" fill="#4f9d78"/><text x="632" y="157" text-anchor="middle" class="svg-t" font-size="11">done≈2400ms</text><path d="M390,128 L390,194" stroke="#c77b72" stroke-dasharray="4 3"/><text x="390" y="211" text-anchor="middle" class="svg-t" font-size="11">若 1s 取消：约已显示 12 token；必须向上游传播 abort</text></svg><figcaption>图 1　流式把 2.4 秒的单次等待改成 0.4 秒开始阅读，但完整计算并未消失。</figcaption></figure>
+<div class="dd-formula" data-formula-id="streaming-latency"><math display="block" aria-label="首 token 时间 TTFT 约等于排队 Q 加预填充 P 加首步解码 D；完成时间 E 约等于 TTFT 加 N 减一乘每 token 时间 TPOT，再加传输渲染 X"><mtable><mtr><mtd><mi>TTFT</mi><mo>≈</mo><mi>Q</mi><mo>+</mo><mi>P</mi><mo>+</mo><mi>D</mi></mtd></mtr><mtr><mtd><mi>E</mi><mo>≈</mo><mi>TTFT</mi><mo>+</mo><mo>(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo>)</mo><mi>TPOT</mi><mo>+</mo><mi>X</mi></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>背压是慢消费者对快生产者的反馈<span class="dd-badge eng">流控</span></h2>
+<div class="dd-agent-response"><p>服务器每秒发来 100 个 text delta，而浏览器按显示器的刷新率渲染画面——最常见的刷新率是 60Hz，75/120/144Hz 的屏幕也很普遍——会发生什么？如果每个增量都触发一次 DOM 更新，每秒 100 次更新就要挤进约 60 帧的画面里，平均一帧要消化 100/60≈1.7 个 delta，更新到达的速度持续超过画面能够绘出的速度，于是事件在客户端、网关和服务端的每一级缓冲里不断堆积：内存持续增长，每级排队都让延迟变大，最终可能被代理断开连接。背压控制就是为这种情况设计的反馈机制：它接收生产速率、消费速率和各级缓冲水位作为输入，输出批量渲染、暂停、合并或取消四类决策。</p>
+<p>慢消费者的存在是整条链路的现实，不能靠假设消费者永远跟得上生产速度来回避。正确的做法是把压力逐层往回传：前端 DOM 更新慢，就让客户端读取变慢；客户端读取变慢，网关的发送缓冲区开始积压，于是网关暂停从应用读取；应用再暂停从上游读取。这条传播链是 DOM 慢 → 客户端读取慢 → 网关发送受阻 → 应用暂停读取上游，每一级都用自己下游的真实速度约束自己的上游。</p>
+<p>如果某个上游无法暂停——比如模型 API 本身不支持中途挂起——就必须退而求其次：在允许的层级设置有界队列，队列水位超过阈值就整条流取消，而不是让缓冲无限制增长下去。文本增量可以合并，把 100 个小 delta 攒成一个词组或一帧再渲染；工具事件却不能这样随意合并，因为它们携带顺序和语义，合并可能改变一个工具调用的参数边界。工具事件必须保持事件语义。</p>
+<p>把症状、原因和对应的控制手段对齐来看：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">症状</th><th class="dd-align-left">原因</th><th class="dd-align-left">控制</th></tr></thead><tbody><tr><td class="dd-align-left">前端卡顿</td><td class="dd-align-left">每个 token 都触发一次重排</td><td class="dd-align-left">按 16–50ms 一帧批量渲染</td></tr><tr><td class="dd-align-left">内存增长</td><td class="dd-align-left">无界队列</td><td class="dd-align-left">设置高水位并在超限时取消</td></tr><tr><td class="dd-align-left">延迟越来越大</td><td class="dd-align-left">代理缓冲或慢客户端</td><td class="dd-align-left">禁用缓冲、心跳、流控</td></tr><tr><td class="dd-align-left">事件乱序</td><td class="dd-align-left">并发通道合并</td><td class="dd-align-left">sequence 校验与单写者</td></tr></tbody></table></div>
+<p>这张表对应同一个因果结构：症状是消费和生产速率不匹配的可见结果，原因是某一级缺少限速或无界累积，控制手段则是把速率差的信息反馈回生产端，或在无法反馈时用有界丢弃来兜底。背压生效的标志不是任何单一开关，而是从最慢的一级开始，每一级都只按自己能承受的速度向上游要数据。</p></div>
+<table class="dd-table"><thead><tr><th>症状</th><th>原因</th><th>控制</th></tr></thead><tbody><tr><td>前端卡顿</td><td>每 token 重排</td><td>16–50ms 批量渲染</td></tr><tr><td>内存增长</td><td>无界队列</td><td>高水位和取消</td></tr><tr><td>延迟越来越大</td><td>代理缓冲/慢客户端</td><td>禁缓冲、心跳、流控</td></tr><tr><td>事件乱序</td><td>并发通道合并</td><td>sequence 与单写者</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>取消、超时和重连都需要幂等语义<span class="dd-badge eng">可靠性</span></h2>
+<div class="dd-agent-response"><p>用户点下停止按钮后，为什么一个已经触发的工具调用仍然可能完成——比如一笔退款照样扣掉了？因为&quot;取消&quot;在流式链路里是一个需要逐层传播的信号，而不是一个瞬时的全局事实。取消与重连机制接收的输入是 request id、sequence、取消信号、幂等键和动作日志，输出的是每条请求的确定状态：已取消、已完成、未知或可重放。</p>
+<p>取消信号最常见的失效方式是只停在最外层：前端停止了显示，但 AbortSignal 没有继续向模型服务和已经发出的工具请求传播，模型还在生成剩余 token，工具进程还在执行。要让取消真正生效，每一层都必须接收并传递取消信号——HTTP 请求中止、上游连接关闭、模型循环在每一步解码前检查取消 token——而工具层在启动不可逆动作之前，也要检查当前请求是否仍然有效。即便如此，取消仍然只作用于尚未发生的事：已经提交的副作用不会因为前端停止显示而自动撤销，它需要补偿动作或人工介入。所以&quot;展示取消&quot;和&quot;事务撤销&quot;是两件不同的事，协议必须如实报告哪一种状态才是真的。</p>
+<p>超时带来的是同源的另一类问题：超时之后结果状态是未知的——请求可能根本没到达服务端，也可能已经执行完毕只是响应丢失。此时直接重试可能重复执行一个不可逆动作。正确顺序是先查询动作状态，确认之后再决定重放还是放弃；对不可逆动作本身，则从一开始就带上幂等键和提交日志，让重复提交和重复完成在服务端可以被识别并折叠成同一次执行。协议对每条流承诺的状态只有四种：已取消、已完成、未知、可重放，客户端必须按这个承诺处理，而不是自行猜测。</p>
+<p>重连则把未知状态变成可恢复状态。SSE 自动重连时可以携带 Last-Event-ID，服务端据此从短期事件日志里把断线期间的事件重放出来；客户端收到后用 request id 加 sequence 去重，把重复到达的事件丢弃。关键约束是：恢复连接不能重复执行工具动作——tool_complete 不能因为重放而被再次执行。如果服务端没有事件日志、无法重放，就必须明确地启动一条新请求，并且绝不能把新请求的前缀和旧请求的后缀拼接成一条看似连续的回答。两条不同的流各有各的 request id，拼接出来的文本在业务上不属于任何一次完整的生成。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>结构化输出必须缓冲到接受态<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>工具参数的 JSON 已经流出了 {&quot;amount&quot;:12，为什么仍然不能执行？因为流式传输中的每一个前缀都还在变化：12 的后面可能接着一个 0，把金额变成 120；字符串可能尚未闭合；对象后面还可能继续追加字段。此刻屏幕上看似完整的内容，只是尚未定型的中间态。结构缓冲接收的输入是逐块到达的 tool_call_delta，输出则是经过完整组装、通过 schema、事实和权限校验之后才能交给执行层的参数。</p>
+<p>因此结构化增量的用途被明确地分成两种：预览和进度展示可以，提前执行不可以。服务端可以发送专门的 tool_call_delta 事件让客户端组装出实时的半截 JSON 用于显示，但客户端只负责拼接，不负责解释——在半截状态上做任何语义推断，比如认为 amount 就是 12，都是在猜测一个随时可能被下一个 chunk 推翻的值。真正执行的前提是拿到完整的对象，并且通过三层校验：schema 校验确认结构合法，事实校验确认参数在业务上说得通，权限校验确认当前请求有权发起这个动作。</p>
+<p>同样的边界适用于流式正文本身。早期的引用或断言可能在后面的文字里被否定——前半段说&quot;结论是 A&quot;，后半段可能接着&quot;但这只在 X 条件下成立&quot;甚至直接推翻 A。因此持久化最终答案时，应当保存的是原始事件序列和完成状态，而不是某个时刻的渲染快照；半途中断的回答必须标记为 interrupted，并且不能混入完整答案的训练集或评测集，否则训练和评测会把一个从未被模型认可的中间态当成它的最终输出。</p>
+<p>安全审查在这条链路上也有自己的时间边界。只检查单个 chunk 会漏掉跨块拼出来的攻击内容——危险词被拆进两个增量，每个单独看都无害；等全文生成完再检查，又丢掉了流式换来的实时性。可行的是增量缓冲审查：对已收到的缓冲内容滚动检查，同时对高风险类别的内容延迟展示，直到有足够上下文确认它安全。审查的粒度在这两种极端之间选取，而不是选择放弃其中一边。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>安全、Markdown 与 UI 都有增量陷阱<span class="dd-badge eng">前端</span></h2>
+<div class="dd-agent-response"><p>单个 delta 看起来无害，拼起来却可能变成一段脚本、一个自动跳转的链接或一条敏感信息——增量渲染的风险就在于，危险从来不落在任何一个 chunk 内部，而落在 chunk 之间的拼接处。Markdown 链接的括号、HTML 标签的尖括号、代码围栏、敏感信息模式，全都可以被拆成两半先后到达，每一半单独扫描都合法。增量安全渲染接收的输入是跨块文本和内容风险策略，输出的是以纯文本形式累积的中间态、经安全渲染器生成的 Markdown 或 HTML，以及通过审核的展示单元。</p>
+<p>正确的渲染路径只有一条：先按纯文本累积，再用安全的 Markdown 渲染器生成 HTML。前端绝不能对每个增量直接调用 innerHTML——那样等于把尚未完成的 HTML 片段当作指令注入 DOM，攻击内容会在拼接完成之前就被执行。安全扫描器要维护一个跨块的滑动窗口，让前一事件的结尾和后一事件的开头在同一窗口里被检查；工具返回内容和外部文档内容一律标记为不可信来源。这条路径把&quot;先累积、后解释、再渲染&quot;的顺序固定下来，任何把半截标记当代码执行的捷径都违反了它。</p>
+<p>展示时机还有一层审核粒度的问题。用户看见的前缀会影响其行为，哪怕系统最终把这句话删除或修正——已经读到的误导性指导不会因为后面的道歉而失去作用。因此医疗、金融和高风险指导类场景可以把内容先缓冲到句子、段落甚至完整审核完成之后再展示，而不是无条件地逐 token 放行。流式并非所有场景默认更好，它的即时性在错误代价高的领域需要用延迟来交换。</p>
+<p>这些风险的对应关系可以对齐成一张表：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">风险</th><th class="dd-align-left">错误做法</th><th class="dd-align-left">安全做法</th></tr></thead><tbody><tr><td class="dd-align-left">XSS/Markdown 注入</td><td class="dd-align-left">逐块 innerHTML</td><td class="dd-align-left">纯文本累积后安全渲染</td></tr><tr><td class="dd-align-left">跨块敏感词</td><td class="dd-align-left">每块独立扫描</td><td class="dd-align-left">滑动窗口或句级缓冲</td></tr><tr><td class="dd-align-left">高风险误导</td><td class="dd-align-left">立即展示未审查前缀</td><td class="dd-align-left">延迟到审核单元</td></tr><tr><td class="dd-align-left">读屏噪声</td><td class="dd-align-left">token 级 aria 更新</td><td class="dd-align-left">语义块与节流</td></tr></tbody></table></div>
+<p>最后一行把无障碍读屏纳入同样的结构：屏幕阅读器如果每个 token 都触发一次朗读，听到的是一串破碎的声音而非句子；更新应该按语义块进行并加以节流。所有四行共享同一条原则——解释和展示都以完成度为准，任何把中间态当作终态的处理，无论面向 DOM、扫描器、审核还是读屏器，都会把流式的增量特性变成漏洞。</p></div>
+<table class="dd-table"><thead><tr><th>风险</th><th>错误做法</th><th>安全做法</th></tr></thead><tbody><tr><td>XSS/Markdown</td><td>逐块 innerHTML</td><td>纯文本累积后安全渲染</td></tr><tr><td>跨块敏感词</td><td>每块独立扫描</td><td>滑动窗口/句级缓冲</td></tr><tr><td>高风险误导</td><td>立即展示未审查前缀</td><td>延迟到审核单元</td></tr><tr><td>读屏噪声</td><td>token 级 aria 更新</td><td>语义块与节流</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测应覆盖完成、取消和故障路径<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>平均 TTFT 很漂亮，只凭它却证明不了流式可靠——因为可靠性的大部分证据藏在完成路径、取消路径和故障路径里，而这些路径在平均值里根本看不见。流式评测的输入应当是端到端的事件日志、按网络与设备切分的并发场景，以及系统性的故障注入；输出则是 TTFT、TPOT、完成时间、取消传播、浪费 token、恢复能力、缓冲水位、前端帧率和最终答案质量这一整套指标，而不是一个数字。</p>
+<p>先看指标需要覆盖什么。延迟类指标按分位数记录：p50 描述典型体验，p95 和 p99 暴露尾延迟，因为平均值会被少数快请求拉好看，而用户感受到的恰恰是慢的那部分。同时要测 TTFT、TPOT、完整完成时间、相邻事件之间的间隙，以及中断率。取消路径上测两个量：取消传播延迟——从用户点击到模型真正停止的时间——以及取消后仍然浪费的 token 数，后者直接衡量取消是否真的节省了后续计算。恢复路径上测重连恢复率和重复事件数；背压路径上测缓冲峰值和前端帧率。最后，所有路径之上还要测最终答案质量：一个显示得很流畅、内容却错的流不是好流。所有这些指标都要按输出长度、网络条件、代理存在与否、设备类型和并发数分别切片统计，因为每一条都是独立的压力来源。</p>
+<p>光测正常路径不够，还要主动注入故障。注入清单覆盖前面每一节讨论过的边界：UTF-8 字符被拆到两个字节块、事件在传输中被截断、代理缓冲引入长暂停、事件乱序、重复事件、模型中途报错、工具调用超时、客户端断网、服务器重启。每一项注入之后，验收的不是&quot;文本看起来差不多显示完了&quot;，而是最终状态和副作用：请求以什么终态结束、有没有产生不该有的工具执行、有没有把失败伪装成完成。</p>
+<p>把这些验收条件收拢起来，一次流式评测要同时证明四件事：用户及时看到了安全的增量；取消确实节省了后续工作；完整结果只在 done 且验证通过之后才提交；故障不会被静默伪装成完成。四条中任何一条不成立，无论延迟数字多好看，这套流式实现都是不可靠的。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>从问题一路走到可验证的实践，流式输出的整条因果链由六个环节依次咬合。</p>
+<p>第一环，为每条流分配 request id 与递增序号。这是后面一切行为的基础：没有 request id，重连后无法判断两段字节属于同一条流；没有序号，无法检测乱序和重复。第二环，把 token 和字节增量解码为类型化事件。模型产生的 token、网络切出的字节块都不是应用能直接消费的单位，增量 UTF-8 解码器和协议帧解析把它们变成 text_delta、tool_delta、usage 这类带语义的事件，客户端从此只按事件而不是按传输分片工作。第三环，客户端在背压约束下安全渲染。消费速率低于生产速率时，按帧批量渲染而不是逐 token 重排；解释和展示以完成度为准，纯文本累积后再安全渲染，防止跨块拼出的脚本或链接被当作代码执行。</p>
+<p>第四环，取消信号沿链路传播，同时保护副作用。前端停止显示只是起点，取消必须穿过网关到达模型和工具，让后续 token 停止生成；已经提交的不可逆动作则依靠幂等键、状态查询和补偿来处置，而不是假装从未发生。第五环，仅在 done 且校验通过之后提交最终结果。EOF 不等于完成，可见的前缀不等于有效答案，半截内容必须保持 interrupted 状态，任何业务提交都以显式终态加 schema、事实、权限校验为前提。第六环，用故障注入和端到端指标回归来验证前五环。注入 UTF-8 跨块、事件截断、乱序、重复、工具超时和断网重启，度量 p50/p95/p99 延迟、取消传播延迟、浪费 token、恢复率、缓冲峰值与最终质量，确认安全增量及时到达、取消真正节省工作、故障从不伪装成完成。</p>
+<p>六个环节里，每一环的输出都是下一环的输入：没有身份与序号，事件就没有归属；没有类型化事件，渲染与背压就没有可操作的粒度；没有安全渲染与取消传播，就没有可以承诺的副作用语义；没有 done 加校验的提交门槛，评测就没有可验收的最终状态。链条一旦在某个环节断开，断裂点之后的环节都会在错误的基础上继续运行——而这正是整条链要被端到端度量的原因。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://html.spec.whatwg.org/multipage/server-sent-events.html" target="_blank" rel="noopener">HTML Living Standard: Server-Sent Events</a>：SSE 事件与重连语义</li><li><a href="https://streams.spec.whatwg.org/" target="_blank" rel="noopener">WHATWG Streams Standard</a>：流、背压与取消</li><li><a href="https://encoding.spec.whatwg.org/" target="_blank" rel="noopener">Encoding Standard</a>：UTF-8 增量解码</li><li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Speculative Decoding</a>：生成延迟优化与流式阶段关系</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/streaming">在地图中查看概念关系</a></nav>
+</article></main></body></html>

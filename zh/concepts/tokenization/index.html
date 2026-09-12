@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Token 与分词：模型真正读写的离散语言 · AI 知识地图</title>
+<meta name="description" content="从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/tokenization/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="Token 与分词：模型真正读写的离散语言">
+<meta property="og:description" content="从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/tokenization/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Token 与分词：模型真正读写的离散语言">
+<meta name="twitter:description" content="从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/tokenization/#page","name":"Token 与分词：模型真正读写的离散语言","description":"从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。","url":"https://ai-knowledge-map.com/zh/concepts/tokenization/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Token 与分词：模型真正读写的离散语言","item":"https://ai-knowledge-map.com/zh/concepts/tokenization/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Token 与分词：模型真正读写的离散语言</span></li></ol></nav><article id="dd-article" data-concept-id="tokenization">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Token 与分词：模型真正读写的离散语言</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> Tokenizer 是权重之前的一台<b>确定性编译器</b>：它把原始 Unicode 字符串变成 token ID，再由嵌入矩阵查表。词表顺序、规范化、特殊 token 或聊天模板一旦改变，ID 的含义就改变；因此 tokenizer 不是可随意更换的前处理插件，而是模型接口和权重的一部分。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>字符、字节、子词和 token 为什么不是同一件事？</li><li>BPE 怎样从字符序列逐步学出子词？</li><li>词表变大为何能缩短序列，却不一定让模型更强？</li><li>为什么换一个 tokenizer 会让原有嵌入权重失去意义？</li><li>怎样测试 Unicode、特殊 token、偏移量和流式停止边界？</li></ul></div>
+<ol class="dd-chain"><li>用户产生 Unicode 字符串，其中可能包含组合字符和不可见符号。</li><li>规范化与预切分确定候选边界。</li><li>BPE、Unigram 或字节级规则把文本覆盖成有限词表片段。</li><li>词表把片段映射到整数 ID，模板插入控制 token。</li><li>嵌入矩阵按 ID 查行，模型只对这条离散序列计算。</li><li>切分粒度改变序列长度、训练频率和要学习的组合路径。</li><li>解码与流式服务把 token 恢复为字节和可见文本。</li><li>任一工件或边界规则变化，都必须与权重共同验证和发布。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>一段文字要经过哪几道门<span class="dd-badge intuition">全景</span></h2>
+<div class="dd-agent-response"><p>用户输入的一段文字，在进入模型之前要依次经过一条确定的转换流水线：</p>
+<p><strong>Unicode 文本 → 规范化 → 预切分 → 子词组合 → 词表查找 → 模板插入 → token ID → 嵌入向量</strong></p>
+<p>输入端是用户看到并输入的 Unicode 文本，输出端则是一串离散的 token ID；模型随后用这些 ID 查找对应的嵌入向量。屏幕上看起来相同或相近的字符串，并不保证经过这条流水线后得到相同的 ID 序列。</p>
+<p>规范化首先处理字符表示。某些视觉上相同或语义上等价的字符可能存在不同的 Unicode 表示，规范化规则可以把其中一部分统一起来。它改变的是后续步骤实际接收到的字符序列，因此必须与模型训练时使用的规则一致。</p>
+<p>预切分接着建立候选边界，常见依据包括空格和正则规则。它并不等于最终分词，而是先限定子词算法在哪些范围内继续处理。子词算法随后在这些边界内组合字符或更小单元，把文本变成词表能够表示的符号序列。</p>
+<p>词表查找把每个符号映射为唯一的整数 ID。此后，聊天模板或任务协议还可能在序列中插入 BOS、EOS、角色标记或工具 token。最终得到的完整 ID 序列才是模型真正接收的输入；每个 ID 再通过嵌入表转换为向量，送入神经网络。</p>
+<p>这条链上的每一步都会影响下一步。只要某处边界或规则不同，后续的符号组合、词表查询结果、ID 数量和位置都可能随之改变。因此，分词管线的规范化规则、预切分规则、子词模型、词表和模板都必须作为一个整体版本化。“大致相同”的实现并不够精确。</p>
+<p>不同模型可以采用不同的管线，同一段可见文本在不同模型中可能产生不同数量、不同边界和不同取值的 token。字符数只是显示层面的长度，不能用来直接推断 token 数；要知道模型实际读取了什么，必须用与该模型匹配的完整分词管线执行一次转换。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 250" role="img" aria-label="从 Unicode 文本到嵌入向量的分词流水线"><defs><marker id="tok-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8Z" fill="currentColor"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2" marker-end="url(#tok-arrow)"><path d="M130 112H180"/><path d="M290 112H340"/><path d="M450 112H500"/><path d="M610 112H660"/></g><g stroke="currentColor" stroke-width="2"><rect x="20" y="70" width="110" height="84" rx="12" fill="#8b5cf6" opacity=".22"/><rect x="180" y="70" width="110" height="84" rx="12" fill="#0ea5e9" opacity=".22"/><rect x="340" y="70" width="110" height="84" rx="12" fill="#10b981" opacity=".22"/><rect x="500" y="70" width="110" height="84" rx="12" fill="#f59e0b" opacity=".22"/><rect x="660" y="70" width="80" height="84" rx="12" fill="#ef4444" opacity=".22"/></g><g class="svg-t" text-anchor="middle"><text x="75" y="103">Unicode</text><text x="75" y="129">原始文本</text><text x="235" y="103">规范化</text><text x="235" y="129">预切分</text><text x="395" y="103">BPE /</text><text x="395" y="129">Unigram</text><text x="555" y="103">词表查 ID</text><text x="555" y="129">加特殊符号</text><text x="700" y="103">嵌入</text><text x="700" y="129">向量</text></g></svg><figcaption>每一步都必须版本化；“大致相同”的实现不够，因为一个边界差异会改变后续全部 ID。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>字符、字节、子词与 ID 分别是什么<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>“字符”“字节”“子词”和“token ID”属于不同层级。把它们混为一谈，才会产生“一个字就是一个 token”这样的误判。这个说法只会在某些输入和某套 tokenizer 恰好给出单字边界时成立，并不是通用规则。</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">层级</th><th class="dd-align-left">例子</th><th class="dd-align-left">能保证什么</th><th class="dd-align-left">不能保证什么</th></tr></thead><tbody><tr><td class="dd-align-left">Unicode 码点</td><td class="dd-align-left">“猫”、é</td><td class="dd-align-left">用抽象编号表示字符</td><td class="dd-align-left">一个视觉字形只包含一个码点</td></tr><tr><td class="dd-align-left">UTF-8 字节</td><td class="dd-align-left">“猫”编码为 3 个字节</td><td class="dd-align-left">任意 Unicode 文本都能编码</td><td class="dd-align-left">字节边界与人类看到的字符边界一致</td></tr><tr><td class="dd-align-left">子词片段</td><td class="dd-align-left"><code>token</code> + <code>ization</code></td><td class="dd-align-left">用有限词表组合开放文本</td><td class="dd-align-left">每个片段自身都有完整语义</td></tr><tr><td class="dd-align-left">token ID</td><td class="dd-align-left">31415</td><td class="dd-align-left">可用于索引嵌入矩阵中的某一行</td><td class="dd-align-left">换一个 tokenizer 后仍表示同一片段</td></tr></tbody></table></div>
+-->
+<p>Unicode 码点描述抽象字符，但用户看到的一个字形未必只由一个码点构成。组合音标会把基础字符和附加符号组合显示；emoji 肤色修饰符会改变前一个 emoji；零宽连接符还能把多个码点连接成一个视觉整体。因此，可见字符数不等于码点数。</p>
+<p>UTF-8 又把码点编码为字节序列。例如“猫”编码后占 3 个字节。字节编码保证任意 Unicode 文本都有可存储和传输的表示，但不保证一个字节对应一个字符，也不保证字节边界就是用户理解的字符边界。</p>
+<p>子词片段是 tokenizer 用有限词表表示开放文本的组合单位。<code>tokenization</code> 可以被表示成 <code>token</code> 与 <code>ization</code>，但实际边界取决于具体 tokenizer。子词的作用是参与组合，不要求每个片段脱离上下文后都具有完整语义。</p>
+<p>token ID 则是词表内部的整数索引。例如 ID 31415 的意义来自当前 tokenizer 的词表：模型用它索引嵌入矩阵中的某一行。这个数字没有跨 tokenizer 的固定含义；另一套词表中的 31415 可能指向完全不同的片段。</p>
+<p>因此，一段文本会经历“可见字形—码点—字节—子词—ID”等不同表示层。任一层的边界都不能直接冒充另一层的边界。可靠系统应保留原文，并维护 token 与原文字符偏移之间的映射；展示选区、标注或定位错误时，应回到用户看到的文本坐标，而不是直接把 token 边界当作字符边界。</p></div>
+<table class="dd-table"><thead><tr><th>层级</th><th>例子</th><th>保证</th><th>不保证</th></tr></thead><tbody><tr><td>Unicode 码点</td><td><code>猫</code>、<code>é</code></td><td>抽象字符编号</td><td>一个视觉字形只含一个码点</td></tr><tr><td>UTF-8 字节</td><td><code>猫</code> 编为 3 字节</td><td>任意 Unicode 可编码</td><td>边界与人类字符一致</td></tr><tr><td>子词片段</td><td><code>token</code>+<code>ization</code></td><td>有限词表可组合开放文本</td><td>片段本身有完整语义</td></tr><tr><td>token ID</td><td><code>31415</code></td><td>可索引嵌入矩阵某一行</td><td>跨 tokenizer 仍表示同一片段</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>手算一次 BPE：高频相邻对怎样变成新符号<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>BPE 学到的不是一张由人工定义的词典，而是一组有顺序的相邻符号合并规则。训练从较小的基本单位出发，反复统计当前表示中相邻符号对的出现频次，把最高频的一对合成一个新符号。这个过程让频繁共同出现的片段逐渐变成更大的 token。</p>
+<p>设玩具语料只包含 <code>low</code> 5 次、<code>lower</code> 2 次。初始时，把每个词拆成字符，并在结尾加入词尾符 <code>&lt;/w&gt;</code>：</p>
+<ul><li><code>l o w &lt;/w&gt;</code>，权重为 5；</li><li><code>l o w e r &lt;/w&gt;</code>，权重为 2。</li></ul>
+<p>统计相邻对时必须乘上词频。于是 <code>l + o</code> 在两种词中都出现，总频次为 5 + 2 = 7。将它合并为 <code>lo</code> 后，再重新统计当前表示中的相邻对。</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">轮次</th><th class="dd-align-left">最高频相邻对</th><th class="dd-align-right">频次</th><th class="dd-align-left">合并后的表示</th></tr></thead><tbody><tr><td class="dd-align-left">0</td><td class="dd-align-left"><code>l + o</code></td><td class="dd-align-right">7</td><td class="dd-align-left"><code>lo w &lt;/w&gt;</code>；<code>lo w e r &lt;/w&gt;</code></td></tr><tr><td class="dd-align-left">1</td><td class="dd-align-left"><code>lo + w</code></td><td class="dd-align-right">7</td><td class="dd-align-left"><code>low &lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr><tr><td class="dd-align-left">2</td><td class="dd-align-left"><code>low + &lt;/w&gt;</code></td><td class="dd-align-right">5</td><td class="dd-align-left"><code>low&lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr></tbody></table></div>
+-->
+<p>第一轮得到规则 <code>l + o → lo</code>。第二轮中，<code>lo + w</code> 同样在全部 7 个词例中出现，于是得到 <code>lo + w → low</code>。第三轮需要区分词尾位置：<code>low + &lt;/w&gt;</code> 只在独立的 <code>low</code> 中出现 5 次，而 <code>lower</code> 中 <code>low</code> 后面接的是 <code>e</code>。因此，完整的词尾形式 <code>low&lt;/w&gt;</code> 被合成一个 token，<code>lower</code> 仍由 <code>low</code>、<code>e</code>、<code>r</code> 等单位组合。</p>
+<p>这个例子展示了 BPE 的因果链：语料词频决定相邻对频次，频次决定下一条合并规则，已应用的规则又改变下一轮的表示和统计。最终词表中的较大符号来自这一连续合并过程，而不是因为系统预先知道某个片段是不是一个“词”。</p>
+<p>真实训练还会受到预切分、并列频次处理和具体实现规则的影响，因此同一份语料在不同实现下可能出现细节差异。不过核心机制保持不变：反复加入能够覆盖高频相邻组合的合并，使常见片段用更少的符号表示，同时保留用较小单位组合其他文本的能力。</p></div>
+<table class="dd-table"><thead><tr><th>轮次</th><th>最高频相邻对</th><th>频次</th><th>合并后的表示</th></tr></thead><tbody><tr><td>0</td><td><code>l + o</code></td><td>7</td><td><code>lo w &lt;/w&gt;</code>；<code>lo w e r &lt;/w&gt;</code></td></tr><tr><td>1</td><td><code>lo + w</code></td><td>7</td><td><code>low &lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr><tr><td>2</td><td><code>low + &lt;/w&gt;</code></td><td>5</td><td><code>low&lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>BPE、Unigram 与字节级方案在优化什么<span class="dd-badge math">方法</span></h2>
+<div class="dd-agent-response"><p>BPE、Unigram 和字节级子词方案都能把开放文本表示成有限词表中的子词序列，但它们构造词表和选择切分的方向不同。比较它们时，不能只看“是否使用子词”，还要看训练过程在搜索什么、编码时如何作出选择，以及无法直接覆盖某段文本时如何退化。</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方法</th><th class="dd-align-left">训练思路</th><th class="dd-align-left">编码特点</th><th class="dd-align-left">典型风险</th></tr></thead><tbody><tr><td class="dd-align-left">BPE</td><td class="dd-align-left">从小符号集出发，逐步向上合并</td><td class="dd-align-left">按固定合并序列得到确定切分</td><td class="dd-align-left">贪心合并规则没有直接优化语言模型目标</td></tr><tr><td class="dd-align-left">Unigram</td><td class="dd-align-left">从较大的候选词表出发，逐步向下剪枝</td><td class="dd-align-left">按片段概率选择高似然切分，也可采样多种切分</td><td class="dd-align-left">概率模型与剪枝实现更复杂</td></tr><tr><td class="dd-align-left">字节级子词</td><td class="dd-align-left">以 256 个字节作为完备底座，再学习更大的合并</td><td class="dd-align-left">任意输入都能回退到字节，因此没有真正无法编码的字符</td><td class="dd-align-left">低覆盖语言或罕见字符串可能被切得很长</td></tr></tbody></table></div>
+-->
+<p>BPE 的起点是较小的符号集合。训练反复选择相邻符号进行合并，得到一系列有顺序的规则；编码时按这些规则组合输入，因而可以产生确定的切分。它直接偏好的是训练语料中高频的局部组合，但这种贪心选择本身并不等同于直接优化后续语言模型的目标。</p>
+<p>Unigram 的方向相反：先准备较大的候选片段集合，再根据概率模型评估切分，逐步删除贡献较小的候选。编码时，一段文本可能存在多种合法切法，系统按片段概率选择高似然方案，也可以从这些方案中采样。其代价是需要维护概率模型，并处理候选词表剪枝，训练和实现逻辑更复杂。</p>
+<p>字节级子词首先用 256 种字节值建立完备底座，然后再把常见字节组合合并成较大的 token。因为任何 Unicode 文本最终都能编码为字节，所以它不会遇到真正无法表示的字符。但是，“能编码”与“编码高效”是两件事：当某种语言、罕见字符或特殊字符串没有被更大的词表片段覆盖时，它会回退成多个字节 token。</p>
+<p>这种回退会产生两层影响。首先，同一段可见文本占用更多 token，也就占用更多上下文位置；其次，模型接收到的是更碎的证据，需要从多个较小单位中学习如何重新组合。因此，评估 tokenizer 时，未知 token 是否消失只是最低层的覆盖指标，还必须同时观察序列是否被过度拉长，以及目标文本是否获得了足够完整、稳定的片段表示。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>训练思路</th><th>编码特点</th><th>典型风险</th></tr></thead><tbody><tr><td>BPE</td><td>从小符号集向上合并</td><td>按固定合并序列得到确定切分</td><td>贪心规则未直接优化语言模型目标</td></tr><tr><td>Unigram</td><td>从大候选词表向下剪枝</td><td>按片段概率选择高似然切分，可采样多种切分</td><td>概率模型与剪枝实现更复杂</td></tr><tr><td>字节级子词</td><td>以 256 个字节为完备底座再合并</td><td>没有真正的未知字符</td><td>低覆盖语言或罕见串可能很长</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>词表大小是一笔参数—序列长度交换<span class="dd-badge math">权衡</span></h2>
+<div class="dd-agent-response"><p>词表大小不是越大越好或越小越好，而是在模型参数、序列长度与训练稀疏性之间做交换。设词表大小为 |V|，嵌入维度为 d，文本分词后的序列长度为 L，可以先用两个近似关系看清主要成本：</p>
+<p><strong>嵌入参数量 ≈ |V| × d</strong></p>
+<p><strong>注意力配对数 ≈ L²</strong></p>
+<p>当 |V| 增大时，词表可以直接容纳更多常见片段。原本需要多个 token 表示的片段可能合并成一个 token，于是同一份语料的平均序列长度 L 可能缩短。由于注意力需要在序列位置之间建立配对，L 下降会使约为 L² 的配对数显著减少，从而有机会节省序列处理成本。</p>
+<p>代价发生在词表相关参数上。输入嵌入矩阵需要为每个 token 保存一个 d 维向量，因此其规模随 |V| 线性增长；输出端用于在整个词表上分类的矩阵也会随词表扩大。若输入嵌入与输出权重共享，具体参数账会不同，但更大词表带来的覆盖收益与训练稀疏性问题仍然存在。</p>
+<p>词表扩大还会把训练证据分配给更多 token。高频片段可能因此获得紧凑表示，但罕见 token 出现次数少，能得到的参数更新也更少。于是，更短的序列并不自动意味着更好的学习：模型也可能付出更大的词表参数，并需要从较稀疏的数据中学好一部分词表项。</p>
+<p>反过来，较小词表能减少词表参数并让基本单位获得更密集的更新，却可能把文本切得更碎，增加 L，使同一内容占用更多上下文位置和计算。选择词表大小时，真正的问题是：增加 |V| 所换来的序列缩短，是否足以抵消参数增长和罕见项训练不足。</p>
+<p>因此，不能只比较“每字符 token 数”或单一压缩率。有效评估应同时报告词表相关参数量、实际语料上的序列长度分布、处理吞吐、下游任务质量，以及不同语言切片的结果。更高压缩率只表示文本用了更少 token，不等于模型必然学到了更好的语义表示。</p></div>
+<div class="dd-formula">嵌入参数量 ≈ |V| × d；注意力配对数 ≈ L²</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>分词效率为什么会影响多语言公平性<span class="dd-badge eng">覆盖</span></h2>
+<div class="dd-agent-response"><p>分词效率会决定一段信息占用多少 token，而上下文窗口、推理成本和截断通常都按 token 计算。因此，语义相近的内容如果在不同语言中产生不同长度的 token 序列，就可能消耗不同的上下文预算，并承受不同的截断风险。</p>
+<p>这种差异首先来自词表的学习数据。词表从训练语料中的频率模式形成：高资源语言里反复出现的常见词形，更容易被学习为较长、较完整的 token；覆盖较少的语言则可能更多地回退到字符或字节级单位。同样长度的可见文本，后者可能被拆成更多 token。</p>
+<p>可以按语言统计 fertility，即每词或每字符对应的 token 数，也可以比较压缩率。它们能描述 tokenizer 如何分配序列长度，却不能单独给出公平性结论。不同语言的形态结构和书写系统本就不同，某种语言产生更多 token 并不能直接被解释为歧视；还要观察这种长度差异是否真正转化成成本、截断或任务质量差异。</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">要测什么</th><th class="dd-align-left">为什么要测</th><th class="dd-align-left">要避免的误判</th></tr></thead><tbody><tr><td class="dd-align-left">每种语言的序列长度分布</td><td class="dd-align-left">估计实际成本与被截断概率</td><td class="dd-align-left">只看混合语料的全局平均</td></tr><tr><td class="dd-align-left">数字、姓名、代码等切片</td><td class="dd-align-left">检查复制能力和边界处理</td><td class="dd-align-left">只测试自然段落</td></tr><tr><td class="dd-align-left">任务准确率随 token 长度的变化</td><td class="dd-align-left">区分语言因素与长度因素</td><td class="dd-align-left">把所有质量差异都归因于 tokenizer</td></tr></tbody></table></div>
+-->
+<p>每语言长度分布比单个平均值更有信息，因为平均值可能掩盖长尾输入。若某种语言在同等内容下更常出现长序列，它会更快用完固定的上下文窗口，也可能在长度上限处更容易丢失尾部信息。</p>
+<p>数字、姓名和代码需要单独测试，因为它们对精确边界和复制尤为敏感。只测流畅的自然段落，无法说明 tokenizer 在这些结构化或罕见输入上是否把序列切得过碎，也无法反映模型能否稳定保留原始形式。</p>
+<p>最后，应把任务准确率与 token 长度放在一起观察。若质量随序列变长而下降，需要进一步区分是语言本身的数据与任务因素，还是 tokenizer 导致的额外长度在起作用。公平性评估的目标不是把一切语言差异消除，而是把“语料频率 → 分词粒度 → 序列预算 → 截断与任务表现”这条因果链逐段测量，避免只凭 token 数或单一质量指标下结论。</p></div>
+<table class="dd-table"><thead><tr><th>要测什么</th><th>为什么</th><th>避免的误判</th></tr></thead><tbody><tr><td>每语言长度分布</td><td>估计成本与截断概率</td><td>只看全局平均</td></tr><tr><td>数字、姓名、代码切片</td><td>检查复制与边界能力</td><td>只测自然段落</td></tr><tr><td>任务准确率随 token 长度</td><td>分离语言与长度因素</td><td>把所有差异归因于 tokenizer</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>特殊 token 和聊天模板为何属于模型协议<span class="dd-badge eng">接口</span></h2>
+<div class="dd-agent-response"><p>特殊 token 不只是普通字符串的缩写，而是模型输入协议中的控制符号。在预训练或指令微调过程中，某些固定 ID 会反复出现在特定位置，从而承担“序列开始”“用户开始”“助手开始”或“工具结果”等结构含义。模型学到的是这些 ID 及其上下文位置所形成的模式。</p>
+<p>聊天模板负责把人类可读的对话结构转换成模型训练时见过的 token 序列。它决定角色标记出现的顺序、各段之间的换行、消息终止位置，以及生成开始前是否需要助手前缀。于是，同一句用户问题只要套用不同角色标记或边界，模型实际接收的 ID 序列就不同，生成行为也可能随之改变。</p>
+<p>这种差异来自明确的因果链：</p>
+<p><strong>对话消息 → 模板排布 → 特殊 token 与文本 token 序列 → 模型所识别的角色和边界 → 生成结果</strong></p>
+<p>如果漏掉助手前缀，模型可能无法在熟悉的位置识别“现在应由助手继续”；重复插入 BOS，会让序列开头出现训练中不常见的结构；把 EOS 当作普通文本处理，则会混淆内容与结束信号。即使消息文字本身没有变化，这些错误也会把模型置于训练分布中不熟悉的输入状态。</p>
+<p>新增特殊 token 也不能只在词表中登记一个字符串。词表增加条目后，输入嵌入矩阵和输出分类矩阵需要扩展相应的新行；这些新参数还必须经过训练，才能获得与预期控制含义相符的表示和输出行为。仅有字符串名称，并不会自动让模型理解它代表某个角色、工具或概念。</p>
+<p>因此，聊天模板、tokenizer 文件、词表哈希和模型权重应被当成同一个发布单元。只替换其中一项，即使接口仍能输出整数 ID，也可能破坏模型训练时建立的协议对应关系。部署和复现时需要同时核对这几部分的版本，确保同一条消息始终被编码成模型预期的完整控制序列。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>数字、代码和复制任务为什么对边界敏感<span class="dd-badge intuition">能力</span></h2>
+<div class="dd-agent-response"><p>分词方式不会单独决定模型是否会算术、写代码或复制文本，但会改变这些能力需要学习的表示路径。边界如果与任务中的基本结构不对齐，模型就必须先从 token 内部恢复结构，再执行任务；边界过细，又会让序列显著变长。</p>
+<p>长数字是典型例子。若数字串被切成长度不稳定的片段，同一个十进制位在不同输入中可能落在 token 的不同内部位置。模型做逐位运算或精确复制时，除了学习数位之间的关系，还要学习如何从不同片段中恢复位结构。切分没有让运算变得不可能，却增加了需要同时掌握的边界变化。</p>
+<p>代码对缩进、换行和运算符边界同样敏感。如果这些结构与邻近内容被合并成不稳定片段，模型必须一边理解程序内容，一边推断 token 内部隐藏的格式边界。精确生成时，少一个空格、换行或运算符字符都可能改变结果。可是，把所有内容无条件拆成单字符也不是通用解法，因为序列长度会明显增加，消耗更多上下文位置。</p>
+<p>合理的切分是在结构可见性与序列长度之间权衡。判断方案好坏不能只凭 token 看起来是否像“人类词语”，而应在真实任务中测量：数字运算能否保持数位关系，代码能否保留格式和运算符，复制任务能否逐字节或逐字符复现目标，以及这些能力需要多长的 token 序列。</p>
+<p>生成阶段也要面对 token 边界。模型一次生成的是 token，但服务向用户输出时需要把 token 对应的数据还原为文本。一个流式块可能只包含某个 UTF-8 字符的部分字节，暂时无法独立解码；停止字符串也可能横跨两个或更多 token，甚至横跨相邻输出块。</p>
+<p>因此，服务端不能把每个 token 或网络块都当作独立完整文本。字节解码器需要保留跨块状态，等字符所需字节完整后再输出；停止匹配器也需要保留前一块的尾部，与新块共同判断是否出现停止串。这样才能避免乱码、漏停或把停止字符串的一部分错误地发送给用户。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Unicode 和偏移量怎样制造静默故障<span class="dd-badge eng">安全</span></h2>
+<div class="dd-agent-response"><p>屏幕上看起来相同的文本，底层不一定是同一串 Unicode 码点。例如，预组字符 <code>é</code> 可以由一个码点表示，也可以由 <code>e</code> 加组合重音表示；两者视觉效果可能相同，底层序列却不同。全角字符、不可见控制符，以及不同文字系统中外形相似的字符，也会造成“看起来一样、比较结果不同”的情况。</p>
+<p>这种差异会沿处理链传递。字符串匹配、正则规则、预切分和词表查找实际接收的是底层序列，而不是屏幕截图。因此，视觉相同的输入可能走过不同的边界，得到不同的 token 和 ID；形似字符或不可见字符还可能绕过只按字面字符串编写的规则。</p>
+<p>Unicode 规范化能够统一其中一部分等价表示，从而减少不必要的分歧。但规范化本身会改变底层文本，在要求逐字保真、精确复制或保留原始证据的任务中，这种改变可能不可接受。系统必须明确采用哪一种 Unicode 形式，并区分“用于模型处理的规范化文本”与“需要原样保存的原始文本”，而不能默认规范化永远无损。</p>
+<p>偏移量会进一步放大问题。不同组件可能用不同单位记录位置：</p>
+<ul><li>标注工具可能按用户看到的字符计数；</li><li>某些系统按 UTF-16 代码单元计数；</li><li>存储或网络组件可能按 UTF-8 字节计数；</li><li>tokenizer 还会输出自己的 offset mapping，把 token 映射回输入范围。</li></ul>
+<p>这些单位在纯 ASCII 文本中常常恰好一致，使错误长期隐藏；遇到多字节字符、组合字符或需要多个 UTF-16 代码单元的符号时，位置才会分离。若把一种单位的起止位置当成另一种使用，实体高亮会偏移，训练标签会落到错误片段，审计证据也可能指向错误文字。由于数值仍然是合法整数，这类故障通常不会触发异常，而是静默地产生错误结果。</p>
+<p>可靠的处理方式是为每个偏移量明确标注单位和所对应的文本版本，并在组件边界进行显式转换。原文、规范化文本与 token offset mapping 之间的关系需要一起保存；高亮、训练和审计时，应先确认坐标系，再把范围映射到目标文本。这样才能避免“字符串显示正确，但标签和证据悄悄错位”的故障。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>怎样做一次可复现的 tokenizer 验收<span class="dd-badge eng">检查表</span></h2>
+<div class="dd-agent-response"><p>一次可复现的 tokenizer 验收，目标不是证明它“能运行”，而是证明相同工件在不同时间、不同实现和不同输入边界下都产生预期结果。普通英文能够编码后再解码，只覆盖了最简单的路径，无法说明 Unicode、模板、偏移和流式处理是否可靠。</p>
+<p>首先要固定完整工件。需要保存词表、合并规则或分词模型、规范化规则、预切分规则、特殊 token 定义、聊天模板以及对应哈希。tokenizer 的行为由这些部分共同决定；只记录词表名称或版本号，无法保证后来重建的是同一条处理管线。</p>
+<p>往返测试应覆盖普通文本以外的边界输入，包括空串、换行、组合字符、emoji、CJK、从右到左书写的文本、代码和随机字节。测试要观察编码再解码是否按照接口约定恢复输入，并把允许发生的规范化变化与意外的数据丢失区分开来。</p>
+<p>仅检查解码后的文字仍然不够，因为不同 ID 序列有时可能还原成相同显示文本。需要建立黄金 ID 测试：固定若干代表性字符串及其精确 token ID 序列，在不同语言实现或部署环境中逐项比对。任何 ID、顺序或特殊标记的差异，都意味着实际送入模型的输入已经变化。</p>
+<p>offset mapping 也要单独验证。应把每个 token 的偏移重新映射到原文，检查得到的范围是否覆盖正确片段，尤其关注组合字符和代理对。这里必须同时确认偏移单位与文本版本，避免结果数值合法却落到错误位置。</p>
+<p>聊天模板的验证应直接打印应用模板后的完整 ID 序列。角色标记、BOS、EOS 和工具边界应只在约定位置出现预期次数。这样可以发现重复 BOS、遗漏助手前缀、错误结束符或工具消息边界错位，而不必等到模型行为异常后再反推原因。</p>
+<p>验收还要报告实际分布，而不只是少量样例。按语言和任务统计 token 长度、截断率、未知字符或字节回退情况以及延迟，才能判断某个实现是否在特定输入上显著拉长序列、增加截断或降低处理效率。</p>
+<p>最后，流式输出要通过随机分块测试。将同一输出按不同位置切成网络块，跨块维护 UTF-8 解码和停止串匹配状态，最终解码文本与停止位置都应保持不变。若改变分块方式就改变结果，说明服务错误地把传输块当成了字符或 token 的完整边界。</p>
+<p>这些测试共同建立可复现性：固定工件定义“测的是哪一个 tokenizer”，黄金 ID 与模板测试定义模型实际接收什么，offset 和往返测试验证文本映射，分布统计验证真实负载，随机分块验证服务边界。只有这些层面都稳定，接口才不只是能处理普通样例，而是具备可部署的确定行为。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>模型处理文本的完整因果链始于用户产生的 Unicode 字符串，终点则是服务重新输出的可见文本。中间每一次表示转换都会约束下一步，任何工件或边界规则变化，都可能改变模型实际接收和生成的离散序列。</p>
+<p>用户输入首先是一串 Unicode 数据，其中可能含有组合字符、不可见符号或多种底层表示。规范化规则决定是否把某些表示统一起来，预切分规则再依据空格、正则或其他约定建立候选边界。这两步共同决定子词算法实际面对的输入单位和可组合范围。</p>
+<p>随后，BPE、Unigram 或字节级规则把文本覆盖成有限词表中的片段。算法和词表共同决定哪些常见序列可以作为一个 token、哪些输入必须拆成多个较小单位。这个切分粒度直接改变序列长度，也改变每个 token 在训练语料中的出现频率，以及模型需要学习多少步组合才能恢复数字、词形、代码边界或其他结构。</p>
+<p>词表把每个片段映射成整数 ID，聊天模板则按协议插入角色、开始、结束或工具控制 token。此时模型不再直接看到用户界面中的字符，而只接收这条完整 ID 序列。嵌入矩阵按照每个 ID 查找相应行，把离散符号转换成向量；后续神经网络计算完全建立在这串位置和向量之上。</p>
+<p>因此，前端一个看似细小的变化也会向后传播：</p>
+<p><strong>Unicode 输入 → 规范化与预切分 → 子词覆盖 → 词表 ID → 模板控制 token → 嵌入向量 → 模型计算</strong></p>
+<p>若规范化改变了码点，预切分边界就可能变化；边界变化会改变子词组合；子词不同会改变 ID、序列长度和嵌入行；模型由此在不同位置上计算不同表示。即使屏幕显示的文字近似相同，最终行为也可能不同。</p>
+<p>生成方向沿相反路径返回。模型先预测 token ID，tokenizer 将其恢复为片段和字节，流式服务再跨输出块完成 UTF-8 解码与停止串检测，最终形成用户看到的文本。这里的 token 边界、字节边界和显示字符边界同样不保证重合，服务必须保存跨块状态。</p>
+<p>tokenizer 因而不是权重之外可随意替换的前处理工具。规范化、预切分、子词模型、词表、特殊 token、聊天模板、解码和流式边界处理共同定义模型的文本协议。任一部分发生变化，都应与模型权重一起验证并作为一致的发布单元交付。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>理解 tokenizer 之后，后续概念可以沿“离散 ID 如何进入模型、怎样在模型中交互、又如何可靠地返回文本”这条路径展开。每个方向都承接分词流水线中的一个接口。</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方向</th><th class="dd-align-left">接下来读</th><th class="dd-align-left">关键问题</th></tr></thead><tbody><tr><td class="dd-align-left">ID 如何变成向量</td><td class="dd-align-left">嵌入</td><td class="dd-align-left">离散索引怎样通过训练获得几何关系？</td></tr><tr><td class="dd-align-left">顺序如何进入模型</td><td class="dd-align-left">位置编码</td><td class="dd-align-left">token 已切好后，模型怎样知道先后和距离？</td></tr><tr><td class="dd-align-left">长度为何昂贵</td><td class="dd-align-left">自注意力</td><td class="dd-align-left">序列长度怎样进入时间与显存复杂度？</td></tr><tr><td class="dd-align-left">协议怎样训练</td><td class="dd-align-left">指令微调</td><td class="dd-align-left">角色和回答边界怎样成为监督信号？</td></tr><tr><td class="dd-align-left">上线怎样守住边界</td><td class="dd-align-left">模型服务</td><td class="dd-align-left">流式解码、截断和版本怎样监控？</td></tr></tbody></table></div>
+-->
+<p>词表把片段映射成 ID，但整数本身只承担索引作用。嵌入解释模型如何用 ID 查找向量，并在训练中让这些向量形成可用于计算的几何关系。这里需要区分“词表规定某个 ID 指向哪个片段”与“模型权重让该 ID 的向量学到什么”。</p>
+<p>tokenizer 输出的是有顺序的 ID 序列，但仅有 token 内容还不足以表达位置。位置编码进一步说明，模型如何把先后、距离等位置信息加入表示，使相同 token 出现在不同位置时能够参与不同的计算。</p>
+<p>序列长度由切分粒度直接影响，自注意力则说明这种长度为什么会转化为时间与显存成本。理解两者的连接，才能把 tokenizer 的压缩率变化解释为实际计算变化，而不是只停留在“token 数多或少”。</p>
+<p>角色标记、助手前缀和回答边界只有经过训练才会成为有意义的协议。指令微调展示这些控制 token 如何与输入、目标回答和监督信号共同出现，使模型学会在特定边界后执行相应角色。</p>
+<p>最后，模型服务负责把这些约定守在部署边界上。流式解码需要处理跨块字节状态，截断需要按真实 token 长度执行，版本管理则要保证权重、词表、规范化和模板一致。线上监控应能识别这些接口是否发生漂移。</p>
+<p>达到可实际运用的标准，意味着面对一段多语言文本和一个模型包时，能够画出从原始字节到 token ID 的每一步，能够根据语料频次手算一次 BPE 合并，并能指出更换词表、聊天模板或规范化规则后必须重新验证的接口。这样，分词就不再只是一个调用函数，而是一条能够解释、复现和验收的模型输入输出协议。</p></div>
+<table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>ID 如何变向量</td><td><a href="#" data-node="embedding">嵌入</a></td><td>离散索引怎样通过训练获得几何关系？</td></tr><tr><td>顺序如何进入模型</td><td><a href="#" data-node="positional-encoding">位置编码</a></td><td>token 已切好后，模型怎样知道先后和距离？</td></tr><tr><td>长度为何昂贵</td><td><a href="#" data-node="self-attention">自注意力</a></td><td>序列长度怎样进入时间与显存复杂度？</td></tr><tr><td>协议怎样训练</td><td><a href="#" data-node="instruction-tuning">指令微调</a></td><td>角色和回答边界怎样成为监督信号？</td></tr><tr><td>上线怎样守住边界</td><td><a href="#" data-node="model-serving">模型服务</a></td><td>流式解码、截断和版本如何监控？</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Neural Machine Translation of Rare Words with Subword Units</a>：BPE 子词方法。</li><li><a href="https://aclanthology.org/D18-2012/" target="_blank" rel="noopener">SentencePiece: A simple and language independent subword tokenizer and detokenizer</a>：原始文本上的 BPE/Unigram 实现。</li><li><a href="https://arxiv.org/abs/1909.03341" target="_blank" rel="noopener">Neural Machine Translation with Byte-Level Subwords</a>：字节级子词建模。</li><li><a href="https://www.unicode.org/reports/tr15/" target="_blank" rel="noopener">Unicode Standard Annex #15: Unicode Normalization Forms</a>：Unicode 规范化形式。</li></ul><p>流水线图、BPE 数值例子、工程检查表和对照表均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/tokenization">在地图中查看概念关系</a></nav>
+</article></main></body></html>

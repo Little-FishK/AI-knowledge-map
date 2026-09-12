@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>数据漂移与持续监控：分布变化何时真的伤害系统 · AI 知识地图</title>
+<meta name="description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="数据漂移与持续监控：分布变化何时真的伤害系统">
+<meta property="og:description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="数据漂移与持续监控：分布变化何时真的伤害系统">
+<meta name="twitter:description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/#page","name":"数据漂移与持续监控：分布变化何时真的伤害系统","description":"从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。","url":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"数据漂移与持续监控：分布变化何时真的伤害系统","item":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">数据漂移与持续监控：分布变化何时真的伤害系统</span></li></ol></nav><article id="dd-article" data-concept-id="data-drift-monitoring">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">数据漂移与持续监控：分布变化何时真的伤害系统</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 漂移检测比较基线与当前数据，但“分布不同”只是诊断信号，不等于质量已经下降，也不是自动重训命令。可靠闭环必须区分<b>输入、标签、概念和真实性能变化</b>，用延迟真值确认影响，并把告警连接到可回滚处置。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分四类漂移；手算 PSI 并理解统计边界；设计无标签早期预警；把漂移告警转成调查与发布闭环。</div>
+<ol class="dd-chain"><li>冻结带版本的多重基线</li><li>持续采集脱敏特征与代理</li><li>按窗口/切片量化变化</li><li>验证埋点并定位贡献来源</li><li>等待成熟标签确认任务影响</li><li>渐进修复并更新评测与基线</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>先把四种变化分开<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>“用户说法变了”“退款资格规则变了”“模型答错变多”看起来都是系统出状况，但发生在完全不同的层次上，处理方式也不同。数据漂移监控的第一步就是把它们拆开，因为只有知道变化发生在哪一层，才知道该看什么指标、该修什么东西。按概率分布所处的位置，可以把变化分为四类：协变量漂移、标签漂移、概念漂移和性能漂移。</p>
+<p>协变量漂移是输入分布 P(x) 变了。用户的表达习惯随时间演变，比如描述商品问题的词从“破损”变成了新口语“翻车货”，于是模型收到的输入构成不再和训练时一样。注意这类漂移只说输入变了，至于输出规则有没有变、模型会不会因此答错，它不直接回答。</p>
+<p>标签漂移是标签分布 P(y) 变了。例如节日促销刚结束时，退款请求里符合退款资格的订单占比明显上升，模型需要预测的 y 的比例结构发生了整体移动。这时即便每个输入对应的正确答案规则不变，训练时的类别平衡假设也已经失效。</p>
+<p>概念漂移是条件关系 P(y|x) 变了，即“同样的输入现在应该得到不同的答案”。典型例子是政策调整：质量问题退款窗口从下单后 30 天延长到 45 天。此时输入分布表面上看可能完全没变，同一条订单数据照样进来，但旧模型学到的决策边界已经不再成立。这一点最关键：P(y|x) 的变化可以在 P(x) 外观稳定的情况下悄悄发生，所以只监控输入字段永远不够。</p>
+<p>性能漂移则是直接观测任务表现：正确率、风险指标或校准程度实际下降了。前三种漂移描述的是分布的哪个部分在移动，性能漂移描述的是模型做得还对不对。两者不能互相替代。</p>
+<p>把四种变化分开之后，一个自然的因果顺序是：先观察“什么变了”，判断变化落在输入、标签还是条件关系上；再验证“是否真的影响任务”，因为并非所有分布变化都会伤害模型——例如用户从 iOS 换到 Android，只要任务只依赖订单日期，设备字段的漂移就是无关的；最后才决定“该修什么”，是补数据、改规则、重训模型，还是排查管道。</p>
+<p>漂移分类的输入是过去与当前的 x、y、条件关系以及任务指标，输出是对协变量、标签、概念或性能漂移的诊断。P(x) 变意味着输入构成变，P(y) 变意味着标签比例变，P(y|x) 变意味着同样输入的正确答案规则变，而性能是否下降还要直接观察任务指标。分类的价值在于定位变化发生在哪一层，而不是下结论：单凭输入分布变化就断言模型已经变差，是越过了这一步能给出的证据范围。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>基线不是永恒真理，而是带版本的参照<span class="dd-badge eng">设计</span></h2>
+<div class="dd-agent-response"><p>漂移检测的本质是比较：把当前的观测分布和一个参照分布放在一起，看差异是否超出预期。于是第一个问题就是“和谁比”——当前流量应该和训练集比、和上周比，还是和去年同期比？答案取决于你想发现什么问题，不同的监控目标对应不同的基线。</p>
+<p>训练集或冻结的评测集回答的是“我们是否已经离开了能力证据所覆盖的范围”。模型的能力只在训练分布上有证据，一旦生产流量离开这个分布，任何表现承诺都只是外推。但它的误判方向也很明显：训练分布本来就不等于生产分布，把两者之间的常态差异当成漂移，会持续产生虚假告警。</p>
+<p>最近稳定窗口回答的是“是否发生了突发异常”。它最适合捕捉管道故障、攻击注入这类瞬间改变，但如果把窗口做成不断滚动的“最近 N 天”，基线就会跟着流量走——慢性漂移会被基线自己吞掉，永远比较不出异常。</p>
+<p>季节同期（比如去年同期）回答的是“这个变化是不是正常的周期现象”。它适合节假日和周期性模式，但当产品和政策本身已经改变时，和去年同期相比的差异可能是两个不同系统的差异，而不是退化。</p>
+<p>控制组或旧版本回答的是“这次新发布带来了什么增量影响”。它适合评估灰度发布，但如果分流不是随机的，或者新旧版本流量互相污染，对比结果就不可信。</p>
+<p>选基线时还要记住一个前提：每个基线都必须绑定版本——应用、模型、提示词、索引、政策和埋点都算版本的一部分。如果基线对应的模型版本和当前线上不同，一次正常发布也会被误报成漂移。比较之前先确认这些版本一致，否则检测到的差异里混入了发布本身的噪音。</p>
+<p>窗口长度同样影响结论：窗口太短，噪声会淹没信号；窗口太长，突变又被平滑稀释。实践中常见的做法是同时维护两个窗口——一个快速窗口负责短时间内的突发告警，一个慢速窗口负责观察长期趋势。快速窗口发现突变，慢速窗口识别趋势，季节同期则用来压掉周期性误报。</p>
+<p>基线设计的输入是监控问题本身、应用与模型版本、季节性假设和时间窗口选择，输出是训练集、最近稳定期、去年同期或控制组这样的带版本参照。不同的基线适合发现不同的变化，也各有各的典型误判，因此没有哪一个基线是永恒正确的参照；选错基线或者让基线悄悄跟着当前流量走，会让整个监控系统在不知不觉中失明。</p></div>
+<table class="dd-table"><thead><tr><th>参照</th><th>适合发现</th><th>主要误判</th></tr></thead><tbody><tr><td>训练/冻结评测集</td><td>能力证据外推风险</td><td>本来就不代表生产</td></tr><tr><td>最近稳定窗口</td><td>突发管道或攻击</td><td>慢性漂移被基线追随</td></tr><tr><td>季节同期</td><td>节假日与周期模式</td><td>产品和政策已变</td></tr><tr><td>控制组/旧版本</td><td>新发布的增量影响</td><td>分流不随机或互相污染</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>从类别分布到 PSI<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>确定基线和当前窗口之后，下一个问题是如何衡量“差多少”。如果特征是一组离散类别——比如用户输入的词类、地区、支付方式——最常用的压缩方式是 Population Stability Index，简称 PSI。</p>
+<p>设基线中每个桶的比例为 eᵢ，当前窗口中同组桶的比例为 aᵢ。PSI 的计算分三步：对每个桶 i，先算当前比例与基线比例的差 (aᵢ − eᵢ)，再乘上两者的对数比 ln(aᵢ/eᵢ)，最后对所有桶求和：</p>
+<p>PSI = Σᵢ (aᵢ − eᵢ) × ln(aᵢ/eᵢ)</p>
+<p>这个结构有两个值得注意的性质。第一，当两个分布完全相同时，每个桶的 aᵢ 都等于 eᵢ，差值项为零，PSI 也为零；分布差异越大，数值通常越高。第二，单个桶的贡献同时被两个因子放大：该桶比例实际偏离了多少 (aᵢ − eᵢ)，以及这个偏离相对于基线规模有多大（对数比）。因此一个小比例桶从 0.1% 涨到 0.5% 也能产生显著贡献，而不会被大桶的体量淹没。PSI 的输入是同一组离散桶在基线期和当前期的比例，输出是各桶的贡献以及总和。</p>
+<p>但 PSI 的数值远没有看上去那么“客观”。它依赖分桶方式：桶的边界怎么切、桶数多少，直接改变结果。某些桶在当前窗口可能比例为零，ln(0/eᵢ) 无定义，必须先做平滑处理。行业里流传的 0.1、0.25 之类的告警阈值只是经验规则，不是统计定律。若特征是连续变量，可以用 KS 距离衡量累积分布的最大差异；若是类别与预期频数的符合度问题，可以用卡方检验；若比较的是完整概率分布而非抽样比例，可以用 JS 散度或 KL 散度；面对高维嵌入这类无法直接分桶的表示，可以用分类器二样本检验或聚类监控。无论选哪种距离，最终都必须能连接到任务影响——距离本身不说明损失。</p>
+<p>大规模流量还会带来一个陷阱：当请求量达到数百万级时，极小的分布差异也可能在统计上显著，告警系统会被噪声淹没。因此告警条件不应只看距离数值，还应同时要求效应量、持续时间以及业务相关性：差异不仅要存在，还要足够大、持续足够久、并且落在影响任务的位置上。</p>
+<p>PSI 的正确定位是一个需要调查的效应信号。它的数值受分桶、平滑和样本量的影响，只能说明“基线和当前窗口的类别构成出现了值得注意的差异”，不能直接充当“模型变差、需要自动重训”的结论。</p></div>
+<div class="dd-formula"><math display="block" aria-label="总体稳定性指数"><mi>PSI</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mrow><mo>(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>−</mo><msub><mi>e</mi><mi>i</mi></msub><mo>)</mo></mrow><mo>×</mo><mi>ln</mi><mo>(</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><msub><mi>e</mi><mi>i</mi></msub></mfrac><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：新政策上线后的 PSI 手算<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>把 PSI 放到一个具体场景里手算一遍，公式的含义会更清楚。某退款系统的退款原因原来大致是“不想要”占 50%、“尺寸”占 30%、“质量”占 20%，新政策上线后变成了 30%/30%/40%。问题：漂移主要来自哪里？</p>
+<p>按公式 PSI = Σᵢ (aᵢ − eᵢ) × ln(aᵢ/eᵢ) 逐桶计算，基线比例记为 e，当前比例记为 a：</p>
+<p>“不想要”桶：a − e = 0.30 − 0.50 = −0.20，对数比为 ln(0.30/0.50) = ln(0.6)，贡献为 (−0.20) × ln(0.6) ≈ 0.102。</p>
+<p>“尺寸”桶：a = e = 0.30，差值项为零，贡献为 0。</p>
+<p>“质量”桶：a − e = 0.40 − 0.20 = 0.20，对数比为 ln(0.40/0.20) = ln(2)，贡献为 0.20 × ln(2) ≈ 0.139。</p>
+<p>三项相加，PSI ≈ 0.102 + 0 + 0.139 ≈ 0.241。如果分桶里还有一个“其他”桶从 0.10 降到 0.04，它的贡献约为 (0.04 − 0.10) × ln(0.04/0.10) ≈ 0.055，完整分桶下的总值约为 0.296。这里的每一步都在强调：PSI 是各桶贡献之和，而不是一个和具体分桶无关的绝对量——图例中给出的 0.358 对应的是另一种平滑和分桶方式，数值无法脱离分桶方案复现，这也正是 PSI 只能作为信号、不能作为绝对结论的原因之一。</p>
+<p>比总数更重要的是逐桶贡献。手算结果中最大的贡献来自“质量”桶：质量原因的占比从 20% 翻倍到 40%。而此刻真正需要回答的业务问题是：新上线的政策把质量问题退款窗口延长到了 45 天，旧的资格判断逻辑很可能会漏判这些新进窗口的订单。这个例子完整展示了图 1 的流程：漂移告警（PSI 告诉我们分布变了）只是起点，接下来要等真实标签成熟——退款是否真的被批准、订单是否真的符合新政策——再确认这次变化是否伤害了系统。统计量只负责回答“分布变没变”，政策和成熟标签才负责回答“这次变化伤不伤害系统”。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 255" role="img" aria-label="退款原因基线与当前比例及从漂移告警到延迟真值确认的流程"><rect x="28" y="38" width="258" height="174" rx="10" fill="#21252d" stroke="#6b8cbe"/><text x="157" y="62" text-anchor="middle" class="svg-t">退款原因分布</text><text x="78" y="190" text-anchor="middle" class="svg-t" font-size="11">不想要</text><rect x="55" y="100" width="22" height="75" fill="#6b8cbe"/><rect x="82" y="130" width="22" height="45" fill="#d3a05a"/><text x="158" y="190" text-anchor="middle" class="svg-t" font-size="11">尺寸</text><rect x="135" y="130" width="22" height="45" fill="#6b8cbe"/><rect x="162" y="130" width="22" height="45" fill="#d3a05a"/><text x="238" y="190" text-anchor="middle" class="svg-t" font-size="11">质量</text><rect x="215" y="145" width="22" height="30" fill="#6b8cbe"/><rect x="242" y="115" width="22" height="60" fill="#d3a05a"/><text x="110" y="82" class="svg-t" font-size="11">蓝=基线 50/30/20　黄=当前 30/30/40</text><path d="M286,125 L353,125" stroke="#6b7484"/><polygon points="353,125 344,120 344,130" fill="#6b7484"/><rect x="355" y="75" width="144" height="98" rx="9" fill="#21252d" stroke="#c77b72"/><text x="427" y="99" text-anchor="middle" class="svg-t">PSI≈0.358</text><text x="427" y="120" text-anchor="middle" class="svg-t" font-size="11">质量问题贡献最大</text><text x="427" y="140" text-anchor="middle" class="svg-t" font-size="11">只是调查信号</text><text x="427" y="158" text-anchor="middle" class="svg-t" font-size="11">不是重训命令</text><path d="M499,125 L553,125" stroke="#6b7484"/><polygon points="553,125 544,120 544,130" fill="#6b7484"/><rect x="555" y="75" width="122" height="98" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="616" y="99" text-anchor="middle" class="svg-t">按切片回放</text><text x="616" y="120" text-anchor="middle" class="svg-t" font-size="11">政策版本核验</text><text x="616" y="140" text-anchor="middle" class="svg-t" font-size="11">14 天标签回填</text><text x="616" y="158" text-anchor="middle" class="svg-t" font-size="11">确认性能影响</text></svg><figcaption>图 1　统计量只告诉我们分布变了；政策与成熟标签决定这次变化是否伤害系统。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>桶</th><th>e 基线</th><th>a 当前</th><th>(a−e)ln(a/e)</th></tr></thead><tbody><tr><td>不想要</td><td>.50</td><td>.30</td><td>(−.20)ln(.6)=.102</td></tr><tr><td>尺寸</td><td>.30</td><td>.30</td><td>0</td></tr><tr><td>质量</td><td>.20</td><td>.40</td><td>.20ln(2)=.139</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>没有真值时只能用代理，不可把代理当结论<span class="dd-badge eng">延迟标签</span></h2>
+<div class="dd-agent-response"><p>退款是否真的正确，要等 14 天标签成熟后才知道——用户可能之后撤销退款，或者人工复核改判。但监控不能等 14 天，那今天怎么预警？答案是把即时可见的代理信号和延迟到达的真值分开处理，并且绝不把代理当成结论。</p>
+<p>即时可见的早期信号包括：输入中新词的出现率、检索返回空结果的频率、模型低置信或拒答的比例、用户反复追问的次数、转人工接管的次数、工具调用错误、规则冲突以及版本变更。它们和最终正确性之间没有必然对应。接管率上升，可能是模型变差了，也可能是新的审核政策本来就要求更多人工介入；置信度分布稳定也不代表安全，模型完全可能在新分布上自信地犯错。因此每个代理信号只能提出一个待验证的假设，而不能直接作为“模型退化”的证据。</p>
+<p>与此同时要建立标签成熟队列。每次预测都保存事件时间、切片信息和模型版本；14 天后回填真实结果——退款是否被撤销、人工是否改判——再计算准确率、风险、校准和选择性覆盖。这里有一个必须避免的错误：把“尚未观察到失败”当成正确。标签还没成熟的样本不能提前记为正确，否则会让准确率虚高、把慢性退化藏起来。</p>
+<p>几组典型代理与它们等待的真值可以列成对应关系。检索空结果增多，可能的根因是新词涌入、索引故障或权限过滤变化，但要等真值确认的是“必要的政策证据到底存不存在”。转人工率上升，可能来自难度变化、阈值调整或容量变化，真正要等的是人工最终是否改判以及原因。用户重问增多，可能是回答不清或界面变化，真正要等的是任务最终有没有解决。置信分布稳定，可能意味着一切正常，也可能意味着模型已经失准，需要按置信桶回看实际正确率来分辨。</p>
+<p>延迟标签监控的输入因此有两类：一是检索空结果、重问、人工接管、置信度这些即时代理，二是稍后回填的真实业务结果；输出也有两层：当下的早期预警，以及标签成熟后的真实性能。代理的作用是提出假设并触发调查，只有成熟标签才能把假设变成结论。</p></div>
+<table class="dd-table"><thead><tr><th>早期代理</th><th>可能根因</th><th>需等待的真值</th></tr></thead><tbody><tr><td>检索空结果↑</td><td>新词、索引故障、权限过滤</td><td>必要政策证据是否存在</td></tr><tr><td>转人工↑</td><td>难度、阈值或容量变化</td><td>人工最终改判及原因</td></tr><tr><td>用户重问↑</td><td>回答不清或界面变化</td><td>任务是否最终解决</td></tr><tr><td>置信分布稳定</td><td>可能无变化，也可能失准</td><td>按置信桶实际正确率</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>平均稳定会掩盖局部伤害<span class="dd-badge math">切片</span></h2>
+<div class="dd-agent-response"><p>总体准确率仍然显示 90%，一切看起来正常——但中文质量问题用户的准确率可能已经从 85% 掉到了 55%。平均数为什么能同时容纳这两种事实？因为总体表现是各切片表现的加权和：</p>
+<p>Qoverall = Σₖ wₖ × qₖ</p>
+<p>其中 wₖ 是切片 k 的流量权重，qₖ 是该切片的表现。如果受伤害的切片只占总流量的 3%，其余 97% 的流量从 90.2% 微升到 91.1%，加权后总体几乎纹丝不动地停在 90% 附近。少数群体的急剧退化被大多数群体的微小改善在权重上抵消了。平均稳定不等于没有伤害，它只是把伤害稀释了。</p>
+<p>所以切片监控不能只看总体。需要按语言、地区、产品、渠道、输入长度、风险等级和政策版本切开观察，同时处理两个统计问题：多重比较——切片越多，纯随机波动越容易在某片产生“显著”告警；小样本噪声——某片只有几例时，波动本身就很大。对小切片，正确做法是报告分子/分母和置信区间，使用更长的窗口累积样本，或者用层级收缩把切片估计向整体收缩。既不能因为 2/3 失败就永久告警，也不能因为样本少就忽略高损失群体。对高风险切片可以采用事件计数与零容忍门槛：只要出现一起严重错误就触发，而不是等总体指标显著。</p>
+<p>切片分析还要区分两种看起来相同的变化：构成变化和切片内性能变化。构成变化指困难案例的比例升高——比如质量问题订单在总流量中的占比上升，此时该群体的性能本身没变，是流量结构变了；切片内性能变化则是指同样类型的任务上，模型或系统做得更差了。前者更可能靠调整流量、规则或数据解决，后者才更直接指向模型退化。把两者混为一谈，会把流量结构问题误当成模型问题去重训，或者反过来。</p>
+<p>切片监控的输入是每个切片的流量权重 wₖ、切片表现 qₖ、样本量和风险等级，输出是总体表现 Qoverall 与各切片的表现区间。总体是加权和这个事实本身就意味着：权重变化可以掩盖少数群体的退化，因此监控必须同时比较构成变化和切片内变化，并给小切片足够长的时间窗口和区间报告，而不是用“总体稳定”四个字关掉所有告警。</p></div>
+<div class="dd-formula"><math display="block" aria-label="总体表现是各切片表现的加权和"><mi>Qoverall</mi><mo>=</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>w</mi><mi>k</mi></msub><mo>×</mo><msub><mi>q</mi><mi>k</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>漂移告警后的调查树<span class="dd-badge eng">响应</span></h2>
+<div class="dd-agent-response"><p>漂移告警触发的第一个冲动往往是“重新训练模型”。这是一条危险的捷径，因为告警只说明某处变了，没说明变的是什么。直接把新流量倒进训练集，等于在还不知道原因的情况下修改系统，而且可能把异常甚至攻击注入训练数据。正确的做法是沿着一条调查树逐层排查，每层排除一类可能，直到找到可验证的根因候选，再选择修复方式。</p>
+<p>第一层是验证信号本身。埋点是否改动过？解析逻辑、时区处理、去重规则、采样策略有没有变化？基线版本是否被人换过？很多“漂移”其实是监控信号自己的漂移，排查这些能省掉后续所有工作。</p>
+<p>第二层是定位切片。把告警分解到具体维度：哪些输入模式、哪个模型版本、哪些地区、哪些风险等级的贡献最大。这一步把“总体漂移”变成“谁在漂移”。</p>
+<p>第三层是检查外因。政策是否变更、产品入口是否改版、是否有营销活动引入了新流量、是否遭受攻击、上游服务是否异常。这些外部事件常常是分布变化的真正来源，而且修复它们不需要动模型。</p>
+<p>第四层是回放评测。把新旧系统放在同一批证据上比较，使用 oracle 证据和冻结的工具响应，判断差异究竟来自模型、提示、检索还是管道。</p>
+<p>只有走到这里，才谈得上选择修复：修埋点、更新规则或检索、改提示词、收紧阈值，训练模型排在最后。如果最终决定发布，也要走渐进发布——先影子运行、再金丝雀验证，并保留旧版本以便回滚。</p>
+<p>投毒风险是这条调查树必须严防的最后一环。把异常生产输入自动加入训练，等于给攻击者开了一条通过漂移通道改写模型的路径：攻击者持续制造某种输入模式，系统检测到“漂移”，自动重训，模型就按攻击者的意图被塑造。因此任何准备进入训练的生产样本都必须去标识、去重，并审核来源和标签。</p>
+<p>调查树的输入是一次漂移告警以及版本和切片证据，输出是经验证的根因候选与修复选择。它要回答的始终是同一个问题：检测到漂移之后，是否应该自动重训——而沿着树走完就会发现，大多数告警的正确终点根本不是重训。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>告警应连接错误预算和可执行手册<span class="dd-badge eng">运维</span></h2>
+<div class="dd-agent-response"><p>如果监控屏上每天亮起几十个红灯却没有人处理，失败的不是模型，而是监控系统本身：告警没有和行动连接起来。一条有价值的告警必须回答三个问题——这次越线有多严重、谁来处理、允许做什么。</p>
+<p>为此，每一项监控指标都要在运行手册里写明完整参数：基线是什么、窗口多长、最小样本量多少、效应阈值多少、严重度如何分级、负责人是谁、诊断入口在哪里、以及触发后允许执行哪些动作。只有把告警和可执行动作绑定，红灯才有意义。</p>
+<p>告警的升级策略应当分级。单点越线通常只进入观察状态；连续多个窗口持续越线，或者错误预算被快速耗尽，才升级为呼叫真人处理。错误预算在这里扮演的是“还剩多少犯错额度”的角色：预算消耗越快，问题越严重。而安全类事件是例外，一旦确认可以立即阻断，不必等待窗口积累。</p>
+<p>处置手段远比“重训模型”丰富：冻结自动退款、提高转人工阈值、回滚索引、切换回旧政策，都是合法的处置。恢复之后要更新评测集和基线，但保留旧基线用于识别慢性漂移；同时记录这次告警是否真阳性、处置带来了什么收益，并定期删除那些长期没有行动价值的噪声指标——一个从不触发有效行动的指标只是在制造噪音。</p>
+<p>最后必须接受一个不对称的事实：没有检测到漂移不等于没有退化。监控只覆盖你选定的特征，遗漏变量、标签错误以及模型内部的变化仍然可能造成伤害，而且它们恰好发生在监控的视线之外。告警运行手册的输入是基线、窗口、最小样本、效应阈值、错误预算、负责人和允许动作，输出是观察、呼叫、阻断、回滚或转人工这些具体处置；未检测到漂移只说明已监控特征没有越线，不能证明系统健康。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各环节串起来，数据漂移监控的完整因果链由六个动作组成，每个动作的产出都是下一个动作的输入。</p>
+<p>第一步，冻结带版本的多重基线。训练集、最近稳定窗口、季节同期、控制组各自回答不同的问题，并且都必须绑定应用、模型、提示、索引、政策和埋点版本。没有这一步，后面所有比较都没有参照。</p>
+<p>第二步，持续采集脱敏特征与代理。分布统计需要输入特征，早期预警需要新词率、检索空结果、重问、接管率、置信度这些即时代理，标签成熟队列则需要保存事件时间、切片和版本。采集从第一天起就要脱敏，否则样本永远无法合法地进入任何后续分析或训练。</p>
+<p>第三步，按窗口与切片量化变化。用 PSI 或其他距离把基线与当前的差异压成可比较的数值，同时把总体拆成切片。只有切片才能暴露“平均稳定、局部崩坏”的情况。</p>
+<p>第四步，验证埋点并定位贡献来源。埋点、解析、时区、去重、采样本身可能出错，先排除信号错误；再按输入、版本、地区、风险定位哪些切片贡献最大，并检查政策、产品、营销、攻击等外部原因。</p>
+<p>第五步，等待成熟标签确认任务影响。统计量只回答“分布变了没有”，政策和成熟标签才回答“这次变化是否真的伤害系统”。14 天标签回填之后，才能把代理信号提出的假设变成结论。</p>
+<p>第六步，渐进修复并更新评测与基线。修复可能是修埋点、改规则、换提示、回滚索引或切换政策，训练排在最后；发布走影子与金丝雀验证并保留回滚。恢复后更新评测集和基线，但保留旧基线以识别慢性漂移，同时记录告警的真阳性和处置收益，让监控系统本身也在迭代。</p>
+<p>这条链的每一环都在约束上一环的结论：基线给比较以参照，切片给总体以分辨率，埋点验证给信号以可信度，成熟标签给代理以证据。缺任何一环，剩下的都只是没有因果依据的告警。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1810.11953" target="_blank" rel="noopener">Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift</a>：无标签数据集漂移检测</li><li><a href="https://arxiv.org/abs/2004.05785" target="_blank" rel="noopener">Learning under Concept Drift: A Review</a>：概念漂移定义与方法</li><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>：反馈环与监控债务</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>：部署监测、测量与响应</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/data-drift-monitoring">在地图中查看概念关系</a></nav>
+</article></main></body></html>

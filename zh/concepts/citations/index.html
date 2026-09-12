@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>引用与证据对齐：把每个可核查主张连接到最小充分原文 · AI 知识地图</title>
+<meta name="description" content="从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/citations/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="引用与证据对齐：把每个可核查主张连接到最小充分原文">
+<meta property="og:description" content="从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/citations/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="引用与证据对齐：把每个可核查主张连接到最小充分原文">
+<meta name="twitter:description" content="从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/citations/#page","name":"引用与证据对齐：把每个可核查主张连接到最小充分原文","description":"从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。","url":"https://ai-knowledge-map.com/zh/concepts/citations/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"引用与证据对齐：把每个可核查主张连接到最小充分原文","item":"https://ai-knowledge-map.com/zh/concepts/citations/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">引用与证据对齐：把每个可核查主张连接到最小充分原文</span></li></ol></nav><article id="dd-article" data-concept-id="citations">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">引用与证据对齐：把每个可核查主张连接到最小充分原文</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从原子主张、稳定锚点和蕴含判断，到引用正确性、完整性与来源质量，建立真正可核验的回答。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 引用系统的核心不是生成链接，而是建立<b>主张—证据跨度—来源版本</b>的可验证映射；“引用真实存在”与“证据支持这句话”是两种完全不同的性质。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>把回答拆成需要引用的原子主张；计算引用正确性与完整性；设计稳定锚点和证据白名单；处理冲突来源、推断与版权边界。</div>
+<ol class="dd-chain"><li>识别答案中应引用的原子主张</li><li>从白名单检索候选证据</li><li>保留文档版本与最小跨度</li><li>判断证据是否蕴含主张</li><li>检查来源质量、时间与冲突</li><li>缺证据则删除/降格/拒答</li><li>渲染就近且可定位的引用</li><li>抽样复核正确性与完整性</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>引用是映射关系，不是答案装饰<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>## 引用是映射关系，不是答案装饰</p>
+<p>段落末尾挂着三个链接，看起来信息很扎实，但仔细核对后可能发现一句都没有真正被支持。原因在于：一个链接只能证明&quot;存在这样一份文档&quot;，它不说明这份文档里的哪句话支撑了紧邻的那个主张。文档可能谈的是完全不同的主题，可能只在一个脚注里顺带提过这个词，甚至可能与主张相矛盾。链接本身不携带语义证据，把链接当作证据本身就是一种混淆。</p>
+<p>正确的引用是一段可验证的映射关系：从答案中的一个主张出发，映射到来源文档中的一段特定文本，并且这段文本在语义上蕴含该主张。所谓蕴含，是指读了这段原文，一个理性的读者会认可&quot;它支持了这个主张&quot;，而不是&quot;它只是提到了同一个词&quot;。要维持这种映射，系统必须保留四类信息：文档身份（是哪一份文档）、版本（同一文档的不同版本内容会变，引用必须锁死到某个版本）、页码或段落位置、以及精确的字符跨度。有了字符跨度，读者才能一键跳回原句，亲眼确认&quot;原文确实这么说的&quot;。</p>
+<p>这一映射的输入与输出都很明确。输入是三样东西：被拆解后的原子主张、由检索阶段提供的证据白名单、以及白名单内稳定的文档跨度。输出则是从主张到版本化原文的可点击映射。因果链是单向的：先有检索到的真实文档跨度，再有对主张的支持判定，最后才有渲染出来的链接。顺序不能颠倒。</p>
+<p>模型在这个过程中承担的角色是选择，而不是创造。它不得凭记忆生成 URL——模型记忆里的网址可能是幻觉出来的、早已失效的，或是被替换过的镜像。正确做法是：模型从检索白名单里挑出证据 ID，指明该证据中支持主张的跨度；链接的生成交给渲染层，由渲染层根据证据 ID 查表拼出可点击地址。这样把&quot;证据选择&quot;和&quot;链接呈现&quot;分离，任何一层的错误都不会伪装成另一层的成功。</p>
+<p>由此可以得到一条解释规则：链接存在只证明文档可定位，跨度在语义上蕴含主张才算真正支持。据此检查时，对每个主张要问的不是&quot;附近有没有链接&quot;，而是&quot;链接指向的句子是否真的说了这件事&quot;。当白名单里没有能支撑某条主张的证据时，系统只有三个可接受的动作：删除该主张、把它降格为不确定的表述、或者直接拒答。第四个动作——补一个主题相关的链接充数——恰恰是最常见的错误。主题相关不等于语义支持，一个关于&quot;气候变化&quot;的链接并不能支撑&quot;某地区降水量下降 30%&quot;这样的具体数字。补链接制造的是被支持的表象，掩盖的是证据缺失的事实，其危害比诚实地说&quot;没有找到来源&quot;更大。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>先把复合句拆成原子主张<span class="dd-badge eng">主张</span></h2>
+<div class="dd-agent-response"><p>## 先把复合句拆成原子主张</p>
+<p>复合句是引用对齐最大的敌人。&quot;新模型速度更快、准确率更高，且成本下降了 30%&quot;——这句话里到底有几条需要证据的主张？至少三条：速度变快、准确率变高、成本下降 30%。这三条可以各自独立地为真或为假：一个模型可能确实更快但准确率毫无变化，或者更准但价格翻倍。把整句话当作一个引用单元，就永远无法知道哪个链接在支撑哪个部分。</p>
+<p>拆分的产物是原子主张：去掉连接词之后，仍保持完整语义、可以单独判断真假的最小陈述。速度、准确率、成本变化就是三个原子主张。拆分后再逐一检查，每条主张只绑定支持它的最小充分证据，一条证据不够就补，没有证据就按上一节的规则删除、降格或拒答。</p>
+<p>哪些原子主张需要引用？有一个实用的经验范围：数字、日期、归因、因果和比较通常需要引用。数字是最典型的——&quot;成本下降 30%&quot;这个 30% 必须有人测过；日期涉及事件的时间定位；归因涉及&quot;谁说的、谁做的&quot;；比较涉及&quot;比谁快、比哪一版快&quot;；因果涉及&quot;因为什么所以什么&quot;。这几类主张一旦失实，错误通常是可证伪且影响重大的。</p>
+<p>连接词是拆分时最隐蔽的陷阱，因为它们会悄悄引入额外断言。&quot;因为 A，所以 B&quot;表面上是一个句子，实际上包含两条主张：A 为真（事实主张），以及 A 与 B 之间存在因果关系（因果主张）。&quot;因为&quot;后面的部分需要的是因果证据，而不是&quot;A 确实发生过&quot;的证据——一份证明 A 发生的文档并不自动证明 A 导致了 B。同样，&quot;因此&quot;往往标志着作者自己的推断：前半句可能全部有来源，但&quot;因此&quot;之后的部分是作者在前半句基础上推出的新结论，需要单独审视它是否另有证据，还是仅属于系统推断。</p>
+<p>拆分时还要给每条原子主张标注类型：需引用的陈述、系统推断、还是主观建议。类型决定处理方式。主观建议本身可以不引用——&quot;建议采用分层缓存&quot;是观点，不是事实，硬找引用反而显得虚假。但支撑建议的事实前提仍需引用：如果建议的理由是&quot;分层缓存能降低 40% 延迟&quot;，这个 40% 就是可核查的事实主张，必须有自己的证据。同时要在表述中明确区分哪句是来源陈述、哪句是系统推断：推断可以被质疑、被修正，而如果它伪装成来源陈述，读者就失去了质疑的机会。</p>
+<p>整套流程的输入是回答中的复合句，输出是三类东西：可分别判断真假的原子主张、每条主张的类型标签（需引用／推断／建议）、以及针对需引用主张的证据需求清单。这个清单是后续检索与匹配的输入，它的质量直接决定整个引用系统的上限：拆分时漏掉的隐含主张，后面没有任何环节能补回来。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：计算引用正确性与完整性<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>## 完整示例：计算引用正确性与完整性</p>
+<p>一个回答里有四条应当被引用的主张 C1–C4，系统给出了三个引用 E1、E2、E3。逐条核对：E1 支持 C1，E2 与 C2 只是主题相关但并不蕴含，E3 支持 C3，C4 没有任何引用。这个系统到底做得好不好？只凭&quot;三个链接看起来都不少&quot;无法回答，必须分别计算两个指标。</p>
+<p>把四条主张和三条引用摊开看，每一条的判断依据是语义蕴含，而不是主题相近：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">主张</th><th class="dd-align-left">证据</th><th class="dd-align-left">判断</th><th class="dd-align-left">原因</th></tr></thead><tbody><tr><td class="dd-align-left">C1：发布于周一</td><td class="dd-align-left">E1 的日期行</td><td class="dd-align-left">支持</td><td class="dd-align-left">日期行直接蕴含发布时间</td></tr><tr><td class="dd-align-left">C2：成本降 30%</td><td class="dd-align-left">E2 的价格首页</td><td class="dd-align-left">不支持</td><td class="dd-align-left">页面没有任何 30% 的对比数据</td></tr><tr><td class="dd-align-left">C3：样本量为 500</td><td class="dd-align-left">E3 的方法段</td><td class="dd-align-left">支持</td><td class="dd-align-left">方法段写明 500 这一数字</td></tr><tr><td class="dd-align-left">C4：优于基线</td><td class="dd-align-left">无</td><td class="dd-align-left">缺失</td><td class="dd-align-left">未给出任何比较证据</td></tr></tbody></table></div>
+<p>E1 与 E3 是真正正确的引用：读证据原文就足以推出对应主张。E2 是典型的主题相关型失败——价格首页当然和成本沾边，但它不含 30% 这个数字，也不含任何&quot;下降前后对比&quot;，读者无法从该页推出 C2。C4 则完全没有证据。</p>
+<p>在此基础上定义两个指标。引用正确性（CitationPrecision）衡量已给出的链接里有多少是真的支持：三个已给引用中两个正确，正确性 = 2 ÷ 3 ≈ 66.7%。完整性（Coverage）衡量应当被引用的主张里有多少获得了正确支持：四个应引主张中 C1 和 C3 被支持，完整性 = 2 ÷ 4 = 50%。</p>
+<p>写成一般形式：输入是四类计数——应引主张总数 Nclaim、已给引用总数 Ncitation、正确支持的引用数 NsupportedCitation、被正确支持的主张数 NcoveredClaim。输出为：</p>
+<p>CitationPrecision = NsupportedCitation ÷ Ncitation；Coverage = NcoveredClaim ÷ Nclaim</p>
+<p>两个分数的分子含义不同：正确性的分子数的是&quot;引用&quot;（一个错误引用就拉低它），完整性的分子数的是&quot;主张&quot;（一条漏引的主张就拉低它）。分母也不同：正确性看的是系统给出的链接集合，完整性看的是回答中应当被支持的主张集合。</p>
+<p>66.7% 与 50% 说明的是两件不同的事，不能互相替代。66.7% 描述已给链接的质量——大多数给出的引用是真的支持；50% 描述应引主张的覆盖——一半本应带证据的主张没有得到支持。一个系统可以给出一条高质量引用但只覆盖四分之一的主张（正确性 100%，完整性 25%），也可以每条主张都有链接但一半是主题相关充数（完整性按粗算可能虚高，正确性暴露真相）。两个指标必须同时看：正确性防止用无关链接刷覆盖，完整性防止用少数精引掩盖大面积的证据缺失。</p></div>
+<table class="dd-table"><thead><tr><th>主张</th><th>证据</th><th>判断</th><th>原因</th></tr></thead><tbody><tr><td>C1 发布于周一</td><td>E1日期行</td><td>支持</td><td>直接蕴含</td></tr><tr><td>C2 成本降30%</td><td>E2价格首页</td><td>不支持</td><td>无30%对比</td></tr><tr><td>C3 样本为500</td><td>E3方法段</td><td>支持</td><td>直接数字</td></tr><tr><td>C4 优于基线</td><td>无</td><td>缺失</td><td>未给比较证据</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="引用正确性与应引主张覆盖率"><mi>CitationPrecision</mi><mo>=</mo><mfrac><mi>NsupportedCitation</mi><mi>Ncitation</mi></mfrac><mo>;</mo><mi>Coverage</mi><mo>=</mo><mfrac><mi>NcoveredClaim</mi><mi>Nclaim</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>证据锚点要经得住切块、更新与重排<span class="dd-badge eng">数据契约</span></h2>
+<div class="dd-agent-response"><p>## 证据锚点要经得住切块、更新与重排</p>
+<p>很多引用系统把 chunk ID 直接存进引用里：证据在检索库的第 7 号分块，引用就记录&quot;chunk_7&quot;。这在构建当下没有任何问题，但 chunk 是索引产物，不是文档本身的属性。检索库一旦重新切块——换了切块策略、改了窗口大小、或上游文档更新后重新索引——第 7 号分块的内容就变了。旧引用点击后会跳到一段无关文字，或者干脆失效。chunk ID 只是索引为了检索方便临时生成的坐标，把它当作永久引用地址，就是把脚手架当成了地基。</p>
+<p>稳定的引用需要锚定到文档自身的原始坐标，而不是索引坐标。一个经得起切块和更新的引用应保存五样东西：规范化的文档 ID（同一份文档无论被如何索引都指向同一标识）、内容版本或内容哈希（锁死引用时看到的是哪个版本）、原始页码或章节位置、精确的字符跨度、以及一句摘录（原文中支持主张的那句话的拷贝）。chunk 只是检索时的暂存容器，正确做法是保存&quot;chunk → 原始锚点&quot;的映射：切块改变后，引用先通过映射找回锚点，再定位原文。这样无论分块怎么变，引用指向的始终是同一句话。</p>
+<p>网页来源还要面对更新问题。线上文档会被编辑、重写甚至下线。抓取网页时必须同时记录抓取时间和快照标识，引用指向的是快照而不仅仅是网址。当旧版本无法再被定位时——页面已经改版、快照也已失效——系统要明确标注链接漂移，而不是悄悄把引用重定向到新文档首页。跳到首页等于放弃证据责任：读者点开链接看到的是一篇已经不同了的文章，还以为这就是原文。</p>
+<p>PDF 类文档的情况更复杂。表格、脚注和 OCR 提取的文本里，纯文本字符偏移不足以还原视觉上下文：一张表格在 OCR 后的文本流里被拆成零散的数字，&quot;第 3 页第 2 行&quot;这样的偏移可能落在表格中间，读者跳过去什么也对应不上。这类来源需要版面坐标或结构路径作为锚点的一部分，把引用定位到视觉上可辨认的位置。脚注同理——它和正文在文本流里可能相距很远，但引用需要的是&quot;哪条脚注&quot;这个结构化位置。</p>
+<p>引用点击失败本身就是信号，应当成为监控指标。用户每次点链接都是一次隐含的核验，点进去跳错位置、跳回首页或 404，都是锚点体系在某处断裂的直接证据。统计点击失败率、按来源文档聚合失败位置，可以在引用大规模失效之前定位到切块错误、快照过期或坐标映射 bug。一套引用系统如果在设计和运营上只关心&quot;生成时链接看起来对&quot;，而从不观察&quot;点击后是否真的到达原句&quot;，它的锚点迟早会在某次不起眼的索引重建里集体失准。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：生成前选择证据，生成后逐主张核验<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>## 原创图：生成前选择证据，生成后逐主张核验</p>
+<p>&quot;先写答案再补链接&quot;是伪引用的温床。在这个顺序里，答案的文字已经定型，链接只是事后贴上的装饰；模型此时没有任何动力去检查证据是否蕴含主张，最省力的做法是按主题搜一圈、挑几个关键词沾边的文档贴上去。主题相关的链接对读者有迷惑性——它们看起来都有关，但没有任何一条真的说了那句话。要阻断这条路，必须把引用的因果顺序倒过来：证据先于答案，核验先于渲染。</p>
+<p>生成过程可以表示为一条单行道。用户问题先经过证据检索，得到证据白名单；白名单与问题一起进入原子主张生成，产出可独立判断真假的主张集合。主张与证据在此汇合，构成一个主张—证据二部图：一边是主张节点，一边是证据节点，边代表&quot;这条证据蕴含这条主张&quot;。二部图形成后，先做蕴含完整性检查——每条应引主张是否都有边连到足够强的证据，同时核查来源质量，然后才进入渲染层，把通过验证的边变成带定位的链接。</p>
+<p>图 1 表达的核心结构是：答案不是&quot;文字 + 链接&quot;的扁平文本，而是可审计的主张—证据二部图。文字只是主张的表述层，链接只是图中通过验证的边的渲染形式。审计发生在图这一层：查每条边的蕴含关系、查孤立的主张节点、查证据的来源质量。文本层面看不到这些结构，所以只从文本出发做引用核对，等于在错误的抽象层上工作。</p>
+<p>整个过程构成一个证据闭环：输入是问题、白名单证据和原子主张，输出是主张—证据二部图、蕴含完整性检查结果和定位链接。闭环的约束在两端。生成前先选证据，把模型的语言空间限制在可用材料之内——模型只能基于白名单里的真实文档跨度来写主张，写不出证据之外的具体数字，因为生成阶段就没有那些材料。生成后再逐主张核验，用来抓漏：即使生成阶段有约束，模型仍可能写出证据没有蕴含的句子，或把两条主张绑到同一条只支持其一的证据上。核验阶段对每个主张检查其在二部图中的边是否存在、蕴含是否充分。</p>
+<p>验证失败的主张有三种处理方式：删除、降格、或补查。删除是把没有证据的主张从答案里移除；降格是把它改写为不确定的表述——&quot;有报告称&quot;、&quot;未经独立证实&quot;——让它不再以事实的口气出现；补查是针对证据不足但重要到不能删的主张，回头再检索一轮。三种方式里唯独没有&quot;给它贴一个主题相关的链接&quot;——那等于在二部图里画一条不存在的边，让审计者看见一个本不存在的支持关系。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 310" role="img" aria-label="用户问题经过证据检索和原子主张生成形成主张证据二部图，再经蕴含完整性和来源质量验证后渲染定位链接"><defs><marker id="c27a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="18" y="112" width="108" height="72" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="72" y="142" text-anchor="middle" class="svg-t">问题</text><text x="72" y="164" text-anchor="middle" class="svg-t" font-size="11">引用要求</text><path d="M126,148 L178,92" stroke="#788293" marker-end="url(#c27a)"/><path d="M126,148 L178,207" stroke="#788293" marker-end="url(#c27a)"/><rect x="183" y="48" width="155" height="88" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="260" y="77" text-anchor="middle" class="svg-t">证据白名单</text><text x="260" y="102" text-anchor="middle" class="svg-t" font-size="11">稳定ID · 版本 · 跨度</text><text x="260" y="122" text-anchor="middle" class="svg-t" font-size="11">来源质量 / 时间</text><rect x="183" y="173" width="155" height="88" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="260" y="202" text-anchor="middle" class="svg-t">原子主张</text><text x="260" y="227" text-anchor="middle" class="svg-t" font-size="11">事实 / 数字 / 归因</text><text x="260" y="247" text-anchor="middle" class="svg-t" font-size="11">推断明确标注</text><path d="M338,92 L400,136" stroke="#788293" marker-end="url(#c27a)"/><path d="M338,217 L400,168" stroke="#788293" marker-end="url(#c27a)"/><rect x="405" y="88" width="145" height="128" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="477" y="118" text-anchor="middle" class="svg-t">主张—证据图</text><text x="477" y="145" text-anchor="middle" class="svg-t" font-size="11">蕴含正确性</text><text x="477" y="169" text-anchor="middle" class="svg-t" font-size="11">应引完整性</text><text x="477" y="193" text-anchor="middle" class="svg-t" font-size="11">冲突 / 时效 / 权威</text><path d="M550,152 L600,152" stroke="#788293" marker-end="url(#c27a)"/><rect x="605" y="88" width="112" height="128" rx="9" fill="#21252d" stroke="#72b293"/><text x="661" y="119" text-anchor="middle" class="svg-t">渲染</text><text x="661" y="146" text-anchor="middle" class="svg-t" font-size="11">就近标记</text><text x="661" y="169" text-anchor="middle" class="svg-t" font-size="11">点击原句</text><text x="661" y="193" text-anchor="middle" class="svg-t" font-size="11">缺证据降格</text></svg><figcaption>图 1　答案不是“文字+链接”，而是可审计的主张—证据二部图。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>蕴含、来源质量与事实真值要分别判断<span class="dd-badge eng">三层验证</span></h2>
+<div class="dd-agent-response"><p>## 蕴含、来源质量与事实真值要分别判断</p>
+<p>一篇可信度很低的自媒体文章确实写了&quot;某药物有效&quot;这句话，模型把这句话引用到&quot;该药物有效&quot;的主张下。这个引用算正确吗？这取决于问的是哪一层的问题。从对齐角度看，引用是忠实的——它准确支持了&quot;该文章声称该药物有效&quot;这个归因陈述；但从事实角度看，药物是否有效仍然未知，一篇低质量文章的声称不构成任何事实证据。两个判断都是真的，它们回答的是不同的问题，混在一起就会同时得出&quot;引用正确&quot;和&quot;结论可疑&quot;两个互相矛盾的印象。</p>
+<p>正确的验证分成三层，每层独立输出一个结果。第一层是蕴含判断：证据的特定跨度是否在语义上蕴含主张。它只回答&quot;原文说了这件事吗&quot;，完全不涉及原文对不对。第二层是来源适用性：这个来源是否适合支撑这条主张。一个论坛帖子蕴含了&quot;该软件有漏洞&quot;并不等于它能支撑这个主张——漏洞声明需要一手资料、原始研究或官方记录。来源适用性还要检查发布日期（三年前的评测对今天的版本还有效吗）、样本（实验室小样本能否推广到生产环境）与适用范围。第三层是事实真值：多个相互独立的来源是否共同支持这个事实。单一一手资料也可能只适用于特定样本和特定时间，事实层面的可信度需要跨来源的交叉印证。</p>
+<p>三层的关系是依次加深，但互相不蕴含。文章确实声称 X，只证明第一层（归因忠实）成立，不能证明 X 为真；一手资料能通过第二层（来源适合），但它记录的可能只是一个特定条件下的观察，第三层仍要看独立来源的收敛程度。反过来，多个来源共同支持一个事实，也不意味着某个具体引用在蕴含层面是合格的——引用仍然可能贴错了跨度。</p>
+<p>三个层次对应三组不同的输入。蕴含判断的输入是主张与支持跨度；来源适用性的输入是主张与来源属性（来源类型、发布日期、样本描述）；事实可信度的输入是主张与多条独立的事实证据。输出是三个可以各自成立的结果：蕴含判断、来源适用性、事实可信度。任何一个结果为否，都意味着答案在该层有缺陷，需要不同的修复——蕴含失败要换证据或改主张，来源不适要换来源或降格表述，事实冲突则要回到冲突处理机制。</p>
+<p>自动蕴含模型在这套体系里只能承担筛查角色。它擅长快速判断&quot;这段文字是否大体支持这句话&quot;，但在几类高难度语言现象上并不可靠：否定词（&quot;未能复现&quot;与&quot;复现&quot;只差两个字）、表格数据、范围限定词（&quot;在特定条件下&quot;&quot;部分样本&quot;）、以及需要跨句拼接才能成立的推断。这些情况必须靠人工抽检兜底。自动筛查把大量明确失败的案例过滤掉，剩下需要人看的是边界案例；两者是流水线关系，任何一环试图替代另一环，都会以特定方式出错。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>冲突证据不能被静默平均<span class="dd-badge eng">冲突</span></h2>
+<div class="dd-agent-response"><p>## 冲突证据不能被静默平均</p>
+<p>两个同样可信的来源给出不同数字：A 报告市占率 18%，B 报告 24%。模型该选哪个？直接选检索结果里排在第一位的那条，是最省力也是最常见的错误。检索名次衡量的是查询相关性，不是证据可信度，更不是事实裁决权。排名靠前只说明它更容易被找到，与它是否更接近真相没有关系。</p>
+<p>处理冲突的第一步不是选择，而是检查冲突是否真实存在。数字不同常常是因为双方描述的其实不是同一件事：口径不同（一个统计装机量，一个统计活跃用户）、时间不同（一个用季度数据，一个用年度数据）、版本不同（产品改版前后的指标）、群体不同（全球市场与某国市场）。逐一核对口径、时间、版本和群体之后，相当一部分&quot;冲突&quot;会自然消解——18% 和 24% 可能分别对应两个不同定义的市场，两者可以同时为真。</p>
+<p>若核对后冲突仍然真实存在，正确的输出是并列呈现，而不是裁决。答案中同时列出 A 的主张、其证据与适用条件，以及 B 的主张、其证据与适用条件，并明确说明系统无法在两者之间裁决。隐瞒任何一方都是篡改证据图景：读者有权知道可信来源之间存在分歧。把&quot;并列呈现&quot;写成&quot;答案更长了&quot;是懒惰；这多出来的长度恰恰是诚实的最小代价。</p>
+<p>当必须做出综合推断时，推断必须被标注为推断。例如 A 与 B 的数字不同但指向同一趋势，可以写&quot;根据 A 与 B 的数据推断，该指标呈上升趋势&quot;——&quot;根据 A 与 B 推断&quot;这几个字不可省略。省略之后，推断就伪装成了某个来源的原话，读者会把系统自己的结论当作 A 的权威陈述。来源陈述与系统推断的区分在这里再次成为硬性要求：任何超出单一来源原文的结论，都必须标明它是由哪些来源、通过什么方式推得的。</p>
+<p>整个冲突处理流程的输入是多个来源的数字，连同各自的口径、时间、版本、群体与权威信息；输出只有两种形态：核对后能裁决的，给出带理由的选择；核对后仍冲突的，给出保留双方及各自适用条件的并列说明。第三种形态——取个平均数、或挑一条顺眼的写进去——在正确性上是不可接受的：平均数可能落在任何一个来源都没有支持过的位置，而静默挑选则把一个开放性分歧伪装成了确定事实。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>引用界面也是验证系统的一部分<span class="dd-badge eng">交互</span></h2>
+<div class="dd-agent-response"><p>## 引用界面也是验证系统的一部分</p>
+<p>用户点开引用标记，落到的是文档首页，需要自己从头翻找那句话——这算可核验吗？不算。验证的全部意义在于读者能回到支持跨度本身，把答案的主张和原文的句子并排对照。只到首页，等于把&quot;找到证据&quot;的工作从系统转移给了用户，而首页可能是几百页的报告或几千行的页面，绝大多数用户会在这一步放弃。可核验的下限不是&quot;链接能打开&quot;，而是&quot;点击后高亮出支持这句话的那段原文&quot;。</p>
+<p>界面的每个环节都有对应的职责。引用标记必须紧邻它所支持的主张——标记悬空在段落末尾、读者分不清它管的是哪句话，是界面层制造出的伪引用。悬停时显示短摘录、来源名称和日期，让读者不点击就能判断这条证据是否值得点开；点击后跳转到锚点定位的原句并高亮其上下文，让蕴含关系可以被亲眼确认。当多条主张共用同一条证据时，界面要明确标出这条证据覆盖的是哪几句的范围；当同一条主张需要多个来源时，各来源并列呈现，而不是只给一个&quot;代表&quot;链接。</p>
+<p>移动端是引用界面的现实约束。若引用的摘录和详情只在桌面端的 hover 状态下可见，触屏用户就完全失去了这一层信息。移动端必须提供可展开的交互，让摘要、来源与跳转能力在无悬停的环境下同样可达。界面设计在这里不是美学问题：任何平台上的用户无法核验，这个平台上输出的引用在该维度上就等同于没有验证。</p>
+<p>摘录的呈现受两重边界约束。一是最小充分上下文——摘录只包含足以让读者判断蕴含关系的原文片段，不整段搬运；这既保护读者注意力，也避免过量复制受版权保护的内容。二是访问权限的诚实性——对付费墙或受限来源，界面要说明访问限制，不能用无法公开核验的摘录冒充开放证据。给出一条别人点不开的&quot;证据&quot;并暗示它已被核验，是在验证链路里制造假出口。</p>
+<p>因此引用界面的输入不只是链接地址，而是五样东西：主张、最小摘录、来源与日期、定位锚点、访问权限。输出对应三个交互层：紧邻主张的标记、悬停（或移动端点击）可见的摘要、点击后高亮原句的定位。三层都成立，读者才真正完成了从答案到证据的往返——而系统的正确性指标，正是以这个往返能否走通来定义的。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要有人标主张，也要测定位是否真的可用<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>## 评测要有人标主张，也要测定位是否真的可用</p>
+<p>自动检查每个引用 URL 是否返回 200，是很多系统的全部引用评测。这个检查能捕捉到的最严重错误是&quot;链接完全失效&quot;，而它恰恰是用户最容易自行发现的错误。返回 200 只证明资源可访问：链接可能指向文档首页而非支持原句，可能指向同一文档里无关的段落，也可能指向一篇主题沾边但什么都没说的文章。用可访问性代替正确性，等于只测了验证系统最容易的一环，却把最难的几环全部放行。</p>
+<p>评测必须建立在人工标注集上。标注者要做的事比&quot;看链接&quot;重得多：把回答拆成应引主张、为每条主张标注最小充分证据、判断证据与主张的蕴含关系、并标注来源质量。这个标注集就是引用评测的金标准——没有它，蕴含关系无法客观判定，所有指标都退化成形式检查。</p>
+<p>在标注集上分别报告六类指标：引用正确性与完整性（沿用前文公式）、无效或错位锚点率（点击后无法到达支持跨度的引用占比）、来源层级（一手资料、原始研究、正式记录等层级的分布）、冲突覆盖（遇到冲突证据时是否并列呈现）、以及答案本身的任务质量——因为一个任务质量很差的答案，引用格式再标准也没有意义。指标还要按困难维度切片：数字、日期、因果、表格、多跳推断各为一类。数字和日期是蕴含判定的基础难度；因果、表格和多跳推断恰恰是自动蕴含模型最容易出错的场景，若不单独切片，这些类别的系统性失败会被总体指标稀释掉。</p>
+<p>评测集里必须包含&quot;无足够证据&quot;的问题。一个系统在证据不足时拒绝回答或降格表述，是引用纪律的一部分；如果把评测限定为&quot;每个问题都必须生成带引用的答案&quot;，系统就会被训练成对任何问题都硬凑引用。结果是一边提高形式覆盖率，一边制造更隐蔽的伪引用——每条主张都有链接、每个链接都返回 200，但蕴含关系大面积不成立。这类错误比诚实的拒答更难发现：它通过了所有形式检查，只能被人工蕴含标注抓出来。</p>
+<p>引用评测的输入因此是四样人工产物：拆好的主张、金标证据、蕴含标注与来源质量标注；输出是六类指标及其按维度的切片。链接可访问性只是其中错位率的一个微弱近似。把评测资源花在人工标蕴含上，还是花在扩大自动 URL 检查的覆盖面，决定了这套系统最终被优化的方向：前者优化&quot;引用真的支持&quot;，后者优化&quot;引用看起来能点开&quot;。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>先澄清：检索、引用、归因与事实核查是四道不同关<span class="dd-badge intuition">概念消歧</span></h2>
+<div class="dd-agent-response"><p>## 先澄清：检索、引用、归因与事实核查是四道不同关</p>
+<p>系统明明检索到了正确的论文，答案仍然可能不可靠。这类失败之所以让人困惑，是因为把四道不同的关当成了同一件事。</p>
+<p>检索只做一件事：把候选材料带进上下文。它保证&quot;这份材料被系统看见了&quot;，仅此而已。引用把答案中的主张连接到材料的某个跨度，保证&quot;这句话有出处&quot;。归因忠实表达&quot;谁说了什么&quot;，保证出处与表述之间没有偷换——检索到正确论文后，系统完全可能把实验组的数字写成对照组的数字，此时引用是真实的，但归因已经失真。事实核查再往前一步，判断该说法本身是否可信：系统可以完美地引用一篇已被撤稿的论文，引用和归因都合格，结论却建立在失效的证据上。</p>
+<p>四道关的失败模式各不相同，修的地方也不同。没找到关键文档，是检索召回问题，答案表现为缺证。引用到邻近的数字——链接真实但原文那句说的是另一个指标——是跨度与蕴含问题。把作者的假设写成结论，是归因失真，属于主张类型标注错误。只用过时的二手来源，是来源与事实核查问题：主张有支持，仍然可能错。四道关必须分别记录通过或失败，一个笼统的&quot;grounded&quot;标签会把四类失败抹成同一种颜色，让人无法定位该修哪一层。</p>
+<p>证据与解释的区分也在这组概念里。证据是可定位的材料；解释是基于材料的综合，它跨越了多条证据、加入了推断。解释可以很有价值，但必须显式标出推断步骤、适用条件和不确定性。统计结论是解释失真最集中的地方：对于&quot;没有显著差异&quot;这类结论，只引用摘要里&quot;结果不显著&quot;的邻近句远远不够——摘要的表述可能省去了比较对象、指标、置信区间与样本信息。引用必须支撑的不是&quot;结果不显著&quot;这五个字，而是&quot;在什么比较、什么指标、什么样本上不显著&quot;。核对范围若与主张范围不一致，引用在蕴含层面就不成立。</p>
+<p>初学者最易混淆的正是这一点：&quot;答案有引用&quot;最多说明存在一条链接。只有主张拆分、跨度蕴含、来源质量和冲突检查都通过，答案才接近可核验。四道关的概念辨析把输入分成四份：检索结果、引用跨度、归因表述、事实核查证据；输出是四道关各自通过或失败的状态。任何一道关失败，都会以不同的症状出现在最终答案里，而它们没有一道能被其他关的通过所弥补。</p></div>
+<table class="dd-table"><thead><tr><th>失败</th><th>表面现象</th><th>应修哪一层</th></tr></thead><tbody><tr><td>没找到关键文档</td><td>答案缺证</td><td>检索召回</td></tr><tr><td>引用到邻近数字</td><td>链接真实但不支持</td><td>跨度/蕴含</td></tr><tr><td>把作者假设写成结论</td><td>归因失真</td><td>主张类型</td></tr><tr><td>只用过时二手来源</td><td>有支持仍可能错</td><td>来源与事实核查</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>## 把因果链连起来</p>
+<p>引用系统里的每一个环节都依赖上一个环节的输出，也决定着下一个环节能做什么。把因果链完整走一遍，才能看清某一步的偷工减料最终会以什么形式出现在用户面前。</p>
+<p>链条的起点是识别答案中应引用的原子主张。复合句被拆开，连接词引出的隐含断言被挑出来，每一条主张都标上&quot;需引用、推断或建议&quot;的类型。这一步漏掉的主张不会在任何后续环节被补回——检索不知道要去找什么证据，验证不知道该检查什么蕴含。</p>
+<p>有了主张，才有检索的输入：从白名单中找候选证据。白名单是这环节的边界，模型只能在其中挑选，不能凭记忆生成网址。检索带回的候选材料带着文档身份，紧接着被固化为稳定的引用锚点——文档版本、页码或章节、字符跨度和最小摘录一起保留，使引用不依赖随时会变的 chunk ID。</p>
+<p>锚点固定之后才轮到蕴含判断：证据的特定跨度是否在语义上支持主张。判断依据是跨度内容能否推出主张，而不是主题是否相近。通过蕴含检查的证据还要再过来源质量关——发布日期、样本、适用范围、来源层级，以及与其他来源的冲突。冲突不能静默平均，无法裁决时要并列呈现双方及其适用条件。</p>
+<p>所有验证都完成后，证据缺失的出路只有三条：删除主张、降格为不确定表述、或拒答。补一个主题相关的链接不在这三条之内——它是把验证失败伪装成验证成功。只有通过验证的边才会进入渲染：引用标记紧邻主张，悬停显示摘录与来源，点击定位并高亮原句，移动端同样可展开。渲染是因果链的出口，但它能呈现的只是上游已经成立的支持关系。</p>
+<p>链条并不在渲染处结束。抽样复核引用正确性与完整性，是把整条链当作一个可观测系统在运营：已给引用里有多少真支持，应引主张里有多少被覆盖，点击失败率是否在上升。复核发现的问题沿着因果链反向定位——错位率指向锚点层，蕴含失败指向验证层，覆盖率低指向拆分或检索层。链路每一环的输出质量最终都由这个闭合的复核来度量，而度量的结果又成为下一轮修正的输入。整个系统因此不是一个&quot;生成时贴好链接&quot;的动作，而是一条从主张到证据、再回到主张的持续往返路径。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2305.14627" target="_blank" rel="noopener">ALCE</a>：带引用长文本生成与评测</li><li><a href="https://arxiv.org/abs/2305.14251" target="_blank" rel="noopener">FActScore</a>：原子事实层面的细粒度评估</li><li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Retrieval-Augmented Generation</a>：检索增强生成基础</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/citations">在地图中查看概念关系</a></nav>
+</article></main></body></html>

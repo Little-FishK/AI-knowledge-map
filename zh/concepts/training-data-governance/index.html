@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>训练数据治理：让模型所学内容可追溯、可审计、可处置 · AI 知识地图</title>
+<meta name="description" content="从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/training-data-governance/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="训练数据治理：让模型所学内容可追溯、可审计、可处置">
+<meta property="og:description" content="从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/training-data-governance/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="训练数据治理：让模型所学内容可追溯、可审计、可处置">
+<meta name="twitter:description" content="从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/training-data-governance/#page","name":"训练数据治理：让模型所学内容可追溯、可审计、可处置","description":"从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。","url":"https://ai-knowledge-map.com/zh/concepts/training-data-governance/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"训练数据治理：让模型所学内容可追溯、可审计、可处置","item":"https://ai-knowledge-map.com/zh/concepts/training-data-governance/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">训练数据治理：让模型所学内容可追溯、可审计、可处置</span></li></ol></nav><article id="dd-article" data-concept-id="training-data-governance">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">训练数据治理：让模型所学内容可追溯、可审计、可处置</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从来源与授权、谱系、过滤去重和配比，到污染、删除请求、训练快照与事故响应。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 训练数据治理不是训练前清洗一次，而是贯穿获取、授权、处理、配比、训练、评测、响应和退役的控制系统。目标不是声称数据“绝对干净”，而是建立<b>样本—处理—快照—模型—评测</b>的可追溯关系，并在风险出现时知道能做什么、不能证明什么。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>设计数据谱系和版本清单；推导重复与配比的有效权重；区分许可、隐私、污染和投毒；处理删除请求与模型影响验证。</div>
+<ol class="dd-chain"><li>登记来源/授权/敏感等级</li><li>版本化处理与去重原因</li><li>显式设计混合配比并隔离评测</li><li>冻结清单连接训练运行与模型</li><li>训练后评测记忆/偏差/能力</li><li>事故或请求沿谱系处置并更新门禁</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>治理对象是生命周期，不是一个文件夹<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>很多团队会在训练前专门扫一遍语料，把敏感词删掉，然后放心地认为数据已经&quot;干净&quot;了。可模型部署之后，版权纠纷、隐私泄露、记忆事故照样出现。原因不在删词这一步做得不够狠，而在于他们治理的对象选错了：他们把训练数据当成一个静止的文件夹，以为删过一次就一劳永逸，而真实的训练数据是一条持续流动的流水线。</p>
+<p>一条数据从互联网上被抓取下来之后，会经历解压、规范化、切块、去重、分类、混合，还会被复制成多个不同用途的快照；每一步都在改变数据的形态和内容。更麻烦的是，规则、许可协议和当事人提出的删除请求并不会停留在训练那一刻——训练完成后它们仍在变化，许可证可能被撤回，用户可能行使删除权，法律也可能更新。模型上线后一旦出现问题，团队又会反过来制造修复数据和新的评测题，这些新材料同样要汇入同一条流水线。也就是说，数据集合的边界始终在扩张和变形，不存在一个可以&quot;删干净之后封存&quot;的静态版本。</p>
+<p>面对这样一条流水线，治理必须回答四件事，而不是只问&quot;文件里现在有什么&quot;。第一，这份数据为什么能用——它的授权依据是什么；第二，它经历了哪些处理——每一步转换是什么、由谁做的；第三，它最终进入了哪些模型——训练清单里有没有它的位置；第四，一旦发现问题，能定位到什么程度、又能处置到什么程度。只保存一份最终合并好的 parquet 文件，这四件事一件也答不上来：parquet 里只剩下混合之后的内容，来源、许可、处理步骤和影响范围全都丢失了。</p>
+<p>所以治理真正需要维护的是一整条证据链，而不是一个存储位置。来源记录证明数据&quot;从哪里来&quot;，授权记录说明它&quot;为何可用&quot;，处理谱系记录它&quot;怎样被改变&quot;，训练清单则标明它&quot;影响了哪些模型&quot;。四者缺一，就一定会出现开头那种局面：训练前删过词，部署后依然拿不出依据来回应版权、隐私和记忆事故的追责。删词只是流水线上的一次操作，而操作本身也需要被记录、被定位、被追溯——治理的对象是这条流水线的完整生命周期，而不是流水线末端的那一个文件夹。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>谱系要从样本连到模型发布<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>事故响应里最常见的追问有两个方向：模型吐出了一段疑似复述的个人信息，怎么找到语料里它所有的副本、又影响了哪些已发布模型？反向也一样——发现某条来源数据有问题，怎么知道它扩散到了哪些产物和版本？这两个方向都要求谱系能够双向可查，而不是只能从数据一路推到模型、却回不到源头。</p>
+<p>要让这种双向追踪成立，需要在链路的每一环留下稳定的、可反向链接的锚点，而不是事后临时去拼。对原始对象，要保存稳定的 source id、获取时间、URI、内容哈希、许可与用途限制、地域归属和敏感分类。source id 保证同一来源在不同快照里还能被认出来，内容哈希保证&quot;这是同一份内容&quot;的判断不被文件名或路径误导，许可与用途字段则把&quot;这段文字能不能用于当前用途&quot;的答案留在数据旁边。</p>
+<p>光有来源侧的记录还不够，因为数据几乎都会被加工。每个处理任务都要保存代码或规则版本、父产物标识和删除原因。代码或规则版本解释了一个样本为什么变成现在这个样子——是哪种切块、哪种过滤、哪种清洗施加了影响；父产物标识让任何中间文件都能逐级回溯到更上游；删除原因则记录了一条数据在流水线中&quot;消失&quot;的具体理由，避免日后分不清它是被规则剔除、被人为下架还是被误删。</p>
+<p>到了混合阶段，多条来源被合并成训练集，这时必须保存来源权重、抽样种子和快照哈希。来源权重决定每个源头在最终混合里的占比，抽样种子让&quot;这一批到底抽了哪些样本&quot;可以被精确复现，快照哈希则为某一时刻的完整集合留下不可伪造的指纹。最后，每一次训练运行要反向链接它到底用了哪一份确切的清单，而不是只记一个笼统的&quot;版本号&quot;。</p>
+<p>把这几层串起来，就得到图 1 所示的谱系结构：从来源、处理、混合一路延伸到模型和事故响应。它的价值在于两个方向都能走通——从某个已发布模型反向定位到它训练时使用的确切样本及其授权依据，也能从一段出问题的样本正向枚举出所有受影响的中间产物、训练运行和模型版本。一个只保存了最终文件、却缺少这些反向链接的仓库，在事故响应时只能靠猜测来回答&quot;这段信息还在哪些地方出现过&quot;，而那正是治理失败的开始。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 710 255" role="img" aria-label="训练数据从来源、处理、混合到模型和事故响应的谱系图"><defs><marker id="tg1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="76" y="101" text-anchor="middle" class="svg-t">来源 S17</text><text x="76" y="122" text-anchor="middle" class="svg-t" font-size="11">URI/许可/哈希</text><path d="M134,111 L174,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="176" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="234" y="101" text-anchor="middle" class="svg-t">处理 P9</text><text x="234" y="122" text-anchor="middle" class="svg-t" font-size="11">脱敏/去重/过滤</text><path d="M292,111 L332,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="334" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="392" y="101" text-anchor="middle" class="svg-t">快照 D42</text><text x="392" y="122" text-anchor="middle" class="svg-t" font-size="11">清单/配比/种子</text><path d="M450,111 L490,111" stroke="#6b7484" marker-end="url(#tg1)"/><rect x="492" y="76" width="116" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="550" y="101" text-anchor="middle" class="svg-t">模型 M8</text><text x="550" y="122" text-anchor="middle" class="svg-t" font-size="11">训练运行/权重</text><path d="M608,111 L680,111" stroke="#6b7484" marker-end="url(#tg1)"/><text x="645" y="91" text-anchor="middle" class="svg-t" font-size="11">部署</text><path d="M550,147 C546,215 235,220 234,148" fill="none" stroke="#c77b72" stroke-dasharray="5 4" marker-end="url(#tg1)"/><text x="392" y="208" text-anchor="middle" class="svg-t" font-size="11">事故/删除请求：反查快照与模型，更新规则、数据和回归评测</text></svg><figcaption>图 1　谱系必须双向可查：从模型回到数据，也能从问题样本找到所有受影响产物。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>授权、隐私与质量是三个不同判断<span class="dd-badge eng">治理</span></h2>
+<div class="dd-agent-response"><p>团队里最常听到的一句话是：&quot;这些数据来自公开网页，内容质量又高，直接拿去训练肯定没问题。&quot;这句话把三个完全不同的判断混成了一句&quot;安全&quot;，而事故往往就藏在被合并掉的差别里。</p>
+<p>公开可访问并不自动等于获得了训练许可。一段文字能被人免费读到，只说明作者把它放到了公开位置，不说明作者授权任何人把它抓下来喂给模型；抓取本身还要受服务条款和合同约束。反过来，拿到许可也不等于这份数据里没有个人敏感信息——许可处理的是&quot;能不能用&quot;的权利问题，隐私处理的是&quot;这里面有没有人、能不能识别、能不能删&quot;的义务问题，两者不能互相替代。再退一步，即便数据既合法又合规，也不表示它在内容上准确或能代表目标群体：一份经过授权的旧文档可能已经过时，一批完全合规的网页也可能高度偏向某个群体，训练出来的模型照样失真。</p>
+<p>因此这四类判断必须分开做、分开记录，而不是用一个 approved=true 的开关把它们统统盖住。每一类判断都有自己的核心问题、需要看的证据和对应的处置方式。</p>
+<p>授权与许可这一轴，核心问题是&quot;能否按此目的使用&quot;，证据来自合同、许可文本和来源条款，处置方式是排除不能用的内容或限制其用途。隐私这一轴，核心问题是&quot;是否必要、是否可识别、是否可删除&quot;，证据来自处理目的、同意或其他合法依据以及分类结果，处置方式是最小化、脱敏和访问控制。质量这一轴，核心问题是&quot;是否准确、是否有代表性、是否非垃圾&quot;，证据来自抽样审计和分布统计，处置方式是过滤、降权或补充代表性不足的部分。安全这一轴，核心问题是&quot;是否被投毒、是否恶意、是否夹带秘密&quot;，证据来自来源信誉、异常检测和扫描结果，处置方式是隔离与人工复核。</p>
+<p>把四轴拆开后，治理动作才真正对应得上风险：许可出了问题就排除或限用，隐私出了问题就最小化和脱敏，质量出了问题就过滤降权，安全出了问题就隔离复核。而 approved=true 只有一个比特的信息量，既说不出问题出在哪一轴，也说不清当时依据了什么证据、采取了什么处置。三个（实为四个）不同判断被压成同一个布尔值的那一刻，责任追溯的链条也就断掉了。</p></div>
+<table class="dd-table"><thead><tr><th>轴</th><th>核心问题</th><th>证据</th><th>处置</th></tr></thead><tbody><tr><td>授权/许可</td><td>能否按此目的使用</td><td>合同、许可、来源条款</td><td>排除或限制用途</td></tr><tr><td>隐私</td><td>是否必要、可识别、可删除</td><td>目的、同意/依据、分类</td><td>最小化、脱敏、访问控制</td></tr><tr><td>质量</td><td>是否准确、代表、非垃圾</td><td>抽样审计与分布</td><td>过滤、降权、补充</td></tr><tr><td>安全</td><td>是否投毒、恶意或含秘密</td><td>信誉、异常与扫描</td><td>隔离、人工复核</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>去重改变的是有效训练权重<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>同一段文本在语料里出现 20 次，很多人只觉得浪费了计算和存储，心想&quot;多算几遍而已，模型又不会因此变坏&quot;。这个直觉是错的：在均匀按样本采样的训练方式下，重复副本悄悄改写了每一条内容实际获得的训练权重，而权重变化会一路传导到模型的记忆和偏差上。</p>
+<p>均匀按样本采样意味着每次随机抓一条样本，抓到谁的副本多，谁被优化的次数就多。于是某条内容的近似有效概率与它的副本数成正比。更精确地说，一段内容 z 的有效权重可以用 w(z) ∝ Σⱼ 1[样本 j 属于 z 的重复簇] × 采样权重ⱼ 来表达：把所有样本 j 逐一过一遍，凡是属于 z 这个重复簇的样本就计一次，再乘上该样本自身的采样权重，最后加总。Σ 表示对全体样本求和，1[…] 是一个指示函数——括号里的条件成立记 1、不成立记 0，所以它本质上是在数&quot;z 到底被多少个样本重复承载&quot;。这个总和高，z 在梯度更新里被强调的次数就高。</p>
+<p>这种放大带来三个后果。第一，逐字记忆增强：同一段文本被反复喂入，模型更容易把它原样背下来，部署后复述个人信息的风险随之上升。第二，高重复来源支配梯度：那些恰好被大量镜像转载的页面或模板，会以远超其真实重要性的强度主导参数更新，挤占其他内容的表达空间。第三，评测题镜像泄漏：如果某个评测集的内容或它的讲解被原样收录进训练语料，副本越多，模型&quot;见过答案&quot;的概率越高，评测分数就变成了对记忆力的测量，而不是对能力的测量。</p>
+<p>要削弱重复，得先知道能抓多&quot;近&quot;的重复。精确哈希只能命中逐字节完全相同的内容；MinHash 和局部敏感哈希能抓到词面上的近邻；语义去重则进一步识别改写后的同义表达。抓得越近，遗漏越少，但误删风险也依次上升——把两段只是碰巧相似、本应分别保留的有效文本当成重复删掉。模板化代码、法律条款和稀有语言天生相似度高，若盲目追求把重复率压到最低，就会把这些原本有效的结构也一起抹掉。</p>
+<p>因此近似去重应当在文档、段落和跨数据集三个层面运行，而不是只在整篇文档层面做一次。同时要按语言、来源、格式和群体分别报告保留率：一个总保留率 90% 的数字，可能掩盖某种低资源语言被删去一半的事实，而这正是下一节要展开的分布偏向问题。</p>
+<p>还有一个动作必须在去重之前完成：先把测试集隔离。在训练混合之前，就要用精确匹配和语义近邻检查，把评测题及其衍生讲解从训练语料中识别并隔离出来；等到训练之后再去检测，最多只能告诉你&quot;风险已经发生&quot;，却无法恢复评测的独立性。隔离的时间点，决定了你是在预防泄漏，还是只能在事后承认泄漏。</p></div>
+<div class="dd-formula" data-formula-id="training-data-governance-formula-1" data-display="mathml"><math display="block" aria-label="内容 z 的有效权重 w(z) ∝ Σⱼ 1[样本 j 属于 z 的重复簇] · 采样权重ⱼ"><mrow><mtext>内容</mtext><mspace width="0.35em"/><mi>z</mi><mspace width="0.35em"/><mtext>的有效权重</mtext><mspace width="0.35em"/><mi>w</mi><mo>(</mo><mi>z</mi><mo>)</mo><mspace width="0.35em"/><mo>∝</mo><mspace width="0.35em"/><mi>Σ</mi><mo>ⱼ</mo><mspace width="0.35em"/><mn>1</mn><mo>[</mo><mtext>样本</mtext><mspace width="0.35em"/><mi>j</mi><mspace width="0.35em"/><mtext>属于</mtext><mspace width="0.35em"/><mi>z</mi><mspace width="0.35em"/><mtext>的重复簇</mtext><mo>]</mo><mspace width="0.35em"/><mo>·</mo><mspace width="0.35em"/><mtext>采样权重</mtext><mo>ⱼ</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>运行示例：去重与配比怎样重塑一个 100 万样本快照<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>上一节讲的是重复副本会改写有效训练权重，这一节用一组具体数字把这条因果链从头到尾走一遍。假设一个训练快照由四类来源拼接而成：通用网页 700k 条，客服对话 100k 条（平均每条重复出现 5 次，所以物理上有 500k 个副本），政策文档 50k 条，多语言长尾 150k 条。把物理副本数加总，得到原始拼接总记录 1.4M。</p>
+<p>在没有任何治理干预的情况下，均匀采样会让每条记录的曝光机会相同。客服对话虽然只有 100k 条语义内容，但它在 1.4M 总记录里占了 500k 个物理副本，因此它实际拿到的采样曝光约 35.7%（500k ÷ 1.4M），从&quot;占比最小的来源之一&quot;一跃成为训练时被反复喂入的大头。这个 35.7% 不是任何人做出的配比决定，而是抓取时偶然产生的重复所强加的。</p>
+<p>去重之后局面立刻改变。通用网页从 700k 降到 500k，客服对话从 500k 物理副本收敛回 100k 语义内容，政策文档从 50k 降到 45k，多语言长尾从 150k 降到 140k，去重后总独特样本约 785k。此时客服对话的自然比例约 12.7%（100k ÷ 785k），回落到它真实的内容体量。原始混合曝光那一列展示的是干预前的比例：通用网页 70%、客服等效约 25%–40%、政策文档 5%、多语言长尾 15%。</p>
+<p>接下来是配比决策。团队可以显式地设定治理后的目标曝光：通用网页 55%、客服对话 20%、政策文档 15%、多语言长尾 10%。这些数字与去重后的自然比例不再相同，区别在于它们是人为、可审计的选择——政策文档被主动从 5% 提到 15%，因为团队判断该任务需要更强的政策理解能力。混合配比可以用 P训练(x) = Σᵢ pᵢPᵢ(x) 来表达，其中 Σpᵢ = 1：最终某类内容 x 在训练里的出现概率，等于每个来源 i 的占比 pᵢ 乘上该来源内部内容 x 的概率 Pᵢ(x)，再对所有来源加总。各来源占比之和必须等于 1，否则采样会偏向被重复计入的类别。按这个配比，若训练运行总计 100k 步，政策文档 15% 的目标曝光就对应约 15k 步（100k × 15%）。</p>
+<p>配比决策是有代价的，这一点必须在做决定时就承认。把政策文档的曝光从 5% 提到 15%，是为了强化政策能力，但它会挤占通用网页、多语言长尾的采样次数，也可能侵蚀模型对旧知识的保持。因此验证配比时不能只看一个指标——如果只盯着&quot;退款准确率&quot;这类任务指标，团队会误以为提配比只有好处没有副作用。正确的做法是在能力、安全、公平和记忆等多个切片上做消融对比，确认提升政策能力的同时，通用能力、多语言能力、偏见水平和逐字记忆风险没有被悄悄牺牲。数字演算的价值正在于此：它把一个原本被偶然重复支配的曝光结构，变成了一组有账可查、有代价可评估的显式决策。</p></div>
+<table class="dd-table"><thead><tr><th>来源</th><th>原始条数</th><th>去重后</th><th>原始混合曝光</th><th>治理后目标曝光</th></tr></thead><tbody><tr><td>通用网页</td><td>700k</td><td>500k</td><td>70%</td><td>55%</td></tr><tr><td>客服对话</td><td>100k×平均5副本</td><td>100k</td><td>等效约 25%–40%</td><td>20%</td></tr><tr><td>政策文档</td><td>50k</td><td>45k</td><td>5%</td><td>15%</td></tr><tr><td>多语言长尾</td><td>150k</td><td>140k</td><td>15%</td><td>10%</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="training-data-governance-formula-2" data-display="mathml"><math display="block" aria-label="P训练(x)=Σᵢ pᵢPᵢ(x)，Σpᵢ=1；100k 步下政策目标曝光 15%≈15k 步"><mrow><mi>P</mi><mtext>训练</mtext><mo>(</mo><mi>x</mi><mo>)=Σ</mo><mo>ᵢ</mo><mspace width="0.35em"/><mi>p</mi><mo>ᵢ</mo><mi>P</mi><mo>ᵢ</mo><mo>(</mo><mi>x</mi><mo>)</mo><mtext>，</mtext><mi>Σ</mi><mi>p</mi><mo>ᵢ</mo><mo>=</mo><mn>1</mn><mtext>；</mtext><mn>100</mn><mi>k</mi><mspace width="0.35em"/><mtext>步下政策目标曝光</mtext><mspace width="0.35em"/><mn>15</mn><mo>%≈</mo><mn>15</mn><mi>k</mi><mspace width="0.35em"/><mtext>步</mtext></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>过滤器也会系统性偏向某些数据<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>一个&quot;高质量分类器&quot;交出的成绩单可能是这样的：英文数据保留了 90%，某低资源语言只保留了 45%。如果只看总保留率，这个差距会被平均成一个看起来还不错的数字，团队于是放心地把过滤当成一次中立清洁。但 45% 意味着那种语言几乎一半的真实表达被系统性地删掉了，模型还没开始训练，就已经少看了半个世界。</p>
+<p>这种偏向来自分类器把&quot;主流百科文风&quot;当成了质量标准的默认值。凡是偏离这套文风的表达——口语、方言、残障人士的书写方式、代码与自然语言混排、低资源语言的少见变体——都更容易被判成垃圾。它们并非真的低质量，只是不符合分类器被训练时所见的&quot;规范样本&quot;。毒性过滤同样会误伤：讨论被歧视群体的文本里，往往本身就含有大量歧视性词汇，过滤器按字面命中这些词，结果把受害群体的讨论、证词和反歧视论述一并删掉，反而让模型更不了解这些群体的处境。</p>
+<p>总体保留率之所以危险，是因为它是一维的汇总数，天然会掩盖分布层面的重塑。要看清过滤器真正做了什么，必须把保留率按来源、语言、群体等切片拆开，并抽样进行双标复核——由人对同一样本独立标注，再计算过滤器的精确率和召回率，比较不同切片之间保留差异的大小。对于分类器拿不准的高不确定样本，不应直接放行或直接丢弃，而要隔离出来交人工复核。</p>
+<p>治理上还要给每条规则留下可解释的痕迹。每条过滤规则保存原因码和分数：为什么删、置信度多高、命中了哪条规则，这样日后才能复现和审计。过滤前后都要保存统计摘要，方便对比这次过滤究竟删掉了什么。而真正被判定为敏感的原始内容，本身不能跟着普通语料到处流转——它应当受限访问，并按照既定的保留政策处理，避免&quot;删了又留、留了又漏&quot;。</p>
+<p>说到底，过滤不是中立的清洁动作。它每一次删减都在定义&quot;模型可见世界&quot;的边界，决定哪些人群的表达会被模型学到、哪些会被沉默。这是能力决策，也是价值决策，因此它和配比一样，必须接受评测和治理审批，而不是作为一段默默跑完的预处理代码存在。一个会系统删掉某种语言一半数据的过滤器，配得上与训练策略本身同等的审视。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>污染、投毒和合成回流的因果不同<span class="dd-badge eng">风险</span></h2>
+<div class="dd-agent-response"><p>&quot;数据不干净&quot;是一句过于笼统的话。测试题泄漏、攻击者注入后门、模型输出被回收再训练，三件事看起来都像&quot;训练数据里混进了坏东西&quot;，但它们的因果机制完全不同，所以不可能用同一个过滤器同时解决。把它们的因果拆开，防线才能对上号。</p>
+<p>评测污染的目标和机制是：评测题或它的答案进入了训练集，模型因此&quot;见过考题&quot;。它的可观测信号是训练样本与保留集出现异常相似，或者数据在时间上自相矛盾（比如一条&quot;2024 年事件&quot;的讲解出现在声称更早的抓取批次里）。防线是隔离保留集，并用近邻扫描在训练混合之前把与评测内容相近的样本挡出去——这正是前面讲测试集隔离的原因。</p>
+<p>数据投毒的目标和机制截然不同：攻击者主动注入经过构造的数据，目的是恶意改变模型行为或埋下后门，让模型在见到特定触发器时执行攻击者预期的动作。它的观测信号是来源异常、样本里出现可疑的触发器，或某个来源簇突然大量涌入。对应的防线是来源信誉评估、内容签名、来源配额，以及红队测试来主动试探后门是否已被激活。</p>
+<p>合成回流又是另一种机制：模型生成的内容被回收后再次用于训练，生成分布逐渐替代了真实世界的尾部数据。它的信号是措辞趋于同质、来源无法追溯。防线是给合成数据打标记，用真实数据作为锚点，并严格控制合成内容在混合中的配比。</p>
+<p>来源漂移则更隐蔽：站点内容和许可会随时间改变，昨天还授权可用的页面，今天可能已经改版或收回许可，数据在仓库里却还保持着旧版本。它的信号是版本与分布的变化，防线是定期复核和快照层面的许可核查。</p>
+<p>四种风险各自需要不同的观测手段和防线，这就是它们无法被一个通用过滤器统一处理的根本原因。还有一条总原则贯穿始终：异常数据不能自动进入重训。生产环境里模型失败的样本要回流利用，必须经过脱敏、去重、标签确认和来源确认，否则攻击者只要故意制造&quot;看起来像失败案例&quot;的内容，就能通过反馈渠道完成投毒。回流通道本身，正是投毒者最容易利用的入口。</p></div>
+<table class="dd-table"><thead><tr><th>风险</th><th>目标/机制</th><th>观测</th><th>防线</th></tr></thead><tbody><tr><td>评测污染</td><td>题或答案进入训练</td><td>异常相似、时间矛盾</td><td>隔离保留集、近邻扫描</td></tr><tr><td>数据投毒</td><td>恶意改变行为/后门</td><td>来源异常、触发器、簇突增</td><td>信誉、签名、配额、红队</td></tr><tr><td>合成回流</td><td>生成分布替代真实尾部</td><td>措辞同质、来源不明</td><td>合成标记、真实锚点、配比</td></tr><tr><td>来源漂移</td><td>站点内容/许可随时间变</td><td>版本与分布变化</td><td>定期复核、快照许可</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>删除文件不等于模型已经遗忘<span class="dd-badge eng">处置</span></h2>
+<div class="dd-agent-response"><p>收到一条删除请求时，最危险的做法是给用户一个模糊的保证：&quot;我们已经删除了，请放心。&quot;因为&quot;删除&quot;这个词至少包含两类结果，一类可以可靠承诺，另一类在当前技术条件下根本无法承诺，把两者混为一谈，就会在审计和诉讼中被打脸。</p>
+<p>可以可靠承诺的那部分，是数据管线的处置。团队可以从原始存储、派生数据集、缓存和未来的训练清单中，删除已经定位到的对象，并且借助谱系阻止它再次被摄取。这些动作是确定性的：删了就是删了，可以逐项核对。但要走到这一步，前提是前面几节建立的那些锚点都在——没有 source id、内容哈希和父子产物关系，就无法确认&quot;删干净&quot;的范围。</p>
+<p>不能可靠承诺的那部分，是模型内部的影响。已经训练好的权重，是大量样本共同优化的结果，删除某一个文件并不会逆转那次参数更新；模型已经&quot;学到&quot;的东西不会因为源文件消失而自动消失。输出层面的拦截同样只是降低了暴露概率——把敏感内容加入输出过滤，可以减少它被复述出来的机会，但并不能证明模型内部的影响已经不存在。这三层要分开表述：存储处置可以承诺、未来摄取可以阻止、已训练权重的影响既不能逆转也无法轻易证明已消除。</p>
+<p>处置流程本身也应当有固定顺序。第一步验证请求主体、请求范围和它背后的法律或合同依据——确认是谁在请求、请求覆盖哪些数据、依据是什么。第二步用精确和近似标识找到目标数据的副本与派生产物。第三步更新删除清单、过滤器和未来快照，确保不会再进。第四步反查受影响的训练运行和已部署模型，弄清波及面。第五步才按风险选择处置手段：重训、机器遗忘、检索或输出控制、甚至退役模型，风险越高，手段越重。</p>
+<p>验证与表述同样要守住边界。可以用成员推断、诱导复现和任务回归来检测删除效果，但要如实说明这些证据能证明什么、不能证明什么。尤其机器遗忘，它本身就必须证明两件事：效用损失可接受、残余记忆确实下降。运行一个遗忘脚本不等于合规完成——如果脚本跑完，模型还能被诱导复述出目标内容，那么&quot;已遗忘&quot;就只是一句没有证据的话。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>治理控制要落到发布门禁和事故演练<span class="dd-badge intuition">工程</span></h2>
+<div class="dd-agent-response"><p>团队手里可能已经有了一堆看起来很完备的东西：数据卡（datasheet）、来源清单、许可记录。可下一次训练开始时，同样的错误还是会出现。问题不在缺少文档，而在于这些文档只是&quot;被人读的&quot;，没有变成&quot;机器必须通过的关卡&quot;。当治理信息只存在于文档里、需要有人主动去查时，赶进度的那一天它就会被跳过。</p>
+<p>所以治理控制必须落到自动门禁上。当快照出现未知来源、缺少许可、敏感等级不明、与评测集存在近邻、异常重复率或混合权重超界时，门禁应当直接阻断该快照，而不是弹出一个&quot;请确认&quot;的提示等待点击。人工豁免是允许的，但必须有期限和责任人——豁免不能是永久性的后门，否则门禁形同虚设。训练之前输出数据卡，训练之后运行记忆、偏差、安全和能力的消融评测，让每一次训练都带着可核查的输入证据和输出证据。</p>
+<p>文档还必须在真实事故面前经得起演练。设计一个场景：&quot;某来源突然撤销授权。&quot;治理系统应当在小时内回答：这个来源进入了哪些快照、哪些训练运行、哪些模型、哪些部署，以及哪些下游衍生数据；并且能够构建一个不含该来源的新快照，估算重训或替代的成本。如果一个谱系系统在这类演练里答不出来，那它就不是治理基础设施，只是文档装饰——无法执行的谱系和没有谱系，在事故发生时是等价的。</p>
+<p>最后要守住诚实的边界。治理不是绝对保证。来源元数据本身可能写错，近似匹配会有遗漏，模型内部的影响难以逐样本归因。因此治理的价值不在于宣称&quot;数据绝对干净&quot;，而在于把残余风险和每一项证据的强度如实报告出来。一个敢于说出&quot;我们在这里不能证明什么&quot;的系统，才真正值得在发布门禁上被信任。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>前面各节分别展开了一个环节，这一节把它们按时间顺序串成一条从问题直达可验证实践的因果链。链条的起点，是当初那个朴素的问题——为什么训练前删过词，部署后还会出事——而链条的终点，是能够逐环回答&quot;为什么、经过了什么、影响了谁、能否处置&quot;。</p>
+<p>第一步是登记。在数据进入系统的入口处，就把来源、授权和敏感等级记下来。没有这一步，后面所有追溯都失去起点，因为没人说得清一条数据&quot;从哪里来、凭什么叫可用&quot;。</p>
+<p>第二步是版本化处理。每一个清洗、切块、去重动作，连同它执行时用的规则版本和删除原因，都要留下版本记录。这样任何一份中间产物都能解释&quot;自己为什么会变成现在这个样子&quot;。</p>
+<p>第三步是显式设计混合配比，并隔离评测。配比从偶然的抓取重复手中拿回来，变成一个有账可查的决策；评测集在训练混合之前就被隔离，独立性才得以保住。</p>
+<p>第四步是冻结清单，把它与训练运行和模型反向连接。一次训练到底用了哪份确切的清单，必须成为可查询的事实，而不是一句笼统的版本号。</p>
+<p>第五步是训练后评测。模型产出后，围绕记忆、偏差和能力做消融和回归，把&quot;训练数据质量&quot;转化为可测量的模型行为证据。</p>
+<p>第六步是事故与请求的处置。一旦出现问题或收到删除请求，就沿着谱系定位受影响的范围，执行处置，并把这次教训反哺回门禁规则，让下一次训练不再重复同样的错误。</p>
+<p>这六步不是六份独立的文档，而是同一条证据链上的六个接口。任何一环断裂，链条就退化成只能猜测：删了词却答不出授权依据，配了比却说不清评测是否泄漏，删了文件却证明不了模型是否遗忘。把六步全部连起来之后，治理才从&quot;事后救火&quot;变成&quot;事前可证、事中可查、事后可处置&quot;的持续控制。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1803.09010" target="_blank" rel="noopener">Datasheets for Datasets</a>：数据集文档与生命周期问责</li><li><a href="https://aclanthology.org/Q18-1041/" target="_blank" rel="noopener">Data Statements for NLP</a>：语言数据群体与语境记录</li><li><a href="https://arxiv.org/abs/2107.06499" target="_blank" rel="noopener">Deduplicating Training Data Makes Language Models Better</a>：重复、记忆与评测污染</li><li><a href="https://arxiv.org/abs/2101.00027" target="_blank" rel="noopener">The Pile</a>：大规模训练语料来源与构成</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/training-data-governance">在地图中查看概念关系</a></nav>
+</article></main></body></html>

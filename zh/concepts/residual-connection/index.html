@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>残差连接：给深层变换保留一条恒等信息高速路 · AI 知识地图</title>
+<meta name="description" content="从 y=x+F(x) 的前向增量与 I+JF 的反向雅可比开始，理解深度退化、投影捷径、分支尺度、零初始化以及 Transformer 的 Pre-Norm/Post-Norm。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/residual-connection/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="残差连接：给深层变换保留一条恒等信息高速路">
+<meta property="og:description" content="从 y=x+F(x) 的前向增量与 I+JF 的反向雅可比开始，理解深度退化、投影捷径、分支尺度、零初始化以及 Transformer 的 Pre-Norm/Post-Norm。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/residual-connection/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="残差连接：给深层变换保留一条恒等信息高速路">
+<meta name="twitter:description" content="从 y=x+F(x) 的前向增量与 I+JF 的反向雅可比开始，理解深度退化、投影捷径、分支尺度、零初始化以及 Transformer 的 Pre-Norm/Post-Norm。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/residual-connection/#page","name":"残差连接：给深层变换保留一条恒等信息高速路","description":"从 y=x+F(x) 的前向增量与 I+JF 的反向雅可比开始，理解深度退化、投影捷径、分支尺度、零初始化以及 Transformer 的 Pre-Norm/Post-Norm。","url":"https://ai-knowledge-map.com/zh/concepts/residual-connection/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"残差连接：给深层变换保留一条恒等信息高速路","item":"https://ai-knowledge-map.com/zh/concepts/residual-connection/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">残差连接：给深层变换保留一条恒等信息高速路</span></li></ol></nav><article id="dd-article" data-concept-id="residual-connection">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">残差连接：给深层变换保留一条恒等信息高速路</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 y=x+F(x) 的前向增量与 I+JF 的反向雅可比开始，理解深度退化、投影捷径、分支尺度、零初始化以及 Transformer 的 Pre-Norm/Post-Norm。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 残差块不要求新层重新构造完整映射，而是在保留输入的恒等通道上学习增量 <code>F(x)</code>；其雅可比含有恒等项 <code>I</code>，为信息与梯度提供短路径。它改善可优化性，但<b>不保证分支尺度、归一化和多块乘积永远稳定</b>。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>为什么网络加深后训练误差反而上升，不一定是过拟合？</li><li><code>y=x+F(x)</code> 怎样把完整映射改写为增量学习？</li><li>为什么反向雅可比中出现 <code>I</code>，它又为何不等于“梯度永不消失”？</li><li>输入输出维度不同、分支尺度过大或归一化位置不同时怎样处理？</li><li>残差连接与 DenseNet、U-Net 跳连、动态跳层和“层没有执行”有何区别？</li></ul></div>
+<ol class="dd-chain"><li>普通深层要求每个新增模块重构完整表示。</li><li>长路径使信息与梯度连续经过局部变换。</li><li>残差块把目标改写为输入加增量。</li><li>恒等捷径保留前向信息，即使分支暂时接近零。</li><li>反向雅可比包含 <code>I+J_F</code>，提供短梯度路径。</li><li>零初始化或残差缩放让多块从近恒等状态开始。</li><li>投影只在形状变化处匹配捷径。</li><li>归一化位置与分支尺度维持长期稳定。</li><li>训练误差、梯度剖面和深度消融共同证明是否真的缓解退化。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>更深网络为什么可能连训练集都做得更差<span class="dd-badge intuition">动机</span></h2>
+<div class="dd-agent-response"><p>深度退化指的是一种优化现象：在数据、训练目标和训练预算可比时，更深的模型反而连训练集上的误差都高于较浅模型。它不同于过拟合；过拟合是训练误差已经很低、验证表现却变差，而深度退化说明新增的模型容量没有被优化过程有效利用。</p>
+<p>设较浅网络已经产生一个可用的中间表示 x，并在它后面加入一个新模块。这个模块最保守的任务是输出仍然等于 x，从而保住浅网络已经找到的解；只有当某种变化能进一步降低训练损失时，它才需要输出 x + Δx。由于额外层理论上可以实现恒等映射，深网络的表达能力至少包含浅网络的已有解，因此训练误差上升不能简单归因于表达力不足。真正的困难是：优化器能否沿着容易到达的参数路径保住这个已有解。</p>
+<p>在普通的层叠结构中，“输出 x”并不是架构直接提供的操作，而要靠一串权重和非线性激活共同合成。即使恒等映射在理论上存在，优化器也未必能把整串参数恰好调到那个状态；路径变长还可能带来尺度和梯度方面的困难。于是，增加深度以后，模型虽然拥有更多参数，却可能先丢掉原本可用的表示，并且在给定训练条件下无法恢复它。</p>
+<p>残差块把保留已有解的要求显式写进结构：一条无参数捷径直接传递 x，另一条变换分支只学习相对输入的修正 Δx。这样，新增模块的输出是 x + Δx，而保留浅网络解只要求新分支接近零，不再要求多层非线性共同精确实现恒等映射。结构上的改变降低了“加深但不破坏已有解”的优化难度，使原解更容易被训练过程到达和维持。</p>
+<p>这种机制改善的是可优化性，不保证新增分支一定学到有用修正，也不替代数据质量、正则化或泛化评测。判断是否发生深度退化，关键证据是可比条件下更深模型的训练误差更高；如果只是验证误差升高，则不能据此把问题归为这里所说的深度退化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>完整映射怎样改写成增量<span class="dd-badge math">核心公式</span></h2>
+<div class="dd-agent-response"><p>设一个模块希望实现的完整目标映射为 H(x)。普通参数化让变换层直接拟合 H(x)，而残差参数化把同一个目标改写为</p>
+<p>y = x + F(x)</p>
+<p>因此</p>
+<p>F(x) = H(x) − x</p>
+<p>这里，x 是模块输入，H(x) 是希望得到的完整映射，F(x) 是可学习变换分支产生的增量，y 是模块最终输出。这种改写没有更换目标：只要分支学到 H(x) − x，两路相加后的结果仍然是 H(x)。改变的是模块直接拟合的对象，从“完整输出是什么”变成“完整输出相对输入应改变多少”。</p>
+<p>一次前向计算包含两条同步路径。输入 x 被送入无变换的捷径，原样到达加法点；同一个 x 还进入变换分支，生成 F(x)。最后，两路结果逐元素相加，得到 y = x + F(x)。捷径负责保留输入，变换分支只负责补上输入与目标输出之间的差值。</p>
+<p>这种参数化在目标映射接近恒等映射时尤其自然。如果已有特征已经足够，理想情况是 H(x) ≈ x，于是 F(x) ≈ 0；模块只要让变换分支接近零，就能保留输入。若已有表示只需轻微校正，H(x) = x 加一个小变化，分支便只需学习这个小变化。相比之下，普通变换层即使不想改变输入，也仍要通过自身参数把 x 完整地重新生成一遍。</p>
+<p>当分支最后一层接近零时，F(x) 也接近零，整个块一开始便近似执行 y ≈ x。训练随后可以从这个保留输入的状态出发，逐渐学会应在已有表示上增加或减少什么。因而，“学习增量更容易”并不是说它改变了任务答案，而是说它为接近恒等的目标提供了更直接的参数表示。</p>
+<p>如果目标映射与输入相差很大，F(x) = H(x) − x 仍然成立，变换分支也仍可学习较大的残差；只是此时“只需拟合一个很小修正”的优势会减弱。残差形式并不假定所有映射都必须接近恒等，它只是把保留项 x 固定提供出来，让可学习部分集中表达相对于 x 的变化。</p></div>
+<table class="dd-table"><thead><tr><th>输入场景</th><th>理想 H(x)</th><th>残差 F(x)</th></tr></thead><tbody><tr><td>已有特征已经足够</td><td>约等于 x</td><td>约等于 0</td></tr><tr><td>需要轻微校正</td><td>x 加小变化</td><td>只学习小变化</td></tr><tr><td>需要彻底变换</td><td>远离 x</td><td>分支仍可学习大残差，但优势减弱</td></tr></tbody></table>
+<div class="dd-formula">y = x + F(x)　　⇔　　F(x)=H(x)−x</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>前向为什么有一条不经过变换分支的通道<span class="dd-badge intuition">信息路径</span></h2>
+<div class="dd-agent-response"><p>残差块接收输入 x 后，会把它同时送入两条路径。变换分支计算 F(x)，恒等捷径不经过这组新权重，直接把 x 搬运到加法点。加法点接收两个形状相同的张量并逐元素相加，得到</p>
+<p>y = x + F(x)</p>
+<p>因此，前向传播中始终存在一条不依赖变换分支质量的直接通道。它解决的是这样一个问题：新增分支在训练早期可能还没有学会有用的变换，甚至暂时学得很差，但旧表示不应因此被迫完全穿过新权重并被重写。恒等捷径让输入 x 可以原样到达块的输出端，再由变换分支提供修正。</p>
+<p>两条路径不是二选一，也不存在根据情况关闭某一条的选择操作。每次调用残差块时，F(x) 仍会被计算，恒等捷径也会传递 x，随后加法节点同时合并保留项与修正项。如果 F(x) = 0，输出自然退化为 y = x；如果 F(x) 包含有用变化，输出就在原表示 x 的基础上进行增量更新。因而，捷径保留信息的机制不是跳过计算，而是在计算结果中始终显式保留输入项。</p>
+<p>这条通道也使已有特征能够跨越多个残差块继续被复用：每个块都可以保留当前表示，同时叠加自己的变化。不过，相加要求两路张量的形状一致，否则对应元素无法直接合并。恒等捷径也不保证输入信息在数值上永远占主导；如果 F(x) 的尺度远大于 x，分支输出仍可能盖过保留下来的信息。它提供的是一条结构上存在的保留路径，而不是对最终信息比例的硬性约束。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 740 280" role="img" aria-label="残差块的变换分支与恒等捷径"><defs><marker id="rsa" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="context-stroke"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="3"><circle cx="85" cy="140" r="30"/><rect x="240" y="55" width="190" height="70" rx="14"/><circle cx="535" cy="140" r="28"/><circle cx="660" cy="140" r="30"/><path d="M115 130 C165 95 190 90 240 90" marker-end="url(#rsa)"/><path d="M430 90 C475 90 490 120 507 130" marker-end="url(#rsa)"/><path d="M115 155 C250 235 425 225 510 155" stroke="#10b981" stroke-width="5" marker-end="url(#rsa)"/><path d="M563 140L630 140" marker-end="url(#rsa)"/></g><g class="svg-t"><text x="73" y="146">x</text><text x="295" y="97">F(x)：变换分支</text><text x="526" y="148">+</text><text x="650" y="148">y</text><text x="255" y="248">恒等捷径：原信息直接到加法点</text></g></svg><figcaption>两条路径都执行：上路学习变换，下路保留输入；输出是相加，不是二选一。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>反向为什么出现恒等项<span class="dd-badge math">梯度路径</span></h2>
+<div class="dd-agent-response"><p>设残差块的前向关系为 y = x + F(x)，损失为 L，下游传回块输出处的梯度为 g_y = ∂L/∂y。反向传播需要求出送往更早层的梯度 g_x = ∂L/∂x。关键在于：输出 y 同时通过捷径项 x 和变换分支 F(x) 依赖输入 x，因此链式法则必须把两条路径的贡献相加。</p>
+<p>对块输出关于输入求导，可得</p>
+<p>∂y/∂x = I + J_F(x)</p>
+<p>其中 I 是单位雅可比，来自 x 在加法中直接出现；J_F(x) 是变换分支 F 对输入 x 的局部雅可比，描述输入发生微小变化时分支输出如何变化。于是损失对输入的梯度为</p>
+<p>∂L/∂x = ∂L/∂y · [I + J_F(x)]</p>
+<p>也就是</p>
+<p>g_x = g_y · [I + J_F(x)]</p>
+<p>这可以理解为两份梯度在输入处汇合：捷径贡献 g_y · I，变换分支贡献 g_y · J_F(x)。即使分支的局部导数很小，捷径仍能把一份上游梯度直接送回输入。若 J_F(x) 接近零，单个残差块便有 g_x ≈ g_y，梯度可以近似原样越过该块，而不会被迫只经过一个很小的分支导数。</p>
+<p>恒等项缓解了长链中的梯度衰减，但不能据此说“残差连接保证梯度为 1”。单块的局部雅可比是 I + J_F(x)，而不是只有 I；只要 J_F(x) 不为零，它就会改变不同方向上的梯度。跨越多个残差块时，还要连续乘上多个不同的 I + J_F，这些矩阵的作用可能相互放大、缩小或抵消。若主路径中还有归一化或捷径投影，直接通道的局部导数也会相应改变。因此，局部读数接近恒等只说明某一块、某一局部方向上的梯度更容易通过，并不意味着整个网络中的梯度始终等于 1。</p></div>
+<div class="dd-formula">∂y/∂x = I + J<sub>F</sub>(x)</div>
+<div class="dd-formula">∂L/∂x = ∂L/∂y · [I + J<sub>F</sub>(x)]</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>完整数值例子：普通连乘与近恒等路径差多少<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>考虑一个只保留单个标量方向的简化实验。输入是每个块在这个方向上的有效局部导数 d，以及块数 n = 20；输出是梯度从第 20 块传回起点后的倍率。由于链式法则会连续乘上每一块的局部导数，若 20 个块都取相同的 d，最终倍率就是 d²⁰。</p>
+<p>普通堆叠若每过一块都把该方向的梯度乘以 0.8，那么 20 块后的倍率为</p>
+<p>0.8²⁰ ≈ 0.0115</p>
+<p>这意味着起点处只收到下游梯度的大约 1.15%。单块的 0.8 看起来并不极端，但连续乘 20 次后，衰减就非常明显。</p>
+<p>对近恒等的残差块，有效局部导数可以写成 1 加分支导数。若分支初始导数为 0，则每块的有效导数是 1 + 0 = 1，经过 20 块后为</p>
+<p>1²⁰ = 1</p>
+<p>在这个简化方向上，梯度倍率保持不变。若分支导数为 −0.02，每块有效导数为 0.98，连续 20 块后得到</p>
+<p>0.98²⁰ ≈ 0.668</p>
+<p>梯度仍保留约 66.8%，明显高于普通层连乘后的 0.0115。若分支导数为 +0.02，每块有效导数为 1.02，则</p>
+<p>1.02²⁰ ≈ 1.486</p>
+<p>此时梯度不是衰减，而是被放大到约 1.486 倍。</p>
+<p>这些数值说明，残差结构的关键作用不是让梯度必然等于 1，而是把单块的有效雅可比放到 1 附近，使深度累积不至于从一开始就把信号压到百分之一量级。0.98 和 1.02 都离 1 很近，但经过 20 次连乘仍会分别产生衰减和放大，所以“近恒等”只是显著延缓不良累积，并不消除累积效应。</p>
+<p>这个实验只描述同一标量方向，并假设每块共享常数 d。真实网络的雅可比是矩阵，不同层和不同方向的局部导数也不会都相同。因此，这组计算适合用来理解单块导数靠近 1 为什么有利，不能据此断言残差网络在任意深度、任意方向上都稳定。</p></div>
+<table class="dd-table"><thead><tr><th>结构</th><th>每块局部导数</th><th>20 块后梯度倍率</th></tr></thead><tbody><tr><td>普通层</td><td>0.8</td><td><code>0.8²⁰≈0.0115</code></td></tr><tr><td>残差块，分支初始导数 0</td><td><code>1+0=1</code></td><td><code>1²⁰=1</code></td></tr><tr><td>残差块，分支导数 −0.02</td><td>0.98</td><td><code>0.98²⁰≈0.668</code></td></tr><tr><td>残差块，分支导数 +0.02</td><td>1.02</td><td><code>1.02²⁰≈1.486</code></td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>形状不同时捷径为什么需要投影<span class="dd-badge eng">维度</span></h2>
+<div class="dd-agent-response"><p>残差块的两条路径最终要做逐元素相加，因此捷径输出与变换分支输出必须具有相同形状。只要通道数、特征宽度或空间分辨率不同，对应元素就无法直接配对，y = x + F(x) 也就不能原样使用。</p>
+<p>这时可以在捷径上加入一个形状适配映射 P。它接收原输入 x，把它变换成与 F(x) 相同的目标形状，再执行</p>
+<p>y = P(x) + F(x)</p>
+<p>在卷积块中，如果需要改变通道数，通常可用 1×1 卷积完成通道映射；如果还要降低空间分辨率，则可同时使用步幅进行下采样。在宽度发生变化的 Transformer 中，可以用线性层把输入映射到目标宽度。P(x) 的任务首先是让两路张量在加法点能够逐元素对应。</p>
+<p>投影捷径保留了“两路分别计算、最后相加”的残差接口，但它不再是严格恒等通道。恒等捷径直接传递 x，无参数，反向梯度也能沿单位映射返回；投影捷径传递的是 P(x)，新增了可学习参数，反向传播还必须经过 P 的雅可比。因此，投影解决了形状不匹配，却同时失去了最短、最直接的恒等主干。</p>
+<p>不同捷径各有适用边界。形状相同时，严格恒等捷径 x 能保留无参数的直接路径。宽度或分辨率确实变化时，线性映射或 1×1 卷积投影 P(x) 可以完成匹配。补零或池化也能以较少参数调整形状，但需要谨慎处理信息与尺度。投影适合集中在网络阶段发生变化的边界；如果形状本来一致，却让每个块的捷径都变成复杂网络，就会削弱捷径作为最短信息与梯度路径的意义。</p></div>
+<table class="dd-table"><thead><tr><th>捷径</th><th>优点</th><th>代价/边界</th></tr></thead><tbody><tr><td>严格恒等 x</td><td>无参数、梯度直接</td><td>只适用于相同形状</td></tr><tr><td>线性/1×1 投影 P(x)</td><td>匹配宽度与分辨率</td><td>新增参数，不再保证严格恒等</td></tr><tr><td>补零/池化</td><td>参数少</td><td>信息与尺度处理需谨慎</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>分支尺度和零初始化为什么影响“从恒等开始”<span class="dd-badge eng">稳定性</span></h2>
+<div class="dd-agent-response"><p>残差公式 y = x + F(x) 虽然显式包含 x，但加法不会自动保证两条路径处于相近尺度。如果 F(x) 的幅度远大于 x，输出仍会主要由变换分支控制，恒等信息在数值上可能被淹没；如果许多块的分支输出都与主干具有相当方差，连续相加还可能使激活随深度不断增长。</p>
+<p>可以用残差分支与主干的范数比来观察这个问题：</p>
+<p>r = ‖F(x)‖ / ‖x‖</p>
+<p>在同一批输入上分别记录 F(x) 和 x 的范数，就能得到一个可沿网络深度比较的尺度指标。训练初期 r 已经很大，说明分支初始化或学习率可能过猛，加法结果从一开始就被分支主导；此时应检查分支末层初始化、残差缩放和预热。若激活范数随深度持续增长，则要检查分支方差的累积、归一化位置和按深度缩放。若 r 长期接近零，也不能直接视为理想状态，它可能表示分支优化不足、容量受限，或者这个块确实没有带来任务收益，需要结合梯度、参数更新量和实际效果判断。</p>
+<p>零初始化的目的，是让网络在训练开始时更接近恒等映射。可以把残差分支末层权重或归一化尺度初始化到零附近，使初始 F(x) 接近零，于是 y ≈ x；也可以显式将 F(x) 乘以一个随深度选择的小残差系数，或按深度缩放初始化。这样，已有表示在初期先通过主干保留下来，训练再逐渐放大真正有用的修正。</p>
+<p>缩放并非越小越好。系数过小会同时压低分支的输出、梯度和可用容量，使分支难以学到必要变化。因此，诊断时不应只盯着 r，而要同时查看主干与分支的范数、沿深度的激活变化、加法前两路统计、梯度和更新量，并最终确认这些调整是否改善任务表现。“从恒等开始”强调的是一个稳定的初始尺度关系，不是让残差分支永久保持为零。</p></div>
+<table class="dd-table"><thead><tr><th>观测</th><th>可能问题</th><th>应检查</th></tr></thead><tbody><tr><td><code>||F(x)||/||x||</code> 从早期就很大</td><td>分支初始化或学习率过猛</td><td>末层初始化、残差缩放、预热</td></tr><tr><td>随深度激活范数持续增长</td><td>分支方差累积</td><td>归一化位置与深度缩放</td></tr><tr><td>分支长期接近零</td><td>优化不足或不需要该块</td><td>梯度、容量和任务收益</td></tr><tr><td>捷径与分支尺度差异极端</td><td>一条路径被完全淹没</td><td>两路统计及加法前尺度</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Transformer 的 Pre-Norm 与 Post-Norm 改变哪条路径<span class="dd-badge math">架构</span></h2>
+<div class="dd-agent-response"><p>Transformer 残差块中的归一化位置，会决定主干表示和主干梯度是否必须经过归一化操作。给定输入表示 x、子层 F 和层归一化 LN，Pre-Norm 与 Post-Norm 可分别写成</p>
+<p>Pre-Norm：y = x + F(LN(x))</p>
+<p>Post-Norm：y = LN(x + F(x))</p>
+<p>在 Pre-Norm 中，LN 位于变换分支的入口。输入 x 一路先经 LN 再进入子层 F，另一路则不经过这次归一化，直接加到子层输出上。因此，残差主干中的 x 更接近严格恒等传递；反向传播时，梯度也可以沿这条主干返回，较少受到子层和分支内归一化的影响。这种布局通常让很深的 Transformer 更容易稳定训练。</p>
+<p>在 Post-Norm 中，先把捷径项 x 与子层输出 F(x) 相加，再对整个结果执行 LN。归一化作用于相加后的整体表示，所以捷径贡献也必须经过 LN，反向主干同样受到 LN 局部导数的影响。它能够规范化每次残差相加后的整体表示，但很深时优化往往更加敏感。</p>
+<p>两种布局并不是只交换了一行计算顺序。Pre-Norm 保留更直接的 x 主干，Post-Norm 则统一处理两路合并后的尺度，因此它们会产生不同的残差输出、梯度路径、表示尺度和收敛行为。Post-Norm 是原始 Transformer 的形式；Pre-Norm 常用于提高深层训练的稳定性，但最终表示性质也会不同。</p>
+<p>选择归一化位置不能脱离其他条件单独判断。模型深度、初始化、残差缩放和末端归一化都会共同影响结果。Pre-Norm 提供更直接的梯度路径，并不意味着它在所有任务、训练预算和设置下都必然优于 Post-Norm。</p></div>
+<table class="dd-table"><thead><tr><th>形式</th><th>示意</th><th>主干性质</th><th>常见权衡</th></tr></thead><tbody><tr><td>Post-Norm</td><td><code>y=LN(x+F(x))</code></td><td>捷径也经过相加后的 LN</td><td>原始 Transformer 形式；很深时优化更敏感</td></tr><tr><td>Pre-Norm</td><td><code>y=x+F(LN(x))</code></td><td>x 主干更接近严格恒等</td><td>通常更易稳定训练深层；最终表示和收敛性质不同</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>残差连接与其他“跳线”到底有什么不同<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>图中的跨层连线只表示某些信息跨越了中间模块，不能单凭画法判断它是否是标准残差连接。对本页而言，可由现有资料直接建立的判断基准是：输入 <code>x</code> 与分支结果 <code>F(x)</code> 在形状匹配后逐元素相加，得到 <code>y=x+F(x)</code>；恒等捷径保留输入项，而变换分支仍然执行。</p>
+<p>这个基准同时给出一条清晰边界。若某条跨层连线不是把捷径项与变换分支逐元素相加，或者它声称能够按条件省去分支计算，就不能仅凭本页的残差公式推断其合并语义、执行语义或计算收益。此时应回到该架构自己的原始资料核验，而不是把“图上有跳线”直接等同于 ResNet 式残差。</p>
+<p>因此，本节的关键结论只保留标准残差连接本身：它在同宽表示上执行增量更新，为信息与梯度提供短路径，但不会因为存在捷径就自动跳过 <code>F</code>，也不能据此宣称降低推理 FLOPs。其他连接结构的具体合并方式、设计目的和是否执行模块，不由本页现有四项资料来源直接支持。</p>
+<p><b>资料边界：</b>下表保留为辨认术语时的待核查清单。除 ResNet 残差一行外，其余架构特定描述需要各自的原始资料确认，不作为本页已经证成的事实，也不用于推导本页结论。</p>
+<table class="dd-table"><thead><tr><th>结构</th><th>合并方式</th><th>主要目的</th></tr></thead><tbody><tr><td>ResNet 残差</td><td>逐元素相加 <code>x+F(x)</code></td><td>增量学习与短梯度路径</td></tr><tr><td>DenseNet</td><td>通道拼接</td><td>复用所有先前特征，宽度增长</td></tr><tr><td>U-Net 跳连</td><td>常为拼接，也可相加</td><td>把高分辨率编码特征送到解码端</td></tr><tr><td>Highway/门控残差</td><td>学习门控制两路比例</td><td>动态决定保留与变换</td></tr><tr><td>动态跳层</td><td>条件性不执行模块</td><td>节省推理计算</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>运行示例：怎样证明残差改善的是可优化性<span class="dd-badge eng">实验</span></h2>
+<div class="dd-agent-response"><p>要判断残差连接改善的是可优化性，不能只比较最终验证分数。分数变好可能来自参数量变化、正则化差异或训练波动，因此需要构造受控对照，并把训练过程本身作为主要证据。</p>
+<p>实验从两组等深模型开始：一组使用普通堆叠，另一组使用残差堆叠。两组应尽量保持宽度、数据、优化方法和训练预算一致，参数量也尽可能匹配。实验输出不只是一个最终指标，而应包括训练误差随时间的轨迹、不同层的梯度范数与更新比，以及残差主干和分支的尺度；验证分数放在最后，用来观察泛化，而不是直接代替优化证据。</p>
+<p>首先比较训练误差。如果深层残差模型能达到显著更低的训练误差，而普通深层模型无法充分拟合，这支持残差缓解了训练退化；如果差异只出现在验证集，就还不能把收益归因于可优化性。随后进行深度扫描，例如比较 10、20、50 和 100 层，观察普通网络从何种深度开始训练退化，以及残差网络是否在增加深度后仍能维持或降低训练误差。深度扫描能把一次偶然的结果变成随深度变化的结构性模式。</p>
+<p>训练曲线还要与内部观测相互印证。记录各层梯度和参数更新比，可以检查残差结构是否让早期层重新获得可用的训练信号；记录 ‖F(x)‖ 与 ‖x‖ 的关系，可以确认收益不是某一路尺度爆炸造成的表面变化。如果训练误差改善的同时，早层梯度和更新也恢复，并且主干、分支尺度保持可解释，这条证据链比单独报告最终分数更能支持“短路径改善深层优化”。</p>
+<p>还应对近恒等起点做消融。比较分支末层零初始化、非零初始化以及不同残差缩放，检验从 F(x) 接近零开始是否改善早期稳定性。如果零初始化或合适缩放带来的稳定变化与更好的训练轨迹一致，就进一步支持残差参数化和近恒等路径确实参与了优化改善。</p>
+<p>只有当参数与预算受控、深度增加时普通网络出现训练退化而残差网络仍可拟合、早层梯度与更新得到恢复，并且初始化消融呈现一致趋势时，才更有理由排除“只是参数更多”“只是正则不同”或偶然波动等替代解释。即便这些证据证明可优化性改善，也不意味着未知数据上的表现必然更好；泛化仍需单独的正则化和验证评测。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>普通深层网络在增加模块时，要求每个新模块通过自身的权重和非线性重新构造完整表示。前向信息必须连续穿过更多局部变换，反向梯度也必须沿同一条长链逐层传播。即使更深模型理论上能够保留较浅模型的解，优化器仍可能难以让新增模块精确实现恒等映射，于是深度增加反而带来训练退化。</p>
+<p>残差块把完整映射改写为输入与增量之和：</p>
+<p>y = x + F(x)</p>
+<p>捷径直接保留输入 x，变换分支只学习相对输入的修正 F(x)。如果分支暂时接近零，前向输出仍有 y ≈ x，已有表示不会因为新增模块尚未学好而被迫重写。这样，“加深但先不破坏原解”从多层共同重构恒等映射，变成让新增分支保持在零附近。</p>
+<p>同一个加法也改变了反向传播。残差块对输入的雅可比包含 I + J_F，其中 I 来自恒等捷径，J_F 来自变换分支。即使 J_F 较小，上游梯度仍可通过恒等项近似原样返回输入。跨越许多块时，梯度依然会连续乘上多个 I + J_F，所以残差连接不是对稳定性的绝对保证；它提供的是更接近恒等的局部路径，使深度累积不必一开始就完全依赖变换分支。</p>
+<p>为了让这种路径在训练初期真正接近恒等，可以把分支末层零初始化，或对残差分支使用合适的缩放，使 F(x) 初始较小，再由训练逐步放大有用修正。长期稳定还取决于分支与主干的尺度、归一化位置以及深度累积。分支过强会淹没 x，过弱则可能学不到有效变化，因此需要同时观察激活、梯度和更新量。</p>
+<p>严格恒等捷径要求两路形状一致。只有在宽度或分辨率变化的阶段边界，才需要用投影把 x 映射到可相加的形状；投影虽然保留了两路汇合的接口，却让主干不再是严格恒等。归一化的位置也会改变主干是否必须经过额外变换，因此会影响极深模型中的梯度路径。</p>
+<p>最终，残差连接从一个简单加法影响深层训练的因果链是：完整映射被重新参数化为“保留输入加学习增量”，恒等捷径保住前向信息，反向雅可比获得恒等项，近零分支让多块从近恒等状态开始，而投影、归一化和尺度控制决定这种优势能否随深度维持。是否真的缓解了退化，不能只看最终分数，而要由训练误差轨迹、分层梯度剖面和深度消融共同验证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>理解残差连接依赖几个相互关联的概念。首先是梯度消失：只有看清雅可比在深度方向上的连续乘积怎样产生指数式的衰减或放大，才能理解恒等项 I 为什么会改变反向传播路径，以及“局部导数接近 1”究竟缓解了什么问题。</p>
+<p>其次是归一化。残差块在相加前后如何控制两路尺度，会影响主干信息能否保留；在 Transformer 中，Pre-Norm 与 Post-Norm 把归一化放在不同位置，因此主干是否必须经过归一化、梯度路径是否接近恒等也随之改变。继续学习归一化时，应把注意力放在相加前后的尺度关系，而不只是归一化公式本身。</p>
+<p>残差连接还要放回具体架构中理解。卷积神经网络与 Transformer 都由变换子层和捷径组成残差块，但子层形式、形状变化方式和归一化位置并不相同。沿数据流画出两条前向路径，并标明它们在哪里变换、在哪里汇合，可以帮助识别标准残差块的共同结构与不同实现。</p>
+<p>初始化和训练策略决定网络能否真正从近恒等状态开始。零初始化、预热、按深度缩放、优化器与学习率调度需要结合考察：目标是让分支初期不过强，同时仍保留学习有效修正的能力。判断配置是否合适，应同时观察训练误差、梯度剖面、参数更新和分支相对主干的尺度。</p>
+<p>相加也不是唯一的跨层或跨来源连接方式。继续研究多模态与其他连接结构时，需要区分逐元素相加、通道拼接和跨模态融合各自保留什么信息、怎样改变输出形状，以及后续模块如何使用这些信息。掌握这些差别后，残差连接的核心判断就会更清晰：两条前向路径如何组成 x + F(x)，反向雅可比为何出现 I + J_F，简化的深度倍率如何计算，以及哪些训练观测能够支持“可优化性确实得到改善”。</p></div>
+<table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>短路径解决什么</td><td><a href="#" data-node="vanishing-gradient">梯度消失</a></td><td>雅可比连乘怎样制造指数效应？</td></tr><tr><td>相加前怎样稳定尺度</td><td><a href="#" data-node="normalization">归一化</a></td><td>Pre-Norm/Post-Norm 如何改变主干？</td></tr><tr><td>残差所在的整体架构</td><td><a href="#" data-node="transformer">Transformer</a>、<a href="#" data-node="cnn">卷积神经网络</a></td><td>子层和捷径怎样组成标准块？</td></tr><tr><td>怎样选择初始化</td><td><a href="#" data-node="optimizer-schedule">优化器与学习率调度</a></td><td>零初始化、预热和深度缩放如何配合？</td></tr><tr><td>另一类连接方式</td><td><a href="#" data-node="multimodal">多模态</a></td><td>相加、拼接与跨模态融合分别保留什么信息？</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">Deep Residual Learning for Image Recognition</a>：残差学习、深度退化与 ResNet。</li><li><a href="https://arxiv.org/abs/1603.05027" target="_blank" rel="noopener">Identity Mappings in Deep Residual Networks</a>：恒等捷径与传播分析。</li><li><a href="https://arxiv.org/abs/2002.04745" target="_blank" rel="noopener">On Layer Normalization in the Transformer Architecture</a>：Pre-LN/Post-LN 优化差异。</li><li><a href="https://arxiv.org/abs/1901.09321" target="_blank" rel="noopener">Fixup Initialization</a>：无归一化残差网络的深度相关初始化。</li></ul><p>结构图、数值倍率、对照表和实验方案均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/residual-connection">在地图中查看概念关系</a></nav>
+</article></main></body></html>

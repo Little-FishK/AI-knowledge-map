@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>响应预填充：让模型从一个给定的答案前缀继续 · AI 知识地图</title>
+<meta name="description" content="理解 assistant prefix 如何改变条件分布，并与输入 prefill、提示缓存和约束解码严格区分。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/prefilling/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="响应预填充：让模型从一个给定的答案前缀继续">
+<meta property="og:description" content="理解 assistant prefix 如何改变条件分布，并与输入 prefill、提示缓存和约束解码严格区分。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/prefilling/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="响应预填充：让模型从一个给定的答案前缀继续">
+<meta name="twitter:description" content="理解 assistant prefix 如何改变条件分布，并与输入 prefill、提示缓存和约束解码严格区分。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/prefilling/#page","name":"响应预填充：让模型从一个给定的答案前缀继续","description":"理解 assistant prefix 如何改变条件分布，并与输入 prefill、提示缓存和约束解码严格区分。","url":"https://ai-knowledge-map.com/zh/concepts/prefilling/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"响应预填充：让模型从一个给定的答案前缀继续","item":"https://ai-knowledge-map.com/zh/concepts/prefilling/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">响应预填充：让模型从一个给定的答案前缀继续</span></li></ol></nav><article id="dd-article" data-concept-id="prefilling">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">响应预填充：让模型从一个给定的答案前缀继续</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">理解 assistant prefix 如何改变条件分布，并与输入 prefill、提示缓存和约束解码严格区分。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 响应预填充把一段 assistant 文本视为已经生成的前缀，模型只续写其后内容。它能强烈偏置开头、格式和语气，但仍是<b>概率条件</b>：错误前缀会锚定后续，且无法保证完整 schema、事实正确或动作安全。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>解释前缀条件分布；手算续写概率变化；区分三种 prefill/caching；设计拼接、停止与验证流程。</div>
+<ol class="dd-chain"><li>选择可独立保证正确的最小前缀</li><li>按真实 API 契约发送 assistant prefix</li><li>模型条件于前缀续写</li><li>正确拼接/停止并等待完整结果</li><li>做 schema/事实/权限验证</li><li>与空前缀配对评测并监控锚定</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>模型不是重新回答，而是继续已开始的答案<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>响应预填充解决的是这样一个问题：让模型按照我们预先确定的结构或内容开头，而不是由模型自由选择回答的起点。它的输入包括用户与系统上下文，以及一段已经确认要出现在回答中的 assistant 前缀；输出则是模型从前缀之后继续生成的 token 序列。</p>
+<p>机制上，预填并不是让模型&quot;重新回答&quot;一遍。当我们把 <code>{&quot;action&quot;:&quot;</code> 这样的片段放进 assistant 侧的历史消息中，模型看到的上下文里已经存在这段文本。模型在自回归生成时唯一要做的事情，是预测这段前缀之后的下一个 token。也就是说，前缀被放进条件上下文，模型不会重新选择它，只会以它为条件继续书写。</p>
+<p>这一机制带来两个直接后果。第一，与续写连贯性不相容的内容会被压低概率。开场寒暄、Markdown 代码围栏，或者其他与给定前缀不连续的结构，都会因为无法与前缀自然衔接而概率下降。因此，一个简短的预填前缀常常比长篇的&quot;不要寒暄、直接给结论&quot;这类指令更直接有效——指令只是描述期望，而前缀直接把期望变成模型必须面对的现实条件。第二，前缀同样会锁定假设。如果预填的是&quot;退款已批准，因为&quot;，模型的任务就从&quot;判断是否应该退款&quot;变成了&quot;为已经宣布的结论寻找理由&quot;；即使订单其实不符合退款条件，模型也倾向于顺着前缀把理由编出来。预填因此不是中性的格式技巧，它对结论方向有真实的约束力。</p>
+<p>对结果的解释也必须限定在这一机制之内：生成结果只证明续写与前缀是连贯的，并不证明前缀中的事实本身正确。模型接受前缀，不代表它核实过前缀；模型顺着前缀写出理由，也不代表理由成立。</p>
+<p>因此使用边界很明确：只预填你能独立保证正确、并且希望固定下来的最小文本，例如一个确定的 JSON 起始片段或一个已核实的事实性开场；其余内容交给后续的约束条件和业务校验去决定。预填的力度应当与你能承担的正确性担保相匹配。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>它改变条件，不改变参数<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>预填改变生成结果的机制，可以用条件概率来说明。设 x 为用户与系统上下文，p 为已经提供的回答前缀，模型生成完整续写的概率写作 P(续写 | x, p)。模型权重在此过程中没有发生任何变化——预填不涉及微调，不修改任何参数。变化发生在条件一侧：自回归生成的每一步，注意力机制都会读取 p，因此每一步可选的 token 空间和概率分布都被重新塑造。</p>
+<p>由此可以推出前缀强度的因果链。前缀越具体，被允许的路径就越少。只预填一个&quot;{&quot;，承诺的仅仅是一个 JSON 风格的开头；预填完整的 {&quot;action&quot;:&quot;refund&quot;，则已经替模型做出了业务决定——退款这个动作被写死，模型只能在既成结论下继续书写。两种前缀的风险完全不同：前者只约束形式，后者锁定了内容。</p>
+<p>如果 p 与模型自己的模板习惯或任务本身冲突，续写并不会被拒绝，而是被推进一个低概率区域勉强进行。模型被迫在前缀设定的轨道上寻找一条连贯但概率不高的路径，这种&quot;勉强&quot;恰恰是冲突存在的证据。</p>
+<p>还要看到，概率偏置不是硬保证。即使开头被固定，模型仍然可能在闭合对象之后追加说明、漏掉字段，或者生成事实性错误。前缀改变的是路径的倾向，不是结果的正确性。</p>
+<p>所以条件生成的完整图景是：输入为上下文 x、前缀 p 与已经产生的续写，输出为下一个 token 的概率分布以及最终的续写文本。把前缀理解为对事件空间的裁剪——更具体的前缀减少可选路径，而冲突或错误的前缀则把续写锚定在错误的区域里。</p></div>
+<div class="dd-formula"><math display="block" aria-label="给定上下文和前缀时完整续写的条件概率"><mi>P</mi><mo>(</mo><mi>y</mi><mo>|</mo><mi>x</mi><mo>,</mo><mi>p</mi><mo>)</mo><mo>=</mo><munder><mo>∏</mo><mi>t</mi></munder><mi>P</mi><mo>(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>|</mo><mi>x</mi><mo>,</mo><mi>p</mi><mo>,</mo><msub><mi>y</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>三种相似名称必须分开<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>prefill 这个名称在推理服务里指代多个完全不同的东西，把它们混为一谈会直接导致实现错误。需要区分的有四个概念：响应预填充、输入 prefill 阶段、提示缓存，以及作为参照的约束解码。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">概念</th><th class="dd-align-left">作用对象</th><th class="dd-align-left">目的</th><th class="dd-align-left">是否改变输出条件</th></tr></thead><tbody><tr><td class="dd-align-left">响应预填充</td><td class="dd-align-left">assistant 文本前缀</td><td class="dd-align-left">引导开头与结构</td><td class="dd-align-left">是</td></tr><tr><td class="dd-align-left">输入 prefill 阶段</td><td class="dd-align-left">全部输入 token</td><td class="dd-align-left">计算输入 KV</td><td class="dd-align-left">不是产品控制，属推理计算</td></tr><tr><td class="dd-align-left">提示缓存</td><td class="dd-align-left">共同输入前缀的 KV</td><td class="dd-align-left">跨请求复用计算</td><td class="dd-align-left">正确实现下为否</td></tr><tr><td class="dd-align-left">约束解码</td><td class="dd-align-left">每步合法 token 集</td><td class="dd-align-left">保证形式语言</td><td class="dd-align-left">是，且为硬屏蔽</td></tr></tbody></table></div>
+<p>四个概念的区别从&quot;作用对象&quot;这一列就能看出。响应预填充处理的是 assistant 侧的文本前缀，直接塑造模型看到的回答历史，因此改变输出条件。输入 prefill 阶段处理的是全部输入 token，目的是把上下文编码成 KV 表示，它是推理计算内部的必要环节，并不属于产品层面的控制手段。提示缓存则把共同输入前缀的 KV 结果保存下来，让多个请求复用同一段计算；在实现正确的前提下，缓存命中与重新计算的输出条件应当一致，因此它只减少计算量，不改变内容。约束解码在每一步生成时都给出合法 token 集合，用硬屏蔽保证输出符合某种形式语言，例如强制输出合法 JSON；它同样改变输出条件，但方式和响应预填充不同——它是排除非法路径，而不是给定一个续写起点。</p>
+<p>常见的混淆还有一层：&quot;预填充加速&quot;通常指的是输入 prefill 阶段的计算优化，而&quot;响应预填充&quot;是把答案开头交给模型继续书写。两者共享 prefill 一词，概念和性能目标却完全不同。</p>
+<p>因此，概念消歧可以按一个固定流程进行：输入是一个名为 prefill 或 cache 的功能及其作用对象，输出是&quot;响应前缀、输入计算、缓存复用或硬约束&quot;中的一种分类。先看它处理的是 assistant 文本、输入 token、KV 结果还是合法 token 集，再判断它改变的是内容条件还是仅仅减少计算。名称相似不能推出语义或接口兼容，最终行为仍以服务文档和契约测试为准。</p></div>
+<table class="dd-table"><thead><tr><th>概念</th><th>对象</th><th>目的</th><th>是否改变输出条件</th></tr></thead><tbody><tr><td>响应预填充</td><td>assistant 文本前缀</td><td>引导开头/结构</td><td>是</td></tr><tr><td>输入 prefill 阶段</td><td>全部输入 token</td><td>计算输入 KV</td><td>不是产品控制，属推理计算</td></tr><tr><td>提示缓存</td><td>共同输入前缀 KV</td><td>跨请求复用计算</td><td>正确实现下否</td></tr><tr><td>约束解码</td><td>每步合法 token 集</td><td>保证形式语言</td><td>是，且为硬屏蔽</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：一个字符怎样重新分配首步概率<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个具体的运行示例可以看出&quot;分布错位&quot;如何发生。没有前缀时，模型回答任务的第一候选往往是&quot;当然&quot;这样的寒暄开场；预填一个&quot;{&quot;之后，模型面对的候选集合完全不同。</p>
+<p>图 1 对比两种条件下首个续写 token 的概率分布：无响应前缀与预填左花括号。两个分布的事件空间不同——预填的&quot;{&quot;本身已经不在候选之列，它成了条件上下文的一部分。因此不能把无前缀分布里&quot;{&quot;的 0.25 与预填分布里&quot;action&quot;的 0.60 说成&quot;同一个 token 的概率从 0.25 提升到 0.60&quot;：前者预测的是答案的第一个 token，后者预测的是花括号之后紧跟的 token，两者根本不是同一事件。正确的评测方式是比较完整输出的结构通过率、内容质量与失败类型。</p>
+
+<p>*取决于支持范围。</p>
+<p>三行对比显示了改善发生在哪一层：从仅提示到预填&quot;{&quot;，首次 JSON 语法通过率从 94% 提升到 98%，Schema 符合率从 86% 提升到 89%；约束解码能把这两项推到 100% 和 99%，但后者取决于服务对所需语法的支持范围。最右一列的事实正确率始终是 80%，没有任何一行改善它。这个案例要强调的是：前两层（语法与结构）的改善不会自动抬高事实正确率。</p>
+<p>回到机制层面，这个案例的输入是空前缀或&quot;{&quot;两种条件以及各自的首步候选，输出是两个不同位置的概率分布和完整的结构指标。解释结果时必须承认 0.25 与 0.60 不是同一事件，不能直接相减当作提升；要解释的是完整输出的结构、事实与失败类型，而不是单个 token 的数字变化。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="无响应前缀与预填左花括号后首个续写 token 概率变化"><rect x="20" y="50" width="280" height="154" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="160" y="76" text-anchor="middle" class="svg-t">无前缀：回答从零开始</text><text x="66" y="110" class="svg-t" font-size="11">“当然” .45</text><rect x="135" y="96" width="125" height="18" fill="#d3a05a"/><text x="66" y="140" class="svg-t" font-size="11">“{” .25</text><rect x="135" y="126" width="69" height="18" fill="#4f9d78"/><text x="66" y="170" class="svg-t" font-size="11">“```” .20</text><rect x="135" y="156" width="55" height="18" fill="#c77b72"/><rect x="400" y="50" width="280" height="154" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="540" y="76" text-anchor="middle" class="svg-t">预填 “{”：模型只预测其后</text><text x="442" y="110" class="svg-t" font-size="11">“action” .60</text><rect x="520" y="96" width="130" height="18" fill="#4f9d78"/><text x="442" y="140" class="svg-t" font-size="11">“status” .25</text><rect x="520" y="126" width="54" height="18" fill="#6b8cbe"/><text x="442" y="170" class="svg-t" font-size="11">“note” .10</text><rect x="520" y="156" width="22" height="18" fill="#d3a05a"/><path d="M300,127 L398,127" stroke="#6b7484" stroke-dasharray="5 4"/></svg><figcaption>图 1　两个分布的事件空间不同：预填的“{”已不是候选，而是条件上下文的一部分。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>方案</th><th>首次 JSON 语法</th><th>Schema</th><th>事实正确</th></tr></thead><tbody><tr><td>仅提示</td><td>94%</td><td>86%</td><td>80%</td></tr><tr><td>预填 {</td><td>98%</td><td>89%</td><td>80%</td></tr><tr><td>约束解码</td><td>100%</td><td>99%*</td><td>80%</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>适合固定开场，不适合替模型做结论<span class="dd-badge eng">用途</span></h2>
+<div class="dd-agent-response"><p>预填的风险取决于前缀落在&quot;格式&quot;还是&quot;内容&quot;上。较适合预填的是低风险格式骨架：JSON 的开括号、固定标题、已验证的代码前文、语言或语气开场、枚举标签的共同前缀。这些文本只规定表达形式，不注入任何尚未成立的判断。高风险的前缀则相反：成功/失败结论、用户身份、金额、引文、工具已执行状态，以及任何未经外部验证的事实。它们把本应由证据或权威系统决定的内容写死在了条件里。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">前缀</th><th class="dd-align-left">风险</th><th class="dd-align-left">替代</th></tr></thead><tbody><tr><td class="dd-align-left">{</td><td class="dd-align-left">低，但不能保证完整 JSON</td><td class="dd-align-left">schema 约束</td></tr><tr><td class="dd-align-left">&quot;根据政策证据：&quot;</td><td class="dd-align-left">证据实际缺失时会误导</td><td class="dd-align-left">条件模板 / 拒答</td></tr><tr><td class="dd-align-left">&quot;退款已批准&quot;</td><td class="dd-align-left">锚定未经授权的结论</td><td class="dd-align-left">工具确认后由服务器填写</td></tr><tr><td class="dd-align-left">已有代码文件</td><td class="dd-align-left">旧代码可能含漏洞或注入</td><td class="dd-align-left">版本与测试校验</td></tr></tbody></table></div>
+<p>逐行看这四类前缀的因果。&quot;{&quot;只承诺 JSON 风格的开头，风险低，但它不能保证输出是完整合法的 JSON，结构校验仍要交给 schema 约束。&quot;根据政策证据：&quot;假设了政策证据存在；如果证据实际缺失，模型会顺着这个开头编造引用来源，把误导伪装成有据可查。替代方案是使用条件模板，在证据不足时显式输出拒答。&quot;退款已批准&quot;直接把未经授权的结论锚定在上下文里，替代方案是让工具确认之后由服务器填写这句话。粘贴已有代码文件作为前文同样危险，旧代码可能含有漏洞或注入缺陷，替代方案是对版本与测试进行校验后再决定是否作为上下文。</p>
+<p>因此前缀选择可以描述为一个决策函数：输入拟固定的文本、它的证据状态和任务风险，输出一个中性骨架，或者&quot;不使用预填&quot;的决定。只有 JSON 开括号、标题或已验证代码这类内容适合固定；结论、身份、金额、引文和工具状态必须由权威系统确认。前缀越长，它覆盖的语义就越多，锚定未知事实的概率也就越高。</p></div>
+<table class="dd-table"><thead><tr><th>前缀</th><th>风险</th><th>替代</th></tr></thead><tbody><tr><td>{</td><td>低，但不能保完整 JSON</td><td>schema 约束</td></tr><tr><td>“根据政策证据：”</td><td>若证据实际缺失会误导</td><td>条件模板/拒答</td></tr><tr><td>“退款已批准”</td><td>锚定未经授权结论</td><td>工具确认后由服务器填</td></tr><tr><td>已有代码文件</td><td>旧代码可能含漏洞/注入</td><td>版本与测试校验</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>API 模板、拼接与停止规则会制造隐藏错误<span class="dd-badge eng">实现</span></h2>
+<div class="dd-agent-response"><p>API 接入层常常是预填失效的地方。为什么有些服务不允许最后一条 assistant 消息非空？因为聊天模板和安全策略由服务方实现：有的 API 原生支持 assistant 前缀，有的会拒绝这种请求、自动闭合消息，或者把前缀当作一段历史回答处理。同一个概念在不同服务里的语义并不一致。因此接入前必须查阅接口文档，并用真实模型测试三个问题：返回的 delta 是否包含前缀本身，计费是否把前缀算入，流式响应的第一个事件从哪里开始。这三个答案决定了客户端应当如何组装结果。</p>
+<p>客户端侧的拼接规则同样有隐藏陷阱。前缀只能拼接一次，之后按 UTF-8 增量解码每个流式片段；停止串可能跨越 token 或事件边界，所以不能简单地对字符串做裁剪。如果前缀以半个转义序列或不完整 Unicode 字符结尾，模型会被迫从一个无法合法继续的位置起步，产生的路径可能无法恢复。日志中应记录前缀的版本信息，但避免写入敏感原文。</p>
+<p>模板重复是契约理解错误的典型症状。如果服务端把前缀回显在输出里，而客户端又手动前置了一遍，最终文本就会出现 &quot;{{&quot; 这样的双重开括号或重复标题。这类问题必须在契约测试中覆盖，而不是等线上输出出现畸形时才发现。</p>
+<p>把整个接入流程抽象出来：输入是服务能力、assistant 前缀、流式事件与停止规则，输出是正确拼接的一份完整结果。服务端决定前缀被当作续写条件、历史答案还是非法消息；客户端则按契约完成拼接、解码与停止。一旦看到回显或重复开头，说明对契约的理解有误。半个转义、不完整 Unicode 和未经实测的接口，都不适合直接进入生产环境。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>错误前缀会造成锚定和“合理化”<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>为什么强迫答案以&quot;是&quot;开头，会让模型更自信地编出理由？受控生成系统（LMQL、Guidance）的运作方式说明了这一点：系统把给定的部分回答当作已经生成的内容放进上下文，模型唯一的任务是条件于它继续补全。即使内部证据倾向&quot;否&quot;，一个已经给定的&quot;是，因为&quot;也会让反驳在语言上变得突兀——否定意味着与前缀直接冲突，而顺着前缀继续只需找到支持性理由。于是模型更可能去搜寻论证&quot;是&quot;的材料。这是条件生成的自然结果，不是模型主动撒谎：模型只是在维持连贯性，而连贯性本身被错误的前缀劫持了。</p>
+<p>可以用正反对照测试来暴露这种锚定。对同一个问题分别预填&quot;是&quot;&quot;否&quot;和空前缀三个版本，观察结论如何随前缀变化。如果事实判断随前缀翻转，说明系统在用格式控制替代证据——输出看起来言之凿凿，实际只是前缀的回声。高风险任务因此只能预填中性骨架，任何带有结论方向的词都不应出现在前缀里。</p>
+<p>还有一层安全绕过风险。预填可能把模型置于安全模板中不常见的状态：常规安全训练通常假设答案开头由模型自己产生，而外部给定的开头可能绕过某些防护路径。供应商允许的前缀范围与安全行为，必须单独进行红队测试，不能因为接口支持就默认安全。</p>
+<p>锚定测试的完整形式是：输入同一问题的空前缀、&quot;是&quot;和&quot;否&quot;三个版本，输出各自的结论变化和证据变化。模型按连贯性续写已有开头，所以当理由随前缀翻转时，它表明格式正在替代证据，而不是答案变得更可靠。高风险任务只能使用中性骨架，并且需要单独的红队验证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>预填不能替代完整约束和业务验证<span class="dd-badge eng">可靠性</span></h2>
+<div class="dd-agent-response"><p>输出已经以 &quot;{&quot; 开头，不代表它通过了任何实质检查。预填只塑造了形式，真正决定安全性的是一串独立的业务验证门。系统的检查必须依次经过：等待完整输出和明确的结束标志——断流不是完成，半截 JSON 不能进入后续流程；解析 JSON 并执行 schema 校验，确认结构与字段类型合法；验证金额、日期、引文和跨字段不变量，防止字段各自合法但组合起来自相矛盾；对涉及的实体查询权威数据库，未知实体应当向用户询问而不是猜测；工具执行按当前主体重新鉴权，并以幂等方式提交，避免重复执行造成副作用。</p>
+<p>当结构校验失败时，允许有限次数的重试；如果同一类失败反复出现，就说明预填加提示词这条路径已经到极限，应当改用约束解码或直接上表单。这指向一个更一般的结论：若硬结构是核心要求，直接使用受支持的约束解码，比不断加长前缀和反复修补提示词更可靠。预填适合作为兼容性或体验优化，不应当被包装成任何形式的保证。</p>
+<p>业务验证的完整图景可以这样描述：输入是完整模型输出、schema、权威数据与当前权限，输出是&quot;可接受、拒绝或重新询问&quot;三种裁决之一。系统依次检查完整性、结构、字段事实、实体权限和幂等提交。通过 JSON 解析只说明形式正确，不说明事实成立或动作获得授权——形式正确与内容正确、动作合法是三个彼此独立的问题。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要和无预填基线配对<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>结构通过率上升之后，需要回答一个更难的问题：事实质量、拒答行为和安全是否被前缀悄悄伤害了。答案是配对评测——同一批输入必须同时跑空前缀与候选前缀两个版本，逐项比较。要测量的指标包括首次语法/schema 通过、字段准确、任务成功、事实正确、拒答、越权、输出长度、首 token 时间 TTFT 与 token 成本；并且按缺信息、高风险、语言和长输入四个切片分别统计，避免平均数的掩盖效应。</p>
+<p>配对评测中有一个专门的指标：前缀反转率。给同一问题加上相反结论的前缀，观察答案是否在没有证据的情况下跟着翻转。反转率高的前缀说明它正在替代证据做决定，而不是只做格式引导。此外还要注入故障测试：断流、服务端回显、重复拼接、Unicode 边界、停止串和接口升级，确认前缀在异常路径下不会产生不可恢复的错误。</p>
+<p>只有同时满足两个条件才能采用候选前缀：格式指标改善，且内容与风险指标不退化。成功标准可以写成一句话——前缀应当减少低价值开场和格式偏离，但不能替模型决定未知事实，也不能让下游因为&quot;开头看起来对了&quot;而降低校验力度。</p>
+<p>配对评测的输入是相同样本在空前缀与候选前缀下的结果，输出是格式、事实、拒答、安全、延迟和成本六个维度的差异。任何模型、API 或模板版本变化之后，都必须重新跑完整配对评测，因为前缀的有效性与风险都绑定在具体的实现版本上。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各环节按因果顺序连起来，预填的完整链路从选择前缀开始，到监控锚定结束。</p>
+<p>第一步是选择可独立保证正确的最小前缀。这个选择决定了整条链的风险上限：前缀只承担你能够用证据背书的部分，其余留白。第二步是按真实 API 契约发送 assistant 前缀——服务可能支持、拒绝或回显它，接入方式必须经过实测确认。第三步，模型以前缀为条件续写：权重不变，但每一步都读取前缀，事件空间被裁剪，路径概率被重塑。这一步是机制的核心，也是所有锚定效应的来源。第四步，正确拼接与停止，等待完整结果；断流、重复前缀、半个转义和不完整 Unicode 都会在这一步把前面的工作变成不可恢复的错误。第五步，对完整输出执行 schema、事实与权限验证；形式正确不构成任何担保，事实与动作授权必须由独立系统确认。第六步，与空前缀配对评测，并持续监控锚定——只有格式改善且内容与风险不退化时，前缀才值得保留。</p>
+<p>这条链的每一环都以前一环的输出为输入，任何一环的放松都会把风险传递给下游：前缀越具体，锚定越强；契约越模糊，拼接越容易出错；验证越弱，形式正确就越容易被误认为内容正确。反过来，链的终点也约束着起点——只有你能独立保证正确的内容，才配出现在第一步的前缀里。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2212.06094" target="_blank" rel="noopener">Language Models as Programmable Systems</a>：LMQL 与受控生成</li><li><a href="https://arxiv.org/abs/2307.09702" target="_blank" rel="noopener">Guidance</a>：交错控制与生成</li><li><a href="https://arxiv.org/abs/2109.05093" target="_blank" rel="noopener">PICARD</a>：与硬约束解码对照</li><li><a href="https://arxiv.org/abs/2305.11627" target="_blank" rel="noopener">Anchoring Effects in Large Language Models</a>：输入锚点对模型判断的影响</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/prefilling">在地图中查看概念关系</a></nav>
+</article></main></body></html>

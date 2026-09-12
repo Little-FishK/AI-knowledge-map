@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>推理优化：先定位 prefill、decode、KV 还是排队瓶颈 · AI 知识地图</title>
+<meta name="description" content="从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/inference-optimization/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="推理优化：先定位 prefill、decode、KV 还是排队瓶颈">
+<meta property="og:description" content="从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/inference-optimization/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="推理优化：先定位 prefill、decode、KV 还是排队瓶颈">
+<meta name="twitter:description" content="从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/inference-optimization/#page","name":"推理优化：先定位 prefill、decode、KV 还是排队瓶颈","description":"从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。","url":"https://ai-knowledge-map.com/zh/concepts/inference-optimization/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"推理优化：先定位 prefill、decode、KV 还是排队瓶颈","item":"https://ai-knowledge-map.com/zh/concepts/inference-optimization/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">推理优化：先定位 prefill、decode、KV 还是排队瓶颈</span></li></ol></nav><article id="dd-article" data-concept-id="inference-optimization">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">推理优化：先定位 prefill、decode、KV 还是排队瓶颈</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> LLM 服务不是一个统一瓶颈：输入 prefill 常偏计算密集，逐 token decode 常偏内存带宽，KV 容量限制并发，调度决定排队与尾延迟。优化必须先用真实负载定位主因，再以<b>质量、p95/p99、吞吐、显存和每成功任务成本</b>联合验收。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分 TTFT、TPOT 和完成时间；识别计算/带宽/KV/排队瓶颈；推导批处理与推测解码收益；设计真实负载基准与回归门禁。</div>
+<ol class="dd-chain"><li>按请求阶段和长度切片测量</li><li>定位 compute/bandwidth/KV/queue 主因</li><li>选择内核/批处理/缓存/低精度方案</li><li>在受控负载做消融</li><li>真实并发压测尾延迟与过载</li><li>质量和每成功任务成本联合门禁</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>先把端到端时间拆开<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>优化推理服务的第一步不是换计算内核，而是把一次请求从进来到离开的时间拆成几段，因为不同段落对应完全不同的瓶颈。同样一句“慢”，可能发生在排队，可能发生在输入预填充，也可能发生在逐 token 生成；不拆开就不知道该改哪里。</p>
+<p>一次生成式推理请求的路径大致是：请求到达后先排队，随后系统对全部输入 token 做 prefill——一次性完成所有输入的前向计算并建立 KV（键值缓存），此后进入 decode 阶段，每一步只生成一个 token，直到输出结束；期间还可能穿插检索、工具调用和网络传输。这些阶段对负载形态的敏感度不同：长输入短输出的请求把压力主要放在 prefill 和 KV 建立上，而长输出请求长期占用 decode 槽位，并持续读取模型权重和 KV。因此长输入短回答与短输入长回答需要不同方向的优化——前者侧重批量预填充和缓存的效率，后者侧重单步解码的耗时与并发容量。</p>
+<p>要定位问题，需要按四个维度把请求切片：输入长度、输出长度、并发数、缓存命中。不先做这种切片，一个“平均慢”的指标无法告诉你该改计算内核、调度器、缓存策略还是换模型。</p>
+<p>切片之后可以计算两个核心指标。首 token 时间（TTFT）衡量从请求发出到用户看到第一个 token 的延迟：</p>
+<p>TTFT = Q + Ccontext + Tprefill + Tfirst</p>
+<p>其中 Q 是排队等待时间，Ccontext 是上下文准备时间（例如从外部存储装载历史会话），Tprefill 是对全部输入做预填充的计算时间，Tfirst 是第一步解码产生第一个 token 的时间。每 token 输出时间（TPOT）衡量首 token 之后平均每个新 token 的间隔，主要由 decode 阶段单步前向计算以及权重与 KV 的读取时间决定。一次完整请求的端到端时间可以写成：</p>
+<p>T完成 ≈ TTFT + (N − 1) × TPOT + Texternal</p>
+<p>N 是输出的 token 总数，Texternal 是工具调用与传输占用的时间。输出越长，(N − 1) 这一项的权重越大，TPOT 和 decode 阶段的效率就越关键。</p>
+<p>这两个指标指向不同的瓶颈，也对应不同的体验目标。交互式场景中用户盯着屏幕等第一个 token，TTFT 及其抖动（高百分位延迟比平均值更有意义）决定体感；离线批处理任务则更看重整体吞吐与单位输出成本。单一 tokens/s 无法代表用户体验——它把排队、首 token 和逐 token 生成混成一个数，很可能掩盖交互场景里真正的问题。先把端到端时间按上述方式拆开，并记录各阶段的日志（排队、输入长度、输出长度、工具与传输分别占多少），再输出 TTFT、TPOT 与端到端完成时间；后续各类优化手段各自只作用于其中某一项，这份分解就是判断每一项投入价值的基础。</p></div>
+<div class="dd-formula"><math display="block" aria-label="首 token 与完成时间分解"><mi>TTFT</mi><mo>≈</mo><mi>Q</mi><mo>+</mo><mi>Ccontext</mi><mo>+</mo><mi>Tprefill</mi><mo>+</mo><mi>Tfirst</mi><mo>;</mo><mi>Tcomplete</mi><mo>≈</mo><mi>TTFT</mi><mo>+</mo><mo>(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>×</mo><mi>TPOT</mi><mo>+</mo><mi>Texternal</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>prefill 与 decode 的硬件性格不同<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>同一个 Transformer 模型在 prefill 和 decode 两个阶段面对的是完全不同的硬件约束：一个吃算力，一个吃带宽。理解这种差别，是判断各优化手段有效性的共同前提。</p>
+<p>prefill 阶段要一次处理全部输入 token。不同位置的 token 在这一阶段可以并行计算，形成很大的矩阵乘法；矩阵乘法的算术强度高——单位数据搬运对应大量浮点运算——因而更容易把 GPU 的算力单元打满。decode 阶段则相反：每步只为当前 batch 生成一个新 token，batch 维和 token 维都很小，单步计算量小，但每一步都要把全部模型权重和不断增长的 KV 从显存中读一遍。数据搬运量与计算量的比例急剧上升，此时瓶颈往往不是算力，而是 HBM（高带宽显存）的带宽。</p>
+<p>这种权衡可以用 roofline 模型量化。对每个阶段分别统计四项输入：FLOPs（该阶段需要的浮点运算总数）、BytesIO（需要从内存搬运的总字节数）、ComputePeak（硬件峰值算力）、Bandwidth（硬件内存带宽）。由此计算算术强度：</p>
+<p>AI = FLOPs ÷ BytesIO</p>
+<p>即每搬运一个字节数据平均完成的浮点运算数。roofline 给出的该阶段性能上限是：</p>
+<p>Perfmax = min(ComputePeak, AI × Bandwidth)</p>
+<p>含义是：当算术强度足够高，使 AI × Bandwidth 超过算力峰值时，上限由算力决定，阶段处于算力受限；当算术强度低时，上限由 AI × Bandwidth 决定，阶段处于带宽受限。prefill 的大矩阵乘法通常落在算力受限一侧，decode 的逐 token 小步推理通常落在带宽受限一侧。需要明确的是，roofline 是定位瓶颈的直觉工具，不是对每个具体内核耗时的精确预测。</p>
+<p>按同样的拆法，推理请求各阶段的工作、瓶颈与优化手段可以对应如下：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">阶段</th><th class="dd-align-left">主要工作</th><th class="dd-align-left">常见瓶颈</th><th class="dd-align-left">典型优化</th></tr></thead><tbody><tr><td class="dd-align-left">排队</td><td class="dd-align-left">等待调度</td><td class="dd-align-left">容量、批策略</td><td class="dd-align-left">扩容、优先级、背压</td></tr><tr><td class="dd-align-left">prefill</td><td class="dd-align-left">输入并行矩阵/注意力</td><td class="dd-align-left">算力、长序列 IO</td><td class="dd-align-left">FlashAttention、前缀缓存</td></tr><tr><td class="dd-align-left">decode</td><td class="dd-align-left">逐 token 权重/KV 读取</td><td class="dd-align-left">带宽、串行步数</td><td class="dd-align-left">批处理、量化、推测解码</td></tr><tr><td class="dd-align-left">工具</td><td class="dd-align-left">外部请求</td><td class="dd-align-left">网络/服务</td><td class="dd-align-left">并行、超时、缓存</td></tr></tbody></table></div>
+<p>这张对应关系解释了为什么优化手段不能随意叠加。增大 batch 能提升 decode 阶段对权重的复用——同一份权重服务更多请求，摊薄每个 token 的读取开销——但 batch 越大排队时间越长，KV 占用也越多；量化把每个数值压缩到更少的字节，减少需要搬运的数据量，瞄准带宽瓶颈；FlashAttention 减少注意力计算中中间矩阵的显存往返，瞄准长序列 IO。三者各自作用于不同瓶颈，把手段用错阶段，对性能几乎不会有帮助。</p></div>
+<table class="dd-table"><thead><tr><th>阶段</th><th>主要工作</th><th>常见瓶颈</th><th>典型优化</th></tr></thead><tbody><tr><td>排队</td><td>等待调度</td><td>容量/批策略</td><td>扩容、优先级、背压</td></tr><tr><td>prefill</td><td>输入并行矩阵/注意力</td><td>算力、长序列 IO</td><td>FlashAttention、前缀缓存</td></tr><tr><td>decode</td><td>逐 token 权重/KV 读取</td><td>带宽、串行步数</td><td>批处理、量化、推测解码</td></tr><tr><td>工具</td><td>外部请求</td><td>网络/服务</td><td>并行、超时、缓存</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="算术强度与 roofline 性能上限"><mi>AI</mi><mo>=</mo><mfrac><mi>FLOPs</mi><mi>BytesIO</mi></mfrac><mo>;</mo><mi>Perfmax</mi><mo>≈</mo><mi>min</mi><mo>(</mo><mi>ComputePeak</mi><mo>,</mo><mi>AI</mi><mo>×</mo><mi>Bandwidth</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>连续批处理用动态调度填掉空洞<span class="dd-badge eng">调度</span></h2>
+<div class="dd-agent-response"><p>静态批处理的低效来自一个直观的事实：每个批次的 GPU 计算要等批内所有序列都产出终止符才能结束。即使某条请求只生成三个 token 就回答完毕，它占用的那一行计算位置在整个批次剩余的生命周期里都空着，GPU 依然为它保留座位。序列长度差异越大，这种空槽越多，吞吐损失越明显。连续批处理换掉了“整批开始、整批结束”的节奏：调度器以更细的粒度在每个调度步检查当前所有请求的状态，把已经结束的序列立即移出计算，并从等待队列里挑新请求插进空出来的容量。GPU 每一轮迭代只面对当前实际还活着的请求，利用率不再被最长的一条请求拖住。</p>
+<p>付出的代价同样明确。调度的频率从“每批一次”变成“每一步一次”，调度器本身必须足够便宜；延迟也不再是整批统一统计，而是每条请求随自身长度波动；当一个批次容量有限时，调度器还必须在长短请求之间做出取舍，公平性成为一个需要显式设计的目标。</p>
+<p>要安全地使用连续批处理，需要一组配套的容量约束。每步允许处理的最大 batch token 数给出硬性上限，避免一次塞入太多请求导致单步延迟失控；prefill 按 chunk 分段执行，让超长的 prompt 输入可以分多步消化，而不是一次 prefill 独占 GPU、把所有 decode 请求晾在一边；优先级和抢占机制则保证高优先级请求可以被插入、低优先级请求可以被暂停后恢复。在混合负载下，交互式队列和离线队列最好分池调度，并为关键租户保留专门的容量，否则大量离线任务会挤占需要低首 token 延迟的交互请求。</p>
+<p>组批等待时间是一个可调的旋钮，方向性很强：调度器等待组批的时间越长，越有机会凑出更大的有效批次，吞吐通常越高；但等待本身直接加在每个请求的 TTFT 上。调大这个窗口改善吞吐，恶化首 token 延迟；调小则相反。没有免费的参数。</p>
+<p>过载情形下连续批处理还有一层危险：如果等待队列没有上限，调度器会本能地把 GPU 填满，看起来吞吐达到最大，但队列长度与排队延迟同步膨胀，p99 尾延迟彻底失控。此时吞吐优化器实际上变成了延迟放大器。真正的保护来自 admission control，在请求进入时按容量判断是否接受或拒绝；来自背压，把满负荷信号传回上游调用方使其减速；以及租户之间的公平边界，防止单一租户的流量洪峰吃光共享容量。</p>
+<p>从接口角度看，连续批处理调度器的输入是等待中的请求集合、每一步可用的 token 容量和每个请求的优先级；输出是这一步的调度决定：哪些序列被移除、哪些新请求被插入、哪些 prefill 被分块、哪些低优先级序列被抢占。完成的序列立刻让位给新请求，空槽因此被动态填掉。但要记住这个优化真正保证的是什么：GPU 利用率与吞吐。吞吐提高并不自动带来尾延迟改善，平均延迟与 p99 的走势在过载时甚至可以相反。所以连续批处理必须与准入控制、背压和租户公平边界一起部署，才是一个完整的方案。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>KV cache 是并发容量的隐藏预算<span class="dd-badge math">内存</span></h2>
+<div class="dd-agent-response"><p>一个常见的困惑是：模型权重明明装得下，为什么并发请求一上来就 OOM？答案是显存里还有第二项大额开销——KV cache。注意力计算中，每个 token 在每一层都会产生自己的 K 和 V 向量，供后续 token 计算注意力时使用。如果不缓存它们，每生成一个新 token 都要把整个历史重新算一遍，代价无法承受；所以这些向量被保留下来。KV cache 的内存占用随并发请求数和序列长度近似线性增长，而权重是固定的，于是并发一提高，最先触顶的往往是 KV cache 而不是权重。</p>
+<p>它的容量可以精确估算。设 Nlayer 为层数，NKVhead 为每层的 KV 头数，d 为头维度，Ntoken 为每个请求的 token 数，B 为并发请求数，b 为每个元素的字节数，则 KV cache 内存 MKV 近似为：</p>
+<p>MKV = Nlayer × NKVhead × d × Ntoken × B × b × 2</p>
+<p>末尾的乘 2 是因为 K 和 V 各保存一份。以 32 层、8 个 KV 头、128 维、FP16（每元素 2 字节）的配置为例，单个 8k token 的请求约占 32 × 8 × 128 × 8000 × 2 × 2 ≈ 1.05GB；16 个并发请求就是约 16.8GB，这还没算模型权重、中间激活和工作区。这个估算直接回答了 OOM 从哪来，也给出了并发上限的数量级。</p>
+<p>PagedAttention 是应对 KV 内存管理的常用手段。它把 KV cache 放进固定大小的块，以块为单位分配，减少了反复分配释放造成的显存碎片，还支持多个请求共享同一前缀（如公共 system prompt）以及更灵活的驱逐策略。但必须清楚它的边界：PagedAttention 改善的是内存管理的效率，KV 向量本身仍然存在，它不会消除 KV 本体。</p>
+<p>真正压缩 KV 本体的手段是另一类。KV 量化把缓存元素换成低精度表示，容量和显存带宽都随之下降，却可能伤害长上下文下的质量，需要回归验证；滑动窗口只保留最近一段窗口内的 KV，历史上下文被截断；压缩缓存把长历史概括成更少的表示。后两者改变了模型实际可见的历史，本质上是算法变化，不能当作纯工程优化来对待，评估时必须连同质量一起测。</p>
+<p>所以 KV cache 的容量估算输入是层数、KV 头数、头维、token 数、并发数和元素字节数，输出是缓存内存总量。它用来解释 OOM 的来源和并发上限，而不是给出最终答案——PagedAttention 只减少碎片，量化或滑窗还需质量回归，任何压缩 KV 本体的手段都要先回答它对输出质量的影响。</p></div>
+<div class="dd-formula"><math display="block" aria-label="KV 缓存内存估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>B</mi><mo>×</mo><mi>b</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>运行示例：优化前后为何平均更快但 p99 更差<span class="dd-badge math">案例推演</span></h2>
+<div class="dd-agent-response"><p>一个退款助手服务在启用大批量处理后吞吐近乎翻倍，交互用户却开始投诉。这个看似矛盾的现象值得拆开看：推理请求从队列出发，经过 prefill 和 decode 两个阶段再返回用户；批处理把更多请求塞进同一个 GPU 迭代，吞吐上升，但个别请求的等待与执行时间可能被拉长。资源利用率的改善并不自动保证尾部体验——调度参数必须按 SLO 来选，而不是按峰值吞吐来选。</p>
+<p>下面这张对比表把三种组批策略放在同一负载下实测：</p>
+
+<p>读这张表的顺序很重要。先看吞吐：静态小批只有 40 tok/s，GPU 利用率低；激进连续批拉到 78 tok/s，几乎翻倍，单看这一列非常诱人。再看延迟分布：它的 TTFT p50 是 470ms，甚至比静态小批的 520ms 还好——平均用户确实变快了。但 TTFT p99 从 1.8s 恶化到 3.2s：少数请求被组批等待和长输入 prefill 卡在后面，首 token 迟迟出不来，这正是交互用户投诉的来源。TPOT p95 的 58ms 说明一旦开始生成，token 节奏并不差，问题集中在排队和 prefill 上。分池加 chunk prefill 的方案吞吐 70 tok/s 略低于激进方案，但 TTFT p99 压回 1.6s、p50 降到 430ms，所有交互 SLO 都在约束内，是真正更优的选择。</p>
+<p>这个案例的输入是三种组批策略及其吞吐、TTFT 和 TPOT 指标，输出是哪一个满足交互 SLO 的决策。判断方法不是看平均：先比较吞吐，再检查 p50 与 p99，激进连续批虽然平均更快，却因组批等待和长输入阻塞让 p99 失败。还要注意结论的边界：这些数字只适用于当时的负载分布，一旦请求长度构成、并发模式或租户结构改变，同一套参数可能给出完全不同的结果，负载变化后必须重测。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 710 260" role="img" aria-label="推理请求从队列经过 prefill 和 decode，批处理提高吞吐但可能增加尾延迟"><defs><marker id="io1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="90" width="120" height="70" rx="8" fill="#21252d" stroke="#c77b72"/><text x="78" y="115" text-anchor="middle" class="svg-t">请求队列</text><text x="78" y="138" text-anchor="middle" class="svg-t" font-size="11">等待组批 0–400ms</text><path d="M138,125 L203,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="205" y="90" width="140" height="70" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="275" y="115" text-anchor="middle" class="svg-t">chunked prefill</text><text x="275" y="138" text-anchor="middle" class="svg-t" font-size="11">长输入分块插空</text><path d="M345,125 L410,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="412" y="90" width="140" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="482" y="115" text-anchor="middle" class="svg-t">continuous decode</text><text x="482" y="138" text-anchor="middle" class="svg-t" font-size="11">完成即插入新序列</text><path d="M552,125 L617,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="619" y="90" width="74" height="70" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="656" y="115" text-anchor="middle" class="svg-t">流式</text><text x="656" y="138" text-anchor="middle" class="svg-t" font-size="11">delta</text><text x="355" y="205" text-anchor="middle" class="svg-t">吞吐 40→78 tok/s；平均 TTFT 520→470ms；p99 TTFT 1.8→3.2s（组批/长输入阻塞）</text></svg><figcaption>图 1　资源利用率改善不保证尾部体验；调度参数必须按 SLO 而非峰值吞吐选择。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>方案</th><th>吞吐</th><th>TTFT p50</th><th>TTFT p99</th><th>TPOT p95</th><th>结论</th></tr></thead><tbody><tr><td>静态小批</td><td>40 tok/s</td><td>520ms</td><td>1.8s</td><td>62ms</td><td>稳定但利用低</td></tr><tr><td>激进连续批</td><td>78 tok/s</td><td>470ms</td><td>3.2s</td><td>58ms</td><td>交互 SLO 失败</td></tr><tr><td>分池+chunk prefill</td><td>70 tok/s</td><td>430ms</td><td>1.6s</td><td>60ms</td><td>约束内更优</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>FlashAttention 减少 IO，不近似注意力结果<span class="dd-badge eng">内核</span></h2>
+<div class="dd-agent-response"><p>注意力计算里有一个巨大的中间产物：N×N 的分数矩阵。它的每一行要先过 softmax 再与 V 相乘，而 N 是序列长度，长序列下这个矩阵比输入本身大得多。普通实现把它完整写进高带宽显存 HBM，写一遍、读一遍，再写结果，IO 往返吞掉了大部分时间。FlashAttention 的做法是把 Q、K、V 切成小块，每次只把一小块装进 GPU 片上的 SRAM，在片上完成该块需要的计算，同时在线上维护 softmax 的行最大值和归一化和——这两个统计量足够让分块结果拼回完整 softmax 的正确值。中间分数矩阵始终不需要整体落回 HBM。</p>
+<p>值得强调的是，它做的不是近似。softmax 本来就可以用行最大值和归一化和拆解，FlashAttention 只是改变计算顺序，让数值在分块间递推合并。在数值精度范围内，它算出的是和标准实现同一个注意力结果，而不是稀疏注意力那样的近似目标。所以问题“不保存完整 N×N 矩阵还能算得精确吗”的答案是：能，因为被省掉的只是往返 HBM 的中间副本，不是计算本身。</p>
+<p>收益的大小取决于场景。序列越长、注意力 IO 在整体耗时里占比越高，收益越明显；短序列或整段推理被其他算子主导时，换内核的收益可能微乎其微，因为瓶颈根本不在这里。收益也随硬件、精度 dtype 和实现细节变化。升级内核属于底层改动，必须做数值、质量和稳定性回归，确认输出与旧实现一致、没有引入边界 bug。</p>
+<p>它的边界同样要划清：FlashAttention 降低的是注意力计算的 IO，不改变 KV cache 的长期容量——该存多少还是多少；也不解决队列等待和外部工具调用的延迟——那些时间发生在 GPU 内核之外。判断要不要优先升级，先看长 prefill 的注意力 IO 是否真的占主导；如果 p99 主要来自排队，换一个更快的内核只是治标，指标不会有明显改善。</p>
+<p>概括来说，FlashAttention 的输入与普通注意力相同——同一组 Q、K、V；输出是数值精度范围内相同的注意力结果，但 HBM 往返大幅减少。它改变计算顺序而非近似目标。收益意味着注意力 IO 降低了，不代表 KV 容量、排队延迟或工具延迟被解决；短序列和非注意力瓶颈下可能没有可见收益。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>量化减少字节，但属于质量相关改动<span class="dd-badge eng">低精度</span></h2>
+<div class="dd-agent-response"><p>把 FP16 权重改成 INT4，每个参数的字节数只剩四分之一，显存占用和权重读取带宽同步下降。这带来两类收益：模型能在更小的设备上装下，decode 阶段受显存带宽约束的吞吐可以提高，同样的显存还能容纳更大的 batch。但量化并不是把数字变小那么简单——低位宽张量在计算前通常要反量化回更高精度，这一步本身有内核开销；如果硬件没有针对该位宽的原生支持，收益会大打折扣；在小 batch 下权重带宽本来就不是瓶颈，省下的字节也就换不来速度。所以“量化后更快”不是必然结论，既可能更快也可能更慢，取决于反量化内核、硬件支持和小 batch 下瓶颈是否真的匹配。</p>
+<p>还要区分量化的对象，权重、激活和 KV 三者的影响各不相同：</p>
+
+<p>权重量化省的是模型常驻显存和读取带宽，风险在于少数数值范围异常的通道产生误差，以及反量化内核的额外开销。激活量化影响算子执行速度和分布式通信，风险来自激活值动态范围大、校准数据选不好时误差集中爆发。KV 量化省的是长上下文场景下 KV cache 的容量和带宽，风险是远距离 token 的检索精度下降和误差随序列累积。</p>
+<p>量化的评估方式也必须与普通优化不同。困惑度平均值只是最粗的参考线，服务质量的回归要按任务类型、语言、长上下文、概率校准和工具参数切片分别看：某个语言切片掉分、长上下文检索失效、模型输出的概率不再校准（比如 confidence 分数失真）、或者工具调用参数格式被破坏，都可能出现在整体平均看起来还行的模型上。量化的选择过程输入的是量化对象（权重、激活或 KV）、目标位宽、硬件内核和任务切片，输出的是低精度模型及其在显存、速度和质量上的差异。它属于质量相关改动，而非纯工程优化——更低位宽减少存储和带宽，反量化与校准又增加开销；“更快”只在硬件支持良好且瓶颈匹配时成立，采纳前必须按语言、长上下文、工具参数和高风险任务逐一回归。</p></div>
+<table class="dd-table"><thead><tr><th>对象</th><th>主要收益</th><th>主要风险</th></tr></thead><tbody><tr><td>权重</td><td>模型显存/带宽</td><td>少数通道误差、内核开销</td></tr><tr><td>激活</td><td>算子速度/通信</td><td>动态范围和校准</td></tr><tr><td>KV</td><td>长上下文并发/带宽</td><td>远距离检索与累积误差</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>推测解码用并行验证减少串行步数<span class="dd-badge math">推测</span></h2>
+<div class="dd-agent-response"><p>自回归生成的一个根本约束是串行：每生成一个 token，都要等目标模型跑完一次前向。推测解码用一个更小更快的草稿模型来打破这种串行依赖。草稿模型先按自己的分布快速猜出接下来 k 个 token；目标模型拿到这 k 个候选位置，用一次前向并行计算同时评估所有位置的概率，然后按接受/拒绝规则逐个校正——某个位置的草稿 token 与目标模型判断一致就接受，否则拒绝并从该位置起用目标模型自己采样，后面的草稿全部作废。只要接受/拒绝规则设计正确，最终产出的 token 序列在概率上仍服从目标模型的原始分布，加速不改变模型本身的行为。</p>
+<p>每轮的产出量可以用接受率 a（草稿 token 被目标模型接受的逐 token 概率）估计。第一个 token 必然产出，第二个以概率 a 产出，第三个以概率 a² 产出，以此类推，一轮的近似产出是 1 + a + a² + … + a^k。例如 a = 0.8、k = 4 时，约 1 + 0.8 + 0.64 + 0.512 + 0.4096 = 3.36 token/轮。但这是理想化的账：草稿模型本身要时间，验证批次也有成本，实际加速永远小于 3.36 这个数。</p>
+<p>接受率 a 决定了一切。草稿与目标模型分布越接近，a 越高；一旦领域错配——比如草稿模型没见过的专业任务——温度设置很高让采样随机性变大，或者两个模型能力差异过大，a 会大幅下跌，每轮实际只产出接近 1 个 token，却还要搭上草稿和验证的双份开销，结果比不用推测解码更慢。</p>
+<p>它优化的对象也要认清：推测解码改善的是 TPOT 和整体吞吐，针对的是 decode 阶段的串行步数；长输入 prefill 的计算量它无能为力。与流式输出结合时还有一个工程细节：验证批次会一次性吐出多个 token，如果不做平滑处理，用户会看到输出一段一段地突然出现，需要避免这种可见的突发抖动。</p>
+<p>把接口理一遍：推测解码的输入是草稿模型、目标模型、草稿长度 k 和逐 token 接受率 a，输出是经目标模型验证后的 token 序列。草稿先并行提出候选，目标模型批量验证并按规则接受或校正；近似轮产出是 1 + a + … + a^k。它保持正确目标分布的前提是使用正确的校正规则，而低接受率或高验证成本会让整体变慢。</p></div>
+<div class="dd-formula"><math display="block" aria-label="推测解码每轮近似产出"><mi>Edraft</mi><mo>≈</mo><mn>1</mn><mo>+</mo><mi>a</mi><mo>+</mo><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><mo>…</mo><mo>+</mo><msup><mi>a</mi><mi>k</mi></msup></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>真实负载基准和质量门禁缺一不可<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>离线单请求的 tokens/s 提升 2 倍，能不能说明生产环境真的变好了？不能直接说明。生产负载与单请求压测之间的差距在输入/输出长度联合分布、并发水平、请求到达的突发性、KV cache 命中率以及优先级构成上——单请求压测把这些全部抹平了。可迁移的基准要回放真实的这些特性，并报告一整套指标：TTFT、TPOT 和端到端延迟的 p50/p95/p99、吞吐、超时率、KV cache 与显存占用、功耗，以及每成功任务的成本。只报一个平均 tokens/s 无法支撑任何结论。</p>
+<p>负载场景也要刻意构造。稳态之外，还要跑突发流量、过载以及单节点故障：稳态看常规性能，突发看排队吸收能力，过载看 admission control 与背压是否生效，节点故障看恢复行为。任何量化、KV 压缩、上下文裁剪或近似解码这类可能改变输出的改动，都必须跑完整应用评测而不是模型层指标；“质量不变”的声明必须附带任务切片和置信区间，否则等于没有证据。内核和调度改动同样可能出问题——数值误差、请求饥饿、租户公平性破坏，这些不会体现在平均延迟里。</p>
+<p>基准作弊的套路是可以枚举的：固定短输出让结果永远好看；预热缓存把冷启动成本藏起来；忽略排队只测单请求；只报最好的 batch 配置；不统计失败的请求。任何一个都会让基准结果无法迁移到生产。反过来，一份可用的生产基准，输入是真实长度分布、并发、突发、缓存命中、优先级和故障注入，输出是延迟分位数、吞吐、资源占用、失败率、质量和每成功任务成本。做法是在固定负载下做方案对照，并覆盖稳态、过载和节点故障三类场景。只有平均 tokens/s 提升不能证明生产更好；任何算法或低精度变化都必须经过质量门禁。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面的手段串起来，推理优化是一条从问题到可验证实践的因果链，每一步都为下一步提供依据，跳步就会选错方案。</p>
+<p>第一步是测量，而且要按请求阶段和长度切片。端到端时间先拆成 prefill 与 decode，再按输入输出长度分层统计：长输入看 prefill，长输出看 decode，短请求看排队。切片之后的指标分布才会告诉你在哪里丢时间。</p>
+<p>第二步是定位主因。延迟高可能是算力不足（compute bound），可能是显存带宽不够（bandwidth bound），可能是 KV cache 容量顶满导致并发受限，也可能是队列在过载下无限增长。四类主因对应的解法完全不同，必须靠第一步的切片数据来判断，而不是凭直觉。</p>
+<p>第三步才是选择方案，方案要与主因匹配。注意力 IO 主导的长 prefill 才值得考虑内核升级；空槽多、利用低才上连续批处理；显存被 KV cache 挤爆才动缓存管理；字节和带宽都紧张、且愿意承担质量风险时才考虑低精度。反过来，p99 来自排队却去换内核，就是把方案用错了地方。</p>
+<p>第四步是在受控负载下做消融。固定同一份负载，一次只改一个变量，记录吞吐、延迟分位数的净变化，确认收益确实来自这个改动，而不是环境的噪声或叠加效应。</p>
+<p>第五步是放到真实并发下验证。回放生产长度分布、突发到达和缓存命中情况，压测尾延迟和过载行为；前面的案例已经说明，平均更快与 p99 合格是两回事，稳态好与过载不崩也是两回事。</p>
+<p>最后一步是质量与成本联合门禁。任何可能改变输出的手段——量化、KV 压缩、上下文裁剪、近似解码——都必须过质量回归；同时用每成功任务的成本把吞吐、显存、功耗折算成同一个尺度。两者同时达标，优化才算完成。每一步的输出都是下一步的输入，任何一步被跳过，结论就失去依据。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">FlashAttention</a>：IO 感知精确注意力</li><li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">vLLM</a>：PagedAttention 与高吞吐服务</li><li><a href="https://www.usenix.org/conference/osdi22/presentation/yu" target="_blank" rel="noopener">Orca</a>：迭代级调度与连续批处理</li><li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Fast Inference from Transformers via Speculative Decoding</a>：保持目标分布的推测解码</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/inference-optimization">在地图中查看概念关系</a></nav>
+</article></main></body></html>

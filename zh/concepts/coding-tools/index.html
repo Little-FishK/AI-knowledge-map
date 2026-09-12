@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>AI 编程工具：从仓库理解到补丁验证的证据闭环 · AI 知识地图</title>
+<meta name="description" content="从搜索、调用链定位和最小编辑，到测试、差异审查、工作树保护与安全回退，理解仓库级智能体为何不只是代码生成。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/coding-tools/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="AI 编程工具：从仓库理解到补丁验证的证据闭环">
+<meta property="og:description" content="从搜索、调用链定位和最小编辑，到测试、差异审查、工作树保护与安全回退，理解仓库级智能体为何不只是代码生成。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/coding-tools/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI 编程工具：从仓库理解到补丁验证的证据闭环">
+<meta name="twitter:description" content="从搜索、调用链定位和最小编辑，到测试、差异审查、工作树保护与安全回退，理解仓库级智能体为何不只是代码生成。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/coding-tools/#page","name":"AI 编程工具：从仓库理解到补丁验证的证据闭环","description":"从搜索、调用链定位和最小编辑，到测试、差异审查、工作树保护与安全回退，理解仓库级智能体为何不只是代码生成。","url":"https://ai-knowledge-map.com/zh/concepts/coding-tools/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"AI 编程工具：从仓库理解到补丁验证的证据闭环","item":"https://ai-knowledge-map.com/zh/concepts/coding-tools/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">AI 编程工具：从仓库理解到补丁验证的证据闭环</span></li></ol></nav><article id="dd-article" data-concept-id="coding-tools">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">AI 编程工具：从仓库理解到补丁验证的证据闭环</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从搜索、调用链定位和最小编辑，到测试、差异审查、工作树保护与安全回退，理解仓库级智能体为何不只是代码生成。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 编程智能体的价值不在生成看似合理的代码，而在真实仓库里形成<b>问题复现—定位—最小补丁—可执行验证—差异审查</b>的闭环；每个结论都应对应代码位置或运行证据。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>从现象追踪到最小相关调用链；设计先窄后宽的验证金字塔；保护用户工作树与权限边界；用补丁质量而非代码数量评测。</div>
+<ol class="dd-chain"><li>读取项目指令与工作树状态</li><li>用最小输入复现问题</li><li>沿堆栈/调用链定位根因</li><li>先建立失败测试或证据</li><li>应用最小范围补丁</li><li>由窄到宽运行验证</li><li>审查diff、依赖与安全影响</li><li>声明证据、未验证项与回退点</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>仓库任务首先是定位问题，不是开始写代码<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>一个真实的仓库任务，它的入口通常是一句自然语言的症状描述，比如 Issue 里写着“导出失败”。这类描述的陷阱在于：自然语言的现象和代码里的结构并不是一一对应的。“导出失败”可能是导出按钮绑定错了处理器，可能是 CSV 生成函数在空数据时抛异常，也可能是下载接口把 500 状态码当成成功返回。只凭“export”这个关键词直接改第一处命中的代码，往往只是遮住了症状，或者顺手破坏了另一条调用路径。</p>
+<p>仓库级编程工具要解决的核心问题，正是这个“自然语言问题与代码结构不一一对应”的定位难题。它的输入是任务现象、仓库当前状态、项目约束和运行环境；它的输出应当是最小补丁、可复现的运行证据，以及明确标注尚未验证的部分。整个过程围绕真实项目展开复现、定位、编辑、验证和审查，而不是在脱离上下文的提示词里拼一段代码。</p>
+<p>正确的顺序从“先定位”开始，而不是从“开始写代码”开始。第一步是读取项目自身的指令文件、当前分支和未提交状态，了解仓库约定和此刻的工作树基线。第二步是复现失败：捕获触发输入、错误信息、日志和依赖版本，让问题从一句模糊的描述变成一组可重复观察的事实。复现成功之后，再去搜索入口、调用者、数据流和测试，把现象沿着调用链往根因方向收敛。只有拿到定位证据，修改才有意义；没有复现就动手，本质上只是在猜测根因。补丁的价值不在于它看起来像修复，而在于它被一条可验证的因果链支撑。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>工具链形成观察—编辑—验证循环<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>搜索、编辑和测试这些工具各自向智能体回传不同性质的反馈，把它们串起来就形成一个“观察—编辑—验证”的循环。这个闭环的输入是仓库观察、搜索定位、候选编辑、测试结果和 diff，输出是下一步要验证的假设，或者一份可以交付的变更。每一阶段都在用外部证据缩小不确定性：没有反馈时猜测很多，反馈每来一次，可能的原因集合就收缩一截。循环一旦失败，正确做法是回到首次偏离预期的位置重新建立证据，而不是在已经跑偏的假设上继续叠加改动。</p>
+<p>这个循环可以按阶段拆开看，每个阶段对应一类工具证据，也对应一类常见误判。</p>
+<p>仓库观察阶段，工具反馈的是项目指令、仓库状态、目录结构和符号索引。这一步的误判风险在于忽略生成文件和用户已有的改动——生成代码不是源头的真相，用户未提交的改动则是必须保护的现状，跳过它们等于在错误的地基上推理。</p>
+<p>定位阶段，工具反馈来自搜索命中、引用关系、调用链和提交历史。最常见的误判是把“相邻的代码”当成根因：某段代码离症状很近，于是被怀疑是元凶，但真正的原因可能在调用链的更上游。定位必须靠引用和调用关系，而不是靠空间上的邻近。</p>
+<p>编辑阶段，工具反馈的是最小补丁，以及格式检查和类型检查给出的反馈。误判在于顺手重构、扩大改动范围——改动越大，引入新问题的面就越宽，也越难回溯是哪一处变更起了作用。</p>
+<p>验证阶段，工具反馈来自测试、构建、静态检查和实际运行。这里最典型的误判是只看退出码，不看测试到底测了什么：退出码为 0 只说明命令执行完了，不说明被验证的目标行为正确。</p>
+<p>审查阶段，工具反馈来自 diff、未跟踪文件和潜在的安全影响。风险在于覆盖用户未提交的内容，把别人的工作一并抹掉。</p>
+<p>贯穿所有阶段的一条边界是：工具调用成功只表示命令被执行了，并不表示目标行为正确，也不表示用户的工作没有受损。命令能跑通是一回事，跑通之后产生了什么效果、有没有越界，是另一回事。</p></div>
+<table class="dd-table"><thead><tr><th>阶段</th><th>工具证据</th><th>常见误判</th></tr></thead><tbody><tr><td>仓库观察</td><td>指令、状态、目录、符号</td><td>忽略生成文件/用户改动</td></tr><tr><td>定位</td><td>搜索、引用、调用链、历史</td><td>把相邻代码当根因</td></tr><tr><td>编辑</td><td>最小补丁、格式/类型反馈</td><td>顺手重构扩大范围</td></tr><tr><td>验证</td><td>测试、构建、静态检查、运行</td><td>只看退出码不看测了什么</td></tr><tr><td>审查</td><td>diff、未跟踪文件、安全影响</td><td>覆盖用户未提交内容</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：修复空CSV导出导致的500错误<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>把一个模糊报错变成最小、可证的补丁，需要一个可追踪的流程。以“修复空 CSV 导出导致的 500 错误”为例，可以看清每一步证据是如何衔接起来的。</p>
+<p>第一步是建立工作树基线。在动手前先确认工作树里已经存在用户自己的修改，把这些改动记录下来但不覆盖它们；同时读取项目约定的测试命令，知道这个仓库用哪种方式跑测试。</p>
+<p>第二步是用最小输入复现。构造一个空数据集，调用 export_csv([])，确认返回 500，并把堆栈完整保存下来。这一步把“导出失败”从一句模糊描述变成一条可重复的触发路径。</p>
+<p>第三步是沿着堆栈定位。堆栈显示聚合函数对空列表取了首元素，这就是异常的直接来源。接着搜索其他调用者和仓库里已有的空输入约定，确认这里的正确处理方式应该与既有约定一致，而不是临时发明一种。</p>
+<p>第四步是先写一个会失败的测试。添加断言：空输入时应当返回只有表头的导出结果，而不是抛异常。然后运行这个测试，确认它在旧代码上确实失败——这个“失败”是证据链的关键一环，它证明测试真的覆盖了问题，而不是在测一段本来就正常的行为。</p>
+<p>第五步是最小实现。在聚合边界加入空集合分支，返回约定的空输入结果，而不是重写整个导出模块。改动被限制在异常真正发生的那一层。</p>
+<p>第六步是由窄到宽验证。依次运行单元测试、导出模块测试、类型检查和相关 API 测试，同时检查生成的文件，确认没有把构建产物误当成需要提交的内容。</p>
+<p>最后一步是审查 diff。确认 diff 只包含这个测试和最小实现，并明确说明哪些全量测试或平台测试没有运行过，把它们列为未验证项。</p>
+<p>在这个案例里，“代码看起来正确”从来没有进入证据链；真正作为交付依据的是“失败—通过”的转换和受控的 diff。输入的 500 报错、堆栈、调用者和已有约定，最终被转化为空集合分支、失败到通过的测试，以及一份范围可控的 diff。测试通过表示“已声明的空输入行为得到了修复”，它并不证明所有平台和并发路径都没有问题——那部分要么另测，要么如实标注为未验证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>验证金字塔从最窄因果证据逐步扩大<span class="dd-badge math">测试策略</span></h2>
+<div class="dd-agent-response"><p>调试时一上来就跑 40 分钟的全量测试，反而会妨碍定位：反馈来得太慢，而且失败一旦出现，很难知道是哪一处改动引起的。验证金字塔的思路是从最窄、最能直接证伪假设的因果证据开始，再逐层扩大到模块、集成、全量，最后补上静态与安全检查。</p>
+<p>先跑单个能证伪当前假设的测试，用最短时间建立“改动到底有没有起作用的”因果联系；确认之后再扩到模块级、集成级，最后才跑全量。这个顺序的价值可以用数字看得很清楚。假设单测一次 1 分钟、模块测试一次 5 分钟、全量测试一次 40 分钟；如果三次迭代每次都跑全量，需要 3 × 40 = 120 分钟。换成前两次迭代只跑 1 分钟的单测，最后一次再跑 1 + 5 + 40，总时间只有 48 分钟，而且因为失败发生时刚做过的改动范围很小，归因也容易得多。</p>
+<p>这个权衡可以形式化。验证的总成本 V 约等于每一层验证的迭代次数乘上该层反馈时间，再对所有层求和：</p>
+<p>V = Σ_{i=1}^{L} n_i × t_i</p>
+<p>其中 V 是累计验证时间成本，i 是验证层编号，L 是验证层总数，n_i 是第 i 层被执行的迭代次数，t_i 是第 i 层一次的反馈时间。节省的关键在于把高迭代次数的阶段放在低 t_i 的窄层上，让昂贵的宽层只执行少数几次。</p>
+<p>金字塔的输入是各层的反馈时间、预期的迭代次数和本次变更的风险，输出是一条从单测、模块、集成到全量的验证顺序以及估算的总成本。但这条优化依赖“窄测试反馈更快”的假设，而且最终范围仍由风险决定：窄测试节省的是迭代成本，不能替代风险要求的跨平台或端到端验证。该跑的全量测试最终还是要跑，只是把它放到证据已经足够收敛之后。</p></div>
+<div class="dd-formula" data-formula-id="coding-tools-validation-cost" data-display="mathml"><math display="block" aria-label="验证成本 V 约等于各验证层迭代次数 n i 乘反馈时间 t i 后求和"><mi>V</mi><mo>≈</mo><munderover><mo>∑</mo><mi>i</mi><mi>L</mi></munderover><msub><mi>n</mi><mi>i</mi></msub><msub><mi>t</mi><mi>i</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：补丁必须穿过复现、测试和差异三道证据门<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>测试全部变绿，补丁仍然不能直接交付，因为“测试通过”只回答了行为这一个问题，而一份可回退的交付还取决于改动范围是否可控、工作树是否干净、有没有把不该提交的东西卷进来。</p>
+<p>一条完整路径可以画成证据闭环：Issue 先经过仓库指令和工作树检查，再进入复现，随后是调用链定位，接着产生最小补丁，补丁经受分层测试和 diff 审查，最后才成为可交付变更。生成代码本身处在这个闭环的中间位置，而不是完成状态——它只是进入后续证据门的候选物。</p>
+<p>这道闭环由三道证据门卡住。复现门证明问题确实存在，它把一句症状描述变成可重复触发的事实；测试门检查行为，确认补丁让目标行为按预期改变；diff 门限制改动范围，确认补丁只动了该动的地方，没有顺手重构或覆盖用户未提交的内容。</p>
+<p>三者的作用各不相同，因此不能互相替代。复现通过说明问题被抓住了，测试通过说明行为被修正了，diff 审查通过说明范围被约束住了。这三道门都通过，支持当前的交付决定；但它们并不表示未覆盖的需求、供应链风险和权限风险就此消失。那些风险属于验证范围之外的部分，需要单独评估，而不是被三道门的绿灯抹掉。</p>
+<p>证据门图的输入是 Issue、工作区状态、复现结果、根因判断、补丁和验证结果，输出只有两种：一份可回退的交付，或者带着新证据回到循环里返工。任何一道门没通过，都意味着证据链有缺口，正确动作是回到首次偏离的位置补证据，而不是强行推进到下一道门。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 320" role="img" aria-label="Issue经过仓库指令和工作树检查、复现、调用链定位、最小补丁、分层测试与diff审查形成可交付变更"><defs><marker id="ct29" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="18" y="112" width="80" height="70" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="58" y="140" text-anchor="middle" class="svg-t">Issue</text><text x="58" y="163" text-anchor="middle" class="svg-t" font-size="11">目标/现象</text><path d="M98,147 L128,147" stroke="#788293" marker-end="url(#ct29)"/><rect x="133" y="82" width="110" height="130" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="188" y="111" text-anchor="middle" class="svg-t">工作区检查</text><text x="188" y="137" text-anchor="middle" class="svg-t" font-size="11">指令 / Git状态</text><text x="188" y="160" text-anchor="middle" class="svg-t" font-size="11">环境 / 权限</text><text x="188" y="188" text-anchor="middle" class="svg-t">保护用户改动</text><path d="M243,147 L273,147" stroke="#788293" marker-end="url(#ct29)"/><rect x="278" y="82" width="110" height="130" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="333" y="111" text-anchor="middle" class="svg-t">复现与定位</text><text x="333" y="137" text-anchor="middle" class="svg-t" font-size="11">失败输入 / 堆栈</text><text x="333" y="160" text-anchor="middle" class="svg-t" font-size="11">搜索 / 调用链</text><text x="333" y="188" text-anchor="middle" class="svg-t">根因假设</text><path d="M388,147 L418,147" stroke="#788293" marker-end="url(#ct29)"/><rect x="423" y="82" width="110" height="130" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="478" y="111" text-anchor="middle" class="svg-t">最小补丁</text><text x="478" y="137" text-anchor="middle" class="svg-t" font-size="11">先失败测试</text><text x="478" y="160" text-anchor="middle" class="svg-t" font-size="11">实现 / 格式 / 类型</text><text x="478" y="188" text-anchor="middle" class="svg-t">避免无关重构</text><path d="M533,147 L563,147" stroke="#788293" marker-end="url(#ct29)"/><rect x="568" y="52" width="145" height="190" rx="9" fill="#21252d" stroke="#72b293"/><text x="640" y="82" text-anchor="middle" class="svg-t">证据门</text><text x="640" y="110" text-anchor="middle" class="svg-t" font-size="11">窄→宽测试</text><text x="640" y="134" text-anchor="middle" class="svg-t" font-size="11">构建/静态/安全</text><text x="640" y="158" text-anchor="middle" class="svg-t" font-size="11">diff/未跟踪文件</text><text x="640" y="182" text-anchor="middle" class="svg-t" font-size="11">未验证项声明</text><text x="640" y="218" text-anchor="middle" class="svg-t">可回退交付</text><path d="M640,242 C640,292 333,292 333,212" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#ct29)"/><text x="486" y="306" text-anchor="middle" class="svg-t" font-size="11">验证失败：用新证据修正假设，不盲目扩大改动</text></svg><figcaption>图 1　仓库级编程是证据闭环；生成代码只处在中间，不是完成状态。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>工作树是共享资产，必须保护用户未提交改动<span class="dd-badge eng">安全边界</span></h2>
+<div class="dd-agent-response"><p>测试失败时想“恢复文件”，最容易犯的错误是直接执行 git reset。Git 能回退的是已经提交的历史，它并不保护尚未提交的用户工作——那些改动一旦被硬重置覆盖，就真的没了，版本控制也救不回来。这是初学者最常混淆的一点：能回退已提交内容，不代表可以覆盖尚未提交的用户工作。</p>
+<p>工作树是一份共享资产，它里面既有仓库的现状，也有用户尚未提交的劳动。因此任何操作在开始前都要先检查当前分支、已跟踪与未跟踪的文件，以及已经存在的 diff，把起始状态记录清楚。随后的原则是只修改任务授权范围内的内容；一旦发现改动会越出这个范围或与用户已有的工作冲突，就停下来并说明，而不是擅自决定。</p>
+<p>有几类操作属于必须禁止的范畴：未经授权的硬重置、覆盖已有文件、递归删除，以及强推远端。这些都是不可逆或影响他人工作的动作，不能因为“测试失败需要干净环境”就自动执行。临时文件应当放进受控目录，而不是散落在用户目录里；安装依赖时要说明会带来的副作用。</p>
+<p>当任务确实需要删除或迁移文件时，不能直接删，而要先把精确目标解析出来，确认影响范围，再采用可恢复的操作执行——删之前要知道删的是什么、能不能拿回来。工作树保护的输入是分支状态、已跟踪和未跟踪文件、已有 diff 以及任务范围，输出是一个允许修改的集合、一份冲突说明，或者干脆停止。保护工作树不是礼貌问题，而是交付正确性的前提：你提交的补丁必须建立在用户真实工作的基础上，而不是把它覆盖掉。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>测试通过只证明被执行的断言成立<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>100% 测试绿色仍然可能是一个错误的补丁，因为“通过”只证明被执行的那些断言成立，它不证明补丁正确。绿色可能来自几个漏洞：测试没有覆盖目标平台、使用了错误的 fixture、断言写得太弱，或者测试在改动之前就已经通过了——最后一种情况下，绿色对本次改动毫无证明力。</p>
+<p>要建立有效的测试证据，第一步是证明新增的测试在旧实现上确实失败，再证明它在新实现上通过。这个“失败—通过”的转换是测试能作证的前提：如果测试在旧代码上就是绿的，那它根本没有覆盖这次修复，通过它不能说明任何因果。</p>
+<p>第二步是检查实际执行范围：测试框架真正收集并运行了哪些测试，有哪些被跳过。收集清单和跳过项决定了绿色的覆盖面，报告里的绿色数字不直接等于覆盖范围。</p>
+<p>对于没有测试覆盖的区域，不能假装它被验证了，而要用其他手段补证：运行示例、静态分析、属性测试，或者人工差异审查。做完这些之后，仍要明确写出剩余的不确定性——哪部分是被证实的，哪部分只是被检查过但未被测试的。</p>
+<p>测试证据的输入是新增测试、旧实现、新实现、收集清单和跳过项，输出是失败到通过的转换以及剩余不确定性的说明。一条可靠的判断顺序是：先证明测试在旧代码失败，再确认新代码通过，同时检查测试实际跑了什么。百分百绿色只覆盖运行过的断言；弱断言和缺失的平台仍然会把错误漏过去，绿色数字越高，越要追问它到底测了哪些东西。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>依赖、生成代码与许可证都是补丁的一部分<span class="dd-badge eng">供应链</span></h2>
+<div class="dd-agent-response"><p>为了省下十行代码而新增一个包，表面改动很小，真实改动范围却要大得多。新增依赖会引入一整套需要承担的东西：下载与构建成本、传递依赖、已知漏洞、许可证约束、包体积，以及维护者本身的风险——这个包是否还在维护、是否会突然变更或废弃。因此“少写十行代码”不等于“改动更小”，依赖的整个生命周期都属于补丁范围。</p>
+<p>正确顺序是优先使用现有依赖和标准库；只有在确实必要时才新增依赖，并且新增时必须锁定版本、更新锁文件、检查来源和许可证。对 AI 生成的代码片段同样不能假设来源自由：避免大段模仿来源未知的实现，遵循项目自身的许可证和归属要求，不能因为“是模型写的”就绕开这些约束。</p>
+<p>除了依赖，生成代码也是补丁的一部分。构建产物、生成文件不该被误当成需要提交的源码，但确实由工具生成的、需要纳入仓库的代码，必须接受与手写代码同样的审查。秘密扫描、危险 API、输入校验和权限变化，这些都要进入 diff 审查，而不是只看功能测试是否通过——功能测试证明行为，审查才证明这些风险被处理过。</p>
+<p>供应链审查的输入是新增依赖、生成片段、许可证、锁文件和危险 API，输出是一个决定：接受、替代、锁定，或者拒绝。判断的顺序是优先现有依赖和标准库，必须新增时检查来源、传递依赖、漏洞和许可。省代码的收益要在依赖引入的全部成本面前重新称量。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>上下文要围绕调用链，不是把整个仓库塞给模型<span class="dd-badge eng">上下文工程</span></h2>
+<div class="dd-agent-response"><p>把整个仓库塞给模型并不会让修复更准，反而可能降低质量：无关代码会挤掉真正起作用的约束，旧摘要会误导判断，模型把注意力分散到与当前假设无关的内容上。上下文工程的起点不是“读得更多”，而是“读得恰到好处”。</p>
+<p>正确做法是从复现结果和符号搜索出发，建立当前假设所需的最小相关集合，内容包括接口、实现、调用者、测试和项目约定。大文件不必整体读入，只读取与假设相关的范围，同时把没查看的部分记成未验证假设，而不是默认它们没问题。生成文件、vendor 目录和二进制文件默认排除在外，它们不是推理所需的源码事实。</p>
+<p>上下文是动态加载的：当改动扩展到新的模块时，再加载对应的上下文。这样既能防止旧摘要和无关代码挤掉关键约束，也能保证每个阶段的上下文都围绕当前的调用链。</p>
+<p>仓库上下文工程的输入是复现、符号、调用链、接口、测试和项目约定，输出是当前假设所需的最小相关文件集合。它的判断顺序是：先读窄范围，改动扩展时再加载，排除生成物和二进制。这里要分清目标：材料更少本身不是目的，关键约束充分且来源可追踪才是目的。凡是没查看的部分，都必须作为假设记录下来，而不是悄悄放进结论里。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>评测补丁要同时看正确性、范围和维护成本<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>SWE-bench 通过率这类单一数字，不能单独代表真实团队的收益。一个补丁是否值得采用，要同时看正确性、范围和维护成本三个维度，而不是只问“测试过没过”。</p>
+<p>正确性层面的指标包括：任务本身是否通过、隐藏测试是否通过、有没有引入回归，以及补丁最终是否被接受。范围层面的指标包括：有没有无关的变更、实际修改了多少行、新增的测试质量如何——测试是不是真的抓住了问题，而不是凑数。维护成本层面还要看命令失败后能否恢复、消耗的 token 和时间、需要人工审查多久，以及合并之后是否又冒出新的缺陷。这些指标加在一起，才接近一次真实改动的完整成本。</p>
+<p>评测还必须和基线比较才有意义。要把它与人类的表现、无 Agent 的“定位 + 生成”流程，以及不同工具权限的基线放在一起看，才能判断 Agent 带来的增量到底是什么，而不是把绝对值当成结论。比较结果还要按语言、仓库规模、测试质量、跨文件改动和环境依赖等维度切片，避免一个平均值掩盖了不同场景下的巨大差异。</p>
+<p>有一条必须守住的红线：防止智能体通过修改测试或评分脚本来迎合指标。验收文件应当受到保护，谁动了评分脚本，谁的成绩就该判失败。补丁评测的输入是任务、隐藏测试、diff、人工审查和多种工具权限基线，输出是正确性、范围、维护成本、时间以及合并后缺陷的一组指标。通过率只是其中一个切面，把它当成团队收益的完整代表，是评测中最需要警惕的简化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>验收标准和测试基础设施必须防奖励投机<span class="dd-badge eng">评测安全</span></h2>
+<div class="dd-agent-response"><p>智能体会发现一条捷径：删掉失败的测试，或者把断言弱化，就能让测试全绿。系统要阻止这种奖励投机，靠的不是信任智能体自觉，而是把验收依据放到智能体碰不到的地方。</p>
+<p>第一道防线是隔离。把隐藏测试、评分脚本、CI 策略和安全基线放到只读或独立环境中，候选补丁在运行时无法修改它们。这样“改测试来迎合指标”这条路在机制上就被封死了。</p>
+<p>第二道防线是审查标记。补丁审查要专门标记几类可疑改动：删除测试、弱化断言、大量跳过测试、以及配置降级。这些改动本身不一定是恶意的，但它们会削弱证据链，必须被显式暴露出来。</p>
+<p>第三道防线是区分新增和修改。允许智能体新增测试，这是合理的补强；但修改既有的验收标准，必须给出单独的理由并获得批准。新增与修改的风险完全不同——新增不会降低已有证据，修改则会。</p>
+<p>第四道防线是干净环境重跑。最终得分不能依赖工作区里的状态，而要在补丁之外的干净环境中重新运行，避免工作区污染和缓存制造假通过。如果全绿是因为删了测试、弱化了断言，或者靠缓存撑出来的，那它就不能算任务成功。</p>
+<p>防奖励投机的输入是只读的隐藏测试、评分脚本、CI 策略，以及候选补丁；输出是干净环境中的独立验收，加上对可疑测试修改的告警。判断顺序是：允许新增测试，修改既有验收需单独批准，最终在补丁之外重跑。验收的价值取决于它是否真的被独立地执行过，而不是取决于报告上是否写着绿色。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>从一句模糊的问题描述到一份可验证的交付，中间的每一步都靠证据衔接。把这条因果链连起来看，它是一条环环相扣的路径。</p>
+<p>第一步，读取项目指令与工作树状态，确定仓库约定和当前基线，同时保护用户未提交的改动。第二步，用最小输入复现问题，把症状变成一条可重复触发的路径。第三步，沿堆栈或调用链定位根因，用引用关系而不是空间上的邻近来判断。第四步，先建立会失败的测试或证据，证明问题确实被覆盖。第五步，应用最小范围的补丁，只改异常真正发生的层次。第六步，由窄到宽运行验证，从最能证伪假设的单测逐步扩到全量。第七步，审查 diff、依赖与安全影响，确认改动范围可控、供应链风险已处理。第八步，声明证据、未验证项与回退点，把已经被证实的、只被检查过的和仍不确定的部分分开写清楚。</p>
+<p>这八步不是八条互相独立的规则，而是一条因果链：每一步的产出都是下一步的输入，任何一步的证据断裂，都会让后面的结论失去支撑。问题定位支撑最小补丁，失败测试支撑验证可信，受控 diff 支撑可回退交付，而未验证项的诚实声明支撑别人能安全地在这个补丁上继续工作。链条完整，交付才算完整。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench</a>：真实GitHub仓库问题基准</li><li><a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener">SWE-agent</a>：智能体—计算机接口设计</li><li><a href="https://arxiv.org/abs/2407.01489" target="_blank" rel="noopener">Agentless</a>：定位、修复和补丁验证流程</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/coding-tools">在地图中查看概念关系</a></nav>
+</article></main></body></html>

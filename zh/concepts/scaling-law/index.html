@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>缩放定律：用幂律规划参数、数据与算力 · AI 知识地图</title>
+<meta name="description" content="从 log-log 直线、边际收益递减到计算最优分配，再到数据质量、能力阈值与全生命周期成本。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/scaling-law/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="缩放定律：用幂律规划参数、数据与算力">
+<meta property="og:description" content="从 log-log 直线、边际收益递减到计算最优分配，再到数据质量、能力阈值与全生命周期成本。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/scaling-law/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="缩放定律：用幂律规划参数、数据与算力">
+<meta name="twitter:description" content="从 log-log 直线、边际收益递减到计算最优分配，再到数据质量、能力阈值与全生命周期成本。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/scaling-law/#page","name":"缩放定律：用幂律规划参数、数据与算力","description":"从 log-log 直线、边际收益递减到计算最优分配，再到数据质量、能力阈值与全生命周期成本。","url":"https://ai-knowledge-map.com/zh/concepts/scaling-law/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"缩放定律：用幂律规划参数、数据与算力","item":"https://ai-knowledge-map.com/zh/concepts/scaling-law/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">缩放定律：用幂律规划参数、数据与算力</span></li></ol></nav><article id="dd-article" data-concept-id="scaling-law">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">缩放定律：用幂律规划参数、数据与算力</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 log-log 直线、边际收益递减到计算最优分配，再到数据质量、能力阈值与全生命周期成本。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 缩放定律是在特定模型族、数据分布和训练配方中观察到的经验规律：验证损失常随参数、数据或计算量按幂律下降。它适合做预算规划与实验外推，但不是自然常数；<b>拟合区间、数据质量、训练配方、目标指标和部署成本</b>都会改变结论。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>由幂律推出 log-log 直线；手算十倍算力的边际收益；解释固定算力下 N 与 D 的权衡；识别外推失效和指标错位。</div>
+<ol class="dd-chain"><li>选择同一模型族与稳定训练配方</li><li>在多个 N、D、C 点训练</li><li>拟合 L∞、A 与 α</li><li>固定预算寻找 N–D 前沿</li><li>用中间规模检验外推</li><li>以任务切片和生命周期成本验收</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>缩放定律描述的是可约损失<span class="dd-badge math">核心公式</span></h2>
+<div class="dd-agent-response"><p>把模型规模加大、把训练数据喂得更足，验证损失就会一路下降；可这条曲线无论怎样延长，都悬在某个正数上方，不会自动压到零。缩放定律（scaling law）刻画的就是这个现象背后的数量关系：在固定的模型族、数据分布与训练配方附近，资源每扩大一档，损失大约按怎样的规律收缩。它并非由物理定律推导出的常数，而是对一组训练实验的统计拟合——把不同规模下的测量结果放到一条经验曲线上，用少数几个参数概括其走势。</p>
+<p>拟合所用的形式是</p>
+<p>L(x) = L∞ + A·x⁻ᵅ</p>
+<p>其中 x 代表规模，可以是参数数量 N、训练 token 数 D，或计算量 C；L(x) 是该规模下测得的目标损失。L∞ 是这条曲线的最低极限：在当前任务、数据和模型族的设定里，光靠继续增大 x 难以消除的那部分损失，它把“还可继续削减”与“暂时减不动”的分界标了出来。A 决定可约部分在参考尺度上的大小，α 是一个正的缩放指数。由于 x 位于负指数上，x 增大时 A·x⁻ᵅ 单调下降；但要注意下降的节奏：每次把规模乘以同一个倍数，被削掉的只是剩余可约损失的一个固定比例，而不是固定数值。损失因此永远朝着 L∞ 逼近，却不会一步到位。</p>
+<p>对这条经验曲线来说，输入是一系列规模点及它们同口径的验证结果，输出是拟合出的参数，以及在被测规模附近的预测和相应的不确定性。使用前必须先确认纵轴究竟是什么：是训练损失、验证交叉熵，还是下游能力分数。不同指标不能混用同一条曲线——训练损失可以降到比验证损失低很多，能力分数甚至不必单调，把它们画在同一套拟合里只会得出误导性的结论。</p></div>
+<div class="dd-formula" data-formula-id="scaling-law-reducible-loss" data-display="mathml"><math display="block" aria-label="规模 x 下的损失 L 等于不可约下限 L 无穷，加常数 A 乘 x 的负 alpha 次方"><mrow><mi>L</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msub><mi>L</mi><mo>∞</mo></msub><mo>+</mo><mi>A</mi><mo>·</mo><msup><mi>x</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>为什么 log-log 图上会出现直线<span class="dd-badge math">推导</span></h2>
+<div class="dd-agent-response"><p>同一批测量点，在普通坐标纸上连成一条缓缓下弯的递减曲线，一旦把横轴和纵轴都改成对数刻度，它们却近似排成一条直线。这个转变来自对数的两条性质：乘法在对数下变成加法，幂运算则把指数“拖”到前面成为系数。缩放定律的幂律形式恰好在这套规则下被拉直。</p>
+<p>具体做法分两步。先从总损失中减去下限 L∞，只保留可约部分；再对等式两边取同一底数的对数。由 L(x) = L∞ + A·x⁻ᵅ 得到 L(x) − L∞ = A·x⁻ᵅ，取对数后：</p>
+<p>log(L − L∞) = log A − α·log x</p>
+<p>把 log x 当作横轴坐标 u，把 log(L − L∞) 当作纵轴坐标 v，上式就是 v = log A − α·u：一条斜率为 −α、截距为 log A 的直线。只要横纵轴使用同一对数底，斜率的结论就不变——换底相当于给两个坐标同时乘一个常数，直线只是整体缩放，倾斜程度保持 −α。图 1 把同一幂律画在两种坐标系中作对比：普通坐标里是递减曲线，双对数坐标里是直线，而只有先减去 L∞ 之后，log-log 上的线性关系才严格对应公式。因此 log-log 图上的直线斜率直接给出缩放指数，截距给出常数 A 的对数。</p>
+<p>L∞ 的取值对这一读图方式至关重要。如果下限估得不准，纵轴度量的就不再是真正的可约损失，图中的点会偏离直线、出现弯曲，据此估出的指数也随之失真。反过来，实践中常通过调整 L∞ 直到点子尽量排直，来反推下限的估计值。</p>
+<p>这套读图流程的输入是多个不同规模 x 及其对应的损失测量点，输出包括直线斜率、截距、下限估计以及拟合的置信区间。需要警惕的是，点列只是在被测的有限区间内近似成直线；离开这个区间，直线外推不再有任何保证。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 720 285" role="img" aria-label="普通坐标中的递减曲线与对数坐标中的直线"><defs><marker id="sl-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#7b8494"/></marker></defs><rect x="22" y="25" width="315" height="225" rx="10" fill="#21252d" stroke="#596273"/><line x1="65" y1="215" x2="310" y2="215" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="65" y1="215" x2="65" y2="52" stroke="#8791a2" marker-end="url(#sl-arrow)"/><path d="M78,70 C120,115 165,150 225,174 C255,186 282,193 305,197" fill="none" stroke="#65a6d9" stroke-width="3"/><line x1="72" y1="200" x2="307" y2="200" stroke="#d48b78" stroke-dasharray="6 5"/><text x="186" y="239" text-anchor="middle" class="svg-t">规模 x</text><text x="104" y="193" class="svg-t" font-size="11">L∞</text><text x="178" y="45" text-anchor="middle" class="svg-t">普通坐标：向下弯曲</text><rect x="382" y="25" width="315" height="225" rx="10" fill="#21252d" stroke="#596273"/><line x1="425" y1="215" x2="670" y2="215" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="425" y1="215" x2="425" y2="52" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="445" y1="78" x2="650" y2="190" stroke="#65a6d9" stroke-width="3"/><path d="M500,95 L500,129 L556,129" fill="none" stroke="#d3a05a"/><text x="522" y="120" class="svg-t" font-size="11">斜率 −α</text><text x="547" y="239" text-anchor="middle" class="svg-t">log x</text><text x="540" y="45" text-anchor="middle" class="svg-t">log-log：近似直线</text></svg><figcaption>图 1　同一幂律在两种坐标系中的形状；只有减去 L∞ 后，log-log 线性关系才严格对应公式。</figcaption></figure>
+<div class="dd-formula" data-formula-id="scaling-law-log-linearization" data-display="mathml"><math display="block" aria-label="损失减下限的对数，等于 A 的对数减 alpha 乘规模 x 的对数"><mrow><mi>log</mi><mo>(</mo><mi>L</mi><mo>−</mo><msub><mi>L</mi><mo>∞</mo></msub><mo>)</mo><mo>=</mo><mi>log</mi><mi>A</mi><mo>−</mo><mi>α</mi><mo>·</mo><mi>log</mi><mi>x</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>数值例子：十倍资源只减少约五分之一可约损失<span class="dd-badge math">算例</span></h2>
+<div class="dd-agent-response"><p>先代入一个具体数字感受这个指数的大小：取 α = 0.10，把计算量扩大十倍，可约损失还剩多少？幂律给出的答案是</p>
+<p>R₂/R₁ = (10C/C)⁻⁰·¹⁰ = 10⁻⁰·¹⁰ ≈ 0.794</p>
+<p>其中 R = L − L∞ 表示可约损失，R₁ 与 R₂ 分别是扩大算力前后剩余的可约部分，C 是原始计算量，指数 −0.10 来自假设的缩放指数 α = 0.10。比值 0.794 的含义是：扩大后剩余的可约损失是原来的 79.4%，本轮只削减了 20.6%。资源增加十倍，损失并不会变成原来的十分之一——幂律的“折扣”远比直觉想象得吝啬。</p>
+<p>再看一个把下限显式写出来的例子。设 L∞ = 1.50，当前损失 L = 2.00，那么可约部分 R = 2.00 − 1.50 = 0.50。十倍算力后的预测损失是</p>
+<p>L = 1.50 + 0.50 × 0.794 ≈ 1.897</p>
+<p>而不是把 0.794 直接乘在总损失上得到的 1.59——那等于假定连 L∞ 也一起按幂律收缩，而 L∞ 正是幂律够不着的那部分。若再扩大十倍，也只是把当时剩余的可约部分再乘以 0.794：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">计算量倍数</th><th class="dd-align-left">可约损失比例</th><th class="dd-align-left">L∞=1.50、起点 L=2.00 时的预测</th></tr></thead><tbody><tr><td class="dd-align-left">1×</td><td class="dd-align-left">1.000</td><td class="dd-align-left">2.000</td></tr><tr><td class="dd-align-left">10×</td><td class="dd-align-left">0.794</td><td class="dd-align-left">1.897</td></tr><tr><td class="dd-align-left">100×</td><td class="dd-align-left">0.631</td><td class="dd-align-left">1.816</td></tr></tbody></table></div>
+<p>100 倍算力对应的比例 0.794² ≈ 0.631，预测损失 1.50 + 0.50 × 0.631 ≈ 1.816。收益递减在这里看得非常清楚：第一档十倍削减约 0.103，第二档十倍只削减约 0.081，但每一档都按相同的相对比例蚕食剩余可约损失。</p>
+<p>这组数字只有在两个前提下才成立：α 与 L∞ 的估计可信，并且扩大后的规模仍然落在拟合使用的区间之内。它们是基于测量曲线的外推，而不是对某次实际训练结果的保证。</p></div>
+<table class="dd-table"><thead><tr><th>计算倍数</th><th>可约损失比例</th><th>若 L∞=1.50、起点 L=2.00</th></tr></thead><tbody><tr><td>1×</td><td>1.000</td><td>2.000</td></tr><tr><td>10×</td><td>0.794</td><td>1.897</td></tr><tr><td>100×</td><td>0.631</td><td>1.816</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="scaling-law-tenfold-example" data-display="mathml"><math display="block" aria-label="十倍计算后可约损失与原可约损失之比，等于十的负零点一次方，约为零点七九四"><mrow><mfrac><msub><mi>R</mi><mn>2</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mrow><mn>10</mn><mi>C</mi></mrow><mi>C</mi></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>0.10</mn></mrow></msup><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>0.10</mn></mrow></msup><mo>≈</mo><mn>0.794</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>固定算力迫使参数与数据互相权衡<span class="dd-badge math">计算最优</span></h2>
+<div class="dd-agent-response"><p>一份固定的训练算力预算摆在面前时，参数量 N 与训练 token 数 D 就变成了一对互相挤压的变量：预算只够执行那么多乘法运算，给参数多一分，能给数据的就少一分。对稠密 Transformer 而言，处理单个 token 的前向与反向计算量大致与参数量成正比，所以整个预训练的总浮点运算数常被粗略记作 C ≈ 6 × N × D。其中 C 表示训练全程执行的浮点运算次数，即常说的 FLOPs；N 是模型参数数量；D 是训练中处理过的 token 总数。系数 6 是对常见稠密 Transformer 前向加反向成本的粗略近似，而不是对所有架构都成立的固定常数。</p>
+<p>这个近似式直接给出一个直观结论：预算 C 固定时，N 翻一倍，D 就大约减一半；把 N 放大四倍，D 只剩原来的四分之一。模型做大的收益并不是免费的——它同时拿走了数据端本来可以多见的 token。两个方向的退化各有各的表现形式。参数太少时，模型无论看多少数据都难以表达数据里的规律，这是容量瓶颈；参数太多而只见过少量 token 时，参数本身没有被充分训练，收敛质量反而下降，这是训练不足。同一预算下的最优点落在两类瓶颈之间的经验平衡上，而不是简单地把参数堆到最大。</p>
+<p>用一张同预算对照表可以看得更清楚。方案 A 选择偏小模型，参数按 1× 计、token 按 8× 计，典型风险是容量瓶颈；方案 B 取平衡点，参数 2×、token 4×，是否真的最优需要实验确认；方案 C 选择偏大模型，参数 4×、token 2×，典型风险是数据不足且推理昂贵。三个方案花掉的浮点运算总量相同，损失的差别完全来自 N 与 D 的分配方式不同。</p>
+<p>因此这类实验的输入是计算预算与若干候选的 N、D 组合，输出是等计算量条件下的实验前沿——前沿上所有点对应同样的 C，损失的高低揭示哪种分配在固定预算下更划算。需要留意的是，这个估算只刻画浮点运算量。注意力序列长度、稀疏结构、梯度重计算与硬件利用率都会改变真实墙钟成本，FLOPs 相同既不保证训练耗时相同，也不保证最终质量相同。</p></div>
+<table class="dd-table"><thead><tr><th>同一预算下的方案</th><th>参数 N</th><th>token D</th><th>典型风险</th></tr></thead><tbody><tr><td>A：偏小模型</td><td>1×</td><td>8×</td><td>容量瓶颈</td></tr><tr><td>B：平衡点</td><td>2×</td><td>4×</td><td>需实验确认</td></tr><tr><td>C：偏大模型</td><td>4×</td><td>2×</td><td>数据不足、推理昂贵</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="scaling-law-training-compute"><math display="block" aria-label="训练计算量 C 约等于六乘模型参数量 N 乘训练 token 数 D"><mrow><mi>C</mi><mo>≈</mo><mn>6</mn><mi>N</mi><mi>D</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Kaplan 与 Chinchilla 不是互相矛盾的口号<span class="dd-badge intuition">研究史</span></h2>
+<div class="dd-agent-response"><p>为什么早期结论偏向把模型做大，后来的研究又反过来强调喂更多数据？两拨结论并不像标语那样针锋相对，它们背后的实验设置从一开始就不相同：模型规模范围、训练点覆盖、拟合方法以及各自的约束都有差异。Kaplan 等人的实验支持平滑幂律，并据此给出较偏向增大参数的预算分配；Chinchilla 则收集更多规模点做联合拟合，指出许多大模型实际处于训练 token 不足的状态，固定计算量下应当让参数与数据同步增加。分歧的核心不是哪边错了，而是两条前沿各自在什么条件下测得。</p>
+<p>这背后有一层更实用的教训：每参数配多少 token 并不存在放之四海皆准的常数。真正可迁移的做法，是用当前的架构、数据与优化器先做一组小规模的等计算量实验，拟合出自己这一族的损失前沿，再按前沿分配预算。把某一篇论文里拟合出来的分配比例原样套到另一个模型族上，得到的往往不是捷径而是错觉。</p>
+<p>还要提防经验指数的漂移。模型族换了、tokenizer 换了、数据过滤策略改了、上下文长度变了，幂律里的指数都可能随之移动，此时必须重新测量。跨论文直接抄指数，可能比不拟合更危险。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>名义 token 不等于有效数据<span class="dd-badge eng">数据质量</span></h2>
+<div class="dd-agent-response"><p>一万亿个重复、污染或低质量的 token，绝不等于一万亿个新信息 token。缩放定律里的 D 只是一个名义计数，真正驱动损失下降的是数据里携带的新信息量。重复内容每多出现一次，边际信息就衰减一分；错误内容可能把错误的规律教给模型；评测污染则会制造出虚假的能力分数。三种情况都在提醒：token 数量与有效数据量之间隔着数据的质量与构成。</p>
+<p>去重与质量过滤的价值正在于此。去重可以减少记忆负担与算力浪费，但要留意稀有样本是否被误删；质量过滤提高平均信号，却可能让领域或语言覆盖发生偏移。过滤并非纯收益，覆盖面的收窄还可能放大某些语言或群体的偏差。数据混合比例一旦改变，同一个 D 对应的有效数据量就不再相同，这也是跨实验比较损失时容易忽略的暗变量。</p>
+<p>同一批有限数据还可以通过重复多轮来榨取，但收益递减明显，多轮之后过拟合与死记硬背会成为主要风险。合成数据则试图补足目标技能，前提是生成质量足够高，否则错误会在代际之间回流，甚至诱发模型坍缩。每一步数据工程都同时带来可能收益与必须监控的副作用，二者从来都是打包出现的。</p></div>
+<table class="dd-table"><thead><tr><th>变化</th><th>可能收益</th><th>必须监控</th></tr></thead><tbody><tr><td>去重</td><td>减少记忆与浪费</td><td>稀有样本是否误删</td></tr><tr><td>质量过滤</td><td>提高平均信号</td><td>领域/语言覆盖偏移</td></tr><tr><td>重复多轮</td><td>榨取有限数据</td><td>过拟合与记忆</td></tr><tr><td>合成数据</td><td>补足目标技能</td><td>模型坍缩和错误回流</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>损失平滑下降，能力分数仍可能跳变<span class="dd-badge intuition">指标</span></h2>
+<div class="dd-agent-response"><p>损失曲线可以一天比一天光滑地下降，而榜单上的能力分数却可能在某一刻突然跳上一个台阶。看到这种跳变，很容易得出“模型内部突然长出了全新机制”的结论，但测量方式本身就可能制造出台阶。交叉熵是一个连续的平均量；准确率、pass@1 或“全部步骤正确”这类分数则带有非此即彼的阈值。设想模型对正确答案的概率从 0.45 升到 0.55：损失在这段区间里连续改善，而取 argmax 的准确率会在概率越过 0.5 的那一点从错翻成对。样本混合也会带来类似的台阶效应。</p>
+<p>反过来，平均损失持续变好并不保证事实性、安全性或罕见能力同步改善，这些维度的变化未必能由交叉熵的下降单独担保。因此评估时应当把连续指标、离散指标和分组结果同时画出来，并在阈值附近加密规模点，观察跳变究竟来自测量方式还是真实机制。所谓涌现可以是模型内部发生了真实机制变化，也可能只是离散测量的产物；仅凭一条离散曲线，无法把两者区分开。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>训练最优不一定是产品全生命周期最优<span class="dd-badge eng">部署</span></h2>
+<div class="dd-agent-response"><p>只盯训练损失的预算分配，常常在部署阶段把钱加倍还回去。多训练一个参数更少的模型，预训练账单可能更贵，却可能让总成本更低，原因在于推理成本是重复支付的：服务海量请求时，每次推理占用的显存、延迟与能耗都会再发生一遍，请求越多，这部分代价被放得越大。相反，对于推理量很小的一次性研究模型，训练前沿的损失水平往往比推理成本更值得优先优化。</p>
+<p>把这件事写成一个等式：K总 = K训练 + N请求 × K单次推理 + K运维与失败。K总 是规划期内的全部成本；K训练 是一次性训练与实验成本；N请求 是预计的请求数量；K单次推理 包含每次服务所付出的硬件、能耗与延迟代价；K运维与失败 则覆盖部署、监控、回退和错误处理。这个等式只有在各项使用同一时间范围和质量门槛时才有意义，否则不同候选之间无法公平比较。</p>
+<p>于是这类决策的输入不只是训练候选，还包括请求规模、上下文长度、并发量、量化方案、硬件条件与质量约束；输出是满足质量条件的生命周期成本前沿。沿着前沿比较，才会发现只优化训练 FLOPs 的策略，本质上是在把成本转移到部署阶段。</p></div>
+<div class="dd-formula" data-formula-id="scaling-law-lifecycle-cost"><math display="block" aria-label="全生命周期总成本等于一次训练成本，加请求总数乘单次推理成本，再加运维与失败成本"><mrow><msub><mi>K</mi><mtext>总</mtext></msub><mo>=</mo><msub><mi>K</mi><mtext>训练</mtext></msub><mo>+</mo><msub><mi>N</mi><mtext>请求</mtext></msub><mo>·</mo><msub><mi>K</mi><mtext>单次推理</mtext></msub><mo>+</mo><msub><mi>K</mi><mtext>运维与失败</mtext></msub></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>外推何时会失效<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>从小模型拟合出来的直线，一旦被延长到陌生规模，随时可能在某个点悄悄断掉。断点出现的方式各不相同，识别它们需要对照症状逐一排查。架构或训练配方改变时，新测得的点会离开旧直线，此时应当分段拟合并重做消融实验，确认偏移来自哪个改动。数据耗尽或分布发生变更时，收益会比预期更早饱和，应对方法是如实报告数据混合比例与有效 token 数。优化不稳定会让大规模点的表现异常变差，这时要优先排查学习率、并行方案与数值精度问题。指标触顶或阈值效应会造成损失与任务分数脱钩，应换用连续指标并对样本做切片分析。若预测点远远超出拟合区间，置信区间会迅速扩大，加入中间规模锚点才能约束不确定性。</p>
+<p>把断点来源、表现与应对方式放在一起看，会发现它们都指向同一条纪律：外推只在“相似系统、附近规模”的范围内可靠。缩放定律是一张地图，而不是保证书。它能预测同类系统在相邻规模上的大致趋势，却不能证明安全性、可靠性或可控性，也永远不能替代目标任务上的真实评测。</p></div>
+<table class="dd-table"><thead><tr><th>断点来源</th><th>表现</th><th>应对</th></tr></thead><tbody><tr><td>架构/配方改变</td><td>新点离开旧直线</td><td>分段拟合并重做消融</td></tr><tr><td>数据耗尽或分布变更</td><td>收益提前饱和</td><td>报告数据混合与有效 token</td></tr><tr><td>优化不稳定</td><td>大规模点异常变差</td><td>先排查学习率、并行与数值问题</td></tr><tr><td>指标触顶/阈值</td><td>损失与任务分数脱钩</td><td>换连续指标并做切片</td></tr><tr><td>超出拟合区间</td><td>置信区间迅速扩大</td><td>加入中间规模锚点</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>从损失为什么可约，到一笔预算究竟该怎么花，中间隔着一条可以逐环验证的因果链。第一步是固定实验条件：选择同一模型族与稳定的训练配方，把架构和优化器带来的干扰排除在外。第二步是在多个 N、D、C 组合点上实际训练，让幂律拟合有足够的观测支撑。第三步才轮到拟合，估计 L∞、A 与 α 三个参数——不可约损失下界、幂律系数与缩放指数——它们分别决定曲线的最低点、整体位置和下降速度。</p>
+<p>拟合完成后，在固定预算下沿曲线寻找 N–D 分配前沿，回答“这笔算力怎样分配损失最低”。但前沿只是内插结果，必须再用中间规模点检验外推是否仍然成立，防止把直线延伸到它不再成立的区间。最后的验收不看单一数字，而是用任务切片与全生命周期成本做判据，确认损失下降确实转化成了目标能力的提升，并且没有把成本悄悄转移到部署阶段。链条每断一环，前面的拟合就失去意义；这也是为什么整套流程强调实验、拟合与检验必须使用同一套条件。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a>：参数、数据与计算的经验幂律</li><li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Training Compute-Optimal Large Language Models</a>：Chinchilla 计算最优训练</li><li><a href="https://arxiv.org/abs/2206.07682" target="_blank" rel="noopener">Emergent Abilities of Large Language Models</a>：能力随规模变化的观测</li><li><a href="https://arxiv.org/abs/2304.15004" target="_blank" rel="noopener">Are Emergent Abilities of Large Language Models a Mirage?</a>：离散指标与阈值效应</li><li><a href="https://arxiv.org/abs/2401.00448" target="_blank" rel="noopener">Beyond Chinchilla-Optimal</a>：把推理需求纳入生命周期优化</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/scaling-law">在地图中查看概念关系</a></nav>
+</article></main></body></html>

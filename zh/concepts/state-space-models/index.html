@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>状态空间模型 SSM：用可控动态系统压缩长序列 · AI 知识地图</title>
+<meta name="description" content="从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/state-space-models/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="状态空间模型 SSM：用可控动态系统压缩长序列">
+<meta property="og:description" content="从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/state-space-models/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="状态空间模型 SSM：用可控动态系统压缩长序列">
+<meta name="twitter:description" content="从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/state-space-models/#page","name":"状态空间模型 SSM：用可控动态系统压缩长序列","description":"从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。","url":"https://ai-knowledge-map.com/zh/concepts/state-space-models/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"状态空间模型 SSM：用可控动态系统压缩长序列","item":"https://ai-knowledge-map.com/zh/concepts/state-space-models/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">状态空间模型 SSM：用可控动态系统压缩长序列</span></li></ol></nav><article id="dd-article" data-concept-id="state-space-models">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">状态空间模型 SSM：用可控动态系统压缩长序列</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> SSM 用一个随输入演化的状态概括历史，把长序列计算从位置两两交互改为线性扫描。结构化 SSM 可在训练时并行卷积、推理时递归更新；选择性 SSM 再让输入决定保留或遗忘什么。效率来自压缩，因此<b>精确回看、状态容量、数值稳定和硬件实现</b>决定真实上限。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>从连续方程推到离散递推；手算状态的衰减与累积；解释递推—卷积二重视角；判断选择性与随机访问的边界。</div>
+<ol class="dd-chain"><li>连续动力学定义状态演化</li><li>按采样步长离散化</li><li>递推或卷积处理序列</li><li>选择性参数按内容控制记忆</li><li>融合扫描实现线性吞吐</li><li>以检索、外推和硬件实测验收</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>状态空间来自“输入驱动的动态系统”<span class="dd-badge math">连续形式</span></h2>
+<div class="dd-agent-response"><p>状态空间模型把一段不断增长的历史压缩为一个固定维度的状态 h。它不必在每次产生输出时重新读取全部过去，而是让状态随新输入持续演化，并把当前状态作为历史信息的摘要。在连续时间下，这一过程写成：</p>
+<p>ḣ(t) = Ah(t) + Bx(t)</p>
+<p>y(t) = Ch(t) + Dx(t)</p>
+<p>其中，t 表示连续时间，x(t) 是时刻 t 的输入，h(t) 是截至该时刻对历史的有限维概括，ḣ(t) 是状态的瞬时变化率，y(t) 是当前输出。第一条式子回答“状态接下来怎样变化”：Ah(t) 表示旧状态自身延续或衰减的方式，Bx(t) 表示当前输入怎样写入状态。第二条式子回答“怎样从内部状态得到可见输出”：Ch(t) 从状态中读出任务所需的信息，Dx(t) 则允许当前输入绕过状态，直接影响输出。</p>
+<p>因此，A、B、C、D 分别控制状态演化、输入写入、状态读出和输入直通。经典控制系统用这些矩阵描述物理动态；在序列模型中，它们由数据学习，使有限维状态尽量保存对任务有用的历史。这里的关键取舍是：历史被压缩后，计算只需维护 h，但状态能保留什么，取决于这些变换以及状态维度。</p>
+<p>离散序列中的机器温度监测可以写成 hₜ = 0.8hₜ₋₁ + xₜ。hₜ₋₁ 是此前温度异常影响的汇总，系数 0.8 表示每前进一步只保留其中的 80%，xₜ 则把当天的新异常完整写入状态。给定输入 x = [1, 0, 2] 和初始状态 h₀ = 0，模型会按时间顺序反复执行“保留旧影响，再加入新输入”。即使某天 xₜ = 0，之前写入的影响也不会立刻消失，而是继续以 0.8 的比例留在状态中；新的异常到来时，它又会与尚未消退的历史共同决定当前状态。这个例子展示了状态空间表示的核心因果链：输入改变状态，状态携带历史，读出再把状态转成当前输出。</p></div>
+<div class="dd-formula">ḣ(t)=Ah(t)+Bx(t)，　y(t)=Ch(t)+Dx(t)</div>
+<table class="dd-table"><thead><tr><th>误区</th><th>更准确的理解</th></tr></thead><tbody><tr><td>线性时间就必然更快</td><td>内核、长度、批量和硬件决定墙钟性能</td></tr><tr><td>状态保留完整历史</td><td>它是有限维有损压缩</td></tr><tr><td>递推与卷积是两种模型</td><td>线性时不变 SSM 中是等价计算视角</td></tr><tr><td>选择性解决所有检索</td><td>它改善内容写入，未消除容量边界</td></tr><tr><td>训练稳定即可无限外推</td><td>需做长度与数值稳定压力测试</td></tr></tbody></table>
+<table class="dd-table"><thead><tr><th>层级</th><th>依赖与延伸</th></tr></thead><tbody><tr><td>先修</td><td>RNN、线性代数、卷积、离散系统</td></tr><tr><td><b>本页核心</b></td><td>离散化、卷积等价、选择性扫描、稳定性</td></tr><tr><td>对比</td><td>注意力、Transformer、长上下文</td></tr><tr><td>工程</td><td>并行 scan、融合内核、流式推理</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>手算离散化后的序列递推<span class="dd-badge math">离散化</span></h2>
+<div class="dd-agent-response"><p>连续系统按固定间隔采样后，需要把连续时间的状态变化换算成离散时间的一步递推：</p>
+<p>hₖ = Āhₖ₋₁ + B̄xₖ</p>
+<p>这里，k 是离散时间步，xₖ 是第 k 步输入，hₖ₋₁ 和 hₖ 分别是更新前后的状态。横线表示 Ā、B̄ 不是原始的连续时间矩阵，而是经过离散化得到的一步状态转移和一步输入写入矩阵。若采样步长为 Δ，则状态转移满足 Ā = e^(ΔA)。其中 e 表示自然指数函数，e^(ΔA) 是矩阵指数，它把由 A 描述的连续演化换算为跨越一个采样间隔后的累计变化。零阶保持等离散化方法会同时计算 Ā 和 B̄，使旧状态的演化与采样区间内输入的作用使用同一时间尺度。</p>
+<p>Δ 是模型含义的一部分。采样间隔改变时，一步对应的真实时间随之改变，因此不能总沿用原来的 Ā 和 B̄；如果频率改变却不重新离散化，同一个离散步就会代表不同长度的连续演化，模型所表达的时间尺度也会改变。由于状态转移会被反复应用，学习时还需要约束状态动力学，避免递推过程中数值不断放大而发生爆炸。</p>
+<p>把离散化结果取为标量 Ā = 0.8、B̄ = 1，并给定 x = [1, 0, 2]、h₀ = 0，可以逐步计算状态：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-right">t</th><th class="dd-align-right">xₜ</th><th class="dd-align-left">递推</th><th class="dd-align-right">hₜ</th></tr></thead><tbody><tr><td class="dd-align-right">1</td><td class="dd-align-right">1</td><td class="dd-align-left">0.8 × 0 + 1</td><td class="dd-align-right">1</td></tr><tr><td class="dd-align-right">2</td><td class="dd-align-right">0</td><td class="dd-align-left">0.8 × 1 + 0</td><td class="dd-align-right">0.8</td></tr><tr><td class="dd-align-right">3</td><td class="dd-align-right">2</td><td class="dd-align-left">0.8 × 0.8 + 2</td><td class="dd-align-right">2.64</td></tr></tbody></table></div>
+<p>第一步没有旧状态，因此输入 1 直接形成 h₁ = 1。第二步当前输入为 0，只保留上一步状态的 80%，得到 h₂ = 0.8。第三步先把 0.8 衰减为 0.64，再写入当前输入 2，得到 h₃ = 2.64。最终的 2.64 不是单独由最新输入产生的：其中的 2 来自当前输入，0.64 来自过去输入经过连续两次状态转移后留下的记忆。离散递推正是通过这种逐步更新，把不断到来的输入累积进有限维状态。</p></div>
+<table class="dd-table"><thead><tr><th>t</th><th>xₜ</th><th>递推</th><th>hₜ</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>0.8×0+1</td><td>1</td></tr><tr><td>2</td><td>0</td><td>0.8×1</td><td>0.8</td></tr><tr><td>3</td><td>2</td><td>0.8×0.8+2</td><td>2.64</td></tr></tbody></table>
+<div class="dd-formula">hₖ=Āhₖ₋₁+B̄xₖ，　Ā=e<sup>ΔA</sup></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>同一线性 SSM 也可以看成一维卷积<span class="dd-badge math">等价视角</span></h2>
+<div class="dd-agent-response"><p>线性状态空间模型既可以按时间递推，也可以把整段输入写成一维卷积。递推形式逐步更新状态，天然适合流式处理，但后一步依赖前一步，直接按时间展开时不容易并行。为使下面的卷积式与第 1 节的一般输出方程保持一致，这里先采用两个明确前提：省略输入直通项，即 D = 0；并把处理 x₀ 之前的初始状态设为 h₋₁ = 0。在这两个前提下，把递推式反复代入，就能消去中间状态，得到第 k 步输出：</p>
+<p>yₖ = Σᵢ₌₀…ₖ CĀⁱB̄ · xₖ₋ᵢ</p>
+<p>若 D ≠ 0，完整输出还要加上当前输入的直通贡献 Dxₖ；若 h₋₁ ≠ 0，还要加上不由输入产生的自由响应 CĀ<sup>k+1</sup>h₋₁。上式只是在 D = 0、h₋₁ = 0 时保留下来的输入卷积部分，索引 i = 0 因而恰好对应 xₖ 对当前状态的写入。</p>
+<p>定义 Kᵢ = CĀⁱB̄ 后，同一个式子可以写成用卷积核 K 对输入序列做卷积。i 表示回看的距离：i = 0 对应当前输入，i = 1 对应前一步输入，依此类推。xₖ₋ᵢ 是 i 步前的输入，B̄ 先把它写入状态；Āⁱ 表示这份信息经历 i 次状态转移，因而随系统动力学传播到当前时刻；C 再从传播后的状态贡献中读出输出。Σ 把从当前到最早位置的所有贡献相加，形成 yₖ。</p>
+<p>卷积核并不是与状态模型无关的一组自由系数。每个距离上的系数都由 Kᵢ = CĀⁱB̄ 生成，因此整组长卷积核 K 共享同一套状态动力学：输入距离越远，Ā 被重复应用的次数越多，其影响如何保留、衰减或变化都由 Ā 决定。结构化参数化使这种长核的计算可行，而不必把每个距离完全独立地处理。</p>
+<p>这两种表达对应不同的计算需求。推理时可以保留当前状态 h；每收到一个新输入，只做一次状态更新和读出，因此相对于已经处理过的历史长度，每步能够进行 O(1) 的增量更新。训练时通常已有完整序列，可以先构造由 Kᵢ 组成的卷积核，再通过并行卷积或扫描一次处理整段，以提高训练吞吐。递推与卷积并不是两个不同模型，而是同一线性系统的两种计算顺序：需要低延迟流式处理时使用状态递推，需要整段并行处理时利用卷积或扫描形式。</p></div>
+<div class="dd-formula">yₖ=Σ<sub>i=0…k</sub> CĀ<sup>i</sup>B̄ · xₖ₋ᵢ，　Kᵢ=CĀ<sup>i</sup>B̄</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>选择性让模型按内容决定写入与遗忘<span class="dd-badge math">Mamba</span></h2>
+<div class="dd-agent-response"><p>线性时不变的状态空间模型在每个位置复用同一组 A、B、C。“时不变”意味着状态演化、输入写入和状态读出的规则不会因当前位置的内容而改变：一个表示红色标记的 token 和一个普通词，只要处在相同的相对距离上，就会受到同样的记忆规则。由这种固定动力学生成的卷积核也只随距离变化，难以直接表达“遇到红色 token 时重点记住，遇到其他内容时忽略”这类由内容决定的操作。</p>
+<p>选择性 SSM 让部分状态空间参数由当前输入动态产生：</p>
+<p>Δₜ, Bₜ, Cₜ = fθ(xₜ)</p>
+<p>hₜ = Ā(Δₜ)hₜ₋₁ + B̄ₜxₜ</p>
+<p>xₜ 是当前位置的输入，fθ 是参数为 θ 的小型可学习函数。它读取 xₜ，并生成当前位置使用的步长 Δₜ、写入参数 Bₜ 和读出参数 Cₜ。Δₜ 决定当前步如何把连续动力学离散化，得到状态转移 Ā(Δₜ)；Bₜ 对应离散后的 B̄ₜ，控制当前输入以多大方式写入状态；Cₜ 控制当前状态中的哪些信息被读出。hₜ₋₁ 是更新前保存的历史，hₜ 是按当前内容选择性保留旧状态并写入 xₜ 后的新状态。</p>
+<p>这条因果链使模型的记忆规则随内容改变：当前输入先经过 fθ 产生参数，参数再控制旧状态保留、当前信息写入以及结果读出。因此，即使两个输入与当前输出的距离相同，模型也能因为它们的内容不同而给予不同的保留程度。对“只记住红色 token”一类任务，红色标记可以触发更强的写入或更合适的保留规则，普通内容则可以被弱化。</p>
+<p>参数随位置变化后，不再存在一组对所有位置都固定的简单卷积核，不能直接照搬线性时不变系统的长卷积计算。为了仍然高效处理整段序列，需要硬件友好的并行 scan：它尊重递推依赖，同时批量合并各步计算。选择性由此增强了内容依赖的记忆能力，但没有取消状态压缩这一基本约束；无论参数怎样变化，历史仍被汇总进有限维状态，而不是被逐项完整保存。</p></div>
+<div class="dd-formula">Δₜ,Bₜ,Cₜ=fθ(xₜ)，　hₜ=Ā(Δₜ)hₜ₋₁+B̄ₜxₜ</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创演示：遗忘门改变脉冲的有效记忆长度<span class="dd-badge math">可视化</span></h2>
+<div class="dd-agent-response"><p>状态保留率决定一次输入写入状态后会以多快的速度消退。设序列在某一时刻出现一次脉冲，此后没有新的输入干扰；如果每一步都将上一状态乘以固定保留率 Ā，那么这次脉冲经过 d 步后的贡献就是 Āᵈ。每前进一步都会再乘一次 Ā，因此距离越远，乘法累计次数越多。</p>
+<p>图 1 对比了 Ā = 0.5 与 Ā = 0.9 时同一脉冲的衰减曲线。两条曲线都从早期事件出发，但 0.5 每步只保留一半，下降很快；0.9 每步保留九成，下降更缓。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-right">距离 d</th><th class="dd-align-right">0.5ᵈ</th><th class="dd-align-right">0.9ᵈ</th></tr></thead><tbody><tr><td class="dd-align-right">1</td><td class="dd-align-right">0.500</td><td class="dd-align-right">0.900</td></tr><tr><td class="dd-align-right">5</td><td class="dd-align-right">0.031</td><td class="dd-align-right">0.590</td></tr><tr><td class="dd-align-right">10</td><td class="dd-align-right">0.001</td><td class="dd-align-right">0.349</td></tr><tr><td class="dd-align-right">50</td><td class="dd-align-right">≈0</td><td class="dd-align-right">0.005</td></tr></tbody></table></div>
+<p>距离为 1 步时，两种设置仍分别保留 0.500 和 0.900。到第 5 步，0.5 的连续相乘已把贡献压到 0.031，而 0.9 仍保留 0.590。到第 10 步，前者只剩 0.001，后者还有 0.349；到第 50 步，前者近似为 0，后者也已衰减到 0.005。这里的“有效记忆长度”不是事件被完整保存的步数，而是它对当前状态仍有可感知贡献的范围：曲线越缓，早期事件在更远位置仍能产生影响，有效记忆就越长。</p>
+<p>固定 Ā 时，所有输入遵循同一条衰减曲线。选择性机制则可以让不同输入对应不同的状态保留尺度：需要长期保存的事件采用较缓的衰减，短期信息采用较快的衰减。图中的 0.5 和 0.9 因而不仅展示两个数值设置，也直观说明了内容相关的保留规则为何能改变不同事件的记忆跨度。无论保留率多高，只要它小于 1，单次脉冲的贡献仍会随距离持续减小；选择更缓的曲线是在延长影响，而不是让有限输入永久不衰减。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 720 285" role="img" aria-label="状态空间模型对单次脉冲的两种衰减曲线"><line x1="65" y1="230" x2="675" y2="230" stroke="#7d8797"/><line x1="65" y1="230" x2="65" y2="42" stroke="#7d8797"/><polyline points="85,65 175,148 265,190 355,211 445,220 535,225 625,228" fill="none" stroke="#cf7c72" stroke-width="3"/><polyline points="85,65 175,82 265,97 355,110 445,122 535,133 625,143" fill="none" stroke="#65a6d9" stroke-width="3"/><circle cx="85" cy="65" r="5" fill="#d3a05a"/><text x="102" y="58" class="svg-t">x₀=1 脉冲</text><text x="500" y="119" class="svg-t" fill="#65a6d9">Ā=0.9</text><text x="420" y="210" class="svg-t" fill="#cf7c72">Ā=0.5</text><text x="365" y="258" text-anchor="middle" class="svg-t">离脉冲的步数</text><text x="75" y="32" class="svg-t">状态贡献 Āᵈ</text></svg><figcaption>图 1　固定保留率下，早期输入贡献按 Āᵈ 衰减；选择性机制相当于让不同输入拥有不同时间尺度。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>距离 d</th><th>0.5ᵈ</th><th>0.9ᵈ</th></tr></thead><tbody><tr><td>1</td><td>0.500</td><td>0.900</td></tr><tr><td>5</td><td>0.031</td><td>0.590</td></tr><tr><td>10</td><td>0.001</td><td>0.349</td></tr><tr><td>50</td><td>≈0</td><td>0.005</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>线性复杂度不等于实际必然更快<span class="dd-badge eng">系统</span></h2>
+<div class="dd-agent-response"><p>序列长度 n 增长时，SSM 的渐近序列计算量为 O(n)，注意力为 O(n²)。这说明在其他条件相近且 n 足够大时，SSM 的计算量随长度线性增长，而注意力的两两位置交互增长更快。但复杂度只描述增长趋势，不直接等于某个硬件上的实际耗时。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">因素</th><th class="dd-align-left">SSM</th><th class="dd-align-left">注意力</th></tr></thead><tbody><tr><td class="dd-align-left">渐近序列计算</td><td class="dd-align-left">O(n)</td><td class="dd-align-left">O(n²)</td></tr><tr><td class="dd-align-left">推理状态</td><td class="dd-align-left">固定维度</td><td class="dd-align-left">KV 随 n 增长</td></tr><tr><td class="dd-align-left">训练内核</td><td class="dd-align-left">依赖高效 scan 与融合</td><td class="dd-align-left">使用成熟矩阵运算与 FlashAttention</td></tr><tr><td class="dd-align-left">随机访问旧位置</td><td class="dd-align-left">经压缩状态间接访问</td><td class="dd-align-left">可直接注意旧 KV</td></tr></tbody></table></div>
+<p>推理时，SSM 把历史压入固定维度状态，因此继续生成时不需要让状态大小随序列长度 n 增长；注意力则保留旧位置的 KV，缓存随 n 增长。这是两者在长序列资源需求上的重要差别。与此同时，注意力可以直接选择旧 KV 中的某个位置，而 SSM 对旧信息的访问要经过压缩状态，计算方式和信息访问能力并不相同。</p>
+<p>实际速度还取决于每一步计算的常数成本以及硬件能否被充分利用。SSM 的线性优势需要高效的 scan 和算子融合才能转化为吞吐；注意力虽然有 O(n²) 的增长项，却能利用成熟的矩阵运算和 FlashAttention。短序列中，n² 项尚未大到主导总耗时，内核启动、数据搬运和算子实现等常数成本可能更重要。较小 batch 或缺少优化内核时，硬件利用率也可能不足，于是渐近复杂度更低的 SSM 仍可能更慢。</p>
+<p>因此，“O(n) 优于 O(n²)”只支持随长度增长的理论判断，不能替代部署测量。是否真正占优，必须在目标硬件上使用目标序列长度和 batch，实际比较 tokens/s、端到端延迟与显存占用。只有这些条件一致时，测得的结果才反映模型在具体工作负载中的真实效率。</p></div>
+<table class="dd-table"><thead><tr><th>因素</th><th>SSM</th><th>注意力</th></tr></thead><tbody><tr><td>渐近序列计算</td><td>O(n)</td><td>O(n²)</td></tr><tr><td>推理状态</td><td>固定维度</td><td>KV 随 n 增长</td></tr><tr><td>训练内核</td><td>依赖高效 scan/融合</td><td>成熟矩阵与 FlashAttention</td></tr><tr><td>随机访问旧位置</td><td>经压缩状态间接访问</td><td>可直接注意旧 KV</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>状态稳定性决定长外推是否可信<span class="dd-badge eng">数值边界</span></h2>
+<div class="dd-agent-response"><p>状态空间模型会在每个时间步反复应用离散状态转移矩阵 Ā，因此一次很小的放大、衰减或数值误差，都可能在足够长的递推中累积。模型在长度 4k 的训练区间内表现正常，只说明这段范围内的动力学和数值误差尚可控制；把同一递推延长到 100k 步后，状态可能逐渐漂移，甚至爆炸，训练区间内稳定并不能保证任意长度都稳定。</p>
+<p>判断反复转移的基本量是 Ā 的谱半径，也就是其所有特征值绝对值中的最大值。它可以粗略理解为：状态不断乘以 Ā 时，最容易被放大的方向会增长还是衰减。谱半径大于 1 时，即使某个状态分量起初很小，也可能随步数不断放大；谱半径远小于 1 时，历史影响则会迅速衰减，模型难以维持长程记忆。稳定性因而不是简单追求“越小越好”，而是在避免放大的同时保留任务所需的时间尺度。</p>
+<p>长序列中的偏差也不只来自理想数学形式。有限精度会让每一步产生微小舍入差异，归一化会改变实际状态演化，输入依赖的步长还会使转移规则随位置变化。这些因素在短序列上可能不明显，却会经过大量递推逐步累积，所以长外推必须直接验证，不能只从训练长度内的结果推断。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">测试</th><th class="dd-align-left">应观察的现象</th></tr></thead><tbody><tr><td class="dd-align-left">长度外推</td><td class="dd-align-left">loss 或准确率怎样随序列长度变化</td></tr><tr><td class="dd-align-left">零输入滚动</td><td class="dd-align-left">没有新输入时，状态是合理衰减、持续漂移还是爆炸</td></tr><tr><td class="dd-align-left">脉冲响应</td><td class="dd-align-left">单次输入在不同时间尺度上的影响是否可解释</td></tr><tr><td class="dd-align-left">精度切换</td><td class="dd-align-left">FP32、BF16、FP16 下的状态轨迹和结果有多大差异</td></tr></tbody></table></div>
+<p>长度外推曲线能显示性能是否在训练范围之外逐渐退化；零输入滚动隔离了状态自身动力学，可以直接发现不受新输入驱动的漂移或爆炸；脉冲响应揭示不同状态分量保留信息的时间尺度；精度切换则暴露递推对数值表示的敏感性。只有这些检查在目标长度上仍表现可信，才能把短序列中的稳定表现外推到更长的运行区间。</p></div>
+<table class="dd-table"><thead><tr><th>测试</th><th>观察</th></tr></thead><tbody><tr><td>长度外推</td><td>loss/准确率随长度曲线</td></tr><tr><td>零输入滚动</td><td>状态是否衰减、漂移或爆炸</td></tr><tr><td>脉冲响应</td><td>不同时间尺度是否可解释</td></tr><tr><td>精度切换</td><td>FP32/BF16/FP16 的状态差异</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>压缩历史会伤害精确复制与任意检索<span class="dd-badge intuition">能力边界</span></h2>
+<div class="dd-agent-response"><p>能够以可接受的计算和显存处理百万长度输入，只说明模型可以让序列通过计算流程，并不保证任意一个早期 token 仍能被精确找回。SSM 持续把历史压缩进固定维度状态：这种表示可以概括长期趋势和任务相关信号，却可能无法同时无损保存大量彼此无关的细节。序列越长，需要共享同一有限状态的信息越多，能否处理长度与能否恢复具体内容就越不能混为一谈。</p>
+<p>密码复制、键值关联、needle-in-a-haystack 以及要求引用原文位置的任务，都会对随机访问能力施加压力。密码复制要求状态保留一段精确符号；键值关联要求在查询出现时找回与特定键配对的旧值；needle-in-a-haystack 把一个目标片段藏在大量干扰文本中，再要求模型恢复它；原文引用还要求返回对应位置的具体内容。这些任务共同检验的不是一般趋势是否进入状态，而是某条旧信息能否在远距离和强干扰下被准确定位并读出。</p>
+<p>选择性机制可以改善写入策略，让模型根据内容决定哪些信息应重点保存、哪些可以淡化。但选择得更聪明并没有把有限状态变成容量无限的数据库：当大量细节都可能在未来被任意查询时，模型仍面对压缩带来的信息取舍。因此，长上下文长度本身不是记忆能力的证明。</p>
+<p>一种边界清晰的组合方式是让 SSM 负责局部或流式压缩，以固定状态高效汇总不断到来的信息；需要精确回看时，再由稀疏注意力或外部检索访问特定历史内容。两部分分别承担概括与精确访问，避免要求有限状态独自保存全部原文细节。</p>
+<p>评测长序列能力时，需要区分三个问题：“输入是否放得下”衡量系统能否接收该长度；“吞吐是否可扩展”衡量计算成本怎样随长度增长；“信息是否仍可取回”衡量早期细节能否被准确恢复。检索结果还应按目标距离、干扰数量和检索精度分别报告。只有在距离增大、干扰增加时仍保持足够的取回精度，才能说明模型具备相应的长程记忆，而不只是具备长序列处理容量。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>与 RNN、卷积和注意力的关系<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>SSM、RNN、卷积和注意力都能处理序列，但它们保存历史和访问历史的方式不同。SSM 与 RNN 共享递归状态这一核心思想：每一步读取当前输入和上一状态，生成新状态，再由状态产生输出。因此，在需要固定大小状态和流式处理时，两者都能逐步消费序列，而不必在每一步重新读取全部历史。</p>
+<p>现代 SSM 并不只是给旧式递归换一个名字。它从连续动态系统出发，通过离散化得到序列递推，并利用结构化矩阵与并行扫描提高训练效率。连续系统的参数描述状态如何随时间演化，离散化把这种演化换算成每个序列步的转移；结构化参数使长程动力学的计算可行；并行扫描则在保持递推依赖的同时批量处理多个位置。这些机制使 SSM 尤其适合表达超长、平滑的动态变化。</p>
+<p>当 SSM 是线性时不变系统时，同一组状态转移、写入和读出参数会在所有位置复用。把递推展开后，每个历史输入到当前输出的作用只由相对距离决定，于是它等价于一类由状态动力学生成的长卷积。这说明线性 SSM 与长卷积不是互斥模型，而是同一计算关系的递推形式和整段形式。普通卷积更直接匹配局部、平移不变的模式；结构化 SSM 则用状态动力学组织更长的卷积核。</p>
+<p>选择性 SSM 进一步让参数依赖当前位置的输入，使不同内容触发不同的写入、保留或读出规则。此时位置之间不再共享一组固定卷积核，模型跨越了线性时不变长卷积的限制。注意力采用另一条路线：它显式保留各位置表示，并根据当前内容对旧位置进行寻址，因此更适合需要任意位置精确回看的任务；代价与收益不能只用是否递归来概括。</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">需求</th><th class="dd-align-left">更匹配的机制</th></tr></thead><tbody><tr><td class="dd-align-left">固定小状态、流式处理</td><td class="dd-align-left">RNN 或 SSM</td></tr><tr><td class="dd-align-left">超长平滑动力学</td><td class="dd-align-left">结构化 SSM</td></tr><tr><td class="dd-align-left">任意位置精确回看</td><td class="dd-align-left">注意力或检索</td></tr><tr><td class="dd-align-left">局部平移模式</td><td class="dd-align-left">卷积</td></tr></tbody></table></div>
+<p>这些对应关系描述的是机制与需求的匹配，而不是绝对的模型边界。选择时应先判断任务需要持续压缩、长时间尺度动力学、局部模式，还是对历史位置的精确内容寻址，再选择更直接支持该需求的计算方式。</p></div>
+<table class="dd-table"><thead><tr><th>需求</th><th>更匹配的机制</th></tr></thead><tbody><tr><td>固定小状态、流式</td><td>RNN/SSM</td></tr><tr><td>超长平滑动力学</td><td>结构化 SSM</td></tr><tr><td>任意位置精确回看</td><td>注意力/检索</td></tr><tr><td>局部平移模式</td><td>卷积</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>部署时状态必须拥有明确生命周期<span class="dd-badge eng">运行约束</span></h2>
+<div class="dd-agent-response"><p>SSM 的递归状态不是可以在请求之间随意复用的临时缓存。它是此前输入经过连续更新后的压缩表示，会直接参与下一步输出。只要状态没有被重置，新输入就会与其中残留的历史共同作用。因此，把一个用户的状态交给下一位用户，相当于让后者的序列从前者历史的摘要继续递推，输出会受到不属于当前会话的信息影响。</p>
+<p>部署系统必须把状态绑定到明确的会话和租户。每条活动序列都应取得自己的状态，更新后仍保存回同一身份；会话结束时显式重置，长时间不再使用时按超时策略回收。模型版本变化时也需要处理状态迁移，因为旧状态是在旧模型的动力学下形成的，不能在没有明确迁移规则的情况下继续交给新版本使用。状态的创建、归属、更新、回收和迁移共同构成它的生命周期。</p>
+<p>批处理调度会让这一要求更严格。一个 batch 中可能同时推进多条序列，每条序列的第 t 步都必须接上它自己第 t−1 步的状态。即使只发生一次索引或顺序错位，错误状态也会进入后续递推；新状态又由错误状态生成，使污染持续传播，而不只影响错位当下的一个输出。调度器因而既要批量计算，也要保持序列身份与状态顺序始终对应。</p>
+<p>故障恢复同样不能把“仍然存在的某个状态”当作可用状态。恢复过程应从来源明确、内容受信的检查点重建会话状态，并确认它对应正确的会话、模型版本和序列位置。来源不明的旧状态可能包含错误历史、错位结果或不兼容表示，静默复用会把这些问题带入所有后续输出。只有在状态归属和来源都可验证时，递归推理的连续性才是可信的。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>状态空间模型从一个明确的问题出发：怎样在序列不断增长时，用有限维状态持续承接历史，并据此产生当前输出。连续动力学先定义这份状态如何变化。输入 x(t) 通过写入项进入状态 h(t)，状态自身按动力矩阵演化，读出再把 h(t) 转成输出 y(t)。这一层描述的是理想连续时间中的机制，给出了“输入 → 状态变化 → 输出”的基本因果关系。</p>
+<p>实际序列由离散位置组成，因此需要按采样步长 Δ 把连续动力学离散化。离散化得到一步状态转移 Ā 和输入写入 B̄，使模型可以按 hₜ = Āhₜ₋₁ + B̄xₜ 更新。采样步长决定一步代表多长的连续演化，所以它改变时，相应的离散参数也要随之改变。离散递推的输出来自当前状态，而当前状态又由旧状态和新输入共同形成，历史由此沿时间轴逐步传播。</p>
+<p>同一线性时不变递推可以换一种计算顺序：把中间状态展开后，历史输入对当前输出的作用形成由状态动力学生成的长卷积核。流式推理可以保留状态逐步递推；整段训练则可以采用卷积或扫描并行处理。二者使用的是同一系统关系，区别在于计算组织方式，而不是模型含义。</p>
+<p>固定参数让相同距离的输入遵循相同记忆规则。需要按内容决定“写入什么、保留多久、读出什么”时，选择性参数由当前输入产生，使状态更新随内容变化。这样能够增强内容选择能力，但历史仍被压入有限状态，精确保存大量互不相关细节仍有边界。参数随位置变化后，固定卷积核的简单形式不再适用，因此需要融合的并行扫描，在遵守递推依赖的同时实现随序列长度线性增长的吞吐。</p>
+<p>这条链上的每个设计目标都要用对应证据验收。检索测试检查压缩后信息是否仍能取回，并应关注目标距离、干扰数量和准确度；长度外推检查反复状态转移在训练范围之外是否衰减合理、发生漂移或爆炸；硬件实测则在目标长度、batch 和设备上比较 tokens/s、延迟与显存，确认线性复杂度是否真正转化为部署收益。只有机制、信息能力、长程稳定性和实际效率都经过各自的测试，才能判断一个 SSM 是否解决了目标序列问题。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2111.00396" target="_blank" rel="noopener">Efficiently Modeling Long Sequences with Structured State Spaces</a>：S4 结构化状态空间</li><li><a href="https://arxiv.org/abs/2208.04933" target="_blank" rel="noopener">Simplified State Space Layers for Sequence Modeling</a>：S5 与并行扫描</li><li><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener">Mamba: Linear-Time Sequence Modeling with Selective State Spaces</a>：选择性 SSM</li><li><a href="https://arxiv.org/abs/2405.21060" target="_blank" rel="noopener">Transformers are SSMs</a>：结构化状态空间二重性</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/state-space-models">在地图中查看概念关系</a></nav>
+</article></main></body></html>

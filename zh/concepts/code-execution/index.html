@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>代码执行与沙箱：让模型计算，但不把主机交给它 · AI 知识地图</title>
+<meta name="description" content="理解生成—执行—观察闭环的能力来源，以及进程、文件、网络、资源、凭据与人工授权组成的隔离边界。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/code-execution/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="代码执行与沙箱：让模型计算，但不把主机交给它">
+<meta property="og:description" content="理解生成—执行—观察闭环的能力来源，以及进程、文件、网络、资源、凭据与人工授权组成的隔离边界。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/code-execution/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="代码执行与沙箱：让模型计算，但不把主机交给它">
+<meta name="twitter:description" content="理解生成—执行—观察闭环的能力来源，以及进程、文件、网络、资源、凭据与人工授权组成的隔离边界。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/code-execution/#page","name":"代码执行与沙箱：让模型计算，但不把主机交给它","description":"理解生成—执行—观察闭环的能力来源，以及进程、文件、网络、资源、凭据与人工授权组成的隔离边界。","url":"https://ai-knowledge-map.com/zh/concepts/code-execution/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"代码执行与沙箱：让模型计算，但不把主机交给它","item":"https://ai-knowledge-map.com/zh/concepts/code-execution/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">代码执行与沙箱：让模型计算，但不把主机交给它</span></li></ol></nav><article id="dd-article" data-concept-id="code-execution">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">代码执行与沙箱：让模型计算，但不把主机交给它</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">理解生成—执行—观察闭环的能力来源，以及进程、文件、网络、资源、凭据与人工授权组成的隔离边界。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 代码执行把语言模型的意图转换为可重复的确定性计算，但任何生成代码都应视为不可信输入；可靠系统依赖<b>临时沙箱、最小权限、资源限额、输出验证和高风险审批</b>，而不是依赖模型承诺安全。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>解释代码工具为何提升可靠性；画出执行闭环；列出六类隔离；区分沙箱与虚拟环境；安全处理依赖、文件、网络、秘密和输出。</div>
+<ol class="dd-chain"><li>将任务拆成最小可执行、可回退、可审计且可重放的步骤。</li><li>按风险配置隔离、权限和限额。</li><li>执行并捕获完整状态。</li><li>失败时只提供必要反馈并限制修正次数。</li><li>用测试、哈希或业务规则验收产物。</li><li>高影响外部动作在沙箱之外重新授权。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>代码工具补的是哪类能力<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>模型能够流畅地解释一个算法，却可能在计算一个大数时给出错误答案，这并非偶然。语言模型擅长把目标转述成程序，而解释器擅长对明确的规则进行精确、可重复的执行。两者解决的问题不同：前者负责“意图的表述”，后者负责“规则的落地”。把计算、数据转换、绘图和测试这些确定性任务交给代码，本质上是用一次真实执行的结果替换掉“凭语言猜结果”，再用这个可观察的结果去校正下一步的判断。</p>
+<p>代码执行因此是一种工具：它让解释器运行候选程序，并返回可观察的证据。它的输入是任务、代码、数据与运行环境；它的输出是运行结果、日志与产物。其工作方式遵循“生成—执行—观察—修正”的循环——先由模型生成候选程序，再由解释器执行，模型观察输出后修正自己的下一步。这个循环的价值在于留下了程序、输入、环境版本与输出，使整个过程可以被独立复核，也可以被确定性重放。</p>
+<p>需要严格区分的是，一次执行结果能说明的只是“这个程序在这个环境中这次运行产生了什么”，它不能自动证明程序正确、安全，也不等于获得了发布授权。正确性需要另外的验证，安全性需要另外的隔离，发布授权需要另外的决策。代码执行补的是“确定性计算与可观察反馈”这一类能力，而不是对结论的最终背书。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>最小执行闭环<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>代码从生成到被信任，要依次经过生成、边界检查、隔离执行、观察记录、反馈修正和独立验收这几个状态，每个状态都由不同的主体负责，不能互相替代。</p>
+<p>闭环的输入是候选代码、只读数据、运行策略和完成谓词。所谓完成谓词，是一个可以在执行之外独立判定“任务是否真正成功”的条件，而不是“进程是否正常退出”。模型提出代码、输入、预期产物和这个完成谓词之后，宿主先做静态检查：检查工具、依赖、权限与资源策略；一旦不满足策略，宿主应当拒绝执行，而不是让代码自行降级去迁就。随后，只读输入被复制进一个全新的沙箱，在非特权身份下运行，宿主捕获 stdout、stderr、退出码、信号、资源峰值、网络尝试和文件差异。这些观测结果回到 Agent；失败时只暴露必要的诊断信息，并限制修正次数，防止无限重试。</p>
+<p>执行结束后是独立验收：宿主不把“进程成功退出”当作任务成功，只导出被允许的产物。整个闭环中，控制平面负责创建环境、注入策略和决定导出，数据平面只运行候选代码。候选进程既不能访问控制平面的令牌，也不能修改自身的限额；否则所谓沙箱就只是被隔离对象自愿遵守的约定，边界形同虚设。</p>
+<p>理解这条闭环的要点在于：宿主先设边界，再执行、观察、验收；退出码 0 只表示进程正常结束，不代表任务完成。一旦控制令牌对候选进程可见，或者完成谓词无法在外部独立检查，闭环就失去了真正的边界。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>为什么必须假设代码有害<span class="dd-badge intuition">威胁</span></h2>
+<div class="dd-agent-response"><p>模型没有恶意，生成出的代码却仍然要按攻击载荷来处理，原因是威胁不由生成者的意图决定，而由代码的能力和它实际可达的资源决定。提示注入、拼错或误装的依赖、从网页复制来的片段，乃至普通的编程错误，都可能导致删文件、读取秘密、扫描内网、进入无限循环或耗尽资源。作者“只是想算个平均值”并不降低这些后果的真实性。</p>
+<p>因此威胁模型应当从“最坏可达效果”出发，而不是从“作者是否好心”出发。需要逐一确认：代码能读哪些路径、能连接哪些地址、以谁的身份运行、能创建多少子进程，以及它的输出是否会触发下游解析器。即便主任务只是计算平均值，只要运行时继承了云凭据和内网访问权限，它就同时拥有了与任务无关的巨大攻击面。最小权限原则要求的是先删除不需要的能力，而不是在提示里礼貌地请求代码“不要使用”。</p>
+<p>eval 并不是 exec 的安全替代：两者都可能执行不可信表达式，安全边界必须建立在独立的执行环境之上，而不是靠挑选某个解释函数来获得。</p>
+<p>这个威胁模型的输入，是代码可调用的能力、可达的文件与网络、运行身份和下游解析器；输出是最坏可达影响，以及应当删除的权限。它解决的是“作者没恶意是否就安全”这类误判。它产出的结论用于配置防护，而不是预测某次攻击一定发生；未知漏洞和配置错误仍可能穿透已知边界，所以防护结论是持续收紧的起点，而非一劳永逸的保证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>沙箱要隔离哪些资源<span class="dd-badge eng">安全</span></h2>
+<div class="dd-agent-response"><p>只开一个新进程远远不够，因为威胁来自多个正交的维度，任何一个维度失守都足以造成损害。沙箱需要在五类资源上同时设立边界，并记录每类资源对应的控制证据。</p>
+<p>文件方面，使用临时工作区、只读输入，禁止访问主机路径与设备，并记录挂载清单和最终的文件差异。网络方面，默认断网，或仅允许目标与协议的白名单，阻断内网元数据，同时记录 DNS 查询与连接尝试。资源方面，为 CPU、内存、磁盘、进程数和墙钟时间设上限，并记录峰值、终止原因与超限项。身份方面，使用非特权用户、不携带宿主凭据、限制系统调用，并记录有效 uid、capability 与策略版本。生命周期方面，每个任务重建环境，用后即销毁并清理产物，记录环境 id 与创建、销毁时间。</p>
+<p>这些控制必须同时存在：只限制 CPU 并不能阻止秘密外传，只断网并不能阻止覆盖宿主文件，只用临时目录也不能防止 fork bomb。输出通道同样属于边界的一部分——stdout、图片、压缩包和电子表格都要限制大小、类型和解析方式，否则攻击只是从执行器被转移到了查看器。</p>
+<p>使用这张隔离表时，输入是任务真正需要的资源以及可承受的损失，输出是五类隔离策略及对应的审计记录。宿主对文件、网络、资源、身份和生命周期分别设限，再做联合检查。日志显示未越界，只能解释本次已经观察到的行为；它不能证明共享内核或查看器不存在未知漏洞。</p></div>
+<table class="dd-table"><thead><tr><th>边界</th><th>控制</th><th>需要记录的证据</th></tr></thead><tbody><tr><td>文件</td><td>临时工作区、只读输入、禁止主机路径与设备</td><td>挂载清单和最终文件差异</td></tr><tr><td>网络</td><td>默认断网或目标/协议白名单、阻断内网元数据</td><td>DNS 与连接尝试</td></tr><tr><td>资源</td><td>CPU、内存、磁盘、进程数和墙钟上限</td><td>峰值、终止原因和超限项</td></tr><tr><td>身份</td><td>非特权用户、无宿主凭据、最小系统调用</td><td>有效 uid、capability 与策略版本</td></tr><tr><td>生命周期</td><td>每任务重建，用后销毁并清理产物</td><td>环境 id、创建/销毁时间</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>虚拟环境不等于安全沙箱<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>Python 的 venv 或依赖容器并不会自动隔离主机。venv 主要隔离的是包版本，它不限制文件访问、网络和系统调用；容器虽然提供命名空间与资源控制，但错误的挂载、特权模式，或者共享内核中的漏洞，仍然可以破坏隔离。面对高风险场景，需要叠加更强的组合：非特权容器、只读根文件系统、系统调用过滤、微型虚拟机，以及外部网络策略。</p>
+<p>“可复现”与“隔离”也不是同一件事。锁文件、固定运行时和确定性随机种子帮助重放结果，却不限制权限；微型虚拟机强化了边界，却仍可能因为未锁定依赖而得到不同的结果。可靠的执行必须同时回答两个独立的问题：这个程序能否逃逸或破坏环境，以及同一个输入能否被再次算出同样的结果。</p>
+<p>做选择时，输入是复现要求、攻击风险，以及需要向宿主开放的能力；输出是依赖环境、容器或微型虚拟机的组合。venv 解决的是包版本冲突，沙箱解决的是越权和损失半径，两者的工作目标不同。容器本身不是安全结论，特权模式、危险挂载或过宽的出网权限都会让隔离失效。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>依赖与结果也不可信<span class="dd-badge eng">供应链</span></h2>
+<div class="dd-agent-response"><p>即使代码本身看起来安全，风险仍可能从依赖和产物这两条路径进入。依赖方面，安装包可能被拼写劫持——用一个名字相近但内容不同的包冒充目标包——也可能在安装时执行任意脚本。产物方面，生成的文件可能包含宏、公式注入或巨量数据。应对方式是使用允许列表、锁定版本和内部镜像来约束依赖，同时扫描产物并限制其类型与大小；只有经过验证的结果才被复制出沙箱。</p>
+<p>供应链检查的输入是依赖名称、版本、来源和待导出文件，输出是允许或拒绝的决定以及扫描证据。它通过锁定版本、使用可信镜像、类型与大小检查来阻断依赖和产物夹带的风险。</p>
+<p>需要清醒的是，通过扫描只说明已知规则没有命中，并不能保证绝对安全；未知的恶意包、宏和解析器漏洞仍然存在，因此最小权限和安全查看仍然必须保留。锁定版本与可信镜像降低了依赖被替换的概率，而类型与大小限制降低了产物在查看器中引爆风险的概率，两者叠加才构成对供应链这条隐蔽路径的有效约束。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>预算必须能算，而不是写“适量”<span class="dd-badge math">推导</span></h2>
+<div class="dd-agent-response"><p>单轮限时 30 秒、最多重试 3 次，用户却仍可能等待两分钟，原因在于端到端等待时间不是单轮上限，而是整个修正循环的上界。最坏墙钟时间可以用公式表示为：</p>
+<p>T最坏 ≤ (1 + N重试) × T单轮 + T排队与启动</p>
+<p>公式输入三个量：N重试 是首次失败后最多再执行的次数，T单轮 是一轮允许占用的最长墙钟时间，T排队与启动 是等待资源与创建沙箱的额外预算；输出 T最坏 是用户端到端等待上界。这里的“最大重试数”不含首次执行。若单轮 30 秒、允许失败后再试 3 次、排队与启动共预留 12 秒，则最坏端到端预算是 (1+3)×30+12 = 132 秒，而不是 30 秒。</p>
+<p>输出同样要能算。若最多允许 20 个文件、单文件 5MB，仅文件导出理论上就可达 20×5 = 100MB；因此还需另设一个总产物上限，避免用许多小文件绕过单文件限制。</p>
+<p>预算需要沿多个轴分别设硬上限，并规定超限动作。计算上设 2 CPU、512MB、30 秒，超限即终止整组进程并记录超限项；并发上设 64 个进程或线程，拒绝继续创建以防 fork bomb；存储上设临时盘 1GB、导出总量 40MB，超限停止写入且不导出半成品；反馈上设 stdout+stderr 共 2MB，超限截断并保留哈希与尾部诊断；尝试上设首次加 3 次修正，超限停止自动循环，交由外部策略决定。</p>
+<p>预算应当是双层的：沙箱内限额约束单次执行，控制器的端到端预算约束整个修正循环；缺了任何一层都可能造成资源失控。这个上界依赖配置假设，是约束性的上限，不是实际耗时的预测，也不覆盖外部人工审批的时间。</p></div>
+<table class="dd-table"><thead><tr><th>预算轴</th><th>示例硬上限</th><th>超限动作</th></tr></thead><tbody><tr><td>计算</td><td>2 CPU、512MB、30 秒</td><td>终止整组进程并记录超限项</td></tr><tr><td>并发</td><td>64 个进程/线程</td><td>拒绝继续创建，防 fork bomb</td></tr><tr><td>存储</td><td>临时盘 1GB、导出总量 40MB</td><td>停止写入；不导出半成品</td></tr><tr><td>反馈</td><td>stdout+stderr 2MB</td><td>截断并保留哈希与尾部诊断</td></tr><tr><td>尝试</td><td>首次 + 3 次修正</td><td>停止自动循环，交给外部策略决定</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="worst-case-wall-clock" data-display="mathml"><math display="block" aria-label="最坏墙钟时间小于等于一加最大重试次数，乘以单轮墙钟上限，再加排队与启动预算"><mrow><msub><mi>T</mi><mtext>最坏</mtext></msub><mo>≤</mo><mo>(</mo><mn>1</mn><mo>+</mo><msub><mi>N</mi><mtext>重试</mtext></msub><mo>)</mo><mo>·</mo><msub><mi>T</mi><mtext>单轮</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>排队与启动</mtext></msub></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>从意图到可信结果<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>让执行反馈提升能力而不是扩大损失半径，靠的是一条把意图逐步收紧成可信结果的链路。第一步是把任务拆成最小可执行、可回退、可审计且可重放的步骤；第二步按风险等级配置隔离、权限和限额；第三步执行并捕获完整状态；第四步在失败时只提供必要反馈并限制修正次数；第五步用测试、哈希或业务规则验收产物；第六步，高影响的外部动作要在沙箱之外重新授权。</p>
+<p>这条综合链路的输入是任务意图、风险等级、候选代码和完成谓词，输出是通过验收的有限产物，或者带证据的停止结果。每一步都在缩小动作的范围，同时让下一步变得可验证：拆解限定了单步的破坏面，配置限定了运行的能力，捕获限定了可追查的状态，反馈限定了重试的规模，验收限定了可导出的产物，而重新授权则把真正危险的动作挡在沙箱的信任边界之外。</p>
+<p>通过沙箱验收只表示产物满足了已声明的规则，不等于允许把它发布、转账或写入生产。发布、转账和写生产都是高影响的外部动作，必须重新授权。执行反馈提升的是模型逐步校正意图的能力，而损失半径由每一步的边界和最后的重新授权共同约束。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>一次缓存修复怎样在沙箱中被证明<span class="dd-badge math">运行示例</span></h2>
+<div class="dd-agent-response"><p>模型提出一个复合缓存键的修复方案后，不能直接把补丁写进生产仓库并宣布完成，因为“提出方案”和“方案已被证明可行”之间隔着一整条验证链路。补丁要先经过宿主策略门，进入临时沙箱执行，产物通过验证之后，才由宿主决定是否导出。安全边界由宿主在执行前配置、执行后复核；沙箱内的进程不能自行扩大网络、文件或凭据权限。</p>
+<p>观察证据和它能证明的内容需要逐项区分。退出码为 0，只能证明测试进程正常结束，不能证明测试覆盖完整、业务目标正确。测试通过 4/4，只能证明已声明的隔离与命中行为通过，不能证明隐藏的并发问题或跨版本问题不存在。资源峰值 310MB / 6.2s，只能证明本次低于 512MB / 30s 的限额，不能证明任意输入规模都安全。文件差异显示 2 个允许文件，只能证明本次未观察到越界写入，不能证明代码没有其他安全缺陷。</p>
+<p>资源限额并不是“防坏人”专用：一个错误递归就可能耗尽内存。在这个例子里，允许的 3 次修正意味着最多执行 4 轮，单任务执行部分的上限是 4×30 = 120 秒；再加上排队与启动才是完整预算。</p>
+<p>失败的边界在于：沙箱降低的是损失半径，它不会把恶意代码变成安全代码。共享内核漏洞、错误挂载、过宽的出网权限和宿主代理接口都可能穿透边界。高风险系统需要采用分层隔离、及时打补丁和外部策略检查，而不是依赖单一沙箱给出绝对保证。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 235" role="img" aria-label="代码候选经过宿主策略门、临时沙箱执行、产物验证再决定是否导出的流程"><defs><marker id="cex1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="16" y="52" width="116" height="82" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="74" y="77" text-anchor="middle" class="svg-t">候选补丁</text><text x="74" y="98" text-anchor="middle" class="svg-t" font-size="10">复合缓存键</text><text x="74" y="117" text-anchor="middle" class="svg-t" font-size="10">+ 回归测试</text><path d="M132,93 L178,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="180" y="39" width="132" height="108" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="246" y="64" text-anchor="middle" class="svg-t">宿主策略门</text><text x="246" y="86" text-anchor="middle" class="svg-t" font-size="10">只读输入副本</text><text x="246" y="105" text-anchor="middle" class="svg-t" font-size="10">断网 · 无凭据</text><text x="246" y="124" text-anchor="middle" class="svg-t" font-size="10">2 CPU / 512MB / 30s</text><path d="M312,93 L358,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="360" y="28" width="140" height="130" rx="8" fill="#21252d" stroke="#c77b72"/><text x="430" y="53" text-anchor="middle" class="svg-t">临时沙箱</text><text x="430" y="77" text-anchor="middle" class="svg-t" font-size="10">应用补丁 → 运行测试</text><text x="430" y="96" text-anchor="middle" class="svg-t" font-size="10">捕获 exit/stdout/stderr</text><text x="430" y="115" text-anchor="middle" class="svg-t" font-size="10">记录文件 diff / 资源峰值</text><text x="430" y="136" text-anchor="middle" class="svg-t" font-size="10">超限立即终止并销毁</text><path d="M500,93 L546,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="548" y="39" width="116" height="108" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="606" y="64" text-anchor="middle" class="svg-t">独立验收</text><text x="606" y="86" text-anchor="middle" class="svg-t" font-size="10">隔离 2/2</text><text x="606" y="105" text-anchor="middle" class="svg-t" font-size="10">命中 2/2</text><text x="606" y="124" text-anchor="middle" class="svg-t" font-size="10">无越界文件</text><path d="M606,148 C600,214 430,216 430,160" fill="none" stroke="#6b7484" marker-end="url(#cex1)"/><text x="515" y="210" text-anchor="middle" class="svg-t" font-size="10">失败证据仅回给修正循环；通过产物也只导出补丁，不携带沙箱秘密与临时文件</text></svg><figcaption>图 1　安全边界由宿主在执行前配置、执行后复核；沙箱内进程不能自行扩大网络、文件或凭据权限。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>观察</th><th>值</th><th>能证明什么</th><th>不能证明什么</th></tr></thead><tbody><tr><td>退出码</td><td>0</td><td>测试进程正常结束</td><td>测试覆盖完整、业务目标正确</td></tr><tr><td>测试</td><td>4/4</td><td>已声明隔离与命中行为通过</td><td>隐藏并发、跨版本问题不存在</td></tr><tr><td>资源峰值</td><td>310MB / 6.2s</td><td>本次低于 512MB / 30s</td><td>任意输入规模都安全</td></tr><tr><td>文件差异</td><td>2 个允许文件</td><td>本次未观察到越界写入</td><td>代码没有其他安全缺陷</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>怎样证明策略真的生效<span class="dd-badge eng">评测</span></h2>
+<div class="dd-agent-response"><p>“配置里写了断网”本身不是证据；要证明策略真的生效，应当让测试主动尝试越界，并从沙箱之外观察结果。对抗测试逐项验证隔离是否真正起作用，每一类测试都对应一个期望的观察结果，以及失败时优先排查的位置。</p>
+<p>读取宿主秘密诱饵时，期望路径不可见，审计日志中没有内容泄漏；若失败，优先查挂载、环境变量和代理凭据注入。访问公网与云元数据地址时，期望连接被宿主网络策略拒绝并留下痕迹；若失败，优先查 DNS、IPv6、代理和旁路接口。fork bomb 或无限循环时，期望进程数或墙钟超限，整组进程被清理；若失败，优先查 cgroup/job object 和子进程回收。写满磁盘或巨量 stdout 时，期望配额触发且宿主服务仍然可用；若失败，优先查临时盘、日志与导出总量上限。符号链接或压缩包路径穿越时，期望导出器拒绝沙箱之外的目标；若失败，优先查路径规范化和解包器。正确程序与业务反例组合时，期望安全测试通过，但错误产物被业务谓词拦截；若失败，优先查验收覆盖而非隔离层。</p>
+<p>这意味着存在两张必须分开看的成绩单：安全性评测问“越界是否被阻断”，任务评测问“结果是否正确”。某一张满分不能替代另一张。对抗测试只能增加对已测策略的证据，它不能证明不存在未知逃逸；安全测试通过也不等于任务做对，反之亦然。两张成绩单分别回答两个不同的问题，必须同时成立，策略才算真正生效。</p></div>
+<table class="dd-table"><thead><tr><th>对抗测试</th><th>期望观察</th><th>若失败，优先查哪里</th></tr></thead><tbody><tr><td>读取宿主秘密诱饵</td><td>路径不可见，审计日志无内容泄漏</td><td>挂载、环境变量、代理凭据注入</td></tr><tr><td>访问公网与云元数据地址</td><td>连接被宿主网络策略拒绝并留痕</td><td>DNS、IPv6、代理和旁路接口</td></tr><tr><td>fork bomb / 无限循环</td><td>进程数或墙钟超限，整组进程被清理</td><td>cgroup/job object、子进程回收</td></tr><tr><td>写满磁盘 / 巨量 stdout</td><td>配额触发且宿主服务仍可用</td><td>临时盘、日志与导出总量上限</td></tr><tr><td>符号链接或压缩包路径穿越</td><td>导出器拒绝沙箱外目标</td><td>路径规范化和解包器</td></tr><tr><td>正确程序与业务反例</td><td>安全测试通过，但错误产物被业务谓词拦截</td><td>验收覆盖而非隔离层</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://csrc.nist.gov/publications/detail/sp/800-190/final" target="_blank" rel="noopener">NIST SP 800-190</a>：应用容器安全风险与控制。</li><li><a href="https://www.usenix.org/conference/nsdi20/presentation/agache" target="_blank" rel="noopener">Agache et al., Firecracker</a>：微型虚拟机的隔离设计与工程权衡。</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">ToolEmu</a>：工具型语言模型的风险模拟与评测。</li><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct</a>：推理、行动与环境观察闭环。</li></ul><div class="dd-src-date">访问日期：2026-07-23</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/code-execution">在地图中查看概念关系</a></nav>
+</article></main></body></html>

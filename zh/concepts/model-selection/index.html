@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>模型选型与成本：寻找满足约束的最小可行方案 · AI 知识地图</title>
+<meta name="description" content="从任务分布、强模型上界和多维门禁，到每成功任务成本、帕累托前沿与退出策略。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/model-selection/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="模型选型与成本：寻找满足约束的最小可行方案">
+<meta property="og:description" content="从任务分布、强模型上界和多维门禁，到每成功任务成本、帕累托前沿与退出策略。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/model-selection/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="模型选型与成本：寻找满足约束的最小可行方案">
+<meta name="twitter:description" content="从任务分布、强模型上界和多维门禁，到每成功任务成本、帕累托前沿与退出策略。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/model-selection/#page","name":"模型选型与成本：寻找满足约束的最小可行方案","description":"从任务分布、强模型上界和多维门禁，到每成功任务成本、帕累托前沿与退出策略。","url":"https://ai-knowledge-map.com/zh/concepts/model-selection/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"模型选型与成本：寻找满足约束的最小可行方案","item":"https://ai-knowledge-map.com/zh/concepts/model-selection/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">模型选型与成本：寻找满足约束的最小可行方案</span></li></ol></nav><article id="dd-article" data-concept-id="model-selection">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">模型选型与成本：寻找满足约束的最小可行方案</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从任务分布、强模型上界和多维门禁，到每成功任务成本、帕累托前沿与退出策略。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 模型选型不是找榜单冠军，而是在代表性任务上先满足质量、安全、隐私和延迟硬约束，再从可行候选中最小化生命周期成本。真正的经济指标是<b>每个成功任务的完整成本与失败损失</b>，不是单次调用或 token 单价。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>把选型写成约束优化；计算每成功任务成本；理解强模型基线与受控消融；用帕累托前沿和切片门槛决策。</div>
+<ol class="dd-chain"><li>定义任务分布与硬约束</li><li>强模型建立架构上界</li><li>固定条件比较逐样本差异</li><li>筛除不满足门槛的候选</li><li>计算完整每成功任务成本</li><li>灰度发布并按触发器复评/退出</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>“哪个模型最好”缺少目标函数<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>“哪个模型最好”这类问题在选型讨论中反复出现，但它本身并不是一个可回答的问题：它缺少目标函数。一个模型只有在指定了任务、定义了什么是“好”之后，才可能被比较；脱离任务的排行榜名次不构成选型依据。同样的排行榜结论，对抽取发票、写营销文案和批准退款这三类任务没有任何共同的解释力，因为这三类任务对“正确”的定义、犯错的代价、所需上下文、输出结构和权限要求完全不同。抽取发票关心字段是否完整准确；写文案关心表达是否清晰有效，错误通常可以容忍并且易于修正；批准退款则是带权限的高风险决策，一次错误的“同意”可能直接造成资金损失。用同一个分数衡量它们，等于默认三类任务的错误可以互相换算，而实际上它们连量纲都不一致。</p>
+<p>因此选型的第一步不是找模型，而是先固定任务条件。需要明确写出：输入分布——请求从哪里来、长什么样；成功事件——什么样的输出算一次成功；高风险切片——哪些子集上犯错代价极高、必须单独度量；延迟 SLO——比如 p95 延迟上限；数据边界——数据允许存放在哪、能否跨越指定区域；吞吐与预算——峰值请求量和可承受的总成本。只有这些条件固定之后，不同模型跑出的分数才成为可比较的证据；条件不一致时，分数的差异无法归因于模型本身的优劣。</p>
+<p>在这些条件中，一部分是硬约束，一部分是可优化目标。以退款助手为例，硬门槛可以是：越权率 ≤ 0.5%（未授权操作的比例必须压到很低）、质量问题资格准确率 ≥ 90%（判定是否符合退款资格时的准确率）、p95 延迟 ≤ 1.8 秒、数据不得跨出指定区域。这些门槛不存在“部分满足”：一个越权率 0.7% 的模型，无论单次调用便宜多少，都不能用更低的价格把越权风险“补回来”。硬约束失败就是失败，更低的价格、普通样本上的高分都不能抵消它。与此相对，“解释清晰度”和“成本”属于可优化目标——在满足全部硬约束的候选里，解释越清晰、成本越低越好，但它们永远不能用来交换硬约束。</p>
+<p>于是选型问题可以被精确表述为：在约束集合 C 内，哪个“模型—提示—工具”配置的长期总成本最小？注意这里的决策对象是整个配置，而不是模型名字。模型名字只是方案的一部分：同一个模型配不同的提示词、不同的工具接入方式，可能产生完全不同的约束满足情况和成本。把选型说成“选哪个模型”是过度简化，真正的选型输出是一组候选配置。</p>
+<p>这就给出了模型选型这个流程的输入与输出。输入是任务分布、成功定义、风险切片、SLO、数据边界和预算这六类条件；输出是满足全部硬约束的候选配置集合。流程的顺序不能颠倒：先定义“成功”和不可补偿的硬门槛，再在门槛内比较候选。排行榜分数只有在所有这些条件相同时才可解释——当两个模型在相同的输入分布、相同的成功定义、相同的风险切片下评测，分数差异才反映真实的能力差异。反过来，任何硬约束的失败，都不能被更低的价格或普通样本上的更高分数抵消。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>先用强模型建立系统上界<span class="dd-badge eng">诊断</span></h2>
+<div class="dd-agent-response"><p>原型表现不达标时，最常见的困惑是：到底是模型不够强，还是检索、提示或流程本身有缺陷？这两种诊断指向完全不同的修复方向——换更强的模型，或者修数据、提示和管线。把它们分开的办法，是先用一个强候选建立系统的上界。</p>
+<p>具体做法：挑选能力强、上下文充分、工具接入稳定的候选，在代表性样本上跑一遍，并给它完整证据——即 oracle 意义上“正确”的上下文与工具结果。这次运行测得的成绩，就是当前架构（检索方式、提示结构、工具链、验收标准）在模型能力充分时的可达上界。随后看结果分两种情形。</p>
+<p>如果强模型在 oracle 证据下仍然失败，说明瓶颈不在模型，而在任务本身：任务定义、数据质量、工具或验收标准有问题，应当先修这些，而不是继续换模型。如果强模型通过了，说明当前架构本身可以把任务做好，上界成立，接下来才开始做消融：逐项换入更小的模型、削减上下文、压缩推理预算，每省掉一样东西就测一次由此造成的损失。消融的原则是固定其余变量，一次只替换一个模型或一种推理配置，否则成绩变化无法归因。整个比较过程要冻结评测集和评分器，不能一边比较一边改题——题目和评分标准一旦变化，先后测出的分数就不可比较了。</p>
+<p>强模型基线的价值还体现在错误分析上。保留逐样本的对比差异，检查新旧配置之间的错误迁移：哪些样本原先对、换配置后错了，哪些原先错、换后对了。错误迁移图能显示每一次“节省”的代价具体落在哪类输入上。同时，评测要覆盖端到端的回退链，而不是只测单次输出的正确率——单步对了、整条链路错了，在真实系统里同样是失败。</p>
+<p>需要强调的是，强模型基线不是默认的生产方案。它只是诊断参照：上界告诉你这个架构最多能做到多好，以及逐样本的错误分布是什么。隐私要求、延迟预算或许可限制，都可能让这个强模型从一开始就无法上线；上界存在的意义是标定改进空间和定位瓶颈，而不是自动成为生产推荐。基线的输入是冻结的评测集、充分的证据和稳定的工具，输出是当前架构可达的质量上界与逐样本错误；当它失败时先修任务、数据或工具，当它通过时才逐项替换变量做消融。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>选型是受约束的多目标优化<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>把质量、风险、延迟和成本放进同一个决策时，最容易犯的错误是武断地把它们加权加成一个总分。权重从哪来？谁规定 1 个质量点等于多少元成本？一旦缺少公认的换算率，任何加权总分都是人为构造，排序结果会随权重微调而反转。选型应当表述为受约束的多目标优化：在候选方案 m（即“模型—提示—工具”配置）上最小化 TotalCost(m)，同时满足一组硬约束——Qualityₖ(m) ≥ Qₖ（第 k 项关键质量不低于下限 Qₖ）、Riskⱼ(m) ≤ Rⱼ（第 j 项风险不高于上限 Rⱼ）、P95(m) ≤ L（p95 延迟不超过上限 L）、Privacy(m) ∈ C（隐私类别落在允许集合 C 内）。质量、风险、延迟、隐私以门槛的形式进入问题，先执行这些硬约束筛出可行域，再在可行域内比较成本、吞吐和维护负担。门槛失败的候选直接出局，无论它在其他维度多出色。</p>
+<p>要让门槛真的可执行，每个维度都需要可度量的表达方式，并且明确它不能被什么抵消。关键质量用切片通过率与置信区间表达——高风险切片上的通过率及其不确定性才是证据，不能被普通样本上的平均提升抵消。安全与权限用事件率与严重度表达——越权、泄露等事件的发生频率和后果等级，不能被更自然的文风抵消。延迟用 TTFT、p95/p99 和超时表达——长尾和超时决定用户体验，不能被平均延迟抵消。成本用每成功任务的成本与峰值容量表达——为一次成功任务实际付出多少、峰值时撑不撑得住，不能被 token 单价抵消。治理用地域、保留、审计和退出能力表达——数据能否留在指定区域、保留策略是否合规、能否审计、能否退出，不能被模型能力分抵消。</p>
+<p>可行域之内，若多个目标之间没有公认的换算率，就用帕累托前沿来做进一步筛选。一个候选被支配，是指存在另一个候选在所有维度上都不比它差、且至少有一项严格更好；帕累托前沿就是可行域中所有未被支配的候选。处于前沿不等于自动胜出：它只说明这个候选没有被全面支配，值得结合业务权重继续讨论；最终取舍仍需业务方在质量、风险、延迟和成本之间表态，而前沿把“值得认真看的候选”从全集缩到了一个小集合。</p>
+<p>整个流程的输入是候选集合 m、各项质量 Qualityₖ、各项风险 Riskⱼ、p95 延迟、隐私类别 Privacy 以及对应的门槛 Qₖ、Rⱼ、L、C；输出是可行域中总成本 TotalCost 最低的方案。顺序固定为：先执行硬门槛筛出可行域，再看帕累托前沿和成本。进入前沿只表示未被全面支配，不代表自动胜出。</p></div>
+<table class="dd-table"><thead><tr><th>维度</th><th>建议表达</th><th>不能被什么抵消</th></tr></thead><tbody><tr><td>关键质量</td><td>切片通过率与区间</td><td>普通样本平均提升</td></tr><tr><td>安全/权限</td><td>事件率与严重度</td><td>更自然的文风</td></tr><tr><td>延迟</td><td>TTFT、p95/p99、超时</td><td>平均延迟</td></tr><tr><td>成本</td><td>每成功任务与峰值容量</td><td>token 单价</td></tr><tr><td>治理</td><td>地域、保留、审计、退出能力</td><td>模型能力分</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="模型选型的受约束优化"><munder><mi>min</mi><mi>m</mi></munder><mi>TotalCost</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>,</mo><mi>s.t.</mi><msub><mi>Quality</mi><mi>k</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≥</mo><msub><mi>Q</mi><mi>k</mi></msub><mo>,</mo><msub><mi>Risk</mi><mi>j</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><msub><mi>R</mi><mi>j</mi></msub><mo>,</mo><mi>P95</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><mi>L</mi><mo>,</mo><mi>Privacy</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>∈</mo><mi>C</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>完整成本从请求流转而不是价目表计算<span class="dd-badge math">经济性</span></h2>
+<div class="dd-agent-response"><p>一个模型单次调用只要另一个模型的四分之一，用它就真的更便宜吗？价目表只描述了单次调用的边际价格，而真实任务的一次完整请求流转包含很多环节：初答、检索、失败重试、升级到更强模型、调用工具、人工复核、失败补救。换一个便宜模型之后，这些环节的使用量会变——初答失败更多，重试和升级变多，人工复核排队更长。与此同时还有固定成本：部署冗余、监控、评测、供应商集成和迁移。把这些都归到成熟业务结果上，而不是只看价目表上的单价。</p>
+<p>完整成本的核心公式是：每成功任务的完整成本 CostPerSuccess = (Ccall + Ctool + Cretry + Chuman + Cinfra + Closs) / Nsuccess。分子汇总任务全链路的资源与损失：Ccall 是模型调用成本，Ctool 是检索与工具成本，Cretry 是重试与升级强模型的成本，Chuman 是人工复核成本，Cinfra 是基础设施成本，Closs 是失败造成的损失；分母 Nsuccess 是经独立确认的真实成功任务数，而不是系统自己宣称完成的任务数。</p>
+<p>分母的选择是公式里最容易出错的地方。若只统计系统宣称完成的任务，就会漏掉用户放弃和错误自动批准这两类结果：用户等不到结果就离开了，系统却把它记成“完成”；错误自动批准的任务被系统当成成功，业务侧却已经承受了损失。成功必须由独立于系统的业务状态来定义，分母只计真实业务成功，才能让成本落到实际产出的结果上。</p>
+<p>分子里的失败损失 Closs 不一定能精确定价。退款误批一笔的期望损失、越权一次的信誉损失，往往无法换算成可靠的金额；对于这类高风险场景，用硬门槛把关比硬凑一个价格更诚实。但即使不把失败损失货币化，核算也至少要显示人工和重试这两项：如果把它们藏起来，比较就会奖励那些把成本转嫁给运营团队的方案——模型便宜了，人工加班多了，总成本其实更高。这就是“小模型单次更便宜、最终更贵”的机制：低单次价格带来更多的重试、升级、人工和失败，这些增量全部进入分子，而分母因为成功率下降而缩小，CostPerSuccess 反而上升。无法定价的高风险损失应当保留为硬门槛，而不是折算进成本公式。</p></div>
+<div class="dd-formula"><math display="block" aria-label="每成功任务完整成本"><mi>CostPerSuccess</mi><mo>=</mo><mfrac><mrow><mi>Ccall</mi><mo>+</mo><mi>Ctool</mi><mo>+</mo><mi>Cretry</mi><mo>+</mo><mi>Chuman</mi><mo>+</mo><mi>Cinfra</mi><mo>+</mo><mi>Closs</mi></mrow><mi>Nsuccess</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>运行示例：便宜模型怎样输给较贵模型<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个具体场景把前面的公式跑一遍：处理 1000 笔退款任务，候选 S 单次调用 ¥0.02，候选 M 单次 ¥0.08，候选 L 单次 ¥0.18（1000 次共 ¥180）。只看价目表，S 显然最便宜；看每成功任务的完整成本，结论相反。比较分两步：先过硬门槛，再做完整经济性核算。便宜但越权率超标的候选根本进不了成本赛道，直接淘汰；进入赛道后，再按 CostPerSuccess 比较。</p>
+<p>核算过程如下表。每行把调用成本、人工复核（每次 ¥1）和失败补救（每次 ¥3）相加得到分子，再用真实成功任务数做分母：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">候选</th><th class="dd-align-left">单次调用</th><th class="dd-align-left">1000 次调用成本</th><th class="dd-align-left">成功率（成功数）</th><th class="dd-align-left">人工复核</th><th class="dd-align-left">失败补救</th><th class="dd-align-left">每成功任务成本</th></tr></thead><tbody><tr><td class="dd-align-left">S 小模型</td><td class="dd-align-left">¥0.02</td><td class="dd-align-left">¥20</td><td class="dd-align-left">78% = 780</td><td class="dd-align-left">180 次 × ¥1 = ¥180</td><td class="dd-align-left">40 次 × ¥3 = ¥120</td><td class="dd-align-left">(20 + 180 + 120) ÷ 780 = ¥0.410</td></tr><tr><td class="dd-align-left">M 中模型</td><td class="dd-align-left">¥0.08</td><td class="dd-align-left">¥80</td><td class="dd-align-left">90% = 900</td><td class="dd-align-left">65 次 × ¥1 = ¥65</td><td class="dd-align-left">2 次 × ¥3 = ¥6</td><td class="dd-align-left">151 ÷ 900 = ¥0.168</td></tr><tr><td class="dd-align-left">L 强模型</td><td class="dd-align-left">¥0.18</td><td class="dd-align-left">¥180</td><td class="dd-align-left">93% = 930</td><td class="dd-align-left">35 次 × ¥1 = ¥35</td><td class="dd-align-left">1 次 × ¥3 = ¥3</td><td class="dd-align-left">218 ÷ 930 = ¥0.234</td></tr></tbody></table></div>
+<p>S 的失败机制一目了然：调用只花了 ¥20，但 78% 的成功率意味着大量任务需要人工和补救——¥180 人工加 ¥120 补救，总支出 ¥320 摊在 780 个成功任务上，每个成功任务 ¥0.41。M 的调用成本是 S 的四倍（¥80），但成功率高、人工和补救都少，总支出 ¥151 摊在 900 个成功任务上，约 ¥0.168。L 能力最强，调用成本也最高（¥180），成功率 93%，人工和补救进一步减少，总支出 ¥218 摊在 930 个成功任务上，约 ¥0.234。在给定假设下 M 胜出：它不是调用最便宜的，也不是能力最强的，而是每成功任务成本最低的。</p>
+<p>这个结论对假设敏感。人工单价从 ¥1 提高，或失败补救单价变化，M 和 L 的相对排序就会移动；流量结构改变——比如输入分布中难题占比上升、S 的成功率进一步下跌——结论同样会变。所以核算不是一次性完成的：拿到每成功任务成本后，必须对人工单价和流量结构做敏感性分析，确认胜者在参数扰动下仍然成立。案例的输入是 1000 笔退款以及 S、M、L 的门槛、调用、成功、人工和补救数据；输出是可行候选及其每成功任务成本——先淘汰越权或延迟不合格者，再按公式计算比较，最后用敏感性分析检验结论的稳定性。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="三个模型候选经过硬门槛筛选和每成功任务成本比较"><defs><marker id="ms1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="52" width="145" height="142" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="92" y="77" text-anchor="middle" class="svg-t">候选 S / M / L</text><text x="92" y="102" text-anchor="middle" class="svg-t" font-size="11">同一评测集与工具</text><text x="92" y="124" text-anchor="middle" class="svg-t" font-size="11">记录质量/风险/延迟</text><text x="92" y="146" text-anchor="middle" class="svg-t" font-size="11">记录重试/人工/失败</text><path d="M165,123 L238,123" stroke="#6b7484" marker-end="url(#ms1)"/><rect x="240" y="52" width="160" height="142" rx="9" fill="#21252d" stroke="#c77b72"/><text x="320" y="77" text-anchor="middle" class="svg-t">硬门槛筛选</text><text x="320" y="103" text-anchor="middle" class="svg-t" font-size="11">S：越权 0.8% → 淘汰</text><text x="320" y="126" text-anchor="middle" class="svg-t" font-size="11">M：全部通过</text><text x="320" y="149" text-anchor="middle" class="svg-t" font-size="11">L：延迟 2.4s → 淘汰</text><text x="320" y="172" text-anchor="middle" class="svg-t" font-size="11">不可用总分互相补偿</text><path d="M400,123 L474,123" stroke="#6b7484" marker-end="url(#ms1)"/><rect x="476" y="52" width="204" height="142" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="578" y="77" text-anchor="middle" class="svg-t">可行域内比较</text><text x="578" y="103" text-anchor="middle" class="svg-t" font-size="11">M：¥151 / 900 成功</text><text x="578" y="126" text-anchor="middle" class="svg-t" font-size="11">≈ ¥0.168 / 成功任务</text><text x="578" y="149" text-anchor="middle" class="svg-t" font-size="11">保留回退与复评计划</text><text x="578" y="172" text-anchor="middle" class="svg-t" font-size="11">不是永久冠军</text></svg><figcaption>图 1　先筛硬约束，再比较完整经济性；便宜但越权的候选不会进入成本赛道。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>候选</th><th>单次调用</th><th>成功率</th><th>人工率×¥1</th><th>失败补救</th><th>每成功任务</th></tr></thead><tbody><tr><td>S 小模型</td><td>¥20</td><td>78%=780</td><td>180×1=¥180</td><td>40×¥3=¥120</td><td>(20+180+120)/780=¥0.410</td></tr><tr><td>M 中模型</td><td>¥80</td><td>90%=900</td><td>65×1=¥65</td><td>2×¥3=¥6</td><td>¥151/900=¥0.168</td></tr><tr><td>L 强模型</td><td>¥180</td><td>93%=930</td><td>35×1=¥35</td><td>1×¥3=¥3</td><td>¥218/930=¥0.234</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>供应商与运行方式也是候选的一部分<span class="dd-badge eng">治理</span></h2>
+<div class="dd-agent-response"><p>两个端点的输出质量在评测集上相近时，决策就转向合同、版本和退出能力这些非行为维度。需要逐项比较的包括：数据是否被用于训练、数据保留期、数据所在区域、加密方式、审计能力、模型版本锁定、速率限制、SLA、批量价格、内容政策和停服条款。自托管则还要另外计入 GPU 利用率、补丁维护、值班和灾备成本——省下的是按量付费，多出来的是整个运维面。开源权重提供控制权，但控制权不自动带来许可、数据来源或安全保证：能改模型不代表有权商用，也不代表训练数据和依赖组件是干净、可审计的。</p>
+<p>供应商评估可以按“问题—证据”逐项落实。能否锁定版本，证据是快照标识、变更通知和回归窗口——模型无声更新会让已经通过评测的配置悄悄失效，所以必须知道线上跑的是哪个快照、变更前有没有通知、变更后有没有回归窗口。数据去向，证据是合同、地域、保留条款和子处理方名单。容量保证，证据是配额、突发策略、SLA 和历史故障记录——签了 SLA 也要看它是否足以覆盖峰值和突发。退出成本，证据是替代端点的实测、迁移脚本和已记录的兼容差异。</p>
+<p>退出能力不能靠假设，要靠演练。做一次退出演练：导出提示与评测集、切换到备用端点、验证输出契约和工具兼容性、测量实际恢复时间。供应商声称的“等价模型”可能在格式、拒答行为和 tokenization 上都不同；抽象接口层只能降低迁移成本，不能消除行为差异。接口相同不保证格式、拒答和 tokenization 相同，真正切换并恢复服务所用的时间才是退出能力的最可信证据。</p>
+<p>供应商评估的输入是模型行为、合同、地域、保留期、版本、容量、许可和退出演练结果；输出是可治理的运行方案与替代路径。质量相近只是必要条件，决定最终结果的往往是这些治理维度。</p></div>
+<table class="dd-table"><thead><tr><th>问题</th><th>需要的证据</th></tr></thead><tbody><tr><td>能否锁版本</td><td>快照标识、变更通知和回归窗口</td></tr><tr><td>数据去向</td><td>合同、地域、保留和子处理方</td></tr><tr><td>容量保证</td><td>配额、突发策略、SLA 与故障记录</td></tr><tr><td>退出成本</td><td>替代端点实测、迁移脚本和兼容差异</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>一个应用可静态组合多个模型<span class="dd-badge eng">架构</span></h2>
+<div class="dd-agent-response"><p>“选一个模型”常常不是最终的系统设计，因为一个应用里的不同步骤，难度和风险完全不同：意图分类、查询改写、核心推理、代码执行、安全复核，各自对能力、延迟和可信度的要求不一样。让一个大模型承担所有步骤，意味着用同一档能力应付所有档风险，既贵又难以分步验收。替代方案是按组件静态分工：确定性规则先检查权限，小模型抽取订单字段，中模型解释政策，高风险异常转人工。每个组件单独负责、单独验收——权限检查按越权率验收，抽取按字段准确率验收，高风险判断按转人工的召回验收——整条链路比单一大模型更可测，也更容易定位失败在哪个组件。</p>
+<p>动态路由是另一种思路：在请求级预测难度，再决定交给哪个模型。它可能比静态分工进一步省成本，因为简单请求不会再经过强模型。但它引入三类新问题：错误下放——难请求被路由误判为简单请求、交给了小模型；级联延迟——路由判断本身占用时间，加上可能的多级重试，长尾延迟恶化；路由器漂移——路由模型自己的分布随流量变化，路由决策质量随时间下滑。因此动态路由不能和底层模型混在一起评：先建立静态基线，确认每个组件的门槛都已满足，再把路由作为一个独立系统单独评测；路由带来的成本节省属于路由器，不能记成底层模型的收益。</p>
+<p>工具也不是模型能力的免费加成。同一个工具链里，不同候选对 schema 的遵循、错误恢复方式和上下文利用各不相同：一个模型在纯问答上表现好，接上工具后可能在 schema 校验、重试策略上表现差。所以任何带工具的候选都必须在同一端到端工具链上实测，而不是用无工具评测分数外推。</p>
+<p>静态模型组合的输入是各组件的难度、风险、结构和工具需求，输出是规则、小模型、中模型、强模型或人工之间的职责分工。按组件固定责任，权限检查、字段抽取和高风险判断才能分别验收；动态路由是建立在静态基线之上的后续独立系统，其收益必须单独归因。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>回退、降级和退出必须进入评测<span class="dd-badge eng">可靠性</span></h2>
+<div class="dd-agent-response"><p>首选模型超时、限流、低置信度或输出非法时，用户实际经历什么？这个问题必须在选型阶段回答，而不是等线上故障来回答。回退设计要把每种异常对应的分支预先定义出来：重试同一端点、升级到更强模型、改用确定性代码、向用户请求补充信息、返回缓存结果、转人工、或者明确失败。每个分支都要有预算——总 token、总延迟和副作用。特别要注意级联污染：首答生成的内容不能未经审查就塞给后续模型，否则首答中的错误或注入会沿链路扩散，升级分支本身也会被污染。</p>
+<p>回退链的评测靠故障注入：主动制造供应商 429 限流、流中断、工具超时、schema 变化和区域不可用，看系统在这些条件下最终表现如何。要测的不是分支“看起来合理”，而是故障条件下的最终任务成功率、p95 延迟、重复动作次数和人工负载。主模型 99.9% 可用不代表整条级联同样可靠——回退链里每个依赖都在主模型前面或后面串着，任何一个不可用都会影响端到端可用性。</p>
+<p>串行独立依赖的可用率近似为各依赖可用率的乘积：Asystem ≈ ∏ᵢ Aᵢ，其中 Aᵢ 是第 i 个依赖的可用率。每个组件都很可靠时，乘积仍然逐级下降：三个各 99.9% 的串行依赖，端到端只剩约 99.7%；十个就只剩约 99%，要到第十一个才跌破 99%。这个近似解释了“组件各自可靠、端到端却明显下降”的普遍现象。它只是近似：真实系统中故障往往相关——一个区域的故障可能同时打挂模型和工具——因此真实的相关故障、重复副作用和总延迟不能靠乘积推算，必须通过故障注入实验直接验证。</p>
+<p>回退设计的输入是超时、限流、低置信度、非法输出这几类触发条件，以及第 i 个依赖的可用率 Aᵢ；输出是重试、升级、确定性代码、询问、人工或失败这几类分支的具体策略，以及系统可用率 Asystem 的估计。选型决策里必须包含这张分支表和它的故障注入结果：一个只在正常条件下表现好的候选，配上一套没测过的回退链，等于把最坏情况的成本留给了上线之后。</p></div>
+<div class="dd-formula"><math display="block" aria-label="串行独立依赖的近似可用率"><mi>Asystem</mi><mo>≈</mo><munder><mo>∏</mo><mi>i</mi></munder><msub><mi>A</mi><mi>i</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>选择会过期，需要触发复评<span class="dd-badge intuition">生命周期</span></h2>
+<div class="dd-agent-response"><p>今天的最优模型，下个月可能不再可行：价格调整、模型版本更新、上下文长度变化、供应商政策修改、流量语言结构漂移、任务规则改动、人工成本波动，任何一项都足以推翻上次的结论。选型不是采购时的一次性比较，而是一个带触发器的持续过程。需要预先设置的触发条件包括：模型快照更新、价格变动、关键风险切片的通过率漂移、错误预算耗尽、新的风险要求出台、备用端点切换失败。触发器一旦出现，就重跑冻结评测集和真实流量抽样，而不是等到出了事故再临时评估。</p>
+<p>每次复评和每次原始决策都要记录决策卡，内容包括：候选名单、每个候选的排除原因、数据版本、门槛值、置信区间、成本假设、审批人和复评日期、退出方案。决策卡的价值在于防止记忆丢失：一个候选曾因隐私或越权被淘汰，几个月后新版本榜单出来，团队可能忘了当年的排除理由，仅凭榜单分数就想把它重新引入。决策卡把这个因果链保留下来，重新引入时必须先重新审视原排除原因是否仍然成立。</p>
+<p>评测数据本身也要防止污染。公开榜单只能用来产生候选名单，不能代替私有的代表性评测集——榜单的构成和你的任务分布无关，其分数在任务条件不同时不可解释。反过来，私有集也有自己的陷阱：反复针对同一私有集调参、改提示、换模型，同样会过拟合到这套集上，评测分数不再代表真实流量。定期混入真实抽样、必要时更新私有集，是对抗双向污染的常规手段。</p>
+<p>生命周期复评的输入是价格、模型版本、任务分布、政策、人工成本和错误预算的变化；输出是四类决定之一：继续使用、重新比较、灰度切换或退出。历史最优只对当时的任务分布、价格和假设成立，它不能凭惯性永久继承——复评不是为了推翻旧决策，而是让“当前最优”始终对应当前的条件。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面的环节按因果顺序连起来，选型从“哪个模型最好”这个问题到可验证的生产实践，一共六步，每一步都为下一步提供前提。</p>
+<p>第一步，定义任务分布与硬约束。写出输入分布、成功事件、高风险切片、延迟 SLO、数据边界和预算，把质量和风险的硬门槛写成可度量的表达式。没有这一步，后面所有比较都没有共同的坐标系。</p>
+<p>第二步，用强模型建立架构上界。在冻结的评测集和充分证据下跑强候选：若它在 oracle 证据下仍失败，瓶颈在任务、数据或工具，先回去修；若它通过，说明当前架构可行，上界成立。</p>
+<p>第三步，固定条件比较逐样本差异。一次只替换一个变量——模型或推理配置——保持其余条件不变，记录新旧配置之间的错误迁移：哪些样本新错了、哪些改对了，代价落在哪类输入上。</p>
+<p>第四步，筛除不满足门槛的候选。用硬约束切出可行域：越权率、切片通过率、延迟 p95、隐私类别，任何一项不过关都直接淘汰；价格和普通样本上的高分不能抵消门槛失败。</p>
+<p>第五步，计算完整每成功任务成本。对可行候选按 CostPerSuccess 核算：分子是调用、工具、重试升级、人工、基础设施和失败损失的全链路支出，分母是经独立业务状态确认的真实成功数。低单价带来更多重试、人工和失败时，最终成本反而更高；必要时结合帕累托前沿和敏感性分析确定胜者。</p>
+<p>第六步，灰度发布并按触发器复评与退出。胜者先在小流量上验证，同时记录决策卡，设置价格、版本、切片漂移、错误预算等触发器；触发器触发时重跑冻结集与真实抽样，做出继续使用、重新比较、灰度切换或退出的决定。历史最优只对当时的数据和假设成立，选型是一条循环的链，而不是一次性的答案。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2305.05176" target="_blank" rel="noopener">FrugalGPT</a>：级联调用的成本与质量优化</li><li><a href="https://arxiv.org/abs/2406.18665" target="_blank" rel="noopener">RouteLLM</a>：偏好数据驱动的模型路由</li><li><a href="https://arxiv.org/abs/2211.09110" target="_blank" rel="noopener">HELM</a>：多场景、透明模型评测</li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI RMF</a>：风险约束与生命周期治理</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/model-selection">在地图中查看概念关系</a></nav>
+</article></main></body></html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>文档切分 Chunking：决定检索系统的证据单位 · AI 知识地图</title>
+<meta name="description" content="理解固定长度、结构、语义与父子切分，处理重叠、上下文丢失、表格代码和嵌入预算。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/chunking/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="文档切分 Chunking：决定检索系统的证据单位">
+<meta property="og:description" content="理解固定长度、结构、语义与父子切分，处理重叠、上下文丢失、表格代码和嵌入预算。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/chunking/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="文档切分 Chunking：决定检索系统的证据单位">
+<meta name="twitter:description" content="理解固定长度、结构、语义与父子切分，处理重叠、上下文丢失、表格代码和嵌入预算。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/chunking/#page","name":"文档切分 Chunking：决定检索系统的证据单位","description":"理解固定长度、结构、语义与父子切分，处理重叠、上下文丢失、表格代码和嵌入预算。","url":"https://ai-knowledge-map.com/zh/concepts/chunking/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"文档切分 Chunking：决定检索系统的证据单位","item":"https://ai-knowledge-map.com/zh/concepts/chunking/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">文档切分 Chunking：决定检索系统的证据单位</span></li></ol></nav><article id="dd-article" data-concept-id="chunking">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">文档切分 Chunking：决定检索系统的证据单位</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">理解固定长度、结构、语义与父子切分，处理重叠、上下文丢失、表格代码和嵌入预算。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> Chunking 将文档变成可检索和可引用的证据单元；块太小缺语境、太大稀释主题并增加成本。最佳切分由<b>文档结构、查询粒度、嵌入模型与生成任务</b>共同决定。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>选择切分策略；设置长度与重叠；保留层级和来源；用检索与答案指标调参。</div>
+<ol class="dd-chain"><li>解析文档恢复结构</li><li>按查询粒度选择单元</li><li>加入必要重叠和层级元数据</li><li>嵌入并建立索引</li><li>召回后邻接扩展与去重</li><li>用证据和答案指标共同调参</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>切分是检索的分辨率<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>## 切分是检索的分辨率</p>
+<p>文档切分要回答一个前置问题：当正确答案恰好横跨两个块时，系统会发生什么？答案是召回器只能返回事先建立好的单元。它手里没有&quot;半句原文&quot;，只有一个个块；如果切分时把句子拦腰截断、让标题脱离了正文、或者把一张表格拆散到两个块里，那么任何一个块都不完整，检索即使命中，取回的也只是残缺的证据。反过来，如果把整篇文档当成一个块，嵌入向量会把全文的主题平均掉，任何局部细节都被稀释，检索同样找不到那个具体的答案。</p>
+<p>这背后的因果关系是：块的大小和边界直接决定了检索系统能看到的最小证据单元，也就是检索的&quot;分辨率&quot;。分辨率定错了，无论嵌入模型多好、重排器多强，上游拿不到完整证据，下游就无法独立做出判断。命中关键词只说明这个块里出现了某个词，并不说明这个块含有独立判断所需的全部条件——例如&quot;7天内退款&quot;的规则块命中了&quot;退款&quot;，但如果&quot;不可退款商品清单&quot;被切到了另一个块里，仅凭前者就下结论必然出错。</p>
+<p>因此，切分的输入不只是原始文档结构，还包括典型查询、答案跨度和嵌入预算；输出则是带原文位置的可检索证据块。建立切分基准时，应当先从真实任务中标注&quot;最小充分证据跨度&quot;：单句事实占多少、同一小节内的条件与例外占多少、跨表格行列的关联占多少、跨章节的多跳推理占多少。然后统计不同切法下的&quot;完整证据命中率&quot;，而不是只统计&quot;包含答案关键词的块命中率&quot;。后者会掩盖问题——关键词命中但条件缺失的块，恰恰是切分失败的典型表现。</p>
+<p>切分的成本也应当分层。如果测量发现 80% 的查询只需单段证据，20% 需要父级语境，就可以让召回先命中小块，只对这 20% 按邻接或标题路径扩展，而不是让所有请求都承担大块的成本。切分策略的收益与代价因此不是抽象的取舍，而是由查询分布决定的具体比例。</p>
+<p>切分还必须可追踪。修改解析器或块大小之后，块 id、原文偏移和嵌入应当构成一个新版本：离线比较两套索引，确认引用仍能定位到同一原文，再切换流量。直接覆盖旧索引会让回归样本、缓存和用户反馈指向已经不存在的块，形成难以复现的观测断裂。频繁更新的文档还要保证父块变化时子块一起失效，否则会出现新标题配旧正文的组合。切分版本变化后必须保留新 id、偏移和索引，不能直接覆盖导致引用失效。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>四类策略<span class="dd-badge eng">方法</span></h2>
+<div class="dd-agent-response"><p>## 四类策略</p>
+<p>&quot;固定 500 token&quot;是不是所有文档的默认答案？这个问题值得直接回答：不是。切分策略的选择取决于文档结构的可靠性、主题边界是否清晰，以及是否需要回填语境。常用的策略有四类，各有其适用的条件与代价。</p>
+<p>固定长度切分最简单也最可控：按预算切，每块 token 数一致，适合缺少可靠结构、主题边界模糊的连续文本。它的代价是边界与语义无关，句子可能被拦腰截断，标题可能和正文分离，块的内容完整与否全凭运气。它解决的是&quot;没有更好的结构依据时仍能建立索引&quot;的问题，而不是&quot;证据完整&quot;的问题。</p>
+<p>结构切分则反过来：按标题、段落、函数等文档自带的边界切分。这样建立的块引用稳定、可解释——你可以指着某个块说&quot;它对应第三章第二节&quot;。代价是切分质量继承了解析器的质量：坏解析器会继承坏结构，标题层级识别错误、表格被拆散，都会原样进入索引。结构切分适用于有可靠标题层级或代码结构的文档。</p>
+<p>语义切分按相邻句子的表示变化寻找主题边界：当连续句子的嵌入相似度出现显著跳变时，那里很可能就是两个主题的分界。它能适应篇章的走向，不依赖格式是否规范。代价在于阈值、模型和语言变化都会导致版本漂移——同样的文档，换了嵌入模型或阈值，边界就变了，上一版本的块 id 与引用不再对应。</p>
+<p>父子切分把小块与大块组合起来：小块负责召回定位，大块负责回填语境，在定位精度与证据完整之间折中。它解决的是&quot;小块命中但证据不全&quot;的问题：召回阶段命中小块，生成阶段把对应父块取回作为完整语境。代价是去重——多个子块可能指向同一个父块，如果不去重，同一个大段上下文会被重复带回多次，既浪费预算又稀释信号。</p>
+<p>这四类策略可以组合。常见的组合方式：先按章节建立不可跨越的硬边界，保证块永远不会跨章节拼接；再在过长的章节内部按段落或语义边界切分；最后为每个短块继承标题路径，让脱离原文的块仍能表明自己来自哪里。组合的次序是有意义的：硬边界保证证据不会张冠李戴，内部分切控制块的大小，标题继承补偿小块丢失的语境。</p>
+<p>策略选择的输入是文档结构可靠性、主题边界和回填需求，输出是固定长度、结构、语义或父子切分及其组合。评价任何切分策略时，都要保留切分器版本和原文偏移，否则无法解释某次命中的变化究竟来自内容变化还是边界变化。最终比较的标准只有一个：按真实查询衡量证据完整性。任何策略都不是所有文档的默认答案，宣称某一策略普适本身就违反了切分的第一原则——切分必须服务于证据，而不是服务于习惯。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>重叠的收益与代价<span class="dd-badge math">权衡</span></h2>
+<div class="dd-agent-response"><p>## 重叠的收益与代价</p>
+<p>相邻块之间常保留一段重复内容。这么做只有一个目的：让恰好落在切分边界上的句子，至少在其中一个块里是完整的。固定长度切分最容易在边界处拦腰截断句子，重叠给了边界句第二次机会——前半段在块 A 里不完整，但块 B 的开头带着完整的它。收益因此很具体：边界截断的概率下降，跨边界证据被某个块完整容纳的概率上升。</p>
+<p>代价同样具体，而且有三重。第一，索引变大：重复的文本被嵌入两次甚至更多次，存储和检索计算都随之膨胀。第二，重复召回：同一个句子出现在多个块里，一次查询可能把语义几乎相同的多个块都排进结果，挤占本该属于其他证据的位置。第三，上下文竞争：召回后要填进生成上下文的 token 是有限的，重复内容重复计费，挤掉的是有效证据。</p>
+<p>正因为收益和代价纠缠，重叠的处理必须遵循一条顺序原则：去重和邻接合并应在检索之后进行，而不是在索引阶段就删除重复。索引里保留重叠，是为了让边界句有机会被完整命中；检索结果里的重复，才需要被清除。所以流程是：重叠进入索引 → 检索召回多个块 → 对结果去重并按邻接合并 → 再计算上下文预算。如果颠倒顺序，在入库时就删掉重复文本，等于亲手把边界句唯一的完整副本也删掉了。</p>
+<p>重叠比例不是一个可以拍脑袋的数字，它应当按答案跨度实验确定：测量真实查询的答案跨边界比例，用实验选择重叠窗口，并分别报告去重前后的有效证据数。去重前看命中率——重叠是否真的让更多完整证据被召回；去重后看效率——剩下多少不重复的有效证据，花了多少 token。两个数字分开报告，才能区分&quot;重叠确实带来了完整证据&quot;和&quot;重叠只是重复了自己&quot;。</p>
+<p>一个容易被忽略的细节：若多个命中块来自同一边界（例如块 3 和块 4 都命中了第 3、4 块之间的重叠区），应先合并再计算上下文预算。否则系统会把同一段内容当作两份独立证据，加倍消耗预算，而实际证据只有一份。</p>
+<p>重叠设计因此有三个输入：窗口长度、答案跨边界比例和上下文预算；输出是相邻块重复范围及检索后的合并规则。最后要明确它的边界：重叠能修复的只有&quot;边界截断&quot;这一类损伤。它不能修复阅读顺序问题——证据块排列错误时重叠无济于事；也不能修复权限错误——不该被看见的内容重叠了依然不该被看见。重叠是对边界损失的补偿，不是对切分错误的整体补救。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>保留元数据与层级<span class="dd-badge eng">结构</span></h2>
+<div class="dd-agent-response"><p>## 保留元数据与层级</p>
+<p>判断一个块是否合格，可以用一个简单的检验：一个段落离开它的标题之后，还表达同一个意思吗？如果答案是&quot;不&quot;，而这个段落被切成孤块存储，那么检索系统每次把它取回，都在把一句脱离了语境的话当作事实使用。标题承载的正是语境的一部分——&quot;申请条件&quot;标题下的句子和&quot;例外情况&quot;标题下的同一句，含义完全不同。</p>
+<p>因此，块必须携带元数据，而不只是文本。元数据的输入包括：文档 id、标题路径、页码或行号、版本、时间和权限。输出则是一个可定位、可过滤、可回查的证据单元。可定位意味着块能指回原文坐标，回答&quot;这句话来自哪里&quot;；可过滤意味着块能按文档、时间、权限被筛除，回答&quot;这条证据还能不能用&quot;；可回查意味着块能参与审计，回答&quot;当时的结论依据是什么&quot;。</p>
+<p>标题的处理有一个值得区分的细节：必要时可以把短标题拼入嵌入文本，帮助嵌入向量理解块的内容，但引用仍必须指回原位置。也就是说，标题拼接是给嵌入模型&quot;读&quot;的，不是给引用&quot;指&quot;的。嵌入文本可以包含&quot;退款政策／例外情况：数字商品不适用&quot;，但块记录的来源坐标仍是原文档中那个段落的真实位置。二者分工不同，不能混用——如果把拼接后的文本当作原文坐标，引用就会指向一段并不存在的文字。</p>
+<p>这引出一个直接约束：脱离标题后语义改变的段落，不能作为无上下文事实使用。这类段落要么保留足够的层级信息，要么必须与父级一起取回。权限和版本也必须随块一起传播——块在索引间移动、在缓存中停留、被用户反馈引用时，它的权限约束和版本号都必须跟着走。一个过期版本携带新权限、或新版本丢失权限限制，都是元数据传播断裂造成的错误。</p>
+<p>元数据不解决切分本身的问题，它解决的是块脱离原文后的可解释性：让每个孤立的块仍然知道自己在文档中的位置、所属的章节、生效的时间和允许的读者。没有这些，检索系统返回的只是一堆文本片段；有了这些，返回的才是可以核验的证据。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>非纯文本需要专门解析<span class="dd-badge intuition">边界</span></h2>
+<div class="dd-agent-response"><p>## 非纯文本需要专门解析</p>
+<p>表格、代码和 PDF 能按字符硬切吗？不能。这些格式的信息不在字符序列里，而在结构关系里：表格的意义依赖行头与列头的对应，代码的意义依赖函数签名和依赖关系，PDF 的意义依赖视觉阅读顺序。硬切会把这些结构关系拦腰斩断，之后发生的检索失败，其实发生在索引之前。</p>
+<p>表格的切分要求保行列头。一个单元格&quot;30&quot;只有在&quot;退款金额／7天内&quot;的行列头下才有含义；如果表格被按行拆开、表头留在别的块里，每个数字块都成了无意义的孤值。正确做法是以整表或带表头的行组为单元，让每个块都自带解释数字所需的结构。</p>
+<p>代码按函数或类切分，并保留依赖签名。函数是代码的最小可理解单元，切在函数中间等于切在句子中间；而依赖签名是函数的意义来源——参数类型和返回类型解释了函数如何被使用。切分后的代码块只有带着签名，才能作为&quot;这段代码做什么&quot;的完整证据。</p>
+<p>PDF 的麻烦在切分之前：先修复阅读顺序和页眉。PDF 内部的文字流顺序未必是视觉顺序，双栏布局、页眉页脚、脚注都可能混入正文流；不修复阅读顺序，切出来的块本身就是错序的。页眉若混入块内，还会污染嵌入向量，让每个块都带上无关的噪声。</p>
+<p>通用流程因此是两段式：专用解析器的输入是 PDF 布局、表格行列、代码语法树或对话轮次，输出是保留各自原子结构的块；解析器先恢复阅读顺序、表头、函数依赖或指代实体，再切分。恢复在前、切分在后——这个次序不可颠倒，因为切分只能基于已恢复的结构进行。</p>
+<p>一个重要的诊断提示：解析错误常被误认为嵌入或模型失败。当检索效果变差时，应当先检查上游——表头是否还在、阅读顺序是否恢复、函数签名是否保留。如果块本身就是残缺的，再好的嵌入也无法找回从未进入索引的语义。字符硬切因此只适合一类情况：结构不重要且已经验证过的连续文本。对表格、代码和 PDF 使用硬切，不是策略偏好问题，而是把结构化信息当作字符流处理的根本性错误。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>怎样调块大小<span class="dd-badge eng">评测</span></h2>
+<div class="dd-agent-response"><p>## 怎样调块大小</p>
+<p>调切分参数时，第一个要问的问题不是&quot;块设多大&quot;，而是&quot;应该优化 Recall@k 还是答案正确率&quot;。两者不能互相替代：Recall@k 只告诉你答案关键词所在的块有没有被召回，答案正确率才告诉你系统最终回答对了没有。而答案正确率又依赖生成模型本身的能力和提示设计，用它单独评价切分，会把切分的问题和其他环节的问题混在一起。</p>
+<p>正确的顺序是先测证据命中与引用，再测端到端答案、token、延迟和重复率。切分的直接责任是证据层：必要证据是否完整进入了候选块、引用是否能定位回原文。这一层通过了，再去测下游——答案对不对、上下文花了多少 token、检索延迟多少、召回结果里有多少重复。上游指标过关而下游失败，说明问题在生成或其他环节；上游就没过关，则切分先行负责。</p>
+<p>评价必须按查询类型分桶：事实查找、概念总结、多跳推理对块大小的要求完全不同。事实查找要的是最小充分块——一个准确的数字或条件；概念总结要的是覆盖整个主题的多个块；多跳推理要的是能把两条因果链都取回的能力。把三类查询混在一起算一个平均指标，任何切法看起来都不错，实际上每一类都可能失败。分桶的结果常常指向多套索引：事实查找用小块索引，概念总结用大块索引，按查询类型路由，而不是用一个折中的块大小同时服务所有人。</p>
+<p>切分调参的输入因此有四个：标注查询、每个查询的必要证据、候选索引和生成任务；输出有六个：证据召回、引用定位、答案、token、延迟和重复率。判定的第一条标准是&quot;先确保必要证据完整进入候选&quot;——必要证据残缺时，Recall 再高也不合格，因为召回的是含关键词的块，不是含完整证据的块。证据完整之后，再看上下文预算和最终任务的表现。</p>
+<p>至于&quot;512 token 是最佳块大小&quot;的说法：不存在通用的最佳值。512 token 只是一个起始超参数，一个供第一轮实验使用的默认起点。真正的块大小由证据跨度分布决定，而这个分布因文档、因查询类型而异。把起始值当成结论，等于在还没有测量证据跨度之前就结束了调参。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>一条退款政策应该怎样切<span class="dd-badge math">运行示例</span></h2>
+<div class="dd-agent-response"><p>## 一条退款政策应该怎样切</p>
+<p>用一个具体场景把前面几节的原则串起来。假设一条退款政策长度为 L = 120 token，内容包含&quot;30 天一般期限&quot;和&quot;质量问题例外&quot;两条规则。如果一般期限和质量例外恰好被固定窗口切开，检索器会看到什么？它会看到两个残缺块：一个块里只有&quot;30 天内可退款&quot;却没有例外，另一个块里只有&quot;质量问题&quot;却脱离了期限条件。对查询&quot;35 天质量问题怎么办&quot;来说，任何单个块都无法独立判断——答案必须同时用到两条规则。</p>
+<p>同一政策在不同切法下表现完全不同。图 1 的对比点在于：固定长度切块把句法和规则边界视为偶然位置，边界落在哪里取决于窗口数字，而不是规则结构；结构化父子切分则用小单元提高命中率，命中后再回填完整父段，恢复条件与例外。</p>
+<p>对比三种方案。方案一：窗口 40 token、无重叠，得到 3 个块，索引约 120 token；查询&quot;35 天质量问题&quot;时，例外可能恰好跨在块边界上；代价是低成本但脆弱。方案二：窗口 40 token、重叠 10 token，块数变为 4，索引约 150 token；边界句更可能完整地落在某个块里；代价是索引膨胀约 25%，且易重复召回。方案三：结构子块加 80 token 父段，3 个子块，索引约 120 token；子块命中后返回完整规则；代价是需要保存层级并控制回填预算。三种方案花掉的索引量相近，差别在于脆弱性、重复率和回填复杂度——这正是切分需要实验比较而不是凭感觉选择的原因。</p>
+<p>方案二的数字可以直接从窗口公式推出来。带重叠的窗口步长是 w − o，块数近似为 n = ⌈(L − w)/(w − o)⌉ + 1。代入 L = 120、w = 40、o = 10：步长为 40 − 10 = 30，n = ⌈(120 − 40)/30⌉ + 1 = ⌈80/30⌉ + 1 = 3 + 1 = 4。四个块满额应嵌入 160 token，但末块不足 40，实际约 150；与无重叠的 120 相比，正好增加约 25%。公式给出的是近似块数——它假设全文均匀切分，末块不满额是常态，所以实际的索引 token 数要按真实末块长度核算。</p>
+<p>这 25% 的索引膨胀是否值得？答案不能凭经验固定，只能由数据决定：标注答案跨边界的比例是多少？跨边界证据的命中率提升了多少？最终答案的改善有多大？如果跨边界答案很少，这 25% 就是纯开销；如果规则性文档中条件与例外经常成对出现，重叠买回的就是完整证据。</p>
+<p>最后给出这个案例的验收单位。查询&quot;35 天质量问题&quot;需要的证据是完整的&quot;30 天一般规则 + 质量问题例外 + 当前版本&quot;。只命中包含&quot;质量问题&quot;的半句话不算成功——那正是关键词命中而证据残缺的典型失败。合格的证据块必须让读者独立判断适用条件，并能回到原文位置核验。切分的输出也由此确定：输入文档长度 L、窗口 w、重叠 o 和规则结构，输出块数 n、索引 token 与完整证据。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 230" role="img" aria-label="同一退款政策采用固定切块与结构化父子切块的对比"><defs><marker id="ch1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><text x="18" y="25" class="svg-t">原文结构</text><rect x="18" y="38" width="644" height="43" rx="7" fill="#21252d" stroke="#6b8cbe"/><text x="340" y="56" text-anchor="middle" class="svg-t" font-size="10">H2 退货政策｜一般商品：签收 30 天内｜质量问题：经核验不受 30 天限制｜到账说明</text><text x="18" y="111" class="svg-t">固定 20-token 边界</text><rect x="18" y="124" width="202" height="50" rx="7" fill="#21252d" stroke="#c77b72"/><text x="119" y="145" text-anchor="middle" class="svg-t" font-size="10">块 A：一般商品…30 天内。质量</text><text x="119" y="162" text-anchor="middle" class="svg-t" font-size="10">（例外语义被截断）</text><rect x="232" y="124" width="202" height="50" rx="7" fill="#21252d" stroke="#c77b72"/><text x="333" y="145" text-anchor="middle" class="svg-t" font-size="10">块 B：问题经核验不受…到账</text><text x="333" y="162" text-anchor="middle" class="svg-t" font-size="10">（主语和标题丢失）</text><text x="18" y="206" class="svg-t">结构化父子切分</text><rect x="154" y="187" width="154" height="37" rx="7" fill="#21252d" stroke="#4f9d78"/><text x="231" y="210" text-anchor="middle" class="svg-t" font-size="10">子块：30 天一般规则</text><rect x="320" y="187" width="176" height="37" rx="7" fill="#21252d" stroke="#4f9d78"/><text x="408" y="210" text-anchor="middle" class="svg-t" font-size="10">子块：质量问题例外</text><path d="M496,205 L548,205" stroke="#6b7484" marker-end="url(#ch1)"/><text x="605" y="202" text-anchor="middle" class="svg-t" font-size="10">命中子块</text><text x="605" y="217" text-anchor="middle" class="svg-t" font-size="10">回填完整 H2 父段</text></svg><figcaption>图 1　固定长度把句法和规则边界视为偶然位置；结构化父子切分用小单元提高命中率，再回填完整父段恢复条件与例外。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>方案</th><th>块数</th><th>索引 token</th><th>查询“35 天质量问题”时的证据</th><th>主要代价</th></tr></thead><tbody><tr><td>40 token，无重叠</td><td>3</td><td>120</td><td>例外可能跨边界</td><td>低成本但脆弱</td></tr><tr><td>40 token，10 token 重叠</td><td>4</td><td>约 150</td><td>边界句更可能完整</td><td>索引约膨胀 25%，易重复召回</td></tr><tr><td>结构子块 + 80-token 父段</td><td>3 子块</td><td>约 120</td><td>子块命中后返回完整规则</td><td>需保存层级并控制回填预算</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="带重叠窗口的近似块数"><mi>n</mi><mo>=</mo><mo>⌈</mo><mfrac><mrow><mi>L</mi><mo>−</mo><mi>w</mi></mrow><mrow><mi>w</mi><mo>−</mo><mi>o</mi></mrow></mfrac><mo>⌉</mo><mo>+</mo><mn>1</mn></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>边界案例如何分别处理<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>## 边界案例如何分别处理</p>
+<p>同一个字符切分器为什么能同时破坏 PDF、表格、代码和对话？因为这四类材料的共同点是：含义不在字符序列里，而在字符之外的结构里。切分器不认识这些结构，就会在结构断裂处&quot;安静地&quot;切下干净的一刀——切出来的文本语法上甚至通顺，但语义已经丢失。这类失败没有报错，所以称为静默失败。每类材料要保留的原子结构、常见的静默失败和检验方法各不相同：</p>
+
+<p>表格的失败最直观：一个&quot;30&quot;离开了&quot;退款天数&quot;列名就只是一个数字。代码的失败最隐蔽：切出来的函数语法完整、缩进正确，却没人知道它的参数类型和导入来源，依赖上下文已经丢了。对话的失败最普遍：代词&quot;它&quot;在脱离说话人和上一轮之后，指向彻底悬空。检验方法对应着修复方法——对照渲染页能发现双栏交错，还原行列语义能验证表头是否还在，AST 解析和编译检查能确认依赖完整，实体绑定能接住悬空的指代。</p>
+<p>解析质量应当在嵌入之前单独设一道门禁。门禁指标包括：空块率、异常短块率、标题继承率、表格表头覆盖率和原文定位成功率。这些指标在索引构建时就能计算，不必等到端到端效果变差才回溯。如果没有这道门禁，&quot;检索不到&quot;看起来就像是嵌入模型的问题，而实际原因是正确句子从未以完整、可理解的形态进入索引——错误发生在检索之前，却在检索之后才被察觉。</p>
+<p>最后划清补救手段的边界。重叠只能缓解偶然边界：一个句子恰好落在窗口边缘，重叠让它有机会在另一个块里保持完整。但重叠不能修复错误的阅读顺序——双栏错序的文本重叠多少次都还是错序的；不能修复权限串库——不该出现的内容重复出现只会扩大泄露；也不能修复版本混合——新旧正文重叠后生成的内容依然自相矛盾。更大的重叠还有一个副作用：同一证据以多个近重复块挤占 top-k，需要基于文档 id 与邻接关系去重。边界材料的处理因此有两层输出：一是可独立还原含义的证据块，二是解析质量指标。用抽样对照、表头覆盖、AST 检查和实体绑定确认结构未丢，才能排除&quot;检索不到其实是索引从未建成&quot;这一可能。</p></div>
+<table class="dd-table"><thead><tr><th>材料</th><th>应保留的原子结构</th><th>常见静默失败</th><th>检验方法</th></tr></thead><tbody><tr><td>PDF</td><td>阅读顺序、标题路径、页码</td><td>双栏交错、页眉混入正文</td><td>抽样对照渲染页与解析文本</td></tr><tr><td>表格</td><td>列名、行标识、单位、脚注</td><td>数值离开表头后失去含义</td><td>要求每块能还原行列语义</td></tr><tr><td>代码</td><td>函数/类、签名、导入和必要调用方</td><td>语法完整但依赖上下文丢失</td><td>解析 AST，并运行引用/编译检查</td></tr><tr><td>对话</td><td>说话人、轮次、被指代实体</td><td>“它”“那个方案”失去指向</td><td>保留会话摘要或实体绑定</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>## 把因果链连起来</p>
+<p>切分的全部内容可以用一条从问题到实践的因果链贯穿。问题在链条起点：检索系统只能返回它事先建立的块，如果证据被切碎、切错或切丢了，后续一切环节都无法补救。从这个问题出发，每一步都是对前一步输出的一次加工，每一步也都有对应的验证方式。</p>
+<p>第一步，解析文档恢复结构。PDF 的阅读顺序、表格的行列头、代码的语法树、对话的指代关系，都要在这一步恢复。结构未恢复就切分，错误发生在索引之前，而它会被误认为嵌入或模型失败。这一步的输出是结构可信的文本与边界标记。</p>
+<p>第二步，按查询粒度选择单元。事实查找、概念总结、多跳推理需要的块大小不同，选择单元的依据是标注出来的证据跨度分布，而不是一个固定的 token 数。粒度选错，分辨率就不匹配查询。</p>
+<p>第三步，加入必要重叠和层级元数据。重叠让偶然落在边界上的句子在至少一个块里保持完整；标题路径、文档 id、版本、时间和权限随块一起传播，让脱离原文的块仍可定位、可过滤、可回查。重叠比例由跨边界答案比例决定，元数据缺失则块不可核验。</p>
+<p>第四步，嵌入并建立索引。到这里，块才变成检索可以命中的向量单元。索引保存的是这一步的输出；任何切分参数的改变都产生新版本，保留新的块 id 与原文偏移，不做直接覆盖。</p>
+<p>第五步，召回后邻接扩展与去重。重叠在索引里是收益，在召回结果里是代价：检索后按邻接关系合并来自同一边界的命中块，按文档 id 去重，然后才计算上下文预算。顺序不可颠倒——入库前去重会删掉边界句唯一的完整副本。</p>
+<p>第六步，用证据和答案指标共同调参。证据命中与引用定位先于端到端答案：先确保必要证据完整进入候选，再看答案、token、延迟和重复率。Recall 高而证据残缺，仍是切分不合格；答案错误而证据完整，问题在切分之后。两个层面共同决定参数，而不是单独迷信任何一个指标。</p>
+<p>这条链的每一环都以前一环为前提，而验证点恰好分布在每一环的输出上：结构是否恢复、单元是否匹配粒度、元数据是否随块传播、索引是否可回溯版本、召回后是否去重、指标是否分层。切分不是一次性的参数设定，而是这条链上每一次变更都要求重新验证的过程——这也是为什么切分版本必须可追踪：观测一旦断裂，就无法判断某一环的失效是内容变化还是边界变化造成的。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Retrieval-Augmented Generation</a>：检索生成基础</li><li><a href="https://arxiv.org/abs/2409.04701" target="_blank" rel="noopener">Late Chunking</a>：长上下文嵌入后切分</li><li><a href="https://arxiv.org/abs/2401.18059" target="_blank" rel="noopener">RAPTOR</a>：层级递归摘要检索</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/chunking">在地图中查看概念关系</a></nav>
+</article></main></body></html>

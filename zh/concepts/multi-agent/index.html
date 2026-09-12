@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>多智能体系统：用边界、并行与独立验证组织复杂任务 · AI 知识地图</title>
+<meta name="description" content="从任务依赖图、通信拓扑和共享状态，到关键路径、移交损失与同源错误，判断何时多智能体真的优于单智能体。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/multi-agent/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="多智能体系统：用边界、并行与独立验证组织复杂任务">
+<meta property="og:description" content="从任务依赖图、通信拓扑和共享状态，到关键路径、移交损失与同源错误，判断何时多智能体真的优于单智能体。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/multi-agent/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="多智能体系统：用边界、并行与独立验证组织复杂任务">
+<meta name="twitter:description" content="从任务依赖图、通信拓扑和共享状态，到关键路径、移交损失与同源错误，判断何时多智能体真的优于单智能体。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/multi-agent/#page","name":"多智能体系统：用边界、并行与独立验证组织复杂任务","description":"从任务依赖图、通信拓扑和共享状态，到关键路径、移交损失与同源错误，判断何时多智能体真的优于单智能体。","url":"https://ai-knowledge-map.com/zh/concepts/multi-agent/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"多智能体系统：用边界、并行与独立验证组织复杂任务","item":"https://ai-knowledge-map.com/zh/concepts/multi-agent/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">多智能体系统：用边界、并行与独立验证组织复杂任务</span></li></ol></nav><article id="dd-article" data-concept-id="multi-agent">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">多智能体系统：用边界、并行与独立验证组织复杂任务</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从任务依赖图、通信拓扑和共享状态，到关键路径、移交损失与同源错误，判断何时多智能体真的优于单智能体。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 多智能体不会创造额外智力；它把上下文、权限和工作分区，并以通信与合并成本换取并行、隔离或独立复核。只有<b>子任务可分、接口明确、结果可验证</b>时，这笔交换才可能划算。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>从任务依赖图判断可并行部分；计算关键路径与并行收益上限；设计角色契约和共享状态；评测移交、冲突与同源错误。</div>
+<ol class="dd-chain"><li>证明单智能体瓶颈</li><li>画任务依赖与关键路径</li><li>选择拓扑并定义角色契约</li><li>分配最小上下文和权限</li><li>并行执行并写版本化状态</li><li>独立验证结果与证据</li><li>仲裁冲突并回派具体缺口</li><li>按完成条件终止并对比基线</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>先找单智能体瓶颈，再决定是否拆分<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>把同一个提示词复制给五个 Agent，并不会自动产生一支团队。五个 Agent 读取相同的输入、持有相同的权限、给出相似的答案，它们之间的“分工”只存在于角色名字上，而不存在于工作内容里。真正有效的分工，来自输入、权限、完成条件或验证视角的差异，而不是角色名不同：一个 Agent 之所以值得存在，是因为它拿到的资料和别人不一样、它能做的事别人做不到、它被要求交出的结果和别人不同，或者它用独立的方式检验别人的结论。</p>
+<p>因此，决定是否引入多智能体系统，应当从单智能体的明确瓶颈出发，而不是从“人多力量大”的直觉出发。如果一个 Agent 的上下文窗口足以装下全部材料，步骤之间强依赖、必须严格串行，而且每一步的工具调用都很短，那么多智能体架构不会带来任何收益——它只是在同一个任务上额外叠加了重复读题、消息传递和仲裁。每一个 Agent 都要重新理解一遍任务背景，协调者还要花时间汇总和裁决，这些开销在简单任务上纯属浪费。</p>
+<p>反过来，有几种信号表明拆分是值得的。其一，存在相互独立的资料源，可以并行读取和处理。其二，不同子任务需要不同权限，必须隔离，不能让一个持有写权限的 Agent 同时掌握本应只读的资源。其三，候选解可以独立产生并独立验证——多个 Agent 各自给出方案，再由另一个视角检验。其四，单个上下文被无关材料污染，塞进太多与当前步骤无关的内容，反而损害了每一步的准确度。</p>
+<p>多智能体系统的本质，是把一个任务拆给多个受边界约束的 Agent，再由协调者负责合并和验证。它的输入是单 Agent 的明确瓶颈、任务依赖关系和可验收接口；它的输出是角色化的子任务以及统一后的结果。整个系统的取舍在于：用通信成本换取并行、权限隔离或独立复核。当任务步骤强依赖、工具调用很短、或者子任务之间的接口定义不清时，增加 Agent 只会复制上下文、复制错误，让结果变得更差而不是更好。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>四种拓扑对应四种控制问题<span class="dd-badge eng">架构</span></h2>
+<div class="dd-agent-response"><p>多智能体系统的拓扑，描述的是 Agent 之间如何连接、谁来分配任务、消息如何流动，以及结果如何被合并。拓扑选择并不改变单个 Agent 的能力，它改变的是控制问题：把责任放在哪里、把并行放在哪里、把冲突放在哪里。四种基本拓扑各对应一种优势和一种主要失败方式。</p>
+<p>管理者—工作者拓扑把责任与预算集中在一个管理者 Agent 手里。管理者拆解任务、分配子任务、收集结果并做最终决策，工作者只负责执行。它的优势是责任清晰、预算可控，任何一笔支出和任何一个结论都有明确归属；它的失败方式同样清晰——管理者本身成为瓶颈，当子任务数量增加、或者每个结果都需要管理者裁决时，管理者成为吞吐量的上限，系统退化为一条串行的窄通道。</p>
+<p>流水线拓扑把任务切成阶段，前一阶段的输出是后一阶段的输入，阶段接口清楚。每个阶段的 Agent 只需关心自己这一步的输入契约和输出契约，因此可以针对单个阶段做深度优化，也便于独立替换。它的主要失败是上游错误层层放大：因为每一步都信任前一步的输出，前端的偏差会在下游被当作事实继续加工，最后放大为完全错误的结论，而且很难追溯到源头。</p>
+<p>对等或辩论拓扑让多个 Agent 地位对等，各自独立产生候选答案，再通过比较或辩论选出胜者。它的优势是能产生多样化的候选，避免单一视角过早收敛。它的失败在于回合膨胀和从众：辩论可以无限进行下去，每一轮都消耗预算；而当某些 Agent 更善于表达时，正确的少数意见可能被多数或更强势的表述压过。</p>
+<p>黑板或共享状态拓扑让所有 Agent 读写一块公共状态，各自异步取任务、写结果，天然支持异步协作与从故障中恢复——某个 Agent 失败不会阻塞其他 Agent，它们可以继续在共享状态上工作。它的主要失败是陈旧写入和冲突：两个 Agent 基于同一个旧版本各自写入，后来者的覆盖会丢失前者的成果，或者产生互相矛盾的中间状态。</p>
+<p>这些拓扑可以混合使用，例如流水线的某个阶段内部采用对等辩论。但无论怎样组合，有四项要素必须唯一且明确：唯一的任务 ID、每个子任务的所有者、终止条件和最终验收者。任务 ID 让每条消息都能归属到具体任务；所有者让每个结果都有人负责；终止条件规定系统何时停下；最终验收者规定谁的结论算数。自由对话不是协调协议——没有 ID、所有者和终止条件的来回讨论，只是把不确定性延后，而不是解决控制问题。</p>
+<p>拓扑选择的输入是任务的依赖结构、控制集中度、并行需求和共享状态方式，输出是管理者—工作者、流水线、对等或黑板中的一种或组合。每种拓扑用不同的消息规则和所有权规则工作，但都必须指定任务 ID、终止条件和验收者。需要注意，拓扑名称只描述协调结构本身，它不保证参与者之间的信息独立，也不保证最终结论正确。</p></div>
+<table class="dd-table"><thead><tr><th>拓扑</th><th>优势</th><th>主要失败</th></tr></thead><tbody><tr><td>管理者—工作者</td><td>责任与预算集中</td><td>管理者成瓶颈</td></tr><tr><td>流水线</td><td>阶段接口清楚</td><td>上游错误层层放大</td></tr><tr><td>对等/辩论</td><td>产生多样候选</td><td>回合膨胀、从众</td></tr><tr><td>黑板/共享状态</td><td>异步协作与恢复</td><td>陈旧写入和冲突</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：三条并行研究线能节省多少时间<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个具体例子可以看清并行的收益上限和真实开销。假设一个任务包含三项互不依赖的研究，每项耗时 20 分钟，研究完成后还需要 10 分钟把结果合并起来。单智能体串行执行时，只能一项接一项地做：20 + 20 + 20 + 10 = 70 分钟。这就是没有并行的基准。</p>
+<p>现在让三名工作者并行执行三项研究，每名工作者负责一项。三项研究同时进行，用户等待的时间不再累加，而是取最长的一条——即关键路径。三项研究都是 20 分钟，所以关键路径是 max(20, 20, 20) = 20 分钟，再加上必须串行完成的合并 10 分钟，总共 30 分钟。理想加速比是 70 ÷ 30 ≈ 2.33×。</p>
+<p>这个 2.33× 是理想值，它假设三条分支完全独立、资源充足、合并成本不变。现实中的并行会引入额外开销。假设每名工作者在开工前还需要 5 分钟重复阅读任务背景——因为每个智能体都要重新理解一遍问题——那么每条分支的实际时长变成 25 分钟；再假设因为并行产生了冲突，合并时间从 10 分钟增加到 20 分钟。此时并行总时长是 25 + 20 = 45 分钟，加速比只剩 70 ÷ 45 ≈ 1.56×。更值得注意的是总工时：串行时总工时是 70 分钟，并行时三个工作者各干 25 分钟、合并者干 20 分钟，合计 25 × 3 + 20 = 95 分钟，比串行还多了 25 分钟。</p>
+<p>这揭示了并行优化的本质，可以用两条公式表达。并行墙钟时间的下界是：T_parallel ≥ max(T₁, T₂, …, Tₙ) + T_merge，其中 T_parallel 是用户实际等待的墙钟时间，Tᵢ 是第 i 条分支的时长，T_merge 是必须串行完成的合并时长，n 是分支数。总工作成本则是：Work = W₁ + W₂ + … + Wₙ + W_merge，其中 Wᵢ 是第 i 条分支的工作量，W_merge 是合并工作量。墙钟时间由最慢分支加串行合并决定，而总成本是把所有分支的工作量累加。</p>
+<p>两条公式合起来说明一件关键的事：并行优化的是墙钟时间，也就是用户等待的时间，它并不一定降低 token 消耗或费用，反而常常提高总成本。并行之所以让用户觉得快，是把原本串行累积的工作摊到了多条分支上同时进行；但所有这些工作并没有消失，它们只是换了位置。强依赖链无法越过关键路径——如果第二步必须等第一步的结果，那么无论加多少智能体，这条链的最短时间都不会变短。因此盲目增加智能体只会推高总成本，而墙钟时间的收益可能被重复准备和合并冲突大幅侵蚀。</p>
+<p>这个例子的输入是三条分支的时长、重复准备成本和合并成本，输出是关键路径墙钟时间、总工时和加速比。70 ÷ 30 ≈ 2.33× 是理想加速比，加入重复读背景和冲突合并的开销后就只有 1.56×。计算成立的前提是资源充足且分支相互独立；一旦存在强依赖或排队等待，实际收益还会进一步下降。</p></div>
+<div class="dd-formula" data-formula-id="multi-agent-critical-path" data-display="mathml"><math display="block" aria-label="并行墙钟时间至少等于最长分支时间加串行合并时间，总工作成本等于所有分支和合并工作量之和"><msub><mi>T</mi><mtext>parallel</mtext></msub><mo>≥</mo><munder><mi>max</mi><mi>i</mi></munder><mo>(</mo><msub><mi>T</mi><mi>i</mi></msub><mo>)</mo><mo>+</mo><msub><mi>T</mi><mtext>merge</mtext></msub><mo>;</mo><mi>Work</mi><mo>=</mo><munderover><mo>∑</mo><mi>i</mi><mi>n</mi></munderover><msub><mi>W</mi><mi>i</mi></msub><mo>+</mo><msub><mi>W</mi><mtext>merge</mtext></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>任务契约要写输入、输出、权限和完成证据<span class="dd-badge eng">委派</span></h2>
+<div class="dd-agent-response"><p>一句“去研究竞争对手”之所以难以合并，是因为它没有交代任何可供验收的东西：研究哪个竞争对手、允许查哪些资料、结果以什么形式返回、花多少预算、什么算做完。当多个智能体各自按自己的理解去执行这样一句话时，交回来的结果格式不一、口径不一、覆盖范围不一，合并者不得不重新阅读每一份长聊天记录来猜测它们到底做了什么。任务契约就是为解决这个问题而存在的：把每个子任务委派出去之前，先写清楚验收所必需的边界。</p>
+<p>一份任务契约需要声明以下内容：子任务的范围、允许使用的资料、输出的 schema（即返回结果的固定结构）、预算、截止时间、明确不可做的事项、来源要求，以及机器可检查的完成条件。前几项界定“做什么、用什么做、做成什么样”，最后一项界定“怎么判断做完了”。完成条件必须可以被机器检查，而不是靠人读一遍再主观判断，这样合并和验收才能自动化、可重复。</p>
+<p>管理者和工作者在契约之下的分工也随之明确。管理者交付最小充分上下文，而不是把整段历史聊天记录一股脑塞给工作者——多余的历史只会污染判断、浪费预算。工作者返回四样东西：结果、证据、未解决的问题、置信边界，而不是返回未经结构化的长聊天记录。结果回答“我得出了什么”，证据回答“凭什么”，未解决问题回答“哪里还缺”，置信边界回答“这个结论有多可靠”。有了这四样，合并者不需要重建工作者的思考过程就能判断结果能不能用。</p>
+<p>权限必须按角色分配，这是多智能体系统隔离价值的来源。研究者只读，执行者可以写但不能自我批准，验证者不能修改被验证的产物。这三条规则把“做”和“批”分开：能修改产物的人没有权力宣布产物合格，负责宣布合格的人没有能力改动产物。只有权限真正隔离，多智能体带来的隔离才是真实控制，而不是名义上的多个人。</p>
+<p>任务契约的输入是子任务范围、资料、schema、预算、权限和完成证据，输出是一份可独立执行且可合并的委派单。管理者提供最小上下文，工作者返回结构化结果、来源、缺口和置信边界。需要澄清契约的边界：契约通过只表示交接是可检查的，它并不保证研究事实正确——一个格式完美的结果可能内容全错。契约保证的是“能被验收”这件事本身，而内容正确性仍然依赖权限分离和后续的独立验证。写权限与自我批准必须分离，这一条不能因为有了契约就省略。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：任务依赖图决定并行，验证门决定可信合并<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>任务依赖图回答的是“哪些步骤可以同时做”，验证门回答的是“哪些结果可以被信任地合在一起”。两者在图上表现为两种完全不同的箭头：依赖边表示必须等待的因果约束，验证边表示允许进入合并的信任许可。</p>
+<p>图中的结构是这样的：管理者把任务拆成三个并行的子任务，交给三个工作者。三个工作者各自独立执行，把结果写入一块版本化的共享状态——版本化意味着每次写入都带上版本号，后来者不会静默覆盖前人的成果。每个工作者的结果在写入之后、进入合并之前，都要经过一次独立验证。只有通过验证的制品，才被合并者接收并合并为最终结果。</p>
+<p>这张图要传达的第一个信息是：并行由依赖图证明。如果任务 A 和任务 B 之间没有任何依赖边，它们就可以并行——这里的“并行”是调度许可，意味着系统允许它们同时运行，而不是强制它们必须同时运行。如果 A 的结果是 B 的输入，那么两者之间就存在一条必须等待的边，无论加多少智能体，这条边的先后顺序都无法越过。所以判断并行能力，看的是依赖图里有没有共享前置，而不是看有多少个智能体。</p>
+<p>第二个信息是：可信度由独立验证建立。并行只能保证结果来得快，不能保证结果对。三个工作者基于同样错误的资料可能给出同样错误的答案，并行只会让错误也来得快。独立验证门的作用，是在合并之前拦住不可信的制品，让合并者只接收经过验证的结果。可信合并依赖的是验证门，而不是参与者的数量。</p>
+<p>依赖图的输入是子任务、先后约束、共享状态和验证门，输出是可并行分支、必须等待的边以及最终合并路径。无依赖的分支并行写入版本化状态，合并者只接收经过验证的制品。这张图同时划定了能力的边界：聊天数量不是系统能力，多几个来回对话并不能替代依赖图和验证门；而缺乏独立证据时，多个分支仍会共同犯错——它们各自忙碌，却可能在同一个地方同时跌倒。并行解决的是墙钟时间，验证解决的是可信度，两者必须由不同的机制来保证。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 325" role="img" aria-label="管理者把任务拆为三个并行工作者写入版本化共享状态，独立验证后由聚合者合并"><defs><marker id="ma28" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="30" width="150" height="58" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="95" y="55" text-anchor="middle" class="svg-t">管理者</text><text x="95" y="76" text-anchor="middle" class="svg-t" font-size="11">依赖图 · 契约 · 预算</text><path d="M95,88 L95,120" stroke="#788293"/><path d="M95,120 L240,120" stroke="#788293"/><path d="M95,120 L95,140" stroke="#788293" marker-end="url(#ma28)"/><path d="M240,120 L240,140" stroke="#788293" marker-end="url(#ma28)"/><path d="M385,120 L385,140" stroke="#788293" marker-end="url(#ma28)"/><path d="M240,120 L385,120" stroke="#788293"/><rect x="25" y="145" width="140" height="70" rx="9" fill="#21252d" stroke="#65a6d9"/><rect x="170" y="145" width="140" height="70" rx="9" fill="#21252d" stroke="#65a6d9"/><rect x="315" y="145" width="140" height="70" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="95" y="174" text-anchor="middle" class="svg-t">工作者 A</text><text x="240" y="174" text-anchor="middle" class="svg-t">工作者 B</text><text x="385" y="174" text-anchor="middle" class="svg-t">工作者 C</text><text x="95" y="198" text-anchor="middle" class="svg-t" font-size="11">不同资料 / 只读</text><text x="240" y="198" text-anchor="middle" class="svg-t" font-size="11">不同资料 / 只读</text><text x="385" y="198" text-anchor="middle" class="svg-t" font-size="11">不同资料 / 只读</text><path d="M95,215 L95,252" stroke="#788293" marker-end="url(#ma28)"/><path d="M240,215 L240,252" stroke="#788293" marker-end="url(#ma28)"/><path d="M385,215 L385,252" stroke="#788293" marker-end="url(#ma28)"/><rect x="25" y="257" width="430" height="55" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="240" y="281" text-anchor="middle" class="svg-t">版本化共享状态</text><text x="240" y="301" text-anchor="middle" class="svg-t" font-size="11">结果 + 来源 + 假设 + 冲突；禁止无主覆盖</text><path d="M455,284 L505,284" stroke="#788293" marker-end="url(#ma28)"/><rect x="510" y="225" width="200" height="87" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="610" y="252" text-anchor="middle" class="svg-t">独立验证与聚合</text><text x="610" y="276" text-anchor="middle" class="svg-t" font-size="11">证据 / 测试 / 冲突仲裁</text><text x="610" y="298" text-anchor="middle" class="svg-t" font-size="11">缺口回派，不靠投票掩盖</text><path d="M170,59 L610,59 L610,225" fill="none" stroke="#d3a05a" stroke-dasharray="6 5" marker-end="url(#ma28)"/><text x="420" y="48" text-anchor="middle" class="svg-t" font-size="11">管理者只接收可验证制品</text></svg><figcaption>图 1　并行由依赖图证明，可信度由独立验证建立；聊天数量不是系统能力。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>共享状态必须版本化，消息只负责通知<span class="dd-badge eng">一致性</span></h2>
+<div class="dd-agent-response"><p>两个工作者同时更新同一个结论时，最后写入者的版本并不一定正确。先后顺序只能说明谁最后按下了保存键，不能说明谁的结论更可靠。共享状态要解决的，正是这种“顺序不等于正确”的问题。</p>
+<p>共享状态中写入的应当是有结构的内容：任务、事实、决策、制品和验证结果，每一条都带版本号。版本化的意义在于，任何一次更新都能追溯到它基于哪个旧版本、带来了什么变更，而不是把旧内容悄悄抹掉。消息传递在这里只扮演通知的角色：它只携带任务 ID 和变更摘要，告诉其他 Agent“有东西变了、变了什么”，而真正的数据本体放在共享状态里。消息不应该承载完整内容，否则消息流本身就变成了另一块不可靠、易丢失的共享状态。</p>
+<p>并发写入通过三种机制之一来约束：所有者、乐观锁或事件日志。所有者机制规定只有某个 Agent 有权写某条记录；乐观锁要求写入时携带它读取的版本号，如果版本号已经变了就拒绝覆盖；事件日志把所有变更按顺序追加，靠追加而非覆盖来保留历史。当冲突真的发生时，不能采用“最后写者覆盖”的规则，而要保留两种候选，交给仲裁者裁决。这样冲突本身被记录下来，而不是被某一次覆盖悄悄消灭。</p>
+<p>每条结论还要附上元数据：来源、生成者、时间、适用范围和状态。来源回答“结论从哪里来”，生成者回答“谁得出的”，时间回答“何时得出”，适用范围回答“在什么条件下成立”，状态回答“这是草稿、已验证还是已废弃”。有了这五样，合并者才能判断一条结论现在还能不能用。</p>
+<p>重试也需要状态配合：工作者重试时使用幂等任务 ID，保证同一次任务的重复执行不会产生重复的分支或重复的副作用。如果任务 ID 已经在共享状态里记录了完成结果，重试就只读取旧结果而不重复执行。</p>
+<p>共享状态的输入是任务、事实、决策、产物及版本，输出是带所有者、来源和冲突状态的可恢复记录。消息只通知 ID 和变更摘要，写入用乐观锁或事件日志检测并发冲突。最后写入不表示更正确，冲突必须保留候选并仲裁；而幂等任务 ID 只负责防止重复副作用，它不解决两个不同任务之间的真实冲突。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>独立 Agent 不等于独立证据<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>五个相同模型的 Agent 给出了一致的答案，仍然可能全部错。因为“一致”只说明它们犯了同样的错，不说明答案正确。独立 Agent 和独立证据是两回事：Agent 是执行任务的角色，证据是支撑结论的根据。角色再独立，如果它们背后的信息完全同源，那么它们的结论也只是同一条错误的五个副本。</p>
+<p>错误的相关性来自共享的底层条件：相同的模型、相同的提示、相同的检索库、相同的训练数据，都会让不同的 Agent 产生高度相关的错误。改变角色口吻——让一个 Agent 装作“审慎的分析师”、另一个装作“激进的批评家”——不会增加机制的多样性，因为它们读取的仍然是同一批资料、运行在同一套推理上。真正的独立验证必须来自不同的信息或验证机制：不同的数据源、不同的工具、可执行的测试、形式规则，或者真正独立的模型与人员。用可执行测试去跑一遍，比让十个 Agent 口头复述更有说服力，因为测试的结果不依赖任何 Agent 的“判断”。</p>
+<p>验证过程中还要防锚定：如果验证者在看到候选答案之后才去收集证据，它会被候选答案牵着走，只寻找支持它的材料而忽略反驳。因此验证者应当在不被候选答案污染的条件下独立作业，或者至少先固定证据再对照结论。</p>
+<p>初学者最容易混淆的一点是：多次调用同一个模型，只是启动了多个进程，不是获得了多个独立的知识源。这些进程共享同一套参数和训练数据，它们的“共识”本质上是一次抽样在不同提示下的重复。共识必须经过外部证据的校验才算数，多数票本身不是证据。</p>
+<p>独立验证的输入是候选结论、数据源、工具和验证者视角，输出是外部证据对结论的支持、反驳或“不确定”三种判定之一。不同模型调用只有在信息或验证机制真正不同时，才增加了独立性；仅仅换了个名字或口吻不构成独立。共享训练数据、提示和检索库会造成相关错误，而相关错误无法用多数票掩盖——因为多数票的每一票都来自同一个错误源头。判断一个多智能体系统是否真的“独立”，要看它背后的证据是否独立，而不是看它有多少个 Agent。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>终止、重试与反循环是控制协议的一部分<span class="dd-badge eng">可靠性</span></h2>
+<div class="dd-agent-response"><p>Agent A 让 B 检查，B 又让 A 补充，A 再请 B 复核——这样的来回如果没有规则约束，永远不会自己停下来。终止、重试与反循环不是事后补救，而是控制协议的一部分，必须在系统启动前就定义好。</p>
+<p>控制协议需要设置五类边界：委派深度、每角色预算、最大回合数、无进展判据和唯一完成状态。委派深度限制一个任务可以向下委派多少层，防止任务被无限拆小；每角色预算限制每个 Agent 能花多少资源；最大回合数给来回交互设一个硬上限；无进展判据定义什么情况算“绕圈子”；唯一完成状态规定任务只有一种方式被标记为完成，避免多个 Agent 各自宣布完成而状态不一致。</p>
+<p>其中最关键的一条规则是：每次回派必须指出新的缺口与验证方法。当 B 把任务退回给 A 时，B 不能只说“再看看”，而必须说明上一轮结果缺了什么、以及用什么方法可以验证补上的内容。这条规则把“再讨论一次”变成了有方向的推进：每退一次，问题都必须更具体，而不是原地打转。如果回派提不出新缺口，那就是无进展，应当终止。</p>
+<p>对不同性质的失败要有不同的处理路径，而不是一律重试。工具错误采用有界重试——比如一次查询超时，重试两三次是合理的，但不能无限重试。逻辑冲突交给仲裁——两个结论互相矛盾时，由有裁决权的角色判定。无法验证的结论则升级人工，或者明确返回“不完整”，不允许用无限次的“再讨论一次”来掩盖验证失败。</p>
+<p>控制协议的输入是委派深度、预算、回合数、进展证据和工具错误，输出是五种动作之一：继续、重试、仲裁、人工升级或停止。无进展或预算耗尽时终止。需要区分“停止”和“成功”：停止表示系统不再自动工作，它不表示任务已经成功。一个因为预算耗尽而停下来的任务，可能是失败的，只是系统如实报告了失败而已。无法验证的结论应当明确返回“不完整”，而不是给出一个看似完整的错误答案。让系统在该停的时候停下来、并如实说明停下的原因，本身就是多智能体系统能力的一部分。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测必须与同预算单智能体比较<span class="dd-badge eng">实验</span></h2>
+<div class="dd-agent-response"><p>成功率提高了，并不能直接说明多智能体结构更好——也可能只是因为多花了四倍 token。评测多智能体系统时，必须排除“花钱更多”这个混淆因素，才能把收益归因到结构本身。</p>
+<p>基线不能只有一个。至少要包含四类对照：单智能体、单智能体等预算多采样、确定性并行工作流和多智能体。单智能体是下限基准；单智能体等预算多采样回答“如果我把多智能体花的预算全部给一个 Agent 反复尝试，结果如何”；确定性并行工作流回答“如果我用脚本而不是 Agent 来做并行，收益是否还在”；多智能体则是被评测的对象本身。只有当多智能体在同等预算下超过了前几类基线，它的结构优势才算成立。</p>
+<p>评测要报告的不只是最终的成功率，还包括任务成功、关键路径延迟、总 token/工具成本、重复工作、移交丢失、冲突率、无效回合、验证发现率和人工介入。成功率只说结果对不对，关键路径延迟说用户等多久，总成本说花了多少资源，重复工作说多少预算被浪费在重复读题上，移交丢失说多少信息在 Agent 之间传递时丢了，冲突率和无效回合说协调本身有多低效，验证发现率说验证门真的拦下了多少错误，人工介入说系统有多少次被迫交还给人。只有把质量、延迟、成本和协调损耗放在一起看，才能判断多智能体到底值不值。</p>
+<p>消融是定位收益来源的手段：逐个去掉角色隔离、共享状态、独立验证或并行，看去掉哪一项后性能显著下降。如果去掉独立验证后结果一样好，说明验证门没有贡献；如果去掉并行后结果反而变好，说明并行在这个任务上是纯开销。消融把“结构好”从一句笼统的话变成“具体哪个部件有用”。</p>
+<p>评测数据还要按可并行度、依赖深度和任务长度切片，避免用最适合并行的少数案例代表所有任务。一个高度可并行的研究任务能跑出漂亮的加速比，不代表一个强依赖的写作任务也能。把最难并行的任务和最容易并行的任务分开报告，才能看出结构在什么条件下有效、在什么条件下失效。</p>
+<p>多智能体评测的输入是同任务、同预算下的单 Agent、多采样、确定性工作流和多 Agent 方案，输出是质量、关键路径、总成本、移交和验证指标。消融角色隔离、共享状态和并行以定位收益来源。两条结论必须守住：成功率提高如果只是因为多花了 token，就不能归因于结构；少数高度可并行的案例也不能代表所有任务。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>成本与可观测性必须按任务树归因<span class="dd-badge eng">运营</span></h2>
+<div class="dd-agent-response"><p>总 token 突然翻倍，可能是正常的并行，也可能是某个智能体陷入了循环委派。要区分这两种情况，成本与可观测性必须按任务树归因——每一笔消耗都要能追到它属于哪棵任务树上的哪个节点。</p>
+<p>任务树的构建从 trace ID 开始：每个根任务生成一个 trace ID，每个子任务记录 parent ID、角色、输入版本、开始/结束时间、模型、token、工具、重试和产物哈希。parent ID 让子任务挂回父节点，角色说明谁在做，输入版本保证结果能对应到具体的输入，时间戳给出时序，token 和工具记录实际消耗，重试记录无效劳动，产物哈希让结果可定位、可校验。有了这一串字段，任何一笔成本都能被归因到具体的子任务，而不是笼统地记在整个系统头上。</p>
+<p>可观测性要同时显示两个时间：关键路径时间与总工时。前者解释用户等待——用户关心的是最慢那条分支加上串行合并要多久；后者解释费用——账单关心的是所有分支的工作量之和。只看其一都会误判：总工时高而关键路径低，说明系统过度并行，很多智能体在做重复或最终被丢弃的活；关键路径低就以为系统高效，却可能账单已经翻了四倍。两个指标并排展示，才能同时看清快和省。</p>
+<p>成本还必须按工作类型拆分：研究、合并、验证、返工。只有拆开，才能发现合并者在过度总结、或工作者在重复检索。合并成本超过分支成本，往往说明输出契约不一致，合并者被迫做大量解析和冲突仲裁；返工比例高，说明验证门之前的工作没有一次做对。按类型拆分把“系统很忙”翻译成“哪一类活最多、为什么多”。</p>
+<p>预算控制同样要分层：设置分支预算和全局预算。子任务超额时，不能自行再委派——那会把预算压力转嫁给更深的节点——而要向所有者报告当前证据、缺口和继续工作的边际收益，由所有者决定是否追加。对共享缓存要记录命中与来源，避免因为缓存节省而把功劳误归因于多智能体架构：缓存提速是工程优化，不是结构优势。</p>
+<p>诊断信号对应着可能的问题：总工时高、关键路径低，指向过度并行，应当比较闲置产物和重复产物；回派深度持续增长，指向完成条件不清，应当检查每次回派是否产生了新证据；合并成本超过分支，指向输出契约不一致，应当统计解析次数与冲突类型。</p>
+<p>任务树可观测性的输入是 trace ID、父子关系、角色、版本、token、工具、重试和产物哈希，输出是关键路径时长与按研究、合并、验证、返工拆分的总成本。前者解释用户等待，后者解释费用，二者同时报告才能识别过度并行。缓存命中和外部排队需要单独归因，既不能把缓存节省算成多智能体的功劳，也不能把外部排队的延迟算成多智能体的过错。</p></div>
+<table class="dd-table"><thead><tr><th>信号</th><th>可能问题</th><th>诊断</th></tr></thead><tbody><tr><td>总工时高、关键路径低</td><td>过度并行</td><td>比较闲置/重复产物</td></tr><tr><td>回派深度持续增长</td><td>完成条件不清</td><td>检查缺口是否产生新证据</td></tr><tr><td>合并成本超过分支</td><td>输出契约不一致</td><td>统计解析与冲突类型</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把整条因果链连起来，多智能体系统的设计与运行遵循一条从问题到可验证实践的路径，每一步都为下一步提供输入，最后回到评测以检验最初的问题是否真的被解决。</p>
+<p>第一步，证明单智能体瓶颈。拆分的理由必须来自证据——上下文不足、权限需要隔离、候选需要独立产生或验证、单上下文被无关材料污染——而不是来自“人多力量大”的直觉。没有明确瓶颈，多智能体只会复制上下文和错误。</p>
+<p>第二步，画任务依赖与关键路径。把任务分解为子任务，标出哪些边必须等待、哪些分支可以并行。关键路径决定墙钟时间的下界：最慢分支加串行合并。依赖图证明并行，也暴露哪些链无法加速。</p>
+<p>第三步，选择拓扑并定义角色契约。根据依赖结构、控制集中度、并行需求和共享状态方式，选择管理者—工作者、流水线、对等或黑板拓扑，并给每个子任务写清楚范围、资料、输出 schema、预算、截止、不可做事项和机器可检查的完成条件。</p>
+<p>第四步，分配最小上下文和权限。管理者只交付完成任务所需的上下文，不倾倒整段历史；权限按角色隔离——研究者只读、执行者可写但不能自批、验证者不能修改被验证产物。权限隔离使多智能体成为真实控制而非名义分工。</p>
+<p>第五步，并行执行并写版本化状态。无依赖的分支并行运行，结果写入带版本的共享状态，用所有者、乐观锁或事件日志约束并发写入，冲突时保留候选而非最后写者覆盖。</p>
+<p>第六步，独立验证结果与证据。验证来自真正不同的信息或验证机制——不同数据源、工具、可执行测试或独立模型——而不是同源 Agent 的一致票数。验证者避免被候选答案锚定。</p>
+<p>第七步，仲裁冲突并回派具体缺口。逻辑冲突交仲裁，每次回派必须指出新缺口与验证方法，防止无限“再讨论一次”。</p>
+<p>第八步，按完成条件终止并对比基线。预算耗尽或无进展时终止，如实报告任务是不完整还是失败；最后与同预算的单智能体、多采样和确定性工作流基线比较，用关键路径、总成本、移交丢失和验证发现率等指标判断结构是否真的带来了收益。</p>
+<p>这八步构成一个闭环：从瓶颈出发，经依赖图、拓扑、契约、权限、并行、验证到终止，每一步都在回答前一步留下的问题，最终用基线对比回到起点，检验当初识别的瓶颈是否被真正缓解、以及为此付出的成本是否值得。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2308.08155" target="_blank" rel="noopener">AutoGen</a>：多智能体会话框架</li><li><a href="https://arxiv.org/abs/2303.17760" target="_blank" rel="noopener">CAMEL</a>：角色协作与社会模拟</li><li><a href="https://arxiv.org/abs/2308.00352" target="_blank" rel="noopener">MetaGPT</a>：结构化软件角色与制品</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/multi-agent">在地图中查看概念关系</a></nav>
+</article></main></body></html>

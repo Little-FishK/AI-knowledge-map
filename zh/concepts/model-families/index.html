@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>模型家族：从信息流与训练目标理解能力边界 · AI 知识地图</title>
+<meta name="description" content="不背品牌榜单，而是用架构、目标、模态与产品层四个轴，判断一个模型为什么擅长某类任务。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/model-families/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="模型家族：从信息流与训练目标理解能力边界">
+<meta property="og:description" content="不背品牌榜单，而是用架构、目标、模态与产品层四个轴，判断一个模型为什么擅长某类任务。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/model-families/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="模型家族：从信息流与训练目标理解能力边界">
+<meta name="twitter:description" content="不背品牌榜单，而是用架构、目标、模态与产品层四个轴，判断一个模型为什么擅长某类任务。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/model-families/#page","name":"模型家族：从信息流与训练目标理解能力边界","description":"不背品牌榜单，而是用架构、目标、模态与产品层四个轴，判断一个模型为什么擅长某类任务。","url":"https://ai-knowledge-map.com/zh/concepts/model-families/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"模型家族：从信息流与训练目标理解能力边界","item":"https://ai-knowledge-map.com/zh/concepts/model-families/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">模型家族：从信息流与训练目标理解能力边界</span></li></ol></nav><article id="dd-article" data-concept-id="model-families">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">模型家族：从信息流与训练目标理解能力边界</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">不背品牌榜单，而是用架构、目标、模态与产品层四个轴，判断一个模型为什么擅长某类任务。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 模型家族不是厂商名单。<b>架构决定信息怎样流动，训练目标决定模型练习预测什么，数据与后训练塑造行为，产品层再增加检索、工具、记忆与权限。</b>只有把这些层拆开，才能从任务约束出发选择模型，而不是从品牌反推能力、隐私或可靠性。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分架构、目标、模态和产品层；比较编码器、解码器、扩散与状态空间模型；用约束驱动的流程选择家族；识别品牌名和能力之间的错误推断。</div>
+<ol class="dd-chain"><li>拆解任务与失败代价</li><li>列出模态、延迟、许可等硬约束</li><li>用信息流与训练目标筛家族</li><li>在真实切片上比较候选</li><li>将生成与高风险执行隔离</li><li>记录完整版本并持续回归</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>“模型家族”至少包含四个互相独立的轴<span class="dd-badge intuition">坐标系</span></h2>
+<div class="dd-agent-response"><p>当人们说“这是一个 Transformer”时，得到的往往只是一个信息流骨架的名称，而不是对模型能力的描述。“模型家族”在这里不是品牌的集合，而是一套用于描述模型机制与交付方式的坐标系：输入是一个具体的模型版本或一项任务需求，输出是四项互相独立的说明——架构、训练目标、模态接口，以及后训练/产品层。</p>
+<p>四个轴各自回答一个不同的问题。架构轴回答“信息怎样被读取、保存与混合”，对应编码器、因果解码器、扩散模型、状态空间模型（SSM）等骨架。训练目标轴回答“模型被奖励去预测什么”，对应掩码词预测、下一个 token 预测、去噪、对比学习等目标。模态/接口轴回答“输入输出是什么结构”，对应文本、图像、音频、动作乃至多模态组合。后训练/产品轴回答“在原始模型之外又叠加了什么”，对应指令对齐、检索增强（RAG）、工具调用、记忆机制与安全策略。</p>
+<p>这四个轴互相独立，意味着任何一个轴上的标签都不能推出其余三个轴的内容。最容易出现的混淆是把“Transformer”“大语言模型”“聊天产品”当作同一层的东西。Transformer 只是信息流骨架；大语言模型除了这个骨架，还包含训练目标与数据；聊天产品又在模型之上叠加了后训练、检索、工具和权限。看到其中一个名称，不能自动推出另外两层的能力与边界。同一个 Transformer 骨架可以训练成分类编码器、文本生成器或视觉模型；同一个生成模型也可以被包装成完全不同的产品。</p>
+<p>四轴坐标的价值在于解释“为什么擅长”：当某个模型在某类任务上表现突出，可以沿着这四个轴定位原因，而不是停留在家族标签上。但它同样划定了边界：家族标签本身不保证质量、隐私或安全。要判断一个具体模型是否满足需求，仍需要查看具体版本并实际测试，仅凭“它属于某个家族”的表述远远不够。</p></div>
+<table class="dd-table"><thead><tr><th>轴</th><th>回答的问题</th><th>例子</th></tr></thead><tbody><tr><td>架构</td><td>信息怎样读取、保存与混合？</td><td>编码器、因果解码器、扩散、SSM</td></tr><tr><td>训练目标</td><td>模型被奖励去预测什么？</td><td>掩码词、下一个 token、去噪、对比学习</td></tr><tr><td>模态/接口</td><td>输入输出是什么结构？</td><td>文本、图像、音频、动作、多模态</td></tr><tr><td>后训练/产品</td><td>原始模型外又加了什么？</td><td>指令对齐、RAG、工具、记忆、安全策略</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>编码器、解码器与编码器—解码器的信息流不同<span class="dd-badge math">Transformer</span></h2>
+<div class="dd-agent-response"><p>同样使用注意力机制，编码器、解码器与编码器—解码器三种家族适合的任务却截然不同。区分它们的关键不在“有没有注意力”，而在注意力可以看见什么、训练目标奖励什么，以及由此形成的计算路径。</p>
+<p>编码器（Encoder-only）在每一层都能双向看到完整输入，即每个位置的表示可以同时吸收它前面和后面的所有 token。它的常见训练目标是掩码 token 预测：随机遮住输入中的一些词，让模型依据上下文重建它们。这种“读完整段再填空”的训练使编码器天然擅长分类、检索表示和抽取类任务——输入一段完整文本，输出对整段或局部位置的判断。因果解码器（Decoder-only）则只能看到当前位置之前的 token，后面的内容被遮蔽。它的训练目标是预测下一个 token：给定一段前缀，输出最可能接续的词。正因为每一步输出都只依赖已生成的前缀，解码器天然适合开放式生成、续写和上下文学习。编码器—解码器（Encoder–decoder）把两者组合起来：编码端双向读取完整输入，解码端按因果顺序逐步生成输出，输入侧的每个位置都能参考全文，输出侧每一步只依赖此前已生成的内容。这种信息流与条件序列生成目标吻合，天然适合翻译、摘要和结构化转换——输入与输出是两条不同的序列，输出必须尊重输入的全部含义。</p>
+<p>“天然强项”并不意味着排他能力。三种架构在原理上都可以被强迫去做其他家族的任务，区别在于训练信号与计算路径是否贴合：当一个任务的自然形式恰好与某个家族的信息流一致时，模型学起来更直接，样本效率也更高。</p>
+<p>条件生成的概率分解揭示了为什么信息流方向如此重要。给定输入 x 时输出序列 y 的概率写为</p>
+<p>P(y | x) = ∏ₜ P(yₜ | x, y&lt;ₜ)</p>
+<p>其中 x 是条件输入，例如待翻译的原文；y 是完整的输出序列；t 是当前生成位置；y&lt;ₜ 是位置 t 之前已经生成的 token。整个式子的含义是：整段输出的概率等于每一步条件概率的乘积。每一步生成 yₜ 时，模型看到的不是孤立信息，而是输入 x 加上此前生成的全部前缀 y&lt;ₜ。因此早期生成的选择会改变后续每一步的条件——一旦前一个 token 定下来，后面的概率分布就被重新约束。这也解释了为何因果生成必须顺序进行：y&lt;ₜ 只有在前面步骤完成后才存在。解码器家族的任务天然按这个链条展开；编码器家族则因为一次性给出完整输出，不需要这种逐步依赖。</p></div>
+<table class="dd-table"><thead><tr><th>家族</th><th>注意力可见范围</th><th>常见目标</th><th>天然强项</th></tr></thead><tbody><tr><td>Encoder-only</td><td>双向看完整输入</td><td>掩码 token</td><td>分类、检索表示、抽取</td></tr><tr><td>Decoder-only</td><td>只看当前位置之前</td><td>下一个 token</td><td>开放式生成、续写、上下文学习</td></tr><tr><td>Encoder–decoder</td><td>输入双向；输出因果</td><td>条件序列生成</td><td>翻译、摘要、结构化转换</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="model-families-autoregressive-decoder"><math display="block" aria-label="给定输入 x 时输出序列 y 的概率，等于每个位置 t 的 token y t 在输入 x 和先前输出 y 小于 t 条件下的概率乘积"><mrow><mi>p</mi><mo>(</mo><mi>y</mi><mo>∣</mo><mi>x</mi><mo>)</mo><mo>=</mo><munder><mo>∏</mo><mi>t</mi></munder><mi>p</mi><mo>(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>y</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>x</mi><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>扩散模型学习逐步去噪，不是从左到右续写<span class="dd-badge math">生成</span></h2>
+<div class="dd-agent-response"><p>图像生成为什么总从一团噪声开始，还要经过很多步才出图？这与扩散模型的学习方式有关：它不学“从左到右续写”，而学“把带噪样本向干净样本推回一步”。</p>
+<p>训练分两个过程。前向过程逐步向干净数据加入噪声：从真实样本出发，一次次混入随机扰动，直到样本几乎变成纯噪声。模型的训练输入是某一时间步的带噪样本、该时间步编号以及可选的文本等条件，训练输出是模型对这个噪声的预测——可以是噪声本身、速度或干净样本，取决于具体参数化方式。生成时方向反过来：从纯噪声出发，反复使用训练得到的预测逐步恢复结构，每一步去掉一部分噪声，而不是逐像素从左到右续写。</p>
+<p>核心公式给出了带噪样本的构造方式：</p>
+<p>xₜ = <math class="dd-inline-root" aria-label="根号 ᾱₜ"><msqrt><mtext>ᾱₜ</mtext></msqrt></math> · x₀ + <math class="dd-inline-root" aria-label="根号 1 − ᾱₜ"><msqrt><mtext>1 − ᾱₜ</mtext></msqrt></math> · ε</p>
+<p>其中 x₀ 是干净样本，xₜ 是时间步 t 的带噪样本，ε 是加入的随机噪声。系数 ᾱₜ 控制还保留多少原信号：t 很小、接近开始加噪时，ᾱₜ 接近 1，xₜ 主要由真实样本 x₀ 构成；t 很大时 ᾱₜ 趋近 0，<math class="dd-inline-root" aria-label="根号 1 − ᾱₜ"><msqrt><mtext>1 − ᾱₜ</mtext></msqrt></math> 趋近 1，xₜ 几乎只剩噪声。去噪网络记为 εθ，θ 是它的参数，c 是文本等条件。训练让网络学会根据 xₜ、t 和 c 预测实际加入的噪声 ε；生成阶段再按调度器从后往前逐步反推，每一步都用到当前带噪样本和网络对噪声的估计。</p>
+<p>理解“高维”才能理解扩散为何是多步的。高维意味着一个样本需要由很多个数值坐标共同描述：图像潜变量包含大量空间位置与通道，每个坐标都带有噪声。因此去噪不是改动一个数字，而是要同时协调成千上万个坐标，让它们在保持一致结构的前提下整体变干净。一步到位几乎不可能，多步迭代让结构在每一步都被小幅修正，这正是传统采样需要很多步的原因。</p>
+<p>扩散模型可以同时修正整幅潜变量，特别适合连续的高维信号，比如图像的像素或潜变量。但维度多并不自动代表信息更丰富：如果数据主要由离散规则构成，或者要求逐字精确——比如精确的文本、严格的逻辑运算，或者对实时延迟敏感的场景——连续去噪的优势未必适用，往往需要额外设计。扩散本身是一种生成机制，而不是图像专属：同样的逐步加噪—去噪框架也可以用于音频、视频、动作序列乃至离散序列。</p></div>
+<div class="dd-formula" data-formula-id="model-families-diffusion-noising"><math display="block" aria-label="时间 t 的带噪样本 x t，等于 alpha bar t 的平方根乘干净样本 x zero，加一减 alpha bar t 的平方根乘噪声 epsilon；模型根据 x t、t 和条件 c 预测 epsilon"><mtable><mtr><mtd><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></msqrt><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></mrow></msqrt><mi>ε</mi></mtd></mtr><mtr><mtd><msub><mi>ε</mi><mi>θ</mi></msub><mo>(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>,</mo><mi>t</mi><mo>,</mo><mi>c</mi><mo>)</mo><mo>≈</mo><mi>ε</mi></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>状态空间与递归家族用压缩状态换线性扫描<span class="dd-badge math">长序列</span></h2>
+<div class="dd-agent-response"><p>注意力让每个位置都能直接看到所有其他位置，代价是两两比较的数量随长度平方增长。状态空间与递归家族选择了另一条路：不做所有位置的两两比较，而是把历史压缩进一个固定大小的状态，边扫描边更新，让计算量随长度线性增长。</p>
+<p>最小信息流可以用两个公式描述：</p>
+<p>hₜ = A · hₜ₋₁ + B · xₜ yₜ = C · hₜ</p>
+<p>xₜ 是当前位置的输入；hₜ₋₁ 是此前全部历史压缩成的状态向量；矩阵 A 决定旧状态如何演化——哪些信息保留、哪些衰减；B 把当前输入写入状态；两者相加得到新状态 hₜ，它既是本步的输出依据，也会传给下一步继续更新；矩阵 C 再把状态读出为当前位置的输出 yₜ。所以整个过程只需要维护一个状态向量：每来一个新 token，用一次乘法和一次加法更新它，然后读出输出。历史没有被丢弃，而是被持续改写进同一个压缩表示里。</p>
+<p>这个公式只是最小信息流骨架。实际的 RNN 或 SSM 会在此基础上加入非线性、门控机制或输入依赖的参数——门控决定这一步哪些信息值得写入、哪些旧信息应该遗忘，输入依赖的参数让状态更新随内容变化。但骨架不变：一条串行扫描的链，状态在其中逐步更新。</p>
+<p>把复杂度算出来就更清楚。对长度为 n 的序列，注意力分数矩阵有 n² 个位置对：n = 1000 时约一百万对，n = 4000 时约一千六百万对——长度只增加四倍，两两比较的数量却增加十六倍。而递归或状态空间模型每步只更新固定大小的状态，扫描步数随 n 线性增长，长度增加四倍时步数也只增加约四倍。这就是“用压缩状态换线性扫描”的含义。</p>
+<p>但压缩状态是有代价的：把全部历史塞进固定维度，必然会丢掉部分细节。当任务需要精确的随机访问——比如随时跳回开头查找某个词——或者需要原样复制早期的长片段时，压缩状态可能力不从心，此时完整的注意力或外部记忆更合适。因此现代系统常做混合设计：用状态空间层处理长距离的粗略扫描，用注意力层或外部检索处理需要精确定位的部分，而不是在两者之间二选一。实际速度也不只由渐近复杂度决定，还取决于硬件并行度、状态维度和具体内核实现。</p></div>
+<div class="dd-formula" data-formula-id="model-families-recurrent-state"><math display="block" aria-label="时间 t 的隐藏状态 h t 等于状态转移 A 乘上一状态 h t 减一，加输入映射 B 乘当前输入 x t；输出 y t 等于读出 C 乘 h t"><mtable><mtr><mtd><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>A</mi><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>B</mi><msub><mi>x</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>C</mi><msub><mi>h</mi><mi>t</mi></msub></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>多模态模型关键在“在哪里融合”<span class="dd-badge intuition">模态</span></h2>
+<div class="dd-agent-response"><p>给模型同时喂图像和文本，是否就等于它形成了统一理解？不一定。多模态融合的本质，是把图像、音频等模态的表示与文本表示放进能够相互影响的计算路径。输入是两种或更多模态，输出可以是共享表示、文本、图像或动作；判断一个多模态模型的关键不在于“接口能不能接收文件”，而在于哪一层开始允许跨模态信息交互。</p>
+<p>常见的融合路线有三类。第一类是“冻结编码器 + 投影器”：视觉或音频编码器先把输入提取成向量，投影器再把这些向量转换成语言模型可读的 token，送进现成的文本模型。第二类是交叉注意力融合：不同模态各自编码，保留各自的专长表示，然后用交叉注意力让两个模态互相查询、互相影响。第三类是统一 token 空间：从一开始就把所有模态映射到同一个 token 空间或同一副骨架上训练。三者的取舍不同。冻结编码器加投影器的训练成本最低，能复用已经成熟的视觉和语言模型，但底层表征是在各自模态里单独学出来的，很难为了彼此共同适配。交叉注意力融合保留了每种模态的专业表示，代价是接口与训练流程更复杂。统一 token 或统一骨架让跨模态交互深入且接口统一，但需要大规模对齐数据和更强的计算投入。</p>
+<p>融合位置与数据配对质量决定了一个多模态模型的实际水平。融合位置决定哪些层能进行跨模态交互：如果只在最顶层拼接，深层表征仍各自为政；如果从底层就共享参数，两种模态的表示在学习早期就被迫相互对齐。数据配对质量决定这些表示是否真正对齐：训练对里图像与文本描述之间的对应关系越准确，学到的共享空间越可靠。</p>
+<p>对这类模型的测试也必须分开。模型能流畅地描述一张图片，只证明“图像进、文本出”的生成路径可用，并不自动证明它的 OCR 识别、空间关系判断、计数或细粒度定位都可靠。这些能力需要分别设计输入输出明确的测试逐一验证——能力边界只能逐项测量，不能从“会说图”整体推断。</p></div>
+<table class="dd-table"><thead><tr><th>方案</th><th>优点</th><th>限制</th></tr></thead><tbody><tr><td>冻结编码器 + 投影器</td><td>训练便宜、复用成熟模型</td><td>底层表征难共同适配</td></tr><tr><td>交叉注意力融合</td><td>保留模态专长</td><td>接口与训练更复杂</td></tr><tr><td>统一 token/骨架</td><td>交互深入、接口统一</td><td>数据与计算需求高</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>运行示例：为退款助手拆分任务，而非先挑品牌<span class="dd-badge eng">决策图</span></h2>
+<div class="dd-agent-response"><p>设计一个退款助手时，直觉上容易先问“该用哪个品牌的大模型”，但正确顺序是先拆任务：分类工单、读小票、生成回复、执行退款，这些子任务的信息流、风险等级和成本结构完全不同，本来就不必由同一个模型包办。</p>
+<p>决策图的起点是任务拆解，模型家族的选择发生在拆解之后。每个子任务带着自己的约束去寻找匹配的家族：约束包括输入输出形态、准确度要求、延迟预算、成本，以及失败后的影响范围。</p>
+<p>先看路由。一个小的编码器模型可以把低成本路由做好：工单进来后判断意图、决定走哪条处理分支。编码器双向阅读完整输入、输出整段判断，与分类任务的信息流天然一致，而且体积小、延迟低、便宜，适合承接所有请求的第一道闸门。</p>
+<p>再看读小票。只有带附件的请求才需要视觉模型，无附件的工单根本不用经过它。把视觉处理限定在真正需要它的子任务上，省下的不只是算力，还减少了出错面——视觉模型只在它被需要的地方被调用，其输出也只影响这一个分支。</p>
+<p>生成回复是典型的开放式文本生成，交给解码器起草解释。退款状态的真正变化——从“待处理”变成“已退款”——则不经过生成模型。退款 API 负责真实状态变化，模型只产出需要人审核或发送的文字。高风险动作交给有权限边界的工具执行，而不是让生成模型“凭语言执行”：模型可以说“已为您退款”，但它没有权限也不应该有能力真的改动账务状态；能改变状态的只有那个 API 调用，其权限、审计日志和回滚机制都与模型无关。</p>
+<p>这样组合出来的系统通常比“最大模型全包”更便宜、更可测、更可控。便宜是因为每个子任务只用恰好够用的模型；可测是因为每个环节有明确的输入输出，可以单独评测路由准确率、票据识别率和回复质量；可控是因为高风险动作被隔离在权限明确的工具层，模型出错时影响范围被限制在它负责的那一环。家族选择的因果链是：任务约束决定子任务拆分，子任务的信息流与风险决定匹配的家族，最后才是具体版本与价格。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 740 330" role="img" aria-label="退款助手按任务约束选择模型家族的决策图"><defs><marker id="mf-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#7c8798"/></marker></defs><rect x="275" y="18" width="190" height="52" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="370" y="49" text-anchor="middle" class="svg-t">退款请求</text><path d="M370,70 L370,98" stroke="#7c8798" marker-end="url(#mf-a)"/><rect x="270" y="100" width="200" height="54" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="370" y="123" text-anchor="middle" class="svg-t">先拆任务与硬约束</text><text x="370" y="142" text-anchor="middle" class="svg-t" font-size="11">准确率·模态·延迟·权限</text><path d="M270,128 L120,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M333,154 L290,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M407,154 L450,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M470,128 L620,185" stroke="#7c8798" marker-end="url(#mf-a)"/><rect x="28" y="188" width="180" height="82" rx="9" fill="#21252d" stroke="#5d9f79"/><text x="118" y="213" text-anchor="middle" class="svg-t">意图分类/检索</text><text x="118" y="236" text-anchor="middle" class="svg-t" font-size="11">编码器或嵌入模型</text><text x="118" y="255" text-anchor="middle" class="svg-t" font-size="11">快、可批量</text><rect x="220" y="188" width="145" height="82" rx="9" fill="#21252d" stroke="#8c76bf"/><text x="292" y="213" text-anchor="middle" class="svg-t">读取小票</text><text x="292" y="236" text-anchor="middle" class="svg-t" font-size="11">视觉编码/OCR</text><text x="292" y="255" text-anchor="middle" class="svg-t" font-size="11">需字段核验</text><rect x="377" y="188" width="145" height="82" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="449" y="213" text-anchor="middle" class="svg-t">生成解释</text><text x="449" y="236" text-anchor="middle" class="svg-t" font-size="11">因果解码器</text><text x="449" y="255" text-anchor="middle" class="svg-t" font-size="11">受政策上下文约束</text><rect x="534" y="188" width="180" height="82" rx="9" fill="#21252d" stroke="#c97872"/><text x="624" y="213" text-anchor="middle" class="svg-t">执行退款</text><text x="624" y="236" text-anchor="middle" class="svg-t" font-size="11">确定性工具/API</text><text x="624" y="255" text-anchor="middle" class="svg-t" font-size="11">鉴权、审批、幂等</text><path d="M118,270 L118,303 L620,303 L620,270" fill="none" stroke="#7c8798"/><text x="370" y="322" text-anchor="middle" class="svg-t">端到端日志与分阶段评测</text></svg><figcaption>图 1　模型家族选择发生在任务拆解之后；高风险动作交给有权限边界的工具，而非让生成模型“凭语言执行”。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把硬约束先过滤，再比较质量—成本前沿<span class="dd-badge eng">选择方法</span></h2>
+<div class="dd-agent-response"><p>排行榜第一的模型不一定是你的最佳选择，因为排行榜分数是在通用评测集上算出来的，而你的任务有自己的失败代价、硬约束和成本结构。正确的筛选顺序是：先定义任务，再筛硬约束，再在真实数据上比较，最后灰度验证。</p>
+<p>第一步是定义任务单位与失败代价。同一个系统里，“一次处理”可能是每封邮件、每张小票，也可能是一次完整会话；一次误判的代价可能是漏掉一张十元的票据，也可能是错误执行一笔退款。单位和代价不同，同一组指标的含义就完全不同，这一步不定义清楚，后面的比较没有意义。</p>
+<p>第二步是筛选硬约束。这些约束是“不满足就出局”的条件，不需要比较优劣：数据驻留（数据必须留在哪个区域）、许可（模型权重或 API 的授权范围）、模态（是否必须支持图像）、上下文长度、可用的硬件，以及最大延迟。先用这些条件把候选集砍小，才能避免在根本不可用的选项上浪费评测成本。</p>
+<p>第三步是在真实的数据切片上评测剩下的候选家族与规模，而且评测要包含拒答与失败回退的行为——模型说“我无法处理”并转人工，通常比硬编一个答案更好，评测集必须覆盖这种情况。</p>
+<p>第四步是画 Pareto 前沿，而不是把异质指标随意加成总分。一个教学算例可以说明这种比较方式：在票据字段抽取任务上，小编码器加 OCR 的字段 F1 为 0.94，P95 延迟 180 ms，每千件成本约 ¥2，适合标准票据；多模态生成器的 F1 为 0.96，延迟却到 1.8 s，每千件成本约 ¥28，适合复杂长尾票据；规则模板的 F1 只有 0.88，但延迟 25 ms、每千件约 ¥0.2，只覆盖固定版式。没有哪个选项在所有维度都赢：谁处在“不额外花钱就提不了质量、不牺牲质量就降不了成本”的前沿上，取决于你的延迟预算和失败代价。这些数字只是教学算例，不代表任何真实厂商的性能；真正重要的是用同一份数据、同一个成功定义去测量，否则指标之间不可比。</p>
+<p>最后一步是灰度上线，并且记录模型版本、提示词、检索库和工具版本。模型行为由这四者共同决定，任何一项变更都可能改变结果；上线后若不做记录，出现问题时就无法定位是哪一层引起的。</p></div>
+<table class="dd-table"><thead><tr><th>候选</th><th>字段 F1</th><th>P95 延迟</th><th>每千件成本</th><th>结论</th></tr></thead><tbody><tr><td>小编码器 + OCR</td><td>0.94</td><td>180 ms</td><td>¥2</td><td>适合标准票据</td></tr><tr><td>多模态生成器</td><td>0.96</td><td>1.8 s</td><td>¥28</td><td>适合复杂长尾</td></tr><tr><td>规则模板</td><td>0.88</td><td>25 ms</td><td>¥0.2</td><td>只覆盖固定版式</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>后训练改变行为，但不会抹去基础机制<span class="dd-badge intuition">后训练</span></h2>
+<div class="dd-agent-response"><p>“推理模型”“聊天模型”“工具模型”这些名字听起来像是不同的架构，但大多数情况下它们指的是同一种底层骨架经过不同后训练得到的产物。监督微调、偏好优化、强化学习和蒸馏可以显著改变模型的回答风格、指令遵循程度、推理时的计算量以及工具调用行为，然而底层可能仍属于同一个解码器家族。信息流与训练目标的骨架没变，变的是在骨架之上叠加的行为层。</p>
+<p>产品层还能在模型之外继续叠加：系统提示词、检索增强（RAG）、输出过滤器、缓存和工作流。因此从产品行为反推模型机制时要特别小心。观察到产品能引用资料，不能直接推断基础模型“记住了数据库”——它很可能只是在运行时执行了检索，把查到的内容塞进了上下文。观察到产品会调用工具，也不能推断模型拥有权限：模型只负责生成调用请求，真正的权限在执行层，由系统决定这个请求能不能执行、作用在谁身上。语言层面的“可以调用”和执行层面的“有权限调用”是两回事。</p>
+<p>这个区分直接决定排查错误的顺序。当系统出错时，先定位错误发生在哪一层：是基础生成本身就错了，还是后训练策略教偏了，还是上下文检索拿回了错误资料，还是工具参数填错了，还是执行权限配置有误。每一层对应的修复方式完全不同——基础生成问题可能要换模型或改提示，检索问题要改索引和查询，权限问题要改执行层的策略。先定位层级再选择修复手段，否则容易在错误的层上反复修补，问题却出在另一层。后训练可以改变行为，但它不会抹去基础机制：底层家族的信息流约束始终在那里，决定着模型能做什么、不能做什么的边界。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>开放权重、API 与品牌属于交付层，不是架构家族<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>“开源模型更隐私”和“闭源模型一定更强”都是不成立的判断，因为它们把交付层的几个独立问题混成了一个标签。权重许可、训练代码的开放程度、数据的开放程度、托管位置和 API 数据政策，是五个不同的问题，任何一个的答案都不能从其他几个推出。</p>
+<p>开放权重允许自托管：把模型跑在自己的服务器上，数据确实不必离开自己的机房。但如果把开放权重模型部署在第三方云上，数据仍然可能外发到云服务商；反过来，API 服务也可能提供零保留与区域选项，在合同层面承诺不保存请求、只在指定区域处理。“开源”描述的是权重能否拿到，不描述数据流向何处；“闭源”描述的是权重拿不拿到，也不描述服务商的日志策略。隐私取决于部署拓扑、合同和日志策略，而不是名称。</p>
+<p>品牌同样不是精确标识。同一个品牌下会同时存在多代模型、多个尺寸、多模态与纯文本版本、不同上下文长度的版本，它们的能力和许可都可能不同。因此从名称不能直接推出任何关键属性，必须逐项查证：隐私与数据保留要查部署拓扑、合同与日志策略；可商用性要查权重、代码和数据的许可证；工具可靠性要查函数调用评测、权限与重试行为；知识新鲜度要查知识截止时间、检索源与更新时间；真实版本要查模型 ID、日期、参数规模和服务档位。</p>
+<p>这也解释了为什么选型时“先挑品牌”是错误起点。品牌只标识交付方，不标识架构家族、训练目标或具体版本的边界。把品牌、许可、托管和版本这四个维度分开核查，才能对“这个模型在我的场景里到底意味着什么”给出可执行的答案。</p></div>
+<table class="dd-table"><thead><tr><th>不能从名称直接推出</th><th>必须查什么</th></tr></thead><tbody><tr><td>隐私与数据保留</td><td>部署拓扑、合同、日志策略</td></tr><tr><td>可商用性</td><td>权重/代码/数据许可证</td></tr><tr><td>工具可靠性</td><td>函数调用评测、权限和重试</td></tr><tr><td>知识新鲜度</td><td>知识截止、检索源与更新时间</td></tr><tr><td>真实版本</td><td>模型 ID、日期、参数和服务档</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把整条因果链连起来，从“我有一个任务”到“我有一个可验证的系统”，每一步都由上一步的结论驱动。</p>
+<p>起点是拆解任务与失败代价。一个需求先被拆成若干子任务，并明确每个子任务出错时付出什么代价：误分类一单、读错一张票据、说错一句话，代价完全不同。这一步决定后面所有取舍的权重。</p>
+<p>第二步是列出硬约束：模态、延迟、许可、上下文长度、数据驻留。这些是“不满足即出局”的条件，先过滤，避免在不可用的选项上浪费时间。</p>
+<p>第三步用信息流与训练目标筛选家族。分类与抽取偏向双向读全文的编码器，续写与对话偏向因果解码器，连续高维信号偏向扩散，长序列扫描偏向状态空间模型。家族匹配的是任务的自然形态，而不是品牌。</p>
+<p>第四步在真实数据切片上比较候选。用同一份数据、同一个成功定义评测通过硬约束筛选的候选家族与规模，画质量—成本—延迟的 Pareto 前沿，而不是把异质指标加成一个总分。</p>
+<p>第五步把生成与高风险执行隔离。模型产出文本与建议，真正改变状态的执行——退款、扣款、发送——交给有权限边界的工具层。模型的输出可以是“请求执行”，但权限永远在执行层。</p>
+<p>第六步记录完整版本并持续回归。模型版本、提示词、检索库和工具版本共同决定系统行为，任何一项变更都可能改变结果；记录它们，并在数据漂移或版本更新时持续回归评测。</p>
+<p>这条链的每一步都产生可验证的中间物：任务清单、约束表、家族候选集、切片评测结果、权限边界图、版本记录。因果链的意义在于，任何一步出错都能定位到具体环节：路由错了回看任务拆解，指标失真回看评测数据，执行越界回看权限层。模型家族从抽象坐标变成可追踪的决策过程。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a>：编码器—解码器 Transformer</li><li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">BERT</a>：双向编码器与掩码目标</li><li><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Language Models are Unsupervised Multitask Learners</a>：因果语言建模</li><li><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Denoising Diffusion Probabilistic Models</a>：扩散去噪机制</li><li><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener">Mamba</a>：选择性状态空间模型</li><li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Learning Transferable Visual Models From Natural Language Supervision</a>：视觉—语言对比学习</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/model-families">在地图中查看概念关系</a></nav>
+</article></main></body></html>

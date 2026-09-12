@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>量化：把连续参数压到有限格点 · AI 知识地图</title>
+<meta name="description" content="从 scale、zero-point 和舍入误差，到粒度、异常值、PTQ/QAT、权重/激活/KV 与硬件内核。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/quantization/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="量化：把连续参数压到有限格点">
+<meta property="og:description" content="从 scale、zero-point 和舍入误差，到粒度、异常值、PTQ/QAT、权重/激活/KV 与硬件内核。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/quantization/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="量化：把连续参数压到有限格点">
+<meta name="twitter:description" content="从 scale、zero-point 和舍入误差，到粒度、异常值、PTQ/QAT、权重/激活/KV 与硬件内核。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/quantization/#page","name":"量化：把连续参数压到有限格点","description":"从 scale、zero-point 和舍入误差，到粒度、异常值、PTQ/QAT、权重/激活/KV 与硬件内核。","url":"https://ai-knowledge-map.com/zh/concepts/quantization/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"量化：把连续参数压到有限格点","item":"https://ai-knowledge-map.com/zh/concepts/quantization/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">量化：把连续参数压到有限格点</span></li></ol></nav><article id="dd-article" data-concept-id="quantization">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">量化：把连续参数压到有限格点</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 scale、zero-point 和舍入误差，到粒度、异常值、PTQ/QAT、权重/激活/KV 与硬件内核。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 量化把浮点数映射到有限整数格点，以近似误差换取存储、带宽和计算收益。位宽只是标签；真实结果由<b>范围选择、量化粒度、异常值、校准数据、计算精度和硬件内核</b>共同决定。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>手算线性量化与误差；区分对称/非对称和量化粒度；理解 PTQ/QAT 与异常值处理；联合评测质量、显存和延迟。</div>
+<ol class="dd-chain"><li>确定量化对象与目标硬件</li><li>用代表性数据选择范围/粒度</li><li>PTQ 或 QAT 生成候选</li><li>检查误差与关键 logits 翻转</li><li>目标负载测显存/延迟/吞吐</li><li>质量风险和每成功任务成本联合门禁</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>有限位宽为什么会丢信息<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>量化要解决的问题很朴素：模型里的权重、激活和 KV 缓存都以浮点数存储，每个数动辄占 32 位甚至 16 位，而这样的数数量极多，推理时的带宽和显存都被它们占满。量化所做的，是把原本可以取大量连续小数的数值，映射到有限个离散格点上，用更短的整数编码来代替浮点数。</p>
+<p>信息丢失首先来自格点数量本身。以 INT4 为例，每个编码只用 4 bit，因此总共只有 2⁴ = 16 种编码。这 16 种编码具体对应哪 16 个整数——是 −8 到 7、−7 到 7，还是别的范围——取决于有符号约定和是否保留了特殊值，不能只看到 &quot;INT4&quot; 三个字就推断它的取值范围。但无论怎么约定，用 16 个格点去承载一个原本连续的区间，必然产生两类误差：区间内落在同一格点附近的连续值会变得彼此不可区分，这是舍入误差；区间外的值会被截断到边界格点，这是饱和误差。</p>
+<p>这里可以看清位宽与误差之间的因果链：更低的位宽减少了模型每次读取的字节数，从而省下带宽和显存；代价是格点更少、间距更粗，舍入或饱和误差随之增大。整个过程的输入是浮点形式的权重、激活或 KV 缓存，输出则包含三样东西：整数编码本身、用于还原数值的尺度元数据，以及计算时还原出的近似值——模型实际参与计算的是近似值，而不是原始浮点数。</p>
+<p>因此量化不是&quot;压缩文件后无损解压&quot;。推理全程使用近似权重或近似激活，误差会沿网络逐层传播。好在神经网络具有冗余，配合合适的尺度，许多任务能够容忍这些误差；但误差并不会均匀分布，关键决策边界上的数值仍可能被推到错误的格点上，使个别输出翻转。</p>
+<p>最后要问清量化的对象是谁，因为不同对象损失的后果完全不同：权重量化节省的是模型带宽，激活量化影响的是中间算子的数值流动，KV 量化决定的是长上下文的容量上限。三者各有各的取舍，不能笼统地用 &quot;INT4&quot; 一个词来概括。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>线性量化的 scale 与 zero-point<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>浮点值到整数的映射要回答一个具体问题：一段连续的浮点范围怎样一一对应到有限个整数格点上？线性量化给出的对应关系由两个参数完全确定：尺度 s（scale）和零点 z（zero-point）。给定整数位宽后，可用的整数被限制在 q_min 与 q_max 之间；例如 8 位有符号整数对应 −128 到 127。量化先做线性变换，再舍入，最后截断：</p>
+<p>q = clip(round(x ÷ s) + z, q_min, q_max)</p>
+<p>反量化用同一组参数把整数还原成浮点近似值：</p>
+<p>x̂ = s × (q − z)</p>
+<p>公式中每个符号都有明确职责。x 是原始浮点值；s 是相邻两个整数格点之间的浮点步长，即量化编码每变化 1，反量化结果就变化 s；round 把 x ÷ s 取到最近的整数；z 是零点，指定哪一个整数格点恰好对应浮点零，作用是把整数轴平移到与浮点分布对齐的位置；clip 把超出范围的中间结果限制在 q_min 与 q_max。最终编码是 q，反量化得到的 x̂ 通常不再与 x 完全相等，二者之差就是本步引入的量化误差。</p>
+<p>两个参数的分工可以这样理解：s 决定格点间距，也就是分辨能力；z 决定格点轴的平移位置，也就是浮点零落在哪个整数上。二者共同决定一段浮点范围被切成多少个格点、每个格点代表多大的浮点区间。因此输出误差应当解释为范围与步长共同选择的结果，而不是仅由位宽决定：位宽相同的情况下，范围选窄、步长选细，主体数据的误差就小；范围选宽、步长选粗，能覆盖更多值，但每个值的误差相应变大。</p>
+<p>按 z 是否为零，线性量化分为对称与非对称两种。</p>
+<p>对称量化取 z = 0，整数范围围绕零对称，浮点零被编码为零。优势是零点简单、乘加运算高效，反量化不需要额外的零点修正。代价是当数据分布整体偏离零时，一侧格点几乎用不上，有效范围被浪费，同等位宽下步长被迫变大。</p>
+<p>非对称量化按数据真实的 min 与 max 放置 q_min 与 q_max，z 通常不为零，可以完整覆盖偏移的分布。优势是贴合任意 min/max，范围利用率高。代价是零点修正更复杂，运算中要额外处理 z 带来的平移。</p>
+<p>范围选择上还有另一条分岔：当数据存在远离主体的极值时，是否让量化范围覆盖它们。</p>
+<p>截断极值：q_min 与 q_max 只覆盖数据主体，少数超出的异常值被 clip 压到边界上发生饱和。优势是主体格点更细、步长更小，大多数数据的误差更低。代价是异常值被强制饱和，它们携带的信息丢失。</p>
+<p>覆盖全部极值：范围从最小值一直延伸到最大值。优势是不截断，任何值都有对应编码。代价是极值撑大了范围、粗化了步长，主体数据的量化变得粗糙。</p>
+<p>这两组选择共同决定一组 s、z 参数。位宽固定时，范围越大步长越粗、主体误差越大；范围越小步长越细、落入饱和区的值越多。零点是否为零则决定内核的复杂度。查看一张量化表，本质上就是看它选了哪一组范围与步长，并据此预期误差会如何分布。</p></div>
+<table class="dd-table"><thead><tr><th>选择</th><th>优势</th><th>代价</th></tr></thead><tbody><tr><td>对称</td><td>零点简单、乘加高效</td><td>偏移分布浪费范围</td></tr><tr><td>非对称</td><td>贴合任意 min/max</td><td>零点修正更复杂</td></tr><tr><td>截断极值</td><td>主体格点更细</td><td>异常值饱和</td></tr><tr><td>覆盖全部极值</td><td>不截断</td><td>主体量化粗糙</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="quantization-linear-map" data-display="mathml"><math display="block" aria-label="整数编码 q 等于浮点值 x 除以尺度 s 后舍入，加零点 z，再截断到整数上下限；反量化值 x hat 等于 s 乘 q 减 z"><mtable><mtr><mtd><mi>q</mi><mo>=</mo><mi>clip</mi><mo>(</mo><mi>round</mi><mo>(</mo><mfrac><mi>x</mi><mi>s</mi></mfrac><mo>)</mo><mo>+</mo><mi>z</mi><mo>,</mo><msub><mi>q</mi><mtext>最小</mtext></msub><mo>,</mo><msub><mi>q</mi><mtext>最大</mtext></msub><mo>)</mo></mtd></mtr><mtr><mtd><mover><mi>x</mi><mo>^</mo></mover><mo>=</mo><mi>s</mi><mo>(</mo><mi>q</mi><mo>−</mo><mi>z</mi><mo>)</mo></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>运行示例：四个数怎样落到 INT3 格点<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>对称 INT3 量化究竟会引入多大误差，用一组具体数字走一遍最直观。假设整数格点是 3 位有符号范围 −4…3，浮点权重的最大绝对值为 1.2。要让格点覆盖到 1.2，用最大的正格点 3 去代表它，尺度就是 s = 1.2 ÷ 3 = 0.4，即相邻两个整数之间相差 0.4 的浮点值。下面把四个权重依次做量化再反量化：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">x</th><th class="dd-align-left">round(x ÷ 0.4)</th><th class="dd-align-left">q</th><th class="dd-align-left">x̂ = 0.4 × q</th><th class="dd-align-left">|误差|</th></tr></thead><tbody><tr><td class="dd-align-left">−1.10</td><td class="dd-align-left">−3</td><td class="dd-align-left">−3</td><td class="dd-align-left">−1.20</td><td class="dd-align-left">0.10</td></tr><tr><td class="dd-align-left">−0.35</td><td class="dd-align-left">−1</td><td class="dd-align-left">−1</td><td class="dd-align-left">−0.40</td><td class="dd-align-left">0.05</td></tr><tr><td class="dd-align-left">0.31</td><td class="dd-align-left">1</td><td class="dd-align-left">1</td><td class="dd-align-left">0.40</td><td class="dd-align-left">0.09</td></tr><tr><td class="dd-align-left">1.25</td><td class="dd-align-left">3</td><td class="dd-align-left">3</td><td class="dd-align-left">1.20</td><td class="dd-align-left">0.05（截断）</td></tr></tbody></table></div>
+<p>每一列的运算都对应公式中的一个步骤。以 −1.10 为例：先除以尺度，−1.10 ÷ 0.4 = −2.75；round 取最近整数得 −3，这就是量化编码 q；反量化乘回尺度，x̂ = 0.4 × (−3) = −1.20；与原始值的绝对误差为 0.10。−0.35 和 0.31 同样只是舍入产生的小误差，分别落在 0.05 与 0.09。只要值在格点覆盖范围内，误差最多是半个步长，即 0.2。</p>
+<p>1.25 是例外。1.25 ÷ 0.4 = 3.125，舍入会给出 3，而 3 已经是正方向最大的格点：x̂ = 1.20，比原始值小 0.05。这个 0.05 看似比 −1.10 的误差还小，但它来自截断——1.25 超出了范围上限 1.2，被饱和到边界，超出的部分信息丢失，无论多大都会被压到同一个格点。</p>
+<p>如果不愿截断，想让 3 恰好代表 1.25，尺度就要调成 s = 1.25 ÷ 3 ≈ 0.4167。代价是所有格点一起变粗：−1.10 反量化后变为约 −1.25，误差从 0.10 涨到 0.15；0.31 反量化后约为 0.4167，误差从 0.09 涨到约 0.11。覆盖极值换来的主体精度损失，比截断一个异常值的代价更大。</p>
+<p>这个四数示例展示了真实校准的本质：范围与尺度是在主体误差与极值截断之间的一次选择。截断极值，主体格点细、多数误差小，代价是异常值饱和；覆盖极值，异常值保住了，代价是每个格点都更粗、主体误差整体抬高。误差大小最终由这组选择决定，而不是由“用了多少位”单独决定。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="四个浮点权重映射到对称 INT3 格点并反量化"><line x1="60" y1="125" x2="650" y2="125" stroke="#6b7484" stroke-width="2"/><g fill="#6b8cbe" class="svg-t" font-size="10"><circle cx="80" cy="125" r="5"/><text x="80" y="150" text-anchor="middle">−1.6</text><circle cx="160" cy="125" r="5"/><text x="160" y="150" text-anchor="middle">−1.2</text><circle cx="240" cy="125" r="5"/><text x="240" y="150" text-anchor="middle">−0.8</text><circle cx="320" cy="125" r="5"/><text x="320" y="150" text-anchor="middle">−0.4</text><circle cx="400" cy="125" r="5"/><text x="400" y="150" text-anchor="middle">0</text><circle cx="480" cy="125" r="5"/><text x="480" y="150" text-anchor="middle">0.4</text><circle cx="560" cy="125" r="5"/><text x="560" y="150" text-anchor="middle">0.8</text><circle cx="640" cy="125" r="5"/><text x="640" y="150" text-anchor="middle">1.2</text></g><circle cx="180" cy="90" r="7" fill="#d3a05a"/><text x="180" y="75" text-anchor="middle" class="svg-t" font-size="11">x=−1.1→q=−3→−1.2</text><path d="M180,96 L160,119" stroke="#d3a05a"/><circle cx="310" cy="62" r="7" fill="#4f9d78"/><text x="310" y="47" text-anchor="middle" class="svg-t" font-size="11">x=−.35→q=−1→−.4</text><path d="M310,68 L320,119" stroke="#4f9d78"/><circle cx="462" cy="90" r="7" fill="#4f9d78"/><text x="462" y="75" text-anchor="middle" class="svg-t" font-size="11">x=.31→q=1→.4</text><path d="M462,96 L480,119" stroke="#4f9d78"/><circle cx="665" cy="62" r="7" fill="#c77b72"/><text x="595" y="47" text-anchor="middle" class="svg-t" font-size="11">x=1.25→clip q=3→1.2</text><path d="M665,68 L640,119" stroke="#c77b72"/></svg><figcaption>图 1　s=1.2/3=0.4；舍入造成小误差，超出范围的 1.25 被截断。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>x</th><th>round(x/.4)</th><th>q</th><th>x̂=.4q</th><th>|误差|</th></tr></thead><tbody><tr><td>−1.10</td><td>−3</td><td>−3</td><td>−1.20</td><td>.10</td></tr><tr><td>−.35</td><td>−1</td><td>−1</td><td>−.40</td><td>.05</td></tr><tr><td>.31</td><td>1</td><td>1</td><td>.40</td><td>.09</td></tr><tr><td>1.25</td><td>3</td><td>3</td><td>1.20</td><td>.05（截断）</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>粒度越细，误差低但元数据与内核更复杂<span class="dd-badge eng">粒度</span></h2>
+<div class="dd-agent-response"><p>一张矩阵里的数值分布往往并不均匀。少数通道可能整体偏移很大或含有离群的大值，而大多数通道的数值都挤在零附近。如果整张张量只用一个 scale，这个尺度必须覆盖最宽的通道范围，于是大多数通道只能使用稀疏格点中的一小段，量化误差被少数异常通道间接抬高。这正是整张矩阵一个 scale 常被少数异常通道支配的原因：范围由极值决定，代价却由全体承担。</p>
+<p>解决思路是把量化范围拆细，让每组数据使用适合自己的尺度。按粒度从粗到细有三种选择：per-tensor 为整张张量共用一个尺度；per-channel 为每个输出通道单独设一个尺度；group-wise 把若干连续权重分成一组，每组一个尺度。粒度越细，每组内部的范围越窄，步长可以取得越小，量化误差通常随之降低。代价同样直观：需要存储的 scale 更多，索引更复杂，计算时还需要支持这种分组布局的专用内核。</p>
+<p>元数据数量的增长可以用一张 4096 × 4096 的权重矩阵估算。它共有 4096 × 4096 = 16777216 个权重。per-tensor 量化只需要 1 个 scale；per-channel 按输出通道划分，需要 4096 个；若每 128 个连续权重一组，则需要 16777216 ÷ 128 = 131072 个 scale。粒度的选择本质上是在误差与元数据之间做交易：scale 数量可以跨越六个数量级。</p>
+<p>从流程角度看，这一步的输入是权重矩阵、分组轴和组大小，输出是各组的整数编码与尺度元数据。scale 元数据相对权重的体积通常仍然很小——即使 13 万个 scale，与 1600 多万个权重相比只占不到 1%——因此精度的主要矛盾不在存储，而在计算：反量化时每个分组都要读取自己的 scale 并按布局换算，实际速度由反量化开销与布局共同决定。</p>
+<p>细粒度量化还有一条边界需要注意：不同库对 group size、分组轴和打包格式的选择各不相同。同样标注“4-bit”的模型文件，内部可能是 per-channel，也可能是不同 group size 的 group-wise，还可能是不同的权重打包顺序，因此不能仅凭位数直接横向比较两个模型文件。</p>
+<p>最后，粒度更细、误差更低并不等于在目标硬件上跑得更快。如果推理内核不支持某种分组布局，元数据读取与反量化的额外开销可能完全抵消精度带来的收益。选择粒度时必须把硬件对布局的支持一并考虑，而不是只看误差指标。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>异常值决定范围，也可能决定能力<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>如果整层只用一个 scale，尺度必须迁就数值最大的那个激活。少数异常大的激活会把范围撑开，步长随之变粗，绝大多数正常值就只能挤在零附近的少数几个格点上，彼此无法区分。少量大激活让普通值失去分辨能力，这就是“异常值决定范围”的含义。</p>
+<p>几种主流方法针对这一问题的不同侧面，优化目标并不相同。</p>
+<p>LLM.int8 直接把离群维度单列出来：它检测的是隐藏状态里的离群特征维度，即激活矩阵中幅度异常大的列，对应权重矩阵输入侧的行，而不是 per-channel 量化所说的权重输出通道；这些维度参与的乘加保持 FP16 高精度，其余部分照常做 INT8 量化。输入是待量化层与代表性校准激活，输出是离群特征维度的高精度分解与其余部分的量化范围。</p>
+<p>SmoothQuant 的思路是把尺度搬一部分到权重上。激活里的离群尺度如果全由激活承担，激活侧步长会被撑粗；把一部分尺度迁移到权重侧，权重相应放大，两侧的量化难度趋于均衡。</p>
+<p>GPTQ 从权重误差对输出的影响入手，用近似曲率衡量不同权重带来的误差会如何传播到层输出，优先用低代价修正影响大的权重。AWQ 则用真实激活找出哪些权重更重要，对重要权重做补偿。GPTQ 关心的是权重误差的全局影响，AWQ 关心的是权重对真实输入的重要性，两者与处理离群特征维度的 LLM.int8、平衡激活与权重的 SmoothQuant 处于不同环节。</p>
+<p>这些方法共享一条前提：校准数据必须代表真实分布。盲目剪裁异常值可能伤害稀有 token、长上下文或特定语言的表现，因为所谓“异常”值可能恰恰承载重要特征——某种少见但关键的语法结构、长序列里的位置信息，都可能由那些离群激活表达。校准集因此必须覆盖真实长度、领域和难例，不能只用短篇英文百科语料。</p>
+<p>最后一条边界属于评测而非量化本身：平均误差小不代表行为安全。模型输出的是各 token 的 logits，最终行为由排序决定。少数关键 logits 的排序翻转，就足以改变工具调用的动作或拒答行为。量化评估必须盯住这类行为级退化，而不是只看平均误差。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>PTQ、QAT 与量化基座训练<span class="dd-badge eng">方法</span></h2>
+<div class="dd-agent-response"><p>量化可以在训练完成后做，也可以在训练过程中做，还可以根本不动原模型。三种路线对应不同的代价与适用场景：PTQ（训练后量化）、QAT（量化感知训练）与 QLoRA 式量化基座训练。它们的产物分别是量化后的模型、适应量化误差的新模型和可挂载的适配器，三者不是同一种东西。</p>
+<p>PTQ 在模型训练完成后进行：不再改动权重，只用一小批代表性数据估计各层的尺度，必要时做权重补偿。成本低，是权重压到 8 bit 或 4 bit 的起点。但 PTQ 不等于零数据——尺度估计仍然依赖校准数据，或依赖逐层优化来修正误差；完全没有代表性数据时，估计出的尺度不可信。</p>
+<p>QAT 把量化搬进训练：前向传播中模拟舍入与截断，反向传播用直通估计让梯度穿透量化节点，使权重在训练中逐步适应量化误差。成本高，适合低位宽或对激活误差敏感的模型。代价是它重新引入了训练数据依赖与过拟合风险，量化后的表现受训练数据影响。</p>
+<p>QLoRA 走的是另一条路：把低比特的基座模型保持冻结，只训练高精度的低秩适配器（LoRA）。微调时的显存大头来自基座，基座保持低位就能显著节省微调显存；适配器参数少、精度高，负责吸收领域知识。注意 QLoRA 训练时基座要先反量化成高精度参与前向计算，因此训练和最终部署不是同一张图：部署时是否把适配器合并进基座、合并后是否重新量化，需要另做评测，不能想当然。</p>
+<p>三者的适用条件可以这样概括：PTQ 成本低，适合作为权重 8/4 bit 的起点；QAT 成本高，用于低位宽或激活敏感的场合；QLoRA 成本居中，用于节省微调显存。实践上应先从低成本的 PTQ 基线开始，只有关键切片无法达标时，再承担 QAT 的训练成本或引入其他补偿手段。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>做法</th><th>成本</th><th>适合</th></tr></thead><tbody><tr><td>PTQ</td><td>训练后估尺度/补偿</td><td>低</td><td>权重 8/4 bit 起点</td></tr><tr><td>QAT</td><td>训练中模拟量化</td><td>高</td><td>低位宽/激活敏感</td></tr><tr><td>QLoRA</td><td>低位冻结基座+高精 LoRA</td><td>中</td><td>节省微调显存</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>省显存不保证更快<span class="dd-badge eng">硬件</span></h2>
+<div class="dd-agent-response"><p>文件变小与跑得更快之间隔着一条执行链。INT4 权重文件体积只有 FP16 的四分之一，传输与存储压力确实下降，但端到端吞吐未必提升。原因是计算时权重必须回到可用形式参与乘加：量化要在目标 GPU 或 CPU 上有匹配的打包格式、低位矩阵乘与融合内核，才能把低位乘加直接做下去。否则每步都要先反量化、做格式转换，还要额外发起 kernel launch——启动一个计算内核本身就有固定开销——这些开销与低位带来的带宽收益相抵消；小 batch 时尤其明显，因为可分摊的固定开销被摊到更少的计算上。</p>
+<p>还要区分“权重变小”和“整条内存变小”。权重下降不等于 KV 缓存、激活和框架开销下降：长上下文的 KV、中间激活与运行时开销照旧，权重省下的部分可能被淹没。</p>
+<p>吞吐与延迟的瓶颈在推理的两个阶段里并不相同。prefill 一次处理整段输入提示，计算量大，通常更偏计算受限，低位权重对它的帮助有限；decode 是逐 token 生成，每生成一个 token 都要读取一次权重，通常更偏权重读取带宽受限，权重越小收益越直接。两个阶段的瓶颈不同，优化对象也就不同。</p>
+<p>因此评估量化的输入不仅是量化产物本身，还包括目标硬件、batch、提示与输出长度；输出应覆盖首 token 延迟、每 token 延迟、吞吐、峰值显存、功耗和加载时间。只看单一数字无法判断收益。</p>
+<p>最后还有服务层面的边界。SLO 是服务承诺的延迟、可用性等目标。“能装进显存”只通过容量门，不等于延迟满足 SLO：模型可能在显存里放得下，但每 token 慢到无法交互。CPU offload 把部分状态移到主机内存，让模型能运行，但 PCIe 搬运的往返延迟仍可能让交互不可用。容量、吞吐、延迟是三个独立的门，量化只有同时通过才算达标。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>量化误差会与后续优化叠加<span class="dd-badge eng">组合</span></h2>
+<div class="dd-agent-response"><p>量化模型上线时很少是孤立的：上面往往还叠着推测解码、LoRA 合并、KV 压缩等优化。这些优化各自有测试结论，但把单项测试相加并不能得到组合后的结论，因为量化误差会与后续优化叠加、互相放大。</p>
+<p>以推测解码为例，它靠草稿模型与目标模型的输出一致性来获得加速。草稿与目标的量化方式会改变两者输出的匹配程度，进而改变接受率；接受率变了，加速比就变了，原来的加速结论随之失效。</p>
+<p>LoRA 合并是更直接的耦合。合并后权重范围发生变化，而 scale 是按合并前的权重分布估计的，旧 scale 可能不再匹配新分布，量化误差被重新放大。</p>
+<p>KV 量化则与注意力误差耦合。长上下文的注意力本来对 KV 精度敏感，KV 量化误差与长上下文的注意力误差叠加，单测 KV 压缩或单测长上下文的结论都无法直接外推到两者同时开启的场景。</p>
+<p>张量并行下还有布局问题：量化布局影响通信，切分方式与量化粒度必须一致考虑。</p>
+<p>正确做法是按真实最终产物重新量化或重新校准，并对叠加优化后的完整系统做端到端消融，而不是在各自独立的测试结果上做加法。</p>
+<p>这引出一条工程要求：量化配方必须完整保留。基座哈希、权重/激活/KV 位宽、对称性、粒度、group size、校准集、算法、计算 dtype、内核和硬件，每一项都会改变最终误差。缺了任何一项，即使两个模型都标注“同为 INT4”，结果也无法复现。</p>
+<p>最后一条边界在评估层面：不可把压缩损失用更多重试隐藏。给模型更多重试机会确实可能提高最终成功率，但这是以成本、延迟和选择偏差为代价换来的——多次采样挑好结果本身就是一种选择偏差，它掩盖了单次行为退化。评估量化损失，要看单次行为，而不是重试后的最佳结果。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要抓排序翻转和长尾退化<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>困惑度只升 0.2% 与工具调用变差可以同时成立，因为模型的最终行为不是由平均误差决定，而是由局部 logits 排序决定。生成时每一步都在比较候选 token 的概率，量化引入的小误差落在接近决策边界的 token 上，就足以让两个本应相邻的概率换位；一次翻转改一个词，落在工具名或参数上就改变动作，落在安全边界上就改变是否拒绝。平均困惑度衡量的是整体 token 预测的接近程度，它对这类少数关键翻转不敏感。</p>
+<p>因此评测不能只看一个总体分数，要按切片比较逐样本差异：通用能力、目标任务、稀有 token、语言、长上下文、结构化输出、校准、拒答和对抗切片。每一切片各自回答一个问题：这一类的行为在量化前后是否发生了变化。</p>
+<p>系统指标与质量指标同样需要精确化。TTFT 是从请求到首 token 的时间；TPOT 是生成阶段平均每个后续 token 的时间；p50、p95、p99 是延迟分位数，分别表示有 50%、95%、99% 的请求不超过该延迟。这些指标只有在输入完全一致的前提下才有对比意义：相同提示、相同采样、相同内核、相同负载。输出则应包含量化前后的质量差、延迟区间、吞吐、显存、能耗与每成功任务成本——质量差回答“变了没有”，成本类指标回答“值不值得”。</p>
+<p>平均困惑度小幅变化只表示整体 token 预测接近，不能排除少数关键动作排序翻转。要区分随机波动和系统性长尾损伤，必须保存逐样本失败，查看是哪些切片在退化：如果失败集中在稀有语言或长上下文切片，就是系统性损伤；如果散落在各处，才可能是随机波动。</p>
+<p>发布门槛因此是两条硬条件：硬风险切片不退化，且系统收益在目标硬件上成立。只有同时满足，量化配置才是可行方案。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>从“为什么要量化”到“这个量化能不能上线”，中间有一条完整的因果链，每一步都以前一步的产物为输入。</p>
+<p>第一步是确定量化对象与目标硬件。对象决定了要量化的是权重、激活还是 KV，硬件决定了哪些打包格式、低位内核可用，也决定了后面所有系统指标在什么环境里测量。</p>
+<p>第二步是用代表性数据选择范围与粒度。校准数据给出真实的数值分布，范围与粒度选择（per-tensor、per-channel 还是 group-wise、对称还是非对称）在这一步落定，主体误差与异常值截断的权衡也在这里完成。</p>
+<p>第三步是用 PTQ 或 QAT 生成候选。低成本场景从 PTQ 起步，关键切片无法达标再考虑 QAT 的训练成本。这一步的输出是一个带有完整配方的候选量化模型。</p>
+<p>第四步是检查误差与关键 logits 翻转。平均误差只能说明整体，行为取决于局部排序；要按切片查看稀有 token、语言、长上下文、结构化输出、拒答等硬风险切片是否出现排序翻转。</p>
+<p>第五步是在目标负载下测系统指标。同样的提示、采样、内核和负载，测量显存、TTFT、TPOT、延迟分位数与吞吐。省显存不保证更快，容量、延迟、吞吐是三个独立的门。</p>
+<p>第六步是联合门禁：质量风险与每成功任务成本同时达标才放行。质量风险回答“会不会做错”，每成功任务成本回答“快与省是否真的成立”。两者之一不达标，候选就应回退或放弃，而不是带着风险上线。</p>
+<p>这条链的每一环都可能在发现问题时回退到上一环：误差大就重新选范围或粒度，延迟差就换硬件或换内核，风险切片退化就回到候选生成。量化不是一个一次性的压缩动作，而是一轮围绕误差、行为与成本的门禁循环。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2208.07339" target="_blank" rel="noopener">LLM.int8()</a>：大模型异常值与混合精度</li><li><a href="https://arxiv.org/abs/2210.17323" target="_blank" rel="noopener">GPTQ</a>：二阶近似训练后权重量化</li><li><a href="https://arxiv.org/abs/2211.10438" target="_blank" rel="noopener">SmoothQuant</a>：权重—激活尺度迁移</li><li><a href="https://arxiv.org/abs/2306.00978" target="_blank" rel="noopener">AWQ</a>：激活感知权重量化</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/quantization">在地图中查看概念关系</a></nav>
+</article></main></body></html>

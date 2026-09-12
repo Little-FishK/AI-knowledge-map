@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>约束解码：用自动机把非法 token 概率置零 · AI 知识地图</title>
+<meta name="description" content="从 JSON Schema、文法状态和 tokenizer 边界，到死路、复杂度、流式输出与语义校验。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/constrained-decoding/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="约束解码：用自动机把非法 token 概率置零">
+<meta property="og:description" content="从 JSON Schema、文法状态和 tokenizer 边界，到死路、复杂度、流式输出与语义校验。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/constrained-decoding/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="约束解码：用自动机把非法 token 概率置零">
+<meta name="twitter:description" content="从 JSON Schema、文法状态和 tokenizer 边界，到死路、复杂度、流式输出与语义校验。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/constrained-decoding/#page","name":"约束解码：用自动机把非法 token 概率置零","description":"从 JSON Schema、文法状态和 tokenizer 边界，到死路、复杂度、流式输出与语义校验。","url":"https://ai-knowledge-map.com/zh/concepts/constrained-decoding/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"约束解码：用自动机把非法 token 概率置零","item":"https://ai-knowledge-map.com/zh/concepts/constrained-decoding/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">约束解码：用自动机把非法 token 概率置零</span></li></ol></nav><article id="dd-article" data-concept-id="constrained-decoding">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">约束解码：用自动机把非法 token 概率置零</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从 JSON Schema、文法状态和 tokenizer 边界，到死路、复杂度、流式输出与语义校验。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 约束解码把 schema、正则或文法编译成状态机，在每一步只允许仍能到达接受状态的 token。它可以保证<b>生成结果属于指定形式语言</b>，却不能保证字段真实、跨字段业务关系成立、用户有权执行动作。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>解释状态机与 token 掩码；手算一步受限概率；识别 tokenizer/文法死路；设计语法、语义和权限三层验证。</div>
+<ol class="dd-chain"><li>将最小 schema 编译为 tokenizer 感知状态机</li><li>逐 token 计算合法集合并掩码</li><li>在合法候选中重新归一化采样</li><li>只在接受态提交完整对象</li><li>做 schema/业务/事实/权限验证</li><li>记录死路与有限恢复并回归</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>提示要求与解码保证的区别<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>在提示词里写上“只返回 JSON”，哪怕是加粗、大写、重复三遍，模型依旧会在大量调用中出现坏格式。原因在于提示词只能改变模型的概率分布，不能删除任何候选。只要某个非法 token 序列在分布中保留着哪怕极小的概率，采样次数一多，它迟早会被抽中。假设合法输出的概率已经高达 99.9%，那么一百万次调用中，预期仍有约一千次会得到坏格式；这就是单纯靠提示无法根除格式错误的数学根源。</p>
+<p>约束解码改变了错误的消除位置：它不再试图让模型“更听话”，而是在采样器层面直接干涉。它的输入是三样东西：模型对下一个 token 给出的 logits（未归一化的对数分数）、当前已经生成的序列前缀、以及一套形式规则（通常是文法或 JSON schema）。输出是照常从分布中抽样得到的序列，但这个序列只能由每一步都合法的 token 构成。具体的做法是，每一步都把违反形式规则的候选 token 的概率置为零，然后对剩下的候选重新归一化，再从这个被裁剪过的分布里采样。非法 token 因此在机制上不可能被选到：不是“模型学会了不选”，而是这些候选已经不存在了。</p>
+<p>由此得到的保证边界非常清晰：约束解码保证的是“输出属于某个形式语言”——结果永远是合法 JSON，永远符合给定的 schema 形状。它不保证字段值真实，不保证字段之间的业务关系成立，也不保证调用者有权执行输出所描述的动作。形式正确与内容可信是两回事。</p>
+<p>这一特性决定了它的适用场景：工具调用的参数、批量信息抽取、数据库接口等位置，输出必须进入下游程序解析，形式正确是硬性前提，约束解码的价值最大。反过来，自由写作类内容如果强行套用复杂 schema，会牺牲表达的灵活性，并且每一步都要做掩码与归一会增加延迟，得到的只是一份结构合法但内容仍需人工判断的文本。</p>
+<p>一个实用的分层边界是：约束解码负责形式；业务校验负责字段之间的关系；鉴权与事务控制负责动作的后果。三层各司其职，任何一层都不能替代另外两层。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>文法怎样变成增量状态<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>生成过程在任意时刻只看到一个前缀，既不知道未来会生成什么，也不能把整个输出拿来整体检查一遍。要判断下一个 token 合不合法，就必须把规则预先编译成可以随前缀一步步推进的解析状态。</p>
+<p>编译阶段做的事情是把约束来源翻译成自动机。JSON Schema 对应确定有限自动机（DFA），上下文无关文法对应下推自动机（PDA），正则表达式同样编译为 DFA；也可以直接构造等价的解析状态。这个解析状态记录了当前位置的结构信息：现在处在对象的哪个位置、当前是在数组里还是字符串里还是数字里、哪些必填字段已经出现过、下一步允许出现什么。整个系统在运行时的行为是：每接受一个完整的 token 字节串，就用它推进一次状态；状态机随之返回新的状态，以及从该状态出发合法的一批 token。当生成结束时，只有处于接受态的前缀才能被允许正常终止。</p>
+<p>把 JSON Schema 变成这样的状态机，需要把它的每一种约束映射成文法结构：type 决定当前位置允许哪几类值；enum 变成一组允许的字面量；required 把对象字段的出现与否变成必须跟踪的状态；additionalProperties 决定未知字段是被拒绝还是被放行；数组的 minItems 和 maxItems 变成计数器上下限；嵌套引用（$ref 与 $defs）则把子 schema 递归地嵌入状态。然而并非每个实现都支持所有关键字，编译支持表是一个现实边界。远程引用、过于复杂的正则、以及格式层面无法用语法表达的语义约束（比如字符串必须恰好是某个合法的日期或邮箱），通常只能留到生成之后再做校验。</p>
+<p>不同约束来源的表达能力各有长短。正则最容易表达局部的字符串形状，但表达不了任意嵌套结构和跨字段关系。JSON Schema 善于描述对象、类型、枚举和必填字段，却表达不了“数据库里存在这条记录”或“调用者有此权限”这类事实。上下文无关文法能描述递归语法和代码结构，但无法表达变量语义与运行结果。自定义状态机能刻画协议和有限的流程，但表达不了开放世界的事实。因此，状态编译解决的是“结构上合法”的判断，凡超出形式语言能力范围的约束，都要交给生成后的业务校验。</p></div>
+<table class="dd-table"><thead><tr><th>约束来源</th><th>容易表达</th><th>通常表达不了</th></tr></thead><tbody><tr><td>正则</td><td>局部字符串形状</td><td>任意嵌套与跨字段关系</td></tr><tr><td>JSON Schema</td><td>对象、类型、枚举、必填</td><td>数据库存在性与权限</td></tr><tr><td>CFG</td><td>递归语法、代码结构</td><td>变量语义与运行结果</td></tr><tr><td>自定义状态机</td><td>协议和有限流程</td><td>开放世界事实</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>掩码后必须重新归一化<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>把非法 token 的概率置零并不是把概率“扔掉”就结束了。原模型的分布总和是 1；直接删除一批候选之后，剩余候选的概率之和会小于 1，已经不再是一个合法的概率分布。因此受限采样的标准流程是两步：先在合法集合上掩码，再在合法集合上重新归一化。输出是一个新分布：非法项的概率严格为 0，合法项的概率重新加起来恰好为 1。</p>
+<p>这一过程可以精确写成一个公式。设 P(t|s) 是解析状态 s 下模型给 token t 的原始概率，M(s) 是从状态 s 出发仍能通向完整合法结果的 token 集合，那么受限后的抽样概率为：</p>
+<p>P′(t|s) = P(t|s) × 1[t ∈ M(s)] ÷ Σ_{u∈V} P(u|s) × 1[u ∈ M(s)]</p>
+<p>其中 1[·] 是指示函数，条件成立时取 1，否则取 0；u 遍历词表中所有候选；分母是剩余合法候选的概率质量之和，作用是完成归一化。代入一个非法 token 时，指示函数取 0，分子整体为 0；代入合法 token 时，它得到的是自己原有的概率除以合法集合的总概率质量，因此合法集合的总和恰好回到 1。分母为零的退化情形后面单独讨论。</p>
+<p>值得强调的是这个变换改变的是分布形状，而不是模型的能力。约束器不知道任务答案，它只是把不合文法的选项删掉。当原模型最想输出的那几个高概率候选恰好全是非法 token 时，模型被迫在低概率的合法候选中选择，此时格式虽然保证正确，内容质量却可能明显变差。这正是“结构合法不等于内容可靠”的数学表现。</p>
+<p>采样顺序同样影响结果。正确的次序是先取得 logits，再应用语法掩码，然后在合法集上进行采样；温度、top-k、top-p 这些截断操作发生在哪一步是有语义差别的。如果先做 top-k，而截断恰好把合法 token 全部删光，剩下的分布里就一个合法候选都没有，这构成一条错误的死路。因此实现必须明确并测试自己采用的处理顺序。</p>
+<p>最后是空候选集合的情形。某一状态下 M(s) 为空，不应当被当作“再试一次”就能恢复的偶发抖动。它通常意味着 schema、tokenizer、当前前缀或裁剪顺序之间存在不兼容，系统应该返回一个可诊断的失败状态，把冲突暴露出来，而不是默默重试。</p></div>
+<div class="dd-formula" data-formula-id="constrained-decoding-renormalization"><math display="block" aria-label="状态 s 下 token t 的受限概率 P prime 等于原概率乘合法集合指示函数，再除以所有候选 u 的合法概率质量之和"><mrow><msup><mi>P</mi><mo>′</mo></msup><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>P</mi><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mn>1</mn><mo>[</mo><mi>t</mi><mo>∈</mo><mi>M</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow><mrow><munder><mo>∑</mo><mi>u</mi></munder><mi>P</mi><mo>(</mo><mi>u</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mn>1</mn><mo>[</mo><mi>u</mi><mo>∈</mo><mi>M</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow></mfrac></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：一步退款动作怎样被约束<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个具体的单步决策来看约束器如何改写分布。假设当前前缀是 {&quot;action&quot;: ，JSON 状态机已经推进到“正在生成 action 字段的枚举值”这一状态 q₃。模型对下一个 token 的原始偏好如下：delete 概率 0.50，refund 概率 0.30，ask 概率 0.15，剩余 0.05 分散在其他候选上。而 schema 规定 action 字段只允许 refund 或 ask 两个枚举值。</p>
+<p>约束器先按文法检查每个候选。delete 不在枚举里，指示函数取 0，它的 0.50 概率质量被直接置零。合法候选是 refund 与 ask，它们的原始概率合计 0.30 + 0.15 = 0.45，这个 0.45 就成为重新归一化的分母。于是 refund 的受限概率为 0.30 ÷ 0.45 = 0.667，ask 的受限概率为 0.15 ÷ 0.45 = 0.333，两者之和恰好为 1。模型原先最想要的 delete 从可采样集合中彻底消失，抽样只能落在 refund 或 ask 上。这正是约束解码改变的是可采样集合、而不是模型偏好的直观体现。</p>
+<p>同时也必须看清这个结果保证了什么、没有保证什么。约束器只证明了“动作名称属于 schema 允许的枚举”，它完全没有讨论业务上是否安全：refund 仍然需要外部系统校验退款资格、退款金额是否正确、调用者是否有权执行；ask 仍然需要确认提出的问题是否必要、是否在索取多余的隐私信息。表格里“业务上是否安全”一栏对 delete、refund、ask 全部是未讨论状态。换句话说，约束解码把 delete 挡在门外，却可能照样让模型对没有资格的调用者输出 refund。结构合法与动作安全之间的差距，必须由生成之后的业务校验和权限控制来填补。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 250" role="img" aria-label="JSON 状态机对退款动作候选 token 掩码并重新归一化"><defs><marker id="cd1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="83" width="150" height="76" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="93" y="108" text-anchor="middle" class="svg-t">状态 q₃</text><text x="93" y="130" text-anchor="middle" class="svg-t" font-size="11">前缀 {“action”:</text><text x="93" y="149" text-anchor="middle" class="svg-t" font-size="11">期待枚举字符串</text><path d="M168,121 L235,121" stroke="#6b7484" marker-end="url(#cd1)"/><rect x="237" y="38" width="175" height="166" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="324" y="62" text-anchor="middle" class="svg-t">原始候选概率</text><text x="324" y="90" text-anchor="middle" class="svg-t" font-size="11">“delete” .50 → 非法×0</text><text x="324" y="116" text-anchor="middle" class="svg-t" font-size="11">“refund” .30 → 保留</text><text x="324" y="142" text-anchor="middle" class="svg-t" font-size="11">“ask” .15 → 保留</text><text x="324" y="168" text-anchor="middle" class="svg-t" font-size="11">其他 .05 → 非法×0</text><text x="324" y="190" text-anchor="middle" class="svg-t" font-size="11">合法质量=.45</text><path d="M412,121 L479,121" stroke="#6b7484" marker-end="url(#cd1)"/><rect x="481" y="64" width="200" height="114" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="581" y="90" text-anchor="middle" class="svg-t">重新归一化</text><text x="581" y="118" text-anchor="middle" class="svg-t" font-size="11">P′(refund)=.30/.45=.667</text><text x="581" y="143" text-anchor="middle" class="svg-t" font-size="11">P′(ask)=.15/.45=.333</text><text x="581" y="165" text-anchor="middle" class="svg-t" font-size="11">delete 不可能生成</text></svg><figcaption>图 1　约束改变可采样集合，却没有证明 refund 真实合格或已授权。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>候选</th><th>原概率</th><th>文法允许</th><th>受限概率</th><th>业务上是否安全</th></tr></thead><tbody><tr><td>delete</td><td>.50</td><td>否</td><td>0</td><td>未讨论</td></tr><tr><td>refund</td><td>.30</td><td>是</td><td>.667</td><td>仍需资格、金额、权限</td></tr><tr><td>ask</td><td>.15</td><td>是</td><td>.333</td><td>仍需问题必要且不索取多余隐私</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>token 不是字符，掩码必须理解 tokenizer<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>文法规则是在字符层面书写的——引号、逗号、枚举值、Unicode 字符——但模型逐 token 采样，而 token 与字符之间没有一一对应关系。因此一个常见的错误实现是“看下一个 token 的首字符是否合法”来过滤候选。这必然出错，因为 token 的边界和字符的边界并不重合。</p>
+<p>一个 token 可能包含开引号加上一串字符，甚至一次吞掉引号、字段名和逗号等多个语法单元；Unicode 字符可能跨越多个字节；转义序列又会改变表面文本与底层字节的关系。真正可靠的判断是：取候选 token 的完整字节串，把它从当前解析状态出发走一遍，看走完之后是否落在仍可继续的状态上，并且从那里仍能最终到达接受态。判断的对象是整个 token，而不是它的首字符。</p>
+<p>这一差异在枚举约束上体现得很直接。枚举值 refund 可能恰好被切成一个 token，也可能被切成 ref 与 und 两个 token。当状态机期望生成 refund 时，ref 这样的前缀 token 虽然没有组成完整枚举，但它是某个合法枚举的前缀，必须放行；等到下一步再验证 und。反过来，一个表面以 r 开头、却无法通过任何后续组合完成合法枚举的 token，无论首字符看起来多正确，都应当被屏蔽。</p>
+<p>这套判断依赖目标模型真实的 tokenizer。词汇表不同，同样的字符串就会被切成不同的 token 序列；因此编译阶段和测试阶段都必须使用实际部署时所用的那个 tokenizer。换模型或换 tokenizer 之后，如果继续复用旧的掩码缓存，就会把针对旧词汇表算出的合法集合套在新词汇表上：结果要么封死本应合法的路径，要么放行本应被拒绝的候选。换 tokenizer 之后重新编译，不是优化，而是正确性的前提。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>复杂 schema 会制造状态与性能问题<span class="dd-badge eng">复杂度</span></h2>
+<div class="dd-agent-response"><p>约束解码的性能不是常数。schema 结构越复杂，编译出来的状态就越多，每一步计算合法 token 集合的代价也越大，解码速度会变慢，抖动也会更明显。治理复杂度需要关注的输入是 schema 结构、tokenizer 与资源上限，输出则是编译后的状态数量、逐步掩码成本以及拒绝发生时的原因。</p>
+<p>具体来说，大枚举、深递归、oneOf/anyOf 的交叉分支、复杂正则，都会同时抬高编译时间和状态空间，并加重每一步合法 token 的计算。编译产物可以缓存，但缓存键必须同时包含 schema 哈希与 tokenizer 版本——只按 schema 哈希缓存，会在换 tokenizer 后复用针对旧词汇表的产物，结果封死合法路径或放行错误候选。缓存之外还必须设上限：schema 大小、递归深度、数组长度和字符串长度都需要限制，否则一个恶意的或失控的 schema 就能耗尽编译资源。</p>
+<p>实践中出现的症状与原因有清晰的对应关系。首 token 很慢，通常是首次文法编译造成的，可以用预编译和版本缓存解决；每个 token 都慢，说明合法集合计算过于复杂，需要简化分支并缓存状态；出现空候选，往往是实现不支持某个 schema 特性或前缀与文法冲突，应做兼容性测试并返回明确失败；输出无限变长，是因为没有给数组和字符串设上限，需要用 schema 边界加上总 token 数双重限制来封顶。</p>
+<p>在这些手段之外，最有效的治理往往是把 schema 本身做小。最小 schema 只让模型生成真正需要它判断的字段，服务器侧再补上默认值和派生字段。字段少了，状态空间和每步掩码成本都随之下降，这类配置通常更稳定。</p></div>
+<table class="dd-table"><thead><tr><th>症状</th><th>可能原因</th><th>处理</th></tr></thead><tbody><tr><td>首 token 很慢</td><td>首次文法编译</td><td>预编译与版本缓存</td></tr><tr><td>每 token 慢</td><td>合法集合计算复杂</td><td>简化分支、状态缓存</td></tr><tr><td>空候选</td><td>实现不支持或前缀冲突</td><td>兼容性测试、明确失败</td></tr><tr><td>输出过长</td><td>无数组/字符串上限</td><td>schema 与总 token 双限</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>流式输出和工具调用的提交边界<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>约束解码的一个诱人之处在于：每一步生成的前缀都保证可以延伸成合法结果，看起来似乎可以边生成边使用。但如果把“当前前缀合法”当成“对象已经完整”，就会在错误的时间执行动作。字符串还在继续、数字可能尚未写完、数组随时可以追加元素，前缀合法只说明存在继续下去的路径，不说明对象已经闭合。网络中断还会让问题更糟：流断在中间，留下的是半个对象，而不是一个可解析的完整值。</p>
+<p>因此提交边界必须收紧。客户端可以在生成过程中流式展示进度，让用户看到内容逐步成形；但工具参数要等到三重条件全部满足后才原子提交：状态机到达接受态，schema 校验通过，业务校验也通过。三者缺一，都不能执行动作。</p>
+<p>流断之后还要区分取消、超时和正常结束这三种情形，分别处理，而不是一概而论。特别要禁止的做法是：自动把截断的 JSON 补齐再执行。模型不知道被截断的那半截值原本想写什么，服务器补出来的内容可能与原意不同；而对一个涉及资金的动作，猜错半个值可能造成真实损失。</p>
+<p>重试环节的边界在幂等键。调用可能在服务端已经成功、只是响应在回程丢失；如果客户端因为没收到响应而原样重发，就可能造成重复执行，例如同一笔退款被处理两次。因此重试必须复用幂等键，让服务端能识别这是同一次操作并拒绝重复执行。</p>
+<p>最后要明确约束的作用范围：它只限制模型自身的输出。schema 描述文本中的恶意内容、检索结果、工具返回值，这些来自外部的输入都不经过解码约束，仍然属于不可信输入。敏感的自由文本字段需要单独的内容检查和注入隔离，不能因为整体输出是合法 JSON 就放松对外部文本的防范。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>格式、模式、业务和权限要分别评测<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>JSON 有效率做到 100% 之后，一个自然的错觉是评测已经完成。但约束解码只保证语法层，团队真正需要的是分层指标：把生成结果依次送进解析器、schema 验证、权威事实核查、主体权限判断和工具反馈，为每一层单独记录通过率。语法有效率、schema 通过率、死路率、额外的 TTFT（首 token 延迟）与 TPOT（每 token 延迟）、业务校验通过率、事实正确率、工具成功率、越权拦截率、最终任务质量，这些数字要分别保留。只报 parse 成功率会把“格式全对、内容全错”的系统显示成完美，因为任何后续关卡的失败都不会被格式有效率补偿。</p>
+<p>分层验证的具体分工是清晰的。解析器只验证形式正确且完整结束；schema 验证字段、类型、枚举和范围；确定性规则验证金额、日期与跨字段不变量；数据库或证据层验证实体存在与事实真伪；执行层在动作真正发生前根据当前主体重新鉴权，并限制副作用。高风险动作还要额外验证幂等性和越权拦截是否真的生效。任何一层失败，都应返回结构化的失败原因，然后进行有限次重试或转交人工，而不是静默吞掉。</p>
+<p>评测用例同样要分层设计。对抗性的回归集应当覆盖 Unicode 与转义、极深嵌套、空数组、长枚举、流式断流、以及实现不支持的关键字。这些用例分别打击不同层：断流测试提交边界，不支持的关键字测试编译兼容性，长枚举和深嵌套测试状态规模与性能，空数组测试上限设定。只有把每一层都单独测量，才能知道格式满分背后其余各层到底塌了没有。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各环节按因果顺序连起来，可以得到一条从问题出发、终点可验证的实践链。</p>
+<p>起点是问题的性质：提示词只能改变概率分布，无法删除任何候选，因此格式错误在大规模调用中必然周期性出现。约束解码把干预点移到采样器层面，用形式规则裁剪候选集合，从而把“输出属于形式语言”从概率保证升级为机制保证。这是第一步的因果：错误为何发生，决定了干预必须发生的位置。</p>
+<p>第二步是规则怎样进入模型。把最小 schema 编译成 tokenizer 感知的状态机——感知 tokenizer 是因为判断单位是完整的 token 字节串而不是字符。编译产物记录解析状态，状态里保存当前位置的结构信息与下一步允许什么。这是“规则变成运行时状态”的一环。</p>
+<p>第三步是逐 token 的运行时循环：每一步计算当前状态下的合法 token 集合，把非法候选的概率置零，然后在合法候选上重新归一化并采样。归一化是正确性的关键——删掉候选后剩余质量之和小于 1，必须除以合法质量才能恢复一个总和为 1 的分布。</p>
+<p>第四步是提交边界：前缀合法不等于对象完整，只有在接受态下、且 schema 与业务校验全部通过后，才原子提交完整对象执行动作。这一步把机制保证转化为对真实动作的保护。</p>
+<p>第五步是验证层：schema、业务、事实、权限分别评测与校验，任何一层的失败都不被格式有效率补偿。第六步是闭环：记录死路率等指标，对失败做有限恢复，并用对抗性用例持续回归。</p>
+<p>整条链的每处衔接都对应一个明确的分工：编译负责正确性前提，掩码与归一化负责机制保证，接受态提交负责执行边界，分层校验负责内容与安全，回归负责长期稳定。任何一环被省掉，其余环节的保证都会失去意义。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2109.05093" target="_blank" rel="noopener">PICARD</a>：增量解析拒绝非法 token</li><li><a href="https://arxiv.org/abs/2212.06094" target="_blank" rel="noopener">LMQL</a>：约束语言模型查询与解码</li><li><a href="https://arxiv.org/abs/2501.10868" target="_blank" rel="noopener">JSONSchemaBench</a>：JSON Schema 约束覆盖、效率和质量</li><li><a href="https://github.com/dottxt-ai/outlines" target="_blank" rel="noopener">Outlines</a>：基于有限状态方法的结构化生成实践</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/constrained-decoding">在地图中查看概念关系</a></nav>
+</article></main></body></html>

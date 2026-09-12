@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号 · AI 知识地图</title>
+<meta name="description" content="从示范数据、偏好比较、奖励模型到策略优化，理解 RLHF 在优化什么，以及它为什么不能等同于“让模型绝对安全”。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/rlhf/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号">
+<meta property="og:description" content="从示范数据、偏好比较、奖励模型到策略优化，理解 RLHF 在优化什么，以及它为什么不能等同于“让模型绝对安全”。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/rlhf/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号">
+<meta name="twitter:description" content="从示范数据、偏好比较、奖励模型到策略优化，理解 RLHF 在优化什么，以及它为什么不能等同于“让模型绝对安全”。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/rlhf/#page","name":"RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号","description":"从示范数据、偏好比较、奖励模型到策略优化，理解 RLHF 在优化什么，以及它为什么不能等同于“让模型绝对安全”。","url":"https://ai-knowledge-map.com/zh/concepts/rlhf/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号","item":"https://ai-knowledge-map.com/zh/concepts/rlhf/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号</span></li></ol></nav><article id="dd-article" data-concept-id="rlhf">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">RLHF 与偏好对齐：把“人更喜欢什么”转成可训练信号</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从示范数据、偏好比较、奖励模型到策略优化，理解 RLHF 在优化什么，以及它为什么不能等同于“让模型绝对安全”。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> RLHF 的本质是把有限标注者对候选回答的相对偏好变成可优化的代理信号；经典流程由 <b>SFT、偏好比较、奖励建模与受约束策略优化</b>组成，因此奖励提高必须由独立能力与安全评测复核。</div></header>
+<!-- source-body:start --><div class="dd-goals"><strong>读完你应该能：</strong>画出经典 RLHF 流程；解释奖励模型如何从成对比较学习；读懂 KL 约束的作用；区分 RLHF、SFT 与 DPO；识别偏好数据的局限。</div>
+<div class="dd-chain">明确目标与冲突 → 设计标注准则 → 检查一致性 → 训练偏好目标 → 监控奖励/KL → 独立能力与安全评测 → 红队和上线监控</div>
+<section class="dd-sec" data-source="content-generation"><h3>1. 为什么不能只靠“标准答案”训练？</h3>
+<div class="dd-agent-response"><p>开放式任务大多没有一个唯一正确的答案。像“解释递归”“帮我起草一封退款邮件”“总结这段代码”这类请求，模型可以给出无数种说得过去的回应，很难用单一的“标准答案”去判定哪一份才是对的。但人类在面对两个候选回答时，通常能比较出哪一个更好：更准确、更有用、更真实，或者更无害。这个直觉正是 RLHF 的出发点——不是去给模型读出一个隐藏的“满分答案”，而是把“人更偏好哪个回答”这种相对判断转化为可以训练的信号。</p>
+<p>监督微调（SFT）走的是另一条路：它要求示范者亲手写出理想的回答，然后用这些示范直接训练模型。这条路有两个现实瓶颈。第一是成本高，写出高质量、覆盖全面的示范需要大量专家时间；第二是覆盖有限，示范者能想到的场景永远是有限的，遇到分布之外的新请求，模型可能没有可参照的“标准答案”。偏好学习把问题重新表述为：给定回答 A 和回答 B，哪个更符合有用、真实、无害等要求？模型不再需要知道绝对分数，只需要从海量相对比较中学习一个可以优化的方向。</p>
+<p>举一个具体例子。面对“解释递归”，回答 A 在概念上完全准确，但堆满了术语，初学者很难跟上；回答 B 同样准确，并且附了一个最小的代码示例帮助理解。标注者选择 B，这提供的是一个相对偏好——B 比 A 更适合这个场景——而不是宣布“递归的客观满分数值是多少”。RLHF 的关键就在于压缩这类比较选择，把“B 更好”这种信息变成模型可以朝哪个方向调整的梯度信号，而不是试图读出一个不存在的绝对真理。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>2. 经典 RLHF 流水线有哪些环节？</h3>
+<div class="dd-agent-response"><p>经典 RLHF 流水线的整体思路是分三步走：先教会模型基本行为，再让模型学会人的偏好，最后让策略朝高奖励的方向移动。这四步可以看成一条从“会说话”到“说得让人满意”的加工链。</p>
+<p>第一步是监督微调（SFT）。基础模型只学会了预测文本，还不一定懂得“按指令办事”。用人工示范或高质量指令数据对它做监督训练，让它学会理解一个提示并给出符合要求的回答。这一步解决的是基本行为：模型开始把输入当作任务，而不是单纯地续写文字。</p>
+<p>第二步是采样与比较。对同一个提示，让当前模型生成多个候选回答，再由人进行排序或成对选择。这一步不要求标注者写出理想答案，只要求他们判断“哪个更好”。这些相对判断就是后续要学习的偏好信号的来源。</p>
+<p>第三步是奖励建模。用上面收集到的比较数据训练一个奖励模型，它为“提示 + 回答”这一对输入输出一个相对分数。奖励模型要学到的不是绝对真理，而是“在人的比较下，这个回答通常更受欢迎”这一可计算的近似。分数的高低顺序应当尽量与人类的排序一致。</p>
+<p>第四步是策略优化。以奖励模型给出的分数为目标，常用 PPO 等强化学习方法提高模型的预期奖励；同时在优化过程中限制策略不要偏离参考模型太远，以免为了刷高分而退化出奇怪的行为。这一步把“人喜欢什么”变成了模型实际可以朝其移动的方向。</p>
+<p>需要说明的是，这四步是经典的 InstructGPT 路线，它给出的是一个通用框架，而不是唯一的标准答案。现代对齐系统不一定都使用同一种优化器，也不一定都使用同一种标注方式；有的方法省去了独立的奖励建模，有的用不同形式的偏好数据，但它们大多仍然遵循“先基本行为、再偏好、再优化”这一大致顺序。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>3. 奖励模型怎样从“二选一”学到分数？</h3>
+<div class="dd-agent-response"><p>奖励模型要学习的不是回答的绝对价值，而是两个回答之间的相对胜率。标注者给出的不是“这个回答值几分”，而是“在这两个回答里我更偏好哪一个”。因此奖励模型的目标是让“优选回答的分数高于落选回答的分数”这件事尽可能多地成立。</p>
+<p>如果标注者更喜欢回答 y_w 而不是 y_l，这种偏好可以用 Bradley–Terry 形式写成一个概率：给定提示 x，回答 y_w 胜过回答 y_l 的概率等于二者奖励差经过 sigmoid 之后的值。</p>
+<p>P(y_w ≻ y_l | x) = σ( r(x, y_w) − r(x, y_l) )</p>
+<p>这里的 σ 是 sigmoid 函数，它把任意实数压缩到 0 到 1 之间；r(x, y) 是奖励模型对“提示 + 回答”这一对给出的分数。这个式子要表达的意思很直接：两个回答的奖励差越大，优选回答胜出的概率就越接近 1；奖励差越接近 0，概率越接近 0.5，也就是几乎无法区分。反过来，如果落选回答的分数反而更高，概率就会跌到 0.5 以下，代表模型判断与人的选择相悖。</p>
+<p>训练奖励模型时，目标就是增大优选回答与落选回答之间的分差。模型看到一组“A 比 B 好”的比较后，会调整参数，让 r(x, A) − r(x, B) 变大，从而让 P(A ≻ B | x) 接近 1。这里优化的是相对顺序，而不是某一个绝对的“质量分数”。</p>
+<p>正因为如此，奖励分数只在当前数据、标注准则和候选分布中有意义。它是一把相对尺子：8 分只意味着“在这个候选集合里、按这批标注者的准则，它通常排在前面”，不能把它解释成现实世界中固定的“质量 8 分”。换一批标注者、换一套准则、或者换一个候选分布，同一个回答可能拿到完全不同的分数。</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="rlhf-formula-1"><math display="block" aria-label="给定提示 x，回答 y w 胜过回答 y l 的概率，等于二者奖励差经过 sigmoid"><mi>P</mi><mo>(</mo><msub><mi>y</mi><mi>w</mi></msub><mo>≻</mo><msub><mi>y</mi><mi>l</mi></msub><mo>|</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>σ</mi><mo>(</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>w</mi></msub><mo>)</mo><mo>−</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>l</mi></msub><mo>)</mo><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>4. 为什么策略优化需要 KL 约束？</h3>
+<div class="dd-agent-response"><p>如果策略优化的目标只是把奖励模型的分数推高，策略很快会学会钻这个代理指标的空子。奖励模型毕竟只是一个近似，它对某些漏洞式回答——重复堆砌讨好措辞、过度自信、迎合表面格式——也可能给出高分。一旦模型发现这类回答能稳定拿到高奖励，它就会沿着这条路越走越远，最终偏离那个原本会说人话的参考模型。</p>
+<p>为了抑制这种漂移，策略优化的目标函数在奖励之外加了一个约束项。要最大化的是回答奖励的期望值，减去 β 乘当前策略与参考策略之间的 KL 散度：</p>
+<p>max π_θ 𝔼[ r(x, y) ] − β · KL( π_θ(· | x) ‖ π_ref(· | x) )</p>
+<p>这个式子由两项组成。第一项 𝔼[ r(x, y) ] 鼓励模型生成高奖励的回答，是优化的直接动力。第二项 KL( π_θ ‖ π_ref ) 度量当前策略 π_θ 与参考策略 π_ref 在给定提示 x 时输出分布之间的距离，并作为惩罚从目标里扣除。系数 β 控制两者的权衡：β 越大，模型越不敢偏离参考策略，更新越保守；β 越小，奖励分数的主导权越强，模型可以更激进地追求高分。</p>
+<p>KL 约束的作用是让更新更保守，从而降低语言崩坏、模式坍缩和奖励过度优化的风险。语言崩坏指模型为了刷分开始重复怪异的措辞，模式坍缩指输出多样性被几个“高分套路”吸走，奖励过度优化则指奖励分数继续上涨但真实质量反而变差。KL 项给这些现象装了一道减速带。</p>
+<p>但 KL 约束本身不是安全证明。它只是让策略不至于一次走得太远，并不保证走得方向一定正确。一个关键易错点是：“奖励上升”只说明输出更符合奖励模型的判断，不自动说明它更真实、更安全、或更符合所有用户的期望。奖励分数和真实质量之间隔着奖励模型本身的误差，KL 只能限制漂移的幅度，不能替代独立的评测。</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="rlhf-formula-2"><math display="block" aria-label="最大化回答奖励的期望，减去 beta 乘当前策略与参考策略的 KL 散度"><munder><mo>max</mo><msub><mi>π</mi><mi>θ</mi></msub></munder><mrow><mi>𝔼</mi><mo>[</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>]</mo></mrow><mo>−</mo><mi>β</mi><mo>·</mo><mi>KL</mi><mo>(</mo><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>∥</mo><msub><mi>π</mi><mtext>ref</mtext></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>5. 人类偏好为什么也是有噪声的代理？</h3>
+<div class="dd-agent-response"><p>把人类的偏好当作训练信号，并不等于拿到了一份客观无偏的标尺。标注者只能根据眼前看到的回答和手头的准则做判断，而这份判断会受到知识背景、文化习惯、措辞方式和时间压力等多重因素影响。所谓“人更喜欢什么”本身就是一个带噪声的代理，而不是纯净的真值。</p>
+<p>噪声首先体现在系统性偏差上。标注者常常偏爱更长的回答，因为长度容易给人“更认真、更完整”的印象；偏爱更自信的回答，即使自信建立在错误之上；也偏爱格式更漂亮的回答，哪怕内容并无实质差异。这些偏好并不总是与真实质量相关，却会稳定地渗入比较数据。</p>
+<p>其次，标注者的能力边界会造成误差。面对专业事实性问题，标注者往往无法当场核验对错，于是可能把“听起来很专业”误判为“事实正确”。这类误判一旦进入训练数据，就会被奖励模型当作有效信号学走。</p>
+<p>更根本的是，不同标注者对“有帮助”和“无害”的权重并不一致。有人认为多给信息最重要，有人认为避免任何潜在伤害优先于满足请求。两个都合理的判断，可能给同一对回答打出相反的比较结果。把这种分歧强行压成单一排序，本身就丢失了信息。</p>
+<p>工程上应对这些噪声，靠的不是消灭分歧，而是把噪声显式化并加以控制：明确标注准则（rubric），让判断标准可执行；培训标注者，缩小理解差异；测量标注一致性，量化数据的可靠程度；保留分歧，不强行抹平真实的价值冲突；并在高风险领域引入专家参与判断。这样得到的偏好数据仍然有噪声，但噪声的来源、范围和影响会被尽量摊开在明处，而不是被默认当成干净的真相。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>6. DPO 与 RLHF 是什么关系？</h3>
+<div class="dd-agent-response"><p>直接偏好优化（DPO）和经典 RLHF 用的是同一类偏好数据——都是“回答 A 比回答 B 更好”这种成对比较，但 DPO 绕过了一个显式奖励模型和在线强化学习循环。经典路线要先训练出一个奖励模型，再用 PPO 等算法在强化学习循环里优化策略；DPO 则把偏好目标直接改写为策略与参考策略之间的对数概率差，从而直接提高优选回答的相对概率。中间那层独立的奖励模型被省掉了。</p>
+<p>这样做的好处是通常更易训练。强化学习循环涉及采样、奖励打分、梯度更新的反复交互，工程上复杂且对超参数敏感；DPO 退回到更像普通监督学习的离线形式，训练更稳定、实现更简单，对需要稳定、简单离线训练的场景更友好。</p>
+<p>但 DPO 并没有因此摆脱偏好对齐的共性依赖。它仍然需要偏好数据、一个参考模型和合适的超参数，也仍然可能继承数据里的偏差——标注者的偏见、候选分布的限制都不会因为少了一个奖励模型而自动消失。</p>
+<p>因此准确的表述是：DPO 是一种偏好对齐方法，而不是经典“奖励模型 + PPO”流水线的同义词。两者共享“把相对偏好变成优化方向”这一目标，但实现路径不同。一个实用的选择提示是：当目标是稳定、简单的离线训练时，可以先考虑 DPO；当需要在线探索、组合复杂奖励、或与环境有交互时，强化学习路线仍然保留其价值，因为显式奖励模型和在线采样能承载更灵活的目标结构。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>7. 如何验证对齐真的改善了产品？</h3>
+<div class="dd-agent-response"><p>对齐到底有没有改善产品，不能靠训练时的奖励分数来下结论，因为训练奖励本身就是被优化过的对象。验证必须依赖独立评测，而且在未参与训练的任务与风险集上复核——那些模型从未见过的场景才是检验泛化能力的地方。</p>
+<p>一个完整的验证链路大致是：先明确目标与冲突，知道“有帮助”和“无害”在哪些地方会互相拉扯；再设计标注准则，让评测标准可执行；接着检查标注一致性，确认数据本身可靠；然后训练偏好目标并持续监控奖励与 KL 的变化；之后用独立的能力与安全评测在留出的集合上复核；最后通过红队攻击和上线后的持续监控兜底。</p>
+<p>评测时至少需要同时观察多个维度，而不是只看单一指标：任务成功率衡量模型有没有把该做的事做成；事实性衡量回答是否真实；安全违规衡量有害输出是否被压住；拒答过度衡量安全约束有没有矫枉过正，把本应正常回答的问题也一律拒绝；群体差异衡量不同用户群体之间是否存在系统性偏差；真人盲评则提供与偏好数据同源的最终人类判断。</p>
+<p>如果一份报告只给出奖励模型分数，就无法排除两类典型失败：一是奖励黑客，即模型学会了钻奖励模型的漏洞，分数虚高但真实质量没变；二是对单一评审器过拟合，即模型专门迎合某一种自动评测器的打分习惯，换一个评审器就原形毕露。只有把奖励分数放进多维度、独立、留出的评测体系里一起看，才能判断对齐是否真的改善了产品。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>8. 哪些常见说法需要修正？</h3>
+<div class="dd-agent-response"><p>关于 RLHF 有几条流传很广的说法需要修正。</p>
+<p>第一，RLHF 不是一次完成的价值观证明，而是把一组偏好压进模型的工程方法。它做的事情是把特定标注者、特定准则、特定候选分布下的相对偏好变成可训练的代理信号，而不是从某个外部真理出发，一次性把价值观“写死”进模型。偏好数据有噪声，奖励模型有误差，优化过程有局限，这些都决定了它只能是一个迭代逼近的工程过程，而不是一劳永逸的证明。</p>
+<p>第二，RLHF 不等于“让模型永不犯错”。它优化的只是有限数据上的代理信号，代理信号与“真实、安全、对所有用户都正确”之间没有等号。奖励分数上涨可以被奖励黑客或数据偏差所污染，真实世界里的新错误照样可能出现。</p>
+<p>第三，SFT、奖励建模和策略优化各有不同的作用，不能把整个流程笼统地都叫作“奖励模型”。监督微调负责教会模型按指令作答，奖励建模负责把人类比较压成分数，策略优化负责让模型朝高奖励方向移动。三者是流水线上不同的环节，各自有各自的输入输出，混为一谈会掩盖它们各自的失效模式。</p>
+<p>第四，对齐与能力之间的关系并不固定。两者可能互相促进——更清晰的回答既更有帮助也更容易被正确评测；也可能互相冲突——过度追求安全会压制有用性，或过度追求有帮助会放松安全。因此不能用单一维度下结论，而需要分维度评测，把能力、事实性、安全性等分别衡量，再判断整体的取舍是否合理。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>9. 运行示例：三个退款回答怎样变成偏好分数与策略更新？</h3>
+<div class="dd-agent-response"><p>用一个退款场景把前面的环节串起来看。假设模型针对同一个退款请求生成了三个候选回答：A 直接保证退款，B 核验订单后说明质量例外，C 一律拒绝。标注者在这三者中选择了 B，理由是它既核验了订单、又给出了明确的质量例外说明。</p>
+<p>偏好数据先做的第一件事，是把这些候选从“三个并列的回答”变成一组成对顺序，例如 B ≻ A、B ≻ C。然后奖励模型为每个回答压出一个标量分数，把成对比较翻译成一维数值。假设奖励模型给出 r(B) = 1.2，r(A) = −0.6，r(C) = −0.1，就能算出每对比较的胜率。</p>
+<p>对 B 与 A，奖励差 Δr = 1.2 − (−0.6) = 1.8，代入 sigmoid 得 σ(1.8) ≈ 0.858，即模型预测 B 胜过 A 的概率为 85.8%。对 B 与 C，Δr = 1.2 − (−0.1) = 1.3，σ(1.3) ≈ 0.786，即模型预测 B 胜过 C 的概率为 78.6%。对 A 与 C，Δr = −0.6 − (−0.1) = −0.5，σ(−0.5) ≈ 0.378，意味着 A 胜过 C 的概率只有 37.8%，模型偏向 C，但这并不代表 C 绝对好，只是相对 A 更受偏好。</p>
+<p>这个例子暴露出标量奖励的两个性质。其一，奖励的零点没有绝对含义：给所有奖励同时加 100，分差 Δr 和所有胜率都完全不变，说明分数只有在相对比较里才有意义。其二，把真实性、帮助性、拒绝适当性等多个维度压进一个一维的 r，会丢掉维度间的结构。压缩让优化变得方便，却也会隐藏偏好冲突和少数意见。因此训练时应保留分维度评测，避免模型只学会最容易讨好标注者的表面特征。</p>
+<p>这组偏好分数接下来会驱动策略更新：B 这样高胜率的回答获得更大权重，策略朝更可能产出这类回答的方向移动，同时受到 KL 约束的限制。整个过程可以概括为：人工成对比较先给出顺序，奖励模型再把顺序压成标量，受约束的策略优化再让模型朝高分方向走。</p>
+<p>还要警惕一个失败边界：这些候选是由旧策略采样得到的，偏好模型只见过这一分布。当新策略为了刷高分开始生成分布之外的文本时，奖励模型是在外推打分，失真风险显著上升。KL 约束、在线抽查、奖励模型集成和独立终验可以共同限制这种风险，但都不能证明系统无漏洞。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 235" role="img" aria-label="退款回答经过人工成对比较、奖励模型和 KL 约束策略优化的 RLHF 流程"><defs><marker id="rh1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="43" width="138" height="116" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="87" y="67" text-anchor="middle" class="svg-t">SFT 策略采样</text><text x="38" y="91" class="svg-t" font-size="10">A：保证退款</text><text x="38" y="111" class="svg-t" font-size="10">B：核验后说明例外</text><text x="38" y="131" class="svg-t" font-size="10">C：一律拒绝</text><text x="38" y="150" class="svg-t" font-size="10">同一提示、候选可比</text><path d="M156,101 L202,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="204" y="43" width="132" height="116" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="270" y="67" text-anchor="middle" class="svg-t">人工偏好</text><text x="270" y="92" text-anchor="middle" class="svg-t" font-size="10">B ≻ A</text><text x="270" y="112" text-anchor="middle" class="svg-t" font-size="10">B ≻ C</text><text x="270" y="132" text-anchor="middle" class="svg-t" font-size="10">A vs C 有分歧</text><text x="270" y="151" text-anchor="middle" class="svg-t" font-size="10">保留标注者/理由</text><path d="M336,101 L382,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="384" y="43" width="132" height="116" rx="8" fill="#21252d" stroke="#c77b72"/><text x="450" y="67" text-anchor="middle" class="svg-t">奖励模型</text><text x="450" y="92" text-anchor="middle" class="svg-t" font-size="10">r(A)=−0.6</text><text x="450" y="112" text-anchor="middle" class="svg-t" font-size="10">r(B)=+1.2</text><text x="450" y="132" text-anchor="middle" class="svg-t" font-size="10">r(C)=−0.1</text><text x="450" y="151" text-anchor="middle" class="svg-t" font-size="10">分数只在数据内相对</text><path d="M516,101 L562,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="564" y="43" width="98" height="116" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="613" y="67" text-anchor="middle" class="svg-t">策略优化</text><text x="613" y="92" text-anchor="middle" class="svg-t" font-size="10">提高 P(B)</text><text x="613" y="112" text-anchor="middle" class="svg-t" font-size="10">KL 约束漂移</text><text x="613" y="132" text-anchor="middle" class="svg-t" font-size="10">独立评测</text><text x="613" y="151" text-anchor="middle" class="svg-t" font-size="10">检查迎合/过拒</text><path d="M613,160 C607,214 270,215 270,161" fill="none" stroke="#6b7484" marker-end="url(#rh1)"/><text x="440" y="208" text-anchor="middle" class="svg-t" font-size="10">发现偏差 → 修 rubric/采样/标注，而不是把奖励分数当真值</text></svg><figcaption>图 1　偏好数据先把候选变成成对顺序，奖励模型再压成标量；压缩方便优化，也会隐藏偏好冲突和少数意见。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>比较</th><th>奖励差 Δr</th><th>σ(Δr)</th><th>解释</th></tr></thead><tbody><tr><td>B ≻ A</td><td>1.2−(−0.6)=1.8</td><td>约 0.858</td><td>模型预测 B 胜率 85.8%</td></tr><tr><td>B ≻ C</td><td>1.2−(−0.1)=1.3</td><td>约 0.786</td><td>模型预测 B 胜率 78.6%</td></tr><tr><td>A vs C</td><td>−0.5</td><td>约 0.378</td><td>偏向 C，但不代表 C 绝对好</td></tr></tbody></table>
+</section>
+<div class="dd-src"><strong>来源与延伸阅读：</strong><ul><li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., Training language models to follow instructions with human feedback</a></li><li><a href="https://arxiv.org/abs/1706.03741" target="_blank" rel="noopener">Christiano et al., Deep Reinforcement Learning from Human Preferences</a></li><li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al., Direct Preference Optimization</a></li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/rlhf">在地图中查看概念关系</a></nav>
+</article></main></body></html>

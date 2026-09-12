@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布 · AI 知识地图</title>
+<meta name="description" content="从极小极大博弈、最优判别器和JS散度，到非饱和损失、模式坍塌、训练振荡、Wasserstein距离与评测边界。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/gan/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布">
+<meta property="og:description" content="从极小极大博弈、最优判别器和JS散度，到非饱和损失、模式坍塌、训练振荡、Wasserstein距离与评测边界。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/gan/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布">
+<meta name="twitter:description" content="从极小极大博弈、最优判别器和JS散度，到非饱和损失、模式坍塌、训练振荡、Wasserstein距离与评测边界。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/gan/#page","name":"生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布","description":"从极小极大博弈、最优判别器和JS散度，到非饱和损失、模式坍塌、训练振荡、Wasserstein距离与评测边界。","url":"https://ai-knowledge-map.com/zh/concepts/gan/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布","item":"https://ai-knowledge-map.com/zh/concepts/gan/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布</span></li></ol></nav><article id="dd-article" data-concept-id="gan">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从极小极大博弈、最优判别器和JS散度，到非饱和损失、模式坍塌、训练振荡、Wasserstein距离与评测边界。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> GAN不显式写出像素似然，而让判别器学习区分真/假，再把判别信号转为生成器梯度；它能一次前向生成锐利样本，却因两个网络共同变化而难以稳定覆盖全部模式。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>写出GAN极小极大目标；手算一次真假损失；解释最优判别器与分布匹配；识别梯度饱和和模式坍塌；用精确率/召回率而非只看锐利度验收。</div>
+<ol class="dd-chain"><li>从噪声经G产生隐式分布</li><li>让D比较真实与生成样本</li><li>更新D学习当前分布差异</li><li>把D梯度反传给G</li><li>平衡双方能力与更新节奏</li><li>监控模式坍塌和梯度异常</li><li>用改进目标/正则增强稳定性</li><li>同时评测逼真度、覆盖、记忆和失败率</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>生成器没有正确答案标签，只能从判别器获得方向<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>生成对抗网络要回答的根本问题是：随机噪声怎样学会变成真实图像？监督学习里每张图都配一个正确答案标签，损失函数逐像素比较预测与真值，差距清晰可算。生成任务没有这样的标签——并不存在一张&quot;标准答案&quot;图像告诉你某个噪声应当变成什么。于是 GAN 换了一条路：不直接规定输出该是什么，而是让另一个网络来评判输出&quot;像不像真的&quot;。</p>
+<p>两个网络各司其职。生成器 G 接收一个从简单分布采样的噪声向量 z，通过多层变换把它映射成一张样本图，记作 G(z)。判别器 D 接收一张图 x，输出一个标量 D(x)，表示它判断这张图来自真实数据的概率。D 的训练方向很明确：对真实样本给出高分，对 G 生成的假样本给出低分，也就是在提高真实分数的同时压低假样本分数。G 的训练方向则完全依赖 D：它顺着 D 的梯度调整自己的参数，让输出朝&quot;更像真实&quot;的方向移动，从而抬高 D 对假样本的打分。生成器从始至终没有见过任何正确标签，它获得的一切方向都来自判别器对它的打分与梯度。</p>
+<p>这一设计让判别器同时扮演两个角色：它既是可学习的损失函数，又是与生成器对弈的对手。作为损失，它远比固定的逐像素误差更能奖励高频的真实感——逐像素损失倾向于把尖锐细节抹平成模糊的平均值，而判别器可以捕捉纹理、边缘这类像素级误差难以刻画的结构。作为对手，它本身也在随着生成器一起更新。生成器每变强一点，判别器就必须重新学习新的判定边界，生成器面对的&quot;损失景观&quot;随之改变。这正是 GAN 优化的核心特征：目标不是静止不动的，而是一个不断移动、由对手实时塑造的动态目标。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>原始目标是两方极小极大游戏<span class="dd-badge math">目标函数</span></h2>
+<div class="dd-agent-response"><p>要精确描述上一节那种&quot;你追我赶&quot;的关系，就需要回答一个更具体的问题：D 和 G 到底在优化相反方向的什么东西？GAN 的原始公式把它写成一个两方极小极大目标，双方共享同一个价值函数，却朝相反方向优化：</p>
+<p>min_G max_D E_data log D(x) + E_z log(1 − D(G(z)))</p>
+<p>先看判别器那一侧，也就是 max_D。期望记号 E_data 表示对真实数据分布求平均，E_z 表示对噪声分布求平均。D 想把 log D(x) 推高——对真实样本，D(x) 越接近 1，这一项越大；同时把 log(1 − D(G(z))) 推高——对生成样本，D(G(z)) 越接近 0，这一项越大。合起来，D 就是在最大化正确区分真假样本的对数似然：真样本判真，假样本判假，做得越彻底，价值函数值越高。</p>
+<p>再看生成器那一侧，也就是 min_G。G 无法影响第一项，因为那里面没有 G 的参与；它只能作用于第二项。在原始的饱和形式里，G 最小化 log(1 − D(G(z)))。当 D(G(z)) 趋近 0，即判别器把假样本干净利落地判为假时，log(1 − D(G(z))) 趋近 0，这项已经没有多少下降空间；G 唯一能压低它的办法，就是让 D(G(z)) 尽可能接近 1，也就是骗过判别器。所以 G 的目标与 D 正好相反：D 要把假样本判假，G 要让假样本判真。这就是&quot;极小极大&quot;的含义——判别器先最大化价值函数，生成器再把它最小化，双方反复交替。</p>
+<p>这个饱和形式在理论上干净，实践中却有一个梯度上的麻烦。当 D 非常强、几乎完全识破假样本时，D(G(z)) 接近 0，饱和损失的梯度也随之趋近 0，G 几乎学不到东西。因此实际训练常用非饱和生成器损失 −E log D(G(z))。它与饱和形式共享同样的最优点，都是想让 D(G(z)) 逼近 1，但梯度行为完全不同：D 越强、D(G(z)) 越小时，−log D(G(z)) 的梯度越大，反而能向生成器传递更强的学习信号。换句话说，非饱和形式只是把同一目标的梯度曲线重新塑形，让训练初期那种&quot;判别器碾压生成器&quot;的局面不再冻结生成器的学习。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>数值例子：一真一假的判别器损失<span class="dd-badge math">手算</span></h2>
+<div class="dd-agent-response"><p>损失公式抽象，代入具体数字能看清每一部分在衡量什么。假设某一步里判别器对一张真实样本输出 D(x_real) = 0.9，对一张生成样本输出 D(G(z)) = 0.2。用最小化二元交叉熵的方式计算判别器损失：它要同时奖励&quot;真样本判真&quot;和&quot;假样本判假&quot;两件事，于是把两项对半平均，得到</p>
+<p>L_D = −[log 0.9 + log(1 − 0.2)] / 2 ≈ 0.164</p>
+<p>先拆开看。−log 0.9 ≈ 0.105，这一项惩罚的是判别器对真样本还不够自信——0.9 已经接近 1，所以惩罚很小。log(1 − 0.2) = log 0.8，取负后 ≈ 0.223，这一项惩罚的是判别器给假样本 0.2 的分数还不够低——0.2 离 0 仍有距离，所以贡献更大。平均下来 0.164 表示判别器大体在正确方向上前进，但离完美区分还有余量。</p>
+<p>再看生成器。非饱和生成器损失只关心&quot;假样本被当成真的程度&quot;，即 −log D(G(z)) = −log 0.2 ≈ 1.609。这个数值明显大于判别器损失，直接说明当前假样本离&quot;被判为真&quot;还很远：判别器只给了 0.2，生成器要把它拉到接近 1 才算成功，中间隔着巨大的距离，因此损失居高不下。</p>
+<p>对比这两个数也揭示了一个容易误读的点：损失绝对值本身不携带统一含义。判别器损失 0.164 与生成器损失 1.609 用的是不同的量纲和不同的方向——一个是真假两类的平均正确率成本，一个是假样本逼真度的成本。而且这些绝对值会随着所选的损失变体（饱和还是非饱和、是否除以 2、是否按批次求和还是平均）以及批次内容的不同而变化。所以单独看某个损失数值不能代表样本质量的好坏，它只有放在同一目标、同一尺度下作相对比较才有意义。真正能说明问题的是方向：判别器损失趋近 0 意味着区分几乎完美，而生成器损失居高不下则意味着假样本尚未骗过对手。</p></div>
+<div class="dd-formula" data-formula-id="gan-formula-1" data-display="mathml"><math display="block" aria-label="L_D≈0.164；L_G(non-sat)=−log0.2≈1.609"><mrow><msub><mi>L</mi><mi>D</mi></msub><mo>≈</mo><mn>0.164</mn><mtext>；</mtext><msub><mi>L</mi><mi>G</mi></msub><mo>(</mo><mi>non</mi><mo>-</mo><mi>sat</mi><mo>)=−</mo><mi>log</mi><mn>0.2</mn><mo>≈</mo><mn>1.609</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>完整示例：八个二维高斯簇暴露模式坍塌<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>一个完整的小例子能把模式坍塌从抽象概念变成看得见的现象。假设真实数据由分布在圆周上的八个二维高斯簇组成，噪声 z 取自二维高斯分布。交替训练判别器和生成器，并在每轮之后把生成的点与真实簇画在同一张图上观察。</p>
+<p>训练早期，生成器很快找到一个判别器暂时给高分的簇，于是把大量不同的 z 都映射到同一片区域，输出挤成一团。判别器随后学会识别&quot;这个簇里的点过密、分布不对&quot;，开始压低这块区域的分数；生成器被逼着迁移，又跳到另一个簇继续重复。整个过程里生成点始终集中在少数簇上，损失随之振荡，却从未稳定地覆盖全部八个簇。这就是模式坍塌的直观表现：生成器通过&quot;只挑少数几个容易骗过判别器的模式&quot;来偷懒，而不是学习完整的真实分布。</p>
+<p>关键问题是：为什么判别器可能仍暂时被骗？因为判别器看到的每个生成点单独拿出来都足够像真实簇里的点。如果只看&quot;这个点离最近的簇有多近&quot;，坍塌后的样本完全可能个个都落在真实簇内部，质量指标依然漂亮。判别器只能在统计意义上发现问题——比如某个簇的密度远高于真实比例——而发现这一点需要足够多样本和足够的训练步数，于是坍塌可以在局部欺骗维持一段时间。</p>
+<p>因此评估必须换视角。不要只看单个点到最近簇的距离，而要统计生成点覆盖了多少个簇、每个簇的占比是否接近真实比例，以及 z 的邻域是否映射到了相近的输出（即 z 空间相近的点在输出空间不应四散，否则说明映射不连续）。这些指标才能暴露&quot;每个样本都像真，但整体分布残缺&quot;的问题。</p>
+<p>针对这种坍塌，可以尝试几种手段：minibatch discrimination 让判别器同时观察一批样本内部的相关性，从而识破&quot;整批样本来自同一模式&quot;的偷懒；谱归一化约束判别器的 Lipschitz 常数，稳定其更新；换成 Wasserstein 目标，用更平滑的距离信号替代会饱和的 JS 型目标；或者调整模型容量与数据配比。比较这些改动时要用冻结的检查点和相同的采样数做对照，并且同时检查锐利度的提升是否以覆盖下降为代价——有时新方法让单样本更精细，代价却是丢掉了更多簇。这个例子最终要说明的一点是：&quot;每个样本都像真&quot;与&quot;生成分布完整&quot;是两回事，前者只保证局部逼真，后者才保证多样性。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：两个玩家的反馈回路会收敛、振荡或坍塌<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>把 GAN 训练画成一张回路图，能直接回答一个反复出现的问题：为什么判别器太强和太弱都无法教好生成器？图 1 展示了这个动态博弈的完整结构：噪声 z 进入生成器，产生假样本；假样本与真实样本一起送入判别器；判别器给出真假判断，其梯度再回传给生成器，驱动它更新。这条&quot;生成器产出 → 判别器评判 → 梯度反馈 → 生成器改进&quot;的闭合回路，就是 GAN 区别于普通监督学习的本质——损失不是固定的，而是对手实时给出的信号。</p>
+<p>图 1 同时画出了这条回路可能落入的三种状态。当双方能力和更新节奏匹配时，回路趋于平衡：生成器逐步逼近真实分布，判别器维持一个不过强也不过弱的边界，两者同步进步。当判别器过强时，回路会振荡甚至停滞：判别器几乎完美区分真假，给假样本的分数被压到接近零，生成器收到的梯度信号趋近于零，学不到方向；而一旦生成器偶然找到突破口，判别器又立刻重新适应，双方在极端的强弱间来回摆动，损失上下颠簸却无法收敛。当生成器在某一局部&quot;卡住&quot;时，回路表现为模式坍塌：生成器把大量不同的 z 都映射到少数几个高分区域，判别器暂时无法识破这种偷懒，双方就在这个残缺的平衡上僵持。</p>
+<p>这三种状态都指向同一句结论：GAN 训练是动态博弈，稳定性取决于双方的能力和更新节奏。能力失衡会让一方碾压另一方，更新节奏失衡则会让梯度信号与参数更新错位。理解了这条回路，后面关于损失选择、归一化和更新比的讨论，本质上都是在为这条回路寻找一个能维持平衡的运行条件。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 340" role="img" aria-label="噪声经生成器产生假样本，与真实样本共同进入判别器，判别梯度反馈生成器，展示平衡、过强和模式坍塌"><defs><marker id="gan32" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="22" y="115" width="95" height="72" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="69" y="156" text-anchor="middle" class="svg-t">噪声 z</text><path d="M117 151H157" stroke="#7f8b9d" marker-end="url(#gan32)"/><rect x="162" y="95" width="118" height="112" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="221" y="128" text-anchor="middle" class="svg-t">生成器 G</text><text x="221" y="157" text-anchor="middle" class="svg-t">假样本</text><path d="M280 151H330" stroke="#7f8b9d" marker-end="url(#gan32)"/><rect x="335" y="95" width="130" height="112" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="400" y="128" text-anchor="middle" class="svg-t">判别器 D</text><text x="400" y="157" text-anchor="middle" class="svg-t" font-size="11">真分布 vs G分布</text><rect x="335" y="28" width="130" height="45" rx="8" fill="#21252d" stroke="#72b293"/><text x="400" y="56" text-anchor="middle" class="svg-t">真实样本 x</text><path d="M400 73V95" stroke="#7f8b9d" marker-end="url(#gan32)"/><path d="M400 207V270H221V207" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#gan32)"/><text x="310" y="294" text-anchor="middle" class="svg-t">D梯度更新G</text><rect x="520" y="75" width="210" height="160" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="625" y="107" text-anchor="middle" class="svg-t">动态平衡</text><text x="625" y="137" text-anchor="middle" class="svg-t" font-size="11">D太强：梯度饱和/过拟合</text><text x="625" y="164" text-anchor="middle" class="svg-t" font-size="11">D太弱：信号无意义</text><text x="625" y="191" text-anchor="middle" class="svg-t" font-size="11">G找捷径：模式坍塌</text><text x="625" y="218" text-anchor="middle" class="svg-t">轮流追逐而非固定损失</text></svg><figcaption>图 1　GAN训练是动态博弈，稳定性取决于双方能力和更新节奏。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>最优判别器连接分布比值和JS散度<span class="dd-badge eng">理论</span></h2>
+<div class="dd-agent-response"><p>如果暂时把生成器固定住，只让判别器无限优化，理想的判别器最终会输出什么？这个问题的答案揭示了 GAN 目标函数背后真正在度量的东西。对每个输入点 x，最优判别器收敛到</p>
+<p>D*(x) = p_data(x) / (p_data(x) + p_g(x))</p>
+<p>其中 p_data(x) 是真实数据在 x 处的密度，p_g(x) 是生成分布在该处的密度。这个比值有直观含义：在 x 这个点上，真实数据密度占总密度的比例是多少，判别器就输出多少。如果某点只来自真实数据（p_g = 0），D* 给出 1；只来自生成器（p_data = 0），D* 给出 0；两者密度相等时 D* = 1/2，判别器承认自己无法区分。</p>
+<p>把这个最优判别器代回原始目标函数，生成器那一侧就化成了一个与两个分布之间 JS 散度（Jensen–Shannon 散度）相关的量。也就是说，在判别器达到最优的理想假设下，生成器的最小化目标等价于缩小 p_data 与 p_g 之间的 JS 散度，当且仅当 p_g = p_data 时达到全局最小，此时逐点都有 D* = 1/2。这正是理论上的漂亮闭环：极小极大博弈的解就是生成分布与真实分布完全重合。</p>
+<p>但这个结论依赖三个在真实训练中不成立的前提：判别器容量无限、数据无限、双方能彻底轮流收敛到各自的最优。实际训练里 D 是有限网络，数据是有限样本，而且 D 和 G 交替更新、谁也没有真正收敛。更严重的麻烦出现在分布支撑几乎不重叠的时候——当真实分布和生成分布各自占据几乎不相交的区域时，JS 散度会趋近一个常数，其梯度随之饱和甚至消失，生成器得不到有用的方向信号。这恰好解释了为什么后续会有更换目标函数和改用其他分布距离（如 Wasserstein 距离）的动机：不是理论错了，而是 JS 型目标在&quot;支撑不重叠&quot;这一常见初期情形下，无法提供足够强的梯度来推动优化。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>非饱和损失修梯度，不修模式覆盖<span class="dd-badge eng">优化</span></h2>
+<div class="dd-agent-response"><p>为什么实践中几乎都用 −log D(G(z)) 而不是原始公式？问题出在饱和损失的梯度曲线上。原始生成器目标是最小化 log(1 − D(G(z)))，当判别器自信地把假样本判假、D(G(z)) 接近 0 时，这一项本身已经接近 0，它的梯度落在 sigmoid 的平坦区域，几乎不再随参数变化。训练刚开始时判别器往往已经能轻松识破生成器，于是生成器收到的梯度几乎为零，学习在起步阶段就冻结住了。</p>
+<p>非饱和目标把生成器的优化方向反过来：从最小化 log(1 − D(G(z))) 改成最大化 log D(G(z))，等价于最小化 −log D(G(z))。它在理想的均衡点上与饱和形式完全一致——两者都要求 p_g = p_data，判别器被迫输出 1/2——所以最优解没有变。变的是通往那个解的路径：当 D(G(z)) 接近 0 时，−log D(G(z)) 的梯度反而很大，能在训练早期向生成器提供强信号，把它从&quot;完全被识破&quot;的状态里拽出来。这正是非饱和损失更常用的原因：它修的是梯度消失，而不是改目标。</p>
+<p>但也必须划清它的边界。非饱和损失只解决了&quot;早期梯度太弱&quot;这一个问题，它不修模式覆盖。模式坍塌的根源更深：分布匹配本身在优化 JS 型目标时可能停在局部解，博弈的动态过程允许生成器靠少数模式偷懒，有限批次让判别器难以察觉整体覆盖缺失——这些原因都不是换个生成器损失项就能消除的。所以非饱和损失是训练 GAN 的默认起点，但若样本开始坍塌、多样性下降，必须转向 minibatch discrimination、谱归一化或 Wasserstein 目标等手段，而不是指望继续调整这一项。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>模式坍塌是多样性失败，不一定在单样本质量上暴露<span class="dd-badge eng">失败模式</span></h2>
+<div class="dd-agent-response"><p>生成器输出 1000 张清晰逼真的人脸，为什么可能只对应少数几个身份模板？答案在于模式坍塌是一种多样性失败，而非质量失败。生成器可以把大量不同的噪声 z 都映射到判别器当前最偏爱的少数几个模式上：这些模式是它最容易骗过对手的区域，于是它反复生成&quot;高分的几种脸&quot;，每一张单独看都清晰、真实、无瑕疵，但放在一起就露出了重复——不同的输入坍缩到了同一批输出。</p>
+<p>完全坍塌容易被发现：所有输出几乎一模一样，一眼就能看出问题。真正危险的是部分坍塌，它表现为稀有属性、特定姿态或某些特征组合的缺失。比如生成器能画出各年龄段的人脸，却几乎从不生成某个罕见角度，或某种肤色与发型的组合；单看任何一张都不觉得有问题，只有统计整体时才会发现某些区域被系统性忽略了。这种缺失无法从一张样本网格上看出结论——网格里每一张都像真的。</p>
+<p>因此检测模式坍塌必须用能反映&quot;整体分布&quot;的手段，而不是抽查单样本。可以计算生成样本与真实样本的最近邻距离，看是否大量生成样本挤在少数真实样本附近；可以在潜空间里做插值，观察相邻 z 是否平滑地映射到相邻输出，还是突然跳跃；可以统计类别或属性的覆盖率，确认稀有类没有消失；可以用 precision–recall 分解，把&quot;生成的样本是否都像真的&quot;（precision）与&quot;真实样本是否都被覆盖到&quot;（recall）分开度量；还可以借助生日悖论式的重复检测——在多样性不足时，重复样本出现的概率会远超直觉。只有这类面向分布的检验，才能区分&quot;每张都像真&quot;和&quot;分布完整&quot;这两件完全不同的事。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Wasserstein目标用critic估计更连续的分布距离<span class="dd-badge eng">改进</span></h2>
+<div class="dd-agent-response"><p>WGAN 换掉了整个目标的度量对象：不再让判别器输出真假概率，而是用一个实值 critic 去近似 Wasserstein-1 距离的对偶形式。Wasserstein 距离度量的是&quot;把一个分布搬运成另一个分布所需的最小代价&quot;，它的关键优势在于连续性——即使两个分布的支撑几乎不重叠，Wasserstein 距离仍会随两个分布之间的几何距离平滑变化，从而持续提供有意义的梯度信号。这正是前面 JS 散度暴露的短板：支撑不重叠时 JS 散度趋近常数、梯度消失，而 Wasserstein 距离不会。</p>
+<p>为了让这个对偶形式成立，critic 必须满足 1-Lipschitz 约束，即它的输出随输入变化的斜率被限制在一定范围内，否则对偶公式不再等价于真正的 Wasserstein 距离，critic 可以通过任意放大输出差值来作弊。早期实现用权重裁剪强行把每个参数夹在固定区间里，做法简单但过于粗糙——它会扭曲 critic 的能力边界，容易导致梯度爆炸或退化。后来的梯度惩罚（在损失里加入对 critic 梯度范数偏离 1 的惩罚项）和谱归一化（把网络每层的谱范数规范化）成为更常见的替代，能更平滑地维持 Lipschitz 约束。</p>
+<p>用 critic 之后，损失值变得更可解释：它近似一个真实的分布距离，数值下降往往意味着两个分布真的在靠近，而不是仅仅骗过了某个概率输出。但 WGAN 不保证消除模式坍塌——连续的距离信号只是让优化更容易进行，分布匹配、博弈动态和有限批次带来的坍塌风险依然存在。而且 Lipschitz 约束的强度与 critic 的更新次数都需要实际验证：约束太紧会限制 critic 的表达能力，更新太少则 critic 追不上生成器，两者都会让对偶近似失效。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>训练稳定性依赖更新比、归一化、数据和增强<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>当判别器准确率接近 100% 时，是不是应该继续把它训得更强？通常不应该。判别器准确率逼近 100%，往往意味着它已经过拟合了有限的数据——它不再输出关于&quot;真假分布差异&quot;的泛化信号，而是记住了训练样本本身。此时它给生成器的梯度不再指向&quot;如何更接近真实分布&quot;，而是指向&quot;如何复现它背下来的那批样本&quot;，这对生成器几乎是无用的甚至有害的。反过来，判别器太弱也不行：它分辨不出差异，给生成器的方向含糊，两个网络会一起在低水平上徘徊。</p>
+<p>所以训练稳定性首先落在&quot;更新比&quot;上：调节判别器与生成器的学习率，以及每轮各自更新几次。判别器通常需要更多更新来维持一个恰当的判定边界，但也不能多到过拟合。与此同时，谱归一化可以约束判别器的 Lipschitz 常数，防止其输出对输入过于敏感而放大噪声；正则化抑制过拟合；数据增强扩充有效样本量；批次统计（如批归一化的均值和方差）影响梯度在批次间的稳定性。这些手段的目标都是让 D 与 G 的能力和更新节奏大致匹配，也就是让上一章讲的反馈回路维持在平衡区。</p>
+<p>监控训练时，要观察几个信号而非只看单一损失：梯度范数是否爆掉或消失，生成器输出分布是否合理，样本覆盖是否充分。还要注意两个常见的误判。训练损失振荡并非必然意味着失败——两个对手交替领先本来就会让损失上下波动；反过来，损失平滑下降也并非成功的保证，因为模式坍塌可以在损失看起来稳定的同时悄然发生。真正可靠的依据是定期保存检查点，并用与训练解耦的外部评测（如后面讲的覆盖、记忆和稳定性指标）来判定每份检查点的实际质量，而不是盯着训练曲线下结论。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>GAN一次前向采样快，但缺少显式似然和反演<span class="dd-badge eng">边界</span></h2>
+<div class="dd-agent-response"><p>GAN 的生成器是从 z 到 x 的直接映射：给定一个噪声向量，一次前向传播就得到一张完整样本，不需要逐步迭代。这让它特别适合低延迟的锐利生成——在需要快速出图的场景里，这个速度优势非常突出。</p>
+<p>但成也直接映射，败也直接映射。给定一张真实图，怎样找到对应的 z 并做编辑？生成器通常没有闭式逆映射，也就是不存在一个现成的函数把 x 反解成 z。要完成反演，只能在潜空间里优化一个 z，使 G(z) 尽量接近目标图，或者额外训练一个编码器来近似逆映射。无论哪种方式，反演都会引入误差，而这些误差会改变原图的身份和细节——编辑结果可能不再忠实于原图，人物的特征、物体的纹理都会在往返过程中漂移。</p>
+<p>同样受限的还有似然。GAN 学习的是隐式分布——它能采样，却不能给出任意样本点的精确概率密度。这意味着计算 p(x) 困难，而异常检测、覆盖率证明这类依赖显式似然的任务也因此更难直接套用。你无法像在自回归或流模型里那样直接读出&quot;这张图出现的概率是多少&quot;。</p>
+<p>这些限制反过来定义了 GAN 的适用边界。它适合以速度和锐利度为优先的生成任务；而在需要精确覆盖、显式控制、可逆编码或严格似然计算的任务上，扩散模型、流模型和自回归模型各自提供了不同的取舍——它们往往牺牲单步生成的速度，换取更稳定的训练、更完整的分布覆盖或更强的可控性。选择哪种生成框架，本质上是在速度、似然、覆盖与可逆性之间做权衡。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>评测必须同时看质量、覆盖、记忆和训练稳定<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>一个常见的误判是：FID 更低，是不是就能排除训练样本被复制的可能？不能。FID 的做法是把真实样本和生成样本分别通过一个预训练特征网络，比较两组特征的一阶均值与二阶协方差。它擅长捕捉整体分布漂移，却可能漏掉稀疏的模式——某个稀有类别即使完全消失，对整体均值和协方差的贡献也可能小到被忽略——也容易受小样本估计偏差影响。而且 FID 完全不回答记忆问题：生成器可以把训练样本逐张背下来输出，FID 依然很低。</p>
+<p>因此评测必须至少同时看四个维度：质量、覆盖、记忆和训练稳定。质量与覆盖可以用 precision–recall 分解来分别度量——precision 衡量生成的样本是否都逼真（是否像真的），recall 衡量真实样本是否都被覆盖到（是否完整）。条件生成任务还要加上类别准确率和人工评判，确认条件确实被满足。记忆则要用训练集最近邻检索、成员推断和重复率来检查：统计生成样本与训练样本的最邻近距离，看是否出现了逐张复制的迹象，检测异常高的重复率。</p>
+<p>训练稳定是第四个维度，它要求在报告结果时固定样本数、特征网络和预处理方式，否则 FID 这类指标不可比。更重要的是报告多个随机种子的结果以及失败训练的比例——只展示成功的 run 会系统性地高估稳定性，因为同一个配置在不同种子下可能大部分都坍塌或发散，而被挑出来的那张&quot;最好看的图&quot;掩盖了这一切。只有把失败率连同均值、方差一起报告，评测结论才可信。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面所有环节串成一条因果链，可以看到 GAN 从&quot;一个想法&quot;一步步落到&quot;可验证的实践&quot;，每个环节的产出都是下一个环节的输入。</p>
+<p>起点是噪声 z，经过生成器 G 得到一个隐式分布——它没有显式的概率公式，只能靠采样来体现。接下来判别器 D 登场，把真实样本与生成样本放在一起比较，学习当前两个分布之间的差异。这个差异随即通过梯度反传给生成器，生成器据此更新，让假样本更像真样本。至此形成闭环，但闭环并不自动稳定：必须平衡双方的能力与更新节奏，否则一方碾压另一方，梯度要么消失要么爆炸。因此训练过程中要持续监控两个信号——模式坍塌和梯度异常——它们是这条链上最先能察觉到的故障点。</p>
+<p>当故障出现，改进手段沿着因果链向前回溯：更换目标函数（如 Wasserstein 距离）、施加谱归一化或正则化，都是在增强这条反馈回路的稳定性。但&quot;训练看起来稳了&quot;还不够，最终必须把评测拉回四个维度同时验证：逼真度、覆盖、记忆和失败率，缺一不可。</p>
+<p>这条从原理到实践的链条，也对应着一套可验证的验证层。要验证一个改动是否真的有效，首先固定输入：使用同一批样本、同样的前处理与权限边界，记录输入哈希、切片标签和拒绝原因，保证比较的起点一致。其次锁定机制：仅改变一个核心变量，其余配置全部锁死，然后观察关键中间状态以及首次偏离预期的位置——这才能把效果归因到那个变量。再次统一输出：采用同一套验收规则与资源预算，度量质量、成本、延迟和失败率的分层差异。最后保留反证：必须有一个不启用目标机制的对照组，确认收益能否跨样本、跨随机种子稳定复现，而不是单次 lucky run 的假象。</p>
+<p>把&quot;生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布&quot;这一整条链看下来，每一个主张都能落到一个可观察的证据上：分布差异看梯度与损失，稳定性看失败率与振荡，多样性看覆盖与重复率，真实性看 precision 与人工评判，记忆看训练集最近邻。因果链的每一环，最终都由某个可度量的输出闭合。</p></div>
+<table class="dd-table"><thead><tr><th>验证层</th><th>在“生成对抗网络 GAN：让生成器在动态判别对手中学习数据分布”中固定什么</th><th>观察什么证据</th></tr></thead><tbody>
+      <tr><td>输入</td><td>同一批样本、前处理与权限边界</td><td>输入哈希、切片标签和拒绝原因</td></tr>
+      <tr><td>机制</td><td>仅改变一个核心变量，其余配置锁定</td><td>关键中间状态及首次偏离预期的位置</td></tr>
+      <tr><td>输出</td><td>同一验收规则与资源预算</td><td>质量、成本、延迟和失败率的分层差异</td></tr>
+      <tr><td>反证</td><td>保留不启用目标机制的对照组</td><td>收益是否跨样本与随机种子稳定复现</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://papers.neurips.cc/paper/5423-generative-adversarial-nets" target="_blank" rel="noopener">Generative Adversarial Nets</a>：原始GAN博弈与理论</li><li><a href="https://arxiv.org/abs/1701.07875" target="_blank" rel="noopener">Wasserstein GAN</a>：Wasserstein距离与critic</li><li><a href="https://arxiv.org/abs/1704.00028" target="_blank" rel="noopener">Improved Training of Wasserstein GANs</a>：梯度惩罚</li><li><a href="https://arxiv.org/abs/1712.04086" target="_blank" rel="noopener">PacGAN</a>：模式坍塌分析与多样性</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/gan">在地图中查看概念关系</a></nav>
+</article></main></body></html>

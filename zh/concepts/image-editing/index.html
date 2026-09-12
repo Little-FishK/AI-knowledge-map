@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>生成式图像编辑：改变目标属性，同时证明其余内容被保留 · AI 知识地图</title>
+<meta name="description" content="从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/image-editing/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="生成式图像编辑：改变目标属性，同时证明其余内容被保留">
+<meta property="og:description" content="从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/image-editing/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="生成式图像编辑：改变目标属性，同时证明其余内容被保留">
+<meta name="twitter:description" content="从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/image-editing/#page","name":"生成式图像编辑：改变目标属性，同时证明其余内容被保留","description":"从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。","url":"https://ai-knowledge-map.com/zh/concepts/image-editing/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"生成式图像编辑：改变目标属性，同时证明其余内容被保留","item":"https://ai-knowledge-map.com/zh/concepts/image-editing/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">生成式图像编辑：改变目标属性，同时证明其余内容被保留</span></li></ol></nav><article id="dd-article" data-concept-id="image-editing">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">生成式图像编辑：改变目标属性，同时证明其余内容被保留</h1><aside class="dd-publication-notice" data-review-status="needs-revision" role="note"><strong>持续修订中</strong><span>本页部分内容有待修订，建议结合参考资料阅读。</span></aside>
+<p class="dd-sub">从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 图像编辑不是重新生成一张“差不多”的图，而是满足双重目标：指定区域/属性发生正确变化，未指定身份、几何、文字和背景尽量不变。编辑强度越高，成功率与保留度越冲突。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分重绘、img2img、提示编辑和指令编辑；计算遮罩外变化与编辑成功；解释扩散反演和噪声强度；诊断属性纠缠与身份漂移；建立局部性、真实性和来源评测。</div>
+<ol class="dd-chain"><li>将请求拆成目标变化与保护项</li><li>选择遮罩重绘、img2img或指令方法</li><li>验证VAE与反演的无编辑重建上限</li><li>用强度和条件执行编辑</li><li>处理遮挡、阴影和边界联动</li><li>分别通过目标门与保留门</li><li>用差异热图和人类复核验收</li><li>保存原图、遮罩、参数和完整来源历史</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>编辑目标包含“改变什么”和“保护什么”两份契约<span class="dd-badge intuition">问题定义</span></h2>
+<div class="dd-agent-response"><p>生成式图像编辑与传统的局部修饰有本质区别：它不是在像素上打补丁，而是让一个生成模型在“新的条件”下重新采样。理解这一点的钥匙，是先把一次编辑请求拆成两份契约——一份说明要改变什么，一份说明要保护什么。</p>
+<p>“把外套改成红色”表面上只是替换一个物体的颜色，但生成模型并不会只重画外套那一块。模型学到的是整张图像的概率分布，其中“红色外套”与光照方向、材质反光、人物肤色、场景色调在训练数据里都高度相关。当它接到“红色外套”这个新条件，它倾向于重新采样一套与红色外套相协调的整体配置：光线可能被调暖、肤色可能被微调、背景中可能多出或消失一些元素，甚至人物的姿势也会随之变化。这不是模型“出错”，而是它没有理由逐像素保留其他区域——除非有人明确告诉它哪些区域必须原样不动。</p>
+<p>因此，一个完整的编辑目标不能只写“把外套变红”。它应当同时列出五项内容：</p>
+<ol><li><strong>目标区域</strong>：哪一块是允许被改动的，例如“人物身上的外套”；</li><li><strong>目标属性</strong>：要把这块区域变成什么，例如“颜色变为红色”；</li><li><strong>必须保留项</strong>：哪些区域或属性绝不允许变化，例如“人脸五官、姿势、背景中的书架”；</li><li><strong>允许联动项</strong>：哪些变化虽非目标，但可接受甚至符合物理规律，例如“外套的阴影和褶皱随颜色一起调整”；</li><li><strong>不可接受变化</strong>：哪些变化一旦出现就判定失败，例如“人脸变形”“背景出现新物体”。</li></ol>
+<p>这五项合在一起，才构成一个可评估、可执行的编辑契约。缺失“必须保留项”，模型就没有任何约束去守住其他区域；缺失“不可接受变化”，就无法判断一次编辑是否真的成功。</p>
+<p>这条边界也划出了两类本质不同的任务。<strong>全局风格转换</strong>（例如把照片变成油画、把白天变成黄昏）本来就要改变整张图的分布，它对“保留”的要求是弱的、语义性的。而<strong>局部事实编辑</strong>（例如删掉桌上一个杯子、只改一个人的外套颜色）则要求：被指定的局部发生精确变化，而其余内容必须逐像素或至少逐语义地保持不变。把二者混为一谈，是很多编辑失败和评测失真的根源——对风格转换来说，全局联动是能力；对事实编辑来说，同样的联动就是破坏。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>四类编辑方法提供不同的保留约束<span class="dd-badge eng">方法地图</span></h2>
+<div class="dd-agent-response"><p>上一节把编辑请求拆成了“改变什么”和“保护什么”两份契约。要让模型同时满足这两份契约，必须通过某种机制把“保留”显式地约束起来。常见的四类编辑方法，本质上是四种不同强度的保留约束。</p>
+<p><strong>Inpainting（遮罩重绘）</strong> 提供最强的空间约束。它要求用户给出一个二值遮罩，指明哪块区域允许生成、哪块区域必须锁定。模型只在遮罩内部生成新内容，遮罩外部要么完全不动，要么在边界处做混合过渡。它的输入是“原图 + 遮罩 + 文本条件”，输出是“遮罩内被替换、遮罩外基本不变”的新图。因为区域是显式给出的，局部性最容易验证。代价是它把压力全转移到遮罩和边界上：如果遮罩边界正好切过一根桌腿、一个被遮挡物体或一条阴影，模型必须推断出边界两侧该怎样衔接，一旦边界画得不好，接缝、遮挡关系和阴影就会在交界处断裂。所以“什么时候该用遮罩重绘”的答案是：当你能明确圈出目标区域、且该区域与保留区域的交界在几何上清晰时，遮罩是最可靠的；当你只能描述“把外套变红”却无法精确圈出外套轮廓时，遮罩就难以画出，反而暴露出边界不一致的问题。</p>
+<p><strong>img2img（图生图）</strong> 用噪声强度代替了遮罩，作为“保留多少”的连续旋钮。它先把原图加噪到某个强度，再从带噪版本按新条件去噪。加噪越浅，去噪后离原图越近；加噪越深，模型重画的自由度越大，整张图也就越容易发生全局漂移。它的约束是“全局性的、以噪声强度为单位”的，而不是“区域性的”。因此 img2img 适合整体风格或氛围的调整，不适合要求“只改一个物体”的局部事实编辑——因为噪声没有告诉模型哪里能动、哪里不能动。</p>
+<p><strong>Prompt-to-Prompt</strong> 不依赖遮罩或噪声强度，而是直接操纵生成过程中的跨注意力对应关系。它比较原提示词和新提示词，通过在注意力层上交换、替换或加权某些词对应的空间特征，实现“只换掉与某几个词相关的区域”。它的保留约束来自词与空间特征的对应，因此可以做到相当精细的局部改动，也不需要用户画遮罩。边界在于它依赖原提示和新提示之间能够建立清晰的词级对齐；两个提示结构差异太大时，对应关系就建立不起来，编辑也随之失效。</p>
+<p><strong>指令编辑</strong> 走的是端到端学习路线：模型直接学习“图像 + 自然语言指令 → 目标图像”的映射，用户只需说一句话。它把显式约束降到最低，体验最自然，但也把不确定性放到最大——指令本身有歧义（“改一下这张照片”到底改哪里），训练数据又有偏差（模型对某些指令的理解来自训练时的统计习惯而非本次意图）。它的保留能力完全取决于模型是否“猜对”了哪部分不该动。</p>
+<p>这四类方法构成一条谱系：从遮罩（显式几何约束）、img2img（全局强度约束）、Prompt-to-Prompt（词-空间对应约束），到指令编辑（隐式语义约束）。一个可操作的规律是：<strong>越能显式提供区域和几何信息，局部性就越容易验证</strong>；反过来，约束越隐式，模型保留得对不对就越难判断，评测也就越依赖“非目标区域是否被守住”这个指标。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>约束</th><th>边界</th></tr></thead><tbody><tr><td>Inpainting</td><td>遮罩内生成、外部锁定/混合</td><td>边界和遮挡需一致</td></tr><tr><td>img2img</td><td>从加噪原图去噪</td><td>强度高时全局漂移</td></tr><tr><td>Prompt-to-Prompt</td><td>操纵跨注意力对应</td><td>依赖原/新提示对齐</td></tr><tr><td>指令编辑</td><td>学习图像+自然语言→目标</td><td>指令歧义和训练偏差</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>img2img强度决定保留多少原图信息<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>img2img 之所以能成为“保留多少原图信息”的旋钮，关键在于它对原图施加的前向加噪过程。扩散模型的前向过程可以写作：</p>
+<p>z_t = <math class="dd-inline-root" aria-label="根号 ᾱ_t"><msqrt><mtext>ᾱ_t</mtext></msqrt></math> · z₀ + <math class="dd-inline-root" aria-label="根号 1 − ᾱ_t"><msqrt><mtext>1 − ᾱ_t</mtext></msqrt></math> · ε</p>
+<p>其中 z₀ 是原图的潜变量表示，ε 是标准高斯噪声，ᾱ_t 是随时间 t 递减的调度系数，z_t 是加噪到时刻 t 之后的潜变量。这个公式的含义是：z_t 是“原图信号”和“纯噪声”的加权混合，两个权重分别是 <math class="dd-inline-root" aria-label="根号 ᾱ_t"><msqrt><mtext>ᾱ_t</mtext></msqrt></math> 和 <math class="dd-inline-root" aria-label="根号 1 − ᾱ_t"><msqrt><mtext>1 − ᾱ_t</mtext></msqrt></math>。ᾱ_t 越接近 1，原图信号的权重越大，噪声越少；ᾱ_t 越接近 0，噪声越占主导。</p>
+<p>用两个具体数值可以看清这条因果链。当 ᾱ_t = 0.81 时，原图信号系数为 <math class="dd-inline-root" aria-label="根号 0.81"><msqrt><mtext>0.81</mtext></msqrt></math> = 0.9，噪声系数为 <math class="dd-inline-root" aria-label="根号 1 − 0.81"><msqrt><mtext>1 − 0.81</mtext></msqrt></math> = <math class="dd-inline-root" aria-label="根号 0.19"><msqrt><mtext>0.19</mtext></msqrt></math> ≈ 0.436。这时潜变量里 0.9 是原图、0.436 是噪声，原图结构清晰可辨，模型只需去除较少的噪声，重建出的图像必然紧贴原图，编辑自由度很小。当 ᾱ_t = 0.16 时，原图信号系数降为 <math class="dd-inline-root" aria-label="根号 0.16"><msqrt><mtext>0.16</mtext></msqrt></math> = 0.4，噪声系数升为 <math class="dd-inline-root" aria-label="根号 1 − 0.16"><msqrt><mtext>1 − 0.16</mtext></msqrt></math> = <math class="dd-inline-root" aria-label="根号 0.84"><msqrt><mtext>0.84</mtext></msqrt></math> ≈ 0.916。这时潜变量里噪声远超原图信号，模型几乎要从一团噪声里重新“想象”整张图，自由度大增，但原图里的身份特征和空间布局也更容易丢失。</p>
+<p>于是“强度”这个 UI 旋钮就对应到这条从 (0.9, 0.436) 到 (0.4, 0.916) 的信号/噪声谱线上。把潜变量加到更深的噪声（对应更高的 t，比如从 t = 0.25 推到 t = 0.8），原图信号系数一路下降，噪声系数一路上升，模型获得更大的重新生成空间，代价是身份与布局保真度的下降。回答开头的问题：加噪到 t = 0.25 时自由度很小，只适合微调色彩、光照这类浅层属性；加噪到 t = 0.8 时自由度很大，足以改变构图和物体，却很可能连人物身份、背景布局一起重画。</p>
+<p>一个必须记住的边界是：“强度”这个百分比并不跨系统通用。不同模型、不同调度器对同一个 UI 百分比的内部映射可以完全不同，同一个“强度 0.5”在两个系统里可能对应完全不同的 ᾱ_t。判断到底保留了多少原图信息，正确的做法是回到调度表查实际映射，看它在哪个 t、对应哪个 ᾱ_t，再代入公式算信号与噪声的权重，而不是把 UI 上的数字当作普适的物理量。</p></div>
+<div class="dd-formula" data-formula-id="image-editing-formula-1" data-display="mathml"><math display="block" aria-label="signal/noise: (0.9,0.436) → (0.4,0.916)"><mrow><mi>signal</mi><mo>/</mo><mi>noise</mi><mo>:</mo><mspace width="0.35em"/><mo>(</mo><mn>0.9</mn><mo>,</mo><mn>0.436</mn><mo>)</mo><mspace width="0.35em"/><mo>→</mo><mspace width="0.35em"/><mo>(</mo><mn>0.4</mn><mo>,</mo><mn>0.916</mn><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>完整示例：删除桌上杯子并保留木纹与阴影<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>把前面几节的契约、约束与强度旋钮串起来，最好的方式是一个完整实例：删除桌上一只杯子，同时保住桌面的木纹、杯子的阴影以及画面中其他一切内容。这个例子能暴露出一个最常见的失败模式——只把杯子遮掉，结果杯子的位置上要么留下一个“洞”，要么被填充进一段明显重复的木纹。</p>
+<p>第一步是资产固定。编辑开始前，先保存原图并记录其哈希，作为后续一切差异比较的基准。然后为杯子建立精确遮罩，并把遮罩略微向外扩张，覆盖杯子的边缘与抗锯齿过渡带。扩张是必要的：如果遮罩只框住杯子的主体，边缘的过渡像素会残留下来，在边界处形成一圈“晕”。</p>
+<p>第二步是条件设计。模型需要从遮罩外部估计桌面的纹理、透视和光照，再据此填充遮罩内部。因此提示词应当描述“连续的木纹桌面”，把生成目标指向被删除区域的上下文，而不是重述整张图里那些与本次编辑无关的内容。提示里塞进太多无关描述，会把模型的注意力分散到不需要改动的地方。</p>
+<p>第三步是生成与候选筛选。生成多个候选结果，逐一检查遮罩边界处的颜色和纹理是否连续。删除物体最容易失败的地方就是边界——如果木纹在边界处断裂、方向突变或出现明显接缝，这个候选就要淘汰。</p>
+<p>第四步是非目标保留的验证。在遮罩之外做像素级或感知级的差异比较，确认脸、文字、背景等区域确实没有变化。这一步是“保护什么”契约的量化落实：目标区域可以变，遮罩外必须守住。</p>
+<p>第五步是目标成功的验证。检测杯子的主体或残影是否仍然存在，同时检查阴影该不该删、该不该重建。一个物体被删除后，它投下的阴影若还留在桌上，就是物理不一致；若阴影与该物体本应一起消失，却被模型“好心”保留下来，同样是失败。</p>
+<p>第六步是人工确认。把输出图和原图叠加，生成差异热图，让人直观地看到哪些像素变了、变了多少，从而确认哪些变化是允许的、哪些是越界的。</p>
+<p>最后一步是过程留档。保存遮罩、提示词、模型版本、随机种子和完整的编辑历史。没有这些记录，事后就无法复现结果，也无法在评测时追溯某次失败到底发生在哪一步。</p>
+<p>这个例子把编辑质量的定义落实为一句可操作的话：<strong>编辑结果的质量由目标成功和非目标保留共同决定</strong>。只把杯子删得干净但木纹接不上，不算成功；木纹天衣无缝但杯子没删掉，同样不算成功。两份契约缺一不可。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：编辑在“目标变化”和“非目标保留”两道门中验收<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>一个编辑系统是否合格，不能靠单一指标来判定，而必须同时通过两道独立的验收门。这个结构可以用一张图来表示：原图、编辑指令和遮罩三样输入一起进入生成式编辑器，编辑器产出一张候选图；候选图随后分两路接受检查——一路是<strong>目标区域成功检查</strong>，验证指令要求的改变是否真的发生了；另一路是<strong>遮罩外保留检查</strong>，验证遮罩之外的内容是否原样未动。两路都通过，才算一次成功的编辑，最后还要把这次编辑的来源一并记录在案。</p>
+<p>这两道门对应的是编辑目标里“改变什么”和“保护什么”两份契约，缺一不可。只设一道门的后果，可以从“为什么只用文本相似度会奖励重画整张图”这个反问中看得最清楚。文本相似度衡量的是“输出图与指令文本有多吻合”，它只关心最终图像是否满足文字描述，完全不关心这张图是不是由原图变化而来。于是一个投机取巧的模型可以把整张图彻底重画一遍，只要重画后的图与文本描述高度契合，文本相似度就会给它高分——哪怕人脸、姿势、背景全部变了样，只要“红色外套”这一条说对了，它照样过关。换句话说，只设“目标成功”这一道门，会把“局部编辑”悄悄变成“全局重新生成”，而模型在这两者之间不需要付出任何保留的代价。</p>
+<p>反过来，只设“保留”这道门同样会失效：一个什么都没改、直接原样返回的模型，在遮罩外保留检查上得分完美，却完全没有完成指令要求的改变，这显然也不是编辑。因此两道门必须同时存在、同时加权：目标变化负责确认“该变的变了”，非目标保留负责确认“不该变的没变”。这正是图 1 要表达的核心——编辑验收必须同时奖励“变化”与“不变化”，任何只奖励其一的指标都会诱导出错误的编辑行为。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 345" role="img" aria-label="原图、编辑指令和遮罩进入生成式编辑器，输出分别经过目标区域成功检查和遮罩外保留检查，再记录来源"><defs><marker id="ie32" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="22" y="40" width="120" height="58" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="82" y="74" text-anchor="middle" class="svg-t">原图 x</text><rect x="22" y="130" width="120" height="58" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="82" y="164" text-anchor="middle" class="svg-t">指令 Δ</text><rect x="22" y="220" width="120" height="58" rx="9" fill="#21252d" stroke="#72b293"/><text x="82" y="254" text-anchor="middle" class="svg-t">遮罩 M</text><path d="M142 69L200 130M142 159H200M142 249L200 185" stroke="#7f8b9d" marker-end="url(#ie32)"/><rect x="205" y="100" width="145" height="120" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="277" y="132" text-anchor="middle" class="svg-t">编辑器</text><text x="277" y="159" text-anchor="middle" class="svg-t" font-size="11">反演/加噪/去噪</text><text x="277" y="189" text-anchor="middle" class="svg-t">候选 x′</text><path d="M350 160H397" stroke="#7f8b9d" marker-end="url(#ie32)"/><rect x="402" y="55" width="140" height="88" rx="9" fill="#21252d" stroke="#72b293"/><text x="472" y="86" text-anchor="middle" class="svg-t">目标门</text><text x="472" y="115" text-anchor="middle" class="svg-t" font-size="11">M内变化是否正确</text><rect x="402" y="177" width="140" height="88" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="472" y="208" text-anchor="middle" class="svg-t">保留门</text><text x="472" y="237" text-anchor="middle" class="svg-t" font-size="11">1−M区域是否稳定</text><path d="M542 99L600 142M542 221L600 178" stroke="#7f8b9d" marker-end="url(#ie32)"/><rect x="605" y="115" width="130" height="105" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="670" y="147" text-anchor="middle" class="svg-t">差异与来源</text><text x="670" y="174" text-anchor="middle" class="svg-t" font-size="11">热图/模型/种子</text><text x="670" y="200" text-anchor="middle" class="svg-t">人类确认</text><text x="380" y="318" text-anchor="middle" class="svg-t">任何一门失败，都不是“完成编辑”</text></svg><figcaption>图 1　编辑验收必须同时奖励变化与不变化。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>扩散反演尝试找到能重建原图的噪声轨迹<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>前面用 img2img 讨论保留程度时，隐含了一个前提：存在一条从原图出发、随噪声逐步加深的生成轨迹。但真实照片并非模型生成的，它并不天然位于扩散模型的轨迹上。扩散反演要解决的就是这个问题——怎样把一张真实图像“放回”生成轨迹，使模型能够沿着它做后续编辑。</p>
+<p>反演的第一步是把图像编码到 VAE 潜空间，得到潜变量 z₀。之后使用 DDIM inversion 等方法，把 z₀ 近似地逆推到一个高噪声状态 z_T。这个逆推的方向与生成相反：生成是从 z_T 去噪到 z₀，而反演是从 z₀ 逐步加噪推回 z_T。得到 z_T 之后，再换上新的编辑条件，让模型沿正向去噪，生成一张既保留了原图结构、又满足新指令的图像。这样编辑就不再是“从随机噪声出发碰运气”，而是“从原图对应的噪声状态出发做有约束的改变”。</p>
+<p>这条链路并不完美。重建误差来自三处：模型本身的近似误差、空文本条件（无条件引导）带来的偏差，以及每一步反演累积的数值误差。三者叠加的结果是，从反演得到的 z_T 正向去噪后，重建出的图并不完全等于原图。这意味着反演对原图的忠实程度有一个上限，而这个上限会直接影响编辑行为——反演越忠实，编辑的起点越贴近原图，模型就越倾向于做小幅改动，编辑自由度反而可能越小；反演越失真，起点越偏离原图，编辑的自由度越大，但也越接近“重新生成”。</p>
+<p>由于重建误差必然存在，一个关键的实验纪律是：在进行任何编辑之前，先做一次<strong>无编辑的纯重建</strong>，用原图不经指令改动地走完“编码 → 反演 → 去噪”全程，测量 codec 与反演共同造成的重建误差上限。只有先测出这个上限，后续评估时才能把“基础重建误差”与“编辑指令带来的变化”区分开。否则，一次编辑结果与原图的差异里，有多少是编辑造成的、有多少本来就是反演重建不出来的，就无从判断，评测也会把重建误差误算到编辑头上。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>注意力控制利用词与空间特征的对应保持布局<span class="dd-badge eng">Prompt-to-Prompt</span></h2>
+<div class="dd-agent-response"><p>在扩散反演把原图放回生成轨迹之后，还有一个问题悬而未决：去噪过程中，模型凭什么知道“狗”这个词应该对应画面里那只动物所在的位置，而不是别处？答案藏在扩散 U-Net 的跨注意力机制里。跨注意力把文本 token 与图像的空间位置连接起来——每个词会在一张注意力图上“点亮”它认为与自己相关的那些空间区域。生成时，模型正是靠这些注意力图来决定哪个词影响画面的哪一块。</p>
+<p>注意力控制（如 Prompt-to-Prompt）的编辑思路是：<strong>复用原提示词已经算好的注意力图，只替换与目标词相关的映射</strong>。把“狗”改成“猫”时，模型先按原提示“一只狗”跑出注意力图，知道“狗”这个词对应着画面中央那个四足动物的轮廓；编辑时保留这张注意力图的空间结构，只把“狗”这个 token 换成“猫”，让新的“猫”沿用原来“狗”所占据的空间位置。这样，对象的位置、轮廓、姿态——甚至它与背景的遮挡关系——都被原注意力图锚定住了，模型只需要在原有布局之内把“狗”的内容重画成“猫”。这就是“只换对象、不换布局”的机制来源：姿态之所以能保留，是因为姿态所在的布局信息通过注意力图被原样继承了下来。更进一步，自注意力控制还能保留图像内部的结构一致性，比如物体各部分的相对关系和纹理的组织方式。</p>
+<p>这条机制也有清晰的失效边界。第一，它假设原提示和新提示的词能一一对应；如果两个提示里词的数量、含义或语法结构对不上，注意力图就无法干净地替换。第二，当编辑涉及<strong>新增或删除对象</strong>、或者<strong>多个对象之间关系发生复杂变化</strong>时，旧注意力图里根本没有新对象的位置，也就没有可复用的布局，方法随之失效——注意力控制擅长“替换已有对象”，不擅长“凭空加一个对象”。第三，也是最容易被误解的一点：注意力图是模型内部的关联关系，不是精确的分割掩码。它表示的是一种软性的、模糊的“哪个词大概影响哪里”，而不是像素级的物体边界。把注意力图当作分割结果来用，会在边界处引入错误。因此注意力控制适合“保持布局、替换语义”的编辑，而不适合需要精确几何边界的删除或合成任务。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>属性纠缠让局部指令引发全局变化<span class="dd-badge eng">失败模式</span></h2>
+<div class="dd-agent-response"><p>一个看似无害的局部指令“让他微笑”，常常会连带改变年龄、牙齿、光照甚至身份。这不是模型的随机故障，而是属性纠缠的结构性结果。在训练数据里，“微笑”这个属性并不孤立存在：它和脸形、年龄、拍摄条件、光线方向都高度相关。当模型在潜空间里沿“微笑”方向移动时，这个方向并不是单一属性的方向，而是混合了多属性的方向——把脸变笑的同时，往往也会把脸形往更年轻的统计模式上推、把牙齿的形态改变、把光照重新分布，甚至让身份特征发生漂移。</p>
+<p>要抑制这种纠缠，有几类约束手段：身份嵌入把“这个人是谁”单独锚定，防止身份漂移；关键点把五官位置固定，防止结构走形；区域遮罩把允许变化限制在嘴部附近，防止扩散到全脸；保留损失则显式惩罚非目标区域的变化。这些约束能显著收窄编辑的波及范围。但它们也有一个反向边界：约束过强时，会连微笑必需的、自然的肌肉变化也一并阻止——脸被“焊死”，笑不出来，或者笑得很僵硬。因此属性编辑要在“防止全局漂移”和“允许局部自然变化”之间找平衡，而不是无限加强约束。</p>
+<p>由此引出一个评测层面的要求：不能只展示成功案例。属性纠缠意味着同一个编辑在不同人身上可能产生不同的副作用，只挑几个效果好的例子展示，会系统性地掩盖失败模式。正确做法是用<strong>因果式的反事实集</strong>：对多个不同身份分别施加同一个编辑（例如对十张不同的人脸都执行“让他微笑”），然后分别报告三组结果——目标是否成功（真的笑了吗）、身份相似度（还是同一个人吗）、以及非目标属性的变化（年龄、光照、背景动了多少）。只有把这三组数据一起报告，才能看清这个编辑方法在纠缠属性上的真实行为，而不是被个别好看的样本误导。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>遮罩边界、遮挡和阴影决定局部编辑是否物理一致<span class="dd-badge eng">局部性边界</span></h2>
+<div class="dd-agent-response"><p>局部编辑的物理一致性，几乎全部压在遮罩的边界上。一个容易犯的错误是：把“目标影响区域”等同于“对象分割本身”。替换一个物体时，真正需要在物理上保持一致的不只是物体自己的轮廓，还包括它投下的影子、它产生的反射、它遮挡后露出的背景，以及它与桌面的接触面。这些都属于该物体的<strong>因果影响</strong>——它们因物体的存在而存在，也会随物体的替换或删除而改变。如果把遮罩只画在物体轮廓上，这些因果影响就被排除在编辑范围之外，结果就是影子还留在原地、反射指向一个已经不存在的物体、被遮挡的背景没有恢复出来。</p>
+<p>遮罩大小的选择因此处在一个两难的中间地带：遮罩太小，会留下残影、残留边缘和断裂的反射；遮罩太大，则会侵入本不该动的背景，把保留区域也一并重画。要在这两者之间取得平衡，需要几种遮罩策略的配合。软边遮罩让生成在边界处平滑过渡，避免硬边造成的接缝；上下文扩张把遮罩稍微向外延伸，覆盖物体边缘的过渡像素，让模型有足够信息推断边界两侧该如何衔接；分层遮罩则更进一步，把像素明确区分为“必须改变”“允许联动”和“必须保留”三类——物体本身是必须改变的，影子和反射是允许联动的，背景是必须保留的。</p>
+<p>这套区分也把约束放回了正确的位置：编辑系统不应该把自动分割的结果当作真值来无条件信任。自动分割可能漏掉影子、可能把反射错划成物体、可能在边界处出错。因此系统应当允许用户在编辑前预览差异、在编辑后检查并修正遮罩。遮罩是用户表达“哪里能动、哪里不能动”的几何语言，它需要人的确认，而不是被当作一个可以自动决定的中间量。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>可逆性测试能暴露信息丢失，但不是完美判据<span class="dd-badge eng">验证思路</span></h2>
+<div class="dd-agent-response"><p>可逆性测试是一种通过“往返编辑”来探测信息丢失的手段。它的思路是：把原图 A 编辑成 B，再把 B 反向编辑回 A，然后比较“回来的图”与原图 A 的差异。如果差异很大，说明模型在第一次转换 A → B 的过程中丢失了某些结构或身份信息——这些信息一旦丢在 B 里，就再也无法通过反向编辑找回来。因此，往返后回不到原图，往往是“非目标区域被破坏”的间接证据。</p>
+<p>拿“白天 → 夜晚 → 白天”这个往返来说：第一次把白天变夜晚时，如果模型顺带改变了建筑轮廓、灯的位置或天空结构，那么第二次想从夜晚变回白天，就只能在已经失真的夜晚图上做文章，回来的白天图自然不会等于最初那张。反过来，如果往返能几乎完美还原，至少说明第一次转换没有造成不可逆的信息丢失。这就是循环一致性作为判据的价值所在：它不依赖任何外部参考，只用模型自己的两次转换就能给出一个有意义的信号。</p>
+<p>但这个判据并不完美，原因是<strong>许多编辑本来就不可逆</strong>。删除物体就是最典型的例子：把桌上的杯子删掉之后，杯子背后被遮住的桌面纹理在原图里根本没有信息，模型只能从周围纹理推断补全。反向编辑时想让杯子“回来”，模型并不知道原来的杯子长什么样、原来背后是什么，只能重新猜一个。这种编辑的正向过程本身就丢弃了信息，往返回不到原图是任务的固有属性，而不是模型的缺陷。如果把循环一致性当作唯一约束去训练或评测，就会错误地惩罚那些本质上不可逆的编辑，逼着模型去“编造”一个并不存在的信息。</p>
+<p>因此可逆性测试应当作为诊断工具之一，而不是唯一的验收标准。正确的做法是把它与遮罩外差异、身份保持、几何一致性和任务相关的具体指标结合起来：往返差异用来提示“可能丢了信息”，再用遮罩外的逐像素比较去确认到底丢了哪里、是不是不可接受。对“白天→夜晚”这类可逆的风格转换，循环一致性是强证据；对“删除物体”这类不可逆的事实编辑，则必须换用其他指标来判定保留是否充分。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>评测分目标成功、局部保留、真实感和多样性<span class="dd-badge eng">评测</span></h2>
+<div class="dd-agent-response"><p>编辑评测不能只看一个数，而要按目标成功、局部保留、真实感和多样性四个维度分开度量。它们各自回答不同的问题，合在一起才构成对一次编辑的完整判断。</p>
+<p><strong>目标成功</strong>回答“指令要求的改变发生了吗”。它的测量手段可以是属性分类（例如检测外套是否真的变成了红色）、目标检测、分割或人工判断。<strong>局部保留</strong>回答“非目标区域守住了吗”。它的测量用遮罩外的 L1 像素差或 LPIPS 感知差、关键点对齐、身份相似度、OCR 结果和背景特征来共同判定——脸有没有变、文字有没有乱、背景有没有被重画。<strong>真实感</strong>与伪影需要单独测，因为一张图可以既满足目标又守住保留，却在边界处出现接缝、模糊或伪影；真实感测量就专门盯着这些视觉瑕疵。<strong>多样性</strong>则要求对同一个编辑生成多个候选，看结果是否只是原图的一个机械变体，还是确实给出了不同且合理的解。</p>
+<p>这四个维度之间存在明确的权衡关系，最适合用 Pareto 曲线来呈现。把“目标成功”和“局部保留”分别放在两个轴上，一个方法的所有结果画成一簇点：往右上靠的方法，是那些既改得好又守得住的好方法；而单纯追求某一个维度的方法会落在曲线的一个极端上。Pareto 曲线的意义在于，它不掩盖权衡，而是把“改得越狠、保留越难”的代价直接显示出来。</p>
+<p>回到开头的问题：“编辑后提示匹配更高，为什么可能是失败？”因为提示匹配只测了目标成功这一维，它完全不关心局部保留。一个模型把整张图彻底重画，只要重画后的图更贴合指令文本，提示匹配就会更高，而遮罩外的脸、背景、文字可能全被破坏了。分数越高，破坏越大，这正是单维度评测的典型陷阱——它把一个多目标问题偷换成了单目标问题。</p>
+<p>为了得到可靠的结论，评测还必须按任务类型切片。新增、删除、替换、属性编辑、风格转换、文字编辑、人脸编辑和复杂遮挡，这些任务的保留要求和目标定义各不相同，混在一起打分会把各自的失败模式平均掉。评测时应固定原图与随机种子，保证可比性；同时检查训练近邻与版权，确认模型不是靠“背下训练数据里的相似图”来应付，也确认输出没有侵犯原始资产的权利。只有分维度、分任务、控变量，评测数字才能真实反映一个编辑方法的强弱。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>编辑来源和原始资产必须不可覆盖地保存<span class="dd-badge eng">治理</span></h2>
+<div class="dd-agent-response"><p>编辑的来源与原始资产必须以一种“不可覆盖”的方式保存下来。这句话的落点是：当一次生成式填充完成、导出为 JPEG 后，为什么还要留着遮罩、历史记录和原图？</p>
+<p>因为导出后的 JPEG 只是一张像素图，它把编辑过程中最关键的信息全部抹平了。用户看到的最终图里，看不出哪里是生成的、哪里是原图、用了什么模型和参数、随机种子是多少。一旦这张图被质疑、需要复现、需要回滚，或者需要证明“这块区域是 AI 生成的、不是拍出来的”，像素图本身什么也提供不了。因此完整的保存应当包含：原图、每一步的指令、遮罩、模型版本、参数、随机种子，以及每次编辑前后与原始图之间的差异。有了这些，才能回滚到任意历史状态，也才能为这张图的来源提供凭证。</p>
+<p>来源凭证在特定领域是硬性要求。新闻图片、证据材料、商品展示图和医疗图像，一旦经过生成式编辑，必须明确标注哪些区域被生成、用途受到什么限制。因为在这类场景里，读者或使用者的默认假设是“图像反映了真实情况”，生成区域的混入会破坏这种信任，标注是唯一能维持可信度的方式。</p>
+<p>编辑工具本身的治理同样不能忽略。上传到工具的图像可能被泄露，模型也可能复制了参考图中某个人的身份特征，因此整个流程要按隐私、版权和肖像授权来治理。这里有一个常见的侥幸心理：以为给导出的图打上水印或写进元数据就够了。但水印和元数据可以被轻易剥离，它们不是可靠的凭证。真正可靠的，是内部留存一份独立于像素图的审计记录——即便图片被二次裁剪、压缩、去元数据，审计记录仍然存在，仍然能回答“这张图从哪里来、经过了什么编辑”。把审计责任从“图片自身携带的标记”转移到“系统内部不可覆盖的记录”，才是来源可追溯的正确做法。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各节串起来，生成式图像编辑的完整因果链是这样的：从一份模糊的自然语言请求出发，最终落到一张可以被验证、被追溯、被复现的图。</p>
+<p>第一步是把请求拆解成两份契约——目标变化和必须保护项。不经过这一步，模型没有理由守住任何区域。第二步是选择方法：需要精确几何边界时选遮罩重绘，需要整体风格调整时选 img2img，需要“替换已有对象但保持布局”时用注意力控制，只有一句话时用指令编辑。第三步，在动手编辑之前，先验证 VAE 编码与反演的无编辑重建上限，把基础重建误差与编辑带来的变化分开。第四步，用强度旋钮和条件真正执行编辑，强度决定了保留多少原图信息。第五步，处理遮挡、阴影和边界联动——把目标影响区域与对象分割区分开，别让影子留在原地、反射指向虚空。第六步，让结果分别通过目标成功门和保留门，两道门缺一不可。第七步，用差异热图和人类复核完成验收，确认哪些变化是允许的。第八步，保存原图、遮罩、参数和完整的来源历史，使结果可回滚、可追溯。</p>
+<p>有了这条链，就能回答“这个概念怎样从问题一路连接到可验证的实践”：它要求每一步都留下可观察的证据，而不是只交付一张图。</p>
+<p>最后一层是验证。验证要在三个层面分别回答“固定了什么、观察什么证据”。在<strong>输入层</strong>，固定同一批样本、相同的前处理流程和相同的权限边界，记录输入哈希、切片标签和拒绝原因，保证比较的起点一致。在<strong>机制层</strong>，一次只改变一个核心变量，其余配置全部锁定，然后观察关键的中间状态、以及结果首次偏离预期的位置——这能把“哪里出了问题”定位到具体的环节，而不是笼统地说“效果不好”。在<strong>输出层</strong>，用同一套验收规则和资源预算，观察质量、成本、延迟和失败率的分层差异。最后用<strong>反证</strong>来排除侥幸：保留一个不启用目标机制的对照组，看收益是否在跨样本和不同随机种子上都能稳定复现。只有经过输入、机制、输出和反证四道验证，一次编辑的能力才从“某个样本上看起来不错”上升为“一条被证据支撑的、可复现的因果链”。</p></div>
+<table class="dd-table"><thead><tr><th>验证层</th><th>在“生成式图像编辑：改变目标属性，同时证明其余内容被保留”中固定什么</th><th>观察什么证据</th></tr></thead><tbody>
+      <tr><td>输入</td><td>同一批样本、前处理与权限边界</td><td>输入哈希、切片标签和拒绝原因</td></tr>
+      <tr><td>机制</td><td>仅改变一个核心变量，其余配置锁定</td><td>关键中间状态及首次偏离预期的位置</td></tr>
+      <tr><td>输出</td><td>同一验收规则与资源预算</td><td>质量、成本、延迟和失败率的分层差异</td></tr>
+      <tr><td>反证</td><td>保留不启用目标机制的对照组</td><td>收益是否跨样本与随机种子稳定复现</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2208.01626" target="_blank" rel="noopener">Prompt-to-Prompt Image Editing</a>：跨注意力控制编辑</li><li><a href="https://arxiv.org/abs/2211.09800" target="_blank" rel="noopener">InstructPix2Pix</a>：自然语言指令图像编辑</li><li><a href="https://arxiv.org/abs/2108.01073" target="_blank" rel="noopener">SDEdit</a>：加噪—去噪引导编辑</li><li><a href="https://arxiv.org/abs/2211.09794" target="_blank" rel="noopener">Null-text Inversion</a>：真实图扩散反演与编辑</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/image-editing">在地图中查看概念关系</a></nav>
+</article></main></body></html>

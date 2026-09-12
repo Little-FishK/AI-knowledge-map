@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>循环神经网络 RNN：把历史压进一个不断更新的状态 · AI 知识地图</title>
+<meta name="description" content="从共享递推、时间展开与 BPTT，到梯度连乘、LSTM 门控、教师强制和流式部署。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/rnn/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="循环神经网络 RNN：把历史压进一个不断更新的状态">
+<meta property="og:description" content="从共享递推、时间展开与 BPTT，到梯度连乘、LSTM 门控、教师强制和流式部署。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/rnn/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="循环神经网络 RNN：把历史压进一个不断更新的状态">
+<meta name="twitter:description" content="从共享递推、时间展开与 BPTT，到梯度连乘、LSTM 门控、教师强制和流式部署。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/rnn/#page","name":"循环神经网络 RNN：把历史压进一个不断更新的状态","description":"从共享递推、时间展开与 BPTT，到梯度连乘、LSTM 门控、教师强制和流式部署。","url":"https://ai-knowledge-map.com/zh/concepts/rnn/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"循环神经网络 RNN：把历史压进一个不断更新的状态","item":"https://ai-knowledge-map.com/zh/concepts/rnn/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">循环神经网络 RNN：把历史压进一个不断更新的状态</span></li></ol></nav><article id="dd-article" data-concept-id="rnn">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">循环神经网络 RNN：把历史压进一个不断更新的状态</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从共享递推、时间展开与 BPTT，到梯度连乘、LSTM 门控、教师强制和流式部署。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> RNN 在每个时间步复用同一组参数，以隐藏状态压缩此前序列。它天然适合流式输入、状态小且单步成本固定；代价是<b>时间步难并行、历史有损压缩、梯度沿时间反复连乘</b>，因此长距离信用分配和精确回看都困难。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>手算一次 RNN 状态递推；从时间展开解释 BPTT；区分梯度爆炸与信息遗忘；理解 LSTM 门控和训练—推理错位。</div>
+<ol class="dd-chain"><li>序列逐步到达</li><li>共享递推更新隐藏状态</li><li>时间展开形成深计算图</li><li>BPTT 沿状态路径分配责任</li><li>门控选择保留与写入</li><li>以长度和流式约束验收</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>同一个单元在时间上反复使用<span class="dd-badge math">核心递推</span></h2>
+<div class="dd-agent-response"><p>RNN 的基本做法，是把同一个状态更新单元沿时间轴反复使用。第 t 个时间步接收当前输入 xₜ 和上一步隐藏状态 hₜ₋₁，并计算新的隐藏状态：</p>
+<p>hₜ = φ(Wₕhₜ₋₁ + Wₓxₜ + b)</p>
+<p>其中，Wₕ 把旧状态变换到当前状态空间，Wₓ 变换当前输入，b 是偏置，φ 是状态激活函数。随后，当前隐藏状态还可以通过</p>
+<p>yₜ = g(Wᵧhₜ)</p>
+<p>得到输出 yₜ；Wᵧ 负责对状态进行输出变换，g 则把变换结果映射成任务所需的输出形式。</p>
+<p>这组计算的关键不在于每个时间步都有一套新参数，而在于所有时间步共享同一组 Wₕ、Wₓ 和 b。序列从三个时间步变成十个时间步时，模型只是把同一个更新过程多执行几次，参数数量并不会随序列长度增加。因此，参数共享让同一模型能够接收不同长度的序列，也迫使它在每个位置使用一致的状态更新规则。</p>
+<p>隐藏状态 hₜ 可以理解为截至时间 t、面向当前任务形成的历史摘要。它由 hₜ₋₁ 和 xₜ 共同决定，所以当前状态既承接过去的信息，也吸收当前输入；但它不是一份可以随意检索所有过去细节的完整日志。哪些历史信息被保留、削弱或覆盖，取决于共享变换和训练目标。</p>
+<p>以三天设备信号 x = [1, 0, 2] 为例，设隐藏状态只有一个数，φ 取恒等函数，Wₕ = 0.5、Wₓ = 1、b = 0、h₀ = 0。此时每一步都使用同一条更新式 hₜ = 0.5hₜ₋₁ + xₜ。这个设置清楚地区分了两个来源：0.5hₜ₋₁ 是过去状态对当前的贡献，xₜ 是当天信号带来的新信息。继续处理更多天的数据，只会继续重复这条式子，不会为新的一天增添新的 Wₕ、Wₓ 或 b。</p>
+<p>参数共享也意味着同一个变换及其误差会在时间上反复作用。它一方面带来长度上的可扩展性，另一方面使每一步的状态更新相互串联：较早输入只能通过连续的隐藏状态传递影响较晚结果。</p></div>
+<div class="dd-formula">hₜ=φ(Wₕhₜ₋₁+Wₓxₜ+b)，　yₜ=g(Wᵧhₜ)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>三步递推可以逐项手算<span class="dd-badge math">算例</span></h2>
+<div class="dd-agent-response"><p>递推式不仅给出“当前状态由过去和现在共同决定”，还可以通过逐步代入看清每个历史输入在最终状态中占多大比重。沿用一维 RNN：输入 x = [1, 0, 2]，Wₕ = 0.5、Wₓ = 1、b = 0、h₀ = 0，并令激活函数为恒等函数。状态更新因此简化为：</p>
+<p>hₜ = 0.5hₜ₋₁ + xₜ</p>
+<p>三个时间步可以逐项计算：</p>
+<!-- retired duplicate table; retained verbatim for controlled preservation: <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">t</th><th class="dd-align-right">xₜ</th><th class="dd-align-left">计算</th><th class="dd-align-right">hₜ</th></tr></thead><tbody><tr><td class="dd-align-left">1</td><td class="dd-align-right">1</td><td class="dd-align-left">0.5 × 0 + 1</td><td class="dd-align-right">1</td></tr><tr><td class="dd-align-left">2</td><td class="dd-align-right">0</td><td class="dd-align-left">0.5 × 1 + 0</td><td class="dd-align-right">0.5</td></tr><tr><td class="dd-align-left">3</td><td class="dd-align-right">2</td><td class="dd-align-left">0.5 × 0.5 + 2</td><td class="dd-align-right">2.25</td></tr></tbody></table></div> -->
+<p>第一步没有过去状态的贡献，因此 h₁ = 1。第二步虽然当前输入为 0，但上一状态会乘以 0.5 继续传递，所以 h₂ = 0.5。第三步先把 h₂ 缩放为 0.25，再加入当前输入 2，得到 h₃ = 2.25。当前输入为零并不等于状态清零，只要旧状态经过递推后仍有非零贡献，历史影响就会保留下来。</p>
+<p>把中间状态继续展开，可以直接看到 h₃ 混合了哪些输入：</p>
+<p>h₃ = 2 + 0.5 × 0 + 0.5² × 1 = 2.25</p>
+<p>当前输入 x₃ 的权重是 1，前一步输入 x₂ 的权重是 0.5，两步前输入 x₁ 的权重是 0.5² = 0.25。也就是说，同一个 Wₕ 在每次跨越时间步时都会再乘一次。对于 Wₕ = 0.5，输入距离当前时刻越远，其影响就按 0.5 的幂次衰减；这里 x₁ 到达 h₃ 需要跨过两次状态传递，所以只剩 0.25 的权重。</p>
+<p>这种展开揭示了递归状态的边界：历史不是被等量保存，而是被状态变换反复缩放。当 Wₕ 的作用小于 1 时，较早信息可能快速衰减；若把 Wₕ 改成 1.2，同一影响会随传播次数按 1.2 的幂次增长，早期信息不再衰减，却会让状态和梯度更容易爆炸。因此，最终状态中各段历史的占比，既由输入值决定，也由共享状态变换在时间上重复作用的次数决定。</p></div>
+<table class="dd-table"><thead><tr><th>t</th><th>xₜ</th><th>计算</th><th>hₜ</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>0.5×0+1</td><td>1</td></tr><tr><td>2</td><td>0</td><td>0.5×1+0</td><td>0.5</td></tr><tr><td>3</td><td>2</td><td>0.5×0.5+2</td><td>2.25</td></tr></tbody></table>
+<div class="dd-formula">h₁=1；　h₂=0.5；　h₃=0.5×0.5+2=2.25</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>时间展开把循环变成深度为 T 的计算图<span class="dd-badge math">BPTT</span></h2>
+<div class="dd-agent-response"><p>RNN 的前向计算写成递推时看起来存在一个“循环”，但训练时可以沿时间轴把这个循环展开。长度为 T 的序列会形成一个深度为 T 的计算图：每个时间步都有一个状态更新节点，h₁ 依赖 h₀ 和 x₁，h₂ 依赖 h₁ 和 x₂，依次连接到 h_T。图 1 展示了三步 RNN 的这种时间展开，前向计算沿 x₁ → h₁、x₂ → h₂、x₃ → h₃ 的顺序推进。</p>
+<p>展开图中的多个节点不是多套不同模型，而是同一组参数在不同时间步的重复使用。假设损失出现在较晚时间步，它对较早状态和共享参数的影响，就沿 h_T → h_T₋₁ → … 的依赖链反向传递。这个过程称为随时间反向传播，即 BPTT。对于图 1 的三步展开，反向传播会经过三次参数复用的位置，并把每一次使用产生的梯度贡献相加。这样，同一个参数既会因它在当前时间步造成的影响而更新，也会承担它通过后续状态间接影响未来损失的责任。</p>
+<p>参数共享并不意味着训练时只计算一次梯度。设某个共享参数为 W，它在每个时间步都参与状态更新，那么总损失对 W 的梯度包含各次复用的贡献之和。每一项贡献又可能经过不同长度的状态链：越早的使用位置，通往较晚损失的反向路径通常越长。BPTT 正是通过展开后的普通计算图，把这些直接和间接影响统一纳入梯度计算。</p>
+<p>完整展开的代价随序列长度增加。反向传播需要使用前向阶段的中间激活，因此序列越长，需要保留的激活越多，梯度传播路径也越长。为了限制这一开销，可以使用截断 BPTT：每处理 K 个时间步就切断一次计算图，只在长度为 K 的窗口内反向传播。这样，训练所需内存从依赖整段序列长度，变为主要依赖窗口长度 K。</p>
+<p>截断带来明确的取舍。窗口内的损失仍能沿展开图给共享参数分配责任，但跨越切断点、超过 K 步的直接信用路径不再参与这一轮反向传播。因此，K 越小，内存和单次反向传播的路径越短；与此同时，模型越难通过直接梯度把很久以前的状态更新与当前损失联系起来。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 730 265" role="img" aria-label="三步 RNN 时间展开与反向传播路径"><defs><marker id="rnna" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#748093"/></marker><marker id="rnnb" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 z" fill="#cf7d72"/></marker></defs><text x="82" y="38" class="svg-t">x₁=1</text><text x="302" y="38" class="svg-t">x₂=0</text><text x="522" y="38" class="svg-t">x₃=2</text><path d="M100,48 L100,92" stroke="#748093" marker-end="url(#rnna)"/><path d="M320,48 L320,92" stroke="#748093" marker-end="url(#rnna)"/><path d="M540,48 L540,92" stroke="#748093" marker-end="url(#rnna)"/><rect x="42" y="96" width="116" height="62" rx="8" fill="#21252d" stroke="#65a6d9"/><rect x="262" y="96" width="116" height="62" rx="8" fill="#21252d" stroke="#65a6d9"/><rect x="482" y="96" width="116" height="62" rx="8" fill="#21252d" stroke="#65a6d9"/><text x="100" y="132" text-anchor="middle" class="svg-t">h₁=1</text><text x="320" y="132" text-anchor="middle" class="svg-t">h₂=0.5</text><text x="540" y="132" text-anchor="middle" class="svg-t">h₃=2.25</text><path d="M158,127 L260,127" stroke="#748093" marker-end="url(#rnna)"/><path d="M378,127 L480,127" stroke="#748093" marker-end="url(#rnna)"/><path d="M540,158 L540,205" stroke="#748093" marker-end="url(#rnna)"/><rect x="478" y="207" width="124" height="42" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="540" y="233" text-anchor="middle" class="svg-t">损失 L₃</text><path d="M520,207 C440,185 405,183 350,158" fill="none" stroke="#cf7d72" stroke-dasharray="6 4" marker-end="url(#rnnb)"/><path d="M490,216 C340,212 220,190 130,158" fill="none" stroke="#cf7d72" stroke-dasharray="6 4" marker-end="url(#rnnb)"/><text x="252" y="231" class="svg-t" font-size="11">梯度从未来沿共享状态路径返回</text></svg><figcaption>图 1　前向是顺序递推；BPTT 将三次使用同一参数的梯度相加。序列越长，需保存的激活和梯度路径越长。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>梯度问题来自雅可比反复相乘<span class="dd-badge math">长依赖</span></h2>
+<div class="dd-agent-response"><p>较早状态 hₖ 对较晚状态 hₜ 的影响，需要穿过 k 与 t 之间的每一次状态更新。把这些局部变化率用链式法则连接起来，可以写成：</p>
+<p>∂hₜ/∂hₖ = ∏(i = k + 1 … t) [diag(φ′ᵢ)Wₕ]</p>
+<p>这里，乘积遍历中间的每个时间步 i。Wₕ 是每一步重复使用的状态权重；φ′ᵢ 是该步激活函数对各坐标的导数，diag(φ′ᵢ) 表示由这些导数组成的对角矩阵。公式的关键含义是：跨越多个时间步的梯度不是把各步影响相加，而是把各步的雅可比矩阵连续相乘。</p>
+<p>在一维线性情形中，激活函数导数为 1，跨越 d 步的梯度就简化为 Wₕᵈ。这解释了 Wₕ = 0.5 与 Wₕ = 1.2 为何会走向两个极端。跨越十步时：</p>
+<p>0.5¹⁰ ≈ 0.00098</p>
+<p>较早状态对较晚状态的影响只剩约千分之一，来自后期损失的责任几乎无法传回早期，形成梯度消失。相反：</p>
+<p>1.2¹⁰ ≈ 6.19</p>
+<p>同一影响被连续放大，梯度更容易急剧增长，形成梯度爆炸。多维情况下，决定结果的不再是一个标量的幂，但“连续相乘导致影响衰减或放大”的机制不变。</p>
+<p>非线性激活还会参与每一次乘法。若激活进入饱和区域，φ′ 会接近零，即使 Wₕ 本身没有明显缩小作用，多个接近零的导数相乘也会进一步压低长距离梯度。因此，能否把后期损失有效分配给早期状态，取决于整条路径上状态权重与激活导数的共同作用。</p>
+<!-- retired duplicate table; retained verbatim for controlled preservation: <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">现象</th><th class="dd-align-left">训练表现</th><th class="dd-align-left">常用缓解方式</th><th class="dd-align-left">这些方式不能解决什么</th></tr></thead><tbody><tr><td class="dd-align-left">梯度爆炸</td><td class="dd-align-left">loss 或梯度范数突然增大，甚至出现 NaN</td><td class="dd-align-left">梯度裁剪、合适的初始化、归一化</td><td class="dd-align-left">不能因此增加模型的长期记忆容量</td></tr><tr><td class="dd-align-left">梯度消失</td><td class="dd-align-left">较早 token 很难从后期损失中学到责任</td><td class="dd-align-left">门控、残差连接、缩短梯度路径</td><td class="dd-align-left">不能恢复已经被隐藏状态丢掉的原始内容</td></tr></tbody></table></div> -->
+<p>梯度裁剪可以在梯度过大时限制更新幅度，却不会让状态自动记住更久的信息；门控、残差或较短路径可以改善梯度传播，却无法找回此前状态更新已经抹去的内容。梯度传播是否稳定与状态中是否还保留所需信息是两个相关但不同的问题，不能只根据梯度范数判断长期记忆是否充分。</p></div>
+<table class="dd-table"><thead><tr><th>现象</th><th>表现</th><th>常用缓解</th><th>不能解决</th></tr></thead><tbody><tr><td>梯度爆炸</td><td>loss/范数突增、NaN</td><td>梯度裁剪、初始化、归一化</td><td>长期记忆容量</td></tr><tr><td>梯度消失</td><td>早期 token 学不到责任</td><td>门控、残差、较短路径</td><td>被状态丢掉的原文</td></tr></tbody></table>
+<div class="dd-formula">∂hₜ/∂hₖ = ∏<sub>i=k+1…t</sub> diag(φ′ᵢ)Wₕ</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>LSTM 用近似加法通道控制记忆<span class="dd-badge math">门控</span></h2>
+<div class="dd-agent-response"><p>LSTM 把“保存什么、写入什么、向外暴露什么”拆成可学习的连续控制，使状态更新不必在每一步都把旧信息完整地重新压过一层非线性。它维护细胞状态 cₜ，并用三个门控制状态流动：</p>
+<p>cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ c̃ₜ</p>
+<p>hₜ = oₜ ⊙ tanh(cₜ)</p>
+<p>cₜ₋₁ 和 cₜ 分别是更新前后的细胞状态，c̃ₜ 是根据当前信息形成的候选内容。符号 ⊙ 表示逐元素乘法，因此各个状态坐标可以得到不同的控制强度。fₜ 是遗忘门，决定旧细胞状态 cₜ₋₁ 的每个分量保留多少；iₜ 是输入门，决定候选内容 c̃ₜ 写入多少；两部分相加后形成新细胞状态 cₜ。oₜ 是输出门，它控制经过 tanh 变换的细胞状态有多少暴露为隐藏状态 hₜ。</p>
+<p>这种结构的关键是细胞状态中的近似加法通道。当某些坐标满足 fₜ ≈ 1 且 iₜ ≈ 0 时，更新近似成为 cₜ ≈ cₜ₋₁：旧内容沿接近恒等映射的路径继续传递，既不被大量新内容覆盖，梯度也不必在每个时间步都穿过完整的候选状态非线性。相反，当模型需要替换记忆时，可以减小 fₜ 并增大 iₜ；当内部状态暂时不应影响外部计算时，则可以减小 oₜ，而不必立即删除 cₜ 中的内容。</p>
+<p>门并不是人工编写的“如果出现某个词就永久保存”的符号规则，也不是离散的硬存储槽。fₜ、iₜ 和 oₜ 都是由数据驱动、随输入和状态变化的连续向量。它们提供的是逐坐标的软控制：接近 1 表示较强通过，接近 0 表示较强抑制，中间值则表示部分保留、写入或暴露。</p>
+<p>近似恒等路径也不等于无损的无限期记忆。即使每一步的遗忘门都达到 f = 0.99，跨 500 步后旧内容的保留比例仍为：</p>
+<p>0.99⁵⁰⁰ ≈ 0.0066</p>
+<p>也就是说，微小的逐步衰减经过长距离累积后依然会很明显。LSTM 改善了普通 tanh RNN 中反复非线性变换带来的信息与梯度衰减，但能保存多久仍由门值在整个时间跨度上的连续乘积决定。</p>
+<p>GRU 采用相关但更紧凑的门控思路，将状态与部分门合并，因此参数更少。无论采用 LSTM 还是 GRU，核心都不是取消递推，而是为递推状态增加可学习的保留、写入和暴露路径。</p></div>
+<div class="dd-formula">cₜ=fₜ⊙cₜ₋₁+iₜ⊙c̃ₜ，　hₜ=oₜ⊙tanh(cₜ)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>教师强制制造训练—推理输入差异<span class="dd-badge eng">生成</span></h2>
+<div class="dd-agent-response"><p>自回归序列生成器在每一步都要把前一个输出作为下一步输入。训练时，常用真实的 yₜ₋₁ 作为第 t 步输入，这种做法称为教师强制。它让模型在每个位置都从正确前缀出发，能够直接学习“已知此前答案正确时，下一项应是什么”。</p>
+<p>推理时不存在可供输入的真实未来答案，模型只能把自己上一步的预测送入下一步。训练与推理因此面对不同的输入分布：训练阶段主要看到真实前缀，推理阶段则会看到由自身预测组成、可能包含错误的前缀。这种错位称为 exposure bias。</p>
+<p>误差滚雪球来自状态递推的因果链。假设模型在某一步预测错误，这个错误输出会成为下一步输入，并把隐藏状态带到训练期间很少出现的区域。后续预测是在这个偏离后的状态上产生的，即使每一步只有局部偏差，偏差也可能继续作为输入向后传播并累积。教师强制下的单步表现良好，因而不保证自由生成长序列时同样稳定。</p>
+<p>几类方法从不同位置缓解这一问题，但各有边界：</p>
+<!-- retired duplicate table; retained verbatim for controlled preservation: <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方法</th><th class="dd-align-left">作用</th><th class="dd-align-left">代价或边界</th></tr></thead><tbody><tr><td class="dd-align-left">计划采样</td><td class="dd-align-left">训练时逐步混入模型自己的预测，让模型接触带误差的前缀</td><td class="dd-align-left">训练目标可能有偏，效果对混入比例的调度敏感</td></tr><tr><td class="dd-align-left">序列级损失</td><td class="dd-align-left">不只评价单步预测，直接优化最终序列指标</td><td class="dd-align-left">梯度估计的噪声较大</td></tr><tr><td class="dd-align-left">beam 或约束解码</td><td class="dd-align-left">推理时同时保留多个候选或限制非法选择，减少局部错误造成的损失</td><td class="dd-align-left">只改变解码过程，不能修复训练分布与推理分布的错位</td></tr></tbody></table></div> -->
+<p>计划采样改变训练输入，使模型有机会学习如何从自己的偏差中继续生成；序列级损失把优化目标移向最终结果；beam 或约束解码则在不改变训练的情况下改善推理搜索。三者处理的是不同环节，不能互相等同。尤其是更强的解码策略，即使减少了某些局部错误，也没有消除模型在训练时主要依赖真实前缀这一根本差异。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>作用</th><th>代价/边界</th></tr></thead><tbody><tr><td>计划采样</td><td>逐步混入模型预测</td><td>目标有偏、调度敏感</td></tr><tr><td>序列级损失</td><td>直接优化最终指标</td><td>梯度估计噪声大</td></tr><tr><td>beam/约束解码</td><td>推理时减少局部错误</td><td>不修复训练分布错位</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>双向、堆叠与多对多只是读取方式变化<span class="dd-badge intuition">变体</span></h2>
+<div class="dd-agent-response"><p>RNN 在每个时间步都能产生隐藏状态，任务之间的差别主要在于读取哪些状态、把哪些状态变成输出，而不是递推机制本身发生了根本变化。</p>
+<p>对于序列分类，可以采用 many-to-one 读取方式：模型依次处理整个输入序列，只把末状态送入分类器。末状态承担整段序列摘要的角色，输出则是一个序列级类别。它适用于“多个输入时间步对应一个结果”的任务，但也意味着分类信息必须在递推过程中被保留到最后。</p>
+<p>对于逐步标注，可以采用 many-to-many：每个输入 xₜ 产生对应状态 hₜ，再由 hₜ 输出该位置的标签 yₜ。输入与输出在时间步上对齐，因此每个位置的判断都能使用递推到该处时形成的上下文。若任务要求从一条输入序列生成另一条长度可能不同的序列，则可以使用编码器—解码器结构：编码器先把输入压入状态，解码器再从该状态出发逐步生成目标序列。</p>
+<p>双向 RNN 改变的是每个位置可读取的上下文范围。一个方向从左向右递推，另一个方向从右向左递推，再把两个方向在同一位置形成的表示结合起来。这样，位置 t 的输出既能利用左侧内容，也能利用右侧内容，适合推理时完整序列已经可见的离线标注。</p>
+<p>双向读取不等于“预测未来”。它之所以能使用右侧信息，是因为推理开始时整条序列已经给出；右侧内容是已知输入，而不是尚未发生的数据。严格在线的任务不满足这个条件。例如实时传感器只能处理已经到达的观测，不能让当前输出读取未来尚未到达的信号，因此不能直接使用依赖右侧上下文的双向结构。</p>
+<p>堆叠 RNN 则把一层的状态序列作为下一层的输入序列。更多层可以提升模型容量，让高层在低层时间表示的基础上继续变换；代价是从输出回到早期层和早期时间步的优化路径更长。选择末状态、每步状态、编码器状态、双向状态或多层状态，本质上是在匹配任务所需的输出粒度、可用上下文和时序约束。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>RNN 与注意力的核心差别是访问历史的方式<span class="dd-badge eng">选型</span></h2>
+<div class="dd-agent-response"><p>RNN 与自注意力结构都处理序列，但它们访问历史的方式不同。RNN 把已经读过的内容持续压缩进一个固定大小的状态；自注意力或 Transformer 则保留各位置的键和值，也就是 KV，使后续位置能够直接连接到先前的具体位置。两种设计交换的是状态大小、并行性和精确回看能力。</p>
+<!-- retired duplicate table; retained verbatim for controlled preservation: <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">维度</th><th class="dd-align-left">RNN</th><th class="dd-align-left">自注意力／Transformer</th></tr></thead><tbody><tr><td class="dd-align-left">历史表示</td><td class="dd-align-left">把历史压缩进固定大小的状态</td><td class="dd-align-left">保留各位置的 KV</td></tr><tr><td class="dd-align-left">训练并行</td><td class="dd-align-left">时间依赖强，后一步等待前一步状态</td><td class="dd-align-left">不同位置的计算可并行</td></tr><tr><td class="dd-align-left">单步流式状态</td><td class="dd-align-left">状态大小固定</td><td class="dd-align-left">KV 随序列长度增长</td></tr><tr><td class="dd-align-left">精确回看</td><td class="dd-align-left">难以从压缩状态中恢复某个旧位置</td><td class="dd-align-left">可直接连接到旧位置</td></tr><tr><td class="dd-align-left">典型优势</td><td class="dd-align-left">端侧、传感器、低延迟场景</td><td class="dd-align-left">大规模训练、长程交互场景</td></tr></tbody></table></div> -->
+<p>RNN 的输入在时间上形成严格依赖：计算 hₜ 之前必须先得到 hₜ₋₁，因此训练时很难把所有位置的状态更新同时完成。它换来的好处是流式处理时只需把固定大小的当前状态传给下一步。无论已经处理多少输入，单步处理需要携带的递推状态都不随历史长度增长。</p>
+<p>自注意力保留每个位置的 KV，训练时各位置可以并行形成表示，后续还可通过注意力直接读取较早位置。它不必要求所有历史都先被压缩成一个小状态，所以当任务需要引用很久以前的具体内容时，更容易建立直接连接。相应地，流式推理期间保留的 KV 会随序列长度增加。</p>
+<p>“固定状态”与“全量 KV 历史”体现了不同取舍，而不是一方在所有条件下都更快或更好。实际速度还取决于计算内核、批量大小和硬件。例如，每秒只到达一个传感器值的在线异常检测需要持续、低延迟地更新状态，小型 GRU 的固定流式状态可能更合适。相反，如果任务需要准确引用数千 token 之前的原句，固定状态必须长期保存具体细节，而自注意力可以直接连接到旧位置，通常更符合这种访问需求。</p>
+<p>因此，选择结构时应先判断任务如何使用历史：若历史可以被连续压缩，且流式状态大小和低延迟更重要，递推结构具有明确价值；若任务需要保留许多位置并频繁精确回看，保留位置级历史的注意力结构更契合。</p></div>
+<table class="dd-table"><thead><tr><th>维度</th><th>RNN</th><th>自注意力/Transformer</th></tr></thead><tbody><tr><td>历史表示</td><td>固定状态压缩</td><td>保留各位置 KV</td></tr><tr><td>训练并行</td><td>时间依赖强</td><td>位置可并行</td></tr><tr><td>单步流式状态</td><td>固定大小</td><td>KV 随长度增长</td></tr><tr><td>精确回看</td><td>困难</td><td>可直接连接旧位置</td></tr><tr><td>典型优势</td><td>端侧、传感器、低延迟</td><td>大规模训练、长程交互</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要把长度、流式约束和状态恢复拆开<span class="dd-badge eng">工程边界</span></h2>
+<div class="dd-agent-response"><p>平均准确率把不同长度、不同依赖距离和不同运行条件混在一个数字里，因此不能单独证明 RNN 真正学会了长距离依赖。若测试集中大多数样本只需要短期信息，模型即使在长距离样本上明显失败，整体平均值仍可能很好看。评测应把“任务答得对不对”“历史隔多远还能用”“上线时状态能否可靠维护”拆开观察。</p>
+<p>长依赖能力可以按依赖距离绘制性能曲线，而不是只报告一个均值。横轴表示作出当前判断所需信息距离当前位置有多远，纵轴表示对应区间的性能。若性能随距离快速下降，就说明模型在短序列上的成功不能外推到长距离条件。测试还应加入干扰项，检查无关输入是否会覆盖有用状态；主动重置状态，确认模型是否确实依赖历史；模拟缺包，观察状态链中断或输入遗漏后的行为；使用超出训练长度的序列，测试长度外推能力。</p>
+<p>部署评测还要覆盖计算和状态管理约束。对流式系统，应测量每一步延迟、隐藏状态大小、批处理吞吐、冷启动以及断线后的恢复过程。每步延迟反映新输入到达后多久能产出结果；状态大小决定每条并发会话需要保存多少运行数据；冷启动与断线恢复则检验没有连续历史或历史暂时中断时，系统如何重新建立可靠状态。这些指标与离线平均准确率回答的是不同问题。</p>
+<p>隐藏状态属于会话状态，因为它压缩了此前输入形成的上下文。它必须与正确的用户、设备或会话身份绑定，并设置明确生命周期，支持重置和版本化。若把一个用户的隐藏状态错误复用于另一个用户，后者的预测会受到前者上下文干扰，形成上下文串扰，并可能造成隐私泄漏。</p>
+<p>模型版本与状态版本也必须对应。模型升级后，旧隐藏状态的数值含义未必仍与新参数兼容；直接把旧状态交给新模型，可能让新模型从一个不符合其训练分布的内部表示继续递推。因此，状态需要可识别版本，升级时应按兼容策略处理，必要时重置，而不能把隐藏状态当成与模型无关的通用缓存。</p>
+<p>只有当模型在依赖距离、干扰、异常输入和状态生命周期等维度都经受检验，才能区分它是“在平均样本上预测正确”，还是确实能在目标部署条件下维护和使用长期状态。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>RNN 解决的是序列信息逐步到达时，如何让当前计算利用此前历史。输入并不是一次性压成一个静态对象，而是按时间步进入模型；共享的递推单元每次接收当前输入和旧隐藏状态，产生新隐藏状态。于是，状态成为历史影响当前输出的通道，而参数共享使这套更新规则能够反复用于不同位置和不同序列长度。</p>
+<p>这条前向因果链可以写成：</p>
+<p>序列逐步到达 → 共享递推更新隐藏状态 → 当前状态影响当前或后续输出</p>
+<p>共享递推只规定了计算如何向前运行。为了训练参数，还需要把循环沿时间展开成深度随序列长度增长的计算图。较晚的损失通过 BPTT 沿状态依赖向前追溯，把责任分配给各时间步对共享参数的使用位置：</p>
+<p>时间展开形成深计算图 → BPTT 沿状态路径反向传播 → 各次参数复用的梯度贡献累加</p>
+<p>同一状态变换在长路径上反复出现，使梯度中的雅可比连续相乘。乘积持续缩小会让早期责任逐渐消失，持续放大则会导致梯度爆炸。这个机制解释了普通递推结构为何难以稳定学习很长距离的依赖，也说明仅仅延长输入序列，并不保证模型能够有效使用更早的信息。</p>
+<p>门控结构在递推链中加入可学习的保留与写入控制。遗忘门决定旧状态保留多少，输入门决定候选内容写入多少，输出门决定内部状态暴露多少。当保留路径接近恒等映射时，信息和梯度不必在每一步都穿过完整非线性，因此较容易跨越更多时间步。但门控仍是连续的、会累积衰减的机制，并不构成无限容量或绝对无损的存储。</p>
+<p>最终验收必须回到任务的时间结构和部署条件。若要验证长依赖，就应按依赖距离观察性能，并加入干扰、状态重置、缺包与超长序列，而不能只看平均准确率。若系统在线运行，还应检查每步延迟、状态大小、冷启动、断线恢复以及状态是否正确绑定到会话。这样才能把“模型在样本上得分较高”与“模型确实在目标长度和流式约束下维护并利用历史”区分开来。</p>
+<p>完整的可验证链条因此是：</p>
+<p>序列逐步到达 → 共享递推压缩历史 → 时间展开暴露跨步依赖 → BPTT 分配未来损失的责任 → 雅可比乘积决定长距离梯度稳定性 → 门控调节保留与写入 → 按长度、异常条件和流式状态管理进行验收</p>
+<p>每个环节都对应可观察结果：状态递推决定历史如何进入当前计算，展开图决定梯度从哪里传回，门值决定内容如何保留或覆盖，分距离与分场景评测则检验这些机制是否真正满足任务边界。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://ieeexplore.ieee.org/document/279181" target="_blank" rel="noopener">Learning Long-Term Dependencies with Gradient Descent is Difficult</a>：长依赖梯度困难</li><li><a href="https://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">Long Short-Term Memory</a>：LSTM 门控记忆</li><li><a href="https://arxiv.org/abs/1406.1078" target="_blank" rel="noopener">Learning Phrase Representations using RNN Encoder–Decoder</a>：GRU 与编码器—解码器</li><li><a href="https://arxiv.org/abs/1506.03099" target="_blank" rel="noopener">Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks</a>：训练—推理错位</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/rnn">在地图中查看概念关系</a></nav>
+</article></main></body></html>

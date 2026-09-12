@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>知识图谱：把身份、关系、时间与证据组织成可查询事实 · AI 知识地图</title>
+<meta name="description" content="从本体、实体解析和时态边，到路径检索与 GraphRAG，理解图何时优于相似度、又怎样传播错误。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/knowledge-graph/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="知识图谱：把身份、关系、时间与证据组织成可查询事实">
+<meta property="og:description" content="从本体、实体解析和时态边，到路径检索与 GraphRAG，理解图何时优于相似度、又怎样传播错误。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/knowledge-graph/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="知识图谱：把身份、关系、时间与证据组织成可查询事实">
+<meta name="twitter:description" content="从本体、实体解析和时态边，到路径检索与 GraphRAG，理解图何时优于相似度、又怎样传播错误。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/knowledge-graph/#page","name":"知识图谱：把身份、关系、时间与证据组织成可查询事实","description":"从本体、实体解析和时态边，到路径检索与 GraphRAG，理解图何时优于相似度、又怎样传播错误。","url":"https://ai-knowledge-map.com/zh/concepts/knowledge-graph/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"知识图谱：把身份、关系、时间与证据组织成可查询事实","item":"https://ai-knowledge-map.com/zh/concepts/knowledge-graph/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">知识图谱：把身份、关系、时间与证据组织成可查询事实</span></li></ol></nav><article id="dd-article" data-concept-id="knowledge-graph">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">知识图谱：把身份、关系、时间与证据组织成可查询事实</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从本体、实体解析和时态边，到路径检索与 GraphRAG，理解图何时优于相似度、又怎样传播错误。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 知识图谱不是“节点连线图”，而是对实体身份、关系语义、有效时间和证据来源的显式契约；多跳能力的上限首先受<b>实体解析与边的可追溯性</b>约束。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分实体、关系、事件与文档片段；手工完成实体解析和路径查询；设计带时间与来源的事实模型；评测图构建误差和端到端问答。</div>
+<ol class="dd-chain"><li>从真实多跳问题定义最小本体</li><li>抽取候选实体与关系</li><li>解析身份并绑定原文跨度</li><li>写入带时间版本的边</li><li>以实体或文本召回建立锚点</li><li>受约束扩展路径/邻域/社区</li><li>重取原文并生成引用回答</li><li>用纠错与新证据更新图</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>图解决的是关系寻址，而不只是相似搜索<span class="dd-badge intuition">定位</span></h2>
+<div class="dd-agent-response"><p>向量检索已经能高效地找到与问题语义相近的段落，为什么还需要知识图谱？答案在于两类系统回答的是不同性质的问题。向量空间擅长回答&quot;语义上像什么&quot;：把问题和段落映射到同一向量空间，用距离度量相关性，返回最接近的内容。图擅长回答的是&quot;谁通过什么关系连接到谁&quot;：从明确的实体出发，沿类型化、有方向的边行走，用路径本身的结构回答问题。</p>
+<p>这个差别决定了各自的适用边界。当任务需要以下能力时，显式边使查询变得可解释、可验证：</p>
+<ul><li><strong>唯一身份</strong>：问题问的是&quot;某一个特定的 X&quot;，而不是&quot;与 X 相似的一堆文本&quot;。向量相似性天然返回近似集合，图用节点标识符保证指代唯一。</li><li><strong>多跳约束</strong>：答案需要满足&quot;从 A 出发，经关系 R₁ 到 B，再经关系 R₂ 到 C&quot;这样的路径条件。图中一条边一个关系，每跳都能核对约束是否满足；向量检索只能给出一段可能同时提到这些实体的文字，让模型自己去猜路径是否成立。</li><li><strong>依赖传播</strong>：一个事实的成立依赖另一个事实，例如&quot;某药的适应症&quot;依赖&quot;该药获批的版本&quot;。图把依赖建模成结构，查询沿依赖方向传播即可；向量段落则把依赖关系埋在自由文本里。</li><li><strong>时间版本</strong>：事实随事件演化，需要知道&quot;在 t 时刻成立的是什么&quot;。图可以在边上挂时间区间，查询按时间条件裁剪；向量检索无法可靠地区分不同版本。</li><li><strong>全局群落</strong>：需要聚合层面的结构，例如&quot;哪些实体形成了同一主题簇、簇与簇之间靠哪些桥接实体相连&quot;。这要求对整张图做全局结构分析，而不是对单个查询做局部相似性匹配。</li></ul>
+<p>所以图的输入与输出和向量库不同。知识图谱的输入是具有稳定身份的实体、受控的关系类型、时间信息以及指向原文的证据；输出是一张可以按关系和约束查询的事实图。查询的形态是结构化的路径与条件，而非相似度排序。</p>
+<p>但图不是无条件更好的选择。它的构建与维护成本——实体识别、关系规范化、时间对齐、证据挂接——显著高于把文本切片建索引。因此要按任务判断：普通 FAQ 或者单段文本就能回答的问题，用图的收益抵不过成本，不必建图；只有在唯一身份、多跳、时间版本或全局结构成为硬需求时，显式边带来的可解释性与可验证性才值得付出这些成本。</p>
+<p>最后要区分一个关键点：图查询返回的是一条<strong>路径存在</strong>的结论——图中确实有 A 经 R₁ 到 B 再经 R₂ 到 C 这样的连接。路径存在只说明图里记录了这条连接，不自动保证这条连接在现实世界中为真。图的可靠性取决于建图时每条边的事实质量，这正是后续章节处理证据与时间建模的原因。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>事实应是带限定条件的边<span class="dd-badge math">数据模型</span></h2>
+<div class="dd-agent-response"><p>&quot;Alice 就职于 Acme&quot;看起来只是三个词，为什么不能作为三个字符串直接存进图里？因为这条事实能被机器可靠地查询、验证和撤回之前，需要回答一系列问题：这里说的 Alice 是哪一位？&quot;就职于&quot;是雇佣关系还是顾问关系？这条关系从什么时候开始、什么时候结束？凭什么说它是真的？它现在是确认状态还是候选状态？</p>
+<p>这些问题的答案必须成为边本身的一部分。事实建模的输入是六类信息——主体 subject、关系 predicate、客体 object、有效时间 validTime、来源 source、置信度 confidence——外加区分处理阶段的状态 status。建模的输出是一条可追踪、可撤回的限定边，可以写成：</p>
+<p>Fact = (subject, predicate, object, validTime, source, confidence, status)</p>
+<p>每个字段解决一类特定的失败模式。</p>
+<p><strong>subject 与 object 用稳定 ID，显示名称只是属性。</strong> &quot;Alice&quot;这个名字在语料里可能对应多个不同的人。如果边两端存的是名字字符串，两条关于不同 Alice 的事实就会错误地合并到同一个节点上；如果将来某个 Alice 改了名字，用名字当标识符的图会出现身份断裂。因此实体的标识是稳定 ID，显示名称只是挂在节点上的一个可变属性。ID 保证同名实体各归其位，改名也不影响图的结构。</p>
+<p><strong>predicate 来自受控本体。</strong> &quot;就职于&quot;&quot;受雇于&quot;&quot;担任&quot;如果各自成为一条独立的边类型，图里会积累出大量含义重叠的关系，查询时要么漏掉同义关系，要么误把不同含义当作同一关系。本体预先限定允许使用的关系集合及其含义，使每条边的语义确定、可对照。</p>
+<p><strong>validTime 说明事实何时成立。</strong> 雇佣关系有起止日期：在入职前查询&quot;Alice 就职于 Acme&quot;，答案应为否；在离职后查询，答案也是否，但历史查询仍应能返回&quot;2019 年至 2023 年期间成立&quot;。没有时间字段的三元组对任何时间点的提问都只能给出同一个答案，无法区分&quot;现在&quot;与&quot;曾经&quot;。</p>
+<p><strong>source 指向原文跨度。</strong> 每条边要能回答&quot;这条事实来自哪段文字&quot;。来源锚定到具体的文本位置，审查者才能回到原文核对抽取是否正确，也才能在原文被修正时定位需要同步更新的事实。</p>
+<p><strong>confidence 与 status 区分可信度与处理阶段。</strong> confidence 是抽取器对事实成立可能性的数值估计；status 标记该事实所处的生命周期——候选、确认、冲突、撤回。两者回答不同的问题：confidence 问&quot;这条抽取有多可靠&quot;，status 问&quot;这条事实现在处于什么状态&quot;。一条低置信度但已被人工确认的事实，与一条高置信度但与其他事实冲突的记录，处理方式完全不同。</p>
+<p><strong>复杂事实要把事件建成节点。</strong> 一条简单边只能表达二元关系，但许多事实天然是多元的：&quot;Alice 于 2022 年 3 月在东京与 Bob 签署了协议&quot;涉及签署人、另一方、时间、地点、客体等多个角色。把这件事硬塞进一条边，要么丢掉角色，要么制造出角色互相纠缠的假边。正确做法是把&quot;签署&quot;这一事件建成一个节点，让参与者、地点、时间作为该事件节点的不同边分别连接进来。事件节点承载多元关系，避免复杂事实被压扁成无法解释的二元边。</p>
+<p>把这些字段组合起来，图获得的不是一堆裸三元组，而是每条都可追溯、可撤回的限定事实。缺少这些字段的三元组无法支持可靠的历史查询和冲突检测：没有 ID 就无法区分实体，没有时间就无法回答&quot;何时&quot;，没有来源就无法核验&quot;为何成立&quot;，没有状态就无法表达&quot;这份事实当前是否有效&quot;。这也解释了建图的代价从何而来——每条边的每个限定字段都要被抽取、规范化、对齐证据，成本自然高于简单索引。</p></div>
+<div class="dd-formula"><math display="block" aria-label="带限定条件的知识图谱事实"><mi>Fact</mi><mo>=</mo><mo>(</mo><mi>subject</mi><mo>,</mo><mi>predicate</mi><mo>,</mo><mi>object</mi><mo>,</mo><mi>validTime</mi><mo>,</mo><mi>source</mi><mo>,</mo><mi>confidence</mi><mo>,</mo><mi>status</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：从四句话解析同名实体并回答多跳问题<span class="dd-badge math">案例推演</span></h2>
+<div class="dd-agent-response"><p>考虑一个具体语料：&quot;Apple 收购 Beats&quot;&quot;Tim 领导 Apple&quot;&quot;Beats 创始人是 Dre&quot;。问题是：&quot;Tim 间接关联谁？&quot;在向量检索里，这四段文字会被当作相关片段拼给模型，由模型凭上下文猜测&quot;Tim → Apple → Beats → Dre&quot;这条链；在图里，这条链必须作为可验证的路径实际存在。</p>
+<p>建图的第一步是实体解析，关键是要给同名实体分配不同的稳定 ID。&quot;Apple&quot;在这里是公司，分配 org:apple，绝不能与食物类实体 food:apple 合并；&quot;Tim&quot;解析为 person:cook（Tim Cook），&quot;Dre&quot;解析为 person:dre（Dr. Dre）。如果这一步把公司 Apple 和水果 apple 混成一个节点，后续所有经过这个节点的路径都会指向错误对象。</p>
+<p>第二步是抽取带来源的边。三句话产生三条边：person:cook → leads → org:apple，org:apple → acquired → org:beats，person:dre → founded_by⁻¹ 即反向边 org:beats → founded_by → person:dre。每条边都挂上它对应的原文跨度作为来源。</p>
+<p>第三步是回答多跳查询。问题&quot;Tim 间接关联谁&quot;被翻译成图遍历：从 person:cook 出发，沿 leads 到 org:apple，沿 acquired 到 org:beats，再沿 founded_by 的反向边到达 person:dre。查询返回的不只是一个名字，而是这条完整路径及其对应的三段原文证据——&quot;间接关联&quot;的定义就落在路径结构上，任何一跳缺失，这个答案就不成立。</p>
+<p>但路径上的每一步都有出错的可能，这些错误会累积。设实体解析的准确率为 pEntity，每条边的正确率为 pEdge，路径含 h 条边，在&quot;各步错误相互独立&quot;的粗略假设下，整条路径正确的概率近似为：</p>
+<p>Ppath = pEntity × pEdge^h</p>
+<p>代入本例：Apple 解析准确率取 0.9，三条边每条正确率取 0.95，则 Ppath = 0.9 × 0.95³ ≈ 0.772。每增加一跳，就多乘一次边正确率，误差随之放大——这正是多跳查询比单跳脆弱的原因：单跳只承担一次边错误，多跳承担全部跳数的连乘风险。</p>
+<p>这个独立近似公式本身也只是一种直觉工具。真实系统中，实体解析错误与关系抽取错误往往相互关联：把&quot;Apple&quot;解析成水果，紧跟着&quot;收购&quot;这条边也会抽取错；同一段原文的错误会同时污染相邻的多条边。相关误差使真实可信度比独立相乘的估计更不可靠，所以最终结论必须回到原文核对。</p>
+<p>不同的错误发生在不同的阶段，造成的后果也不同：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">阶段</th><th class="dd-align-left">候选错误</th><th class="dd-align-left">后果</th></tr></thead><tbody><tr><td class="dd-align-left">实体解析</td><td class="dd-align-left">Apple → 水果</td><td class="dd-align-left">路径完全断裂或误连到无关实体</td></tr><tr><td class="dd-align-left">关系抽取</td><td class="dd-align-left">收购 → 合作</td><td class="dd-align-left">路径仍在，但语义结论被改变</td></tr><tr><td class="dd-align-left">方向</td><td class="dd-align-left">founded_by 反向边取反</td><td class="dd-align-left">查询返回错误的主体</td></tr><tr><td class="dd-align-left">来源</td><td class="dd-align-left">引用的是邻近句子而非证据句</td><td class="dd-align-left">路径看似合理，但无法回到原文验证</td></tr></tbody></table></div>
+<p>实体解析错误最具破坏性，因为它影响所有经过该节点的边；关系错误让路径&quot;看似存在实则语义错误&quot;；方向错误让&quot;谁收购了谁&quot;这种主客关系颠倒；来源错误则让整条路径失去可验证性——路径看着通，却找不到支撑它的原文。因此多跳答案的正确性不能只看路径是否连通，还要逐跳核对实体、关系、方向和证据。</p></div>
+<table class="dd-table"><thead><tr><th>阶段</th><th>候选错误</th><th>后果</th></tr></thead><tbody><tr><td>实体解析</td><td>Apple→水果</td><td>路径完全断裂/误连</td></tr><tr><td>关系抽取</td><td>收购→合作</td><td>语义结论改变</td></tr><tr><td>方向</td><td>founded_by反向</td><td>查询返回错误主体</td></tr><tr><td>来源</td><td>引用邻近句</td><td>路径看似合理但不可证</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="多跳路径的独立近似置信度"><mi>Ppath</mi><mo>≈</mo><mi>pEntity</mi><mo>×</mo><msup><mi>pEdge</mi><mi>h</mi></msup><mo>=</mo><mn>0.9</mn><mo>×</mo><msup><mn>0.95</mn><mn>3</mn></msup><mo>≈</mo><mn>0.772</mn></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>本体是问题驱动的约束，不是世界百科全书<span class="dd-badge eng">建模</span></h2>
+<div class="dd-agent-response"><p>关系类型是不是越多越好？图里的关系越丰富，是不是就意味着图越有知识？答案是否定的。本体的目标不是穷尽世界的概念，而是用最小的约束稳定地支撑一类查询。</p>
+<p>本体设计的输入是真实问题和决策需求，而不是&quot;世界上有哪些概念&quot;。正确顺序是：先收集用户实际会问的问题和需要做出的决策，再据此定义最小化的实体类型、关系、方向、基数规则和时间规则。输出是一份恰好能支持这些目标查询的 schema。判断本体质量的标准只有一个——它能否稳定地回答业务问题，而不是它定义了多少种类型。</p>
+<p>两端偏离都会破坏这个目标。<strong>过宽的本体</strong>——例如把一切都塞进一条含义模糊的 related_to 边——无法支持精确查询：related_to 不区分&quot;收购&quot;&quot;竞争&quot;&quot;供货&quot;还是&quot;被起诉&quot;，图遍历无法在这条边上施加语义约束，多跳路径变成无意义的连通性。<strong>过细的本体</strong>同样有害：关系切分过细，抽取系统难以在真实文本中可靠地区分相邻类型，标注成本随之上升，每个细分类别下的边变得稀疏，查询反而要枚举大量类型才能覆盖同一语义。宽度选择的原则是：刚好能区分对业务查询产生不同答案的关系，再细就是过度设计。</p>
+<p>schema 不是一成不变的，但变化必须受控。每次修改——新增类型、拆分关系、调整方向——都要有迁移和兼容策略：已有的旧边要么迁移到新类型，要么明确标注其旧语义，绝不能悄悄改变含义。一条边建的时候是&quot;合作&quot;，schema 调整后如果被解释成&quot;控股&quot;，所有依赖这条边的历史查询结论都会在无人察觉的情况下翻转。</p>
+<p>本体中的身份规则必须显式写出，因为这是同名实体问题的根源。两条规则互相制衡：<strong>同名不等于同实体</strong>——两个都叫&quot;Apple&quot;的节点，一个是公司一个是水果，绝不能自动合并；<strong>别名不等于不同实体</strong>——&quot;Tim Cook&quot;和&quot;Apple CEO&quot;指向同一个人时，也不能因为写法不同就拆成两个节点。实现身份判定的手段依次是：使用规范 ID 作为节点主键，挂接外部标识符（如组织编号、人员 ID）做交叉核对，用属性证据（地址、任职时间等）辅助判别，对于合并或拆分会影响重要结论的高影响操作，必须经过人工复核。自动合并图省事，但错误合并一个高影响实体，会污染所有经过该节点的路径；错误拆分则让本应连通的查询永远走不通。</p>
+<p>因此，本体不是越全越好，schema 也不是越稳越好：它是一组随问题演化、随数据能力伸缩的约束。约束过宽，查询失去精度；约束过细，抽取失去密度；变化失控，历史失去语义。三者之间唯一的锚点是：当下要回答的问题。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：从原文证据到图路径，再回到原文<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>图建好之后，能不能只把边列表（subject → predicate → object 的三元组集合）交给模型生成答案？不能。因为边列表丢掉的信息，恰好是前几章花大力气建模的东西：每条边的限定条件（时间、来源、置信度、状态）和抽取本身的不确定性。模型拿到一张光秃秃的边列表，看到的只是&quot;存在某些连接&quot;，既不知道连接何时成立、依据哪段原文，也不知道这条边是确认的还是候选的。用它生成的答案无法核验，错误也无法定位。</p>
+<p>证据闭环的架构明确了图和原文的分工。输入端是原始文档及其版本。文档块先经过实体解析（同名消歧、稳定 ID 分配）、关系抽取和时间与来源绑定，进入一张时态图——图 1 展示的就是这条从文档块到时态图的构建链路。回答问题时，查询在图里通过路径遍历与社区聚合得到结构线索，再与文本检索混合，由模型综合生成答案。</p>
+<p>这里的分工是：<strong>图负责寻路与聚合，原文跨度负责事实核验与纠错。</strong> 图的价值在于指出&quot;从哪个实体出发、经过哪些关系、到达哪个实体&quot;这条路径，以及&quot;哪些实体属于同一社区&quot;这类聚合结构；但&quot;这条边是否为真&quot;的最终证据永远在原文里。因此证据闭环是双向的：从原文进图（抽取、绑定），再从图回到原文（回取、核验）。每条回答路径都必须能够回到可访问的原文证据——审查者顺着答案里的路径，能找到支撑每一跳的具体句子；如果某跳回不去，答案就不具备可验证性。</p>
+<p>回不到原文的后果在系统层面成立：抽取错误被发现时，无法定位是哪段文本的哪次抽取出问题，也就无法定向修复；原文更新后，无法判断哪些边需要同步变更。图的路径给出了&quot;答案可能是什么&quot;，原文跨度给出了&quot;为什么这是真的&quot;以及&quot;错了该改哪里&quot;。把图当作答案的机器而丢掉原文，等于丢掉了事实质量的全部保障。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 735 310" role="img" aria-label="文档块经过实体解析关系抽取和来源绑定进入时态图，再经路径社区和文本混合检索回答"><defs><marker id="k27a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="18" y="105" width="120" height="90" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="78" y="134" text-anchor="middle" class="svg-t">原始文档</text><text x="78" y="158" text-anchor="middle" class="svg-t" font-size="11">版本 · 页码</text><text x="78" y="179" text-anchor="middle" class="svg-t" font-size="11">字符跨度</text><path d="M138,150 L190,150" stroke="#788293" marker-end="url(#k27a)"/><rect x="195" y="75" width="165" height="150" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="277" y="105" text-anchor="middle" class="svg-t">构建管线</text><text x="277" y="133" text-anchor="middle" class="svg-t" font-size="11">实体解析 / 去重</text><text x="277" y="157" text-anchor="middle" class="svg-t" font-size="11">关系 + 时间抽取</text><text x="277" y="181" text-anchor="middle" class="svg-t" font-size="11">来源与置信绑定</text><text x="277" y="205" text-anchor="middle" class="svg-t" font-size="11">人工抽检 / 撤回</text><path d="M360,150 L412,150" stroke="#788293" marker-end="url(#k27a)"/><rect x="417" y="75" width="135" height="150" rx="9" fill="#21252d" stroke="#8b76bd"/><circle cx="455" cy="126" r="15" fill="#303746" stroke="#8b76bd"/><circle cx="512" cy="112" r="15" fill="#303746" stroke="#8b76bd"/><circle cx="492" cy="181" r="15" fill="#303746" stroke="#8b76bd"/><line x1="468" y1="121" x2="497" y2="116" stroke="#788293"/><line x1="507" y1="127" x2="497" y2="166" stroke="#788293"/><line x1="464" y1="139" x2="482" y2="168" stroke="#788293"/><text x="484" y="211" text-anchor="middle" class="svg-t">时态证据图</text><path d="M552,150 L600,150" stroke="#788293" marker-end="url(#k27a)"/><rect x="605" y="75" width="112" height="150" rx="9" fill="#21252d" stroke="#72b293"/><text x="661" y="107" text-anchor="middle" class="svg-t">查询</text><text x="661" y="135" text-anchor="middle" class="svg-t" font-size="11">路径 / 邻域</text><text x="661" y="158" text-anchor="middle" class="svg-t" font-size="11">社区摘要</text><text x="661" y="181" text-anchor="middle" class="svg-t" font-size="11">原文重取</text><text x="661" y="205" text-anchor="middle" class="svg-t" font-size="11">带证据回答</text><path d="M661,225 C661,280 78,280 78,195" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#k27a)"/><text x="367" y="292" text-anchor="middle" class="svg-t" font-size="11">回答中的每条路径都必须回到原文核验</text></svg><figcaption>图 1　图用于寻路与聚合；原始跨度仍是事实证据和纠错入口。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>时间与冲突必须一等建模<span class="dd-badge eng">时态</span></h2>
+<div class="dd-agent-response"><p>当 CEO 从甲换成乙，图里&quot;谁在领导这家公司&quot;的边该怎么处理？最省事的做法是删掉旧边、写入新边，但这样做丢掉的不只是旧事实，还有回答&quot;公司历史上有过哪些 CEO&quot;以及&quot;甲的任职何时结束&quot;的能力。时间是事实的组成部分，必须作为一等要素建模，而不是用覆盖来替代更新。</p>
+<p>时态建模需要区分两个不同的时间概念。<strong>validFrom 与 validTo 表示事实本身的有效区间</strong>：这条边在现实世界中从何时起、到何时止成立。<strong>observedAt 表示系统何时获知这一事实</strong>：证据进入语料、被系统抽取到的时刻。两者回答完全不同的问题——valid 区间问&quot;事实什么时候是真的&quot;，observedAt 问&quot;我们什么时候知道的&quot;。一条 2020 年发布的新闻可能在 2023 年才被收录，observedAt 晚于事实发生；一份旧档案被新纳入时，observedAt 也可能晚于事实早已结束的时间。把两者混为一谈，就无法区分&quot;那时还没发生&quot;与&quot;那时我们还不知道&quot;。</p>
+<p>时间上的更新遵循&quot;关闭而非删除&quot;的原则。新证据显示 CEO 已更换时，正确的操作是给旧边写入 validTo = 交接时刻，关闭其有效区间，同时新建一条从交接时刻起有效的新边；旧边及其历史来源必须保留在图中。这样，按任意时间点查询&quot;当时的 CEO 是谁&quot;都能得到唯一答案，而历史查询能看到完整的任职序列。删除旧边虽然让&quot;当前 CEO&quot;查询仍然正确，却永久摧毁了历史可查询性——所有依赖时间区间的下游查询都会失去过去的信息。</p>
+<p>冲突来自不同来源对同一事实给出互相矛盾的陈述，且时间区间重叠。此时不能静默地选一条覆盖另一条：冲突本身是有价值的信息，说明信息源之间存在分歧或演化。正确做法是让冲突边<strong>并存</strong>，各自保留来源，并标上冲突状态。查询时再决定如何处理：按时间过滤出与问题相关区间的边；按来源权威给可信度加权；按用途选择——例如面向大众的问答可以采用权威来源的说法，而舆情分析恰恰需要暴露分歧本身。对尚未解决的冲突，系统要么如实向用户展示，要么依据预先定义的、明确的用途规则做选择，任何情况下都不允许静默覆盖。</p>
+<p>由此得到时态建模的完整图景。输入是事实的有效区间 validFrom/validTo、系统获知时间 observedAt、来源权威和冲突状态；输出是一组可按时点查询、可并存的边。新任 CEO 出现时关闭旧边有效期而不删除历史证据；observedAt 只是系统获知时间，不等于事实生效时间；来源冲突未解决时必须展示或按明确规则选择。时间让同一关系在不同时刻给出不同答案，冲突让同一时刻的答案保留不确定性，二者共同使图从&quot;当前事实的静态快照&quot;变成&quot;随时间演化、可审计的事实记录&quot;。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>GraphRAG 有路径、邻域与社区三个尺度<span class="dd-badge eng">检索</span></h2>
+<div class="dd-agent-response"><p>面对一个问题，检索器该取什么？取起点到目标的最短路径，还是干脆把整张图摘要交给模型？答案取决于问题属于哪种类型。GraphRAG 的检索在三个尺度上工作——路径、邻域与社区——每个尺度对应一类问题，每个尺度都需要严格的规模限制。</p>
+<p><strong>实体问题：从锚点扩展有限邻域。</strong> &quot;关于 X 我们了解什么&quot;这类问题没有预设路径。检索器先定位锚点实体 X，再沿边向外扩展有限的几跳，把 X 及其邻近实体、边的信息作为上下文。邻域的半径必须受跳数限制，否则遇到高度连接的枢纽节点——例如&quot;美国&quot;&quot;互联网&quot;这样被大量事实引用的实体——邻域会瞬间膨胀到淹没所有相关信息。</p>
+<p><strong>多跳关系问题：寻找受类型约束的路径。</strong> &quot;谁通过收购关系间接关联到谁&quot;这类问题有明确的结构要求。检索器在图里搜索满足边类型约束的路径：每一跳的关系类型都必须匹配问题限定的类型，路径长度受最大跳数限制。这正是图区别于向量检索的地方——不是返回提及相关实体的片段，而是返回一条每跳都可核对的路径。</p>
+<p><strong>全局主题问题：使用社区检测与分层摘要。</strong> &quot;这个领域整体有哪几个研究主题、彼此如何关联&quot;这类问题没有单一锚点，需要的是整张图的结构视图。检索器运行社区检测，把实体聚类成群落，再对社区做分层摘要，逐层浓缩出主题概貌。</p>
+<p>三种尺度共享同一条纪律：<strong>每次扩展都要限制跳数、节点数和边类型。</strong> 没有预算约束的图遍历必然撞上枢纽节点和无界扩张——一跳从&quot;某初创公司&quot;连到&quot;美国&quot;，两跳后半个图都在邻域里，相关信息被稀释殆尽，模型拿到的是噪声而非证据。规模预算不是性能优化，而是检索质量的组成部分。</p>
+<p>还要划清社区摘要的边界。社区摘要是对图结构的二次生成物：它浓缩了社区内容，但浓缩过程丢弃了细节，是一个<strong>有损索引</strong>。它可以用来导航——指出哪个社区值得深入、哪个主题覆盖了什么——但绝不能作为最终答案的证据。回答前必须重新取回路径对应的原文，逐跳核对。</p>
+<p>最后，图检索不能是封闭的。图中尚未结构化的新事实——刚进入语料、还没被抽取成边的信息——在图里查不到。因此图的输出要与向量检索和关键词检索的结果融合：图提供可解释的结构线索，向量与关键词检索兜住图上缺失的内容，原文跨度提供最终证据。三个尺度决定&quot;从图里取什么&quot;，融合决定&quot;图外还有什么&quot;，回取原文决定&quot;这些是不是真的&quot;。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>图与向量检索应互补而非二选一<span class="dd-badge eng">混合系统</span></h2>
+<div class="dd-agent-response"><p>图检索有一个天然的入口难题：如果问题里没有精确的实体名——用户问&quot;那个做降噪耳机的公司后来被谁收购了&quot;，而不是&quot;Apple 收购了谁&quot;——图该从哪里开始走？图的遍历需要锚点，而锚点识别恰恰是向量检索的强项。这个问题本身给出了答案：图与向量不是互相替代的关系，而是流程上互补的两级。</p>
+<p>混合流程的输入是自然语言问题，输出是经过实体解析、路径约束和文本重排后的候选证据，中间经过三个环节。</p>
+<p><strong>向量检索负责找锚点。</strong> 问题与语料段落做向量匹配，返回语义相近的候选文本；从这些文本里再解析出候选实体——&quot;降噪耳机公司&quot;对应到 Beats。没有精确实体名时，向量检索把模糊的自然语言问题变成具体的实体候选，图的遍历才得以启动。</p>
+<p><strong>实体解析后进入图，图负责施加关系约束。</strong> 候选实体进入图后，问题中&quot;被谁收购&quot;的关系约束变成边的类型约束：从 Beats 出发，沿 acquired 的反向边找到 Apple。图在这里的价值是结构性的——不是&quot;哪些文本提到了这些词&quot;，而是&quot;存在一条满足收购关系的路径&quot;。</p>
+<p><strong>文本重排负责选择证据。</strong> 图返回的候选路径不止一条，也可能把无关但连通的实体带进来。用文本重排对候选证据打分排序，选出与问题最贴合的路径和原文。另一个方向同样可行：把图的邻域结构文本化——把锚点附近的实体与边写成一段描述——再嵌入向量空间参与检索，让结构信息以文本形式进入向量侧。</p>
+<p>这套混合的关键纪律有两条。第一，<strong>保留各路召回来源</strong>，不因为图（或向量）单方面命中就丢弃另一路的候选：每一路召回都可能是答案的唯一线索，融合时让它们相互补充，而非相互覆盖。第二，<strong>各路贡献必须可观测</strong>：一个答案的证据里，哪些来自向量召回、哪些来自图路径、哪些来自文本重排，应当能够区分。否则系统退化成一个黑盒，出了错无法判断该修哪一路。</p>
+<p>这也决定了图与向量的比较方式。问&quot;图和向量哪个更好&quot;没有意义——它们只有放在<strong>同一质量、延迟与成本预算</strong>下，比较&quot;向量-only、图-only、混合&quot;三种配置才有意义。混合配置通常质量更高，但图构建与路径查询增加了延迟和成本；如果预算严格受限，向量-only 可能才是正确选择。互补的价值要在预算约束下量化验证，而不是靠架构上的先验偏好。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要分解构建质量与任务贡献<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>端到端问答答对了，能不能证明图里的边都是对的？不能。模型可能在证据缺失时凭参数记忆&quot;蒙&quot;对答案，可能从向量检索的片段里找到答案而完全绕过图，也可能图里恰好有一条正确路径但其余大量边是错的。问答准确率衡量的是整个系统的输出，不是图的质量。图的评测必须把构建质量与任务贡献分开测量，分别在三个层次上进行。</p>
+<p><strong>构建层</strong>直接度量图本身有多准确。对照金标实体、关系、时间与来源，分别计算实体识别与实体链接的精确率和召回率、关系类型和方向的正确率、时间区间的准确度、来源跨度的对齐度。这一层回答的问题是：&quot;抽取出来的边，与金标相比对了几条、错了几条、漏了几条？&quot;</p>
+<p><strong>查询层</strong>度量图在检索环节的真实贡献。指标包括锚点命中率（问题里的实体有没有被正确链接到图中的节点）、路径召回率（金标路径有没有被图检索找回来）、证据正确性（路径对应的原文是否真的支撑结论）以及延迟。这一层回答的问题是：&quot;当答案需要图时，图把该给的路径给出来了吗？&quot;</p>
+<p><strong>应用层</strong>度量整个系统对最终用户的价值。指标包括端到端答案的正确率、引用的完整性（答案中的每一跳能否回到原文），以及相对混合检索基线的增益——启用图之后，答案质量到底提升没有、提升多少。这一层回答的问题是：&quot;图的存在，最终让答案变好了吗？&quot;</p>
+<p>只有三层分开测，才能定位问题：构建层差而应用层好，说明图没被真正用上；构建层好而查询层差，说明检索策略有问题；查询层好而应用层无增益，说明图的贡献在融合环节被稀释了。</p>
+<p>除此之外，评测必须<strong>按维度切片</strong>，而不是只看全局平均。四个关键切片是：路径长度（长路径的错误率远高于短路径，全局平均会掩盖多跳的脆弱性）、实体热度（高热度实体被大量文本提及，抽取和链接的行为与长尾实体完全不同）、时间更新（新事实覆盖旧事实的时机是否准确）、冲突（冲突检测与保留是否正确）。</p>
+<p>其中误合并需要专项指标。一个高连接实体的误合并——比如把公司 Apple 与水果 apple 并成一个节点——会让所有经过该节点的路径同时变错，一条错误的合并污染几十条路径。平均边准确率对这种非线性伤害几乎无感：99% 的边都正确时，只要那 1% 的错误恰好落在枢纽实体上，大量查询依然会系统性失败。因此误合并必须单独度量，用&quot;错误合并影响到的路径比例&quot;这类指标暴露它，而不是淹没在平均准确率里。</p>
+<p>图的评测输入是金标实体、关系、时间、来源、查询路径与最终答案，输出是构建层、查询层与应用层三组指标。问答偶然答对不能证明所有边正确，平均指标不能代表所有情况成立——这是图评测与普通检索评测之间最重要的差别。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>先澄清：知识图谱、图数据库与可视化不是同义词<span class="dd-badge intuition">概念消歧</span></h2>
+<div class="dd-agent-response"><p>把一份 CSV 导入图数据库，再画成漂亮的网络图，就得到知识图谱了吗？没有。这个动作得到的是&quot;一个存储在图数据库里的网络可视化&quot;，它与知识图谱之间还隔着身份、语义、时间、来源与治理这五道关。</p>
+<p>四个概念处在不同的层级，常常被混为一谈。</p>
+<p><strong>图数据库是存储与查询技术。</strong> 它能保存任意节点和边，并提供沿边遍历的查询能力，但它不关心节点的身份是否稳定、边的语义是否明确。把两列名字和它们之间的关系塞进图数据库，图数据库忠实存下，不负责判断对错。它的价值在于存储与遍历的效率，不在事实的质量。</p>
+<p><strong>网络图是视觉呈现。</strong> 节点和边的图形化布局帮助人看清结构，但呈现的只是数据里已有的东西。一张图看起来连接丰富，可能是因为数据里确实有很多关系，也可能是因为抽取器产生了大量噪声边。可视化不改变事实质量，它放大什么取决于数据里有什么。</p>
+<p><strong>知识图谱在前两者的基础上多出一整套要求：</strong> 稳定的实体身份（同名消歧、稳定 ID）、明确的关系语义（受控本体、方向与基数）、时间（有效区间与获知时间）、来源（每条边可回到原文证据）和治理（冲突处理、schema 迁移、状态管理）。这些正是前几章逐项展开的内容。反过来也成立：一个小型知识图谱完全可以存在关系表里——实体一张表、关系一张表、时间与来源作为字段——不一定需要专用图数据库。图数据库是存储选项之一，不是知识图谱的定义性要素。</p>
+<p><strong>GraphRAG 又是不一样的东西：</strong> 它是一种使用图索引辅助检索与生成的系统模式。图在其中扮演索引角色——寻路、邻域扩展、社区聚合——用来给模型挑选上下文。GraphRAG 是&quot;图的用法&quot;，不是&quot;图本身&quot;。一套 GraphRAG 系统里可能有一个质量很差的知识图谱，而一份高质量的知识图谱也可以完全不用于检索。</p>
+<p>概念辨析的输入是一个具体对象——某个图存储、某张网络可视化或某套 GraphRAG 系统——输出是它在&quot;图数据库 / 可视化 / 知识图谱 / 图辅助检索&quot;层级中的正确定位。初学者的典型混淆是：以为&quot;能沿边查询&quot;就等于&quot;边表达了真实知识&quot;。能沿边查询只证明结构存在，不证明结构为真。判断一个对象是否是知识图谱，不看它存在哪里、画出来多好看，而看它是否经得起核验：身份是否唯一、关系方向是否正确、每条边能否回到原文证据跨度。核验通过之前，它只是一堆连起来的字符串。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各章连成一条完整的因果链，知识图谱的实践是一个循环：从问题出发定义约束，用约束构建可核验的事实，用事实服务查询，再用查询与纠错反哺图本身。</p>
+<p><strong>第一步：从真实多跳问题定义最小本体。</strong> 一切从用户实际要回答的问题开始。收集真实的多跳问题与决策需求，据此定义最小化的实体类型、关系、方向、基数与时间规则。本体不是世界的百科全书，而是恰好支撑目标查询的约束集。</p>
+<p><strong>第二步：抽取候选实体与关系。</strong> 在原始文档上运行抽取，产出候选实体和候选关系。这一步的产物只是候选——身份尚未确认，关系尚未对齐，来源尚未绑定。</p>
+<p><strong>第三步：解析身份并绑定原文跨度。</strong> 给候选实体分配稳定 ID，同名消歧、别名归并；每条候选关系锚定到产生它的原文跨度。没有这一步，图里只有连起来的字符串，没有可核验的事实。</p>
+<p><strong>第四步：写入带时间版本的边。</strong> 把带限定条件的事实写入图：有效区间 validFrom/validTo、系统获知时间 observedAt、来源、置信度与状态。新证据关闭旧边的有效区间而不删除历史，冲突边并存并标记状态。至此，图成为随时间演化、可审计的事实记录。</p>
+<p><strong>第五步：以实体或文本召回建立锚点。</strong> 回答问题时，问题里有精确实体名就直接定位锚点；没有实体名则先向量检索候选文本，从中解析出候选实体进入图。两条入口保证图在模糊问题下依然可启动。</p>
+<p><strong>第六步：受约束地扩展路径、邻域或社区。</strong> 实体问题扩展有限跳邻域，多跳问题搜索受类型约束的路径，全局主题问题使用社区检测与分层摘要。每一步扩展都限制跳数、节点数与边类型，防止枢纽节点和无界扩张淹没相关信息。</p>
+<p><strong>第七步：重取原文并生成引用回答。</strong> 图路径给出的只是结构线索，社区摘要更是有损索引，都不能当作最终证据。沿路径回取原文跨度，与向量、关键词检索结果融合，生成带引用的回答——答案中的每一跳都能回到原文。</p>
+<p><strong>第八步：用纠错与新证据更新图。</strong> 评测暴露的错误、审查发现的误合并、语料新到的事实，都会作为更新流回到图中：修正抽取、关闭过期区间、写入新边。这一步把一次性的管道变成持续运行的循环。</p>
+<p>这条链的每一环都依赖前一环成立：本体约束了抽取能产出什么，身份与来源决定了边是否可核验，时间与状态决定了图能否回答&quot;何时&quot;，锚点与扩展决定了查询能否命中，原文回取决定了答案能否被验证，更新则让所有环节在时间上持续有效。切断任何一环——没有本体就失去语义，没有来源就失去证据，没有时间就失去历史，没有预算就失去精度——整条链的价值都会在那一环断裂。知识图谱的全部成本，正是为维护这条链的完整性而付出的；它的全部收益，也来自这条链每一环都可追溯、可核验、可修正。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2003.02320" target="_blank" rel="noopener">Knowledge Graphs Survey</a>：知识图谱表示、构建与应用综述</li><li><a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">From Local to Global: GraphRAG</a>：图索引与社区摘要</li><li><a href="https://arxiv.org/abs/2405.14831" target="_blank" rel="noopener">HippoRAG</a>：知识图上的长期检索</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/knowledge-graph">在地图中查看概念关系</a></nav>
+</article></main></body></html>

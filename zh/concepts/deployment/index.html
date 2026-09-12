@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务 · AI 知识地图</title>
+<meta name="description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/deployment/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务">
+<meta property="og:description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/deployment/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务">
+<meta name="twitter:description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/deployment/#page","name":"AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务","description":"从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。","url":"https://ai-knowledge-map.com/zh/concepts/deployment/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务","item":"https://ai-knowledge-map.com/zh/concepts/deployment/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务</span></li></ol></nav><article id="dd-article" data-concept-id="deployment">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 部署不是把模型包成 URL，而是把模型、提示、索引、工具、策略和基础设施组成一个<b>可追溯发布单元</b>。可靠性取决于容量与尾延迟、真实副作用边界、渐进放量和完整回滚；离线质量更高并不足以证明生产上更好。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>比较云端、自托管和端侧约束；手算容量与排队风险；设计影子/金丝雀/蓝绿发布；定义降级、回滚和版本原子性。</div>
+<ol class="dd-chain"><li>定义位置/隐私/延迟/容量约束</li><li>把全部依赖冻结成发布单元</li><li>离线评测并压力测试</li><li>影子验证真实分布与容量</li><li>金丝雀按门槛渐进放量</li><li>告警时降级/回滚并回流失败</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>运行位置首先决定责任边界<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>同一份模型能力，放在哪里运行，回答的并不是一个纯技术问题，而是“谁为此负责”的问题。部署位置的选择决定了模型服务的形态、团队获得的收益、承担的代价，以及它适合什么样的业务阶段。运行位置通常分为四种形态：托管 API、自托管（云或机房）、边缘/端侧、以及混合部署。</p>
+<p>托管 API 是借用供应商已经建好的推理服务。团队获得的是弹性伸缩、快速的模型更新，以及免去 GPU 运维的负担；作为交换，数据需要离开自己的域内，团队要接受供应商的配额与单价约束，并对供应商形成依赖。这种形态适合处于快速迭代阶段、流量波动明显的产品——团队可以把有限的工程力量全部投入业务，而不是投入机器。</p>
+<p>自托管（自己的云账号或机房）换取的是对权重、数据、容量和版本的控制权。权重文件、推理代码和版本发布节奏都由自己决定，数据也不离开自己划定的边界；代价是必须自己承担资源调度、补丁、安全加固和值班等全部运维责任。当业务规模趋于稳定、合规控制要求很强时，这种形态才有意义，因为它要求团队真正具备长期运维能力。</p>
+<p>边缘/端侧部署把推理放到用户设备或靠近设备的位置。获得的是离线可用、极低的网络往返，以及数据不出端的局部隐私；代价则是内存和功耗的硬约束、硬件碎片化带来的适配成本，以及模型更新的困难。它适合弱网环境、实时性要求极高、或数据不允许出端的场景。</p>
+<p>混合部署是端侧快路径与云端升级的组合：简单请求在本地直接应答，复杂请求或新能力回源到云端。这种形态能够按风险和能力分层，让端侧承担低风险高频任务、云端承担高质量兜底；但它引入了同步、路由和一致性方面的复杂度，需要团队有能力设计清楚“什么走哪里”。</p>
+<p>两种直觉在此常常出错。端侧并不自动等于低延迟：如果设备算力不足，解码本身就会很慢，省下的网络时间会被计算时间吃回去。自托管也不自动更便宜：低利用率、工程人力投入和冗余建设会吞掉表面上的单价优势。因此运行位置的选择输入是实际流量特征、数据地域要求、隐私约束、延迟预算、可用性目标、硬件条件和团队运维能力，输出是托管 API、自托管、端侧或混合方案中的一种；每一种交换的都是控制权、弹性、成本与责任。如果团队没有能力承担补丁、值班和灾备，就不能仅仅因为偏好数据控制而选择自托管。</p></div>
+<table class="dd-table"><thead><tr><th>形态</th><th>获得</th><th>承担</th><th>适合</th></tr></thead><tbody><tr><td>托管 API</td><td>弹性、快速更新、免 GPU 运维</td><td>数据出域、配额、供应商与单价</td><td>快速迭代、波动流量</td></tr><tr><td>自托管云/机房</td><td>权重、数据、容量和版本控制</td><td>调度、补丁、安全与值班</td><td>稳定规模、强合规控制</td></tr><tr><td>边缘/端侧</td><td>离线、低网络往返、局部隐私</td><td>内存、功耗、硬件碎片与更新</td><td>弱网、实时、数据不出端</td></tr><tr><td>混合</td><td>端侧快路径与云端升级</td><td>同步、路由和一致性复杂度</td><td>分级风险与能力</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>服务路径比模型权重更长<span class="dd-badge eng">系统</span></h2>
+<div class="dd-agent-response"><p>模型推理只花了 600ms，用户却等了 2 秒——这个差距提醒我们，把模型权重视为部署的唯一对象是一种错觉。一次真实请求从发出到返回，依次要经过认证、限流、排队、上下文装配、检索、预填充、逐 token 解码、工具调用、后处理和流式传输。模型计算只是这条路径上的一段，而路径上的任何一段都可能成为尾延迟的主导者。</p>
+<p>这条路径的因果链是：请求先通过网关的认证与限流决定它是否被允许进入；随后在队列中等待计算资源；进入服务后需要把用户上下文与检索到的材料装配成完整输入；预填充一次性处理全部输入，解码则逐个 token 产出；若模型决定调用工具，还要等待外部系统的响应；最后经过后处理与流式传输把结果送回用户。端到端延迟是所有这些阶段耗时的叠加，而不是模型耗时本身。600ms 的模型推理时间，加上排队等待和工具往返，2 秒的体验就出现了。诊断尾延迟时，只看模型耗时没有意义——排队或工具调用在关键路径上完全可以主导这 2 秒。</p>
+<p>工具调用还引入了另一层责任。模型不直接执行转账、退款这类外部操作，而是通过工具去做，这些操作一旦发生就留下真实世界的副作用。因此工具调用必须带权限控制、幂等设计和事务补偿：重复调用不能重复扣款，失败的操作要能撤销。模型输出可以随时重新生成，外部副作用却不能靠重新生成来挽回。</p>
+<p>图 1 展示了退款助手的部署路径：请求从网关进入，经过队列与检索，到达模型，模型再触发工具，整条路径都处于金丝雀回滚的覆盖之下。这张图说明的真正结论是：可回滚的对象从来不是单一权重，而是模型、提示词、索引、工具 schema、策略与服务配置组合成的版本。任何一个环节单独改动都可能破坏整条链路，所以发布单元必须覆盖全部依赖。</p>
+<p>因此服务路径的输入是一次请求及其所经历的认证、排队、检索、预填充、解码、工具与传输各阶段，输出是端到端延迟、系统状态与外部副作用。模型耗时 600ms 只是其中一段；关键路径上的排队或工具可以主导 2 秒的响应时间。发布单元必须覆盖路径上的全部依赖，外部副作用需要权限、幂等与补偿，不能只回滚模型。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 720 250" role="img" aria-label="退款助手从网关、队列、检索、模型到工具的部署路径以及金丝雀回滚"><defs><marker id="dp1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="16" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="64" y="99" text-anchor="middle" class="svg-t">网关</text><text x="64" y="119" text-anchor="middle" class="svg-t" font-size="11">认证/限流</text><path d="M112,103 L148,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="150" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="198" y="99" text-anchor="middle" class="svg-t">队列</text><text x="198" y="119" text-anchor="middle" class="svg-t" font-size="11">背压/批处理</text><path d="M246,103 L282,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="284" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="332" y="99" text-anchor="middle" class="svg-t">检索</text><text x="332" y="119" text-anchor="middle" class="svg-t" font-size="11">index p17</text><path d="M380,103 L416,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="418" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="466" y="99" text-anchor="middle" class="svg-t">模型 v42</text><text x="466" y="119" text-anchor="middle" class="svg-t" font-size="11">prompt h83</text><path d="M514,103 L550,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="552" y="74" width="144" height="58" rx="8" fill="#21252d" stroke="#c77b72"/><text x="624" y="99" text-anchor="middle" class="svg-t">退款工具</text><text x="624" y="119" text-anchor="middle" class="svg-t" font-size="11">策略 s9 / 幂等键</text><path d="M466,133 C464,196 294,204 198,136" fill="none" stroke="#c77b72" stroke-dasharray="5 4" marker-end="url(#dp1)"/><text x="362" y="195" text-anchor="middle" class="svg-t" font-size="11">安全、质量或 p95 越线：停止放量，整体回滚到 v41 发布单元</text></svg><figcaption>图 1　可回滚对象不是单一权重，而是模型、提示、索引、工具 schema、策略与服务配置的组合版本。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>吞吐、延迟与并发的基本账<span class="dd-badge math">容量</span></h2>
+<div class="dd-agent-response"><p>每秒来 8 个请求、每个平均服务 0.1 秒，单实例够不够？直觉上 8 × 0.1 = 0.8，还剩下 20% 的空闲，似乎绰绰有余。队列理论给出的答案要悲观得多，原因在于“平均”掩盖了到达的随机性。</p>
+<p>容量估算的两个基本量是利用率与系统内请求数。设到达率为 λ，平均服务时间为 S，并行槽位数为 c，则利用率 ρ = λ×S/c。把数字代入：c=1，λ=8/s，S=0.1s，得到 ρ=0.8。也就是说实例有 80% 的时间在忙。问题在于请求不是均匀间隔到达的——随机到达意味着请求会扎堆，于是即使平均服务时间只有 100ms，请求仍然会在队列里排队。随着 ρ 向 1 逼近，排队时间以非线性方式恶化，尾延迟急剧上升；ρ=0.8 时排队已经实际发生，而不是到满负荷才发生。</p>
+<p>Little 定律 L=λ×W 给出了另一种观察角度：系统内平均请求数 L 等于到达率 λ 乘以端到端平均逗留时间 W。若端到端平均 W=0.5s，λ=8/s，则 L=8×0.5=4——系统内平均同时有 4 个请求在流转。这个关系把延迟、吞吐和并发拴在一起：想让用户在系统里停留更久，就必须有能力容纳更多在途请求；想降低逗留时间，要么减少排队，要么提高服务速度。</p>
+<p>LLM 服务还以 token 为单位工作，这给上述账本加了两道约束。输入长度决定预填充阶段的耗时，输出长度决定请求占用计算槽位的时间；长输出会把槽位占得很久，拖长排在后面的请求。continuous batching 把多个请求的 token 计算打包执行，提升了吞吐，但代价是调度变得复杂——谁先被服务、被服务多少 token，都需要调度器实时决策。因此容量模型不能只按“每秒几个请求”划分，而应按输入/输出长度、模型、优先级和工具路径切片，因为不同切片的服务时间分布完全不同。</p>
+<p>另一个必须警惕的事实是：平均数不保 SLO。平均延迟 500ms 的服务可以同时存在 p99=8s 的尾部，因为少数被长请求堵住的用户会贡献出极大的分位数。容量评审必须看尾部，还要看两件公式不涵盖的事：超时后仍在进行的残留计算——客户端放弃的请求并不会自动释放服务端资源；以及突发流量——突发把瞬时 λ 抬到远高于平均值的水平，排队会在几分钟内积累起来。</p>
+<p>综合起来，容量估算的输入是到达率 λ、平均服务时间 S、并行槽位 c 和端到端平均时间 W，输出是利用率 ρ 与系统内平均请求数 L。公式提供了初步的容量直觉：ρ=0.8 已经会排队，接近 1 时尾延迟非线性恶化。但公式只覆盖稳态平均行为，LLM 的长度差异、批处理调度、工具往返和突发流量都需要用压力测试来验证，而不是只套队列公式。</p></div>
+<div class="dd-formula"><math display="block" aria-label="利用率与 Little 定律"><mi>ρ</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>×</mo><mi>S</mi></mrow><mi>c</mi></mfrac><mo>;</mo><mspace width="1em"/><mi>Lsystem</mi><mo>=</mo><mi>λ</mi><mo>×</mo><mi>W</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：新模型为何质量更高却不能直接上线<span class="dd-badge math">案例推演</span></h2>
+<div class="dd-agent-response"><p>新模型准确率高了 3 个点、吞吐减半、p95 翻倍，该怎么决定它能不能上线？一个退款助手的发布过程可以完整展示这个决策。候选版本在任务通过率、越权率、p95、吞吐和每成功任务成本五个维度上的表现如下：</p>
+
+<p>发布门槛是：任务通过率 ≥ 87%、越权率 ≤ 0.5%、p95 ≤ 1.8s、峰值容量 ≥ 16 req/s。逐项核对能看出问题的层次。v42 离线评测的任务通过率 89%、越权率 0.3%，质量确实优于 v41 的 86% 和 0.4%，但它只证明了模型在离线样本上的能力，没有测过排队、缓存、真实输入长度和工具超时——这些正是服务环境与离线环境的差异所在。影子实测补上了这一课：同一份模型放进真实流量路径后，任务通过率降到 88.5%（仍达标），p95 却变成 2.6s、吞吐只有 11 req/s，两者双双跌破门槛，单位成功成本也从 ¥0.10 升到 ¥0.17。v42 的原始服务形态因此不能通过门禁。经过优化后，p95 降到 1.5s、吞吐回到 17 req/s，任务通过率 88.3% 仍 ≥ 87%，成本 ¥0.13，这时才具备进入金丝雀的资格。离线质量可以用于筛选候选，但不能替代服务门禁——发布决策必须基于在服务路径上的实测。</p>
+<p>通过门禁还只是第一步，接下来要算需要多少实例。峰值到达率 λpeak 除以单实例额定吞吐 qinstance，再向上取整：峰值 24 req/s 除以优化后的 17 req/s，24/17 ≈ 1.41，向上取整得至少 2 个实例。这个数字是按理想状态算的裸容量。为单实例故障和突发流量留出余量后，实际可能需要 3 个实例——一旦 2 实例中的 1 个挂掉，剩余实例只有 17 req/s 的容量，扛不住 24 req/s 的峰值。因此成本核算必须按冗余后的实际利用率来算，而不是按平均利用率裸配。</p>
+<p>整个发布案例的输入是 v41 与 v42 的任务通过率、越权率、p95、吞吐和单位成功成本，输出是是否满足全部门槛以及所需实例数。决策顺序是先检查任务 ≥ 87%、越权 ≤ 0.5%、p95 ≤ 1.8s、容量 ≥ 16 req/s 四项门禁，再用峰值到达率除以单实例额定吞吐并向上取整得到最小实例数；冗余和单实例故障会把实际需求从 2 抬高到 3，成本核算必须反映这个冗余。</p></div>
+<table class="dd-table"><thead><tr><th>候选</th><th>任务通过率</th><th>越权率</th><th>p95</th><th>吞吐</th><th>每成功任务成本</th></tr></thead><tbody><tr><td>v41</td><td>86%</td><td>0.4%</td><td>1.2s</td><td>20 req/s</td><td>¥0.10</td></tr><tr><td>v42 离线</td><td>89%</td><td>0.3%</td><td>—</td><td>—</td><td>—</td></tr><tr><td>v42 影子实测</td><td>88.5%</td><td>0.3%</td><td>2.6s</td><td>11 req/s</td><td>¥0.17</td></tr><tr><td>v42 优化后</td><td>88.3%</td><td>0.3%</td><td>1.5s</td><td>17 req/s</td><td>¥0.13</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>批处理、缓存和量化各在改什么<span class="dd-badge eng">优化</span></h2>
+<div class="dd-agent-response"><p>批处理、缓存、量化都能让服务“变快”，但它们改变的是推理系统中的不同环节，各自引入的风险也完全不同。把优化手段混为一谈，是容量调优中最常见的归因错误。</p>
+<p>连续批处理把多个请求的 token 计算打包进同一次硬件执行，提高的是硬件利用率与整体吞吐。代价在于调度：一个请求要等其他请求凑成一批，等待时间增加；长输出请求占用槽位更久，短请求可能被长期挤压。因此上线连续批处理后必须回归排队行为、长短请求之间的公平性以及 p99。</p>
+<p>前缀/KV 缓存复用的是已经算过的注意力状态：当多个请求共享同一段系统提示或文档前缀时，缓存让后续请求跳过重复的预填充计算，直接降低首 token 延迟（TTFT）和计算成本。它的风险在键的设计上：缓存命中键必须同时包含模型版本、提示词版本与权限上下文，否则换了一批提示词仍然命中旧缓存，或者更严重——权限不同的用户读到同一份缓存内容，造成跨用户泄漏。缓存还需要明确的失效机制，模型或提示一更新，旧缓存必须作废。</p>
+<p>量化改变的是数值本身的表示方式：把权重和激活从高精度压缩到低位宽，减少显存占用和内存带宽压力，从而提速。但低位宽意味着近似，可能让少数切片的质量变差——尤其是某些依赖精确数值模式的输入。因此量化必须针对关键切片、长上下文场景做回归，并用校准集验证压缩后的表现。</p>
+<p>除了这三种，推测解码、上下文裁剪和小模型路由也是常见手段，各有各的准确性边界。上下文裁剪削减送入模型的文本以降低预填充成本，但裁剪掉的内容可能正是回答问题所需的证据，需要回归证据召回率和“中间迷失”现象——模型对长上下文中段信息的利用本来就弱，裁剪会放大这个问题。小模型路由把简单请求分给便宜的小模型以降低平均成本，但分类错误时复杂请求被下放给小模型，质量受损；同时被路由请求的延迟分布会叠加两个模型的尾延迟，形成级联尾部。</p>
+<p>这些手段的收益与必须回归的项可以对照如下：</p>
+
+<p>这张表的深层结构是：每种优化都牺牲了某种原本被默认保证的性质。批处理改变排队，缓存复用计算，量化改变数值表示，裁剪改变模型可见的证据，路由改变服务请求的模型——风险各不相同，所以必须分别回归。优化的输入是当前瓶颈、批处理参数、缓存键、量化位宽、上下文和路由策略，输出是吞吐、首 token 延迟、显存、质量与隔离性的差异。实施时要一次只改变少量变量，并保留逐请求的版本记录；把五种优化一次性全部上线，服务变快之后将无人能说清收益来自哪一项，出了问题也无从归因。</p></div>
+<table class="dd-table"><thead><tr><th>优化</th><th>主要收益</th><th>必须回归</th></tr></thead><tbody><tr><td>连续批处理</td><td>吞吐/利用率</td><td>排队、长短请求公平、p99</td></tr><tr><td>前缀/KV 缓存</td><td>TTFT 与成本</td><td>版本键、租户隔离、失效</td></tr><tr><td>量化</td><td>显存、速度</td><td>关键切片、长上下文、校准</td></tr><tr><td>上下文裁剪</td><td>prefill 成本</td><td>证据召回与中间迷失</td></tr><tr><td>模型路由</td><td>平均成本</td><td>错误下放与级联尾延迟</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>影子、金丝雀、蓝绿解决不同风险<span class="dd-badge eng">发布</span></h2>
+<div class="dd-agent-response"><p>影子、金丝雀、蓝绿都传达着“先别全量”的意思，但它们观察的风险不同、对真实用户的影响也不同。发布策略的选择取决于你此刻最想验证什么、最怕破坏什么。</p>
+<p>发布的第一道闸是离线门禁：在冻结的评测集上排除已知的质量、安全和契约回归。它的作用是低成本地挡住明显不合格的候选，但它只能验证候选在离线样本上的表现，无法回答“放进真实流量会怎样”。</p>
+<p>影子部署复制真实流量给候选版本，候选处理与线上完全相同的输入，但结果不返回给用户。它验证的是候选在真实输入分布下的容量与延迟表现，以及对读操作的兼容性；因为用户看不到影子结果，观察不会影响线上体验。影子的边界在于：必须禁止真实的不可逆副作用——候选触发的退款、转账等工具调用不允许真的执行；同时，用户看不到候选结果，也就测不到用户对候选输出的后续行为，例如用户是否会接受某个建议、是否继续追问。</p>
+<p>金丝雀更进一步：把真实流量中的一小部分交给候选，这部分用户看到并接受真实的候选结果。它的核心是分级放量与观察：流量按 1%→5%→25%→100% 逐级扩大，每一级都停留足够长的观察窗口，等完整的标签收集回来——例如退款任务的成功率要等任务真正走完才能确认。金丝雀能测到影子的盲区（用户真实反应），代价是它本身会造成真实伤害：放量的那一小部分用户承受了候选的所有缺陷。因此金丝雀的每一步都必须在观察窗口内确认指标无劣化才能继续。</p>
+<p>蓝绿部署维护两套完整环境，蓝环境跑旧版本、绿环境跑新版本，切换只靠流量指向的改变，回退就是再把流量指回去。它解决的是“回退要快且确定”的风险，代价是双份容量和两套环境间的状态同步——数据库、缓存和工具状态必须对齐，否则切过去的瞬间就产生不一致。</p>
+<p>三种策略的边界交叉处还有一个共同盲区：蓝绿切回蓝环境再快，也无法自动回退绿环境已经执行的退款——外部工具执行的副作用不在环境切换的控制范围内。同理，影子禁止副作用、金丝雀真实产生副作用，都要求发布策略与副作用隔离、幂等和补偿机制共同设计，而不是发布工具单独能解决的问题。</p>
+<p>分流本身也有讲究。不能按单次请求随机分流，否则同一会话的多个请求会被打散到不同版本，用户在一段对话里交替面对新旧模型，行为数据也失去意义。应按用户或会话做稳定哈希，让同一用户单位始终落在同一版本上，并排除员工账号、机器人和地区比例失衡的流量，避免观察窗口被污染。</p>
+<p>综合起来，发布策略的输入是候选版本、真实流量、副作用风险、观察窗口和回滚能力，输出是影子、金丝雀或蓝绿以及分级流量动作。影子结果不影响用户且禁止不可逆动作，金丝雀产生真实结果但分级可控，蓝绿保留两套完整环境以换取快速切换；按用户或会话稳定分流，并且任何副作用路径都要配齐幂等和补偿。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>回滚需要原子版本和向后兼容<span class="dd-badge eng">可靠性</span></h2>
+<div class="dd-agent-response"><p>把模型退回 v41，为什么系统仍可能继续答错？因为模型只是发布单元的一个组件：提示词已经改过，索引已经按 v42 的行为重建，工具 schema 已经迁移，缓存里还装着 v42 的前缀，数据库里已经写入了无法撤销的记录。单独退回权重文件，所有这些组件都停留在新状态，服务自然继续出错。</p>
+<p>回滚的正确做法是让发布单元原子化。原子发布把模型、提示词、解码参数、索引、工具 schema、策略、代码和基础设施配置一起纳入一个组合版本，给这个组合分配一个 releaseId，并记录各组件之间的依赖兼容矩阵——哪个模型版本配哪套提示词、哪版索引、哪个工具 schema 才构成一个已知可工作的整体。回滚时按 releaseId 同步恢复所有可回滚的组件，同时明确列出哪些状态无法逆转。发布清单的价值正在于此：它迫使团队在发布前就写清楚“回滚 v42 时，同时要退回提示词版本 A、索引快照 B、缓存作废范围 C”，而不是出事后才回忆。</p>
+<p>不可逆的部分需要从设计上预先处理。数据库和工具动作使用幂等键：同一笔业务操作带上同一个键，重试不会重复退款。schema 变更采用 expand/contract 策略：先扩展，让新旧两代代码都能读写新结构；再迁移数据；最后收缩，删除旧字段。这样每一步中间态都是双版本兼容的，任何时刻切回旧代码都不会读写失败。索引则用蓝绿方式构建：新索引在后台完整建好后，原子切换别名指向，切换失败的瞬间流量仍指向旧索引。缓存键必须包含 releaseId，版本切换时旧前缀缓存自然失效，不会被新版本误命中。</p>
+<p>还有一层是演练。回滚时长必须通过事故演练实际验证——真的在某次演练中执行一次回滚、计时、检查一致性，而不是相信文档里写的“预计 2 分钟”。文档中的数字只有在演练中兑现过才有意义。</p>
+<p>因此原子发布的输入是模型、提示、解码、索引、工具 schema、策略、代码和基础设施配置，输出是一个 releaseId 与兼容矩阵。回滚按 releaseId 同步恢复可逆组件，数据库工具依赖幂等键和 expand/contract 的 schema 演进，索引用蓝绿别名切换；只退模型会留下新提示词、新缓存或新状态继续制造错误。对于已经发生的不可逆副作用，能做的只有补偿——退款可以再退回来，但必须明确承认这是补偿动作，而不是假装系统已经回滚。</p></div>
+<div class="dd-formula"><math display="block" aria-label="发布单元的组成"><mi>ReleaseUnit</mi><mo>=</mo><mo>{</mo><mi>Model</mi><mo>,</mo><mi>Prompt</mi><mo>,</mo><mi>Decode</mi><mo>,</mo><mi>Index</mi><mo>,</mo><mi>ToolSchema</mi><mo>,</mo><mi>Policy</mi><mo>,</mo><mi>Code</mi><mo>,</mo><mi>Infra</mi><mo>}</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>容量不足时怎样安全降级<span class="dd-badge eng">降级</span></h2>
+<div class="dd-agent-response"><p>峰值超过容量时，可选的降级动作有排队、拒绝、缩短输出、切换小模型、延迟处理甚至停服，但“选哪一个”不能按技术便利决定，而要按风险等级和任务价值分层。低风险的摘要任务可以切到小模型或延迟处理；高权限的退款任务不能因为拥塞就跳过验证环节——流量压力不是降低安全门槛的理由。分层的依据是任务出错后的代价，而不是请求的类型标签。</p>
+<p>降级需要一套明确的基础机制：对输入和输出长度设置上限，防止单个长请求吞掉全部资源；用优先级队列保证关键请求先被服务；用背压让上游感知下游压力并放慢发送；设置超时防止请求无限占用槽位；限制重试次数并引入熔断，让故障依赖项被暂时隔离而不是反复被打。最关键的一条是为关键路径保留容量——预留的资源平时看似闲置，但在峰值时保证高价值任务仍然有路可走。</p>
+<p>降级本身是产品行为，不是临时的技术补丁，所以必须进入评测集。切小模型会让本应被大模型直接处理的请求升级到人工或更大模型，形成“先小后大”的二次流量，反而加重峰值；缓存陈旧会向用户返回旧政策内容；截短输出可能丢掉安全警告。降级路径同样会产生错误，因而同样需要质量回归。所有降级响应都应显式标记——用户或下游系统要能知道“这是一条降级回答”——并且可观测，让运维能在事后复盘降级范围。恢复时还要防止瞬间重放：降级期间积压的请求如果一次性全部放回，会造成第二次雪崩，应分梯度放行。</p>
+<p>重试风暴是降级场景里最隐蔽的放大器。超时不代表上游停止了计算，也不代表工具没有执行：客户端放弃请求的那一刻，服务端的推理可能仍在继续，退款可能已经发生。因此只有明确可恢复的错误才允许重试——例如网络层的瞬时失败；对于无法判断是否已执行的副作用操作，重试等于重复执行。重试必须使用抖动退避避免同步风暴、设置总预算限制重试总量，并且始终携带同一个幂等键，让上游能够识别并合并重复请求。</p>
+<p>综合起来，安全降级的输入是当前容量、风险等级、任务价值、操作可逆性和依赖状态，输出是排队、拒绝、延迟、小模型、截短或停服等动作。低风险任务可以延迟或切换模型，高权限退款不得因拥塞绕过验证；每个降级结果都要显式标记并监控。超时不证明上游停止或工具未执行，重试必须满足可恢复条件、总预算和同一幂等键三个约束，才不会把一次拥塞放大成一场重试风暴。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>部署的原理可以从一条连续的因果链来回顾：每一步的产出都是下一步的输入，任何一步被跳过，后续步骤就建立在未经验证的假设上。</p>
+<p>第一步是定义约束：运行位置、数据地域、隐私边界、延迟预算与容量目标。这些约束决定了后续所有决策的可行空间——托管还是自托管、要不要端侧快路径、SLO 定多严，都在这里定下基调。第二步是把全部依赖冻结成发布单元：模型、提示词、索引、工具 schema、策略、代码和基础设施配置打包为一个带 release id 的组合版本，并记录兼容矩阵。不冻结依赖，后面任何一次放量或回滚都找不到“完整的一个东西”可以操作。第三步是离线评测并压力测试：在冻结集上排除已知的质量、安全与契约回归，用压力测试验证容量模型，而不是只套队列公式。离线这一步的成本最低，能挡住明显不合格的候选。</p>
+<p>第四步进入真实世界：影子部署复制真实流量，验证候选在真实分布下的容量与读行为，同时禁止不可逆副作用。影子补齐了离线评测看不见的排队、缓存和真实输入长度。第五步是金丝雀：按门槛逐级放量，1%→5%→25%→100%，每一级都观察完整的标签窗口，确认任务通过率、越权率、延迟和容量都没有越过门禁，才扩大流量。第六步是运行期的闭环：告警触发时执行降级或回滚——降级按风险分层保护高价值路径，回滚按 release id 原子恢复——并且把失败案例回流，成为下一轮评测集和门禁的一部分。这样，一次事故不只是被扑灭，而是让整个因果链的下一次迭代更严格。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>：ML 系统组合依赖与运维债务</li><li><a href="https://sre.google/sre-book/handling-overload/" target="_blank" rel="noopener">Google SRE Book: Handling Overload</a>：容量、背压、降级与负载保护</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/mlops-checklist/continuous-deployment.html" target="_blank" rel="noopener">AWS MLOps Continuous Deployment</a>：影子、金丝雀、蓝绿与回滚</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>：部署监测、事件响应和变更管理</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/deployment">在地图中查看概念关系</a></nav>
+</article></main></body></html>

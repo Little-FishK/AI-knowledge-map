@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>检索与语义搜索 · AI 知识地图</title>
+<meta name="description" content="从知识库里找出最相关的少量内容，喂给模型作答">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/retrieval/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="检索与语义搜索">
+<meta property="og:description" content="从知识库里找出最相关的少量内容，喂给模型作答">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/retrieval/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="检索与语义搜索">
+<meta name="twitter:description" content="从知识库里找出最相关的少量内容，喂给模型作答">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/retrieval/#page","name":"检索与语义搜索","description":"从知识库里找出最相关的少量内容，喂给模型作答","url":"https://ai-knowledge-map.com/zh/concepts/retrieval/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"检索与语义搜索","item":"https://ai-knowledge-map.com/zh/concepts/retrieval/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">检索与语义搜索</span></li></ol></nav><article id="dd-article" data-concept-id="retrieval">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">检索与语义搜索</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从知识库里找出最相关的少量内容，喂给模型作答</p>
+<p class="dd-ali">Retrieval · 语义搜索 · Semantic Search</p>
+<p class="dd-metabar">建议 25–35 分钟 · 中级 · 需要：了解「嵌入」「上下文窗口」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 检索是从大量文档里，找出与当前问题<b>最相关的少量片段</b>的过程。它有两条路：关键词检索（对字面）和语义检索（对意思，靠嵌入找最近邻）。因为窗口装不下整个知识库，模型答得好不好，往往取决于<b>检索有没有捞对</b>——这也是 RAG 效果的真正瓶颈。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>为什么要检索</b>——为什么不把整个知识库直接给模型。</li>
+    <li><b>两条路</b>——关键词检索和语义检索的区别，各自何时更好。</li>
+    <li><b>怎么运作</b>——离线和在线两个阶段各做什么。</li>
+    <li><b>为什么是瓶颈</b>——为什么说「检索捞不对，后面再强也白搭」。</li>
+    <li><b>怎么捞得更准</b>——重排等改进手段。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>窗口装不下整个知识库，所以要先检索出最相关的少量材料。<span>（§1）</span></li>
+    <li>检索有两条路：对字面的关键词检索、对意思的语义检索（靠嵌入找最近邻），常混合使用。<span>（§2）</span></li>
+    <li>流程分离线建库（切块→嵌入→存向量库）和在线查询（查询嵌入→找最近邻→Top-K）。<span>（§3）</span></li>
+    <li>它是 RAG 的瓶颈：检索捞不对，模型没有正确材料，只能答错或编。<span>（§4）</span></li>
+    <li>用重排、查询改写、混合检索、调切块来提升，并用评测衡量。<span>（§5）</span></li>
+    <li>Recall@K 管漏证据，Precision@K 管噪声，MRR/nDCG 管排序；最终还要连接到引用和任务成功。<span>（§6）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>为什么要「检索」<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>要让模型基于知识库回答问题，最直接的想法是把整个知识库全部塞给模型，让它自己在里面找答案。这条路在绝大多数现实场景里走不通，原因是三重的。</p>
+<p>第一重是容量：模型的上下文窗口是有限的（该机制的细节见其深读页），而真实知识库动辄包含几万篇文档，它们的总规模远远超过窗口能容纳的长度，根本装不进去。第二重是成本与速度：即便勉强装得下，把海量文本全部作为输入，推理会变得又慢又贵，token 消耗随输入长度快速增长。第三重是质量：输入里混入大量与问题无关的内容会稀释信号，模型可能被噪声淹没，出现「中间迷失」——长上下文里位于中段的信息更容易被模型忽略，反而抓不住真正关键的信息。</p>
+<p>因此正确的做法是反过来：先从海量文档里挑出与问题最相关的一小撮，只把这一小撮喂给模型，让模型在缩小后的、干净的范围内作答。这个「挑」的过程，就是检索。</p>
+<p>用一句话概括：检索是「大海捞针」的那一步——把与问题相关的少量材料，从知识库里准确捞出来，供模型作答。捞得准不准，直接决定答得好不好：如果关键证据没有被捞出来，模型再强也无从答起；如果捞出来的全是噪声，模型同样会被带偏。检索因此是整个流程的前置关卡，它的质量给最终回答的质量设定了上限。</p>
+<p>把检索抽象成一个组件来看：它的输入是用户查询、可访问的知识库和上下文预算，输出是少量候选片段及其来源。它所做的，是在模型有限的窗口被填满之前，先把材料的范围大幅缩小，从而同时压低成本、降低延迟并减少噪声。需要注意的是，一个片段被召回，只表示它与查询相关，是「值得看」的候选；它并不保证足以回答问题，也不保证内容本身正确——这些判断留给后续的模型推理去完成。</p>
+<p>检索也不是无条件必需的。当知识库很小、并且可以完整且安全地装入上下文时，直接全量喂入是合理的选择，此时检索的收益会被它自身的开销抵消。因此是否引入检索，取决于知识库规模与上下文预算之间的关系：规模越接近预算上限，检索的价值越大。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>运行示例：对字面 vs 对意思<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>「找相关文档」这件事，可以从两个根本不同的角度去做：关键词检索和语义检索。</p>
+<p>关键词检索匹配的是字面：查询与文档之间是否出现相同的词。它的实现依赖倒排索引等传统搜索手段——预先为每个词维护一份「出现在哪些文档」的清单，查询时直接查出包含这些词的文档。语义检索匹配的则是意思：把查询和文档都嵌入成向量，再找与查询向量距离最近的几个邻居。</p>
+<p>两种思路各有一片盲区。关键词检索强在精确词、专有名词、编号：查「订单号 2026-0715」这类字面唯一的对象，命中即对。可一旦用户换了说法，比如查询「退货」，而文档写的是「返还流程」，两者没有任何共同词，关键词检索就会直接漏掉这篇本来高度相关的文档。语义检索正好补上这一点：因为「退货」与「返还流程」意思相近，它们的嵌入向量靠得很近，所以能召回。反过来，语义检索对编号、专名等字面唯一但语义罕见的对象未必可靠，因此它强在换了说法、同义、跨语言等场景，而不是替代字面匹配。</p>
+<p>语义检索的工作方式，是把每篇文档和查询都变成向量——意思近则向量近，具体机制见「嵌入」深读页——然后计算查询向量与各文档向量之间的余弦相似度，取相似度最高的前几个。余弦相似度衡量的是两个向量的方向接近程度：</p>
+<p>cos(q, d) = q·d / (‖q‖ × ‖d‖)</p>
+<p>即查询向量 q 与文档向量 d 的点积，除以二者范数的乘积。</p>
+<p>用一个二维玩具向量演算可以看清每一步。设查询 q = (1,1)，片段 A = (1,0)，片段 B = (2,2)。对 A：点积 q·A = 1×1 + 1×0 = 1，范数 ‖q‖ = <math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math>，‖A‖ = 1，于是 cos(q, A) = 1/(<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> × 1) = 1/<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> ≈ 0.707。对 B：点积 q·B = 1×2 + 1×2 = 4，范数 ‖B‖ = <math class="dd-inline-root" aria-label="根号 8"><msqrt><mtext>8</mtext></msqrt></math>，于是 cos(q, B) = 4/(<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> × <math class="dd-inline-root" aria-label="根号 8"><msqrt><mtext>8</mtext></msqrt></math>) = 1。B 的得分更高，意味着在这个表示空间里 B 的方向更接近查询。真实嵌入有数百到数千维，维度高得多，但逻辑相同：分数只表示该模型学到的几何相似，不等于事实正确，也不等于足以回答问题。</p>
+<p>既然两种检索各有盲区，实践常用「混合检索」：把关键词与语义两路结果融合起来，往往比单用一种更稳——既不漏精确的编号词，也不错过换了说法的表达。</p>
+<p>下面这个运行示例用查询「退款期限」展示两路分数与融合后的排序：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">文档</th><th class="dd-align-left">关键词分</th><th class="dd-align-left">语义分</th><th class="dd-align-left">融合后排名</th></tr></thead><tbody><tr><td class="dd-align-left">A《退款与返还：30 天》</td><td class="dd-align-left">0.90</td><td class="dd-align-left">0.82</td><td class="dd-align-left">第 1</td></tr><tr><td class="dd-align-left">B《商品返还流程：签收后 30 天》</td><td class="dd-align-left">0.10</td><td class="dd-align-left">0.94</td><td class="dd-align-left">第 2</td></tr><tr><td class="dd-align-left">C《退款到账时间：3–5 天》</td><td class="dd-align-left">0.88</td><td class="dd-align-left">0.70</td><td class="dd-align-left">第 3</td></tr></tbody></table></div>
+<p>这张表同时说明：分数不能只看「高不高」。A 和 B 都能回答「可申请多久」；C 虽然字面上与查询高度重合（关键词分高达 0.88），说的却是批准后多久到账，回答的是另一个问题。如果取 Top-2 为 A、B，则两个相关片段都被召回，Recall@2 = 2/2 = 100%；如果只按关键词排序取 A、C，B 被挤出前二，Recall@2 = 1/2 = 50%。这个对比指向一条更根本的原则：检索评测需要先标注「什么算相关」，而不是盯着相似度分数自我感觉良好。</p>
+<p>从组件视角看，混合检索的输入是查询 q、文档向量 d、关键词分和语义分，输出是融合后的候选排序。两条支路各有适用边界：精确编号类需求优先信关键词，换说法与同义表达优先信语义，生产环境通常把两路融合后再重排。</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>关键词检索</th><th>语义检索</th></tr></thead>
+    <tbody>
+      <tr><td>匹配什么</td><td>字面词是否重合</td><td>意思是否相近</td></tr>
+      <tr><td>怎么做</td><td>倒排索引等（传统搜索）</td><td>把查询和文档都<b>嵌入</b>成向量，找最近邻</td></tr>
+      <tr><td>「退货 / 返还流程」</td><td>没共同词，<b>漏掉</b></td><td>意思相近，<b>能召回</b></td></tr>
+      <tr><td>强在</td><td>精确词、专有名词、编号</td><td>换了说法、同义、跨语言</td></tr>
+    </tbody>
+  </table>
+<table class="dd-table"><thead><tr><th>运行示例：查询“退款期限”</th><th>关键词分</th><th>语义分</th><th>融合后</th></tr></thead><tbody><tr><td>A《退款与返还：30 天》</td><td>0.90</td><td>0.82</td><td><b>第 1</b></td></tr><tr><td>B《商品返还流程：签收后 30 天》</td><td>0.10</td><td>0.94</td><td><b>第 2</b></td></tr><tr><td>C《退款到账时间：3–5 天》</td><td>0.88</td><td>0.70</td><td>第 3</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="查询与文档向量的余弦相似度"><mi>CosineSim</mi><mo>(</mo><mi>q</mi><mo>,</mo><mi>d</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>q</mi><mo>·</mo><mi>d</mi></mrow><mrow><mo>‖</mo><mi>q</mi><mo>‖</mo><mo>×</mo><mo>‖</mo><mi>d</mi><mo>‖</mo></mrow></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>它怎么运作：离线 + 在线<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>以语义检索为例，一次检索的背后分成两个阶段：离线建库和在线检索。</p>
+<p>图 1：离线建库与在线检索两阶段。上半部分为离线阶段：原始文档 → 切成小块 → 逐块嵌入 → 存入向量数据库；下半部分为在线阶段：用户查询 → 嵌入 → 在库中找最相似的 Top-K 个片段（近似最近邻）→ 返回候选。</p>
+<p>离线阶段做的事是一次性的准备工作：把文档切成小块、逐块嵌入、存进向量数据库（切分与存储的细节见「文档切分」「向量数据库」深读页）。它把「文档」变成「可以快速比较的向量集合」。因为这一步发生在查询到来之前，它的开销不进入单次问答的延迟，代价由全库共享。</p>
+<p>在线阶段则要求快：用户查询到达后，先把查询用同样的规则嵌入成向量，再到库里找与它最相似的 Top-K 个片段并返回。这一步走的是近似最近邻（ANN）搜索——在海量向量上做精确比较代价过高，近似算法用索引结构在质量与速度之间做折中，快速给出足够好的邻居。</p>
+<p>两个阶段之间有一条硬性的一致性约束：查询必须用与离线建库时相同的表示规则来编码。也就是说，在线嵌入查询所用的模型与配置，必须和离线嵌入文档时一致，否则两边的向量处在不同的几何空间里，比较出来的「远近」没有意义。因此嵌入模型一旦更换，旧的索引整体失效；切块方式或权限范围变化，同样会改变索引应当包含的内容。这三种变化中的任何一种发生后，都必须重建或更新索引，索引永远只是「某套配置下」的一个快照。</p>
+<p>把整条流水线抽象成组件：输入是原始文档和在线查询，输出是 Top-K 候选，每个候选带片段 ID、版本、权限与相似度。权限这一项提醒我们，检索不是纯数学问题——它必须在「用户有权看什么」的范围内进行，检索结果不能越权。</p>
+<p>最后要对返回顺序做一个解释上的限定：候选的先后顺序是检索器对「哪个更相关」的判断，它把最可能的证据排在最前，但这不是最终的事实排序；被排在后面的片段未必更不可靠，最终取舍仍由下游的推理环节完成。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 200" role="img" aria-label="离线建库与在线检索两阶段">
+      <text x="20" y="24" class="svg-t">离线（建库，一次性）</text>
+      <rect x="20" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#2c313b"/><text x="60" y="52" text-anchor="middle" class="svg-t" font-size="11">文档</text>
+      <line x1="100" y1="48" x2="128" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="128" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#2c313b"/><text x="168" y="52" text-anchor="middle" class="svg-t" font-size="11">切块</text>
+      <line x1="208" y1="48" x2="236" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="236" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="276" y="52" text-anchor="middle" class="svg-t" font-size="11">嵌入</text>
+      <line x1="316" y1="48" x2="344" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="344" y="34" width="110" height="28" rx="5" fill="#21252d" stroke="#4f9d78"/><text x="399" y="52" text-anchor="middle" class="svg-t" font-size="11">存进向量库</text>
+
+      <text x="20" y="112" class="svg-t">在线（每次查询）</text>
+      <rect x="20" y="122" width="90" height="28" rx="5" fill="#1a1d23" stroke="#6b8cbe"/><text x="65" y="140" text-anchor="middle" class="svg-t" font-size="11">查询：怎么退货</text>
+      <line x1="110" y1="136" x2="138" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="138" y="122" width="70" height="28" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="173" y="140" text-anchor="middle" class="svg-t" font-size="11">嵌入</text>
+      <line x1="208" y1="136" x2="236" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="236" y="122" width="110" height="28" rx="5" fill="#21252d" stroke="#4f9d78"/><text x="291" y="140" text-anchor="middle" class="svg-t" font-size="11">找最近邻</text>
+      <line x1="346" y1="136" x2="374" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="374" y="122" width="150" height="28" rx="5" fill="#1a1d23" stroke="#d3a05a"/><text x="449" y="140" text-anchor="middle" class="svg-t" font-size="11">Top-K：商品返还流程…</text>
+      <defs><marker id="k1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg>
+    <figcaption>图 1　离线：把文档切成小块、逐块嵌入、存进向量数据库（见「文档切分」「向量数据库」）。在线：把查询嵌入，到库里找最相似的前 K 个片段（近似最近邻）返回。</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>为什么它是 RAG 的真正瓶颈<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>RAG 里的生成模型通常很强，输出也流畅，可工程实践中大家反复强调「问题多半出在检索」。原因要从 RAG 自身的结构说起。</p>
+<p>RAG 的逻辑是「先检索、再让模型基于检索到的材料作答」，检索是生成的前置条件。如果检索这一步没捞到正确的文档，模型手里就根本没有正确的材料——它要么答不上来，要么干脆编，也就是幻觉。这里起作用的是「garbage in, garbage out」：喂进去的材料不对，再强的模型也救不回来，因为模型只能在自己收到的上下文中寻找依据，无法凭空「想起」从未出现在它输入里的内容。所以在很多 RAG 系统里，效果的天花板不在模型，而在检索：生成环节的上限再高，也会被检索环节的失误直接截断。</p>
+<p>检索失败有几种常见的具体形态。一是查询和文档用词差太远：用户用了与知识库完全不同的说法，字面匹配和语义相似都没能把正确的文档顶上来。二是切块把关键信息切散了：一份文档的答案依据被切分到不同片段里，单独任何一个片段都不足以支撑回答，检索即使召回其中一块也无济于事。三是相关文档被更多不相关的文档挤出了 Top-K：Top-K 的容量有限，噪声文档得分虚高时，真正相关的片段就会落到 K 之外，永远进不了上下文。</p>
+<p>把检索当作瓶颈来做诊断时，可以把它抽象成一个判定组件：输入目标问题、必要证据和召回结果，输出三种状态之一——「证据已召回」「被噪声挤出」或「库中不存在」。这个三分法把症状和原因分开：第一种状态下瓶颈不在检索，问题出在更下游；第二种说明排序或融合策略有问题；第三种则是知识库本身缺少该证据，任何检索算法都无法凭空变出不存在的内容。</p>
+<p>由于生成模型只能利用进入上下文的材料，必要证据未召回时，再强的模型也无法可靠恢复答案。反过来，检索合格也不保证装配和生成就正确——召回正确的片段之后，模型仍可能把它们拼错、读错或推理错。因此定位 RAG 失败时，第一步永远是先判断证据链断在哪一层：是没捞到、被挤掉，还是捞到了但没用对。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>怎么捞得更准<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>承接前面的例子：初始 Top-K 里混进了《退款到账时间》这类字面相似却答非所问的文档。怎样才能提高召回，又不让噪声淹没答案？有四种常用的改进手段，分别作用于检索流水线的不同环节。</p>
+<p>重排是最直接的一手。先用快而糙的检索捞回一批候选（比如 50 条），再用一个更精细的模型逐条精算相关性、重新排序，取最好的几条。它的分工是「先粗筛后精排」：粗筛负责便宜地覆盖大范围，精排负责把真正值得看的顶上来（细节见「重排」深读页）。</p>
+<p>查询改写作用在输入端。用户的问题往往是口语化的、隐含上下文的，直接拿来检索效果不佳；把它改写、扩展成更利于检索的形式，或拆成多个子查询分别检索再合并，可以显著提升命中率（属于「高级 RAG」的做法）。</p>
+<p>混合检索把关键词与语义两路结果融合，让两条支路互补盲区：精确编号靠关键词，换说法靠语义。</p>
+<p>调切块作用在离线建库阶段。块太大，无关内容混进来成为噪声；块太小，完整语义被切散。切法直接影响查询能不能命中正确的片段，是需要结合文档类型反复调试的变量。</p>
+<p>这些手段各自都能改善检索，但怎么知道捞得准不准？答案只能是评测：常看召回率（该捞的有没有捞到）等指标。没有评测，检索的好坏就只能靠感觉，优化无从下手（方法论见「LLM 应用评测」深读页）。</p>
+<p>评测时还必须守住一条原则：相似不等于可回答。文档可能主题相关，却不包含问题所需的对象、时间或条件——就像「退款到账时间」与「退款期限」字面高度相似，但前者不回答「可以申请多久」。重排器也会犯错，它同样可能把主题相关但缺关键要素的片段排在前面。因此生产评测应同时看多个维度：相关性、答案覆盖、时效、权限过滤，以及最终引用是否真的支撑结论。</p>
+<p>把这一整套改进抽象成组件：输入是初始候选、查询、切块、权限与时效信息，输出是经过查询改写、混合召回和重排之后的更小候选集。各环节的分工可以概括为：粗召回追求不漏，精排追求把真正可回答的片段放在前面；最终交付的结果要能同时解释召回、噪声、版本和权限，而不是只给一个排序列表。两条边界需要记住：Top-K 过大可能加剧模型的「中间迷失」——上下文越长，中段证据越容易被忽略；重排器本身也必须独立评测，不能默认它一定比粗排可靠。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Recall@K、MRR 和 nDCG 各在测什么<span class="dd-badge math">评测</span></h2>
+<div class="dd-agent-response"><p>两个系统都召回了正确文档，为什么把它排第 1 和排第 20 不是同样好？因为下游能消化的位置有限：排在 Top-K 之内才能进入上下文，排在前面才更容易被模型真正利用。于是评测指标关心的不单是「有没有」，还有「在第几位」和「前面的内容对不对」。常用指标各回答一个不同的问题，也各有一个盲区：</p>
+
+<p>两个核心指标的公式都很直观。MRR 是平均倒数排名：对每道查询取第一个相关结果所在位置的倒数，再对所有查询求平均。设三道测试题中，第一个相关片段分别排第 1、2、5 位，则</p>
+<p>MRR = (1 + 1/2 + 1/5)/3 ≈ 0.567</p>
+<p>每一项的含义是：排第 1 贡献 1，排第 2 贡献 1/2，排第 5 只贡献 1/5——第一个证据出现得越晚，这道题的贡献越接近 0。</p>
+<p>Recall@K 则是命中率：Recall@K = Hit@K / Relevant，其中 Hit@K 是 Top-K 个结果中命中的相关项数，Relevant 是该题全部相关项数。它只问「该捞的捞到了多少」，完全不管捞到的排在什么位置，也不管 Top-K 里混进了多少无关内容。</p>
+<p>这两个指标的盲区恰好互补，把它们放在一起看才完整。考虑这样的任务：每题其实都需要「一般规则 + 例外」两个片段才能正确作答，而系统总是只把一般规则排在第 1 位、把例外漏掉。此时 MRR 依然漂亮——第一个相关结果每次都在第 1 位——但例外从未被召回，答案必然出错。所以只看 MRR 会给出虚假的安心，必须同时看 Recall@K 才能发现证据缺失。</p>
+<p>更一般的原则是：指标由任务需要决定。需要不漏证据的任务优先 Recall@K；上下文预算紧张、要控制噪声的任务优先 Precision@K；「找到第一个答案入口就够」的任务适合 MRR；有完整相关等级标注的任务适合 nDCG@K。反过来，把排行榜上的单一 nDCG 自动当作产品质量，是常见的误用——它测的是排序质量，不是任务完成质量。</p>
+<p>离线相关性也不是最终成功。评估时还要按文档版本、权限、语言、查询长度和难例切片，看系统在不同条件下的表现差异；上线后要在线观察引用支持率、无答案处理、用户重问和任务完成等行为信号。特别要注意点击率：它可能偏爱标题党，不能直接当正确性标签用。</p>
+<p>把这些指标组装成评测组件：输入 N 个查询、每题的标注相关集合、各相关结果的排序位置 rankᵢ 和截断 K，输出 Recall@K、Precision@K、MRR 与 nDCG。其中 MRR 是每题第一个相关结果排名倒数的平均，Recall@K 等于 Hit@K 除以 Relevant。解释结果时守住一条边界：MRR 高只说明第一个证据靠前，不代表一般规则和例外都已召回；指标必须按任务的证据需求选择，而不是按习惯选择。</p></div>
+<table class="dd-table">
+    <thead><tr><th>指标</th><th>回答的问题</th><th>适合</th><th>盲区</th></tr></thead>
+    <tbody>
+      <tr><td>Recall@K</td><td>需要的相关材料有多少进入前 K？</td><td>RAG 候选召回、避免漏证据</td><td>不关心前 K 内部顺序和噪声</td></tr>
+      <tr><td>Precision@K</td><td>前 K 中有多少真正相关？</td><td>控制上下文噪声与成本</td><td>可能奖励只取很少材料而漏掉例外</td></tr>
+      <tr><td>MRR</td><td>第一个相关结果出现得多早？</td><td>每题只需一个答案入口</td><td>忽略后续其他相关材料</td></tr>
+      <tr><td>nDCG@K</td><td>多档相关性是否被正确排到前面？</td><td>有“完全/部分/无关”等等级标注</td><td>依赖稳定的相关等级和截断 K</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula"><math display="block" aria-label="平均倒数排名和前 K 召回率"><mi>MRR</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mn>1</mn><mi>ranki</mi></mfrac><mo>;</mo><mi>RecallK</mi><mo>=</mo><mfrac><mi>HitK</mi><mi>Relevant</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各节串起来，可以看到整条设计链的每一步都是从上一个约束推导出来的，环环相扣。</p>
+<p>链条的起点是一个硬约束：上下文窗口装不下整个知识库（§1）。既然不能全量喂入，就必须先检索出最相关的少量材料，再交给模型。这一约束同时决定了检索的目标——用尽量小的材料量，覆盖回答所必需的证据。</p>
+<p>有了「要挑」的需求，下一步是「怎么挑」。检索有两条根本不同的路：对字面的关键词检索、对意思的语义检索——后者靠嵌入把查询和文档变成向量，再找最近邻（§2）。两条路各有盲区，所以实践中常混合使用：关键词保住精确编号，语义保住换了说法的表达。</p>
+<p>然后是工程实现。整条流程分离线建库（切块 → 嵌入 → 存向量库）和在线查询（查询嵌入 → 找最近邻 → Top-K）两个阶段（§3）。离线阶段摊薄成本，在线阶段追求低延迟，而查询与建库必须使用同一套表示规则，任何配置变化都要求重建索引。</p>
+<p>为什么值得在这些环节上较真？因为检索是 RAG 的瓶颈（§4）：检索捞不对，模型手里就没有正确材料，只能答错或编造。检索质量给整个系统的效果设定了天花板，后面的模型再强也越不过去。</p>
+<p>针对这个瓶颈，改进手段落在四个环节：重排把粗筛的候选精排一遍，查询改写让口语问题更适合检索，混合检索融合两路信号，调切块改变命中粒度；而所有这些手段是否有效，只能靠评测来衡量（§5）。</p>
+<p>评测指标本身也按因果链分工（§6）：Recall@K 管漏证据——该进 Top-K 的证据有没有进；Precision@K 管噪声——Top-K 里混进多少无关内容；MRR 和 nDCG 管排序——第一个证据来得早不早、多档相关性排得对不对。但离线指标不是终点：最终还要把检索结果连接到引用是否支撑结论、用户任务是否成功上。如果检索指标很好看，引用却不支撑答案，或用户反复重问，说明链条在检索之后的环节断了。</p>
+<p>整条链可以用一个问题自查：语义检索为什么能召回没有共同关键词的文档——因为文档和查询被嵌入到同一个几何空间，意思相近则向量相近，最近邻搜索就能跨过字面的隔阂。而为什么检索是 RAG 效果的天花板——因为模型只能利用进入上下文的材料，没捞到的证据无法凭空恢复。能讲清这两个「为什么」，就抓住了检索的内核。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>检索不是一座孤岛，它位于一条清晰的概念依赖链的中间。理解本页之前，需要先具备几个先修概念；掌握本页之后，又有若干紧邻延伸与更远的方向可以继续深入。</p>
+
+<p>先修层奠定了本页的两块地基。嵌入是语义检索的数学基础——没有「把文本变成向量」这一步，就没有「意思近则向量近」的比较；上下文窗口和 Token 与分词则解释了检索为什么必须存在：窗口有限、按 token 计费，才需要先缩小材料范围。</p>
+<p>本页核心的五个概念构成一条完整的机制链：关键词与语义检索是两条互补的匹配路线，最近邻是语义路线在向量空间里的搜索方式，离线/在线是工程上的两阶段划分，检索即瓶颈说明了它为什么值得投入，重排则是在粗召回之后的精修手段。</p>
+<p>紧邻延伸顺着这条链向外展开：RAG 是检索所服务的最直接场景；向量数据库是离线建库的存储载体；文档切分决定离线阶段的命中粒度；重排值得单独立页深读；高级 RAG 涵盖查询改写等更复杂的编排；评测则是检验这一切是否真的有效的唯一途径。</p>
+<p>更远的方向把视野拉大：知识图谱与 GraphRAG 把检索从向量相似扩展到结构化关系，中间迷失解释了为什么捞得多不一定好，上下文工程则把「给模型什么材料」本身当成一个系统问题来设计。沿着这条依赖链学习，每一层都能直接回答上一层留下的问题。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>嵌入、上下文窗口、Token 与分词</td></tr>
+      <tr><td><b>本页核心</b></td><td>关键词 vs 语义检索、最近邻、离线/在线、检索即瓶颈、重排</td></tr>
+      <tr><td>紧邻延伸</td><td>RAG、向量数据库、文档切分、重排、高级 RAG、评测</td></tr>
+      <tr><td>更远</td><td>知识图谱与 GraphRAG、中间迷失、上下文工程</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>：问题与段落双编码、内积检索。</li>
+    <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>：可用于语义相似搜索的句向量。</li>
+    <li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">Khattab &amp; Zaharia, ColBERT</a>：晚交互检索及精度—成本折中。</li>
+    <li><a href="https://arxiv.org/abs/2104.08663" target="_blank" rel="noopener">Thakur et al., BEIR</a>：跨领域检索基准与稀疏、稠密、重排方法比较。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/retrieval">在地图中查看概念关系</a></nav>
+</article></main></body></html>

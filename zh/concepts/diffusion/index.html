@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>扩散模型 · AI 知识地图</title>
+<meta name="description" content="学习「从一团噪声一步步去噪」，把图像「显影」出来">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/diffusion/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="扩散模型">
+<meta property="og:description" content="学习「从一团噪声一步步去噪」，把图像「显影」出来">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/diffusion/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="扩散模型">
+<meta name="twitter:description" content="学习「从一团噪声一步步去噪」，把图像「显影」出来">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/diffusion/#page","name":"扩散模型","description":"学习「从一团噪声一步步去噪」，把图像「显影」出来","url":"https://ai-knowledge-map.com/zh/concepts/diffusion/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"扩散模型","item":"https://ai-knowledge-map.com/zh/concepts/diffusion/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">扩散模型</span></li></ol></nav><article id="dd-article" data-concept-id="diffusion">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">扩散模型</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">学习「从一团噪声一步步去噪」，把图像「显影」出来</p>
+<p class="dd-ali">Diffusion Model · 扩散模型 · 去噪扩散</p>
+<p class="dd-metabar">建议 25–35 分钟 · 中级 · 需要：了解「神经网络」「自监督学习」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 扩散模型定义一个逐步加噪的前向过程，并训练网络估计噪声、分数或干净样本，从而近似其反向生成过程。采样时从高斯噪声出发，沿离散或连续时间轨迹迭代更新。现代系统常在压缩潜空间运行，并用无分类器引导在条件一致性与多样性之间权衡。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>难在哪</b>——凭空造一张逼真的新图，难点是什么。</li>
+    <li><b>核心思路</b>——「加噪」和「去噪」两个过程各是什么。</li>
+    <li><b>为什么拆步</b>——为什么不一步从噪声到图，非要走很多步。</li>
+    <li><b>文本怎么控制</b>——一句话怎么指挥它画出对应的图。</li>
+    <li><b>vs GAN</b>——以前的图像生成方法差在哪。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>凭空一步造出协调逼真的图太难。<span>（§1）</span></li>
+    <li>扩散把它拆开：正向加噪造训练样本，反向学去噪。<span>（§2）</span></li>
+    <li>生成时从纯噪声反复去噪显影；拆成小步是因为每小步都简单可学。<span>（§2、§3）</span></li>
+    <li>把文本作为条件注入去噪，靠图文对齐让它朝符合描述的方向生成。<span>（§4）</span></li>
+    <li>相比 GAN，扩散更稳、更多样、更可控，成了主流（代价是慢）。<span>（§5）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>它要解决的难题<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>扩散模型要解决的核心问题，是让 AI 凭空造出一张&quot;没人拍过、却合理逼真&quot;的图。这里的&quot;凭空&quot;是关键词：模型拿到的不是一张现成图片供它修改，而是一份训练图像分布和一份生成条件；它要产出的是同一分布里从未见过的新样本，而且这张新图必须经得起人的直觉检验。</p>
+<p>难在哪？难在&quot;一步到位&quot;几乎不可能。一张图有几百万个像素，这些像素不能各自为政——柯基的两只眼睛要对称、帽子要戴在头上、光影要落在同一边、毛色和背景要搭配。单独一个像素取什么值无所谓，真正难的是让几百万个像素互相协调，同时满足所有约束。让模型一次就吐出这么多协调好的像素，等于要求它在一步之内把整张图的全部联合关系都算对，这对任何生成器都是极重的负担。</p>
+<p>扩散模型的聪明之处，是不这么干。它不去挑战&quot;一步生成整张图&quot;，而是把生成拆成一系列小步，每一步只处理一小部分变化，让像素之间的协调关系逐步建立起来。这个思路的价值，要在理解后面章节的加噪与去噪之后才完全显现，但它的动机在这里已经清楚了：回避一步到位的不可行性。</p>
+<p>同时要清楚这件事的边界。生成模型的输出只表示&quot;像素之间的关系像训练数据那样合理&quot;，它并不证明画面中的事实、文字或物理过程是真实的。当任务要求精确复制、可核验测量或确定性答案时，生成模型不是可靠的数据库，也不该被当作事实来源使用。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>核心思路：加噪与去噪<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>扩散模型把&quot;凭空生成&quot;这个难题变成一件可学的事，靠的是一正一反两个过程：加噪和去噪。</p>
+<p>正向过程是加噪。拿一张清晰的真图，一步步往上撒噪声，而且撒很多步，直到它变成一团纯噪声。这个过程本身极其简单，却顺带解决了一个关键问题——训练样本从哪里来。每撒一步噪声，&quot;加噪前&quot;和&quot;加噪后&quot;就是一对现成的题目和答案：题目是那张已经带了一点噪声的图，答案是它上一步更清晰的样子。整个过程自动生成了海量这样的配对，不需要人工标注，这正是自监督学习的思路（相关内容见&quot;自监督学习&quot;）。</p>
+<p>反向过程是去噪。训练一个神经网络，学会把这个过程倒过来：给它一张有噪声的图，让它预测该去掉哪些噪声、把它还原成更清晰一点的图。网络学到的不是一个完整的图像生成器，而是一个&quot;去噪一步&quot;的操作——输入带噪样本，输出一个去噪方向。</p>
+<p>一旦网络学会去噪，生成就水到渠成。从一团随机噪声出发，这团噪声里其实什么都没有，只是让模型反复执行去噪，每做一次图像就清晰一点，一步步&quot;显影&quot;出一张全新的图。这张图在训练数据里从未出现过，但它经过的每一步去噪都符合训练时学到的图像结构。</p>
+<p>这里的每一步有明确的输入输出边界。正向过程接收干净样本和随机噪声，输出任意噪声时刻的训练对；反向网络接收带噪样本、当前时刻和可选的条件，输出一次去噪方向。单步的输出要解释为&quot;下一次更新的估计&quot;，不是完整成图。也要注意它的局限：如果噪声日程安排得不合理，或者训练数据覆盖得不够，即使每一步都做对，多步累积起来仍然可能得到失败的结果。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 120" role="img" aria-label="从纯噪声一步步去噪，图像逐渐显现">
+      <g>
+        <rect x="20" y="35" width="70" height="55" rx="6" fill="#3a4150"/><text x="55" y="108" text-anchor="middle" class="svg-t" font-size="10">纯噪声</text>
+        <rect x="130" y="35" width="70" height="55" rx="6" fill="#4a5160"/><text x="165" y="108" text-anchor="middle" class="svg-t" font-size="10">去一点</text>
+        <rect x="240" y="35" width="70" height="55" rx="6" fill="#5a6472"/><text x="275" y="108" text-anchor="middle" class="svg-t" font-size="10">更清晰</text>
+        <rect x="350" y="35" width="70" height="55" rx="6" fill="#7d8a70"/><text x="385" y="108" text-anchor="middle" class="svg-t" font-size="10">快好了</text>
+        <rect x="460" y="35" width="70" height="55" rx="6" fill="#c08a4a"/><text x="495" y="55" text-anchor="middle" class="svg-tn" font-size="11">柯基</text><text x="495" y="108" text-anchor="middle" class="svg-t" font-size="10">成图</text>
+      </g>
+      <g stroke="#6b7484" stroke-width="1.4">
+        <line x1="90" y1="62" x2="126" y2="62" marker-end="url(#o1)"/><line x1="200" y1="62" x2="236" y2="62" marker-end="url(#o1)"/><line x1="310" y1="62" x2="346" y2="62" marker-end="url(#o1)"/><line x1="420" y1="62" x2="456" y2="62" marker-end="url(#o1)"/>
+      </g>
+      <defs><marker id="o1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg>
+    <figcaption>图 1　生成过程：从纯噪声出发，模型每一步只去掉一点点噪声，几十步之后，一张符合描述的图就「显影」了出来。训练时它学的，正是「怎么把噪声去掉一点」。</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2.5</span>数值例子：随机抽一步就能学整条链<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>既然完整的加噪链有那么多步，训练时是否每次都要从头走到尾？不需要。关键在于：给定干净样本 x₀，可以直接采样任意时刻 t 的带噪样本，而不必一步步地加过去。具体公式是带噪样本 xₜ 等于 ᾱₜ 的平方根乘干净样本 x₀，再加上 1 − ᾱₜ 的平方根乘随机噪声 ε。这里的 ᾱₜ 由噪声日程决定，它刻画了在时刻 t 时，信号成分还剩多少、噪声成分占了多少。训练时通常让网络 εθ(xₜ, t, c) 预测&quot;当初加入了多少噪声&quot;，并最小化 ||ε − εθ||²；条件 c 可以是文本。因为任意时刻的带噪样本都能直接构造出来，所以一次随机抽到的 t 就能为整条时间轴提供无偏的训练信号，不需要把整条链走一遍。</p>
+<p>用一维数值例子把这件事算清楚。取干净值 x₀ = 2、ᾱₜ = 0.64，那么 ᾱₜ 的平方根就是 0.8，1 − ᾱₜ 的平方根就是 0.6。如果这次随机噪声 ε = −1，带噪值就是 xₜ = 0.8 × 2 + 0.6 × (−1) = 1.0。假设网络预测 εθ = −0.8，那么这个样本上的噪声损失是 (−1 + 0.8)² = 0.04；由此反推出的干净值约为 (1.0 − 0.6 × (−0.8)) / 0.8 = 1.85。一次预测并没有完美还原出 2，这正是多步采样的意义：每一步的预测只是对反向方向的一次估计，多步采样会沿模型估计的反向方向逐步修正，最终逼近合理的图像。</p>
+<p>这里要澄清一个容易固化的直觉。&quot;去掉一点噪声&quot;只是对训练目标的一种直观描述，并不是唯一的参数化方式。模型也可以预测干净样本本身、预测速度变量，或者预测数据分布的分数；不同的采样器还能用更少的步骤近似反向轨迹。核心是学习&quot;反向更新的方向&quot;，而不是必须逐像素擦除某个固定的噪点。</p>
+<p>边界同样要讲清。训练输入是干净样本 x₀、随机时刻 t 和噪声 ε，输出是网络对噪声或等价目标的预测。公式之所以高效，是因为它把任意时刻直接构造出来，因此无需逐步加噪。但损失越小只说明模型更接近这一次已知的噪声，它不能单独保证最终样本贴题、真实或多样——那要依赖后面章节讨论的条件与引导。</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="diffusion-formula-1"><math display="block" aria-label="带噪样本 x t 等于 alpha bar t 的平方根乘干净样本 x zero，加上一减 alpha bar t 的平方根乘随机噪声 epsilon"><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></msqrt><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></mrow></msqrt><mi>ε</mi><mo>,</mo><mspace width="1em"/><mi>ε</mi><mo>∼</mo><mi>𝒩</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>I</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>为什么要拆成很多步<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>既然目标是从噪声得到图，为什么不训练一个模型&quot;一步&quot;搞定，非要走几十步？原因和第 1 节讲过的&quot;一步到位&quot;难题是一样的：一步从纯噪声跳到完美图，等于要求模型在单次预测里同时满足整张图所有像素之间的协调关系，这个负担重到不切实际。</p>
+<p>拆成很多小步之后，每一步的任务都简单得多。模型只需要从&quot;噪声多一点的图&quot;还原成&quot;噪声少一点的图&quot;——这是一个模型学得会的小活。每一个小步的输入是当前带噪状态，输出是稍微更接近数据分布的下一状态，采样器不断重复这个转换。许多个简单小步累积起来，就完成了原本不可能的大跳跃。这就是&quot;拆步&quot;的核心因果链：把不可学的大目标分解成一系列可学的小目标，再把小目标逐个叠加。</p>
+<p>这个思路常被拿来和思维链类比，两者确实都能用&quot;把大跳跃拆成小步&quot;来帮助理解。但这个类比的边界必须说清：扩散是带有明确前向随机过程与反向生成模型的概率建模，思维链是离散 token 轨迹。类比只解释&quot;分步&quot;这一层直觉，不能把两套数学机制视为相同。</p>
+<p>步数多少也有权衡。步数增加通常能降低离散化误差，让反向轨迹更贴近连续过程，但同时提高延迟——每多一步就多一次网络前向计算。更重要的是，如果模型学到的是错误的更新方向，那么无论多走多少步都不会自动纠正知识与结构上的错误，只是把错误方向多执行几遍。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>文本怎么指挥它<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>前面的去噪只能生成&quot;某张合理的图&quot;，却无法决定生成哪一张。要让模型画出&quot;戴帽子的柯基&quot;这张用户想要的图，办法是把文本作为条件，注入到每一步去噪里——让模型不只是&quot;去噪&quot;，而是&quot;朝着符合这句描述的方向去噪&quot;。</p>
+<p>这依赖文本和图像的对齐。模型得知道&quot;戴帽子的柯基&quot;这句话对应到图像空间里大概长什么样：哪部分是帽子、哪部分是柯基、它们应该以什么方式组合。这份对齐正是 CLIP 那类图文对比学习提供的（相关内容见&quot;CLIP&quot;&quot;多模态&quot;&quot;嵌入&quot;）。文本编码器先把提示变成条件表示，去噪网络在每一步读取这个表示，输出受条件影响的更新方向。</p>
+<p>于是两个角色分工变得清楚：去噪决定&quot;怎么画出一张合理的图&quot;，文本条件决定&quot;画成哪一张&quot;。两者合起来，就是文生图。</p>
+<p>也要理解生成结果的正确解释方式。生成结果应理解为模型对条件与训练分布的联合采样，而不是逐字执行命令。对常见、训练覆盖充分的组合，条件能有效地把生成引导到目标内容上；但罕见组合、精确计数、复杂空间关系和文字排版仍可能失控——因为模型学到的是分布层面的关联，不是对指令的逐条服从。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>和 GAN 的对比<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>扩散之前，图像生成的主力是 GAN。两者在生成方式上有根本区别：GAN 让生成器与判别器相互对抗，生成器一步就输出图像；扩散模型则从噪声出发，经过多步去噪逐步生成。</p>
+<p>这个区别直接带来了各自的优缺点。GAN 生成快，因为一次前向就出图；但训练不稳定，容易陷入&quot;模式坍缩&quot;——即生成器为了骗过判别器，只学会生成少数几种样本，丢失多样性。扩散模型更稳定、样本更多样、也更容易被文本等条件控制，但代价是要走多步，生成较慢。</p>
+<p>扩散后来居上的原因就在这里：它把生成拆成许多可学的小步，训练更稳、样本更多样，也更便于用条件引导。速度的短板则通过&quot;潜空间扩散&quot;大幅缓解——先在压缩后的小空间里做去噪，而不是直接在原始像素空间（相关内容见&quot;VAE&quot;）。GAN 的详细机制见&quot;生成对抗网络 GAN&quot;节点。</p>
+<p>比较两者时要保持公平：输入应是相同的数据、分辨率、算力和评测切片，输出的速度、质量与覆盖差异才有解释意义。还要注意两个容易被忽略的边界：GAN 一次前向快，不等于训练便宜，对抗训练的代价可能很高；扩散训练稳，也不等于它在所有任务上都更好。具体选哪个，取决于延迟要求、编辑能力、多样性需求和部署预算。</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>GAN</th><th>扩散模型</th></tr></thead>
+    <tbody>
+      <tr><td>怎么生成</td><td>生成器与判别器<b>对抗</b>，一步生成</td><td>从噪声<b>多步去噪</b></td></tr>
+      <tr><td>速度</td><td>生成快</td><td>要走多步，较慢</td></tr>
+      <tr><td>稳定性/多样性</td><td>训练不稳、易「模式坍缩」（只会生成少数几种）</td><td>更稳、更多样、更可控</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5.5</span>潜空间与引导：速度、贴题和多样性的权衡<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>高分辨率像素空间太贵，文本条件又可能不够强，工程上用两个手段来应对。</p>
+<p>第一个是潜空间扩散。先用编码器把图像压缩到更小的潜变量，在这个小空间里做去噪，最后再解码回像素，从而显著降低计算量。潜空间扩散的输入是压缩表示，输出是解码后的图像；压缩丢掉的是细节信息，这是它提速所付的代价。</p>
+<p>第二个是无分类器引导。它把有条件预测与无条件预测组合起来，用来改变采样方向：让采样结果更偏向&quot;符合文本条件&quot;那一侧。引导尺度提高通常会让图更贴提示，但过高会牺牲多样性、造成过饱和或产生伪影。这说明&quot;更听话&quot;不是免费的单向增益，而是一个权衡——更高的引导分数表示更强地追随条件差异，不代表总体质量必然更高。</p>
+<p>既然两个旋钮都存在权衡，就需要系统的评测与失败诊断。做法是固定提示集和随机种子，对采样步数、调度器与引导尺度做网格实验，同时记录耗时、提示遵循、样本多样性和伪影率。FID 或图文相似度只能作为代理指标，还要专门检查计数、文字、手部和身份一致性等困难切片。诊断时先判断失败属于哪一类：如果高引导只提升相似度却让样本趋同，应归因于贴题—多样性权衡；如果结构普遍模糊，再分别检查去噪器、VAE 解码和采样步数。这样能把&quot;调参问题&quot;和&quot;模型能力问题&quot;区分开，避免盲目加大某一个参数。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面各节串成一条完整的因果链，起点是&quot;一步生成太难&quot;：凭空一步造出协调逼真的图，等于一次预测满足整张图所有像素之间的联合关系，这个负担重到不切实际（§1）。</p>
+<p>扩散的应对是把它拆开：正向加噪，拿清晰真图一步步撒噪声直到变成纯噪声，顺带自动生成海量&quot;加噪前/加噪后&quot;训练样本；反向学去噪，训练网络把带噪图还原成稍微清晰一点的图（§2）。</p>
+<p>生成时就从纯噪声出发反复去噪，让图像逐步&quot;显影&quot;；之所以拆成小步而不是一步完成，是因为每一小步&quot;从噪声多一点到噪声少一点&quot;都简单可学，许多小步累积起来就完成了原本不可能的大跳跃。而训练不必逐步走完整条链，可以直接构造任意时刻的带噪样本，随机抽一个时刻就能为整条时间轴提供训练信号（§2、§3）。</p>
+<p>接下来把文本作为条件注入去噪，靠图文对齐让模型朝着符合描述的方向生成，于是&quot;去噪决定怎么画一张合理的图、条件决定画成哪一张&quot;（§4）。</p>
+<p>相比 GAN，扩散更稳、更多样、更可控，因此成了主流，代价是生成慢（§5）；这一速度短板又被潜空间扩散缓解，引导尺度则在贴题与多样性之间做权衡（§6、§7）。</p>
+<p>能抓住内核的标志是：讲清扩散为什么要把生成拆成&quot;加噪—去噪&quot;的很多小步，以及文本是怎么指挥去噪方向的。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>理解扩散模型需要先具备几项基础：神经网络提供反向去噪网络的骨架，自监督学习解释了加噪过程为何能自动产生训练样本，嵌入则是文本条件进入模型的语言（先修）。</p>
+<p>本页的核心概念是加噪—去噪、多步生成、文本条件注入，以及它与 GAN 的对比。这些是理解整个机制的枢纽。</p>
+<p>紧邻的延伸概念包括：图像生成这一更广的任务背景，CLIP 与多模态（提供文本和图像之间的对齐），生成对抗网络 GAN（扩散之前的图像生成主力，用于对比理解），以及 VAE（潜空间扩散所依赖的压缩与解码机制）。</p>
+<p>更远的方向则从&quot;生成一张图&quot;延伸到可控生成、视频生成、图像编辑和超分辨率——它们都建立在同一套加噪—去噪与条件引导的基础上，只是把生成对象从单张静态图扩展到了更复杂的空间。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>神经网络、自监督学习、嵌入</td></tr>
+      <tr><td><b>本页核心</b></td><td>加噪-去噪、多步生成、文本条件注入、vs GAN</td></tr>
+      <tr><td>紧邻延伸</td><td>图像生成、CLIP、多模态、生成对抗网络 GAN、VAE</td></tr>
+      <tr><td>更远</td><td>可控生成、视频生成、图像编辑、超分辨率</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al., Denoising Diffusion Probabilistic Models</a>：前向加噪、反向去噪与训练目标。</li>
+    <li><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., High-Resolution Image Synthesis with Latent Diffusion Models</a>：潜空间扩散与交叉注意力条件注入。</li>
+    <li><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans, Classifier-Free Diffusion Guidance</a>：无分类器引导与条件强度权衡。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/diffusion">在地图中查看概念关系</a></nav>
+</article></main></body></html>

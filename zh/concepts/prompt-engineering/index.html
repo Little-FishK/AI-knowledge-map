@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>提示工程 · AI 知识地图</title>
+<meta name="description" content="设计输入的措辞与结构，让模型稳定产出你想要的结果">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/prompt-engineering/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="提示工程">
+<meta property="og:description" content="设计输入的措辞与结构，让模型稳定产出你想要的结果">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/prompt-engineering/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="提示工程">
+<meta name="twitter:description" content="设计输入的措辞与结构，让模型稳定产出你想要的结果">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/prompt-engineering/#page","name":"提示工程","description":"设计输入的措辞与结构，让模型稳定产出你想要的结果","url":"https://ai-knowledge-map.com/zh/concepts/prompt-engineering/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"提示工程","item":"https://ai-knowledge-map.com/zh/concepts/prompt-engineering/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">提示工程</span></li></ol></nav><article id="dd-article" data-concept-id="prompt-engineering">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">提示工程</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">设计输入的措辞与结构，让模型稳定产出你想要的结果</p>
+<p class="dd-ali">Prompt Engineering · 提示词工程</p>
+<p class="dd-metabar">建议 20–30 分钟 · 基础 → 中级 · 需要：了解「大语言模型」「上下文学习」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 提示工程是通过设计输入的措辞、结构、示例与约束，提高模型产出符合要求结果的概率。它不改模型权重、迭代快，但并非零成本：更长的提示会增加 token、延迟、维护与评测成本，且跨模型迁移时需要重新验证。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>是什么</b>——不训练、不改模型，怎么让它产出你要的东西。</li>
+    <li><b>凭什么</b>——同一个模型，换个问法凭什么结果差这么多。</li>
+    <li><b>怎么写</b>——有效提示的几招通用套路。</li>
+    <li><b>底层原理</b>——为什么「给示例、给格式」就管用。</li>
+    <li><b>边界</b>——提示压不稳时，该往哪走。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>不改模型，只把「怎么问」设计好，让模型稳定产出想要的结果——这就是提示工程。<span>（§1）</span></li>
+    <li>它有效，是因为模型在「接龙」，你的提示是它的起点和条件，越明确它越准。<span>（§2）</span></li>
+    <li>通用套路：清晰具体、给角色、指定格式、给示例、让它分步、给边界，并迭代。<span>（§3）</span></li>
+    <li>底层原理是上下文学习：提示在演示「要什么样」，模型照做。<span>（§4）</span></li>
+    <li>它的边界：缺事实上 RAG、要稳定行为上微调、管上下文靠上下文工程。<span>（§5）</span></li>
+    <li>它的暗面是提示注入：能被提示塑造，就能被恶意提示劫持。<span>（§6）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>什么是提示工程<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>面对一个已经训练好的模型，想让它稳定地产出符合预期的结果，通常有两条路：一条是训练或微调，也就是修改模型内部参数；另一条是什么都不改，只调整喂给它的那段输入。提示工程走的是第二条路——不碰模型的任何权重，只靠设计输入措辞与结构来提高命中率。所谓命中率，指的是模型的输出在多大程度上符合你事先设定的约束：要什么内容、给谁看、用什么格式、什么口吻、举不举例子。约束说清楚了，输出命中的概率就提高了；说不清楚，模型只能靠猜。</p>
+<p>这是一门可以反复测试和改进的手艺，而不是一次性的按钮。它的工作过程可以拆成几步：先把任务目标、受众、上下文、边界和输出要求逐一想清楚，再把这些要求写进一段可以实际提交给模型的提示，然后交给模型执行，观察输出。整个流程的产出是两样东西：一份可被测试、可被复用的提示，以及这份提示在模型上得到的实际结果。用结果反过来检验提示写得好不好——输出越贴近要求，说明这份提示的约束命中率越高；偏差大，就回头改措辞、补例子、限定格式，再跑一遍。这个「写提示 → 看输出 → 改提示」的循环，就是提示工程的日常工作方式。</p>
+<p>它之所以被放在所有手段的最前面，是因为它具备三个明显的特性：不更新权重、即时生效、随时可改。不需要训练数据，不需要等训练完成，改完立刻就能看到效果，不满意马上再改。因此它通常适合用来先验证需求：在决定是否投入训练成本之前，先用提示探明「模型到底能不能干这件事、差在哪」。但「无需训练」并不等于「零成本」——提示越长，单次推理的费用和延迟越高；提示本身也需要维护和版本管理；每改一次，还要重新跑回归评测确认没有破坏原来的效果。这些成本都应计入提示工程的账里，只是它们发生在推理阶段而不是训练阶段。</p>
+<p>同时要清楚这个手段的能力边界：它从头到尾没有更新模型的权重，所以它的效果只对「已经测试过的那类模型」成立。换一个模型、或者模型本身升级、或者数据分布变了，原来那套提示未必继续命中，必须重新验证。提示工程改变的是你与模型之间的接口，而不是模型本身的能力上限。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>凭什么「怎么问」影响这么大<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>很多人第一次接触提示工程时都有一个共同的疑问：模型还是那个模型，权重一个都没动，凭什么只是换了个问法，输出质量就差那么多？要回答这个问题，得先回到大语言模型的本质。它的工作方式并不是理解你的意图然后照办，而是在预测：在你给出的这段文字之后，最可能接下去的内容是什么（参见「大语言模型」深读页）。模型做的每一件事——无论是翻译、总结还是写文案——最终都落在这一个动作上：给定一段前缀，续写最可能的下一步。</p>
+<p>一旦接受了这个视角，提示的作用就变得直观了：提示就是你为这次续写设定的起点与条件。模型每次生成时，读入的是「提示 + 已有前缀」整体，然后基于这些已经存在的文字，去估计下一个 token 该是什么。这里的关键在于，模型被训练成对已给定文字高度「顺从」——前缀里已经出现的约束，会强烈地收窄它后续生成的概率分布。所以提示越清楚、约束越具体，模型能锁定「该说什么」的范围就越窄、越准。你规定是给中年男性看的手表广告、三条、每条不超过四十字、强调防水，模型往下接的时候，大部分不符合这些条件的续写方向就已经被前缀排除掉了，剩下的高概率路径自然都落在你要的范围内。</p>
+<p>反过来，提示越含糊，前缀里没有提供任何可依循的约束，模型就只能往最泛泛、最安全的公共方向上接。所谓「最安全」，是指这些方向在训练语料里出现的频率最高、对任何上下文都不太会出错——比如空泛的套话、放之四海皆准的形容词、正确但没有任何信息量的话。于是你会得到一段挑不出毛病、但也毫无用处的「正确的废话」。不是模型变笨了，是它收到的起点信息太少，只能选择最平庸的高概率路径。</p>
+<p>因此可以这样理解整个机制：你不是在命令一个理解你的人去执行任务，而是在给一个接龙引擎设定尽量明确的开头。开头设定得越好，续写方向被约束得越窄，接出来的内容就越合你意。同时要注意这句话的另一半：输出更符合要求，只说明这次续写的约束命中率提高了，并不代表模型因此获得了任何新知识。它的能力上限没有变，变的只是这次生成中哪些能力被前缀引导了出来。而设定这个开头，正是提示工程全部操作的作用点。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>运行示例：把含糊愿望改成任务契约<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>光知道「提示是接龙的开头」还不够，还得知道怎么把一个含糊的愿望改写成一份可执行的规格。这里引入一个更可操作的概念：任务契约。一份好的提示应当像接口契约一样，让模型和评测器都能照着执行——模型知道该产出什么，评测器知道该按什么标准判分。缺少契约的提示，模型只能靠猜，评测器也只能靠感觉。</p>
+<p>契约的结构可以从图 1 的分层来看：最外层先定义目标，也就是这次要解决的具体问题；再往里提供完成目标所必需的上下文；接着写清边界，也就是哪些事不能做、越过去就算违约；最内层规定可验证的输出结构，让结果可以被机器或人工逐项核对。四个层次从外到内依次收窄。其中角色描述（如「你是资深文案」）只起辅助作用，用来设定身份与视角、收敛语言风格，它不能代替权限声明，也不能代替事实来源的规定——这两件事必须由边界和上下文层分别承担。</p>
+<p>把常见的提示手法整理成表，每一行都是一类「套路 → 做什么 → 例子」的对应关系：</p>
+
+<p>表中的每一项都在做同一件事：把某个原本留给模型去猜的维度，提前在提示里写死。但即便如此，提示也很少一次就能写好，它的正确用法是迭代。看输出哪里不对，就针对性地补一条约束，再看效果。把提示当成一个可调的参数：一次只改一处，观察这一处带来的变化，比一次性堆一大段更容易找到真正起作用的那句。</p>
+<p>下面这个运行示例能说明「可归因迭代」与「不可归因堆叠」的区别。某个退款助手的初版提示只有一句话「回答退款问题」，在 20 个测试用例里只有 11 个能同时给出退款期限和依据出处。这 9 个失败是可观察的、有明确类别的：缺少期限、缺少出处，或两者都缺。于是新版提示加入了任务范围、允许引用的资料、无证据时的澄清策略，并要求输出 JSON 字段 decision、reason、source。复测后 17 个用例通过。注意看剩下的 3 个失败：它们全部涉及质量问题例外的场景，属于另一类失败，指向的下一步是补检索证据或补业务规则，而不是继续在提示里堆「请认真、请专业」这类泛泛的恳求。</p>
+<p>这个例子揭示的因果链是：分数改善只有能对应到具体失败类别的消失时才有意义。从 11 到 17 的改善，可以归因于「期限与出处」这类失败被新约束消除；而如果改完提示分数涨了，却说不清哪些失败消失了，那只是不可归因的提示堆叠——涨分可能来自巧合，也无法指导下一步。所以每次改动提示，都应当先问：这次改动针对的是哪一类可观察的失败？</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 620 180" role="img" aria-label="提示从目标、上下文、约束到输出契约的分层结构"><defs><marker id="pe1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="55" width="115" height="62" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="77" y="80" text-anchor="middle" class="svg-t">目标</text><text x="77" y="100" text-anchor="middle" class="svg-t" font-size="10">回答退款政策</text><path d="M135,86 L172,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="174" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="236" y="80" text-anchor="middle" class="svg-t">上下文</text><text x="236" y="100" text-anchor="middle" class="svg-t" font-size="10">用户订单 + 资料</text><path d="M299,86 L336,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="338" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="400" y="80" text-anchor="middle" class="svg-t">边界</text><text x="400" y="100" text-anchor="middle" class="svg-t" font-size="10">无依据就澄清</text><path d="M463,86 L500,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="502" y="55" width="98" height="62" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="551" y="80" text-anchor="middle" class="svg-t">输出契约</text><text x="551" y="100" text-anchor="middle" class="svg-t" font-size="10">结论 + 引用</text><text x="310" y="148" text-anchor="middle" class="svg-t" font-size="10">每一层都应能用测试样例检查，而不是靠“更专业一点”等主观咒语</text></svg><figcaption>图 1　有效提示像接口契约：先定义目标，再提供必要上下文，写清禁止越过的边界，最后规定可验证输出。角色描述只是辅助，不应代替权限或事实来源。</figcaption></figure>
+<table class="dd-table">
+    <thead><tr><th>套路</th><th>做什么</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>清晰具体</td><td>说清任务、受众、约束，别让它猜</td><td>「面向跑者、每条≤20字」</td></tr>
+      <tr><td>给角色</td><td>设定身份/视角，收敛风格</td><td>「你是资深文案」</td></tr>
+      <tr><td>指定格式</td><td>要什么结构就明说</td><td>「输出 3 条，用列表」</td></tr>
+      <tr><td>给示例（few-shot）</td><td>演示一两个「输入→输出」，让它照做</td><td>见「上下文学习」</td></tr>
+      <tr><td>让它分步（思维链）</td><td>复杂题让它先推理再答</td><td>见「思维链 CoT」</td></tr>
+      <tr><td>给边界</td><td>说明不要什么、无法回答时怎么办</td><td>「不确定就说不知道」</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>它的底层原理，其实是上下文学习<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>上一节的示例里出现了一个值得追问的现象：只是往提示里塞了几个示例、规定了一下输出格式，模型就真的照着办了。它凭什么能「照做」？提示工程之所以管用，背后有一个更基础的机制，叫做上下文学习（参见「上下文学习」深读页）。理解了它，前面那些技巧就不再是一堆孤立的口诀，而是同一个能力在不同维度上的应用。</p>
+<p>上下文学习指的是：模型不需要更新任何权重，仅凭提示里给出的示例，就能当场识别出一个任务「长什么样」并照着执行。它的工作过程可以这样描述：输入的是提示中的示例加上新查询；模型在前向计算中先定位出示例里「输入到输出」的规律——比如每一条输入都是商品卖点、每一条输出都是二十字以内的广告语，或者每次输出都是三个列表项；定位到这个模式之后，再按同样的模式处理新查询，输出符合示例样式的回答。整个过程发生在前向传播里，模型的知识没有发生任何持久性改变。</p>
+<p>把提示工程里最有效的几招放在这个视角下看，本质全都一样：给示例，是演示「输入长什么样、输出长什么样」；给格式，是演示「输出的结构长什么样」；给角色，是演示「用什么身份和口吻说话」。这些手法都是在用提示本身演示「我要的输出长什么样」，模型识别出这个模式后，就顺着模式往下接。换句话说，前面讲的「给接龙引擎设定一个尽量明确的开头」，其中最有效的那类开头，就是示范。</p>
+<p>由此可以给出一个清晰的层次划分：上下文学习是模型本身具备的能力——「能照着提示里的样子办事」；提示工程则是把这门能力用好的手艺——设计出让模型一看就懂「该办成什么样」的提示。能力是模型自带且不可改的，手艺是可学习、可迭代、可评测的。同时这个机制也给出了两条边界提醒：第一，这种「照着办」是发生在上下文里的模仿，并不写进权重，换个会话、清空上下文，模型并不会变得更会办这件事；第二，模型有照示例办事的能力，不等于每个提示都会被忠实遵循——当提示内部矛盾、约束太多或与模型已有模式冲突时，照办就可能打折扣。上下文学习解释了提示为什么会生效，也划定了它生效的范围。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>边界：提示不是万能<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>提示工程见效快、成本低，但它有明确的天花板。这一节要回答的问题是：什么时候提示压不住局面，应该换招？判断的入口是看「失败的类型」——模型这次输得不对，到底缺的是什么。把失败类型、所需知识的来源、对输出稳定性的要求、调用规模与成本放在一起看，就能做出换招的决策：继续打磨提示、接入检索，还是转向微调。</p>
+<p>先看三类典型的「提示压不住」的情况。</p>
+<p>第一种是缺事实。如果任务需要的是最新的或私有的知识——比如公司内部的最新退款政策、今天的库存数据——那么提示写得再好也变不出模型参数里根本没有的知识。提示只能调度模型已有的能力，不能凭空创造知识。这种情况该上的是 RAG：把外部资料检索进来，放进上下文，让模型基于这些材料回答（参见「RAG」深读页）。</p>
+<p>第二种是缺稳定的复杂行为或格式。有些任务的输出结构很复杂，或者对行为的一致性要求极高，而提示总是压不稳——同一个提示这次符合、下次漂移，或者每次都要写一大段才能勉强维持。反复靠措辞去「哄」模型，说明这个行为已经超出了措辞能控制的范围，这时应考虑微调，把期望的行为固化进权重里，让它不再依赖每次精心设计的提示。</p>
+<p>第三种则要分辨一个更上层的概念：如果你要管理的不再是单条提示的措辞，而是「整个上下文里放什么」——历史消息怎么裁剪、检索结果怎么排布、示例怎么组织——那就进入了上下文工程的领域（参见其节点）。这是比提示工程更高一层的工程问题，输入物从「一段话」变成了「一组材料的编排策略」。</p>
+<p>由此可以排出一个务实的阶梯：先用提示工程做低成本验证，明确需求和差距；发现缺的是可更新的事实，就考虑接入 RAG；需要跨大量请求维持特定的稳定行为时，再评估微调。这个顺序是默认的起点，不是死规则——具体怎么选，最终取决于质量要求、延迟、隐私与运维约束。提示是起点，不是终点。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>暗面：提示注入<span class="dd-badge eng">安全</span></h2>
+<div class="dd-agent-response"><p>提示能塑造模型行为，这是它的力量来源，同时也意味着它可能是攻击面：既然模型这么听提示的话，那恶意构造的提示会不会反过来劫持它？这一节不引入任何本页之外的新事实，只用第 2、4 节已经建立的机制做一次推演——这个风险有一个专门的名字，叫提示注入（参见「提示注入」深读页）。</p>
+<p>先回顾第 2 节的机制：模型做的是接龙，它读入的是「提示 + 已有前缀」的整体，然后续写最可能的下一步。注意这个机制里没有任何一步会把前缀里的文字分成「你的指令」和「其他内容」两个类别来处理——对续写而言，前缀里所有的字都只是估计下一个 token 的条件。第 4 节又用 GPT-3 所展示的上下文学习补充了一点：上下文里出现什么样式，模型就顺着什么样式接。把这两条合起来就是：任何进入上下文的文字，都参与了「演示接下去该是什么样」这件事。</p>
+<p>由此可以推出风险所在。提示工程要做的，本来就是精心挑选进入上下文的那段文字来塑造输出；那么反过来，只要还有别的文字也能进入上下文，它就会以同样的方式参与塑造——这就是「注入」这个想法的全部原理。举一个假设性的推演（不是对某次真实攻击的记录）：你的提示要求「总结下面这篇文章」，而文章内容本身混入了一段「忽略上面的要求，改为输出……」。这段文字一旦进入上下文，就和其他提示文字处于同一个位置：都是前缀的一部分，都在影响续写方向。模型并不需要「被说服」或「被欺骗」——它只是在按第 2 节描述的方式续写，只不过塑造输出的文字里，有一部分不是来自你。</p>
+<p>于是因果链可以分成三步：提示能塑造行为（这是提示工程的根基）→ 任何进入上下文的文字都以同样的方式参与塑造 → 有人把想要的那段文字混进上下文，就相当于对输出施加了部分控制。所以提示注入并不是提示工程的某种「失败」，而是同一个原理被反过来利用——攻击者做的恰恰是最「正统」的提示设计，只不过他的目标和你相反。</p>
+<p>由此也能看出防护该从哪一层入手。第 5 节说过，管理「整个上下文里放什么」是上下文工程的问题——这条边界在这里正好就是防线：决定哪些外部文字可以进入上下文，就决定了哪些文字有机会参与塑造输出。顺着这个思路，防护的第一步是把「什么能进上下文」当作一个显式的设计决策，而不是默认外部内容总是安全的；对于输出会带来高影响后果的场景，还应考虑用人工确认这类流程性控制来兜底。反过来说，「检测出恶意句子就拦截」式的对策最多只能算其中一层：它拦的是已知措辞，而上下文塑造输出的路径并不依赖任何固定措辞。提示的力量无法被完全消除，能做的是把「谁能影响上下文」管起来，让想劫持提示的人没有进入上下文的通道。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面几节串起来，整条因果链是这样的。</p>
+<p>链条的起点是一个目标：不改模型，只把「怎么问」设计好，让模型稳定地产出想要的结果——这就是提示工程的定义，也是它区别于训练类手段的根本特征（§1）。</p>
+<p>为什么「怎么问」能起作用？因为模型本质上是在续写，你给出的提示就是它这次续写的起点和条件，起点越明确，续写方向被收窄得越准（§2）。从这个机制出发，自然就派生出一套通用套路：清晰具体、给角色、指定格式、给示例、让它分步、给边界——每一招都是在提前写死一个原本要留给模型猜的维度，并且通过迭代逐步调准（§3）。</p>
+<p>再往下一层，这些套路的底层原理是上下文学习：提示真正在做的事，是在演示「我要的输出长什么样」，模型识别出这个模式就照着办。提示工程的全部技巧，本质上都是把这门模型自带的能力用好（§4）。</p>
+<p>有了力量，就要知道力量的边界：缺事实时提示造不出知识，该上 RAG；要稳定行为时提示压不稳，该考虑微调；要管理的是整个上下文里放什么，那是上下文工程的事（§5）。而力量的反面就是暗面：模型能被提示塑造，也就能被恶意提示劫持——提示注入利用的正是与提示工程完全相同的原理（§6）。</p>
+<p>这条链从「模型在接龙」这个事实出发，一条线推出提示为什么有效、怎么设计、怎么迭代；另一条线推出它何时失效、何时危险。抓住它的内核，只需能回答两个问题：为什么换个问法结果差这么多——因为模型在接龙，问法就是接龙的起点；以及提示工程和上下文学习是什么关系——上下文学习是模型照着提示里的样子办事的能力，提示工程是把这门能力用好的手艺。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>这张知识地图上的提示工程节点，概念依赖关系可以按学习层级排成下面这张表：</p>
+
+<p>这个层级结构的逻辑是：先修层回答「模型是什么、它凭什么能照提示办事」，本页核心层则是在这两个事实之上建立的——模型是接龙引擎，所以措辞与结构决定起点；模型有上下文学习能力，所以清晰具体、角色、格式、示例这些演示手段才有效；而「无需训练但需评测」规定了这门手艺必须靠迭代和固定测试集来调准。紧邻延伸层里的每个概念都直接长在本页的某个结论上：思维链 CoT 是「让它分步」的深入形式，系统提示是提示里专门承载全局约束的那部分，上下文工程是「管理整个上下文里放什么」的上层问题，RAG 与微调是越过提示边界后的两个换招方向，提示注入则是提示塑造行为这一原理的暗面。更远一层——自洽性、思维树、结构化输出、提示缓存——分别对应推理可信度、复杂推理的组织方式、输出格式的刚性保障与推理成本的优化，属于在掌握核心概念之后的进阶方向。学习时按「先修 → 核心 → 紧邻延伸」的顺序推进即可，更远一层可作为选题线索，不必一开始就深入。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>大语言模型、上下文学习</td></tr>
+      <tr><td><b>本页核心</b></td><td>措辞与结构、清晰具体/角色/格式/示例、迭代、无需训练但需评测</td></tr>
+      <tr><td>紧邻延伸</td><td>思维链 CoT、系统提示、上下文工程、RAG、微调、提示注入</td></tr>
+      <tr><td>更远</td><td>自洽性、思维树、结构化输出、提示缓存</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., GPT-3</a>：零样本、单样本与少样本上下文学习。</li>
+    <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al., Chain-of-Thought Prompting</a>：示例化中间步骤对复杂推理的影响。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理提示与外部行动交错的设计。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/prompt-engineering">在地图中查看概念关系</a></nav>
+</article></main></body></html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>重排 Reranking：在高召回候选中做精细相关性判断 · AI 知识地图</title>
+<meta name="description" content="理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/reranking/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="重排 Reranking：在高召回候选中做精细相关性判断">
+<meta property="og:description" content="理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/reranking/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="重排 Reranking：在高召回候选中做精细相关性判断">
+<meta name="twitter:description" content="理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/reranking/#page","name":"重排 Reranking：在高召回候选中做精细相关性判断","description":"理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。","url":"https://ai-knowledge-map.com/zh/concepts/reranking/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"重排 Reranking：在高召回候选中做精细相关性判断","item":"https://ai-knowledge-map.com/zh/concepts/reranking/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">重排 Reranking：在高召回候选中做精细相关性判断</span></li></ol></nav><article id="dd-article" data-concept-id="reranking">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">重排 Reranking：在高召回候选中做精细相关性判断</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 检索首阶段用可预计算表示快速召回，重排器对较小候选集进行更昂贵的查询—文档交互；它能提高前排精度，却<b>无法找回首阶段未召回的证据</b>。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分召回与重排；解释 cross-encoder；选择候选深度；评测位置、延迟与答案贡献。</div>
+<ol class="dd-chain"><li>首阶段快速召回候选</li><li>检查正确证据 Recall@k</li><li>重排器做精细交互</li><li>截取前若干进入上下文</li><li>生成器引用并回答</li><li>用检索与答案指标共同回归</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>两阶段为何必要<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>检索系统的根本矛盾在于：最强模型能做出最精细的相关性判断，但让它把查询与数据库中的全部文档逐一交互，成本高到不可接受。两阶段检索就是为这一矛盾设计的分工方案——第一阶段用廉价的向量检索或关键词匹配在全集上快速筛选，只保证高召回：宁可多取，不可漏掉可能包含答案的文档；第二阶段把更强的模型（如交叉编码器或大语言模型）只应用到这个被大幅缩小的候选集上，做逐对的精细排序。速度来自第一阶段，精度来自第二阶段，两者共享同一个查询、同一份全库和一个延迟预算。</p>
+<p>整个流程的输入是查询、完整文档库和延迟预算，输出是第一阶段的高召回候选列表，以及经重排器排序后的前排片段。第一阶段用便宜表示把集合缩小到可以承受精细比较的规模；重排器只在这个集合内部工作，从不越出候选集去全库重新比较。因此，正确证据若根本没有进入候选，问题出在召回阶段，而不是重排阶段——重排器在定义上就看不到候选之外的文档，指责它漏排是没有意义的。只有当全库规模很小、对全部文档逐一精细比较也扛得住时，才可能省略第一阶段，直接让强模型面对全集。</p>
+<p>这一分工带来的另一个后果是：线上出问题时，故障类型必须先被区分，否则修复方向会相互抵消。诊断需要保存重排前后的候选 id、首阶段分数、重排分数、文档版本以及最终被引用的证据。在这条链条上存在三个性质不同的失败点：正确证据不在候选中，是召回失败，要修的是首阶段的检索表示或索引；证据在候选中却仍被排到后面，才是排序失败，要修的是重排器本身；证据排进了送给生成的上下文却最终没有被引用，属于装配或生成环节的失败，与重排器无关。把三者混为一谈、全部归咎于重排模型，会导致对无关组件的无效改动。</p>
+<p>跨领域使用时还要提防绝对分数的整体漂移：同一模型在不同领域的数据分布上，输出的相关性分数可能整体抬高或压低。此时为一个领域标定的固定阈值不能直接搬到另一个领域，必须按查询类型重新校准，否则按阈值截断前排时会系统性多取或少取。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>双塔与交叉编码器<span class="dd-badge eng">架构</span></h2>
+<div class="dd-agent-response"><p>重排器普遍比首阶段表示更准、也更慢，根源在于两种编码方式的交互粒度不同。双塔模型把查询和文档分别送入各自的编码器，各自产出向量后再算相似度：因为文档向量可以离线预计算并入库，线上只需编码查询，所以它足够便宜，适合全库规模的召回；代价是查询与文档在编码过程中从未见面，两者的表示互不影响，交互发生在压缩后的向量层面，容易丢失细微语义。交叉编码器则把查询和文档拼接后一起输入，让查询的每个 token 与文档的每个 token 在注意力机制中充分交互，相关性判断自然更细；代价是每个候选文档都必须经历一次完整前向计算，且候选一旦变化无法复用缓存，因此只能用在候选数量已大幅缩减的重排阶段。</p>
+<p>这种 token 级交互的价值在需要精确逻辑判断的场景最明显：条件、数字、否定和实体关系。例如&quot;质量问题不受 30 天限制&quot;与&quot;所有商品受 30 天限制&quot;，两者共享大量词汇，双塔向量可能把二者判为高度相似，而交叉编码器能看到否定结构与数字约束的组合方式，从而区分两种相反的权利状态。这正是把重排器放在第二阶段的原因：首阶段负责把相关文档圈进来，重排器负责在这个小集合里把真正满足查询约束的排上去。</p>
+<p>架构选择是一个受约束的权衡问题。输入是查询、候选文档、所需的交互粒度以及计算预算，输出要么是双塔的相似分，要么是交叉编码器的相关分。预算充足且候选较少时选交叉编码器换精度；预算紧张或候选极多时退回双塔。无论选哪种，都有一条共同边界：模型输入长度有限，长文档可能在被截断的位置恰好丢掉承载答案的关键句。此时低分反映的是&quot;被看到的那段与查询不相关&quot;，而不是&quot;全文不相关&quot;。处理长文档应依据文档结构选择摘要、滑动窗口或抽取关键段来构建输入，而不是默认整篇截断。另一条边界是，高分只意味着在该模型训练目标下判定为相关，并不证明文档来源真实或内容无误——相关性判断与事实核验是两回事。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>候选深度的上限<span class="dd-badge math">度量</span></h2>
+<div class="dd-agent-response"><p>重排阶段必须回答一个看似简单的问题：到底取首阶段的前多少条交给重排器。取 top-20 与取 top-200 代表两种相反的倾向。增大 k 确实提高候选集中包含正确证据的概率——首阶段排序虽然粗糙，但正确证据通常落在某个深度范围内，k 越大，把这条证据圈进来的机会越大；同时重排成本随 k 近似线性增长，因为交叉编码器对每条候选都要做一次前向计算，而且更深的候选本身与查询的相关性更弱，涌入的更多是噪声而非增益。k 的选择就是在&quot;圈住正确证据的概率&quot;与&quot;计算成本加噪声&quot;之间取平衡。</p>
+<p>决策不能凭感觉，要由数据给出。输入三样东西：首阶段的 Recall 曲线，即不同 k 下正确证据被包含的比例；重排单条候选的成本；以及下游生成阶段能接收的上下文预算。输出就是实际需要重排的深度 k。判断方法是按查询桶分别观察 Recall@k 曲线——不同查询类型的正确证据分布深度不同，混在一起看会掩盖差异。曲线尚未饱和时，增大 k 换来的召回提升是实打实的；曲线已趋于平坦，继续加大 k 只会线性增加延迟、向重排器灌入更多与查询无关的候选，前排排序还可能被噪声扰动。</p>
+<p>这里有一条先决条件式的因果链：重排器只能重新排列首阶段交给它的集合，永远无法凭空产生候选之外的证据。因此当 Recall@k 本身很低时，换更强的重排器没有意义——正确证据根本没进集合，再精密的排序也排不出它。此时的正确动作是修首阶段召回：改进向量表示、补关键词索引或调整检索策略，把 Recall@k 抬到合理水平之后，才轮到讨论重排深度与重排器选型。反过来，若 Recall@k 已经很高而最终效果仍差，问题才真正落在重排或下游环节。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Late interaction<span class="dd-badge intuition">折中</span></h2>
+<div class="dd-agent-response"><p>双塔与交叉编码器各自牺牲了一部分东西：双塔为速度牺牲了 token 级交互，交叉编码器为交互牺牲了预计算。Late interaction 试图同时保留两者，其代表实现是 ColBERT。它把查询和文档各自编码成一串 token 级向量——文档的每个 token 都有自己的向量，而不是整篇文档压成一个——这些文档 token 向量可以离线预计算入库；线上收到查询后，查询的每个 token 向量与文档的每个 token 向量做局部匹配，通过 MaxSim 聚合成一个相关分：对每个查询 token，取它与文档所有 token 相似度的最大值（即该查询词在文档中的最强匹配位置），再把所有查询 token 的最大相似度求和。查询 token 与文档 token 之间因此保留了&quot;哪个词匹配到了文档的哪一处&quot;这种双塔完全没有的信息，而文档侧仍然可以预计算，避免了交叉编码器逐候选全量前向的开销。</p>
+<p>于是 Late interaction 的输入是查询与文档各自的 token 级向量，输出是经 MaxSim 聚合后的相关分，定位恰好落在双塔与交叉编码器之间：精度高于双塔，速度优于交叉编码器。代价也很直接——存储的单元从每篇文档一个向量膨胀为每篇文档每个 token 一个向量，索引体积显著增大，检索时的计算与内存压力随之上升。这在文档数量大或 token 粒度细的场景下是必须计入预算的成本。</p>
+<p>和前面两种架构一样，Late interaction 的相关分衡量的只是&quot;查询与文档在语义上的匹配程度&quot;。它不编码文档是否仍然有效、访问者是否有权限查看、内容是否经过事实核验。时效、权限与真实性必须由独立的机制保证，任何相关分都不该被当作这三者的替代品。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>LLM 重排的偏差<span class="dd-badge eng">LLM</span></h2>
+<div class="dd-agent-response"><p>把候选排序交给 LLM 时，先要选择让它以什么方式输出判断，再面对这种方式自带的偏差。输入包括候选文档、候选进入提示词时的排列顺序、评分提示词本身，以及比较方式；输出可以是点式打分——逐条给候选一个分数，也可以是成对比较——两两决出谁更相关，还可以是列表排序——让模型直接给出整份候选的排名。三种方式成本不同：点式打分每个候选一次调用，成对比较的组合数随候选数平方增长，列表排序一次调用处理全部候选但判断质量受列表结构影响。真正的风险集中在列表排序上。</p>
+<p>列表式输出表现出几类可测量的偏差。首因偏差使模型偏爱排在列表靠前位置的候选，哪怕换一批候选填充同样位置也可能获得加分；长度偏差让更长的文档看起来更权威或更相关；顺序偏差则意味着同样的候选集合，仅仅改变送入时的排列顺序，模型给出的排名就可能变化。此外措辞显眼、格式整齐的候选也可能获得与内容相关性无关的优势。要区分&quot;模型真的认为 A 比 B 相关&quot;与&quot;A 只是恰好在某个位置或更长&quot;，需要做对照诊断：对同一批候选随机置换输入顺序多次运行，观察排名是否稳定；用滑窗方式分批比较，或引入成对比较的结果做校准。只有当排名在置换下保持稳定时，两次排序的变化才能作为可信证据；若置换后排名大幅漂移，说明输出被位置因素污染，不应据此下结论。</p>
+<p>这些诊断的代价是成倍增加的模型调用，而 LLM 推理本身就不便宜。因此把 LLM 重排作为默认方案的前提是调用成本可承受，且位置偏差已被校准或在设计上被绕开。在位置偏差未经校准的高吞吐场景里，逐候选的 LLM 重排既昂贵又不可靠，通常不适合取代双塔或交叉编码器成为第一选择。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>端到端评测<span class="dd-badge eng">评测</span></h2>
+<div class="dd-agent-response"><p>仅凭 NDCG 这类排序指标判断重排是否成功，会错过链路后段的大部分故障。端到端评测的输入不止重排前后的候选列表，还包括正确回答问题所必需的证据、生成器最终给出的引用，以及最终任务是否完成；输出则是并列的一组数字：NDCG、MRR 等排序指标，关键证据是否进入上下文的覆盖率，引用是否忠实于被引文档，再加上延迟、费用和任务成功率。排序指标的提高只能说明在相关性标注下候选顺序变好了，它不告诉我们生成器是否真的使用了被排到前面的证据——证据覆盖与引用忠实必须单独测量，最终任务是否成功更要独立判定。</p>
+<p>&quot;相关&quot;与&quot;可信&quot;不是一回事。重排器优化的是查询与文档的匹配程度，一个与问题高度贴题但内容错误的文档完全可能被排到第一。排序指标在这种情况下反而会上升，因为它恰好把最&quot;像答案&quot;的东西放到了最前面，而生成器若据此作答，输出就是错的。所以评测切片不能只有相关性：要按查询类型、文档长度和时效要求分别观察指标，同时报告延迟与费用，才能在精度提升与成本增长之间做出判断，而不是只看到一个孤立的 NDCG 数字。</p>
+<p>上线门禁同样要覆盖排序指标之外的内容：候选文档的版本是否正确、访问权限是否满足、答案切片是否与评测集一致。缺少这些约束，一个在离线评测里 NDCG 更高的重排配置仍可能在线上给出过时、越权或答非所问的结果。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>一次排序怎样改变可见证据<span class="dd-badge math">运行示例</span></h2>
+<div class="dd-agent-response"><p>首阶段已经召回正确材料，答案仍可能被排在前面的近似材料带偏——这正是重排环节存在的意义，用一个具体案例看得最清楚。用户询问某商品的质量问题是否受 30 天期限限制，首阶段召回四份候选。双塔把查询和文档各压成独立向量摘要后再算相似度，无法分辨&quot;质量问题例外&quot;与&quot;所有商品受 30 天限制&quot;这种细粒度条件差异，于是按召回名次排出了这样的顺序：</p>
+
+<p>交叉编码器让&quot;30 天&quot;&quot;质量问题&quot;&quot;不受期限限制&quot;这些 token 直接互动，能把真正回答问题的例外条款从第 3 名提到第 1 名；而原本排第 1 的&quot;退款到账时间&quot;只是与查询共享&quot;退款&quot;主题，任务意图完全不同，被降到第 4。用首个相关结果排名 rank 的倒数来度量，即 MRR = 1 ÷ rank：若把等级 ≥ 2 视为相关，重排前首个相关结果排在第 2，MRR 为 1/2 = 0.5；重排后排到第 1，MRR 升为 1/1 = 1.0。</p>
+<p>这个 0.5 → 1.0 的提升只说明&quot;首个相关结果提前了&quot;，其余结论都要另测：旧版质量条款虽然文本相关，仍需要独立的时效过滤才能排除；生成器是否同时使用一般规则与例外来组成完整答案，也取决于 top-2 证据覆盖、版本过滤、引用忠实和最终答案的检查，MRR 本身不回答这些问题。</p>
+<p>案例还展示了集合上限的约束：若首阶段只取 top-4，而质量问题例外不在其中，候选 Recall@4 就是 0，任何重排模型的最好结果也只能是 0——重排不能凭空制造候选。因此应先把 Recall@k 曲线画出来，确定正确证据通常在哪个深度出现，再据此决定重排的 k。这个排序案例的输入是四份候选各自的召回名次、人工相关等级与重排名次，输出是重排前后的 MRR 与 top-2 证据覆盖，作为一次局部排序变化的量化记录。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 680 225" role="img" aria-label="双塔召回候选经交叉编码器重排后把质量例外提到首位"><defs><marker id="rr1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="35" width="155" height="155" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="95" y="58" text-anchor="middle" class="svg-t">双塔 top-4</text><text x="36" y="84" class="svg-t" font-size="10">1. 到账时间　0.84</text><text x="36" y="108" class="svg-t" font-size="10">2. 一般期限　0.82</text><text x="36" y="132" class="svg-t" font-size="10">3. 质量例外　0.79</text><text x="36" y="156" class="svg-t" font-size="10">4. 旧版条款　0.77</text><path d="M173,112 L252,112" stroke="#6b7484" marker-end="url(#rr1)"/><rect x="254" y="54" width="164" height="116" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="336" y="78" text-anchor="middle" class="svg-t">交叉编码器</text><text x="336" y="102" text-anchor="middle" class="svg-t" font-size="10">[查询；候选] 共同编码</text><text x="336" y="123" text-anchor="middle" class="svg-t" font-size="10">token 级条件/否定交互</text><text x="336" y="144" text-anchor="middle" class="svg-t" font-size="10">每个候选一次前向</text><path d="M418,112 L497,112" stroke="#6b7484" marker-end="url(#rr1)"/><rect x="499" y="35" width="163" height="155" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="580" y="58" text-anchor="middle" class="svg-t">重排后 top-3</text><text x="517" y="84" class="svg-t" font-size="10">1. 质量例外　0.93</text><text x="517" y="108" class="svg-t" font-size="10">2. 一般期限　0.88</text><text x="517" y="132" class="svg-t" font-size="10">3. 旧版条款　0.41</text><text x="517" y="161" class="svg-t" font-size="10">到账时间降至第 4</text><text x="340" y="213" text-anchor="middle" class="svg-t" font-size="10">重排只改变已有集合的顺序；如果质量例外不在左侧候选中，右侧永远不会出现它</text></svg><figcaption>图 1　双塔把查询和文档压成独立摘要，交叉编码器则让“35 天”“质量问题”“不受期限限制”等 token 直接互动，因此能修正细粒度条件排序。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>候选</th><th>人工相关等级</th><th>召回名次</th><th>重排名次</th><th>为何改变</th></tr></thead><tbody><tr><td>质量问题例外</td><td>3（直接回答）</td><td>3</td><td>1</td><td>同时匹配“质量问题”和期限例外</td></tr><tr><td>30 天一般规则</td><td>2（必要背景）</td><td>2</td><td>2</td><td>说明默认规则但不是完整答案</td></tr><tr><td>旧版质量条款</td><td>1（相关但过期）</td><td>4</td><td>3</td><td>文本相关，仍需独立时效过滤</td></tr><tr><td>退款到账时间</td><td>0（不回答资格）</td><td>1</td><td>4</td><td>共享“退款”主题但任务意图不同</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="重排前后首个相关结果的倒数排名"><mi>MRRbefore</mi><mo>=</mo><mfrac><mn>1</mn><mi>rankbefore</mi></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>=</mo><mn>0.5</mn><mo>;</mo><mi>MRRafter</mi><mo>=</mo><mfrac><mn>1</mn><mi>rankafter</mi></mfrac><mo>=</mo><mn>1.0</mn></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>精度收益怎样换算成延迟预算<span class="dd-badge math">成本边界</span></h2>
+<div class="dd-agent-response"><p>候选越多越保险，但线上系统不能总把 top-200 全部交给交叉编码器，因为延迟的增长是实打实且可预估的。用一个具体假设来计算：交叉编码器一批处理 20 对查询—文档需要 35 ms，此外每次重排请求还有 25 ms 的固定网络与编排开销。那么重排 20 条只需 1 批，耗时约 25 + 35 = 60 ms；重排 100 条需要 5 批，耗时约 25 + 5 × 35 = 200 ms。把这一步抽象成公式：输入固定编排开销 T_fixed、每批耗时 T_batch、每批候选量 b 和候选数 k，输出重排延迟 T_rerank，批次数是 k 对 b 的向上取整，于是 T_rerank = T_fixed + ⌈k/b⌉ × T_batch。代入数字：20 条约 60 ms，100 条约 200 ms。批处理降低了单位候选的平均成本，但它不能消除候选数增加带来的总计算量——批量只是把 ⌈k/b⌉ 压得更接近 k/b，总耗时仍随 k 增长。</p>
+<p>延迟花得值不值，要和换来的覆盖对照。若 Recall@20 = 92%、Recall@100 = 96%，把候选深度从 20 提到 100 要多付约 140 ms，换来的只是 4 个百分点的候选覆盖，而且这部分覆盖未必能转化为最终答案的提升。按这个思路可以得到一张生产决策表：</p>
+
+<p>生产调参的正确顺序是先设定端到端延迟 SLO，再把预算分配到召回、重排和生成各环节，而不是让每个环节各自把延迟用满。深度也可以按查询难度自适应：精确编号类查询靠关键词检索即可命中，重排少量候选就够；歧义大的自然语言查询值得扩大候选深度；高风险问题则应在版本与权威性过滤之后再做精排。表里的延迟估算只适用于给定的硬件与批设置，换设备或改批次都要重算。</p>
+<p>交叉编码器还有一个更隐蔽的失败边界：它学的是标注相关性。如果训练集把&quot;措辞更像问题&quot;误标成了&quot;能支撑答案&quot;，模型会稳定地把文字贴切但缺少关键条件的片段排到前面，且这种偏差在单一指标下不易暴露。对新领域、长文档、否定句式和时间敏感查询，必须单独切片评测，而不能复用通用集合上的结论。额外 Recall 是否值得，最终都要由它能否改善最终任务来证明。</p></div>
+<table class="dd-table"><thead><tr><th>候选深度</th><th>证据 Recall</th><th>估算重排延迟</th><th>适用判断</th></tr></thead><tbody><tr><td>20</td><td>92%</td><td>60 ms</td><td>默认交互场景</td></tr><tr><td>50</td><td>95%</td><td>约 130 ms</td><td>高价值且召回尾部仍有收益</td></tr><tr><td>100</td><td>96%</td><td>200 ms</td><td>需证明额外 1% 能改善任务</td></tr><tr><td>200</td><td>96.2%</td><td>约 375 ms</td><td>收益已饱和，通常应修首阶段</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="分批交叉编码重排延迟"><mi>Trerank</mi><mo>=</mo><mi>Tfixed</mi><mo>+</mo><mo>⌈</mo><mfrac><mi>k</mi><mi>b</mi></mfrac><mo>⌉</mo><mo>×</mo><mi>Tbatch</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把重排放回整条检索链路，它只是六个环节中的一环，每个环节的产出是下一个环节的输入，任何一环断掉，最终答案都会出错。链条从问题开始：首阶段用廉价表示在全库上快速召回候选，这一步只保证高召回而不保证顺序；随后必须检查正确证据的 Recall@k——若证据根本没进候选，后面所有环节的最优表现也被封顶为 0，此时要回去修召回而不是动重排。Recall 达标后，重排器才在候选集内做精细交互，用 token 级的条件、数字与否定匹配把真正回答问题的片段排到前面；接着按延迟与上下文预算截取前若干条进入生成上下文；生成器引用这些片段并给出答案；最后用检索指标与答案指标共同回归，验证排序改善是否真的转化为证据覆盖、引用忠实与任务成功。</p>
+<p>沿着这条链回看全章各环节的决策，可以看到它们彼此约束。架构选择（双塔、交叉编码器或 Late interaction）决定精细交互能做到什么程度，也决定单位候选的计算与存储成本；候选深度 k 由 Recall@k 曲线的饱和位置和重排延迟公式 T_rerank = T_fixed + ⌈k/b⌉ × T_batch 共同决定；评测则必须同时报告排序指标、证据覆盖、引用忠实、延迟、费用与任务成功率，并守住版本、权限与时效的切片门禁。任何单一环节的指标提升——无论是 MRR 从 0.5 到 1.0，还是 NDCG 的整体上浮——都只说明该环节局部变好，只有沿因果链逐环验证到最终答案，才能确认一次重排改动是真正有效的。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Sentence-BERT</a>：双塔与交叉编码比较</li><li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">ColBERT</a>：late interaction</li><li><a href="https://arxiv.org/abs/2304.09542" target="_blank" rel="noopener">Is ChatGPT Good at Search? RankGPT</a>：LLM 列表重排</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/reranking">在地图中查看概念关系</a></nav>
+</article></main></body></html>

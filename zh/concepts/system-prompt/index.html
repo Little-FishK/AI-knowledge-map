@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>系统提示：在概率模型里声明行为契约，而不是建立安全边界 · AI 知识地图</title>
+<meta name="description" content="从消息序列、指令优先级、冲突解析和上下文拼装，到注入、泄露、版本化与契约测试，理解系统提示能控制什么。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/system-prompt/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="系统提示：在概率模型里声明行为契约，而不是建立安全边界">
+<meta property="og:description" content="从消息序列、指令优先级、冲突解析和上下文拼装，到注入、泄露、版本化与契约测试，理解系统提示能控制什么。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/system-prompt/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="系统提示：在概率模型里声明行为契约，而不是建立安全边界">
+<meta name="twitter:description" content="从消息序列、指令优先级、冲突解析和上下文拼装，到注入、泄露、版本化与契约测试，理解系统提示能控制什么。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/system-prompt/#page","name":"系统提示：在概率模型里声明行为契约，而不是建立安全边界","description":"从消息序列、指令优先级、冲突解析和上下文拼装，到注入、泄露、版本化与契约测试，理解系统提示能控制什么。","url":"https://ai-knowledge-map.com/zh/concepts/system-prompt/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"系统提示：在概率模型里声明行为契约，而不是建立安全边界","item":"https://ai-knowledge-map.com/zh/concepts/system-prompt/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">系统提示：在概率模型里声明行为契约，而不是建立安全边界</span></li></ol></nav><article id="dd-article" data-concept-id="system-prompt">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">系统提示：在概率模型里声明行为契约，而不是建立安全边界</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从消息序列、指令优先级、冲突解析和上下文拼装，到注入、泄露、版本化与契约测试，理解系统提示能控制什么。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 系统提示是应用在每次推理中注入的高优先级上下文，用来声明角色、任务、边界和输出契约；它影响下一 token 分布，却不是操作系统权限，不能独立保护秘密或阻止越权工具。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>解释系统消息怎样参与自回归生成；区分优先级、时间顺序与可信度；把提示拆成可测试的行为契约；设计冲突和注入回归集；将硬安全约束下沉到确定性执行层。</div>
+<ol class="dd-chain"><li>把业务需求拆成稳定契约与动态数据</li><li>给每类上下文标记角色、来源和可信度</li><li>用最小提示声明目标、冲突和失败路径</li><li>让模型只提出结构化意图</li><li>由确定性策略核验身份、权限和业务状态</li><li>把工具事实回传而不伪造成功</li><li>用四象限契约集评测并灰度发布</li><li>监控长时状态漂移并版本化回滚</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>系统提示仍然只是模型看到的一串 token<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>把一段文本标上 system 角色之后，它是否就变成了模型不可违反的程序？不是。系统提示和其他消息一样，最终只是模型看到的一串 token，真正改变模型行为的方式是概率，而不是强制执行。</p>
+<p>要看清这一点，先看系统提示的输入与输出。它的输入是应用注入的一段文本，通常包含角色设定、任务描述、行为边界和输出契约；它的输出是模型在这段 token 条件下给出的回答分布。聊天运行时并不会把 system 消息挑出来单独“执行”，而是按照聊天模板把不同角色的消息编码进输入前缀，再让模型对整个前缀计算下一个 token 的条件概率。system 角色的特殊地位主要体现在模板编码上：它通常被放在对话的最前面，并用专门的标记与其他消息区隔开来。</p>
+<p>这种区隔带来的是训练层面上的倾向，而不是运行层面上的强制。模型在训练过程中学到了一条统计规律：高优先级角色给出的指令更值得遵守，因此被标为 system 的内容在统计上获得了更大的影响力。但生成过程本身没有任何形式化解释器会逐条读取提示、逐条执行规则。模型做的始终是同一件事：根据整个前缀估计下一个 token 的概率分布，然后采样。所谓“遵循系统提示”，本质上只是模型在这种条件概率下更可能产生符合提示期望的文本。</p>
+<p>既然遵循是一种概率行为，它的稳定性就必然随输入特征而波动。提示越长、内部冲突越隐蔽、任务越陌生，模型把不同要求正确分离并逐一落实的把握就越低，遵循就可能越不稳定。这并不意味着系统提示没有用：在常见场景下，它仍能以很高的概率把行为引导到期望的方向。但它不能被当作硬边界。任何依赖“模型一定不会违反这句话”的保证，都是把概率行为误认为形式规则。</p>
+<p>因此系统提示的合理用途是声明行为预期、协调上下文：告诉模型它扮演什么角色、当前要完成什么任务、输出应满足什么契约。不合理的用途则是把模型外的强制责任塞进提示里，例如在其中保存 API 密钥、用它实施租户隔离，或让它自行决定是否授权付款。秘密一旦写进提示，就进入了模型可被诱导输出的文本空间；身份与权限涉及现实后果，模型的概率判断无法替代审计。真正不可越过的边界必须由模型外系统提供：工具参数校验、身份权限和业务策略。提示负责声明“应该怎样做”，而“不能怎样做”必须由系统强制执行。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>优先级解决冲突，时间顺序只补充同层上下文<span class="dd-badge eng">机制</span></h2>
+<div class="dd-agent-response"><p>后出现的用户消息为什么不应覆盖更早的系统约束？因为消息之间不是靠时间先后定胜负，而是靠来源的信任层级。</p>
+<p>冲突解析要处理的输入是一条带角色、来源与时间的消息序列，输出是两件事：应当执行的高层任务，以及被忽略的低层冲突。冲突典型地发生在用户说“忽略之前的规则”与系统约束相撞时；解析的目标不是满足每一条消息，而是确定在给定的信任结构下哪一层意图应当胜出。</p>
+<p>信任层级按来源划分：</p>
+
+<p>系统或开发者消息代表应用策略与任务契约，地位最高，用来约束低层指令：无论用户后来说什么，都不能改写应用已经确定的边界。用户消息代表目标和输入，它在高层允许的范围内被执行——用户可以在系统划定的区域内自由提要求，但越界部分直接落空。检索、网页或工具的输出属于不可信数据：它们只能作为事实候选参与推理，不能因为恰好长得像指令就自动升级为命令。历史摘要与记忆是派生状态，不是原始事实，使用时应带上来源标记、明确作用域，并保持可纠正——它们可能过时或出错，随时可以被更可靠的信息推翻。</p>
+<p>时间顺序只在同一层级内起作用。两条来自用户的意图如果互相矛盾，可以用较新的意图更新较早的意图；两条工具返回的事实如果打架，也可以按到达情况重新权衡。但一旦冲突跨层——例如不可信文本里出现一句“现在改用管理员身份”——时间再晚也不能压过系统约束。跨层冲突由信任优先级决定，而不是由先后顺序决定。</p>
+<p>优先级是期望规则，不是执行保证。模型可能因为提示过长、冲突过于隐蔽或任务陌生而执行失败，所以运行时不能把解析结果当作既成事实，仍须验证输出与副作用，确保真正生效的是高层契约，而不是被诱导出的低层指令。</p></div>
+<table class="dd-table"><thead><tr><th>来源</th><th>信任角色</th><th>应当怎样处理</th></tr></thead><tbody><tr><td>系统/开发者</td><td>应用策略与任务契约</td><td>约束低层指令</td></tr><tr><td>用户</td><td>目标和输入</td><td>在高层允许范围内执行</td></tr><tr><td>检索/网页/工具输出</td><td>不可信数据</td><td>作为事实候选，不自动当命令</td></tr><tr><td>历史摘要/记忆</td><td>派生状态</td><td>带来源、作用域和可纠正性</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>完整示例：退款助手的契约怎样从需求变成提示与硬门<span class="dd-badge eng">案例推演</span></h2>
+<div class="dd-agent-response"><p>“退款超过500元需批准”这条规则，应该只写进系统提示吗？一个完整的退款助手案例可以把答案展示清楚。</p>
+<p>这个案例的输入是四类信息：用户的退款请求、订单事实、金额规则和登录主体。期望的输出不是“账户已改”，而是结构化的退款提议，或者一个明确的缺信息状态。也就是说，模型的任务被限定为解释与提议，动账这件事根本不在它的职责里。</p>
+<p>系统提示在这里负责声明职责，并且只声明职责：解释退款政策、收集订单信息、提出退款建议，明确不声称已经执行。订单数据则放入带来源的结构化区块，同时注明其中的自由文本不可信——用户填写的备注、网页抓来的描述都属于数据，不是命令。输出被要求遵循固定的 schema：提议内容、作为证据的订单ID、金额，以及是否需人工批准。这样，模型的每一步产出都有形状可查。</p>
+<p>看一条具体的请求：用户要求退800元。800元超过500元的门槛，模型可以解释政策，并生成一条待审批的退款提议。注意此刻什么也没发生——提示通过了，不代表退款获准。真正执行的是退款工具，它独立核验登录主体、订单所有权、金额和审批令牌；超过500元且没有批准时，执行器必须拒绝这次调用。模型提出的意图只有在确定性策略门逐项通过后才可能变成真实操作。</p>
+<p>工具返回状态后，模型只能报告真实结果。工具说“已提交”，模型就不能写成“已到账”；工具拒绝，模型也不能宣称成功。提示决定模型如何解释和提议，而执行器拥有最终权威。</p>
+<p>这样的分工直接影响测试设计。需要覆盖的场景包括：正常流程、恰好卡在边界的金额、字段缺失、用户试图用自己的话覆盖规则、订单备注里夹带注入指令，以及工具本身报错。每一类场景验证的都是同一件事：模型是否始终停留在提议与解释的范围内，而每一次真实副作用是否都由执行器独立裁决。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>系统提示预算要用消融实验而不是越写越长<span class="dd-badge math">数值例子</span></h2>
+<div class="dd-agent-response"><p>新增一页规则后整体效果下降，怎样判断是规则之间互相冲突，还是上下文变长挤占了注意力？答案不是继续加规则，而是做提示消融。</p>
+<p>提示消融的输入是同一份契约测试集，加上提示的几个版本：短版、长版、以及把新规则改写为结构化表达的版本。输出是一组可比指标：通过率、修复数、回归数、token成本和首字延迟。做法上有一条纪律：一次只改变规则的表达方式，然后逐切片比较。如果某个版本的净收益为负，说明它造成的回归多于修复，这个版本就没有资格发布。</p>
+<p>两个基础量度值得写下来。通过率 r 等于通过数 m 除以测试总数 n，即 r = m ÷ n。净收益 Δ 等于新版本修复的旧失败数 f 减去新版本造成的新回归数 g，即 Δ = f − g。Δ 为负意味着新引入的回归比修复还多，此时哪怕某些新规则确实生效了，也不能发布。</p>
+<p>看一个具体的消融过程。测试集一共200条契约测试。短版提示通过176条，遵循率88%。加入新规则后的长版通过170条，遵循率85%；细看这170条的构成，旧能力回归了12条，新规则只修复了6条，净变化 Δ = 6 − 12 = −6。表面上的差值是6条，但性质完全不同：长版把12条原本能过的测试搞坏了，换来的修复只有6条。</p>
+<p>这一步还不能下结论说“模型记不住所有规则”。把新增规则拆成结构化的冲突表再测，若通过184条，即92%，就说明问题出在规则之间的表达与冲突上，而不是简单的容量不足。同一个机制，用不同表达方式得到从85%到92%的差别，这正是消融的价值：它把“加规则变差”这样一个模糊现象，分解成可以定位的原因。</p>
+<p>单个总通过率仍然会掩盖关键的安全回归——比如总体85%里，恰恰是“超额退款被拒绝”这一条失败了。所以发布决策不能只看一个总数，必须连同修复、回归、成本一起看。除了通过率与净收益，还要测token成本、首字延迟，并在不同任务切片上分别验证，不能让单个示例决定版本去留。</p></div>
+<div class="dd-formula" data-formula-id="system-prompt-contract-metrics"><math display="block" aria-label="通过率 r 等于通过数 m 除以测试总数 n；净收益 delta 等于新修复数 f 减去新回归数 g，本例为六减十二等于负六"><mtable><mtr><mtd><mi>r</mi><mo>=</mo><mfrac><mi>m</mi><mi>n</mi></mfrac></mtd></mtr><mtr><mtd><mi>Δ</mi><mo>=</mo><mi>f</mi><mo>−</mo><mi>g</mi><mo>=</mo><mn>6</mn><mo>−</mo><mn>12</mn><mo>=</mo><mo>−</mo><mn>6</mn></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>原创图：提示契约与执行权限必须分层<span class="dd-badge intuition">可视化</span></h2>
+<div class="dd-agent-response"><p>模型被注入时，哪一层仍能阻止真实副作用？这张分层图给出答案：模型后面的确定性层。</p>
+<p>图1描绘的是控制流。图的左侧，三股输入进入模型：系统提示、用户目标、不可信数据。模型在内部把它们融合为一条结构化意图——不是自由文本，而是带字段、可被下游程序检查的提议。这条意图流出模型后，依次经过两层：先是策略权限层，输入的是模型提出的结构化意图，以及身份、金额、目标域等权威状态；输出是允许、拒绝或待审批的工具调用。然后是业务工具层，负责执行幂等的状态变化，并把真实结果回传。</p>
+<p>三个角色的分工在图中被固定下来：概率模型只提出意图，确定性策略门执行校验，业务工具负责幂等状态变化并回传事实。模型那一层没有任何真实权限——它输出的意图只有通过策略校验才可能转化为工具调用，而校验所用的身份、金额、目标域都来自模型外的权威状态，不来自模型自己的判断。</p>
+<p>解读这张图时有一个容易读错的点：图中的箭头表示控制流，不表示系统提示本身拥有授权能力。系统提示出现在图的输入侧，它的作用是管理模型行为，让模型提出格式正确、边界清楚的意图；而现实权限由确定性策略管理。两层的职责不重叠，也不能互相替代——这正是图1标题的含义：系统提示管理模型行为，确定性策略管理现实权限。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 760 335" role="img" aria-label="系统提示与用户目标、不可信数据进入模型，模型提出结构化意图，再经策略权限和业务工具验证"><defs><marker id="sp31" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="24" y="42" width="128" height="62" rx="9" fill="#21252d" stroke="#72b293"/><text x="88" y="70" text-anchor="middle" class="svg-t">系统契约</text><text x="88" y="91" text-anchor="middle" class="svg-t" font-size="11">目标/边界/schema</text><rect x="24" y="126" width="128" height="62" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="88" y="162" text-anchor="middle" class="svg-t">用户目标</text><rect x="24" y="210" width="128" height="62" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="88" y="238" text-anchor="middle" class="svg-t">不可信数据</text><text x="88" y="259" text-anchor="middle" class="svg-t" font-size="11">网页/工具/文档</text><path d="M152 73L207 137M152 157H207M152 241L207 177" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="212" y="96" width="132" height="122" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="278" y="126" text-anchor="middle" class="svg-t">概率模型</text><text x="278" y="153" text-anchor="middle" class="svg-t" font-size="11">冲突解析不保证</text><text x="278" y="180" text-anchor="middle" class="svg-t">提出意图</text><path d="M344 157H389" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="394" y="96" width="138" height="122" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="463" y="126" text-anchor="middle" class="svg-t">确定性策略门</text><text x="463" y="153" text-anchor="middle" class="svg-t" font-size="11">身份/金额/目标域</text><text x="463" y="180" text-anchor="middle" class="svg-t">允许/拒绝/审批</text><path d="M532 157H577" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="582" y="96" width="150" height="122" rx="9" fill="#21252d" stroke="#72b293"/><text x="657" y="126" text-anchor="middle" class="svg-t">业务工具</text><text x="657" y="153" text-anchor="middle" class="svg-t" font-size="11">真实状态/幂等</text><text x="657" y="180" text-anchor="middle" class="svg-t">审计结果</text><path d="M657 218V286H278V218" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#sp31)"/><text x="468" y="311" text-anchor="middle" class="svg-t">工具事实返回模型；提示不能伪造执行成功</text></svg><figcaption>图 1　系统提示管理模型行为，确定性策略管理现实权限。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>把提示写成最小、分区、无矛盾的契约<span class="dd-badge eng">设计</span></h2>
+<div class="dd-agent-response"><p>角色口吻、政策、数据和例子混在一段里会发生什么？模型会难以区分哪些是必须遵守的规则、哪些只是语气示范、哪些是可变的事实，冲突也随之而来。提示设计要解决的就是这个问题。</p>
+<p>设计一份提示的输入包括：稳定目标、动态数据、信任边界、失败处理和输出schema。经过设计后的输出，应当是一份最小、分区且无矛盾的行为契约。</p>
+<p>分区的做法是按性质把内容拆开：稳定目标、不可违反约束、输入信任边界、决策流程、输出schema、失败处理各归其位。同时全篇使用同一套术语表达主体和动作，并且写清适用与不适用——规则不只说“做什么”，还要说“不做什么”，否则模型会在沉默地带自行发挥。稳定规则留在提示里；频繁变化的业务数据则放进结构化配置或通过检索注入，不要复制进长提示。把会变的数据硬编码在提示里，结果是每次数据变化都要改写整份契约，旧值与新值还可能在长文本里并存，制造新的冲突。</p>
+<p>规则之间冲突时，要明示优先关系，并给出保守回退。例如：“资料不足时询问，不猜测；涉及写操作先提议再批准。”这样的句子把两条规则交叉处的裁决顺序写死了：信息不足时宁可停下来问，写操作一律先提议。回退方向统一选更保守的一侧，模型在不确定时就不会自作主张选激进路径。</p>
+<p>“最小”不等于越短越好。删减之后的提示仍须用覆盖边界的正反例来验收：正例确认规则在该生效时生效，反例确认不该生效时不生效。相比大量同质化的风格示例，少量覆盖边界的正反例更有价值，因为它们测试的是契约的边界，而不是文笔。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>提示注入利用的是指令与数据共享通道<span class="dd-badge eng">失败边界</span></h2>
+<div class="dd-agent-response"><p>用XML标签把网页内容包起来，为什么只能降低混淆，而不能真正隔离？因为指令与数据共享同一条通道。</p>
+<p>注入测试的输入是两部分：可信指令，以及来自网页、文档或工具结果的恶意文本。输出要观察两个层面：模型声称的意图，和实际发生的工具动作。一个模型嘴上说“我不会执行网页里的指令”，随后却调用了网页要求的工具，这才是注入真正生效的地方。</p>
+<p>标签、引号和“不要执行以下内容”这类写法给模型的是语义提示：它们让模型在统计上更容易把这段文本当数据对待。但提示不等于隔离。网页里的恶意文本仍然进入同一上下文，和其他token一起参与同一轮注意力计算；它仍然能影响下一个token的概率分布。所谓“只降低混淆”指的就是这个：标签减少了把数据误读为指令的概率，却堵不死恶意文本通过内容本身、通过相邻关系、通过长链条逐步改变模型行为的路径。</p>
+<p>间接注入正是利用这条共享通道：攻击文本不要求模型立刻照办，而是诱导它泄露提示、改写目标或调用工具。链条越长，模型越可能在某个中间步骤忘记信任边界，把早期确立的规则稀释在后续文本里。</p>
+<p>因此真正的防线不在提示措辞，而在结构：把外部内容一律视为数据，并最小化可见上下文，不让无关的外部文本进入窗口；工具使用最小权限和目标白名单，使模型即使被诱导也只能调用预定义的那几个工具；敏感动作由确定性策略或人来批准，不给模型自行触发的路径。</p>
+<p>测试同样要按这条通道设计。只通过一种“忽略之前指令”的模板攻击，不能证明对多语言改写、编码混淆或多轮诱导的抵抗。有效的注入测试应覆盖多语言、编码、长上下文中的注入，以及藏在工具返回值里的注入——攻击者会从任何一个能进入上下文的口子塞入文本，防线就必须在每个口子上被验证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>系统提示不是秘密存储，防泄露要假设它可被推断<span class="dd-badge eng">保密</span></h2>
+<div class="dd-agent-response"><p>提示里不直接放密钥，是否就可以放内部政策和检测阈值？泄露评测给出的默认答案是：不可以。系统提示不是秘密存储，防泄露要假设它可被复述或推断。</p>
+<p>泄露评测的输入是三样东西：系统提示中的资产、攻击提问、以及日志工具路径。输出是三个层次：原文复述、语义推断、实际安全损失。前两个层次衡量泄露的形式，第三个层次衡量它是否真的构成事故。这个评测框架背后有一条默认假设——只要文本进了上下文，就应视为可能被复述或推断。因此密钥、个人数据和敏感的检测逻辑不能进入上下文；可公开的行为规范可以写入提示，而敏感检测逻辑放在服务端。</p>
+<p>泄露的路径远比“直接索要”更宽。用户可以通过直接索要、角色扮演、逐段推断、错误回显或工具日志拿到提示内容，模型也可能主动复述其语义。错误回显尤其隐蔽：一次报错把提示片段原样吐回，就等于完成了一次无意的泄露。这意味着防泄露不能依赖“我们没把密钥写进去”这样的措辞技巧，而要依赖“凡进上下文皆可能泄露”的资产分类。</p>
+<p>评测时还要把两个指标分开：提示泄露与指令违反。模型不复述原文，不代表它没有被低层恶意指令控制——攻击者完全可以在不触发复述的情况下改变模型行为。反过来，公开行为规范被复述，未必造成安全损失，因为那本来就不是秘密。判断一次泄露是否算失败，必须先按资产价值定义：这条文本泄露后损失什么？先定义资产，再测试；否则要么把无关紧要的复述当成事故，要么漏掉真正值钱的信息。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>输出结构与拒绝路径必须可被消费者验证<span class="dd-badge eng">接口</span></h2>
+<div class="dd-agent-response"><p>模型说了一句“需要批准”，下游为什么不能只读这句话？因为自然语言没有可供程序验证的结构，也没有可供程序处理的拒绝路径。输出契约要解决的就是这一点。</p>
+<p>输出契约的输入是模型的建议，输出是版本化的状态、字段和拒绝原因，供下游消费者解析。所谓版本化，是指模型产出的schema带有明确的版本标识；状态也必须从有限的枚举中取值，例如 propose_refund、needs_approval、insufficient_data。拒绝或缺信息不是意外状况，而是一等状态——它们和成功提议一样拥有固定的形状，消费者不需要从一段解释文字里猜测发生了什么。</p>
+<p>消费者拿到输出后，要依次做五类校验：类型校验、枚举校验、跨字段校验、身份校验和业务状态校验。类型与枚举保证字段本身合法；跨字段校验保证字段之间不矛盾；身份校验确认发起者确实有权操作；业务状态校验则向权威系统确认当前状态是否允许这次操作。自由文本解释始终不能触发副作用——它可以解释原因，但没有任何一段解释有权驱动真实操作。</p>
+<p>这里有一个必须说清的边界：结构合法只表示格式通过，不证明语义正确。一份格式完美的 propose_refund，仍然可能属于别人的订单、超出允许的金额。订单是否属于该用户、金额是否被允许，只能由权威系统查询决定，而不是由模型的措辞决定。结构化输出保证的是格式，不是语义。</p>
+<p>最后，提示与schema的版本必须一起回归。模型看到的提示版本和消费者解析的schema版本一旦错位，新状态名称就会出现，旧消费者会因为枚举不匹配而拒绝或误判。契约漂移发生在这两个版本各自升级却互不知情的时候，所以它们的回归测试要作为同一次变更来做。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>会话、摘要和记忆会让旧提示假设漂移<span class="dd-badge eng">长时状态</span></h2>
+<div class="dd-agent-response"><p>系统提示从未改过，为什么长对话之后行为仍然可能变化？因为模型每一轮看到的上下文都不是同一份。提示只是上下文的一部分，其余部分在会话过程中持续漂移。</p>
+<p>长时状态的装配过程可以这样看：它的输入包括系统不变量、历史消息、压缩摘要、工具观察和带作用域的记忆，输出是这一轮模型实际可见的上下文。历史消息不断累积，压缩摘要把早期内容改写浓缩，工具观察注入新的事实，记忆按任务或用户作用域被读取进来。这些部件不断改变条件上下文——模型看到的“当前局面”里，旧用户目标可能已经被摘要成高置信事实，或跨任务残留下来。初始规则只在对话开头出现一次，不能保证它在摘要之后仍然存在，也不能阻止旧目标在下一个任务里继续生效。</p>
+<p>应对办法是把不变量变成每轮的例行程序：每轮重申必要的边界，而不是依赖“最初说过一次”。记忆按任务/用户作用域读取，只带进与当前任务相关的部分；传给模型的派生状态要携带来源，并标记为可纠正——模型应知道一段摘要从何而来、在什么范围内成立、何时应当被权威信息推翻。任务切换时清除局部记忆，让上一个任务的目标不污染下一个任务。</p>
+<p>验证也要针对这个漂移机制：压缩之后重新运行冲突测试和安全哨兵测试，检查摘要是否吞掉了关键边界、旧目标是否在切换后仍然残留。一个长时Agent的安全如果建立在“开场白里说过一次”之上，它就已经把保险放在了会被漂移冲走的地方。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>版本化提示像代码，但回滚证据比文本diff更重要<span class="dd-badge eng">发布</span></h2>
+<div class="dd-agent-response"><p>只改一句措辞，为什么也可能改变完全无关的任务？因为提示的每个token都参与生成概率的计算，任何文本变化都会重新分配生成分布。</p>
+<p>提示发布不是粘贴一段新文本那么简单。一次发布的完整输入是六个版本：提示、模板、模型、采样参数、工具schema和评测集。它们必须一起被记录，因为行为是它们的共同产物。输出则是一份带回归证据的候选版本和一个回滚包——后者意味着异常发生时，可以同时把提示与关联的schema一起退回上一个一致的状态。</p>
+<p>为什么措辞的改动有这么大的连带面？提示变化会改变模型内部的注意力和生成分布，这种改变不是局部的：它可能影响不同语言的输出、长上下文中的表现、工具的选择倾向，以及拒绝的时机。一句看似无害的措辞调整，可能让某个工具在边缘场景下被多选了一次，也可能让某类请求从“正确拒绝”滑向“误拒”。所以发布前要用灰度比较，把新旧版本在真实流量的一小部分上并行观察，比较任务成功、契约遵循、冲突解决、误拒、token成本和人工修正这几项指标。</p>
+<p>文本diff说明改了什么，不说明行为怎样变。diff能告诉你哪一行变了，却不能证明无关任务没有发生旁路回归。因此发布需要三组数据：冻结的回归集，保证已知行为不退化；隐藏的攻击集，保证安全边界不被这次改动悄悄削弱；生产影子样本，观察真实分布上的变化。当异常出现时，回滚的依据是这套证据，而不是文本本身——回滚的是一整套互相锁定的版本，而不是把一句话改回去。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>契约测试覆盖正常、冲突、恶意和故障四象限<span class="dd-badge eng">验证</span></h2>
+<div class="dd-agent-response"><p>提示测试为什么不能只保存几个理想对话？因为理想对话只覆盖了一个象限，而模型在另外三个象限里正是最容易出错的地方。</p>
+<p>契约测试的输入是四类样本：正常、冲突、恶意和故障。输出是对结构、决策、副作用与用户可见事实的断言结果。断言的对象不是逐字措辞——模型用不同表述完成同一件事是允许的——而是那些必须成立的东西：输出结构对不对、决策走没走对路径、工具副作用发生没有、用户看到的事实是否与真实状态一致。逐字措辞不必一致，但高风险动作和事实边界必须确定性通过。</p>
+<p>四个象限各有各的任务。正常集验证主任务本身：给定标准输入，模型是否产出正确的提议与解释。冲突集让用户、历史消息和工具内容与高层约束相反：用户要求越权、历史里残留旧目标、工具返回了与规则矛盾的文本，模型是否仍然守住高层约束。恶意集覆盖注入、提取、编码混淆和多轮诱导，检验攻击文本是否改变了行为。故障集覆盖缺字段、超时、拒绝和工具返回不一致，检验模型在信息不完整时是否停下来询问，而不是猜测。</p>
+<p>测试结果不能只给一个总数。要按语言、长度、模型版本和风险切片统计，报告置信区间并保留失败样例——失败样例是下一轮修复和扩展测试的直接素材。模型评审可以帮助扩展测试集，找出遗漏的场景，但高风险的判定不使用模型评审作最终依据，而使用确定性检查或人工复核：一条测试涉及退款是否真的发生，就必须由确定性代码断言工具调用的真实结果，而不是由另一个模型来打分。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>整条因果链可以从一个问题走到可验证的实践，共八步。</p>
+<p>第一步，把业务需求拆成稳定契约与动态数据：规则留在提示，会变的数据走结构化配置或检索。第二步，给每类上下文标记角色、来源和可信度：系统约束、用户目标、不可信数据、派生记忆从此各归其层。第三步，用最小提示声明目标、冲突和失败路径：提示只写行为预期，并明示冲突时的优先关系与保守回退。第四步，让模型只提出结构化意图：带schema的提议，而不是自由文本承诺。第五步，由确定性策略核验身份、权限和业务状态：真正拦住副作用的不是措辞，而是策略门。第六步，把工具事实回传而不伪造成功：模型报告工具返回的真实状态，不添不减。第七步，用四象限契约集评测并灰度发布：正常、冲突、恶意、故障四类样本冻结为回归集，小流量灰度比较。第八步，监控长时状态漂移并版本化回滚：每轮重申不变量，按作用域读取记忆，异常时连同schema一起回退。</p>
+<p>链条本身要经得起验证，验证按四个层次展开：</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">验证层</th><th class="dd-align-left">固定什么</th><th class="dd-align-left">观察什么证据</th></tr></thead><tbody><tr><td class="dd-align-left">输入</td><td class="dd-align-left">同一批样本、前处理与权限边界</td><td class="dd-align-left">输入哈希、切片标签和拒绝原因</td></tr><tr><td class="dd-align-left">机制</td><td class="dd-align-left">仅改变一个核心变量，其余配置锁定</td><td class="dd-align-left">关键中间状态及首次偏离预期的位置</td></tr><tr><td class="dd-align-left">输出</td><td class="dd-align-left">同一验收规则与资源预算</td><td class="dd-align-left">质量、成本、延迟和失败率的分层差异</td></tr><tr><td class="dd-align-left">反证</td><td class="dd-align-left">保留不启用目标机制的对照组</td><td class="dd-align-left">收益是否跨样本与随机种子稳定复现</td></tr></tbody></table></div>
+<p>输入层固定同一批样本、前处理与权限边界，观察输入哈希、切片标签和拒绝原因，确保每次实验面对的是同一个输入分布。机制层一次只改变一个核心变量，其余配置全部锁定，观察关键中间状态以及首次偏离预期的位置——偏离发生在哪一步，就说明因果链在哪一环断裂。输出层使用同一验收规则与资源预算，观察质量、成本、延迟和失败率的分层差异，防止一个总数掩盖局部分化。反证层保留不启用目标机制的对照组，检验收益是否跨样本与随机种子稳定复现——只有去掉机制后效果可测地变差，才能说效果来自该机制而不是偶然。</p>
+<p>这条链的终点回扣主题：系统提示是在概率模型里声明行为契约，而不是建立安全边界。契约靠结构、策略和证据来兑现，边界则始终由模型外的确定性系统把守。</p></div>
+<table class="dd-table"><thead><tr><th>验证层</th><th>在“系统提示：在概率模型里声明行为契约，而不是建立安全边界”中固定什么</th><th>观察什么证据</th></tr></thead><tbody>
+      <tr><td>输入</td><td>同一批样本、前处理与权限边界</td><td>输入哈希、切片标签和拒绝原因</td></tr>
+      <tr><td>机制</td><td>仅改变一个核心变量，其余配置锁定</td><td>关键中间状态及首次偏离预期的位置</td></tr>
+      <tr><td>输出</td><td>同一验收规则与资源预算</td><td>质量、成本、延迟和失败率的分层差异</td></tr>
+      <tr><td>反证</td><td>保留不启用目标机制的对照组</td><td>收益是否跨样本与随机种子稳定复现</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2404.13208" target="_blank" rel="noopener">The Instruction Hierarchy</a>：训练模型优先遵循特权指令</li><li><a href="https://arxiv.org/abs/2502.08745" target="_blank" rel="noopener">IHEval</a>：对齐与冲突指令层级评测</li><li><a href="https://arxiv.org/abs/2302.12173" target="_blank" rel="noopener">Indirect Prompt Injection</a>：外部数据中的间接指令攻击</li><li><a href="https://arxiv.org/abs/2402.06363" target="_blank" rel="noopener">StruQ</a>：结构化查询与提示注入防御研究</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/system-prompt">在地图中查看概念关系</a></nav>
+</article></main></body></html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>提示缓存：复用共同前缀的 KV 计算 · AI 知识地图</title>
+<meta name="description" content="从最长共同 token 前缀、KV 占用与命中价值，到提示排序、路由亲和、失效和租户隔离。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/prompt-caching/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="提示缓存：复用共同前缀的 KV 计算">
+<meta property="og:description" content="从最长共同 token 前缀、KV 占用与命中价值，到提示排序、路由亲和、失效和租户隔离。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/prompt-caching/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="提示缓存：复用共同前缀的 KV 计算">
+<meta name="twitter:description" content="从最长共同 token 前缀、KV 占用与命中价值，到提示排序、路由亲和、失效和租户隔离。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/prompt-caching/#page","name":"提示缓存：复用共同前缀的 KV 计算","description":"从最长共同 token 前缀、KV 占用与命中价值，到提示排序、路由亲和、失效和租户隔离。","url":"https://ai-knowledge-map.com/zh/concepts/prompt-caching/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"提示缓存：复用共同前缀的 KV 计算","item":"https://ai-knowledge-map.com/zh/concepts/prompt-caching/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">提示缓存：复用共同前缀的 KV 计算</span></li></ol></nav><article id="dd-article" data-concept-id="prompt-caching">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">提示缓存：复用共同前缀的 KV 计算</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从最长共同 token 前缀、KV 占用与命中价值，到提示排序、路由亲和、失效和租户隔离。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 提示缓存跨请求复用相同 token 前缀在模型各层产生的 KV 状态，减少重复预填充。它不缓存最终答案，也不减少新后缀和输出解码；净收益由<b>命中长度 × 复用频率 × 预填充成本 − 查找/搬运/驻留代价</b>决定。</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>读完你应该能：</b>区分请求内与跨请求 KV cache；计算最长共同前缀和收益；设计缓存友好提示布局；处理容量、失效与隐私隔离。</div>
+<ol class="dd-chain"><li>测量 prefill 占比与重复前缀</li><li>按稳定性和权限重排上下文</li><li>用配置/租户/token 前缀构建键</li><li>价值感知存储与路由命中</li><li>版本变化原子失效</li><li>用命中长度/TTFT/显存/质量联合验收</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>重复计算发生在输入预填充<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>每一轮 Agent 对话都携带几乎相同的系统规则和工具 schema，如果每轮都让 GPU 从头处理一遍这些输入，计算就浪费在完全相同的内容上。要看清浪费发生在哪里，需要先拆开自回归服务的处理过程：它先并行处理全部输入 token，为每一层生成对应的 K/V 中间张量，这一步称为预填充；随后再逐 token 生成输出，称为解码。相邻请求之间往往共享系统提示、工具定义和对话早期的历史，这些 token 序列逐字相同，但默认实现仍然为每个新请求重新计算一遍它们的 K/V。</p>
+<p>跨请求前缀缓存针对的正是这部分重复计算：把某个请求已经算好的中间张量保存下来，当新请求到来时，先查找它的输入与哪个已保存前缀一致，找到后直接从共同前缀的末尾继续预填充，只为新增的后缀 token 计算 K/V。于是重复部分只需计算一次，后续请求全部复用。</p>
+<p>缓存里存的不是自然语言答案的存档，也不是语义检索的结果索引。它只对特定模型、特定 tokenizer、特定权重（含适配器）和特定位置配置下的确切 token 前缀有效：换一个模型版本、换一种分词方式，甚至同一串文字被切成不同的 token 序列，缓存都不能直接复用。</p>
+<p>主要收益集中在输入侧：减少重复的输入计算量、降低首 token 延迟（TTFT）、把原本被重复预填充占用的吞吐释放给新请求。边界同样明确：被省略的只是输入预填充，长输出的逐 token 解码过程完全不变，仍然一个 token 一个 token 地生成，输出部分不存在“缓存加速”。</p>
+<p>从输入输出关系看：提示缓存的输入是模型配置和多个请求共享的精确 token 前缀，输出是可以被后续请求复用的中间 KV 状态。服务端的处理顺序是——先查找最长可用的已缓存前缀，再只为新后缀计算。一次“命中”只表示省掉了部分输入计算，不表示答案被缓存过，也不保证输出一定正确。它只适用于模型、tokenizer、位置配置和安全域一致的请求；任何一个维度不一致，缓存都应视为不可用。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>三种缓存不要混淆<span class="dd-badge intuition">消歧</span></h2>
+<div class="dd-agent-response"><p>“缓存”在提示处理系统里至少指代四类彼此不同的机制：请求内 KV cache、跨请求前缀缓存、响应（语义）缓存和应用数据缓存。它们被混用同一个“缓存命中率”数字是危险的，因为后两类保存的已经不是纯计算状态，而是可能陈旧或越权的内容。要区分它们，只需要回答三个问题：保存的对象是什么、在什么范围内复用、跳过了哪一个计算阶段。把这三个问题的答案作为分类输入，输出就落在四类之一。</p>
+<p>请求内 KV cache 保存的是同一次生成过程中已经计算过的历史 token 的键值状态，复用范围严格限于当前序列本身，命中条件就是这些状态属于正在解码的这个序列，改变的是逐 token 解码阶段。它是最纯粹的算力复用：后续每个 token 解码时不再对整个前缀重新计算，而且被保存、被复用的东西从未离开这次请求，不携带任何跨请求的语义。</p>
+<p>跨请求前缀缓存保存的是不同请求共同开头部分对应的输入状态，复用范围跨请求，键由模型加上精确的 token 前缀构成，改变的是输入预填充阶段。它复用的仍然是计算状态，只是把“本次已经算过”推广为“上一次请求算过、且本次开头逐 token 一致”。命中与否在答案产生之前就由前缀是否一致决定，因此不引入内容层面的正确性问题。</p>
+<p>响应缓存，也叫语义缓存，保存的是相同或近似问题的最终答案，键由请求本身或其语义表示加上版本构成，跳过的可能是部分或全部生成阶段。应用数据缓存保存的是检索结果或工具调用结果，键由查询加上权限和新鲜度约束构成，跳过的阶段位于外部组件。这两类的共同点是：保存和复用的对象变成了“内容”。当问题语义近似但提问者不同、权限不同，或者外部数据已经变化时，直接返回缓存内容就可能给出陈旧或越权的答案，正确性风险远高于前两类的纯计算状态复用。</p>
+<p>正因为如此，这四种机制不能共享同一个命中率口径：前缀缓存命中意味着省下了一批预填充计算，而语义缓存命中意味着直接返回了一个旧答案，两者的收益和风险含义完全相反。判断一个具体缓存属于哪类，就看它复用的是什么——当前生成历史、共同输入状态、最终答案还是工具结果。据此可以解释它的收益来自哪里，也能说清它的正确性边界。</p></div>
+<table class="dd-table"><thead><tr><th>机制</th><th>复用范围</th><th>键/条件</th><th>改变的阶段</th></tr></thead><tbody><tr><td>请求内 KV cache</td><td>同一次生成历史 token</td><td>当前序列</td><td>逐 token 解码</td></tr><tr><td>跨请求前缀缓存</td><td>不同请求共同开头</td><td>模型+精确 token 前缀</td><td>输入预填充</td></tr><tr><td>响应/语义缓存</td><td>相同或近似问题答案</td><td>请求/语义+版本</td><td>跳过部分或全部生成</td></tr><tr><td>应用数据缓存</td><td>检索/工具结果</td><td>查询+权限+新鲜度</td><td>外部组件</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>只有连续共同 token 前缀可直接复用<span class="dd-badge math">机制</span></h2>
+<div class="dd-agent-response"><p>前缀缓存能够复用多少，取决于两条 token 序列从第一个 token 起连续相同的长度，也就是最长共同前缀（LCP）。给两条 token 序列 A、B，LCP 的输出是长度 ℓ，表示从首 token 开始逐位相同的连续 token 数。系统按 token 逐个比较，遇到第一次分叉就停止，分叉点之后的 KV 不能直接复用。这解释了为什么两份包含同一份 8000 token 文档的提示，只要顺序不同，命中率就可能为零：因果注意力中位置 i 的表示依赖此前全部 token，文档换个位置，后续每个位置的输入上下文都变了，整条 KV 链从分叉处起全部失效。</p>
+<p>共同前缀必须精确到 token，而不是语义。语义相同不代表 token 相同：JSON 字段顺序、空格、Unicode 规范化、模板版本和工具排序中的任何差异，都会改变 token 序列，从而缩短甚至抹掉共同前缀。一些基于 radix-tree 的系统可以在大量已存前缀中寻找最长命中，让缓存不必一对一匹配整条提示，但搜索的目标仍然是“从首 token 起精确相同的前缀”这一条件，命中规则没有改变。</p>
+<p>这条规则直接决定了提示布局：不要把动态值放在最前。请求 ID、当前时间或用户问题一旦出现在开头，后面所有稳定内容——系统指令、工具定义、知识文档——都会因为前缀被打断而失去复用。把静态内容前置、动态内容后置，是把共同前缀做长的基本手段。</p>
+<p>需要注意，LCP 长只说明计算状态可以复用，并不说明两份提示语义更相近。两条截然不同的问题可以共享很长的公共前缀（例如相同的系统提示部分），而两条语义几乎相同的问题可能因为一处 token 差异而命中归零。任何影响 token、位置或模型状态的变化——改一个字符、插入一行、换模型版本——都会在对应位置终止命中。</p></div>
+<div class="dd-formula"><math display="block" aria-label="两条序列的最长共同前缀"><mi>LCP</mi><mo>(</mo><mi>A</mi><mo>,</mo><mi>B</mi><mo>)</mo><mo>=</mo><munder><mi>max</mi><mi>ℓ</mi></munder><mo>{</mo><msub><mi>A</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>=</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>}</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>运行示例：12k 输入里究竟省了多少<span class="dd-badge math">逐步演算</span></h2>
+<div class="dd-agent-response"><p>用一个 12k token 的典型请求可以看清布局与收益估算的全过程。假设提示由五段组成：系统规则 2k、工具定义 3k、共享政策 5k、会话历史 1k、当前问题 1k。如果不做任何布局，动态内容可能夹在中间或顶在开头，共同前缀会被截断；按稳定性排序之后，大段共享内容在前，动态历史与问题在后，最长共同前缀才有机会达到 10k——于是 12k token 的提示被拆成 10k 的缓存命中区与 2k 的新后缀。</p>
+<p>节省量的核心公式是期望避免处理的输入 token 数，即命中率 h 乘以命中长度 L。h 是请求能命中前缀的比例，L 是命中的 token 长度；两者相乘得到平均避免量。这个公式要求先按稳定性排布出足够长的 L，再用命中率 h 做加权——只谈命中率不谈命中长度，或者只谈前缀最长值不谈实际命中比例，都会高估或低估收益。</p>
+<p>延迟收益可以用同一组假设估算。无缓存时预填充占 TTFT 的 600ms；命中后 10k/12k 的预填充计算被省掉，但要付出 60ms 的缓存查找与搬运成本。单个命中请求的粗略节省是 600×(10/12)−60=440ms：先按命中长度占输入比例换算省下的预填充时间，再扣除缓存本身的固定开销。再叠加命中率，全流量的期望节省约 440×70%=308ms。平均节省的 token 数按同一逻辑为 10k×70%=7k。</p>
+<p>这里的 440ms 与 308ms 都是给定假设下的估算：预填充 600ms、命中长度 10k、命中率 70%、查找搬运 60ms。真实注意力计算成本随长度非线性增长，且查找、搬运、失效检查的实际开销因实现而异，任何部署前结论都必须以实测为准。这个例子的意义在于给出估算顺序：先按稳定性排布确定 L，再用 h×L 求平均避免 token 数，最后换算延迟并扣除缓存开销。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 710 260" role="img" aria-label="十二千 token 提示按稳定性排序形成十千 token 缓存命中与两千 token 新后缀"><rect x="18" y="74" width="112" height="58" rx="7" fill="#4f9d78"/><text x="74" y="99" text-anchor="middle" class="svg-t">系统 2k</text><text x="74" y="119" text-anchor="middle" class="svg-t" font-size="11">稳定</text><rect x="130" y="74" width="140" height="58" fill="#4f9d78"/><text x="200" y="99" text-anchor="middle" class="svg-t">工具 3k</text><text x="200" y="119" text-anchor="middle" class="svg-t" font-size="11">稳定</text><rect x="270" y="74" width="206" height="58" fill="#4f9d78"/><text x="373" y="99" text-anchor="middle" class="svg-t">共享政策 5k</text><text x="373" y="119" text-anchor="middle" class="svg-t" font-size="11">版本 p17</text><rect x="476" y="74" width="100" height="58" fill="#d3a05a"/><text x="526" y="99" text-anchor="middle" class="svg-t">历史 1k</text><text x="526" y="119" text-anchor="middle" class="svg-t" font-size="11">动态</text><rect x="576" y="74" width="116" height="58" rx="7" fill="#c77b72"/><text x="634" y="99" text-anchor="middle" class="svg-t">问题 1k</text><text x="634" y="119" text-anchor="middle" class="svg-t" font-size="11">每次不同</text><path d="M18,151 L476,151" stroke="#4f9d78" stroke-width="5"/><text x="247" y="178" text-anchor="middle" class="svg-t" font-size="11">命中前缀 10k：直接复用 KV</text><path d="M476,151 L692,151" stroke="#d3a05a" stroke-width="5"/><text x="584" y="178" text-anchor="middle" class="svg-t" font-size="11">新后缀 2k：仍需 prefill</text><text x="355" y="220" text-anchor="middle" class="svg-t">若命中率 70%，平均避免处理约 0.7×10k=7k input token/请求</text></svg><figcaption>图 1　按稳定性排序把大段共享内容放在前，动态历史与问题放后，最长共同前缀才有机会达到 10k。</figcaption></figure>
+<div class="dd-formula"><math display="block" aria-label="期望避免处理的输入 token 数"><mi>E[Nsaved]</mi><mo>≈</mo><mi>h</mi><mo>×</mo><mi>L</mi><mo>=</mo><mn>0.7</mn><mo>×</mo><mn>10000</mn><mo>=</mo><mn>7000</mn></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>提示布局与规范化决定命中<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>布局与规范化的目标不是把命中率做到最大，而是在不破坏语义和权限边界的前提下，让共同前缀尽可能长。排序的依据是每个片段的稳定性、权限域和语义顺序：稳定且公共的内容放前面，动态且私有的内容放后面。</p>
+<p>具体顺序可以这样组织。最前放模型与应用版本都稳定的系统规则；随后放排序固定的工具 schema 和共享的少样本示例；再往后放版本化的公共文档或政策。后部才是会话历史、检索证据和当前输入。时间戳、随机 nonce、trace id 这类每次请求都变的值，要么放进不参与模型计算的元数据，要么放在最末尾，避免打断前缀。</p>
+<p>序列化同样要确定化：对象序列化时固定字段顺序与工具顺序，统一空白与 Unicode 规范化。这些差异在语义上不可见，却足以改变 token 序列，让完全相同的上下文失去命中。规范化做得越好，精确前缀复用的机会越大。</p>
+<p>但布局有一条不可逾越的边界：不能为了提高命中率，把用户特定的权限或秘密提升为共享前缀，也不能把本应私有的内容移进公共区。性能优化服从数据边界，任何提高复用率的移动都必须同时保持安全规则的含义和租户隔离。语义顺序也受这条约束：把安全规则挪到靠前位置对缓存有利，可一旦模板的整体语义随之改变，就必须重新评测安全效果，而不是只看命中率涨了多少。布局的输出是稳定公共内容在前、动态私有内容在后的序列，其正确性标准始终是安全规则含义与租户隔离同时成立。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>KV 容量随层、token 和并发增长<span class="dd-badge math">内存</span></h2>
+<div class="dd-agent-response"><p>一个 10k token 的前缀不能无限期常驻 GPU，原因可以直接从 KV 缓存的体积公式看出来。粗略估算中，KV 字节数 MKV 与 2×层数 Nlayer×KV 头数 NKVhead×头维 d×token 数 Ntoken×每元素字节数 b 成正比。系数 2 来自 K 与 V 各保存一份。以 32 层、8 个 KV 头、128 维、FP16（每元素 2 字节）、10k token 为例：2×32×8×128×10000×2 = 1,310,720,000 字节，约 1.31 GB——这只是一个请求的一段前缀。乘上并发请求数，占用会与模型权重和活跃请求一起争夺显存。不同架构、张量并行方式和量化会改变具体数值，但量级说明前缀缓存绝非免费。</p>
+<p>因此容量规划的输出不仅是字节数，还包括存储层级的选择，输入则是层数、KV 头数、头维、token 数、每元素字节和并发。几种典型策略各有代价：GPU 常驻命中最快，但昂贵且挤压并发；搬到 CPU 或远端容量大，但搬运开销可能超过重算本身；TTL/LRU 实现简单，却不理解前缀价值，可能淘汰掉最值钱的长前缀；按“节省计算除以占用字节”的价值感知淘汰能保留长且热的前缀，但估值与实现都复杂。工程上常用分块或 PagedAttention 管理内存、用前缀树组织共享结构，再叠加 TTL、LRU 或价值淘汰，在命中速度、容量与并发之间做取舍。</p></div>
+<table class="dd-table"><thead><tr><th>策略</th><th>优点</th><th>代价</th></tr></thead><tbody><tr><td>GPU 常驻</td><td>命中最快</td><td>昂贵、挤压并发</td></tr><tr><td>CPU/远端层级</td><td>容量大</td><td>搬运可能超过重算</td></tr><tr><td>TTL/LRU</td><td>简单</td><td>不理解前缀价值</td></tr><tr><td>价值感知</td><td>保留长且热门前缀</td><td>估值和实现复杂</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="KV 缓存字节数估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>b</mi><mo>≈</mo><mn>1.31</mn><mi>GB</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>缓存键和失效必须包含模型语义版本<span class="dd-badge eng">正确性</span></h2>
+<div class="dd-agent-response"><p>文本前缀没变，不代表 KV 还能复用。换一个 LoRA、调整 RoPE 配置，隐藏状态就会整体偏移，此时直接复用旧缓存等于让新配置读旧状态。凡是可能影响隐藏状态的因素——权重与适配器、tokenizer、位置编码、注意力实现、精度、模型模板，以及各类推理配置——只要发生变化，就必须进入缓存的命名空间，或直接触发失效。提示、工具和政策版本变更也会改变 token 序列本身，同样需要通过版本字段反映在键里。</p>
+<p>缓存键通常由模型快照、适配器标识、token 序列哈希、租户或安全域、位置起点等共同构成。命中后还可以抽样重算部分结果进行对比，用来捕获实现层面的错误。滚动发布时新旧缓存必须隔离：v42 不能读取 v41 留下的状态，隔离靠的就是版本字段进入键和命名空间。</p>
+<p>这样设计是因为缓存污染会静默传播。一段错误状态如果被高频复用，影响面远大于一次单发推理错误，而且难以追溯。因此除哈希与版本校验外，系统还要保留快速全量失效的开关，出现污染迹象时能立刻停用整片缓存。</p>
+<p>失效设计的输入是模型快照、适配器、tokenizer、位置配置、模板和租户域，输出是缓存命名空间、键和失效动作。只要其中任何一项改变，同一段文本就可能产生不同的 KV。当版本字段不完整时，正确的做法是拒绝复用、按未命中重新计算，而不是冒险读取旧状态。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>隐私、租户隔离与侧信道<span class="dd-badge eng">安全</span></h2>
+<div class="dd-agent-response"><p>KV 看起来只是数值张量，不是可读文本，但它是对输入的派生表示，可能包含敏感信息，因此必须按敏感数据状态治理。风险不止于内容本身：跨租户共享缓存时，攻击者可以通过命中延迟推测某个前缀是否已存在于缓存中，形成侧信道；如果缓存键缺少权限字段，还可能复用本不应共享的内容。</p>
+<p>默认做法是按租户、组织或数据分类隔离，公共系统前缀与用户私有历史分开放置。缓存需要设置保留期、加密、访问审计和删除传播，日志只记录前缀的哈希与长度，不记录原文。共享公共政策等前缀时，要先确认所有租户持有相同版本并具有相同访问权；服务供应商的缓存政策本身属于数据处理协议的一部分，需要在协议层面明确。</p>
+<p>用户可控的前缀不能用来直接寻址共享缓存。这类设计必须配合域隔离、完整哈希和长度或配额限制，才能防住哈希碰撞、前缀探测和资源耗尽攻击。</p>
+<p>安全治理的输入是前缀的数据分类、租户、保留期和访问权，输出是隔离域、加密、审计与删除策略。核心结论是：KV 是输入的派生数据，命中时间可能泄露“某前缀是否存在”，所以跨租户共享只限真正公共、版本一致、权限一致的版本化内容。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>评测要证明净收益而非命中率<span class="dd-badge intuition">评测</span></h2>
+<div class="dd-agent-response"><p>命中率从 40% 升到 80%，TTFT 却没有改善，这并不矛盾。可能的解释有三类：命中的都只是很短的前缀，省下的预填充微乎其微；缓存查找或跨机搬运的耗时超过重算本身；请求被路由到缓存节点，排队时间抵消了计算节省。所以评测不能只看命中率，要看请求级的命中长度分布、节省的预填充 token 数与时间、查找与搬运耗时、GPU KV 占用、驱逐行为、TTFT 的 p50/p95/p99、吞吐、费用和质量——这些才是净收益的构成。</p>
+<p>A/B 对比的前提是可比性：两组的提示语义和路由负载必须保持一致，否则命中的变化只是布局差异的假象；结果还要按租户、长度和并发切片，避免平均值掩盖某类流量实际变差。故障路径同样要纳入测试：版本错配、缓存节点丢失、缓存雪崩、冷启动、删除传播和跨租户访问，任何一项失效都可能让线上收益归零甚至变成事故。</p>
+<p>对决策真正有用的价值指标是每 GB·小时缓存带来的 TTFT 或计算节省，以及在 SLO 内增加的可服务吞吐。它们直接对应缓存占用与业务容量，比裸命中率更接近决策。</p>
+<p>缓存评测的输入是请求级命中长度、计算与搬运时间、显存占用、延迟、吞吐和质量，输出是按租户、长度、并发切片的净收益。命中率升高而 TTFT 不降，通常说明命中太短，或查找、搬运、排队抵消了收益。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>提示缓存的完整因果链可以串成一条从问题到验收的路径。起点是测量：先确认预填充在总延迟中的占比，以及流量里重复出现的 token 前缀有多少。只有这两项真实存在，缓存才有收益空间。</p>
+<p>第二步是按稳定性和权限重排上下文，把稳定公共内容前置、动态私有内容后置，让最长共同前缀有机会变长。第三步是构造缓存键，键由配置、租户和 token 前缀共同构成，保证相同文本在不同模型版本、不同租户下不会错误复用。第四步是价值感知的存储与命中路由，按“节省计算除以占用字节”决定哪些前缀常驻 GPU、哪些降级到 CPU 或远端、哪些淘汰。第五步是版本变化的原子失效：权重、适配器、tokenizer、位置配置或模板任一改变，立即停用对应命名空间，防止旧状态被新配置静默复用。</p>
+<p>最后一步是联合验收：命中长度、TTFT、显存占用与质量四者一起看，而不是用单一命中率代替结论。链条每一环都以前一环为条件——没有测量就不知道该重排什么，没有正确的键和失效就谈不上安全复用，没有价值感知存储就守不住容量，没有联合验收就无法证明净收益。</p></div>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">vLLM: Easy, Fast, and Cheap LLM Serving with PagedAttention</a>：KV cache 分页与服务</li><li><a href="https://arxiv.org/abs/2312.07104" target="_blank" rel="noopener">SGLang</a>：RadixAttention 与共享前缀复用</li><li><a href="https://arxiv.org/abs/2407.00023" target="_blank" rel="noopener">Preble</a>：前缀感知分布式调度</li><li><a href="https://arxiv.org/abs/2311.04934" target="_blank" rel="noopener">Prompt Cache</a>：长提示模块复用</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/prompt-caching">在地图中查看概念关系</a></nav>
+</article></main></body></html>

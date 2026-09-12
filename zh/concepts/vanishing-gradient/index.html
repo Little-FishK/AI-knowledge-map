@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>梯度消失与爆炸：深度怎样把局部导数放大成指数效应 · AI 知识地图</title>
+<meta name="description" content="从标量连乘到矩阵雅可比，从 sigmoid 饱和到 RNN 时间展开；用数值例子理解初始化、门控、残差、归一化和梯度裁剪分别改变哪段路径。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="梯度消失与爆炸：深度怎样把局部导数放大成指数效应">
+<meta property="og:description" content="从标量连乘到矩阵雅可比，从 sigmoid 饱和到 RNN 时间展开；用数值例子理解初始化、门控、残差、归一化和梯度裁剪分别改变哪段路径。">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="梯度消失与爆炸：深度怎样把局部导数放大成指数效应">
+<meta name="twitter:description" content="从标量连乘到矩阵雅可比，从 sigmoid 饱和到 RNN 时间展开；用数值例子理解初始化、门控、残差、归一化和梯度裁剪分别改变哪段路径。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/#page","name":"梯度消失与爆炸：深度怎样把局部导数放大成指数效应","description":"从标量连乘到矩阵雅可比，从 sigmoid 饱和到 RNN 时间展开；用数值例子理解初始化、门控、残差、归一化和梯度裁剪分别改变哪段路径。","url":"https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"梯度消失与爆炸：深度怎样把局部导数放大成指数效应","item":"https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">梯度消失与爆炸：深度怎样把局部导数放大成指数效应</span></li></ol></nav><article id="dd-article" data-concept-id="vanishing-gradient">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">梯度消失与爆炸：深度怎样把局部导数放大成指数效应</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">从标量连乘到矩阵雅可比，从 sigmoid 饱和到 RNN 时间展开；用数值例子理解初始化、门控、残差、归一化和梯度裁剪分别改变哪段路径。</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 反向传播跨越深层或长时间依赖时，要连续乘上局部雅可比；相关方向的有效尺度若长期小于 1 或大于 1，信用信号就会指数衰减或放大。问题核心不是“网络太深”本身，而是<b>深度 × 局部导数谱 × 路径结构</b>共同塑造的信号传播。</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">读完这一页，你应该能自己回答：</div><ul><li>为什么几十个看似温和的 0.9 或 1.1 连乘会造成巨大差异？</li><li>sigmoid 饱和、权重矩阵和序列长度怎样共同进入雅可比连乘？</li><li>梯度消失、梯度爆炸和“根本没有梯度”怎样区分？</li><li>Xavier/He 初始化、LSTM 门控、残差、归一化和裁剪各解决什么？</li><li>怎样用分层激活、梯度范数与更新比率证明根因，而不是凭训练慢猜测？</li></ul></div>
+<ol class="dd-chain"><li>损失在输出端产生初始梯度。</li><li>反向每过一层就乘局部雅可比。</li><li>激活饱和、权重谱和路径方向共同决定伸缩。</li><li>深度或时间距离让这些伸缩指数累积。</li><li>早期层因此几乎无更新，或全局梯度爆炸失控。</li><li>合适初始化先稳定起点尺度。</li><li>门控、残差和归一化改变长期路径与局部条件。</li><li>裁剪与精度管理处理极端更新和数值表示。</li><li>分层监控与消融证明根因，而不是凭技巧有效就倒推机制。</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>输出层知道错了，早期层为什么收不到消息<span class="dd-badge intuition">动机</span></h2>
+<div class="dd-agent-response"><p>这段内容的核心是在区分“反向传播路径存在”和“有效梯度能够到达”。计算图连通，只说明损失对早期参数的导数可以通过链式法则被计算出来；它并不保证这个导数仍有足够大的数值，能够让参数产生可观更新。</p>
+<p>梯度每经过一个节点，都要乘上该节点的局部导数。早期层距离损失函数更远，沿途经历的乘法更多，因此深度会把局部尺度效应累积起来。若相关方向上的大多数乘数小于 1，连乘结果会随路径长度快速衰减，形成梯度消失；若大多数乘数大于 1，连乘结果会快速增大，形成梯度爆炸。关键不只是单个导数“大或小”，而是许多局部导数连续相乘后的总体尺度。</p>
+<p>数值系统和优化过程会放大这一影响。极小梯度可能接近浮点表示或有效更新的下限，即使形式上非零，也不足以改变参数；极大梯度则可能导致更新步长失控，并使权重、激活或损失溢出为 Inf/NaN。优化器接收到的是已经被这条链路缩放后的梯度，所以不能自动恢复途中丢失的有效信号。</p>
+<p>由此可以得到一个重要的层间诊断特征：梯度问题通常不是“整个网络一起慢”。梯度消失时，靠近输出的层由于反向路径较短，仍可能正常学习，而靠近输入的层几乎冻结，早期特征长期不变；梯度爆炸时，则可能在某一步突然出现数值失控。观察不同深度层的梯度和参数更新幅度，比只看总体损失下降速度更能揭示问题。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>链式法则怎样把深度写成连乘<span class="dd-badge math">数学</span></h2>
+<div class="dd-agent-response"><p>这段内容用链式法则把“网络很深”转换成了一个可分析的数学对象：雅可比矩阵的连乘。设损失为 <span class="dd-inline-math" role="math">L</span>，早期状态为 <span class="dd-inline-math" role="math">h_0</span>，第 <span class="dd-inline-math" role="math">k</span> 层状态为 <span class="dd-inline-math" role="math">h_k</span>，则损失对早期状态的梯度需要依次通过后续各层的局部雅可比 <span class="dd-inline-math" role="math">J_k=∂ h_k/∂ h_{k-1}</span>。因此，反向信号的尺度和方向由整串雅可比乘积共同决定，而网络层数 <span class="dd-inline-math" role="math">K</span> 就直接表现为乘积中因子的数量。</p>
+<p>在标量情形中，每个雅可比退化为一个普通导数。若把每层沿某个方向的典型伸缩尺度近似为 <span class="dd-inline-math" role="math">c</span>，经过 <span class="dd-inline-math" role="math">K</span> 层后的总尺度就约为 <span class="dd-inline-math" role="math">c^K</span>。这揭示了深度带来的指数效应：当 <span class="dd-inline-math" role="math">c=0.5</span> 时，10 层后约为 <span class="dd-inline-math" role="math">9.77×10^{-4}</span>，50 层后约为 <span class="dd-inline-math" role="math">8.88×10^{-16}</span>；即使 <span class="dd-inline-math" role="math">c=0.9</span> 看起来只比 1 小一点，50 层后也只剩约 0.00515。反过来，<span class="dd-inline-math" role="math">c=1.1</span> 在 50 层后可放大到约 117.4，<span class="dd-inline-math" role="math">c=1.5</span> 更会达到约 <span class="dd-inline-math" role="math">6.38×10^8</span>。所以局部尺度仅仅温和偏离 1，也会被深度累计成巨大的整体差异。</p>
+<p><span class="dd-inline-math" role="math">c=1</span> 表示尺度理想化地保持不变，但真实向量网络不能由一个平均尺度完整描述。此时雅可比是矩阵，不同输入方向会受到不同程度的伸缩；矩阵乘法还会改变方向。用奇异方向来理解更准确：同一个网络的某些方向可能在连乘中持续收缩，而另一些方向同时被放大，因此梯度消失与爆炸可以并存。</p>
+<p>这个公式的诊断价值在于，它把问题定位到“整条反向传递链的谱与方向行为”，而不只是某一层的单个导数。标量近似 <span class="dd-inline-math" role="math">c^K</span> 提供了指数积累的第一层直觉；进一步分析时，则需要关注各层雅可比在不同方向上的伸缩以及这些方向在层间如何组合。</p></div>
+<table class="dd-table"><thead><tr><th>每层尺度 c</th><th>10 层</th><th>50 层</th><th>含义</th></tr></thead><tbody><tr><td>0.5</td><td>9.77×10⁻⁴</td><td>8.88×10⁻¹⁶</td><td>迅速消失</td></tr><tr><td>0.9</td><td>0.349</td><td>0.00515</td><td>温和缩小也会累积</td></tr><tr><td>1.0</td><td>1</td><td>1</td><td>理想化保持</td></tr><tr><td>1.1</td><td>2.59</td><td>117.4</td><td>逐渐爆炸</td></tr><tr><td>1.5</td><td>57.7</td><td>6.38×10⁸</td><td>极快失控</td></tr></tbody></table>
+<div class="dd-formula">∂L/∂h₀ = ∂L/∂h<sub>K</sub> · J<sub>K</sub>J<sub>K−1</sub>…J₁，　Jₖ=∂hₖ/∂h<sub>k−1</sub></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>激活函数为什么直接进入反向尺度<span class="dd-badge math">饱和</span></h2>
+<div class="dd-agent-response"><p>这一节说明，激活函数并不只是决定前向表示的形状，它的导数还是反向传播链中的直接乘子。第 <span class="dd-inline-math" role="math">k</span> 层前向计算为 <span class="dd-inline-math" role="math">z_k=W_kh_{k-1}</span>、<span class="dd-inline-math" role="math">h_k=φ(z_k)</span>。反向传播到这里时，上游梯度 <span class="dd-inline-math" role="math">∂ L/∂ h_k</span> 会与当前预激活处的斜率逐元素相乘：</p>
+<div class="dd-equation" role="math" aria-label="∂L/∂zₖ = (∂L/∂hₖ) ⊙ φ′(zₖ)."><span>∂L/∂zₖ = (∂L/∂hₖ) ⊙ φ′(zₖ).</span></div>
+<p>因此，输入是预激活 <span class="dd-inline-math" role="math">z_k</span> 和上游梯度，输出是形状不变、但被各单元局部斜率重新加权的梯度。斜率接近零，对应单元传递的信用信号就被压低；斜率为 1，则激活本身不改变该处的反向尺度。</p>
+<p>sigmoid 最能展示这种机制。其导数为 <span class="dd-inline-math" role="math">σ&#39;(z)=σ(z)(1-σ(z))</span>。当输出接近 0 或 1 时，导数趋近零，这对应函数两端的饱和区；即使在最有利的 <span class="dd-inline-math" role="math">z=0</span> 处，导数也只有 0.25。若十层都包含这一激活因子，仅激活导数连乘就会产生 <span class="dd-inline-math" role="math">0.25^{10}≈9.5×10^{-7}</span> 的收缩。权重必须在每层沿相应方向提供约四倍放大，才可能抵消这一项，但这又会引入其他方向失控的风险。</p>
+<p>不同激活函数改变的是局部雅可比中的激活部分。tanh 在中心处导数可达 1，但状态远离中心后仍会饱和。ReLU 在正区导数为 1，因此不会像 sigmoid 那样持续把正区梯度向下压缩；可是在负区导数为 0，单元若长期停留在负区，梯度会被完全截断，形成“死亡”单元。GELU 和 SiLU 的曲线更平滑，负区仍保留小导数，缓解了硬截断，但小导数依然会缩短信号。</p>
+<p>完整的局部雅可比可理解为 <span class="dd-inline-math" role="math">J=D_φ W</span>：<span class="dd-inline-math" role="math">D_φ</span> 由各单元的激活导数组成，<span class="dd-inline-math" role="math">W</span> 则提供线性变换。更换激活只改变前一部分，因此它能显著改善深层可训练性，却不能单独保证整体稳定。即使激活导数理想，权重矩阵仍可能在某些方向上强烈收缩或放大。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 700 280" role="img" aria-label="Sigmoid 函数及其导数，远离零时导数趋近零"><line x1="65" y1="225" x2="650" y2="225" stroke="currentColor" opacity=".28"/><line x1="350" y1="30" x2="350" y2="235" stroke="currentColor" opacity=".28"/><path d="M80 210 C220 205 275 180 315 125 C355 70 420 45 630 42" fill="none" stroke="#8b5cf6" stroke-width="5"/><path d="M80 220 C240 218 285 190 350 170 C415 190 460 218 630 220" fill="none" stroke="#ef4444" stroke-width="5"/><text x="540" y="36" class="svg-t">σ(x)</text><text x="455" y="178" class="svg-t">σ′(x)，最大仅 0.25</text><text x="80" y="250" class="svg-tn">负饱和区：导数≈0</text><text x="485" y="250" class="svg-tn">正饱和区：导数≈0</text></svg><figcaption>sigmoid 输出有界，但两端饱和区几乎不传梯度；层层乘上不超过 0.25 的因子会迅速衰减。</figcaption></figure>
+<table class="dd-table"><thead><tr><th>激活</th><th>局部导数特征</th><th>新风险</th></tr></thead><tbody><tr><td>sigmoid</td><td>最大 0.25，饱和区接近 0</td><td>深层与长序列易消失</td></tr><tr><td>tanh</td><td>中心可到 1，两端仍饱和</td><td>状态离开中心后衰减</td></tr><tr><td>ReLU</td><td>正区为 1，负区为 0</td><td>负区长期为零的“死亡”单元</td></tr><tr><td>GELU/SiLU</td><td>平滑、负区仍有小导数</td><td>不能单独保证整体雅可比稳定</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>权重矩阵为什么让同一层同时有收缩和放大方向<span class="dd-badge math">矩阵</span></h2>
+<div class="dd-agent-response"><p>这一节把梯度的“大小”从单一数值扩展为方向相关的矩阵行为。在线性层后接激活函数时，局部雅可比可写成 <span class="dd-inline-math" role="math">J=D_\phi W</span>。其中，权重矩阵 <span class="dd-inline-math" role="math">W</span> 先对信号做线性变换，激活导数矩阵 <span class="dd-inline-math" role="math">D_\phi</span> 再依据各单元当前所处位置对反向信号加权。梯度经过该层后的变化，不仅取决于一个总范数，还取决于它具体落在哪个方向上。</p>
+<p>权重矩阵的奇异值刻画了不同方向的伸缩程度。较大的奇异值对应被放大的方向，较小的奇异值对应被压缩的方向。如果反向传播过程中，相关方向不断遇到大于 1 的最大奇异值，梯度可能连续放大并最终爆炸；如果承载任务信息的方向对应很小的奇异值，该方向的梯度就会快速衰减。因为同一个矩阵可以同时具有很大和很小的奇异值，所以同一层完全可能一边放大某些方向，一边抹去另一些方向。</p>
+<p>激活导数会进一步改变这种方向结构。<span class="dd-inline-math" role="math">D_\phi</span> 对不同单元赋予不同斜率，有些坐标可能被保留，有些可能被显著压缩甚至置零。它与 <span class="dd-inline-math" role="math">W</span> 组合后，最终的有效方向未必与原始坐标轴或 <span class="dd-inline-math" role="math">W</span> 的单独奇异方向一致。因此，仅凭权重范数或激活导数中的任一项，都不能完整判断局部雅可比是否稳定。</p>
+<p>这也解释了为什么“平均梯度范数正常”可能产生误导。少数特别大的梯度能够把整体范数抬到看似健康的范围，同时多数层、通道或参数的梯度已经接近零。一个聚合标量会把方向不均衡和稀疏异常压扁，既可能掩盖消失，也可能掩盖局部爆炸。</p>
+<p>更有效的诊断应保留结构：按网络层、模块、参数类型以及序列模型中的时间步分别记录梯度分布，查看中位数、多个分位数、极值和接近零的比例；同时比较参数更新量与参数自身尺度的比率。这样才能判断哪些位置仍在学习、哪些方向已经冻结，以及总体范数是否只是被少量异常值支撑。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>RNN 怎样把“深度”换成时间距离<span class="dd-badge intuition">序列</span></h2>
+<div class="dd-agent-response"><p>这一节说明，循环神经网络虽然在结构图上只有少数参数层，但沿时间展开后会形成一条很深的计算链。普通 RNN 的状态更新为</p>
+<div class="dd-equation" role="math" aria-label="h_t=\phi(W_hh_{t-1}+W_xx_t)."><span>h_t=\phi(W_hh_{t-1}+W_xx_t).</span></div>
+<p>同一组状态转换参数在每个时间步重复使用。若第 <span class="dd-inline-math" role="math">T</span> 步的损失需要把信用信号传回第 <span class="dd-inline-math" role="math">t</span> 步，梯度就必须依次穿过 <span class="dd-inline-math" role="math">T-t</span> 个状态转移雅可比。因此，序列中的时间距离承担了前馈网络中层数的角色：相隔越远，有效深度越大。</p>
+<p>每个时间步的局部雅可比都包含循环权重 <span class="dd-inline-math" role="math">W_h</span> 和当前激活导数。反向传播会把这些雅可比连续相乘。即使单步的伸缩只是略小于或略大于 1，重复几十次后也会产生指数级衰减或放大。参数共享只表示每一步使用同一个矩阵，并不会缩短从损失到早期状态的计算路径；相反，同一矩阵反复相乘仍会持续累积其方向性伸缩效应。</p>
+<p>长距离依赖面临两个相互关联但不同的困难。前向过程中，早期输入留下的状态信息可能被后续状态更新不断覆盖，使 <span class="dd-inline-math" role="math">h_T</span> 已经不再保留足够线索；反向过程中，即便早期信息曾影响状态，来自后期损失的梯度也可能在长路径上衰减，无法把“应当如何修改早期处理”传回去。前者是记忆内容的保存问题，后者是信用分配信号的传递问题。</p>
+<p>因此，RNN 难以学习几十步以前的信息，不是因为可训练参数的种类很多，而是因为信息和梯度都要穿过很长的时间链。分析这类问题时，应把序列长度视为网络深度，并按时间距离观察状态敏感性和反向梯度，而不能只按模型代码中显式声明的层数判断深浅。</p></div>
+<figure class="dd-fig"><svg viewBox="0 0 720 220" role="img" aria-label="RNN 时间展开及远距离反向梯度路径"><defs><marker id="vga" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="context-stroke"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2"><rect x="60" y="80" width="90" height="52" rx="12"/><rect x="220" y="80" width="90" height="52" rx="12"/><rect x="380" y="80" width="90" height="52" rx="12"/><rect x="540" y="80" width="90" height="52" rx="12"/><path d="M150 106L220 106M310 106L380 106M470 106L540 106" marker-end="url(#vga)"/><path d="M585 155 C470 205 215 205 105 155" stroke="#ef4444" stroke-width="4" stroke-dasharray="7 6" marker-end="url(#vga)"/></g><g class="svg-t"><text x="88" y="112">hₜ</text><text x="245" y="112">hₜ₊₁</text><text x="405" y="112">…</text><text x="565" y="112">hT</text><text x="230" y="205">跨很多时间步的信用分配：连续雅可比乘积</text></g></svg><figcaption>参数共享不会减少反向路径长度；同一矩阵反复相乘同样会造成指数效应。</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>LSTM/GRU 门控怎样建立更稳定的状态通道<span class="dd-badge intuition">门控</span></h2>
+<div class="dd-agent-response"><p>这一节的核心是：LSTM 和 GRU 通过门控构造了一条接近“恒等传递”的状态路径，使长期信息和梯度不必在每个时间步都经过循环权重与饱和激活的完整乘积。</p>
+<p>LSTM 除隐藏状态外，还维护细胞状态 <span class="dd-inline-math" role="math">c_t</span>：</p>
+<div class="dd-equation" role="math" aria-label="c_t=f_t\odot c_{t-1}+i_t\odot \tilde c_t."><span>c_t=f_t\odot c_{t-1}+i_t\odot \tilde c_t.</span></div>
+<p>遗忘门 <span class="dd-inline-math" role="math">f_t</span> 决定旧状态保留多少，输入门 <span class="dd-inline-math" role="math">i_t</span> 决定候选内容 <span class="dd-inline-math" role="math">\tilde c_t</span> 写入多少。这个更新具有近似加法结构。沿细胞状态通道反向传播时，相邻时间步之间的主要局部乘数是 <span class="dd-inline-math" role="math">f_t</span>，而不是普通 RNN 中反复出现的“循环权重谱乘以非线性导数”。模型因而可以学习让需要长期保存的维度对应的 <span class="dd-inline-math" role="math">f_t</span> 接近 1。</p>
+<p>门值接近 1 对长路径非常关键。跨越 100 步时，若每步有效乘数为 0.99，连乘结果 <span class="dd-inline-math" role="math">0.99^{100}\approx0.366</span>，仍保留可用尺度；若为 0.9，则 <span class="dd-inline-math" role="math">0.9^{100}\approx2.66\times10^{-5}</span>，信号依旧几乎消失。这说明门控的优势不是取消连乘，而是让连乘因子可由数据驱动地接近 1。</p>
+<p>GRU 没有独立细胞状态，而采用</p>
+<div class="dd-equation" role="math" aria-label="h_t=(1-z_t)\odot h_{t-1}+z_t\odot \tilde h_t."><span>h_t=(1-z_t)\odot h_{t-1}+z_t\odot \tilde h_t.</span></div>
+<p>当更新门 <span class="dd-inline-math" role="math">z_t</span> 接近 0 时，旧状态几乎被原样复制，有效保留乘数 <span class="dd-inline-math" role="math">1-z_t</span> 接近 1，也能形成较稳定的长程通道。与 LSTM 相比，GRU 用同一个门把保留旧信息和写入新信息绑定为凸组合；LSTM 的遗忘门和输入门相对独立，因此对“保留多少”和“写入多少”的控制更分离。</p>
+<p>两种结构的共同机制，是把普通 RNN 中难以控制的“权重矩阵伸缩 × 激活导数”转换成可学习的门值，让模型能够为重要状态维度建立接近恒等映射的路径。但这并不保证无限记忆：门值长期偏离 1 仍会指数衰减，有限状态容量、优化难度和序列噪声也会损害信息保存。门控提供的是更容易学习的长期通道，而不是自动获得永久记忆。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>初始化怎样让第一步信号尺度不立即失控<span class="dd-badge math">起点</span></h2>
+<div class="dd-agent-response"><p>这一节说明，初始化的目标不是简单地让权重“尽量小”，而是让信号在网络起点处穿过多层时，前向激活和反向梯度的尺度都尽可能稳定。若每层都轻微缩小方差，深度会把这种收缩累积成消失；若每层都放大方差，则可能造成爆炸，还可能把 sigmoid 或 tanh 等激活推入饱和区，使导数进一步接近零。因此，过小和过大都不是安全选择。</p>
+<p>Xavier/Glorot 初始化依据输入宽度和输出宽度设置权重方差，典型尺度约为 <span class="dd-inline-math" role="math">2/(\mathrm{fan\_in}+\mathrm{fan\_out})</span>。它在前向与反向的方差保持之间做折中，适用于线性附近或近似对称的激活，例如 tanh。He/Kaiming 初始化典型方差约为 <span class="dd-inline-math" role="math">2/\mathrm{fan\_in}</span>，针对 ReLU 类激活会让约一半单元输出为零这一事实，用更大的初始方差补偿能量损失。</p>
+<p>这两类方法主要约束统计意义上的平均方差。正交初始化则从方向角度处理问题：正交矩阵的列彼此垂直且长度为 1，所有奇异值均为 1，因此它只旋转向量，不放大或压缩任何方向。将其作为权重起点时，局部雅可比 <span class="dd-inline-math" role="math">J=D_\phi W</span> 中的 <span class="dd-inline-math" role="math">W</span> 初始在各方向上都具有接近 1 的伸缩尺度，深层线性路径的范数因而更稳定。这比只保证平均方差，更直接地对应了奇异值视角。</p>
+<p>正交权重通常还会乘以增益 <span class="dd-inline-math" role="math">gain</span>，以预先补偿后续激活带来的能量变化。ReLU 平均会截去约一半能量，因此常配合 <span class="dd-inline-math" role="math">\sqrt{2}\approx1.414</span> 的增益；tanh 可使用略大于 1 的经验增益。若增益与激活不匹配，激活导数仍会破坏原先的保尺度性质。</p>
+<p>初始化解决的是训练开始时的条件，而不是整个训练过程的永久稳定性。参数更新会逐渐改变权重谱，数据和参数变化也会改变激活分布，初始时健康的雅可比可能在训练后偏离稳定区。因此，合理初始化需要与残差通路、归一化、学习率调度以及对梯度和激活的持续监控共同使用。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>典型方差尺度</th><th>主要假设</th></tr></thead><tbody><tr><td>Xavier/Glorot</td><td>约 <code>2/(fan_in+fan_out)</code></td><td>前后向方差折中，tanh/线性附近</td></tr><tr><td>He/Kaiming</td><td>约 <code>2/fan_in</code></td><td>ReLU 类激活的门控比例</td></tr><tr><td>正交初始化</td><td>方向范数初始更稳定</td><td>形状允许且增益选得合适</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>残差、归一化和裁剪为什么不能互相替代<span class="dd-badge eng">机制映射</span></h2>
+<div class="dd-agent-response"><p>这一节把多种“稳定训练”技巧放回雅可比连乘链中比较，关键结论是：它们作用的位置和解决的问题不同，因此不能因为都能减少训练崩溃，就把它们视为可互换方案。</p>
+<p>残差连接把模块写成 <span class="dd-inline-math" role="math">y=x+F(x)</span>，其雅可比为</p>
+<div class="dd-equation" role="math" aria-label="∂y/∂x = I + ∂F/∂x."><span>∂y/∂x = I + ∂F/∂x.</span></div>
+<p>单位矩阵 <span class="dd-inline-math" role="math">I</span> 对应一条无需经过分支变换的恒等路径。即使分支 <span class="dd-inline-math" role="math">F</span> 在某些方向上的导数很小，梯度仍可通过恒等项传递，从而改善深层信用分配。但残差并不自动限制分支尺度；若 <span class="dd-inline-math" role="math">∂F/∂x</span> 很大，整体雅可比 <span class="dd-inline-math" role="math">I+∂F/∂x</span> 仍可能放大梯度。</p>
+<p>归一化在这里用于调节中间激活的数值尺度；标准化后的值还可通过可学习参数 <span class="dd-inline-math" role="math">γ,β</span> 重新缩放和平移。把中间值维持在较稳定的范围，能减少预激活漂入 sigmoid、tanh 饱和区的机会，并改善局部优化条件。但统一整体尺度不等于把权重矩阵的每个奇异值都变为 1；不同方向之间原有的强弱差异仍可能保留。</p>
+<p>梯度裁剪发生在完整反向传播之后。若全局梯度范数 <span class="dd-inline-math" role="math">‖g‖</span> 超过阈值 <span class="dd-inline-math" role="math">τ</span>，就将梯度整体乘以 <span class="dd-inline-math" role="math">τ/‖g‖</span>，保持方向不变而限制长度。它适合处理梯度爆炸或异常批次造成的尖峰，却不能修复消失梯度，因为当梯度本来只有 <span class="dd-inline-math" role="math">10^{-8}</span> 时，裁剪根本不会触发。</p>
+<p>损失缩放是低精度训练中的数值保护。FP16 反向前先把损失乘以较大系数 <span class="dd-inline-math" role="math">S</span>，使微小梯度落入可表示范围，参数更新前再除回 <span class="dd-inline-math" role="math">S</span>。它能防止本来非零的梯度因浮点下溢被舍入成零，但不能改变数学上真实梯度已经很小的事实。</p>
+<p>门控则通过可学习的保留与写入系数建立长期状态通路，主要针对时间维度上的信用传播，也不等于无限记忆。由此可见：残差改变雅可比结构，归一化调节激活尺度与局部条件，门控控制状态传递，裁剪限制最终大梯度，损失缩放保护数值表示。稳定系统往往需要组合使用这些机制，并依据诊断出的具体失效位置选择工具。</p></div>
+<table class="dd-table"><thead><tr><th>方法</th><th>直接改变</th><th>主要帮助</th><th>不能单独解决</th></tr></thead><tbody><tr><td>残差连接</td><td>雅可比加入恒等短路径</td><td>深层信用传播、退化问题</td><td>分支尺度失控、错误目标</td></tr><tr><td>归一化</td><td>激活尺度和局部条件</td><td>数值范围、可优化性</td><td>所有方向谱保持 1</td></tr><tr><td>门控</td><td>学习状态保留/写入系数</td><td>长时间依赖</td><td>无限序列记忆</td></tr><tr><td>梯度裁剪</td><td>过大梯度的最终范数</td><td>爆炸与异常批次</td><td>消失梯度</td></tr><tr><td>损失缩放</td><td>低精度反向数值范围</td><td>防浮点下溢</td><td>真实数学梯度过小</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>运行示例：怎样证明是梯度消失而不是泛泛的“训练慢”<span class="dd-badge eng">诊断</span></h2>
+<div class="dd-agent-response"><p>这一节给出的是一套“证据链”式诊断方法：损失停滞只是表面现象，只有把任务可学性、前向状态、反向梯度、参数更新和路径长度联系起来，才能把根因定位为梯度消失。</p>
+<p>第一步是建立可学性基线。让小模型或浅模型在一小批数据上过拟合。如果连这个最小实验都失败，更应先检查数据、标签、损失函数和实现；如果浅模型能学而同任务的深模型不能学，深度相关的反向路径就成为重点嫌疑。</p>
+<p>第二步是同时记录分层激活和分层梯度。激活侧应观察均值、方差、饱和比例以及 ReLU 的零值比例，判断信号是否随深度缩小或进入饱和区。梯度侧不能只记一个全局范数，而应按层记录范数、中位数、最大值和 finite 比例，并比较靠近输入和输出的层。若靠近输入的层梯度系统性远小于靠近输出的层，这与长路径上的连乘衰减一致。</p>
+<p>第三步是把梯度与实际更新连接起来。记录“参数更新量/参数量”的比率，可判断小梯度经过优化器后是否仍产生可见更新。若梯度看起来正常而参数完全不变，应检查学习率、优化器参数组、参数冻结或缩放设置，而不是直接归因于梯度消失。</p>
+<p>深度消融能提供更强的因果证据：在保持任务和主要设置不变时，将 50 层缩短为 5 层。如果浅版本恢复学习，说明路径长度与失败高度相关。随后每次只替换一个机制，例如初始化、激活函数或残差连接，观察分层梯度剖面是否恢复；单变量干预比同时堆叠多个技巧更能确定原因。</p>
+<p>不同观测对应不同故障：所有层梯度都是 None 或零，更像计算图被切断、参数被冻结或损失不依赖这些参数；偶发巨大尖峰和 NaN 指向爆炸、异常批次或精度溢出；梯度正常但参数不变则指向优化器配置。FP16 中的零梯度还可能是浮点下溢，需要通过数值精度检查与数学上的连乘衰减区分。最终，只有“深度依赖的梯度剖面 + 可学基线 + 单变量干预恢复”共同成立，才能较有力地证明问题确实来自梯度消失。</p></div>
+<table class="dd-table"><thead><tr><th>观测</th><th>更可能的问题</th></tr></thead><tbody><tr><td>浅层梯度系统性远小于深层</td><td>长路径消失</td></tr><tr><td>所有层梯度均为 None/零</td><td>计算图切断、冻结或损失无依赖</td></tr><tr><td>偶发巨大尖峰与 NaN</td><td>爆炸、异常批次或精度溢出</td></tr><tr><td>梯度正常但参数不变</td><td>学习率、优化器参数组或缩放问题</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>这一节把梯度消失与爆炸组织成一条完整的因果链。起点是输出端的标量损失产生梯度；随后反向传播每经过一层，都要乘上该层的局部雅可比。局部雅可比由当前激活导数、权重矩阵的方向性伸缩以及梯度实际经过的路径共同决定，因此每一步都可能对信号进行压缩、放大或旋转。</p>
+<p>单层中的轻微尺度偏差并不一定立刻造成明显异常，但深度或时间距离会让它重复出现。连续雅可比相乘后，小于 1 的有效尺度会指数衰减，大于 1 的有效尺度会指数放大。激活进入饱和区会让局部导数接近零；权重谱则可能使不同方向同时发生收缩和放大。最终结果表现为靠近输入的早期层几乎没有有效更新，或者全局梯度突然失控并产生极端更新与数值异常。</p>
+<p>各种稳定技术应按照它们在因果链中的作用位置理解。合适的初始化首先让训练起点处的前向和反向尺度不过早漂移。门控为长时间依赖建立可学习的状态保留通道；残差连接加入恒等短路径；归一化控制激活尺度并改善局部条件。这些机制直接改变长期传播路径或局部雅可比的环境。梯度裁剪则在反向计算完成后限制过大的最终更新，精度管理用于避免低精度表示中的下溢或溢出，它们处理的是链条后端的极端值和数值表示问题。</p>
+<p>因果链也决定了诊断方式。不能因为加入某个技巧后训练恢复，就反向断言原问题一定是该技巧通常针对的机制；多个变化可能同时影响结果。更可靠的方法是按层监控激活、梯度和更新幅度，再通过深度消融和单变量干预观察异常是否随路径长度出现、是否在特定位置恢复。</p>
+<p>因此，训练成败不是由某个孤立局部导数决定的，而是由“初始梯度—局部雅可比—路径长度—参数更新—数值表示”整条链共同形成。理解每种机制插入链条的位置，才能选择针对性的修复手段，并用观测证据验证真正根因。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>这一节给出了一张围绕梯度传播问题的概念依赖图，核心脉络是从数学来源、结构性改造、数值条件和优化保护四个层面继续深入。</p>
+<p>“反向传播”是理解雅可比连乘的基础。计算图中的每个节点只提供局部导数，反向传播通过链式法则复用这些局部雅可比，最终组成从损失到早期状态或参数的长乘积。掌握这一层后，梯度消失与爆炸就不再只是经验现象，而能被定位到具体路径、具体局部变换和具体伸缩方向。</p>
+<p>“残差连接”对应缩短有效反向路径。恒等分支在前向中直接保留输入，在反向中让模块雅可比包含单位矩阵项，因此深层信号不必完全依赖复杂分支逐层传递。它解释了结构设计如何直接改变雅可比链，而不只是调整参数的初始数值。</p>
+<p>“归一化”和“批归一化”对应激活尺度与局部条件的稳定。它们减少激活分布随层和训练过程的漂移，避免预激活频繁进入不利区域。但激活尺度稳定与梯度谱稳定是不同问题：统一整体统计尺度，并不意味着各个方向的奇异值都接近 1。这个区别把统计视角与矩阵方向视角连接起来。</p>
+<p>“循环神经网络”把问题扩展到序列。门控通过可学习的保留系数构造较稳定的时间状态通道，而更一般的结构目标，是减少或绕开跨越很长时间距离的反向路径。由此可以把长期依赖问题理解为时间维度上的有效深度问题。</p>
+<p>“优化器与学习率调度”属于优化层面的保护。梯度裁剪限制异常大的更新，预热控制训练早期的步长冲击，精度管理防止低精度表示中的下溢与溢出。这些机制需要协同，但它们并不替代对雅可比链本身的结构性改善。</p>
+<p>整张依赖图最终形成一套统一映射：反向传播解释连乘来源；初始化控制起点尺度；门控和残差改变长路径；归一化改善激活尺度与局部条件；裁剪、调度和精度管理保护最终更新与数值表示。把这些概念放到同一条因果链中，才能区分每种方法真正改变的环节。</p></div>
+<table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>连乘从哪里来</td><td><a href="#" data-node="backprop">反向传播</a></td><td>局部雅可比如何在计算图上复用？</td></tr><tr><td>怎样建立短路径</td><td><a href="#" data-node="residual-connection">残差连接</a></td><td>恒等项怎样进入前向和反向？</td></tr><tr><td>怎样稳定激活尺度</td><td><a href="#" data-node="normalization">归一化</a>、<a href="#" data-node="batch-norm">批归一化</a></td><td>尺度稳定与梯度谱有什么区别？</td></tr><tr><td>序列中的门控</td><td><a href="#" data-node="rnn">循环神经网络</a></td><td>LSTM/GRU 如何控制状态保留？</td></tr><tr><td>优化层面的保护</td><td><a href="#" data-node="optimizer-schedule">优化器与学习率调度</a></td><td>裁剪、预热和精度管理怎样配合？</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://proceedings.mlr.press/v9/glorot10a.html" target="_blank" rel="noopener">Understanding the difficulty of training deep feedforward neural networks</a>：饱和、信号方差与 Xavier 初始化。</li><li><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noopener">Delving Deep into Rectifiers</a>：ReLU 网络与 He 初始化。</li><li><a href="https://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">Long Short-Term Memory</a>：门控状态与长期依赖。</li><li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">Deep Residual Learning for Image Recognition</a>：残差学习与极深网络优化。</li></ul><p>连乘表、激活与时间展开图、诊断流程均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/vanishing-gradient">在地图中查看概念关系</a></nav>
+</article></main></body></html>

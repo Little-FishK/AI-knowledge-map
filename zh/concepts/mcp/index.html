@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>MCP 模型上下文协议 · AI 知识地图</title>
+<meta name="description" content="让任何工具和数据，都能用同一个标准接口插进 AI 应用">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/mcp/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="MCP 模型上下文协议">
+<meta property="og:description" content="让任何工具和数据，都能用同一个标准接口插进 AI 应用">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/mcp/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MCP 模型上下文协议">
+<meta name="twitter:description" content="让任何工具和数据，都能用同一个标准接口插进 AI 应用">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/mcp/#page","name":"MCP 模型上下文协议","description":"让任何工具和数据，都能用同一个标准接口插进 AI 应用","url":"https://ai-knowledge-map.com/zh/concepts/mcp/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"MCP 模型上下文协议","item":"https://ai-knowledge-map.com/zh/concepts/mcp/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">MCP 模型上下文协议</span></li></ol></nav><article id="dd-article" data-concept-id="mcp">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">MCP 模型上下文协议</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">让任何工具和数据，都能用同一个标准接口插进 AI 应用</p>
+<p class="dd-ali">MCP · Model Context Protocol · 模型上下文协议</p>
+<p class="dd-metabar">建议 20–30 分钟 · 中级 · 需要：先了解「工具调用」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> MCP 是一个<b>开放协议</b>，规范模型应用如何发现并使用外部工具、资源与提示。Host 管理用户体验和权限，内部 Client 与 Server 建立一对一会话，通过 JSON-RPC 完成初始化、版本与能力协商，再经 stdio 或 Streamable HTTP 传输消息。“M×N 变 M+N”是生态复用的理想化直觉，不代表不同服务无需认证、授权和语义适配。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>解决什么痛点</b>——已经有工具调用了，为什么还需要一个「协议」。</li>
+    <li><b>是什么</b>——一句话说清 MCP 是什么、类比什么。</li>
+    <li><b>和工具调用的分工</b>——它和工具调用不是一回事吗。</li>
+    <li><b>三个角色</b>——一次 MCP 连接里，Host / Client / Server 谁是谁。</li>
+    <li><b>带来什么</b>——标准化之后，AI 工具生态发生了什么变化。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>工具调用让模型会「点单」，但没解决「成千上万工具怎么标准接入各种应用」。<span>（§1）</span></li>
+    <li>没有标准时是 M×N 套两两定制，会爆炸。<span>（§1）</span></li>
+    <li>MCP 是一个开放标准（AI 界的 USB-C），两边各按标准实现一次即可互通，M×N 降到 M+N。<span>（§2）</span></li>
+    <li>它和工具调用分属两层：一个是模型能力，一个是连接标准；MCP 底下仍用工具调用。<span>（§3）</span></li>
+    <li>一次连接有三个角色：Host（应用）、Client（连接器）、Server（暴露工具/数据/提示）。<span>（§4）</span></li>
+    <li>连接先经历初始化、能力协商、发现与调用；协议规定消息顺序，Host 负责授权和结果处置。<span>（§5）</span></li>
+    <li>标准化让工具可复用、应用可扩展、能力可组合，形成公共生态。<span>（§6）</span></li>
+    <li>但连外部 server 引入信任问题：恶意 server、工具结果里的提示注入、权限管理。<span>（§7）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>它要解决的痛点<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>工具调用解决的是&quot;模型如何表达它想调用某个工具&quot;这件事，但它没有回答另一个更实际的问题：成千上万的工具和数据源，要怎么标准地接进各种各样的 AI 应用？</p>
+<p>没有统一标准时，局面是两两定制。设想有 M 个 AI 应用、N 个工具或数据源，每个应用要用每个工具，都得单独写一套对接逻辑，于是总共需要 M×N 套定制集成。应用一多、工具一多，这个数字就迅速膨胀：工具方每出一个新应用就要重接一遍，应用方每加一个新工具也要重写一遍，两边都在重复造同样的轮子。</p>
+<p>图示把这种对比画得很清楚：左边是没有标准的情况，M 个应用 × N 个工具等于 M×N 套两两定制的对接，连线杂乱且难以维护；右边是引入 MCP 这个统一接口之后，每个应用、每个工具都只需要各接一次 MCP，就能互相连通，集成数从 M×N 降到 M+N。</p>
+<p>所以 MCP 真正解决的是&quot;不同 AI 应用与工具提供方之间重复编写连接适配器&quot;的问题。它的输入是 M 个应用和 N 个能力源，输出是双方各自只实现一次公共协议就能互通的连接结构，理想的集成数量由 M×N 变为 M+N。这里 M+N 的含义是连接代码可以复用，而不是说每个具体组合都不再需要处理认证、授权、版本和语义适配——那些属于每一次具体连接仍然要面对的工作，但至少不再需要为每一对组合从头重写一遍适配层。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 210" role="img" aria-label="没有标准时 M×N 套定制对接，杂乱">
+      <text x="140" y="24" text-anchor="middle" class="svg-t">没有标准：M × N 套定制对接</text>
+      <g>
+        <rect x="30" y="45" width="70" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="65" y="63" text-anchor="middle" class="svg-t" font-size="11">应用A</text>
+        <rect x="30" y="95" width="70" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="65" y="113" text-anchor="middle" class="svg-t" font-size="11">应用B</text>
+        <rect x="30" y="145" width="70" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="65" y="163" text-anchor="middle" class="svg-t" font-size="11">应用C</text>
+        <rect x="200" y="45" width="70" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="235" y="63" text-anchor="middle" class="svg-t" font-size="11">GitHub</text>
+        <rect x="200" y="95" width="70" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="235" y="113" text-anchor="middle" class="svg-t" font-size="11">数据库</text>
+        <rect x="200" y="145" width="70" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="235" y="163" text-anchor="middle" class="svg-t" font-size="11">文件系统</text>
+        <g stroke="#cf6f6f" stroke-width="1" opacity=".65">
+          <line x1="100" y1="58" x2="200" y2="58"/><line x1="100" y1="58" x2="200" y2="108"/><line x1="100" y1="58" x2="200" y2="158"/>
+          <line x1="100" y1="108" x2="200" y2="58"/><line x1="100" y1="108" x2="200" y2="108"/><line x1="100" y1="108" x2="200" y2="158"/>
+          <line x1="100" y1="158" x2="200" y2="58"/><line x1="100" y1="158" x2="200" y2="108"/><line x1="100" y1="158" x2="200" y2="158"/>
+        </g>
+      </g>
+      <text x="430" y="24" text-anchor="middle" class="svg-t">有 MCP：M + N，各接一次</text>
+      <g>
+        <rect x="330" y="45" width="60" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="360" y="63" text-anchor="middle" class="svg-t" font-size="11">应用A</text>
+        <rect x="330" y="95" width="60" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="360" y="113" text-anchor="middle" class="svg-t" font-size="11">应用B</text>
+        <rect x="330" y="145" width="60" height="26" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="360" y="163" text-anchor="middle" class="svg-t" font-size="11">应用C</text>
+        <rect x="430" y="93" width="50" height="30" rx="6" fill="#1a1d23" stroke="#4f9d78" stroke-width="2"/><text x="455" y="112" text-anchor="middle" class="svg-tn" font-size="11">MCP</text>
+        <rect x="510" y="45" width="45" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="532" y="63" text-anchor="middle" class="svg-t" font-size="10">GitHub</text>
+        <rect x="510" y="95" width="45" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="532" y="113" text-anchor="middle" class="svg-t" font-size="10">数据库</text>
+        <rect x="510" y="145" width="45" height="26" rx="5" fill="#21252d" stroke="#d3a05a"/><text x="532" y="163" text-anchor="middle" class="svg-t" font-size="10">文件</text>
+        <g stroke="#4f9d78" stroke-width="1.2">
+          <line x1="390" y1="58" x2="430" y2="103"/><line x1="390" y1="108" x2="430" y2="108"/><line x1="390" y1="158" x2="430" y2="113"/>
+          <line x1="480" y1="103" x2="510" y2="58"/><line x1="480" y1="108" x2="510" y2="108"/><line x1="480" y1="113" x2="510" y2="158"/>
+        </g>
+      </g>
+    </svg>
+    <figcaption>图 1　左：没有标准，M 个应用 × N 个工具 = M×N 套两两定制的对接，杂乱且难维护。右：有了 MCP 这个统一接口，每个应用、每个工具都只接一次 MCP，就能互通——M×N 降到 M+N。</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>MCP 是什么：AI 世界的「USB-C」<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>MCP 是一个开放标准协议：它规定了&quot;工具和数据源怎么暴露自己&quot;，以及&quot;AI 应用怎么连接并使用它们&quot;。</p>
+<p>这个定位可以用两个大家熟悉的类比来理解。它像 USB-C——不管什么设备、什么线，认准这个口就能插，统一了充电和数据接口；也像 HTTP——统一了浏览器和网站的对话方式。共同点在于：定好一套接口之后，两边各自按标准实现一次就能互通，不必再为每一对组合做两两定制。</p>
+<p>回到上一节的 M×N 与 M+N：工具方实现一次 MCP Server，比如官方的 GitHub Server，就能被所有支持 MCP 的应用使用；应用方实现一次 MCP Client，就能接入整个 MCP 生态里的工具。于是新增一个工具，代价是&quot;＋1&quot;，而不是&quot;×M&quot;。</p>
+<p>因此，MCP 本质上是规定能力如何暴露、发现和调用的开放协议。它的输入是实现 MCP 的应用端与服务端，输出是能够互通的结构化消息和生命周期。需要守住的两条边界是：它像 USB-C 一样统一接口，却不替设备完成工作；兼容协议只说明双方能交换消息，并不保证某个工具真实、安全或适合当前任务。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>它和工具调用的分工<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>工具调用和 MCP 是两层不同的事，需要分开看。</p>
+<p>工具调用解决的是模型层面的问题：模型怎么表达&quot;我要调这个工具&quot;。MCP 解决的是连接层面的问题：工具和数据怎么标准地暴露、应用怎么连。用一个类比来说，工具调用是&quot;点单&quot;这个动作，MCP 则是统一的&quot;菜单格式＋后厨接口&quot;标准。</p>
+<p>换个说法更直白：工具调用告诉你&quot;模型会点单&quot;，MCP 告诉你&quot;所有餐厅的菜单和后厨都按同一套标准来做，于是任何一个会点单的助手，走进任何一家餐厅都能直接点&quot;。前者是一种能力，后者是让这种能力变得规模化、可复用的标准。</p>
+<p>所以两者不是替代关系，而是配合关系：MCP 底下仍然使用工具调用，它标准化的只是&quot;工具从哪来、怎么接进来&quot;。整个分工可以这样描述——输入是模型提出的工具意图和外部能力连接，输出是工具调用层与 MCP 连接层。模型用工具调用表达&quot;想做什么&quot;，Host 通过 MCP 发现并请求&quot;由谁怎样做&quot;。两层必须配合才能真正执行；MCP 不会替模型选择工具，工具调用也不解决跨提供方接入和复用的问题。</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>工具调用</th><th>MCP</th></tr></thead>
+    <tbody>
+      <tr><td>解决哪层问题</td><td><b>模型层面</b>：模型怎么表达「我要调这个工具」</td><td><b>连接层面</b>：工具/数据怎么标准地暴露、应用怎么连</td></tr>
+      <tr><td>类比</td><td>「点单」的动作</td><td>统一的「菜单格式 + 后厨接口」标准</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>三个角色：Host / Client / Server<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>一次 MCP 连接里有三个角色，分清谁是谁，整件事就清楚了。</p>
+<p>Host（宿主）是跑着模型、面向用户的那个应用，比如 Claude Desktop、某个 IDE、某个 Agent。Client（客户端）是 Host 内部负责连接某一个 Server 的连接器，可以理解为 Host 里连 GitHub Server 的那根&quot;插头&quot;。Server（服务端）是暴露某个工具或数据源能力的一方，比如 GitHub Server、数据库 Server、文件系统 Server。</p>
+<p>三者的关系是：一个 Host 里可以有多个 Client，每个 Client 连一个 Server。要多接一个工具，就在 Host 里加一个 Client 去连它的 Server，即插即用。三角色与传输方式的细节属于 MCP 架构节点，这里先把握分工。</p>
+<p>Server 通常暴露三类东西：工具（tools）是可调用操作，资源（resources）是可读取的上下文，提示（prompts）是用户可选择的模板。它们的控制主体不同——工具常由模型决定是否调用，资源由应用管理，提示通常由用户显式选择。</p>
+<p>还要注意，连接不是&quot;插上就直接调用&quot;。Client 与 Server 先以 JSON-RPC 完成 initialize 握手，协商协议版本与双方能力，然后才进入正常会话；本地常用 stdio，远程常用 Streamable HTTP。只有协商中声明过的能力才应被使用，生命周期和错误也要按协议处理。</p>
+<p>归纳起来，这一组角色的输入是用户会话、单个 Server 连接和服务能力，输出是 Host、Client、Server 各自的责任以及 tools、resources、prompts 目录。Host 管用户与策略，每个 Client 维护一个 Server 会话，Server 暴露聚焦的能力。角色关系说明的是通信边界，并不表示 Server 已经获得全部会话、资源或执行权限。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 560 180" role="img" aria-label="Host 里有多个 Client，各连一个 Server">
+      <rect x="20" y="40" width="200" height="110" rx="10" fill="none" stroke="#6b8cbe" stroke-width="2"/>
+      <text x="120" y="32" text-anchor="middle" class="svg-t">Host（AI 应用）</text>
+      <circle cx="70" cy="75" r="10" fill="#1a1d23" stroke="#6b8cbe"/><text x="70" y="98" text-anchor="middle" class="svg-t" font-size="10">Client</text>
+      <circle cx="120" cy="75" r="10" fill="#1a1d23" stroke="#6b8cbe"/><text x="120" y="98" text-anchor="middle" class="svg-t" font-size="10">Client</text>
+      <circle cx="170" cy="75" r="10" fill="#1a1d23" stroke="#6b8cbe"/><text x="170" y="98" text-anchor="middle" class="svg-t" font-size="10">Client</text>
+      <text x="120" y="135" text-anchor="middle" class="svg-t" font-size="11">模型在这里跑</text>
+      <line x1="80" y1="75" x2="360" y2="55" stroke="#4f9d78" stroke-width="1.4" marker-end="url(#i1)"/>
+      <line x1="130" y1="75" x2="360" y2="95" stroke="#4f9d78" stroke-width="1.4" marker-end="url(#i1)"/>
+      <line x1="180" y1="75" x2="360" y2="135" stroke="#4f9d78" stroke-width="1.4" marker-end="url(#i1)"/>
+      <rect x="360" y="40" width="160" height="30" rx="6" fill="#21252d" stroke="#d3a05a"/><text x="440" y="60" text-anchor="middle" class="svg-t" font-size="11">GitHub Server</text>
+      <rect x="360" y="80" width="160" height="30" rx="6" fill="#21252d" stroke="#d3a05a"/><text x="440" y="100" text-anchor="middle" class="svg-t" font-size="11">数据库 Server</text>
+      <rect x="360" y="120" width="160" height="30" rx="6" fill="#21252d" stroke="#d3a05a"/><text x="440" y="140" text-anchor="middle" class="svg-t" font-size="11">文件系统 Server</text>
+      <defs><marker id="i1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#4f9d78"/></marker></defs>
+    </svg>
+    <figcaption>图 2　一个 Host（AI 应用）里可以有多个 Client，每个 Client 连一个 Server。要多接一个工具，就在 Host 里加一个 Client 去连它的 Server——即插即用。（三角色与传输方式的细节见「MCP 架构」节点。）</figcaption>
+  </figure>
+<table class="dd-table">
+    <thead><tr><th>角色</th><th>是谁</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr><td><b>Host（宿主）</b></td><td>跑着模型、面向用户的那个应用</td><td>Claude Desktop、某 IDE、某 Agent</td></tr>
+      <tr><td><b>Client（客户端）</b></td><td>Host 内部、负责连<b>一个</b> Server 的连接器</td><td>Host 里连 GitHub server 的那根「插头」</td></tr>
+      <tr><td><b>Server（服务端）</b></td><td>暴露某个工具/数据源能力的一方</td><td>GitHub server、数据库 server、文件系统 server</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>运行示例：从握手到调用工具<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>把&quot;连接一个天气 Server 并查纽约天气&quot;完整走一遍，就能看清协议如何把能力变成可发现、可验证的消息序列——同时也要看清协议本身并不替 Host 决定是否授权。</p>
+<p>第一步是发起握手：Client 向 Server 发送 initialize，声明协议版本、Client 信息与支持的能力。第二步是协商结果：Server 回送 InitializeResult，选定协议版本，并返回 Server 信息及它支持的能力。第三步是握手完成：Client 发送 notifications/initialized，确认初始化结束，双方进入正常会话。这三步解决的是&quot;双方能否对话、以什么版本对话&quot;的问题。</p>
+<p>第四步是发现能力：Client 发送 tools/list，取得工具名、描述和输入 schema，例如 get_weather(city)。第五步是发起调用：Client 发送 tools/call，此时 Host 已经选中工具并验证过参数，再发送 {city: &quot;New York&quot;}。第六步是处理结果：Server 返回调用结果，Host 标记来源、检查错误，再决定哪些内容进入模型、哪些动作需要用户确认。</p>
+<p>这里有几条关键边界。能力协商只说明&quot;双方会什么&quot;，不等于&quot;用户授权做什么&quot;：即使 Server 声明了写文件或发消息的工具，Host 仍应独立执行权限检查；工具返回值也是外部数据，不会因为走了 MCP 就自动可信。把协议看成状态机的话，初始化完成前不能随意调用；发现工具后，模型提出的只是候选调用；真正执行前还要经过参数校验、权限与同意检查。也就是说，MCP 规范的是消息交换，Host 保留最终控制权。</p>
+<p>整个天气示例的输入是双方版本能力与城市参数，输出是协商会话、工具目录和带来源的结果。Client 依次完成 initialize、确认 initialized、tools/list，再由 Host 校验和授权 tools/call。返回的天气只表示 Server 给出了结果，能力协商不等于用户授权，错误信息或外部文本仍然按不可信数据对待。</p></div>
+<table class="dd-table">
+    <thead><tr><th>阶段</th><th>消息</th><th>这一步解决什么</th></tr></thead>
+    <tbody>
+      <tr><td>① 发起握手</td><td>Client → Server：<code>initialize</code></td><td>声明协议版本、Client 信息与支持的能力</td></tr>
+      <tr><td>② 协商结果</td><td>Server → Client：<code>InitializeResult</code></td><td>选定协议版本，返回 Server 信息及它支持的能力</td></tr>
+      <tr><td>③ 握手完成</td><td>Client → Server：<code>notifications/initialized</code></td><td>确认初始化结束，双方进入正常会话</td></tr>
+      <tr><td>④ 发现能力</td><td>Client → Server：<code>tools/list</code></td><td>取得工具名、描述和输入 schema，例如 <code>get_weather(city)</code></td></tr>
+      <tr><td>⑤ 发起调用</td><td>Client → Server：<code>tools/call</code></td><td>Host 选中工具并验证参数后，发送 <code>{city: &quot;New York&quot;}</code></td></tr>
+      <tr><td>⑥ 处理结果</td><td>Server → Client：调用结果</td><td>Host 标记来源、检查错误，再决定哪些内容进模型、哪些动作需用户确认</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>标准化带来了什么<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>接口统一之后，AI 工具生态发生了三个实质变化。</p>
+<p>第一，工具可复用。工具方实现一次 MCP server，凡是兼容相同核心原语、传输和授权条件的 Host 就能复用，不必为每个应用两两重写。</p>
+<p>第二，应用可扩展。一个 Agent 支持 MCP 之后，可以按需接入兼容的 server；实际可用性仍取决于协议版本、认证授权和扩展能力。</p>
+<p>第三，可组合。把文件系统、数据库、浏览器几个 server 拼起来，同一个 Agent 就能跨系统协作完成复杂任务。</p>
+<p>这三条合起来，为什么是件大事？因为它把&quot;给 AI 接工具&quot;从一次性的定制活，变成了可积累的公共生态——就像有了 USB 标准之后，外设厂商和电脑厂商不用再两两适配。这是 AI 应用能快速长出&quot;手和脚&quot;的关键基础设施之一，所以它被标为演进中的活跃方向。</p>
+<p>把生态标准化整体看，输入是多个兼容的 Host 与 Server，输出是可复用、可扩展、可组合的能力网络。新增一方只需实现公共接口就能被兼容方发现，跨系统任务由 Host 编排。同时要记住 M+N 是理想的复用直觉，扩展差异、协议版本、认证和业务语义仍会限制实际互通。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>安全：连外部 Server 的代价<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>&quot;插上就能用&quot;很爽，但连接外部 Server 也引入了新的信任问题，代价需要正视。</p>
+<p>第一，Server 本身可能不可信。一个恶意或被攻陷的 Server，可能滥用它被授予的权限，或者返回误导性内容，所以原则是只连你信任的 Server。</p>
+<p>第二，工具结果里可能夹带提示注入。Server 返回的内容会进入模型的上下文，其中若藏有恶意指令，可能劫持模型去调用别的危险工具，这一点与提示注入、工具调用第 6 节所述的问题相通。</p>
+<p>第三，权限与授权。给 Server 的访问权限要遵循最小权限；涉及高危操作，仍然需要人在回路确认。</p>
+<p>更要紧的是，标准降低了接入门槛，同时也降低了&quot;接入坏东西&quot;的门槛。正因为&quot;插上就能用&quot;，更要对&quot;插的是什么&quot;保持警惕。MCP 解决的是&quot;怎么连&quot;，它不替你判断&quot;该不该连、连了给多大权限&quot;。</p>
+<p>因此 MCP 的安全治理，输入是 Server 身份、所需资源、工具风险和返回内容，输出是连接允许、最小权限、逐次授权或拒绝。Host 要在模型之外校验主体、参数和副作用，外部结果要保留来源并隔离提示注入。还要记住，可信的 Server 也可能被攻陷；协议兼容和一次性的批准，都不能替代持续的授权与审计。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把&quot;为什么要标准化&quot;一路连到&quot;为什么协议不能替代授权&quot;，可以检查每个结论从哪里来。</p>
+<p>工具调用让模型会&quot;点单&quot;，但没解决&quot;成千上万工具怎么标准接入各种应用&quot;（§1）。没有标准时，是 M×N 套两两定制，会随规模爆炸（§1）。于是 MCP 作为一个开放标准出现，相当于 AI 界的 USB-C：两边各按标准实现一次即可互通，M×N 降到 M+N（§2）。</p>
+<p>它和工具调用分属两层——一个是模型能力，一个是连接标准，而 MCP 底下仍然使用工具调用（§3）。一次连接里有三个角色：Host（应用）、Client（连接器）、Server（暴露工具、数据与提示）（§4）。连接先经历初始化、能力协商、发现与调用；协议规定消息顺序，Host 负责授权和结果处置（§5）。标准化让工具可复用、应用可扩展、能力可组合，从而形成公共生态（§6）。但连外部 server 也引入了信任问题：恶意 server、工具结果里的提示注入、以及权限管理（§7）。</p>
+<p>因此整条链的落脚点是：标准化解决了&quot;怎么连&quot;，但授权与安全仍是 Host 独立的责任。若能讲清&quot;MCP 为什么把 M×N 变成 M+N&quot;，并说出&quot;它和工具调用分别解决哪一层的问题&quot;，就抓住了 MCP 的内核。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>学习这一页可以按依赖层级安排顺序。</p>
+<p>先修概念包括：工具调用／函数调用、大语言模型、AI Agent。这三者构成理解 MCP 的底座——先知道模型能&quot;调用工具&quot;，才能理解 MCP 在工具之上又标准化了什么。</p>
+<p>本页的核心概念是：开放标准、M×N→M+N、Host／Client／Server 三角色，以及 tools／resources／prompts 三类能力。</p>
+<p>紧邻的延伸概念是：MCP 架构、AI Agent、Agent 循环、提示注入、人在回路。其中 MCP 架构补充三角色的传输与协议细节，提示注入和人在回路则直接承接本页安全部分提出的信任问题。</p>
+<p>更远的延伸方向包括：智能体技能、上下文工程、多 Agent 编排、计算机操作。这些是在掌握了单个连接标准之后，才逐步展开的更大主题。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>工具调用 / 函数调用、大语言模型、AI Agent</td></tr>
+      <tr><td><b>本页核心</b></td><td>开放标准、M×N→M+N、Host/Client/Server、tools/resources/prompts</td></tr>
+      <tr><td>紧邻延伸</td><td>MCP 架构、AI Agent、Agent 循环、提示注入、人在回路</td></tr>
+      <tr><td>更远</td><td>智能体技能、上下文工程、多 Agent 编排、计算机操作</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-11-25/server/index" target="_blank" rel="noopener">MCP Specification 2025-11-25: Server Features</a>：Resources、Prompts、Tools 三类服务端原语与控制边界。</li>
+    <li><a href="https://modelcontextprotocol.io/specification/2025-11-25/schema" target="_blank" rel="noopener">MCP Specification 2025-11-25: Schema Reference</a>：初始化、能力协商、工具发现和调用的消息结构。</li>
+    <li><a href="https://modelcontextprotocol.io/docs/learn/architecture" target="_blank" rel="noopener">MCP Architecture Overview</a>：Host/Client/Server 连接模型与 stdio、Streamable HTTP 传输。</li>
+    <li><a href="https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices" target="_blank" rel="noopener">MCP Security Best Practices</a>：最小权限、令牌与本地 Server 风险。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/mcp">在地图中查看概念关系</a></nav>
+</article></main></body></html>

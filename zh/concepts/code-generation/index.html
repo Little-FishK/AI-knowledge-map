@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>代码生成 / AI 编程 · AI 知识地图</title>
+<meta name="description" content="让模型写代码，从补全一行到实现整个功能">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/code-generation/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="代码生成 / AI 编程">
+<meta property="og:description" content="让模型写代码，从补全一行到实现整个功能">
+<meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/code-generation/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="代码生成 / AI 编程">
+<meta name="twitter:description" content="让模型写代码，从补全一行到实现整个功能">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/code-generation/#page","name":"代码生成 / AI 编程","description":"让模型写代码，从补全一行到实现整个功能","url":"https://ai-knowledge-map.com/zh/concepts/code-generation/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"代码生成 / AI 编程","item":"https://ai-knowledge-map.com/zh/concepts/code-generation/"}]}]</script>
+</head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">跳到正文</a>
+<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
+<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">代码生成 / AI 编程</span></li></ol></nav><article id="dd-article" data-concept-id="code-generation">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">代码生成 / AI 编程</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
+<p class="dd-sub">让模型写代码，从补全一行到实现整个功能</p>
+<p class="dd-ali">Code Generation · AI 编程 · Coding</p>
+<p class="dd-metabar">建议 25–35 分钟 · 中级 · 需要：了解「大语言模型」「工具调用」</p>
+<div class="dd-thesis"><span class="dd-thesis-l">核心命题</span> 代码生成让大模型写代码——从补全一行，到实现整个功能、跨文件改动。它之所以成为大模型<b>最成功的应用之一</b>，是因为代码有三个绝佳性质：本身是文本（预训练见过海量）、有明确语法且<b>可执行验证</b>（对错能测）、模式重复多。可验证，让它能「写了就跑、跑错就改」，形成别的任务少有的自我纠正闭环。</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">读完这一页，你应该能自己回答：</div>
+  <ul>
+    <li><b>是什么</b>——让模型写代码，和让它写文章有何不同。</li>
+    <li><b>为什么这么成功</b>——为什么「写代码」成了大模型最成功的应用之一。</li>
+    <li><b>怎么进化的</b>——从补全一行，到自主编程 Agent。</li>
+    <li><b>关键搭档</b>——光会写还不够，还差什么。</li>
+    <li><b>能直接信吗</b>——AI 写的代码有哪些坑。</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>AI 编程让模型把意图翻译成能跑的代码，从补全到实现功能。<span>（§1）</span></li>
+    <li>它成功，因为代码是文本（海量训练）、可执行验证（对错能测）、模式多。<span>（§2）</span></li>
+    <li>它沿补全→对话→仓库级→自主编程 Agent 进化，高级形态就是把 Agent 用在代码上。<span>（§3）</span></li>
+    <li>关键搭档是代码执行：写→跑→看报错→改的闭环让它能自我纠正。<span>（§4）</span></li>
+    <li>但在大项目里，上下文喂不对就会瞎写，故核心是上下文工程。<span>（§5）</span></li>
+    <li>风险：编不存在的 API、隐藏 bug、安全漏洞、过度信任——必须审必须测。<span>（§6）</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>什么是 AI 编程<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>让模型写代码和让它写一段文案，表面上都是「生成文本」，但两者有一个本质区别：代码不是给人读着舒服就行的文字，它必须能运行，而且对错分明。一段文案写得平庸只是效果差一点；一段代码少一个符号、用错一个接口，程序就会崩溃或产生错误结果，这在绝大多数情况下是可被验证、可被判定的事实。这个区别决定了 AI 编程这项任务的根本性质：它不是自由创作，而是把一个「意图」翻译成「能跑的代码」的生成任务。</p>
+<p>具体来说，AI 编程的输入包括三样东西：用自然语言表达的（或隐含在注释、函数签名里的）需求、仓库里已有的代码、以及验收条件。输出则是候选补丁、对新代码的解释，或者一个全新的程序。模型要做的，是理解这些输入之后，产出一段机器能够执行、并且符合意图的代码。</p>
+<p>AI 编程覆盖从小到大的一整条谱系。最小的一端是补全：你正在打这一行，模型猜出后半截。往上一级是按注释生成一个函数：你写一句「把列表里所有正数加起来」，模型生成对应的实现。再往上是实现一整个功能：跨函数、跨模块地把一个需求变成可工作的代码。最大的一端是跨多个文件的重构：在保持行为不变的前提下重新组织代码结构。这些任务规模不同，但内核完全一样——都是把意图翻译成能运行的代码，机制上也没有本质区别。</p>
+<p>这里有一条必须记住的边界：代码能够运行，只说明语法正确、并且被测试到的那些执行路径成立。运行通过并不证明需求全部满足、安全无漏洞、性能也达标。一个程序可能跑起来没有任何报错，却把边界条件处理错了，或者在极端输入下耗尽资源。所以「能跑」是 AI 编程的必要条件，远远不是充分条件；它只是验证链条上的第一环，而不是终点。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>为什么代码特别适合大模型<span class="dd-badge intuition">直觉</span></h2>
+<div class="dd-agent-response"><p>同样是生成，为什么「写代码」偏偏成了大模型落地最成功的方向之一？答案在于代码同时具备三个对模型极其友好的性质。</p>
+<p>第一，代码本身是文本。预训练阶段，模型在海量公开数据里见过数量惊人的开源代码，各种语言、各种风格的仓库都被它读过。写代码不是模型被强加的新技能，而是它原本就在做的事——续写一个函数、补全一个循环，正是它在预训练时反复练习过的行为模式。</p>
+<p>第二，代码可以执行、可以验证。这一点最为关键。代码对不对，跑一下就知道：编译报错、测试挂掉，都是明确、客观、不依赖人主观判断的反馈信号。这与散文形成鲜明对照——一段散文「好不好」没有客观标准，模型得不到可衡量的反馈，改进方向模糊；而代码一旦跑失败，错误就变成了一个具体、可定位的反例，模型可以据此修正。可验证性把「模糊的错误」压缩成了「具体的反例」，这是代码生成能够形成高效闭环的根本原因。</p>
+<p>第三，代码模式重复且结构严格。语法有明确规则，套路高度复现——增删改查、循环遍历、错误处理、资源清理，这些模式在无数项目里以相近的形态反复出现。模型擅长「按模式续写」，而代码恰好就是模式密度最高的文本之一。</p>
+<p>但「可验证」有一个容易被忽视的边界：验证只覆盖已经表达出来的规格。编译器、测试和静态分析工具能给出客观反馈，但它们只能检查你是否实现了「已写下来的要求」。如果测试本身缺少边界条件，或者根本没有把真实需求转成可检查的验收条件，那么一段错误代码完全可以做到「测试全绿」——所有测试都通过，但需求从一开始就被理解错了。要形成真正可靠的闭环，不能只靠「跑一下」，而要先花力气把需求翻译成可检查的验收条件，再配合单元测试、集成测试、安全扫描和人工审查一起使用。换句话说，代码适合大模型，是因为训练语料丰富、语法结构重复、并且能用编译和测试产生外部反馈；输入是需求与代码模式，输出是可被工具检验的候选实现。而验证的真正价值在于把错误逼成具体反例，它做不到的，是替你把「规格」补完整。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>从「补全」到「编程 Agent」<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>AI 编程不是一步到位的，它沿着「管得越来越宽」的方向逐级进化。理解这条谱系，关键是看每一级把多宽的决策面交给了模型。</p>
+<p>最早的一级是补全。你打字时，模型实时补出下一行、下一段，早期的 Copilot 就是这种形态。它只负责「你正在写的这行后面跟什么」，输入是光标前的一小段上下文，输出是一小段续写代码，不需要理解整个项目，也不需要自己做任何决策。</p>
+<p>往上一级是对话式。你可以用自然语言让它生成一段代码、解释一段代码、或者改动一段已有代码。这时模型开始理解需求语句，但工作范围通常仍局限在你指给它看的片段。</p>
+<p>再往上是仓库级。模型要读懂整个项目，跨文件地做改动——找到所有相关的调用点、同步修改接口和它的使用者。这需要检索和搜索能力，而不仅仅是续写。</p>
+<p>最宽的一级是自主编程 Agent。你给它一个任务，它自己读代码、改多个文件、跑测试、看报错、再改，循环往复直到任务完成。这一步的本质，是把「Agent」这一整套机制用在了代码上：规划、调用工具（读文件、跑命令）、观察结果、再调整。</p>
+<p>这条谱系的因果链很清楚。补全只需要「模型会写」；对话式需要「模型听懂并写对一段」；仓库级需要「模型会搜、会定位」；而自主编程需要模型像 Agent 一样进入一个闭环——规划、调工具、看结果、再改。越往后，模型负责的工作面越宽，系统随之增加搜索、规划、执行和恢复这些能力。</p>
+<p>因此，能力阶段的输入不再是单纯的代码片段，而是任务范围、仓库上下文、可用的工具和授予的自主权；输出也相应地从补全、对话修改，扩展到仓库级补丁，再到完整的 Agent 轨迹。有两点边界必须说清。第一，阶段更高只表示模型负责的工作面更宽，不代表模型本身变得更聪明——一个在补全上平庸的模型不会因为被包装成 Agent 就突然擅长规划。第二，更宽的负责面不应当自动换来更大的权限；让一个仓库级工具获得删库、发布、打款的权限，是不由能力阶段支撑的越权。</p></div>
+<table class="dd-table">
+    <thead><tr><th>阶段</th><th>能做什么</th></tr></thead>
+    <tbody>
+      <tr><td>补全</td><td>你打字时实时补下一行/一段（如早期 Copilot）</td></tr>
+      <tr><td>对话式</td><td>用自然语言让它生成、解释、改一段代码</td></tr>
+      <tr><td>仓库级</td><td>读懂整个项目、跨文件改动（见「AI 编程工具」）</td></tr>
+      <tr><td>自主编程 Agent</td><td>给个任务，自己读代码、改多个文件、跑测试、看报错再改（见「AI Agent」「Claude Code」）</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>关键搭档：代码执行运行示例<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>光会「写」代码还不够。要让 AI 编程真正靠谱，还差最重要的一步：把代码真的跑起来。让模型写完就执行，把运行结果和测试结果拿回来，它就能发现自己写错了、并据此修改。「写 → 跑 → 看报错 → 改 → 再跑」这个闭环，正是让代码生成区别于其他文本生成的关键搭档。</p>
+<p>用一个缓存功能的例子能看清整个过程。第一步是把模糊需求变成可检查的验收条件：需求说「让查询更快」，要把它改写成三个可检查的条件——相同参数第二次调用时不走后端；不同用户之间不能共享结果；原有测试保持通过。这一步决定了后面所有验证是否有效。</p>
+<p>第二个补丁，模型用 query 作为全局缓存键。单元测试通过了，但安全审查发现缓存键里缺少 user_id——这意味着不同用户会命中同一个缓存槽，互相看到对方的结果。</p>
+<p>于是引入失败测试 test_cache_isolated_by_user：它让用户 B 得到用户 A 的结果，把一个「逻辑正确」的假象改写成「缓存键不完整」的明确结论。关键在这里——闭环之所以比「再生成一次」强，是因为第二个补丁不是因为模型随机换了个写法，而是失败测试提供了一个具体反例：同一个 query 在两个不同的 user_id 下，必须产生两个缓存槽。可执行反馈把模糊的「可能有 bug」收缩成可定位、可复验的约束。</p>
+<p>接着是最小修复：把缓存键改为 (user_id, query)，并且只缓存成功响应。目标测试与全量测试都通过，而 diff 显示没有改动任何测试本身——这保证模型是通过修实现来过关，而不是靠篡改测试来过关。</p>
+<p>最后是交付：报告改动内容、测试命令与剩余风险，但不自动合并。这里要记住，测试全绿只支持已被测试覆盖的行为，它不替代代码审查，也不授予自动合并或发布的权力。</p>
+<p>图 1 可验证带来的闭环：写完就跑，用真实的报错和测试结果来纠错，再改再跑。正是这个客观反馈，让 AI 编程能够自我纠正——这是写文案等任务给不了的。整个运行示例的输入是缓存需求、首个补丁、用户隔离测试和项目回归，输出是修正后的最小补丁与运行证据。系统先把需求变成三条验收条件，再用失败测试定位缓存键缺少 user_id 的问题，修复后由窄到宽地验证。</p></div>
+<figure class="dd-fig">
+    <svg viewBox="0 0 420 130" role="img" aria-label="写-跑-改的闭环">
+      <rect x="30" y="48" width="90" height="34" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="75" y="70" text-anchor="middle" class="svg-t" font-size="12">写代码</text>
+      <line x1="120" y1="65" x2="160" y2="65" stroke="#6b7484" stroke-width="1.4" marker-end="url(#n1)"/>
+      <rect x="160" y="48" width="90" height="34" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="205" y="70" text-anchor="middle" class="svg-t" font-size="12">跑 / 测</text>
+      <line x1="250" y1="65" x2="290" y2="65" stroke="#6b7484" stroke-width="1.4" marker-end="url(#n1)"/>
+      <rect x="290" y="48" width="100" height="34" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="340" y="70" text-anchor="middle" class="svg-t" font-size="12">看报错→改</text>
+      <path d="M340,82 C340,110 120,110 75,84" fill="none" stroke="#6b7484" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#n1)"/>
+      <defs><marker id="n1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg>
+    <figcaption>图 1　可验证带来的闭环：写完就跑，用真实的报错和测试结果来纠错，再改再跑。正是这个客观反馈，让 AI 编程能自我纠正——这是写文案等任务给不了的。</figcaption>
+  </figure>
+<table class="dd-table">
+    <thead><tr><th>运行示例</th><th>证据怎样改变下一步</th></tr></thead>
+    <tbody>
+      <tr><td>需求与验收</td><td>把“更快”改写成三个可检查条件：相同参数第二次不调用后端；不同用户不能共享结果；原测试保持通过。</td></tr>
+      <tr><td>首个补丁</td><td>模型用 <code>query</code> 作全局缓存键；单元测试通过，但安全审查发现键缺少 <code>user_id</code>。</td></tr>
+      <tr><td>失败测试</td><td><code>test_cache_isolated_by_user</code> 显示用户 B 得到用户 A 的结果，把“逻辑正确”改成“缓存键不完整”。</td></tr>
+      <tr><td>最小修复</td><td>键改为 <code>(user_id, query)</code> 并只缓存成功响应；目标测试与全量测试通过，diff 未修改测试。</td></tr>
+      <tr><td>交付</td><td>报告改动、测试命令与剩余风险，不自动合并；测试全绿不替代代码审查和发布授权。</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>上下文决定成败<span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>为什么同一个模型，写一个小函数时很强，一放进你的大项目里就频繁出错？最直接的原因：它没看到项目的全貌。在真实代码库里，一段改动往往要顾及别处的接口、命名约定、依赖关系，而这些都散落在其他文件里。如果没把相关的上下文喂给它——相关文件、函数签名、项目约定——它就只能靠猜，于是写出「单看没错、放进项目就崩」的代码。</p>
+<p>所以仓库级 AI 编程的核心，是上下文工程：把对的上下文，在有限的窗口里喂对。输入包括当前失败的表现、相关接口、调用者、测试、项目约定和依赖版本，输出则是完成修改所需的最小相关代码包。系统从复现问题和符号关系出发逐步扩展材料——先看报错在哪，再看它调用了什么、被谁调用、有什么约定——而不是把整个仓库无差别地塞进窗口。无差别塞入只会撑满上下文窗口，稀释真正有用的信息。</p>
+<p>这里有一条边界要记清：上下文充分，只表示关键约束被看见了，不表示模型一定做对。模型仍可能误解约束的含义，或者遗漏那些没有被加载进来的路径。上下文工程解决的是「看不见」的问题，它无法消除「看见了却理解错」的问题。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>能直接信吗：风险<span class="dd-badge eng">安全</span></h2>
+<div class="dd-agent-response"><p>AI 写的代码，能闭眼合并吗？不能。它带来的风险具体有几种。</p>
+<p>幻觉编 API：模型可能一本正经地调用一个根本不存在的函数或库——名字看着合理，其实压根没有。这是幻觉在代码里的典型形态，编译或运行到那一步才会暴露。</p>
+<p>看着对、其实有 bug：能跑通不代表逻辑对。边界情况、并发、数值精度这些地方藏着隐患，测试没覆盖到就发现不了。</p>
+<p>安全漏洞：模型可能写出有注入、越权等问题的代码，或者照抄了训练数据里的坏范例。它学到的写法里，本身就混着大量不安全的历史代码。</p>
+<p>过度信任：代码越长、越像模像样，越容易让人放松审查——而这恰恰是最危险的一点。格式工整和逻辑正确是两回事，而人很容易把前者误当成后者。</p>
+<p>正确的定位，是把它当作「很强但会犯错的初级工程师」：高产、好用，但产出必须审、必须测。AI 编程的正确用法是「人把关的加速器」，不是「无人监督的替代品」。</p>
+<p>落到操作上，代码风险控制的输入是候选补丁、依赖、测试、安全规则和审查者，输出是接受、修正、拒绝或待验证项这几类结论。编译、测试、静态分析和人工 diff 分层检查：编译挡掉幻觉 API，测试挡掉已覆盖的逻辑错误，静态分析挡掉已知的漏洞模式，人工审查挡掉那些机器规则表达不出的问题。有一点要诚实面对：把模型当高产初级工程师是一种责任分配方式，它并不意味着人类审查天然不会漏错——审查者自己也可能疲惫、误判，所以这个把关过程同样需要被认真对待。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6.5</span>怎么评估：片段题不等于真实仓库<span class="dd-badge math">数学</span><span class="dd-badge eng">工程</span></h2>
+<div class="dd-agent-response"><p>一个模型在小函数基准上很强，能否直接推出它会修真实项目？不能直接推出。这背后是两套测量逻辑的差异。</p>
+<p>函数生成常用 pass@k 这个指标：采样 k 个候选，只要其中至少一个通过隐藏测试，就算成功。它衡量的是「多试几次能否命中」，允许用采样次数去换成功率。pass@1 则只关注单次生成就命中，不含采样预算带来的收益。所以同一个模型，报 pass@k 和报 pass@1，数值含义完全不同。</p>
+<p>仓库级任务的要求要高得多：它还要模型能定位相关文件、理解依赖、做最小范围的修改、并通过回归测试。SWE-bench 一类的评测更接近这种真实流程，它检验的不只是「会不会写这段」，而是「会不会在别人的项目里找到该改的地方、改对、并且不碰坏别处」。</p>
+<p>比较结果时，还必须固定几个变量，否则分数不可直接比较：测试集、工具权限、采样预算、以及是否允许重试。任何一个不同，数字就没有可比性。</p>
+<p>最后一条边界：无论 pass@1 还是 pass@k，测试通过只证明代码通过了现有测试，不证明它安全、性能合格，或者完全符合用户意图。指标的输入是固定任务、隐藏测试、工具权限、采样数 k 和重试预算，输出是 pass@1、pass@k 或仓库级任务成功率；它们各自覆盖的范围，恰恰决定了它们各自证明不了的东西。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>把整条因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<div class="dd-agent-response"><p>把前面几节的线索串起来，可以看到一条完整的因果链，从「代码为何适合语言模型」一路推到「为什么测试全绿仍不是无人审查合并的许可证」。</p>
+<p>起点是：AI 编程让模型把意图翻译成能跑的代码，从补全到实现功能。它之所以成功，是因为代码同时具备三个性质——它是文本，模型在海量开源代码里受过训练；它可以执行验证，对错能用编译和测试测出来；它的模式高度重复，适合按模式续写。</p>
+<p>由此，工具沿着补全、对话式、仓库级、自主编程 Agent 逐级进化，高级形态本质上就是把 Agent 用在代码上。而让这个进化真正闭环的关键搭档，是代码执行：写、跑、看报错、改、再跑，模型靠真实反馈自我纠正。</p>
+<p>但进入大项目后，新的约束出现了：上下文喂不对，模型就瞎写，所以仓库级编程的核心是上下文工程。即使上下文和验证都做好了，风险依然存在——编不存在的 API、隐藏 bug、安全漏洞、过度信任，因此产出必须审、必须测。</p>
+<p>最终这条链落到一个结论上：可验证性让代码成为大模型最成功的应用之一，但它只验证「已表达的规格」；仓库级的成功则高度依赖把对的上下文喂对。两者加在一起，解释了为什么「测试全绿」是必要的一环，却永远不是跳过人工审查、自动合并发布的许可证。</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>概念依赖与延伸学习<span class="dd-badge eng">路线</span></h2>
+<div class="dd-agent-response"><p>这一页的知识不是孤立的，它站在几个更基础的概念之上，又为若干更深入的主题铺路。</p>
+<p>先修概念：要理解 AI 编程，先要理解大语言模型本身、工具调用，以及 AI Agent 的基本机制。这三者决定了「模型为何会写代码」以及「高级形态为何是 Agent」。</p>
+<p>本页的核心，是可执行验证、写-跑-改的闭环、从补全到编程 Agent 的进化，以及上下文决定成败。这四个点合起来，构成了理解 AI 编程的内核。</p>
+<p>紧邻的延伸是：代码执行与沙箱（跑代码的安全环境从哪来）、AI 编程工具（具体工具如何实现前面讲的机制）、上下文工程（如何系统地把对的上下文喂给模型）、幻觉（编出不存在的 API 这类错误的根源）、人在回路（为什么必须由人把关）。</p>
+<p>更远的方向还有：规划与任务分解、工作流编排、评测。这些属于把单个编程任务放大成更大系统时才会遇到的问题，可以在掌握本页内核之后再深入。</p></div>
+<table class="dd-table">
+    <thead><tr><th>学习层级</th><th>涉及概念</th></tr></thead>
+    <tbody>
+      <tr><td>先修</td><td>大语言模型、工具调用、AI Agent</td></tr>
+      <tr><td><b>本页核心</b></td><td>可执行验证、写-跑-改闭环、从补全到编程 Agent、上下文决定成败</td></tr>
+      <tr><td>紧邻延伸</td><td>代码执行与沙箱、AI 编程工具、上下文工程、幻觉、人在回路</td></tr>
+      <tr><td>更远</td><td>规划与任务分解、工作流编排、评测</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>资料来源与改编说明</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al., Evaluating Large Language Models Trained on Code</a>：代码模型训练与 pass@k 评测。</li>
+    <li><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">Jimenez et al., SWE-bench</a>：真实仓库级软件工程任务评测。</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：工具交互与反馈循环，可迁移到编码 Agent。</li>
+  </ul>
+  <div class="dd-src-date">访问日期：2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/code-generation">在地图中查看概念关系</a></nav>
+</article></main></body></html>
