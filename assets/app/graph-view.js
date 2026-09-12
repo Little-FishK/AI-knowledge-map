@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'content-detection': {
+        support: [], peer: ['gan'], risk: ['image-generation', 'speech'], output: ['voice-cloning', 'governance'],
+        offsets: { 'gan': [245, -285], 'voice-cloning': [410, -120], 'governance': [690, 0], 'image-generation': [0, 210], 'speech': [135, 185] }
+      },
+      'alignment': {
+        support: ['fine-tuning', 'supervised-learning', 'reinforcement-learning', 'post-training', 'constitutional-ai', 'rlhf', 'interpretability', 'governance', 'bias-fairness'], peer: [], risk: ['reward-hacking'], output: ['jailbreak', 'llm'],
+        offsets: { 'fine-tuning': [-45, -195], 'supervised-learning': [-110, -172], 'reinforcement-learning': [-160, -125], 'post-training': [-195, -62], 'constitutional-ai': [-210, 0], 'rlhf': [-195, 62], 'interpretability': [-160, 125], 'governance': [-110, 172], 'bias-fairness': [-45, 195], 'jailbreak': [410, -120], 'llm': [700, 0], 'reward-hacking': [0, 210] }
+      },
+      'interpretability': {
+        support: ['logprobs', 'governance', 'attention'], peer: [], risk: [], output: ['hallucination', 'alignment', 'neural-network'],
+        offsets: { 'logprobs': [-155, -150], 'governance': [-215, 0], 'attention': [-155, 150], 'hallucination': [350, -150], 'alignment': [680, 0], 'neural-network': [350, 150] }
+      },
       'voice-cloning': {
         support: ['fine-tuning', 'content-detection'], peer: [], risk: ['privacy'], output: ['speech', 'controllable-generation'],
         offsets: { 'fine-tuning': [-175, -95], 'content-detection': [-175, 95], 'speech': [420, -125], 'controllable-generation': [680, 0], 'privacy': [0, 210] }
