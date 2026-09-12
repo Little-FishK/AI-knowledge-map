@@ -331,7 +331,7 @@
           'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
           'target-arrow-color': '#8fb87f'
         } },
-        { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '160ms'} },
+        { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '600ms'} },
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
         { selector: ".hidden", style: { "display": "none" } }
@@ -355,23 +355,27 @@
       if (!cullingDirty) return;
       cullingDirty = false;
       const width = cy.container().clientWidth;
-      if (!width) return;
+      const height = cy.container().clientHeight;
+      if (!width || !height) return;
       // Keep the fade bands rendered; cull only entire node/label bounds that
       // have moved behind a fully opaque curtain. Never alter graph positions.
-      const left = width * .22, right = width * .86;
+      const cx = width / 2, cyCenter = height / 2, radius = Math.min(width, height) / 2;
+      const left = cx - radius, right = cx + radius;
       const sides = new Map();
       cy.batch(() => {
         cy.nodes().forEach(node => {
-          const x = node.renderedPosition().x, zoom = cy.zoom();
+          const {x, y} = node.renderedPosition(), zoom = cy.zoom();
           // Bounds must be independent of visibility; hidden renderer bounds can
           // collapse and cause repeated hide/show cycles at the curtain edge.
           const label = String(node.style('label') || node.data('label') || '');
           const labelWidth = Math.max(...label.split('\n').map(line => line.length)) * parseFloat(node.style('font-size')) * zoom;
           const halfWidth = Math.max(node.width() * zoom * .7, labelWidth / 2) + 8;
+          const halfHeight = node.height() * zoom * .7 + (label.split('\n').length + 2) * parseFloat(node.style('font-size')) * zoom + 8;
+          const hidden = Math.hypot(Math.max(0, Math.abs(x - cx) - halfWidth), Math.max(0, Math.abs(y - cyCenter) - halfHeight)) > radius;
           const side = x + halfWidth < left ? -1 : x - halfWidth > right ? 1 : 0;
           sides.set(node.id(), side);
-          if (node.hasClass('viewport-occluded') !== Boolean(side)) node.toggleClass('viewport-occluded', Boolean(side));
-          if (side) dragArtworkCache.delete(node.id());
+          if (node.hasClass('viewport-occluded') !== hidden) node.toggleClass('viewport-occluded', hidden);
+          if (hidden) dragArtworkCache.delete(node.id());
         });
         cy.edges().forEach(edge => {
           const side = sides.get(edge.source().id());
@@ -402,7 +406,7 @@
       clearTimeout(edgeFadeTimer);
       edgeFadeTimer = setTimeout(() => {
         if (viewportDragging) cy.edges().addClass('viewport-drag-hidden');
-      }, 180);
+      }, 650);
     }
     function finishViewportDrag() {
       heldPointers.clear();
@@ -425,6 +429,7 @@
     global.addEventListener('blur', finishViewportDrag);
     document.addEventListener('visibilitychange', visibilityChanged);
     cy.on('pan', beginViewportDrag);
+    cy.on('tapstart', event => { if (event.target === cy || event.target.isEdge?.()) beginViewportDrag(); });
 
     function paintNodeArtwork(context, node, sprite, size, motion, hovered, x, y) {
       const scale = 1 + 0.18 * motion.emphasis;
