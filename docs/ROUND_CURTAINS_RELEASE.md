@@ -30,3 +30,9 @@ The radius now uses 60% of the shorter viewport dimension, a 20% increase.
 The mask receives this exact radius through `--curtain-radius`, keeping the
 visual boundary and conservative culling synchronized. The inner 78% remains
 clear. The user explicitly authorized immediate publication of this adjustment.
+
+Published as `1ddc0d8` on `gh-pages`; live manifest, renderer and stylesheet
+hashes match the verified production artifact. Focused desktop onboarding,
+circle culling/reveal and introduction checks passed, with screenshot review.
+The full onboarding suite stalled after its desktop checks and was stopped;
+its remaining checks are not reported as passing for this release.
