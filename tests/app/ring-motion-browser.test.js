@@ -5,11 +5,12 @@ const {chromium} = require(require.resolve('playwright', {paths:[path.join(os.ho
   const browser = await chromium.launch({headless:true,channel:'msedge'});
   try {
     for (const reduced of [false,true]) {
-      const page = await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:reduced?'reduce':'no-preference'});
+      const page = await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:2,reducedMotion:reduced?'reduce':'no-preference'});
       const errors=[]; page.on('pageerror', e=>errors.push(e.message));
       await page.addInitScript(()=>localStorage.setItem('ai-knowledge-map.onboarding.v1',JSON.stringify({version:1,skipped:true,read:0,cursor:0})));
       await page.goto((process.argv[2]||'http://127.0.0.1:5103/')+'?lang=zh-Hans#/map');
       await page.waitForFunction(()=>window.__cy?.nodes('.motion-art').length===130);
+      assert.equal(await page.evaluate(()=>document.getElementById('node-ring-motion').width),await page.evaluate(()=>__cy.container().clientWidth),'ring canvas uses one pixel per CSS pixel on high-DPI screens');
       const official=process.argv.includes('--official');
       if(official){
         await page.locator('#official-path-toggle').click();
@@ -49,6 +50,16 @@ const {chromium} = require(require.resolve('playwright', {paths:[path.join(os.ho
       assert.notDeepEqual(await page.evaluate(()=>({...__cy.pan()})),initialPan,'actual background drag pans map');
       const heldA=await pixels();await page.waitForTimeout(300);const heldB=await pixels();
       assert.deepEqual(heldA.ringPixels,heldB.ringPixels,'decorative ring freezes while dragging');
+      const reused=await page.evaluate(async()=>{
+        const proto=CanvasRenderingContext2D.prototype,original=proto.rotate;
+        let rotations=0;proto.rotate=function(...args){rotations++;return original.apply(this,args);};
+        try {
+          __cy.emit('render');
+          await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+          return rotations;
+        } finally {proto.rotate=original;}
+      });
+      assert.equal(reused,0,'drag repaint reuses rasterized node artwork without repeating ring rotation');
       await page.mouse.up();
       await page.waitForTimeout(550);
       assert.equal(await page.evaluate(()=>__cy.edges('.viewport-drag-fade, .viewport-drag-hidden').length),0,'edges restored on release');
