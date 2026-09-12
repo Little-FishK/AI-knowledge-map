@@ -22,3 +22,11 @@ phase at 200 ms, actual drag and release recover correctly. Artifact verified.
 
 Published with explicit user authorization as `69e86b4` on `gh-pages`.
 Live manifest, renderer and stylesheet hashes match the verified build.
+
+## Larger circle
+
+Rollback tag in both repositories: `codex/pre-larger-circle-20260912`.
+The radius now uses 60% of the shorter viewport dimension, a 20% increase.
+The mask receives this exact radius through `--curtain-radius`, keeping the
+visual boundary and conservative culling synchronized. The inner 78% remains
+clear. The user explicitly authorized immediate publication of this adjustment.

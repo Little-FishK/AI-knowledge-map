@@ -359,7 +359,8 @@
       if (!width || !height) return;
       // Keep the fade bands rendered; cull only entire node/label bounds that
       // have moved behind a fully opaque curtain. Never alter graph positions.
-      const cx = width / 2, cyCenter = height / 2, radius = Math.min(width, height) / 2;
+      const cx = width / 2, cyCenter = height / 2, radius = Math.min(width, height) * .6;
+      curtains.style.setProperty('--curtain-radius', radius + 'px');
       const left = cx - radius, right = cx + radius;
       const sides = new Map();
       cy.batch(() => {
