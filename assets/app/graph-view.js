@@ -333,6 +333,7 @@
         } },
         { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '160ms'} },
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
+        { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
         { selector: ".hidden", style: { "display": "none" } }
       ],
       layout: { name: "preset" }
@@ -345,6 +346,41 @@
     ringCanvas.setAttribute('aria-hidden', 'true');
     ringCanvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:3';
     cy.container().appendChild(ringCanvas);
+    const curtains = document.createElement('div');
+    curtains.id = 'map-side-curtains';
+    curtains.setAttribute('aria-hidden', 'true');
+    cy.container().appendChild(curtains);
+    let cullingDirty = true;
+    function updateCurtainCulling() {
+      if (!cullingDirty) return;
+      cullingDirty = false;
+      const width = cy.container().clientWidth;
+      if (!width) return;
+      // Keep the fade bands rendered; cull only entire node/label bounds that
+      // have moved behind a fully opaque curtain. Never alter graph positions.
+      const left = width * .22, right = width * .86;
+      const sides = new Map();
+      cy.batch(() => {
+        cy.nodes().forEach(node => {
+          const x = node.renderedPosition().x, zoom = cy.zoom();
+          // Bounds must be independent of visibility; hidden renderer bounds can
+          // collapse and cause repeated hide/show cycles at the curtain edge.
+          const label = String(node.style('label') || node.data('label') || '');
+          const labelWidth = Math.max(...label.split('\n').map(line => line.length)) * parseFloat(node.style('font-size')) * zoom;
+          const halfWidth = Math.max(node.width() * zoom * .7, labelWidth / 2) + 8;
+          const side = x + halfWidth < left ? -1 : x - halfWidth > right ? 1 : 0;
+          sides.set(node.id(), side);
+          if (node.hasClass('viewport-occluded') !== Boolean(side)) node.toggleClass('viewport-occluded', Boolean(side));
+          if (side) dragArtworkCache.delete(node.id());
+        });
+        cy.edges().forEach(edge => {
+          const side = sides.get(edge.source().id());
+          const hidden = Boolean(side && side === sides.get(edge.target().id()));
+          if (edge.hasClass('viewport-occluded') !== hidden) edge.toggleClass('viewport-occluded', hidden);
+        });
+      });
+    }
+    cy.on('pan zoom resize position data', () => { cullingDirty = true; });
     const ringContext = ringCanvas.getContext('2d');
     const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
     const ringSprites = {};
@@ -447,7 +483,7 @@
       const dt = Math.min(0.1, Math.max(0, (time - (ringLastTime || time)) / 1000));
       ringLastTime = time;
       if (!active) { hoveredRing = null; return; }
-      cy.nodes().not('.hidden').forEach(node => {
+      cy.nodes().not('.hidden, .viewport-occluded').forEach(node => {
         const sprite = ringSprites[node.data('domain')];
         if (!sprite) return;
         const p = node.renderedPosition(), size = node.width() * cy.zoom();
@@ -483,6 +519,7 @@
       // so bursts of map renders cannot paint the rings repeatedly in one frame.
       if (ringDirty || (!viewportDragging && time - ringLastTime >= 1000 / 30)) {
         ringDirty = false;
+        updateCurtainCulling();
         renderRings(time);
       }
       ringFrame = requestAnimationFrame(ringTick);
@@ -493,7 +530,7 @@
       const x = event.clientX - box.left, y = event.clientY - box.top;
       let nearest = Infinity;
       hoveredRing = null;
-      cy.nodes().not('.hidden').not('.dim').forEach(node => {
+      cy.nodes().not('.hidden, .viewport-occluded').not('.dim').forEach(node => {
         const p = node.renderedPosition(), distance = Math.hypot(p.x - x, p.y - y);
         if (distance <= node.width() * cy.zoom() / 2 && distance < nearest) {
           nearest = distance; hoveredRing = node.id();
@@ -508,6 +545,7 @@
     cy.on('destroy', () => {
       clearTimeout(edgeFadeTimer);
       dragArtworkCache.clear();
+      curtains.remove();
       global.removeEventListener('pointerup', releasePointer, true);
       global.removeEventListener('pointercancel', releasePointer, true);
       global.removeEventListener('blur', finishViewportDrag);
