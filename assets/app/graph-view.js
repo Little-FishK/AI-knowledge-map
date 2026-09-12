@@ -714,6 +714,18 @@
     const localLayouts = {'supervised-learning': supervisedOffsets, 'neural-network': neuralOffsets, 'attention': attentionOffsets, 'llm': llmOffsets, 'context-window': contextOffsets, 'multimodal': multimodalOffsets};
 
     const batchLayouts = {
+      'rlhf': {
+        support: ['reinforcement-learning', 'fine-tuning', 'information-theory', 'post-training'], peer: ['constitutional-ai'], risk: ['reward-hacking', 'bias-fairness'], output: ['alignment'],
+        offsets: { 'reinforcement-learning': [-125, -185], 'fine-tuning': [-205, -65], 'information-theory': [-205, 65], 'post-training': [-125, 185], 'constitutional-ai': [245, -285], 'alignment': [700, 0], 'reward-hacking': [0, 210], 'bias-fairness': [135, 185] }
+      },
+      'constitutional-ai': {
+        support: ['governance'], peer: ['rlhf'], risk: [], output: ['alignment', 'reward-hacking'],
+        offsets: { 'governance': [-195, 0], 'rlhf': [245, -245], 'alignment': [420, -125], 'reward-hacking': [680, 0] }
+      },
+      'training-data-governance': {
+        support: [], peer: [], risk: [], output: ['pretraining', 'synthetic-data', 'data-poisoning', 'privacy', 'bias-fairness', 'scaling-law'],
+        offsets: { 'pretraining': [300, -230], 'synthetic-data': [480, -150], 'data-poisoning': [620, -75], 'privacy': [760, 0], 'bias-fairness': [500, 110], 'scaling-law': [320, 190] }
+      },
       'adversarial-robustness': {
         support: ['curse-of-dimensionality'], peer: ['jailbreak'], risk: [], output: ['neural-network'],
         offsets: { 'curse-of-dimensionality': [-195, 0], 'jailbreak': [245, -235], 'neural-network': [660, 0] }
