@@ -23,5 +23,6 @@ baseline, rebuild through `node tools/build-website.js production`, verify the
 artifact and follow the normal publication workflow. Never reset unrelated
 workspace changes or force-push the public branch.
 
-This trial has not been deployed. Cached node images and reduced render resolution
-are outside this first trial.
+Published with explicit user authorization as `f6be6cf` on `gh-pages`.
+The live release manifest and renderer hash were verified against the tested build.
+Cached node images and reduced render resolution are outside this first trial.
