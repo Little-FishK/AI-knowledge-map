@@ -8,6 +8,7 @@
   let storage = null, storageFailed = false, returnFocus = null, previousTitle = document.title;
   let state = model.normalize(null, count);
   let view = 'map';
+  let stopNodeMotion = () => {};
   try {
     storage = global.localStorage;
     state = model.normalize(JSON.parse(storage.getItem(model.key)), count);
@@ -49,7 +50,38 @@
     }).join('');
     return `<figure class="dd-fig"><svg viewBox="0 0 360 ${height}" role="img" aria-labelledby="onboarding-fig-title onboarding-fig-desc"><title id="onboarding-fig-title">${escape(lesson.short)}：图解</title><desc id="onboarding-fig-desc">${escape(cards.map(row => row.join('：')).join('。'))}</desc>${diagram}</svg><figcaption>图1 · ${escape(caption)}</figcaption></figure>`;
   }
+  function startNodeMotion() {
+    const preference = global.matchMedia('(prefers-reduced-motion: reduce)');
+    const animations = [];
+    root.querySelectorAll('.onboarding-dot').forEach(dot => {
+      const spin = dot.querySelector('.onboarding-ring-spin');
+      const animation = spin.animate([{transform:'rotate(0deg)'}, {transform:'rotate(360deg)'}], {duration:48000,iterations:Infinity});
+      const button = dot.closest('button');
+      const emphasize = value => {
+        dot.classList.toggle('is-hovered', value);
+        animation.updatePlaybackRate(value ? 16 : 1);
+      };
+      dot.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') emphasize(true); });
+      dot.addEventListener('pointerleave', () => emphasize(false));
+      button.addEventListener('focus', () => emphasize(true));
+      button.addEventListener('blur', () => emphasize(false));
+      animations.push(animation);
+    });
+    const update = () => animations.forEach(animation => {
+      if (preference.matches || document.hidden || root.hidden) animation.pause();
+      else animation.play();
+    });
+    preference.addEventListener('change', update);
+    document.addEventListener('visibilitychange', update);
+    update();
+    stopNodeMotion = () => {
+      animations.forEach(animation => animation.cancel());
+      preference.removeEventListener('change', update);
+      document.removeEventListener('visibilitychange', update);
+    };
+  }
   function render(focus = false) {
+    stopNodeMotion();
     const lesson = lessons[state.cursor];
     const last = state.cursor === count - 1;
     const isMap = view === 'map';
@@ -64,7 +96,8 @@
       ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
         const locked = index > state.read;
         const read = index < state.read;
-        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><img class="onboarding-dot" src="assets/node-art/${nodeArtwork[index]}.png?v=2" alt="" aria-hidden="true" width="96" height="96"><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
+        const src = `assets/node-art/${nodeArtwork[index]}.png?v=2`;
+        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true"><img class="onboarding-face" src="${src}" alt=""><span class="onboarding-hover-band"></span><span class="onboarding-ring"><img class="onboarding-ring-spin" src="${src}" alt=""></span></span><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
       }).join('')}</ol>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
@@ -75,6 +108,7 @@
       <div class="onboarding-footer"><button class="onboarding-prev" type="button" data-prev ${state.cursor === 0 ? 'disabled' : ''}>← 上一站</button>
         <button class="onboarding-next" type="button" data-next>${last ? '读过，进入完整地图' : state.cursor < state.read ? '下一站 →' : '读过，下一站 →'}</button></div>
       </article>`}${isMap ? '' : '<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p>'}</div>`;
+    if (isMap) startNodeMotion();
     if (focus) {
       root.querySelector(isMap ? '[data-skip]' : '#onboarding-lesson-title').focus({preventScroll: true});
       root.scrollTop = 0;
@@ -94,6 +128,7 @@
     document.documentElement.classList.remove('onboarding-pending');
   }
   function close() {
+    stopNodeMotion();
     root.hidden = true;
     app.inert = false;
     document.documentElement.classList.remove('onboarding-pending');
