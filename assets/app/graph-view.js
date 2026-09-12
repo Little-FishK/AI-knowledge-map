@@ -163,8 +163,8 @@
       container: document.getElementById("cy"),
       elements: elements,
       minZoom: 0.2, maxZoom: 3,
-      // Cap high-DPI canvas growth: 2x DPR means four times as many pixels.
-      pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+      // Render at CSS-pixel resolution to bound high-DPI drawing cost.
+      pixelRatio: 1,
       style: [
         {
           selector: "node",
@@ -349,6 +349,7 @@
     const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
     const ringSprites = {};
     const ringStates = new Map();
+    const dragArtworkCache = new Map();
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
     let ringDisposed = false, ringActive = false;
     let ringDirty = true;
@@ -357,6 +358,7 @@
     function beginViewportDrag() {
       if (viewportDragging || !heldPointers.size) return;
       viewportDragging = true;
+      dragArtworkCache.clear();
       hoveredRing = null;
       ringStates.forEach(motion => { motion.emphasis = 0; });
       ringLastTime = performance.now(); ringDirty = true;
@@ -370,6 +372,7 @@
       heldPointers.clear();
       if (!viewportDragging) return;
       viewportDragging = false;
+      dragArtworkCache.clear();
       clearTimeout(edgeFadeTimer);
       cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
       ringLastTime = performance.now(); ringDirty = true;
@@ -387,11 +390,49 @@
     document.addEventListener('visibilitychange', visibilityChanged);
     cy.on('pan', beginViewportDrag);
 
+    function paintNodeArtwork(context, node, sprite, size, motion, hovered, x, y) {
+      const scale = 1 + 0.18 * motion.emphasis;
+        context.save();
+        context.globalAlpha = Number(node.style('opacity'));
+        context.translate(x, y);
+        if (node.hasClass('sl-support')) {
+          const green = context.createRadialGradient(-size * 0.12, -size * 0.14, 0, 0, 0, size * 0.4);
+          green.addColorStop(0, '#9af7d8'); green.addColorStop(1, '#19af8d');
+          context.beginPath(); context.arc(0, 0, size * 0.38, 0, Math.PI * 2);
+          context.fillStyle = green; context.fill();
+          if (hovered) { context.strokeStyle = '#ffffff'; context.lineWidth = size * 0.045; context.stroke(); }
+          context.restore(); return;
+        }
+        if (node.hasClass('official-path-node')) {
+          // Keep the official order and gold/black hierarchy stationary while
+          // reusing the same domain ring as the ordinary map.
+          context.beginPath(); context.arc(0, 0, size * 0.38, 0, Math.PI * 2);
+          context.fillStyle = node.style('background-color'); context.fill();
+          context.fillStyle = node.style('color');
+          context.font = `${node.style('font-weight')} ${parseFloat(node.style('font-size')) * cy.zoom()}px ${node.style('font-family')}`;
+          context.textAlign = 'center'; context.textBaseline = 'middle';
+          context.fillText(String(node.data('officialOrder')), 0, 0, size * 0.70);
+        } else {
+          context.drawImage(sprite.face, -size / 2, -size / 2, size, size);
+        }
+        // White band starts exactly at the face's radius (38% of icon size).
+        if (motion.emphasis > 0.005) {
+          context.save();
+          context.globalAlpha *= motion.emphasis;
+          context.beginPath(); context.arc(0, 0, size * 0.4025, 0, Math.PI * 2);
+          context.strokeStyle = '#ffffff'; context.lineWidth = size * 0.045;
+          context.stroke(); context.restore();
+        }
+        context.rotate(motion.angle);
+        context.drawImage(sprite.ring, -size * scale / 2, -size * scale / 2, size * scale, size * scale);
+        context.restore();
+    }
+
     function renderRings(time = performance.now()) {
       if (!ringReady || ringDisposed) return;
       const container = cy.container();
       const w = container.clientWidth, h = container.clientHeight;
-      const dpr = Math.min(global.devicePixelRatio || 1, 1.5);
+      const dpr = 1;
       if (ringCanvas.width !== Math.round(w * dpr) || ringCanvas.height !== Math.round(h * dpr)) {
         ringCanvas.width = Math.round(w * dpr); ringCanvas.height = Math.round(h * dpr);
         ringCanvas.style.width = w + 'px'; ringCanvas.style.height = h + 'px';
@@ -417,40 +458,22 @@
         motion.emphasis += ((hovered ? 1 : 0) - motion.emphasis) * Math.min(1, dt * 12);
         if (!viewportDragging && !motionPreference.matches) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
         const scale = 1 + 0.18 * motion.emphasis;
-        ringContext.save();
-        ringContext.globalAlpha = Number(node.style('opacity'));
-        ringContext.translate(p.x, p.y);
-        if (node.hasClass('sl-support')) {
-          const green = ringContext.createRadialGradient(-size * 0.12, -size * 0.14, 0, 0, 0, size * 0.4);
-          green.addColorStop(0, '#9af7d8'); green.addColorStop(1, '#19af8d');
-          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.38, 0, Math.PI * 2);
-          ringContext.fillStyle = green; ringContext.fill();
-          if (hovered) { ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.045; ringContext.stroke(); }
-          ringContext.restore(); return;
-        }
-        if (node.hasClass('official-path-node')) {
-          // Keep the official order and gold/black hierarchy stationary while
-          // reusing the same domain ring as the ordinary map.
-          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.38, 0, Math.PI * 2);
-          ringContext.fillStyle = node.style('background-color'); ringContext.fill();
-          ringContext.fillStyle = node.style('color');
-          ringContext.font = `${node.style('font-weight')} ${parseFloat(node.style('font-size')) * cy.zoom()}px ${node.style('font-family')}`;
-          ringContext.textAlign = 'center'; ringContext.textBaseline = 'middle';
-          ringContext.fillText(String(node.data('officialOrder')), 0, 0, size * 0.70);
+        if (viewportDragging) {
+          // Freeze and rasterize each visible node once per gesture. Pan frames
+          // reuse the composed face/ring, including official numbers and gradients.
+          const key = [size, motion.angle, node.classes().join(' '), node.style('opacity'), node.data('officialOrder')].join('|');
+          let cached = dragArtworkCache.get(node.id());
+          if (!cached || cached.key !== key) {
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = Math.ceil(size * 1.3) + 4;
+            paintNodeArtwork(canvas.getContext('2d'), node, sprite, size, motion, false, canvas.width / 2, canvas.height / 2);
+            cached = {key, canvas};
+            dragArtworkCache.set(node.id(), cached);
+          }
+          ringContext.drawImage(cached.canvas, p.x - cached.canvas.width / 2, p.y - cached.canvas.height / 2);
         } else {
-          ringContext.drawImage(sprite.face, -size / 2, -size / 2, size, size);
+          paintNodeArtwork(ringContext, node, sprite, size, motion, hovered, p.x, p.y);
         }
-        // White band starts exactly at the face's radius (38% of icon size).
-        if (motion.emphasis > 0.005) {
-          ringContext.save();
-          ringContext.globalAlpha *= motion.emphasis;
-          ringContext.beginPath(); ringContext.arc(0, 0, size * 0.4025, 0, Math.PI * 2);
-          ringContext.strokeStyle = '#ffffff'; ringContext.lineWidth = size * 0.045;
-          ringContext.stroke(); ringContext.restore();
-        }
-        ringContext.rotate(motion.angle);
-        ringContext.drawImage(sprite.ring, -size * scale / 2, -size * scale / 2, size * scale, size * scale);
-        ringContext.restore();
       });
     }
 
@@ -484,6 +507,7 @@
     cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
     cy.on('destroy', () => {
       clearTimeout(edgeFadeTimer);
+      dragArtworkCache.clear();
       global.removeEventListener('pointerup', releasePointer, true);
       global.removeEventListener('pointercancel', releasePointer, true);
       global.removeEventListener('blur', finishViewportDrag);
