@@ -94,10 +94,10 @@
       ${isMap ? '' : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
       ${isMap ? '' : `<p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>`}
       ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
-        const locked = index > state.read;
+        if (index > state.read) return '';
         const read = index < state.read;
         const src = `assets/node-art/${nodeArtwork[index]}.png?v=2`;
-        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" data-visit="${index}" ${locked ? 'disabled' : ''} ${!locked && !read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true"><img class="onboarding-face" src="${src}" alt=""><span class="onboarding-hover-band"></span><span class="onboarding-ring"><img class="onboarding-ring-spin" src="${src}" alt=""></span></span><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
+        return `<li class="${read ? 'is-read' : 'is-current'}"><button type="button" data-visit="${index}" ${!read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true"><img class="onboarding-face" src="${src}" alt=""><span class="onboarding-hover-band"></span><span class="onboarding-ring"><img class="onboarding-ring-spin" src="${src}" alt=""></span></span><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
       }).join('')}</ol>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
