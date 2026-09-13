@@ -27,10 +27,37 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/clustering/#page","name":"聚类：相似度、簇形状与用途共同决定分组","description":"从 K-means 的分配—更新手算，到层次、DBSCAN、混合模型、选 k、稳定性和业务解释。","url":"https://ai-knowledge-map.com/zh/concepts/clustering/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"聚类：相似度、簇形状与用途共同决定分组","item":"https://ai-knowledge-map.com/zh/concepts/clustering/"}]}]</script>
-</head><body class="concept-preview">
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
-<header class="preview-header"><a class="preview-brand" href="/?lang=zh-Hans#/map">◈ AI 知识地图</a>
-<span>简体中文</span><a href="/search/">搜索与文字目录</a><a class="release-directory-link" href="/about/">关于与纠错</a></header>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-reset" class="btn" title="重置视图" data-i18n="controls.reset" data-i18n-title="controls.reset">重置</button>
+      <button id="btn-onboarding" class="btn" type="button" data-i18n="onboarding.open">新手导览</button>
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
 <main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">聚类：相似度、簇形状与用途共同决定分组</span></li></ol></nav><article id="dd-article" data-concept-id="clustering">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">聚类：相似度、簇形状与用途共同决定分组</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从 K-means 的分配—更新手算，到层次、DBSCAN、混合模型、选 k、稳定性和业务解释。</p>
@@ -56,4 +83,35 @@
         <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">14</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">你能否不用背术语，解释它的机制、边界与验证方法？</p><div class="dd-quiz"><ol><li>第一次更新后的两个中心是什么？</li><li>本例J从多少降到多少？</li><li>DBSCAN的核心点怎样定义？</li><li>single linkage的典型风险？</li><li>为什么不能直接比较两次运行的“簇1”？</li><li>假设“聚类：相似度、簇形状与用途共同决定分组”在离线示例上表现正常、上线后核心结果却下降，你会怎样按输入、内部变换、输出反馈和适用边界定位问题？</li></ol></div><details class="dd-answers"><summary>参考答案</summary><ol><li>μ₁=(4/3,4/3)，μ₂=(8.5,8)。</li><li>从3降到11/6≈1.833。</li><li>ε邻域内至少有minPts个点。</li><li>少量桥接点造成链化。</li><li>簇编号可任意置换，要先按样本重叠或中心匹配。</li><li>先保存同一失败样本及环境，确认输入、权限和前置条件没有漂移；再记录关键中间状态，检查机制是否按本页描述完成变换；随后把原始输出与独立指标、人工终验对照；最后用边界样例和对照实验复测。只有定位到首次偏离预期的环节，才能判断应修改数据、机制、评测还是使用边界。</li></ol></details></section>
         <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf" target="_blank" rel="noopener">k-means++: The Advantages of Careful Seeding</a>：初始化与近似保证</li><li><a href="https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf" target="_blank" rel="noopener">DBSCAN</a>：密度聚类与噪声</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>：聚类与混合模型</li><li><a href="https://onlinelibrary.wiley.com/doi/book/10.1002/9780470316801" target="_blank" rel="noopener">Finding Groups in Data</a>：聚类分析与验证</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
 <nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/clustering">在地图中查看概念关系</a></nav>
-</article></main></body></html>
+</article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

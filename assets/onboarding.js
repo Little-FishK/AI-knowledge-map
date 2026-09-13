@@ -189,5 +189,9 @@
   });
   document.getElementById('btn-onboarding').addEventListener('click', open);
   global.AI_ONBOARDING = Object.freeze({ready, open, isOpen});
-  if (model.unlocked(state, count)) close(); else open();
+  if (new URLSearchParams(location.search).get('onboarding') === '1') {
+    const url = new URL(location.href); url.searchParams.delete('onboarding');
+    history.replaceState(null, '', url);
+    open();
+  } else if (model.unlocked(state, count)) close(); else open();
 })(window);
