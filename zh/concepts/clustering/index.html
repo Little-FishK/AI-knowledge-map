@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>聚类：相似度、簇形状与用途共同决定分组 · AI 知识地图</title>
 <meta name="description" content="从 K-means 的分配—更新手算，到层次、DBSCAN、混合模型、选 k、稳定性和业务解释。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/clustering/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/clustering/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/clustering/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="聚类：相似度、簇形状与用途共同决定分组">
@@ -82,7 +84,7 @@
         <section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">13</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2><p class="dd-lead">这个概念怎样从问题一路连接到可验证的实践？</p><ol class="dd-chain"><li>定义用途、表示和距离</li><li>选择与簇形状匹配的算法</li><li>多初始化并调粒度参数</li><li>用重采样匹配检查稳定</li><li>由样本和领域知识解释</li><li>以下游增益与公平风险决定采用</li></ol></section>
         <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">14</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">你能否不用背术语，解释它的机制、边界与验证方法？</p><div class="dd-quiz"><ol><li>第一次更新后的两个中心是什么？</li><li>本例J从多少降到多少？</li><li>DBSCAN的核心点怎样定义？</li><li>single linkage的典型风险？</li><li>为什么不能直接比较两次运行的“簇1”？</li><li>假设“聚类：相似度、簇形状与用途共同决定分组”在离线示例上表现正常、上线后核心结果却下降，你会怎样按输入、内部变换、输出反馈和适用边界定位问题？</li></ol></div><details class="dd-answers"><summary>参考答案</summary><ol><li>μ₁=(4/3,4/3)，μ₂=(8.5,8)。</li><li>从3降到11/6≈1.833。</li><li>ε邻域内至少有minPts个点。</li><li>少量桥接点造成链化。</li><li>簇编号可任意置换，要先按样本重叠或中心匹配。</li><li>先保存同一失败样本及环境，确认输入、权限和前置条件没有漂移；再记录关键中间状态，检查机制是否按本页描述完成变换；随后把原始输出与独立指标、人工终验对照；最后用边界样例和对照实验复测。只有定位到首次偏离预期的环节，才能判断应修改数据、机制、评测还是使用边界。</li></ol></details></section>
         <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf" target="_blank" rel="noopener">k-means++: The Advantages of Careful Seeding</a>：初始化与近似保证</li><li><a href="https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf" target="_blank" rel="noopener">DBSCAN</a>：密度聚类与噪声</li><li><a href="https://hastie.su.domains/Papers/ESLII.pdf" target="_blank" rel="noopener">The Elements of Statistical Learning</a>：聚类与混合模型</li><li><a href="https://onlinelibrary.wiley.com/doi/book/10.1002/9780470316801" target="_blank" rel="noopener">Finding Groups in Data</a>：聚类分析与验证</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/clustering">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/clustering">在地图中查看概念关系</a><a href="/en/concepts/clustering/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

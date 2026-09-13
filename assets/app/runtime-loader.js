@@ -60,7 +60,7 @@
         const envelope = await response.json(), payload = envelope.payload;
         const sourceFields = {};
         for (const key of ["title", "subtitle", "aliases", "meta", "thesis", "html"]) if (source[key] !== undefined) sourceFields[key] = source[key];
-        if (envelope.schemaVersion !== 1 || envelope.status !== "human-approved" || payload?.pageId !== id
+        if (envelope.schemaVersion !== 1 || !["human-approved", "machine-reviewed"].includes(envelope.status) || payload?.pageId !== id
           || envelope.artifactHash !== await digest(payload) || payload.sourceContentHash !== await digest(sourceFields)) return fallback();
         const page = payload.page;
         if (!page || typeof page.title !== "string" || typeof page.html !== "string"
