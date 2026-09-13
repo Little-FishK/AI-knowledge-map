@@ -163,8 +163,9 @@
       container: document.getElementById("cy"),
       elements: elements,
       minZoom: 0.2, maxZoom: 3,
-      // Render at CSS-pixel resolution to bound high-DPI drawing cost.
-      pixelRatio: 1,
+      // Supersample labels and native graph strokes for readable small text.
+      // Decorative node artwork keeps its independent CSS-pixel canvas/cache.
+      pixelRatio: 2,
       style: [
         {
           selector: "node",
