@@ -332,6 +332,7 @@
           'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
           'target-arrow-color': '#8fb87f'
         } },
+        { selector: 'edge.viewport-drag-restore', style: {'transition-property': 'opacity', 'transition-duration': '1350ms'} },
         { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '600ms'} },
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
@@ -400,7 +401,7 @@
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
     let ringDisposed = false, ringActive = false;
     let ringDirty = true;
-    let viewportDragging = false, edgeFadeTimer = null;
+    let viewportDragging = false, edgeFadeTimer = null, edgeRestoreTimer = null;
     const heldPointers = new Set();
     function beginViewportDrag() {
       if (viewportDragging || !heldPointers.size) return;
@@ -410,7 +411,11 @@
       ringStates.forEach(motion => { motion.emphasis = 0; });
       ringLastTime = performance.now(); ringDirty = true;
       if (state.selected) return;
-      cy.edges().addClass('viewport-drag-fade');
+      clearTimeout(edgeRestoreTimer);
+      cy.batch(() => {
+        cy.edges().removeClass('viewport-drag-restore');
+        cy.edges().addClass('viewport-drag-fade');
+      });
       clearTimeout(edgeFadeTimer);
       edgeFadeTimer = setTimeout(() => {
         if (viewportDragging && !state.selected) cy.edges().addClass('viewport-drag-hidden');
@@ -422,7 +427,13 @@
       viewportDragging = false;
       dragArtworkCache.clear();
       clearTimeout(edgeFadeTimer);
-      cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
+      const fadedEdges = cy.edges('.viewport-drag-fade');
+      cy.batch(() => {
+        if (!state.selected) fadedEdges.addClass('viewport-drag-restore');
+        cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
+      });
+      clearTimeout(edgeRestoreTimer);
+      edgeRestoreTimer = setTimeout(() => cy.edges().removeClass('viewport-drag-restore'), 1400);
       ringLastTime = performance.now(); ringDirty = true;
     }
     const holdPointer = event => { heldPointers.add(event.pointerId); };
@@ -557,6 +568,7 @@
     cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
     cy.on('destroy', () => {
       clearTimeout(edgeFadeTimer);
+      clearTimeout(edgeRestoreTimer);
       dragArtworkCache.clear();
       curtains.remove();
       global.removeEventListener('pointerup', releasePointer, true);
@@ -1510,7 +1522,11 @@
     });
 
     function applyFocus() {
-      if (state.selected) finishViewportDrag();
+      if (state.selected) {
+        finishViewportDrag();
+        clearTimeout(edgeRestoreTimer);
+        cy.edges().removeClass('viewport-drag-restore');
+      }
       cullingDirty = true;
       updateCurtainCulling();
       ringDirty = true;
