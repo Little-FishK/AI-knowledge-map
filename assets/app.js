@@ -390,9 +390,16 @@
       goToRoute({ name: targetMode === "software" ? "software" : targetMode === "library" ? "library" : "map" });
     }));
 
-  window.addEventListener("hashchange", () => applyRoute());
-  if (window.location.hash) applyRoute();
-  else goToRoute({ name: "map" }, { replace: true });
+  function applyLocationRoute() {
+    const route = ROUTER.parse(window.location.hash);
+    // Old bookmarks remain valid; ordinary map URLs have no fragment.
+    if (route.name === "map" && !route.id && window.location.hash) {
+      ROUTER.navigate(route, { replace: true });
+    }
+    applyRoute(route);
+  }
+  window.addEventListener("hashchange", applyLocationRoute);
+  applyLocationRoute();
 
   // 暴露给调试用
   window.__cy = cy;

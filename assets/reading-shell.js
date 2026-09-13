@@ -11,13 +11,13 @@
   window.createMapSettings({language,manifest:window.I18N_MANIFEST,content:{ensureLocale:async () => {}}});
   const route = (hash, extra = '') => `${base}?lang=${encodeURIComponent(language.getLocale())}${extra}${hash}`;
   bar.querySelectorAll('[data-mode]').forEach(button => {
-    button.onclick = () => location.assign(route('#/' + (button.dataset.mode === 'graph' ? 'map' : button.dataset.mode)));
+    button.onclick = () => location.assign(route(button.dataset.mode === 'graph' ? '' : '#/' + button.dataset.mode));
   });
-  document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('#/map')));
-  document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('#/map', '&onboarding=1')));
+  document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('')));
+  document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('', '&onboarding=1')));
   const brand = bar.querySelector('.brand');
   brand.setAttribute('role','link'); brand.tabIndex = 0;
-  brand.onclick = () => location.assign(route('#/map'));
+  brand.onclick = () => location.assign(route(''));
   brand.onkeydown = event => { if (event.key === 'Enter') brand.click(); };
   const search = document.getElementById('search');
   search.addEventListener('keydown', event => {

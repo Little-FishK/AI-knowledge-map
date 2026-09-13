@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>决策树与集成方法：用分裂规则组合非线性决策 · AI 知识地图</title>
 <meta name="description" content="从不纯度、信息增益、剪枝到随机森林和梯度提升，理解树模型对表格数据的优势与泄漏风险。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/decision-tree/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/decision-tree/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/decision-tree/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="决策树与集成方法：用分裂规则组合非线性决策">
@@ -84,7 +86,7 @@
         <section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">15</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2><p class="dd-lead">这个概念怎样从问题一路连接到可验证的实践？</p><ol class="dd-chain"><li>候选阈值划分样本</li><li>不纯度增益选择分裂</li><li>递归形成分段规则</li><li>单树高方差</li><li>bagging 平均或 boosting 逐步纠错</li><li>时间切分和独立验证决定泛化</li></ol></section>
         <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">16</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">你能否不用背术语，解释它的机制、边界与验证方法？</p><div class="dd-quiz"><ol><li>分裂增益衡量什么？</li><li>单树为何不稳？</li><li>随机森林如何去相关？</li><li>Boosting 后树学什么？</li><li>重要度等于因果吗？</li><li>假设“决策树与集成方法：用分裂规则组合非线性决策”在离线示例上表现正常、上线后核心结果却下降，你会怎样按输入、内部变换、输出反馈和适用边界定位问题？</li><li>如何为“决策树与集成方法：用分裂规则组合非线性决策”设计一个最小对照实验，证明观察到的改善来自核心机制，而不是数据、提示、权限或评测口径同时变化？</li></ol></div><details class="dd-answers"><summary>参考答案</summary><ol><li>子节点相对父节点的不纯度下降。</li><li>高方差，样本扰动会改变结构。</li><li>bootstrap 样本和随机特征子集。</li><li>当前损失的残差或负梯度。</li><li>不等于。</li><li>先保存同一失败样本及环境，确认输入、权限和前置条件没有漂移；再记录关键中间状态，检查机制是否按本页描述完成变换；随后把原始输出与独立指标、人工终验对照；最后用边界样例和对照实验复测。只有定位到首次偏离预期的环节，才能判断应修改数据、机制、评测还是使用边界。</li><li>固定数据、模型版本、提示、权限、预算和评测，只改变一个与核心机制直接相关的因素，并在多个样本与随机种子上重复；同时保存中间状态和失败样本。若差异只在目标因素变化时稳定出现，才支持机制解释，否则应继续排查混杂变量。</li></ol></details></section>
         <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://link.springer.com/article/10.1023/A:1010933404324" target="_blank" rel="noopener">Random Forests</a>：随机森林</li><li><a href="https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boosting-machine/10.1214/aos/1013203451.full" target="_blank" rel="noopener">Greedy Function Approximation: A Gradient Boosting Machine</a>：梯度提升</li><li><a href="https://arxiv.org/abs/1603.02754" target="_blank" rel="noopener">XGBoost</a>：可扩展正则化提升树</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/decision-tree">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/decision-tree">在地图中查看概念关系</a><a href="/en/concepts/decision-tree/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
