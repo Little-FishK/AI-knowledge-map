@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  const base = new URL('.',document.currentScript.src.replace(/assets\/release-navigation\.js$/, ''));
+  const base = new URL('../', document.currentScript.src);
   const link = document.createElement('a'); link.className='release-directory-link';link.href=new URL('search/',base);link.textContent='文字目录 / Search';
   if (!document.querySelector('[data-release-search]')) document.getElementById('topbar')?.append(link);
   function legacy() {
