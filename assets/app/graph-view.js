@@ -332,7 +332,7 @@
           'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
           'target-arrow-color': '#8fb87f'
         } },
-        { selector: 'edge.viewport-drag-restore', style: {'transition-property': 'opacity', 'transition-duration': '1350ms'} },
+        { selector: 'edge.viewport-drag-restore', style: {'transition-property': 'opacity', 'transition-duration': '675ms'} },
         { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '600ms'} },
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
@@ -433,7 +433,7 @@
         cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
       });
       clearTimeout(edgeRestoreTimer);
-      edgeRestoreTimer = setTimeout(() => cy.edges().removeClass('viewport-drag-restore'), 1400);
+      edgeRestoreTimer = setTimeout(() => cy.edges().removeClass('viewport-drag-restore'), 725);
       ringLastTime = performance.now(); ringDirty = true;
     }
     const holdPointer = event => { heldPointers.add(event.pointerId); };
