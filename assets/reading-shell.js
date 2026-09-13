@@ -13,8 +13,8 @@
   bar.querySelectorAll('[data-mode]').forEach(button => {
     button.onclick = () => location.assign(route('#/' + (button.dataset.mode === 'graph' ? 'map' : button.dataset.mode)));
   });
-  document.getElementById('btn-reset').onclick = () => location.assign(route('#/map'));
-  document.getElementById('btn-onboarding').onclick = () => location.assign(route('#/map', '&onboarding=1'));
+  document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('#/map')));
+  document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('#/map', '&onboarding=1')));
   const brand = bar.querySelector('.brand');
   brand.setAttribute('role','link'); brand.tabIndex = 0;
   brand.onclick = () => location.assign(route('#/map'));
