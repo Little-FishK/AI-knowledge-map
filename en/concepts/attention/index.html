@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Attention Mechanism · AI Knowledge Map</title>
+<meta name="description" content="When processing each word, let the model decide for itself which words in the sentence to &#39;look at&#39;.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/attention/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/attention/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/attention/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Attention Mechanism">
+<meta property="og:description" content="When processing each word, let the model decide for itself which words in the sentence to &#39;look at&#39;.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/attention/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Attention Mechanism">
+<meta name="twitter:description" content="When processing each word, let the model decide for itself which words in the sentence to &#39;look at&#39;.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/attention/#page","name":"Attention Mechanism","description":"When processing each word, let the model decide for itself which words in the sentence to 'look at'.","url":"https://ai-knowledge-map.com/en/concepts/attention/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Attention Mechanism","item":"https://ai-knowledge-map.com/en/concepts/attention/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Attention Mechanism</span></li></ol></nav><article id="dd-article" data-concept-id="attention">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Attention Mechanism</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">When processing each word, let the model decide for itself which words in the sentence to &#39;look at&#39;.</p>
+<p class="dd-ali">Attention · Self-Attention · Self-attention</p>
+<p class="dd-metabar">Suggested 30–40 minutes · Intermediate · Requires: vector dot product, softmax, familiarity with &#39;neural networks&#39;.</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Standard global attention computes matching scores between each query and visible keys, then aggregates values by normalized weights; it is essentially a weighted sum whose weights are jointly determined by content, position, and masking. It shortens long-distance information paths and allows positions to be processed in parallel during training, but the weights are not interpretability guarantees, nor do they automatically equal correct causal relationships.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer for yourself:</div>
+  <ul>
+    <li><b>What problem to solve</b>—what is the core challenge the model faces when understanding a word?</li>
+    <li><b>Core mechanism</b>—how the three steps of Query / Key / Value let the model “decide for itself what to look at.”</li>
+    <li><b>Why it is a turning point</b>—the two ways it outperforms older sequence models.</li>
+    <li><b>Multi-head</b>—why run several groups of attention in parallel.</li>
+    <li><b>Cost</b>—where its quadratic cost comes from and what it constrains.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Understanding a word requires looking at the related words in the sentence, and those related words may be far away and change with the content—classic RNNs cannot handle this.<span>(§1)</span></li>
+    <li>Attention uses Q/K/V in three steps: Query·Key computes matching scores, softmax turns them into weights, and a weighted sum over Values is computed according to those weights.<span>(§2)</span></li>
+    <li>Softmax turns the scaled scores into weights, and the weighted sum of Values produces a new representation; the weights are not a causal explanation.<span>(§3)</span></li>
+    <li>When Q/K/V all come from the same sentence, that is self-attention: the words in the sentence look at each other.<span>(§4)</span></li>
+    <li>It allows any two positions to interact directly within one layer and can be trained in parallel, improving the long paths and serial bottleneck of classic RNNs.<span>(§5)</span></li>
+    <li>Multi-head provides multiple projection subspaces; specialization may occur, or it may be redundant.<span>(§6)</span></li>
+    <li>The score matrix of standard global attention has quadratic cost; long contexts can also exhibit positional bias, but “Lost in the Middle” cannot be attributed solely to quadratic complexity.<span>(§7)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The core problem to solve<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Understanding a word in a sequence depends not only on the word itself but also on which words in the context it is related to. For example, in a sentence containing "Xiaohong" and "she", to correctly understand "she", it must be linked to the preceding "Xiaohong". This associated word may be several positions away, and what needs attention changes with the sentence content, so it cannot be resolved by fixed rules such as "only look at the previous few words".</p>
+<p>The attention mechanism enables the model to dynamically decide, based on the current content, which positions in the sequence should be attended to for each position. The input is a set of representations for all words in the sequence. When processing a word, the model first compares its representation with those of other words one by one to obtain content relevance, then converts these relevance scores into weights and aggregates the information carried by each position according to the weights. Positions with higher relevance contribute more to the aggregated result; the final output is a new representation for each word that combines information from the entire sequence.</p>
+<p>Therefore, a higher weight for a word indicates that it is more relevant to the current word in the current context, not that it is closer in position. The causal chain can be summarized as: word representation → content comparison with other positions → different attention weights → information aggregation weighted by these weights → a new context-aware representation. This process simultaneously addresses two issues: "distant information may be important" and "the target of attention must change with the content."</p>
+<p>Before attention mechanisms became mainstream, recurrent networks typically processed words one by one in order and passed memory forward along time steps. The longer the chain through which information passes, the harder it is to retain earlier content; different time steps depend on each other, making parallelization difficult. Gated recurrent networks can alleviate the information-retention problem, but cannot eliminate the two structural constraints of long propagation paths and sequential computation.</p>
+<p>Attention provides a mechanism for learning how to associate content and aggregate information, not a guarantee of correctness. That weights are produced by content comparison does not mean the model will necessarily place the highest weight on the truly correct position; whether the model can learn appropriate attention relationships still depends on training outcomes and input conditions.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Core Mechanism: Query / Key / Value<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>To let the model decide which positions the current word should attend to, each word first generates three vectors with different purposes from its own input representation: Query, Key, and Value. Query represents "What am I looking for?", Key represents "What can I be matched by?", and Value is the content that actually participates in aggregation after a successful match. Taking the pronoun "she" as an example, its Query can look for possible referents; each word in the sentence provides its own Key for comparison and simultaneously prepares a corresponding Value as information that can be taken away.</p>
+<p>Attention computation consists of three steps: matching, normalization, and aggregation. In the first step, the current word's Query is dotted with the Keys of all visible words, producing a row of matching scores. The larger the dot product, the better this Query–Key pair matches in the current attention computation. In the second step, the scores are passed through softmax, converting them into a set of non-negative weights that sum to 1; positions with larger scores receive larger weights. In the third step, these weights are used to compute a weighted sum of the Values at all positions, producing a new representation of the current word that incorporates global information.</p>
+<p>Arrange the vectors of all visible tokens into matrices Q, K, and V respectively. The whole process can be written as:</p>
+<p>Attention(Q, K, V) = softmax(Q·Kᵀ / <math class="dd-inline-root" aria-label="根号 d"><msqrt><mtext>d</mtext></msqrt></math>) · V</p>
+<p>Q·Kᵀ computes the dot products between every query and every key simultaneously. The T in Kᵀ denotes transpose, so that the matrix dimensions correspond to pairwise comparisons of "each Query against all Keys". d is the dimensionality of the Query and Key vectors; dividing by <math class="dd-inline-root" aria-label="根号 d"><msqrt><mtext>d</mtext></msqrt></math> is to prevent the dot-product values from becoming too large as vector dimensionality increases. Softmax normalizes the row of scores corresponding to each Query, producing attention weights; multiplying by V then completes the weighted sum over all Values. The inputs are Q, K, and V, and the output is a new representation for each Query after aggregating its visible Values.</p>
+<p>When processing "she", its Query is compared with the Keys of "Xiaohong" and every other word in the sentence. If "Xiaohong" receives the highest weight after softmax, the new representation of "she" will absorb more of "Xiaohong"'s Value. The thickness of the lines in the figure corresponds to the weight magnitude: the line to "Xiaohong" is thicker, indicating that it contributes more information in this aggregation.</p>
+<p>The final scores are not determined solely by distance between words. Query–Key content matching is the core source; if the model also uses masking, positional bias, RoPE, or local windows, these mechanisms affect the scores or the visible range before softmax, allowing position and distance to contribute to the result. Masking can make certain positions invisible, local windows restrict the comparable range, and positional mechanisms change the matching conditions at different relative positions.</p>
+<p>A word receiving a high weight only means that it is a better match under the current attention head, current input, and current visibility conditions; it is not an explanation probability, nor can it alone prove that it is the only cause of the model's final conclusion. Attention weights describe how the Value aggregation proportions are distributed in this step, and their explanatory scope should be limited to the interior of this computation.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 180" role="img" aria-label="When processing &apos;she&apos;, attention weights favor &apos;Xiaohong&apos;.">
+      <g font-size="14">
+        <rect x="30" y="40" width="70" height="30" rx="5" fill="#21252d" stroke="#2c313b"/><text x="65" y="60" text-anchor="middle" class="svg-tn" font-size="13">Xiaoming</text>
+        <rect x="130" y="40" width="70" height="30" rx="5" fill="#21252d" stroke="#2c313b"/><text x="165" y="60" text-anchor="middle" class="svg-tn" font-size="13">book</text>
+        <rect x="230" y="40" width="70" height="30" rx="5" fill="#21252d" stroke="#4f9d78" stroke-width="2"/><text x="265" y="60" text-anchor="middle" class="svg-tn" font-size="13">Xiaohong</text>
+        <rect x="330" y="40" width="70" height="30" rx="5" fill="#21252d" stroke="#2c313b"/><text x="365" y="60" text-anchor="middle" class="svg-tn" font-size="13">birthday</text>
+      </g>
+      <rect x="430" y="120" width="70" height="30" rx="5" fill="#1a1d23" stroke="#6b8cbe" stroke-width="2"/><text x="465" y="140" text-anchor="middle" class="svg-tn" font-size="13">she</text>
+      <text x="465" y="112" text-anchor="middle" class="svg-t" font-size="11">Query</text>
+      <line x1="450" y1="120" x2="80" y2="72" stroke="#6b7484" stroke-width="1"/>
+      <line x1="452" y1="120" x2="165" y2="72" stroke="#6b7484" stroke-width="1"/>
+      <line x1="454" y1="120" x2="265" y2="72" stroke="#4f9d78" stroke-width="3.5"/>
+      <line x1="456" y1="120" x2="365" y2="72" stroke="#6b7484" stroke-width="1.2"/>
+      <text class="svg-t" fill="#4f9d78" font-size="12" x="20" y="167" style="font-size:12px"><tspan x="20" y="167">Highest weight → looks toward "Xiaohong"</tspan></text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1: When processing "she", its Query matches the Keys of every word, and after softmax "Xiaohong" receives the highest weight, so "she" primarily aggregates "Xiaohong"'s information. Thickness indicates weight magnitude.</figcaption>
+  </figure>
+<table class="dd-table">
+    <thead><tr><th>Vector</th><th>Role</th><th>In one sentence</th></tr></thead>
+    <tbody>
+      <tr><td>Query (query)</td><td>What am I looking for?</td><td>"She" sends out: I am looking for the person I refer to.</td></tr>
+      <tr><td>Key (key)</td><td>What can I provide?</td><td>Each word presents a "label" for others to match.</td></tr>
+      <tr><td>Value (value)</td><td>My actual content.</td><td>Once selected, the information that is actually aggregated.</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula">Attention(Q, K, V) = softmax( Q·Kᵀ / <span class="dd-radical" role="math" aria-label="square root of d"><span class="dd-radicand">d</span></span> ) · V</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Work Through Scaled Dot-Product Attention by Hand<span class="dd-badge math">Numerical Example</span></h2>
+<div class="dd-agent-response"><p>Suppose a query q = [1, 0], two keys k₁ = [1, 0], k₂ = [0, 1], key dimension d = 2; the values corresponding to the two keys are v₁ = [2, 0] and v₂ = [0, 4], respectively. This set of inputs can fully demonstrate how scaled dot-product attention goes from "matching degree" to "information mixing result".</p>
+<p>First, compute the dot product of the query with each key:</p>
+<p>[q·k₁, q·k₂] = [1×1 + 0×0, 1×0 + 0×1] = [1, 0]</p>
+<p>The first score is higher, indicating that q matches k₁ better. Next, use <math class="dd-inline-root" aria-label="根号 d"><msqrt><mtext>d</mtext></msqrt></math> = <math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> scale these two scores:</p>
+<p>[1, 0] / <math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> ≈ [0.707, 0]</p>
+<p>Scaling does not change the relative order of the two keys; it only controls the numerical scale of the scores. Then apply softmax to the scaled scores. Softmax first exponentiates each score, then divides by the sum of all exponentials:</p>
+<p>softmax([0.707, 0]) = [exp(0.707), exp(0)] / [exp(0.707) + exp(0)] ≈ [0.670, 0.330]</p>
+<p>In this way, the original matching scores are converted into two weights that sum to 1. Since k₁ is the better match, the corresponding v₁ receives the larger weight of 0.670; v₂ receives the smaller weight of 0.330. Finally, use these weights to compute a weighted sum of the Values:</p>
+<p>0.670v₁ + 0.330v₂ = 0.670[2, 0] + 0.330[0, 4] = [1.340, 0] + [0, 1.320] = [1.340, 1.320]</p>
+<p>The final output is not a direct copy of the best-matching v₁; instead, it mixes the two Values according to the matching weights. This clarifies the roles of Key and Value: comparing the Query with the Keys determines "how much to take" from each position, while the Value determines "what to actually take" from that position. The complete chain from input to output is: dot product of query and key → scale by dimension → softmax normalization → mix the Values using the resulting weights → output a new vector representation.</p>
+<p>The 0.670 and 0.330 values here are only coefficients for this one information-mixing step in the current layer and current attention head. A higher weight indicates that the corresponding key matches the query better, but it is not an explanatory probability and cannot prove that the corresponding token is the sole reason for the model's conclusion; residual connections, other attention heads, and later layers will continue to change the representation.</p></div>
+<table class="dd-table"><thead><tr><th>Step</th><th>Calculation</th><th>Result (approx.)</th></tr></thead><tbody><tr><td>Dot product</td><td><code>[q·k₁,q·k₂]</code></td><td><code>[1,0]</code></td></tr><tr><td>Scaling</td><td><code>[1,0]/<span class="dd-radical" role="math" aria-label="2 的平方根"><span class="dd-radicand">2</span></span></code></td><td><code>[0.707,0]</code></td></tr><tr><td>softmax</td><td><code>exp(s)/Σexp(s)</code></td><td><code>[0.670,0.330]</code></td></tr><tr><td>Weighted sum</td><td><code>0.670v₁+0.330v₂</code></td><td><code>[1.340,1.320]</code></td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Self-Attention: Looking at Each Other Within a Sentence<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>In self-attention, the Query, Key, and Value are all produced from the word representations of the same sequence, so each word in the sequence can both issue a query and provide keys for other words to match against and values to be aggregated. It addresses how the words within a sentence refer to one another, thereby forming contextual understanding of roles and relationships.</p>
+<p>The input is the representations of all words in a sentence. For each word, the model generates its Query and compares relevance with the Keys of all words in the same sentence; after obtaining weights, it then computes a weighted sum of those words' Values. Because this process is carried out at every position, the output still corresponds to each word in the sentence, but each output is no longer just the isolated representation of that word; instead, it is a new representation that incorporates the information visible within the sentence.</p>
+<p>For example, when "Xiaohong" and "she" appear in the same sentence, the Query of "she" will match the various Keys in the sentence, including "Xiaohong". If "Xiaohong" receives a larger weight, the output representation of "she" will absorb more of the Value of "Xiaohong", thereby establishing the association between the two in the current sentence. When a word mainly looks toward another word, this indicates that they are more related in this within-sentence attention computation; this describes an information aggregation relationship, not a fixed lexical relation independent of context.</p>
+<p>The "self" limits the source of information: Query, Key, and Value come from the same sequence. If the Query comes from one sequence while the Key and Value come from another sequence, this variant is called cross-attention. Its matching, normalization, and weighted-sum mechanisms remain unchanged; what changes is the source of the querying side and the information being queried. For example, in translation, the Query of each word in the target sequence can match the Keys of the source sequence and aggregate information from the corresponding Values in the source.</p>
+<p>Therefore, self-attention is suitable for modeling cross-references within a sequence, while cross-attention is suitable for allowing one sequence to selectively read another sequence. The boundary between the two is determined by where Q, K, and V come from, not by the computational form of dot product, softmax, or weighted sum.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Why It Is a Turning Point<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>A classic RNN processes sequences serially across time steps: step t+1 must wait for the state from step t to be produced, and information from earlier positions can only reach later positions along a chain of step-by-step propagation. Attention changes both of these structural constraints. It receives representations of all tokens in the entire sequence, allows each position to directly match all visible positions, and simultaneously outputs new representations for each position that fuse context.</p>
+<p>For information separated by n positions, the interaction path in a classic RNN usually grows with the distance, requiring propagation over about n time steps. Global self-attention allows any two visible positions to interact directly within the same layer: one position's Query can directly match another position's Key, and its Value is weighted and aggregated. In the figure, information in the RNN propagates step by step along positions, while attention establishes direct connections between visible positions, reflecting exactly this path difference.</p>
+<p>Shorter interaction paths are beneficial for learning long-range dependencies, because distant information does not have to pass through a series of intermediate states before it can contribute to the current representation. But a “shorter path” does not mean that information is unchanged, nor does it guarantee that the model necessarily learns the correct associations. Information still goes through vector projection, score scaling, softmax, Value aggregation, and subsequent layers; attention weights may also fail to land on truly useful positions. Therefore, what it improves is the structural condition for long-range interaction, not an automatic guarantee of correct understanding.</p>
+<p>Another turning point comes from parallelism. RNN time steps have dependencies from earlier to later, making it impossible to complete computations for all positions simultaneously in the same layer; in attention, matching and aggregation for each position can be computed in parallel, without waiting for the previous position to complete. This allows hardware to process many positions in a sequence at the same time, making fuller use of GPUs.</p>
+<p>This parallelism directly affects whether model and data sizes can continue to scale up in engineering terms. If training were still constrained by step-by-step serial dependencies, the larger the model and the more data, the more likely training time would become impractical. Attention transforms the main interactions within a sequence into parallel whole-sequence computation, providing a key condition for training today's large models along the path of scaling up model and data size.</p>
+<p>Attention is a turning point not merely because it can represent relationships between words, but because the same mechanism simultaneously alleviates two bottlenecks: using direct interaction within a layer to shorten long-range information paths, and enabling computation across all positions to be parallel. The former improves the conditions for learning long-range dependencies, while the latter makes large-scale training feasible from an engineering standpoint.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 200" role="img" aria-label="RNN step-by-step propagation path is long; attention connects any two words directly">
+      <text class="svg-t" x="20" y="15" style="font-size:12px"><tspan x="20" y="15">RNN: information propagates step by step along the chain; the farther apart, the </tspan><tspan x="20" y="31">more it attenuates, and it must also be serial</tspan></text>
+      <g>
+        <circle cx="60" cy="60" r="16" fill="#21252d" stroke="#6b7484"/><circle cx="160" cy="60" r="16" fill="#21252d" stroke="#6b7484"/><circle cx="260" cy="60" r="16" fill="#21252d" stroke="#6b7484"/><circle cx="360" cy="60" r="16" fill="#21252d" stroke="#6b7484"/><circle cx="460" cy="60" r="16" fill="#21252d" stroke="#cf6f6f"/>
+        <line x1="76" y1="60" x2="144" y2="60" stroke="#6b7484" stroke-width="1.6" marker-end="url(#d1)"/><line x1="176" y1="60" x2="244" y2="60" stroke="#6b7484" stroke-width="1.6" marker-end="url(#d1)"/><line x1="276" y1="60" x2="344" y2="60" stroke="#6b7484" stroke-width="1.6" marker-end="url(#d1)"/><line x1="376" y1="60" x2="444" y2="60" stroke="#6b7484" stroke-width="1.6" marker-end="url(#d1)"/>
+        <text text-anchor="middle" class="svg-t" fill="#cf6f6f" x="280" y="95" style="font-size:12px"><tspan x="280" y="95">For the 1st word to influence the 5th word, it has to go through 4 steps.</tspan></text>
+      </g>
+      <text class="svg-t" x="20" y="115" style="font-size:12px"><tspan x="20" y="115">Attention: any two words are directly connected, path length is always 1, and </tspan><tspan x="20" y="131">computed simultaneously.</tspan></text>
+      <g>
+        <circle cx="60" cy="165" r="16" fill="#21252d" stroke="#6b8cbe"/><circle cx="160" cy="165" r="16" fill="#21252d" stroke="#6b8cbe"/><circle cx="260" cy="165" r="16" fill="#21252d" stroke="#6b8cbe"/><circle cx="360" cy="165" r="16" fill="#21252d" stroke="#6b8cbe"/><circle cx="460" cy="165" r="16" fill="#21252d" stroke="#6b8cbe"/>
+        <path d="M60,149 C160,110 360,110 460,149" fill="none" stroke="#4f9d78" stroke-width="2"/>
+        <path d="M160,149 C260,120 360,120 460,149" fill="none" stroke="#4f9d78" stroke-width="1.2" opacity=".6"/>
+        <path d="M60,181 C200,205 320,205 460,181" fill="none" stroke="#4f9d78" stroke-width="1.2" opacity=".6"/>
+      </g>
+      <defs><marker id="d1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 2  In a classic RNN, information separated by n time steps must go through a propagation chain whose length grows with n; global attention allows any two visible positions to interact directly within one layer. Shorter paths are beneficial for learning long-range dependencies, but information still passes through projection, softmax, and subsequent layers, and it is not “attenuation-free”.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Multi-head Attention: Why Multiple Heads?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>A single attention head uses one set of Query, Key, and Value projections to measure correlation between tokens, but the same pair of words may simultaneously have grammatical, referential, positional, and other relationships. Multi-head attention runs multiple attention heads in parallel within the same layer, providing multiple representation subspaces and multiple information routes for these different matching patterns, without having to squeeze all relationships into the same set of scores.</p>
+<p>The input is the same set of word representations. Each attention head uses its own projections to transform the input into that head's Q, K, and V, and computes matching scores, softmax weights, and a weighted sum of Value in its own subspace. Because different heads use different projections, even with the same input they can form different attention distributions and extract different content from different positions. The outputs of the heads are then concatenated and passed through another projection, producing a new representation that fuses multiple perspectives.</p>
+<p>This computational chain can be summarized as: the same set of input representations → each head projects into a different subspace → each head independently computes attention and aggregates information → concatenate the results of all heads → project into the layer's combined output. Multi-head mechanisms do not solve the problem of 'repeating the same result several times,' but rather give the model multiple simultaneous opportunities to learn relationships and transmit information.</p>
+<p>After training, some heads may show fairly clear grammatical, referential, or positional patterns. For example, one head may often link pronouns to their referents, while another may pay more attention to neighboring positions. However, the architecture does not pre-specify 'which head handles which type of relationship'; if such specialization emerges, it is learned during training rather than being a rule written in by humans.</p>
+<p>Multi-head attention also does not guarantee that every head forms a stable, independent, and easily interpretable role. Many heads may be redundant with each other, and the same head may not express only one relationship. Therefore, observing a certain attention pattern can serve as an analytical clue, but one cannot infer the function of each head merely from the architecture's name. What multi-head attention provides is the capacity for multiple subspaces and parallel routing; whether a clear division of labor actually forms must be determined through empirical analysis.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Its Cost: Quadratic Overhead<span class="dd-badge math">Mathematics</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Global attention allows every token to interact directly with all tokens, and the cost comes precisely from this pairwise comparison. Let the sequence length be n; each position must compute matching scores against n positions, so the attention score matrix contains n×n = n² elements. The model takes representations of all positions as input, performs pairwise scoring, normalization, and Value weighting in turn, and finally outputs a new representation for each position; the score computation—and score storage in a naive implementation—both grow with n².</p>
+<p>Quadratic growth means that when the sequence length doubles, this part of the cost becomes roughly four times as large. For 1 thousand tokens, about 1,000×1,000 = 1 million position pairs must be computed; for 100 thousand tokens, about 100,000×100,000 = 10 billion position pairs are required. This explains why long-context inference quickly becomes slower and more expensive: each time the context increases by one level, attention does not pay a linearly increasing cost.</p>
+<p>n² describes the core cost of attention's pairwise interactions, not the model's total cost. Actual computation also includes Q, K, V projections, output projection, and feed-forward layers; specific memory usage and runtime are also affected by implementation details. FlashAttention can significantly reduce memory traffic and change the actual memory constant, but it does not reduce the computational complexity of global pairwise attention from the quadratic level.</p>
+<p>Quadratic overhead directly limits the context window from being extended arbitrarily. The longer the window, the more position pairs can be compared, and the harder computation and naive memory requirements become to sustain. Long windows may also expose positional biases such as the “lost in the middle” effect, where the model makes better use of information at the beginning and end but underutilizes information in the middle. This phenomenon is related to multiple factors such as training distribution, position representation, and attention patterns, and cannot simply be reduced to “attention weights being diluted.”</p>
+<p>Different optimizations make different trade-offs around this bottleneck. Sparse attention computes only some position pairs; sliding-window attention restricts each position's visible range to nearby regions, both starting by reducing the number of interactions; FlashAttention, by contrast, optimizes the execution process of global attention and reduces data movement. The first two may change visibility relationships and effective complexity, while the latter mainly improves engineering efficiency. They can all alleviate long-context costs, but they cannot be broadly understood as both preserving arbitrary global interaction and completely eliminating the quadratic cost.</p>
+<p>To verify whether an optimization is truly effective, you need to check both efficiency and task capability. You should fix model weights, numerical precision, batch, and hardware, and record task accuracy, peak memory usage, throughput, and p95 latency at input lengths such as 1K, 4K, and 16K. You should also place key evidence at different positions in the sequence to check whether the speedup damages long-distance information utilization through truncation, local windows, or changes in visibility range.</p>
+<p>If speed improves but accuracy on long-distance tasks decreases, you should first check the visibility range and mask to confirm whether key evidence can still be accessed by the query position, then compare the underlying kernel implementation. An attention heatmap can only show a particular weight assignment and cannot replace joint verification of accuracy, memory usage, throughput, and latency.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The starting point of sequence understanding is that a word's meaning often depends on other words in the sentence, and the truly relevant words may be far apart, while what is attended to also changes with content. Classical RNNs rely on state being passed successively along time steps; distant information requires a longer path, and computation is also constrained by dependencies between successive time steps. Attention reframes the problem as “how much information should the current word take from each visible position?”</p>
+<p>Each position first produces Query, Key, and Value. The current Query takes dot products with all Keys, producing content-based matching scores; after these scores are scaled by dimension and passed through softmax, they become weights that sum to 1; these weights are then used to compute a weighted sum over all Values, generating a new representation for the current position. Thus, content matching determines “how much to take,” and Value determines “what to take,” closing the causal chain from original representation to contextual representation.</p>
+<p>The role of softmax is not to select a single position, but to turn a row of scaled scores into weights that can be used to mix information. The position with the highest weight usually contributes the most, but the output can still be a mixture of multiple Values. The weights only describe the proportions of information aggregation in the current head and current layer, not causal proof that a particular token caused the final conclusion.</p>
+<p>When Q, K, and V all come from the same sentence, this mechanism is self-attention. Every position in the sentence can match all visible positions in the same sentence, so relationships between words can be established directly within a single layer. Positional mechanisms and masking can still affect the final scores or the visible range, so “content-determined” means the core matching of the weights comes from Query–Key, rather than adopting the rule that “the closer the distance, the larger the fixed weight.”</p>
+<p>This direct interaction simultaneously changes the information path and the computation method. Two visible positions far apart need not be passed successively along RNN time steps; they can interact directly in one attention layer. Computation at each position in the same layer also need not wait for the previous time step to complete, so it can be parallelized. The shorter path improves the structural conditions for learning long-distance dependencies, while parallelism makes scaling up models and training data more feasible in engineering terms. Together, these two points explain why attention could replace classical RNNs as the core mechanism for large-scale sequence modeling.</p>
+<p>Multi-head attention further provides multiple sets of projection subspaces in the same layer. Different heads can learn different matching methods and information routing, and the results of each head are then concatenated and projected into a combined representation. Some heads may form specialized patterns for syntax, coreference, or position, but this division of labor comes from training, not from architectural presets; there may also be redundancy among multiple heads.</p>
+<p>Directly looking at all positions also brings clear costs. Standard global attention of length n needs to form a score matrix containing n² elements, so computation and naive memory usage grow quadratically with length. This limits expansion of the context window, and long contexts may also exhibit position biases such as “Lost in the Middle”; the latter is also influenced by factors such as training distribution, position representation, and attention patterns, and cannot be attributed solely to quadratic complexity.</p>
+<p>The entire mechanism ultimately forms a set of mutually constraining results: content-based dynamic matching lets the model select relevant information, short paths help distant positions interact, and parallel computation supports scaling; multi-head attention brings multiple representational perspectives, while global pairwise matching incurs quadratic cost. Transformer further packages this mechanism into a standard layer that can be repeatedly stacked.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Roadmap</span></h2>
+<div class="dd-agent-response"><p>Understanding attention mechanisms requires first mastering vectors and dot products, softmax, and neural networks. Vectors and dot products are the basis for computing matching scores between Query and Key, softmax normalizes a row of scores into weights, and neural networks provide the overall background of representation learning and parameter projection. Recurrent neural networks (RNNs) are also an important prerequisite, because the changes that attention brings to path length and parallelism become clear only when compared with RNNs' step-by-step passing.</p>
+<p>The core concepts of attention mechanisms themselves, in order, include Query, Key, Value; self-attention and cross-attention; information path length and parallel computation; multi-head attention; and the quadratic cost caused by global pairwise matching. These concepts connect into a single logical chain: Q/K/V define how information is matched and aggregated; the sources of Q, K, and V determine whether it is self-attention within a sequence or cross-attention across sequences; direct interaction changes path length and supports parallelism; multiple heads provide multiple projection subspaces; and global interaction brings cost that grows quadratically with sequence length.</p>
+<p>After mastering these core concepts, the closely adjacent extension directions are Transformer, positional encoding, vanishing gradients, context window, and lost in the middle. Transformer shows how attention composes into a stackable standard structure; positional encoding adds sequence position information; vanishing gradients help understand why long paths are difficult to train; the context window corresponds to the range of sequence a model can process at one time; and lost in the middle focuses on whether information at different positions in a long sequence is used equally effectively.</p>
+<p>Further learning directions include scaling laws, large language models, and inference optimization represented by FlashAttention. Scaling laws and large language models examine attention's parallel capability in the context of increasing model and data scale, while inference optimization starts from practical execution cost and studies how to alleviate the efficiency pressure of attention in long contexts.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning level</th><th>Concepts involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Vectors and dot products, softmax, neural networks, recurrent neural network (RNN)</td></tr>
+      <tr><td><b>Core on this page</b></td><td>Query/Key/Value, self-attention and cross-attention, path length and parallelism, multi-head, quadratic cost</td></tr>
+      <tr><td>Immediate extensions</td><td>Transformer, positional encoding, vanishing gradients, context window, lost in the middle</td></tr>
+      <tr><td>Further</td><td>Scaling laws, large language models, inference optimization (FlashAttention, etc.)</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Attention Is All You Need</a>: Q/K/V, scaled dot-product, multi-head attention, path length, and complexity.</li>
+    <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>: IO complexity and memory optimization of exact attention.</li>
+    <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>: experiments on position bias in long contexts.</li>
+  </ul>
+  <div class="dd-src-date">Accessed: 2026-07-21</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/attention">Explore connections on the map</a><a href="/zh/concepts/attention/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
