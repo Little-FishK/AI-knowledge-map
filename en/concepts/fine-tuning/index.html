@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Fine-tuning · AI Knowledge Map</title>
+<meta name="description" content="Continue training on a pre-trained “generalist” to turn it into a task-specific “specialist”">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/fine-tuning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/fine-tuning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/fine-tuning/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Fine-tuning">
+<meta property="og:description" content="Continue training on a pre-trained “generalist” to turn it into a task-specific “specialist”">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/fine-tuning/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fine-tuning">
+<meta name="twitter:description" content="Continue training on a pre-trained “generalist” to turn it into a task-specific “specialist”">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/fine-tuning/#page","name":"Fine-tuning","description":"Continue training on a pre-trained “generalist” to turn it into a task-specific “specialist”","url":"https://ai-knowledge-map.com/en/concepts/fine-tuning/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Fine-tuning","item":"https://ai-knowledge-map.com/en/concepts/fine-tuning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Fine-tuning</span></li></ol></nav><article id="dd-article" data-concept-id="fine-tuning">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Fine-tuning</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Continue training on a pre-trained “generalist” to turn it into a task-specific “specialist”</p>
+<p class="dd-ali">Fine-tuning · fine-tuning · instruction fine-tuning SFT</p>
+<p class="dd-metabar">Suggested 30–40 minutes · Intermediate · Requires: basic understanding of pre-training, supervised learning, and large language models</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Fine-tuning is the process of taking an already pre-trained large model and continuing to train it on a batch of targeted data, slightly adjusting its weights to turn a “generalist” into a “specialist” for a particular task or domain. It stands on the shoulders of pre-training, saving the astronomical cost of training from scratch—the underlying principle is called transfer learning.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>What it is</b>— how fine-tuning differs from "training from scratch" and why it is much cheaper.</li>
+    <li><b>Why it works</b>— transfer learning: why you don't need to learn from scratch, just adjust a bit.</li>
+    <li><b>What it can and cannot change</b>— fine-tuning is good at changing behavior, not at stuffing in facts.</li>
+    <li><b>Instruction fine-tuning</b>— how ChatGPT's ability to follow instructions is trained.</li>
+    <li><b>The key to saving cost</b>— why you don't need to modify all several hundred billion parameters (LoRA).</li>
+    <li><b>How to choose</b>— when facing a need, try prompting first, or RAG, or fine-tuning.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Training from scratch is too expensive, so take a pre-trained model as the starting point, use a small amount of data to continue training for a short while — that is fine-tuning.<span>(§1)</span></li>
+    <li>It works because pre-training has already learned general capabilities, and fine-tuning only needs small adjustments (transfer learning).<span>(§2)</span></li>
+    <li>Therefore, fine-tuning is good at changing "behavior/format/style", while stuffing in "large amounts of new facts" should be left to RAG.<span>(§3)</span></li>
+    <li>The most important behavior change is instruction fine-tuning (SFT): using "instruction → ideal response" to teach the base model to become an assistant that follows instructions, essentially supervised learning.<span>(§4)</span></li>
+    <li>Since we only push a small step, there is no need to change all parameters — LoRA freezes the original weights, trains only small matrices, saving memory and being pluggable.<span>(§5)</span></li>
+    <li>Common mistakes are overfitting, catastrophic forgetting, and poor data quality.<span>(§6)</span></li>
+    <li>Therefore, when facing a need, first try prompting, then RAG, and only finally fine-tune — from light to heavy.<span>(§7)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What is fine-tuning<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The problem fine-tuning solves is very direct: powerful pre-trained models already exist, so how do you make one specialize in the exact thing you want to do?</p>
+<p>First, look at the path without fine-tuning. Training a large model from scratch requires massive data, thousands of GPUs, and months of time—most people and teams simply cannot afford it. Fine-tuning takes a different approach: take someone else’s pre-trained model as the starting point, use your own small batch of data, let it continue training for a little while, and the weights are only lightly adjusted. After this step, a generalist becomes a specialist.</p>
+<p>More precisely, fine-tuning has three inputs: a pre-trained model, samples collected for the target task, and a training configuration (learning rate, number of training epochs, etc.). The output is adapted weights, or an adapter that can be attached to the original model. The training process itself is not mysterious: it still computes a task loss and still updates parameters with gradients. The only differences from training from scratch are two: the starting point is not random weights, but pre-trained weights; and the training data no longer covers everything, but is concentrated on your task. Because the starting point is already close to a solution region, only a small step is needed.</p>
+<p>How should the results be interpreted? The most important judgment criterion is the held-out task metric: if the fine-tuned model’s performance on the target task improves, it means the model is better suited to the current task. At the same time, note the other side: if performance on general capabilities or other language slices declines, it means this specialization is accompanied by regression—the model is transferring capability from elsewhere to your task. An ideal fine-tuning is one where the target metric improves while losses on unrelated capabilities are as small as possible.</p>
+<p>The applicable boundary of this path is equally clear. When there is too little data, the task distribution differs too much from what the pre-trained model has seen, or the base model simply does not know the task, a “light nudge” may not be enough. Fine-tuning can efficiently channel existing capabilities toward new uses, but it cannot teach a model something it has never learned out of thin air.</p>
+<p>So in one sentence: fine-tuning is not “building a new model,” but “pushing an existing good model one small step in your direction.”</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>From-scratch training</th><th>Fine-tuning</th></tr></thead>
+    <tbody>
+      <tr><td>Starting point</td><td>Randomly initialized blank model</td><td>Pre-trained model</td></tr>
+      <tr><td>Data volume</td><td>Massive</td><td>Small, targeted</td></tr>
+      <tr><td>Cost</td><td>Exorbitant (compute/time/data)</td><td>Relatively low</td></tr>
+      <tr><td>Output</td><td>A general capability</td><td>A version specialized in a specific task/domain</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Why It Works: Transfer Learning<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The most critical question about fine-tuning is: why is it enough to “continue training briefly” on a small batch of data, without having to start learning from scratch?</p>
+<p>The answer is that the pre-trained model has already learned a large amount of general, reusable things. During pre-training, language models master syntactic structure, common sense, and basic reasoning; vision models master low-level features such as edges, textures, and shapes. These capabilities are useful for almost all downstream tasks and serve as the foundation for any specific application. The specialized thing you want to master often only requires a small adjustment on top of these general capabilities—nudging the existing representations toward your target direction. For example, a model that has read vast amounts of text already knows the word order rules of “subject–predicate–object” and the meanings of a large number of words. When you teach it sentiment classification, the gradients no longer need to rediscover these rules; they only need to slightly shift the existing word-meaning representations toward the “positive/negative sentiment” direction.</p>
+<p>This idea of “moving capabilities learned in one domain to another task” is called transfer learning. Its input is the parameter representation learned in the source task (pre-training), plus a small number of target-task samples; its output is a decision boundary or generation behavior more appropriate for the target task. At the parameter level: during fine-tuning, gradients preferentially adjust the representations and output directions most relevant to the current sample, rather than rediscovering all language rules from scratch. This is the entire source of its savings in data and compute—the most expensive step, pre-training, has already been done for you by others. Figure 1 expresses exactly this relationship: transfer learning is doing small-scale fine-tuning on top of massive pre-trained capability.</p>
+<p>The effectiveness of transfer has clear dependency conditions. The closer the target data is to the coverage of the pre-training corpus or images, the more reusable the base representations, and transfer typically requires fewer samples. Conversely, if the domain, modality, or meaning of labels differs greatly, negative transfer can occur—transfer not only fails to help, but the final performance may even be worse than a simpler specialized solution. By analogy, a knowledgeable person changing careers does not need to go back to elementary school; they only need a period of specialized training for the new position to get started. Fine-tuning relative to a pre-trained model is exactly this specialized training. But the premise of specialized training is that the old knowledge and the new position are truly connected; if the new position requires completely unfamiliar skills, this training has no foundation.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 170" role="img" aria-label="Transfer learning: small-scale fine-tuning on top of massive pre-trained capability">
+      <rect x="30" y="45" width="200" height="80" rx="10" fill="#21252d" stroke="#6b7484"/><text x="130" y="80" text-anchor="middle" class="svg-tn">Pre-trained Model</text><text x="130" y="102" text-anchor="middle" class="svg-t">General capabilities · sky-high training cost</text>
+      <line x1="230" y1="85" x2="285" y2="85" stroke="#6b7484" stroke-width="1.6" marker-end="url(#c1)"/>
+      <text x="257" y="72" text-anchor="middle" class="svg-t" font-size="11">+ a small amount</text><text x="257" y="104" text-anchor="middle" class="svg-t" font-size="11">task data</text>
+      <rect x="285" y="55" width="90" height="60" rx="10" fill="#1a1d23" stroke="#d3a05a"/><text x="330" y="90" text-anchor="middle" class="svg-t">Fine-tuning</text>
+      <line x1="375" y1="85" x2="430" y2="85" stroke="#6b7484" stroke-width="1.6" marker-end="url(#c1)"/>
+      <rect x="430" y="45" width="110" height="80" rx="10" fill="#21252d" stroke="#4f9d78"/><text x="485" y="80" text-anchor="middle" class="svg-tn">Specialist Model</text><text x="485" y="102" text-anchor="middle" class="svg-t">specialized in your task</text>
+      <defs><marker id="c1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1　The expensive step (pre-training) has already been done for you by others. Fine-tuning only pushes a small step on this massive capability using a small amount of data—this is the entire source of its savings in data and compute.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>What It Can and Cannot Change<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>This is the most practical—and most easily misused—section of the page: which problems should use fine-tuning, and which should not?</p>
+<p>One-sentence watershed: fine-tuning is good at changing “behavior”—format, tone, style, way of doing things; it is not good at reliably stuffing in “lots of new facts”—that is better suited to external retrieval (RAG). Along this watershed, common needs can be placed one by one.</p>
+<p>If you want it to consistently output only a certain format, such as JSON, you should fine-tune. Format is a behavioral habit; with enough demonstrations it becomes fixed in the weights. If you want it to answer with a certain fixed tone or style, you should also fine-tune: style is trainable behavior. If you want it to master the way of expressing a particular professional domain, that also goes to fine-tuning—here what is adjusted is “how to say it,” not “which facts to remember.” The common point of these three types of needs is: they change the way the model does things, not what the model knows.</p>
+<p>Conversely, if you want it to know your company's latest documents or data, you should use RAG. Facts need to be updateable and traceable; retrieval can swap knowledge sources at any time and provide sources, while cramming facts into weights both makes them easy to forget and may crowd out other capabilities (Section 6's “forgetting” expands on this). If you only want the model to do as required this once, the lightest choice is prompts and in-context learning: no training, fast iteration, but each call still has token and evaluation costs, and it cannot be said to be solidified.</p>
+<p>The most common misuse scenario is “I want the model to know our company's knowledge”—many people's first reaction is fine-tuning, but most of the time they should use RAG: company knowledge keeps changing, retrieval can update at any time and provide sources. Pouring a pile of facts into weights doesn't learn them solidly and they become outdated. So you can remember a rule of thumb: facts that can't be remembered go to retrieval; habits that can't be changed go to fine-tuning.</p>
+<p>When making a choice, the inputs should be the type of need, knowledge update frequency, traceability requirements, call volume and latency budget, and the output is a solution chosen from prompts, RAG, fine-tuning, or a combination. When interpreting results, also keep the evidence boundary: an improved format pass rate only proves more stable behavior, not that factual coverage is more complete. Behavior and knowledge often appear together, so a real system can completely combine the two—use fine-tuning to fix the output format, then use RAG to provide updateable evidence.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Your need</th><th>Better choice</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Have it consistently output only a certain format (JSON)</td><td>Fine-tuning</td><td>This is a behavioral habit; with enough demonstrations it becomes fixed.</td></tr>
+      <tr><td>Have it answer in a certain fixed tone/style</td><td>Fine-tuning</td><td>Same as above; style is trainable behavior</td></tr>
+      <tr><td>Have it master the way of expressing a particular professional domain</td><td>Fine-tuning</td><td>It adjusts “how to say it,” not “which facts to remember.”</td></tr>
+      <tr><td>Have it know my company's latest documents/data</td><td>RAG (retrieval)</td><td>Facts need to be updateable and traceable; fine-tuning that crams in facts is easy to learn poorly and becomes outdated.</td></tr>
+      <tr><td>Just want it to do as required this one time</td><td>Prompt / in-context learning</td><td>No training, fast iteration, but still has token and evaluation costs</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Instruction fine-tuning: turning a “base model” into an “assistant”<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The previous section said fine-tuning is good at changing “behavior.” One of the most important behavior changes is something you use every day—this is how conversational assistants come about.</p>
+<p>A base model that has just finished pre-training can only “continue writing.” If you ask it a question, it may continue your sentence with more questions instead of answering. This is a direct product of the pre-training objective: the task it learned on massive text is to predict the next word, not to respond to questions. Instruction fine-tuning (SFT) is a supervised fine-tuning step specifically targeting this behavior: it uses a large amount of “instruction → ideal answer” demonstration data to train it, teaching it the behavior of “answer when asked.” After this step, the model changes from a “base model that can continue writing” into an “assistant that can respond.”</p>
+<p>From a mechanistic perspective, instruction fine-tuning is standard supervised learning: here the “instruction” is the input, the “ideal answer” is the label, and during training cross-entropy is used to gradually increase the probability of each token in the demonstration answer (this set of mechanisms is detailed in the “Supervised Learning” deep-dive page). Therefore, strictly speaking: instruction fine-tuning = supervised learning performed on a pre-trained model. It does not introduce any new algorithm; it only takes the pre-trained weights as a starting point and applies the supervised learning objective.</p>
+<p>After instruction fine-tuning, there is often another step of preference alignment (RLHF or DPO): using human preferences for “which answer is better” to make the model more helpful and safer. These three steps—“pre-training → instruction fine-tuning → preference alignment”—are the origin of today’s conversational assistants (see Section 8 of the “Large Language Model” deep-dive page for details).</p>
+<p>When interpreting the results of instruction fine-tuning, you must maintain a boundary: an increase in the instruction-following rate means the model more often reproduces the norms in the training demonstrations; it does not mean the facts in its answers are necessarily correct—errors in the demonstration data will be learned as-is. Situations not covered by the demonstrations, conflicting demonstrations, and incorrectly written refusal criteria in the demonstrations will all be inherited by the model as defects. Preference alignment is likewise only the next stage in the pipeline and cannot replace independent safety evaluation and factuality evaluation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>No Need to Change All Parameters: Parameter-Efficient Fine-Tuning<span class="dd-badge math">Math</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>A practical question: if a model has several hundred billion parameters, does fine-tuning it once require changing all parameters, and is it still expensive? The good news is no. Since fine-tuning was originally only meant to “push it a small step,” there is no need to touch all weights.</p>
+<p>The idea of parameter-efficient fine-tuning (PEFT) is to freeze the vast majority of the original parameters and train only a small number of newly added parameters. The most popular approach is LoRA—attach two low-rank small matrices alongside the original weights, train only them, and use them to represent “the small change to be added to the original weights.” “Rank” can first be understood as the number of mutually independent directions of variation in a matrix; the low-rank hypothesis assumes that task adaptation requires only a few such directions, so there is no need to arbitrarily change every degree of freedom of the original weights. Figure 2 contrasts the two approaches: full fine-tuning updates the entire weight block, which is expensive and requires storing a whole model for each task; LoRA freezes the original weights and trains only the two low-rank small matrices beside them. Trainable parameters can often drop to less than 1%, GPU memory is greatly reduced, and one base model can have multiple “adapters” attached, switched on demand.</p>
+<p>5.1 Worked Example: How a rank-1 LoRA Changes the Output</p>
+<p>Use a 2×2 toy weight to walk through a low-rank update. Let the base matrix W = I (the identity matrix), and let the LoRA adapter be formed by multiplying a column vector B = [0.2, 0.1]ᵀ and a row vector A = [1, −1]. The weight increment ΔW = B × A is a 2×2 matrix of rank at most 1: W is the frozen base weight, ΔW is the increment learned by the adapter; A compresses the input into one low-dimensional direction, and B expands that direction back out to the output space. Here A has only one row and B has only one column, so the product can provide at most one independent direction of change, written as rank(ΔW) ≤ 1.</p>
+<p>Now concretely compute the result for input x = [3, 1]. The base output is Wx = [3, 1], because W is the identity matrix. Adapter increment ΔWx: first A compresses x into a scalar A·x = 1×3 + (−1)×1 = 2, then multiplying by B gives [0.2×2, 0.1×2] = [0.4, 0.2]. Combined output (W + ΔW)x = [3.4, 1.2]. You can see that the adapter applies only a limited correction along the single direction of “increase the first dimension, decrease the second,” without having to change W itself.</p>
+<p>During training, only A and B are updated; W always remains frozen. At deployment time, you can dynamically attach the adapter, or you can merge ΔW back into W and freeze it together. Real LoRA also has a scaling factor, target layer selection, and dropout, which all change the strength of the effective update, but the structure of the low-rank bypass remains unchanged.</p>
+<p>This also explains why such methods are the default choice in practice: they save GPU memory, train quickly, and enable “one base model + multiple pluggable adapters”—to switch tasks, just swap in a small matrix, without having to store a full-size large model for each one. For most teams, parameter-efficient fine-tuning is the starting point; full fine-tuning is used only when necessary.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 180" role="img" aria-label="Full fine-tuning changes the whole weight block; LoRA trains only the small matrices attached at the side.">
+      <g>
+        <text x="120" y="30" text-anchor="middle" class="svg-t">Full fine-tuning</text>
+        <rect x="70" y="45" width="100" height="100" rx="6" fill="#d3a05a" opacity=".75"/><text x="120" y="100" text-anchor="middle" class="svg-tn" font-size="12">Train entire block</text>
+      </g>
+      <g>
+        <text x="400" y="30" text-anchor="middle" class="svg-t">LoRA (parameter-efficient)</text>
+        <rect x="300" y="45" width="100" height="100" rx="6" fill="#21252d" stroke="#6b7484"/><text x="350" y="92" text-anchor="middle" class="svg-t" font-size="12">Frozen</text><text x="350" y="110" text-anchor="middle" class="svg-t" font-size="12">(unchanged)</text>
+        <text x="415" y="98" class="svg-t">+</text>
+        <rect x="432" y="55" width="60" height="16" rx="3" fill="#4f9d78"/><rect x="432" y="119" width="16" height="26" rx="3" fill="#4f9d78"/>
+        <text x="500" y="66" class="svg-t" font-size="11">Only train</text><text x="500" y="140" class="svg-t" font-size="11">small matrices</text>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 2 Full fine-tuning updates the entire weight block (expensive, stores a whole model per task); LoRA freezes the original weights and trains only the two low-rank small matrices alongside. Trainable parameters can often drop to less than 1%, GPU memory is greatly reduced, and one base model can have multiple “adapters” attached on demand.</figcaption>
+  </figure>
+<table class="dd-table"><thead><tr><th>Step</th><th>Result for input x=[3,1]</th></tr></thead><tbody><tr><td>Base output <code>Wx</code></td><td><code>[3,1]</code></td></tr><tr><td>Adapter increment <code>ΔWx</code></td><td><code>[0.4,0.2]</code></td></tr><tr><td>Combined output <code>(W+ΔW)x</code></td><td><code>[3.4,1.2]</code></td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="fine-tuning-lora-rank-one" data-display="mathml"><math display="block" aria-label="权重增量 delta W 等于列向量 B 乘行向量 A，结果是一个秩至多为一的二乘二矩阵"><mrow><mi>ΔW</mi><mo>=</mo><mi>B</mi><mi>A</mi><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mn>0.2</mn></mtd><mtd><mo>−</mo><mn>0.2</mn></mtd></mtr><mtr><mtd><mn>0.1</mn></mtd><mtd><mo>−</mo><mn>0.1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mspace width="0.8em"/><mtext>rank</mtext><mo>(</mo><mi>ΔW</mi><mo>)</mo><mo>≤</mo><mn>1</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Three Pitfalls Most Likely to Trip You Up<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Fine-tuning looks simple, but the failures are concentrated in a few specific places.</p>
+<p>The first pitfall is overfitting. Fine-tuning data is often scarce, and the model can easily memorize those few hundred samples, losing generalization ability—it answers beautifully on training samples but falls apart on a similar unseen question. The countermeasures are lowering the learning rate, early stopping, adding regularization, and not training for too many epochs (see the deep-dive pages on “Overfitting” and “Regularization” for mechanisms).</p>
+<p>The second pitfall is catastrophic forgetting. By focusing single-mindedly on learning a new task, the model forgets the general capabilities learned during pre-training: it becomes able only to output JSON, and everything else degrades. The countermeasures are switching to parameter-efficient fine-tuning (freezing most of the original parameters so that a smaller change surface means less forgetting), further lowering the learning rate, and mixing some general-purpose samples into the training data to remind the model that old skills still need to be preserved.</p>
+<p>The third pitfall is data quality, and it matters more than quantity. The effectiveness of fine-tuning depends heavily on the quality of the demonstration data: a few hundred high-quality, consistently formatted samples often beat a large pile of noise. Dirty data will be faithfully learned by the model—incorrect formats and wrong refusal criteria in the examples will be transferred into the model's behavior unchanged.</p>
+<p>Here is a counterintuitive point: fine-tuning is not “the more you feed it, the better.” Dirty data, large volume, and long training are often worse than small and refined, because you are teaching it to “follow these (bad) examples.” The correct order is to first polish a few hundred samples until they are clean, and only then talk about scale.</p>
+<p>The inputs to the risk check are training curves, an independent task set, a general capability baseline, and a stratified data audit; the output is the localization of overfitting, forgetting, or data defects. Several signals map directly: training loss keeps falling while validation set worsens—that is overfitting; target task improves while general set declines—that is forgetting; errors concentrate on paraphrasing the demonstration wording—then fix the data first. Low learning rate, early stopping, mixing in general-purpose samples, and parameter-efficient fine-tuning can all reduce risk, but they cannot replace an independent held-out set—no matter how you guard against it, the final conclusion can only come from data the model has not seen.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>How to choose: fine-tuning, or not yet fine-tuning<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>When facing a real requirement, what should the first step be? The answer is usually not 'fine-tune right away.'</p>
+<p>View the three methods as a ladder from light to heavy, starting with the most economical and moving up only when it's insufficient. The first level, lightest: prompt and in-context learning. If adjusting wording and providing a few examples is enough, stop there—no training needed, and iteration is fastest (for the mechanism, see the 'In-context Learning' deep-dive page). The second level, in the middle: RAG retrieval. If what's missing is facts or up-to-date knowledge, use external retrieval and don't stuff those into the weights. The third level, heaviest: fine-tuning. Only when you need stable behavior, format, or style, and prompts can't stabilize it and call volume has risen, does fine-tuning become relevant.</p>
+<p>The practical order is therefore: first use prompt and in-context learning to quickly verify 'whether the model can do this at all'; add RAG if facts are missing; only when you need to solidify a certain behavior, and you need long-term stability while saving per-request cost, does fine-tuning truly become worthwhile. In one sentence: fine-tuning is the endpoint, not the starting point.</p>
+<p>The input to this ladder is the same set of representative requirements, quality thresholds, and total cost constraints; the output is the lightest solution that meets the threshold. Comparison must be done on the same test set: quality, latency, per-request tokens, training and maintenance costs must all be considered together. The heavier the solution, the greater the burden of version management and regression testing, so 'stop when it's good enough' itself saves money. Of course, this is the default trial order rather than an absolute rule: in scenarios of strict offline use, extremely low latency, or high call volume, fine-tuning may become economical earlier.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Ladder</th><th>Method</th><th>Try it first, if...</th></tr></thead>
+    <tbody>
+      <tr><td>① Lightest</td><td>Prompt / In-context learning</td><td>Adjust wording and provide a few examples and that's enough → stop here (no training needed; see 'In-context Learning')</td></tr>
+      <tr><td>② Medium</td><td>RAG retrieval</td><td>What's missing is<b>facts / up-to-date knowledge</b> → use external retrieval, don't stuff into weights</td></tr>
+      <tr><td>③ Heaviest</td><td>Fine-tuning</td><td>What you need is<b>stable behavior / format / style</b>, and prompts can't stabilize it and volume has increased → then fine-tune</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connecting the Entire Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Here is how the entire causal chain from beginning to end is connected.</p>
+<p>Training from scratch is too expensive, so we take a pre-trained model as the starting point and continue training for a short while with a small amount of data—this is fine-tuning. It is cheap and effective because pre-training has already learned general capabilities, and fine-tuning only needs a small adjustment; this is transfer learning at work. Precisely because of this, fine-tuning is good at changing 'behavior/format/style', while cramming 'a large amount of new facts' should be left to Retrieval-Augmented Generation (RAG): behaviors can be solidified through demonstration, but facts must be updatable and traceable.</p>
+<p>The most important behavior modification on this chain is instruction fine-tuning (SFT): using 'instruction → ideal answer' to teach the base model to become an assistant that follows instructions, essentially a supervised learning exercise, and then through preference alignment it takes today's conversational assistant form. Since we only push a small step, we do not need to modify all parameters—LoRA freezes the original weights and trains only the small matrices attached on the side, saving memory and being pluggable, making 'pushing a small step' truly feasible in engineering. But fine-tuning is not without risks: overfitting, catastrophic forgetting, and poor data quality—these three pitfalls all arise from this very characteristic of 'data being scarce and narrow, behavior being specialized', and require a low learning rate, early stopping, mixing in general samples, and a held-out set as safeguards.</p>
+<p>Therefore, when facing a new requirement, the endpoint of the causal chain is a sequence of choices from light to heavy: prompt first, then RAG, and only finally fine-tuning—first verify feasibility, then supplement facts, and finally pay the training cost only for behaviors that truly need to be solidified.</p>
+<p>The passing standard is thus also clear: being able to clearly explain 'why fine-tuning is cheap (transfer learning)' and accurately state 'what should be fine-tuned and what should use RAG' captures its most practical core.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Before studying this page, you need to have these concepts: pre-training (where the starting point of fine-tuning comes from), supervised learning (the essence of instruction fine-tuning), large language models (the most frequently appearing application object on this page), and neural networks and weights (what training actually changes).</p>
+<p>The core concepts of this page are: transfer learning (why fine-tuning is cheap and effective), instruction fine-tuning SFT (the step that tunes the base model into an assistant), parameter-efficient fine-tuning and LoRA (the engineering implementation that does not require changing all parameters), catastrophic forgetting (one of the most typical risks of fine-tuning), and the division-of-labor boundaries among fine-tuning, RAG, and prompting.</p>
+<p>The natural next steps extending from these core concepts are overfitting and regularization (means of controlling fine-tuning risk), in-context learning (the lightest rung on the ladder), retrieval-augmented generation RAG (a fact-supply solution complementary to fine-tuning), and alignment and RLHF (the step after instruction fine-tuning).</p>
+<p>Further learning directions include: quantization and deployment (how the trained model actually goes into production), distillation (squeezing large-model capabilities into a small model), evaluation (how to objectively confirm that fine-tuning is really effective), and model selection (questions that should be thought through before fine-tuning).</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Pre-training, supervised learning, large language models, neural networks and weights</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Transfer learning, instruction fine-tuning SFT, parameter-efficient fine-tuning / LoRA, catastrophic forgetting, fine-tuning vs RAG vs prompting</td></tr>
+      <tr><td>Near Extensions</td><td>Overfitting, regularization, in-context learning, retrieval-augmented generation RAG, alignment and RLHF</td></tr>
+      <tr><td>Farther</td><td>Quantization and deployment, distillation, evaluation, model selection</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">Hu et al., LoRA</a>: parameter-efficient fine-tuning mechanism via low-rank adaptation.</li>
+    <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., InstructGPT</a>: supervised fine-tuning, preference data, and reinforcement learning phases.</li>
+    <li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">Dettmers et al., QLoRA</a>: efficient fine-tuning on quantized base models.</li>
+  </ul>
+  <div class="dd-src-date">Accessed: 2026-07-21</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/fine-tuning">Explore connections on the map</a><a href="/zh/concepts/fine-tuning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.querySelector('[transform]'))continue;
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if(text.children.length||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){probe.textContent=line+token;if(line&&probe.getComputedTextLength()>available){lines.push(line);line=token;}else line+=token;}
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
