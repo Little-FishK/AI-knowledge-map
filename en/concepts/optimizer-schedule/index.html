@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory · AI Knowledge Map</title>
+<meta name="description" content="From the state updates of SGD, Momentum, Adam, and AdamW, to warm-up, plateau, decay, batch size, and mixed precision; understand why a training recipe must be tuned as a whole.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/optimizer-schedule/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/optimizer-schedule/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/optimizer-schedule/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory">
+<meta property="og:description" content="From the state updates of SGD, Momentum, Adam, and AdamW, to warm-up, plateau, decay, batch size, and mixed precision; understand why a training recipe must be tuned as a whole.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/optimizer-schedule/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory">
+<meta name="twitter:description" content="From the state updates of SGD, Momentum, Adam, and AdamW, to warm-up, plateau, decay, batch size, and mixed precision; understand why a training recipe must be tuned as a whole.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/optimizer-schedule/#page","name":"Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory","description":"From the state updates of SGD, Momentum, Adam, and AdamW, to warm-up, plateau, decay, batch size, and mixed precision; understand why a training recipe must be tuned as a whole.","url":"https://ai-knowledge-map.com/en/concepts/optimizer-schedule/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory","item":"https://ai-knowledge-map.com/en/concepts/optimizer-schedule/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory</span></li></ol></nav><article id="dd-article" data-concept-id="optimizer-schedule">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Optimizers and Learning Rate Schedules: Turning Instantaneous Gradients into a Controllable Training Trajectory</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From the state updates of SGD, Momentum, Adam, and AdamW, to warm-up, plateau, decay, batch size, and mixed precision; understand why a training recipe must be tuned as a whole.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Backpropagation only delivers gradients for the current batch; the optimizer turns gradient history into parameter updates, and the scheduler makes the overall step size vary with the training stage. What truly determines the trajectory is the combination of direction estimation, per-parameter scaling, global learning rate, batch noise, weight decay, and numerical range, not the name of an optimizer.</div></header>
+<!-- source-body:start -->
+<div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer:</div><ul><li>Why don't we always perform a single SGD step right after obtaining the gradient?</li><li>How does Momentum accumulate consistent directions, and how does Adam scale parameters according to historical squared gradients?</li><li>Why are L2 regularization and AdamW's decoupled weight decay not the same implementation?</li><li>How do warmup, peak learning rate, decay, and batch size form a recipe?</li><li>When seeing oscillation, stagnation, NaN, or validation degradation, what runtime evidence should you look at?</li></ul></div>
+<div class="dd-note key"><b>Recurring scenario</b>　Imagine a two-dimensional loss valley: the horizontal direction is very steep, the vertical direction is very flat. Mini-batch gradients alternate signs in the horizontal direction, but consistently point in the same direction along the vertical. Plain SGD will 'zigzag left and right, making slow progress'; Momentum tries to cancel the alternating component, and Adam also changes the effective step size based on the historical squared gradient in each direction.</div>
+
+<section class="dd-sec"><h2><span class="dd-n">1</span>Why a Gradient Is Not Yet a Reliable Update<span class="dd-badge intuition">Positioning</span></h2><p class="dd-lead">Backpropagation has already computed the slope for each parameter; what is still missing if you simply subtract it?</p><p>The gradient only describes the first-order direction at the current batch and current position. It may contain sampling noise, different parameters may differ in numerical scale by several orders of magnitude, and in narrow valleys it may repeatedly change sign along steep directions. The optimizer's job is not to redefine the objective but to decide how to turn this local, noisy directional evidence into stable updates.</p>
+<table class="dd-table"><thead><tr><th>Component</th><th>Question answered</th><th>Not responsible for</th></tr></thead><tbody><tr><td>Loss Function</td><td>What outcome counts as better?</td><td>How to efficiently compute derivatives</td></tr><tr><td>Backpropagation</td><td>How sensitive is the current loss to the parameters?</td><td>How far the parameters move</td></tr><tr><td>Optimizer</td><td>How to combine gradient history to form updates?</td><td>Whether the objective represents actual needs</td></tr><tr><td>Learning Rate Schedule</td><td>What global step size to use at different stages of training?</td><td>Fixing data and label errors</td></tr></tbody></table></section>
+
+<section class="dd-sec"><h2><span class="dd-n">2</span>SGD is the minimal baseline, not “no optimizer”<span class="dd-badge math">Math</span></h2><p class="dd-lead">What state does the simplest optimizer actually store?</p><div class="dd-formula">θ<sub>t+1</sub>=θ<sub>t</sub>−η<sub>t</sub>g<sub>t</sub></div><p>SGD uses only the current mini-batch gradient <code>gₜ</code> and the learning rate <code>ηₜ</code>; it has no per-parameter historical state, so extra memory is small and behavior is easy to interpret. Gradient noise makes each step jitter, but the long-term average may still move in a useful direction.</p><p>SGD’s “simplicity” is an important baseline: if a complex optimizer is faster only on early training loss but does not improve the same number of steps, compute, or validation metrics, it cannot be claimed to be better overall.</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">3</span>How Momentum Makes Consistent Directions Accumulate and Alternating Directions Cancel<span class="dd-badge math">Numerical Example</span></h2><p class="dd-lead">In a narrow valley, how do historical gradients turn left-right oscillations into forward speed?</p><p>Using a common notation:</p><div class="dd-formula">v<sub>t</sub>=βv<sub>t−1</sub>+(1−β)g<sub>t</sub>, θ<sub>t+1</sub>=θ<sub>t</sub>−ηv<sub>t</sub></div><p>Let <code>β=0.5</code>, the horizontal gradients are, in order, <code>+4,−4,+4,−4</code>, the vertical gradient is always <code>−1</code>, initial velocity is 0:</p>
+<table class="dd-table"><thead><tr><th>Step</th><th>Gradient g=(horizontal,vertical)</th><th>Momentum v=(horizontal,vertical)</th><th>Observation</th></tr></thead><tbody><tr><td>1</td><td>(4,−1)</td><td>(2,−0.5)</td><td>Starts responding</td></tr><tr><td>2</td><td>(−4,−1)</td><td>(−1,−0.75)</td><td>Horizontal reversal is weakened by history</td></tr><tr><td>3</td><td>(4,−1)</td><td>(1.5,−0.875)</td><td>Vertical continues to accumulate</td></tr><tr><td>4</td><td>(−4,−1)</td><td>(−1.25,−0.938)</td><td>Vertical approaches stable −1</td></tr></tbody></table><p>The horizontal component still oscillates, but its amplitude is no longer equal to the original gradient; the vertical component accumulates because its sign remains the same over time.<code>β</code> The higher it is, the longer the smoothing window, and the more likely it is to react slowly to new terrain or overshoot the target due to inertia.</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">4</span>Why Adam forms different effective step sizes for different parameters<span class="dd-badge math">Mechanism</span></h2><p class="dd-lead">When averaging directions alone is not enough, what information does the squared gradient history provide?</p><div class="dd-formula">mₜ=β₁mₜ₋₁+(1−β₁)gₜ　　vₜ=β₂vₜ₋₁+(1−β₂)gₜ²</div><div class="dd-formula">θₜ₊₁=θₜ−η · m̂ₜ/(<span class="dd-radical" role="math" aria-label="square root of v̂ₜ"><span class="dd-radicand">v̂ₜ</span></span>+ε)</div><p><code>m</code> smooths the direction,<code>v</code> estimates the squared gradient scale; parameters whose gradient history is always large are shrunk by the denominator, and sparse or smaller-scale parameters may receive relatively larger steps. The hats indicate correction for the early bias caused by initialization to zero,<code>ε</code> prevents division by zero and affects very small-scale parameters.</p>
+<div class="dd-note warn"><b>“Adaptive” does not mean no learning rate tuning.</b>　Adam still has a global <code>η</code>, and <code>β₁、β₂、ε</code>, batch size, and gradient clipping all alter the effective update. The defaults are common starting points, not cross-task laws.</div></section>
+
+<section class="dd-sec"><h2><span class="dd-n">5</span>AdamW: Why Take Weight Decay Out of the Gradient<span class="dd-badge math">Disambiguation</span></h2><p class="dd-lead">Adding <code>(λ/2)||θ||²</code> to the loss, and directly shrinking parameters each step—when are they no longer equivalent?</p><p>In plain SGD, under this coefficient convention, the L2 term produces the gradient <code>λθ</code>, and is closely related to proportionally shrinking the parameters. But Adam also divides this part of the gradient by <code><span class="dd-radical" role="math" aria-label="v 的平方根"><span class="dd-radicand">v</span></span></code>, causing different parameters to receive different strengths of “regularization.” AdamW decouples the decay:</p><div class="dd-formula">θ←θ−η·AdamUpdate(g)−ηλθ</div><p>This way <code>λ</code> is closer to a uniform parameter shrinkage rate. Biases and normalization scales are often excluded from decay, but this too is a recipe choice that needs verification, not a syntax rule.</p>
+<table class="dd-table"><thead><tr><th>Mechanism</th><th>Where it enters</th><th>In adaptive optimizers</th></tr></thead><tbody><tr><td>L2 regularization</td><td>Added to loss, changes gradient</td><td>Is scaled by the per-parameter preconditioner</td></tr><tr><td>Decoupled weight decay</td><td>Shrinks parameters independently during updates</td><td>Does not mix with the gradient scale</td></tr><tr><td>Early stopping / data augmentation</td><td>Training process or data</td><td>Not an alternative notation for parameter decay</td></tr></tbody></table></section>
+
+<section class="dd-sec"><h2><span class="dd-n">6</span>Why does the learning rate need to vary with training stage?<span class="dd-badge intuition">Schedule</span></h2><p class="dd-lead">Why is it hard for the same step size to simultaneously suit the early, middle, and final stages of training?</p>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 260" role="img" aria-label="Learning rate curve with warmup, plateau, and cosine decay"><line x1="65" y1="215" x2="650" y2="215" stroke="currentColor" opacity=".3"/><line x1="65" y1="30" x2="65" y2="215" stroke="currentColor" opacity=".3"/><path d="M65 210 L155 70 L350 70 C470 70 540 135 650 205" fill="none" stroke="#8b5cf6" stroke-width="5"/><line x1="155" y1="55" x2="155" y2="220" stroke="currentColor" opacity=".18" stroke-dasharray="5 5"/><line x1="350" y1="55" x2="350" y2="220" stroke="currentColor" opacity=".18" stroke-dasharray="5 5"/><text x="82" y="238" class="svg-t">Warmup</text><text x="230" y="238" class="svg-t">Peak/plateau</text><text x="470" y="238" class="svg-t">Decay</text><text x="8" y="45" class="svg-tn">Learning rate</text><text x="608" y="245" class="svg-tn">Training step</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Illustrative recipe, not a fixed template. Many training runs do not have a long plateau; decay can be linear, cosine, or piecewise.</figcaption></figure>
+<p><b>Warmup</b>is the stage in the initial training steps during which the learning rate gradually rises from a lower value to the peak; at this point, parameters, activation statistics, and Adam moment estimates are not yet stable, and limiting early step sizes can avoid unrecoverable spikes.<b>Peak stage</b>handles the main learning.<b>Decay</b>allows the later stage to move finely within an existing basin and reduces the parameters' continuous wandering in noise. After the total number of steps or batch size changes, you cannot simply copy the absolute step counts from the original curve.</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">7</span>Why batch size belongs in the optimizer recipe<span class="dd-badge eng">scaling</span></h2><p class="dd-lead">Does increasing the global batch size only change throughput, or also change gradients and usable learning rate?</p><p>Larger batch sizes reduce gradient sampling noise, reduce the number of updates per epoch, and change the amount of data covered by one update. Linear learning rate scaling and warmup are common starting points, but they are only effective within a certain range and under certain conditions.<b>Critical batch size</b>is the turning-point range where continuing to increase batch size no longer significantly improves statistical efficiency: after fixing a validation target and separately tuning the recipe, increase batch size step by step; if the number of samples or update steps needed to reach the target no longer decreases significantly, you are near this range. Beyond it, continuing to scale up may yield benefits mainly from parallel throughput rather than fewer training samples or update steps.</p>
+<table class="dd-table"><thead><tr><th>Change</th><th>Also affected</th><th>Fair comparison should fix/report</th></tr></thead><tbody><tr><td>batch size increase</td><td>noise, update count, memory, throughput</td><td>sample count, step count, compute, and wall-clock time</td></tr><tr><td>gradient accumulation</td><td>effective batch size and optimizer update frequency</td><td>micro-batch size, accumulation steps, normalization method</td></tr><tr><td>data parallelism scale</td><td>global batch size and communication</td><td>number of devices, per-GPU batch size, synchronization strategy</td></tr></tbody></table></section>
+
+<section class="dd-sec"><h2><span class="dd-n">8</span>Which layer do gradient clipping and mixed precision protect<span class="dd-badge eng">Numerical</span></h2><p class="dd-lead">When the loss suddenly becomes NaN, are lowering the learning rate, clipping, and loss scaling solving the same problem?</p><p><b>Mixed precision</b>Mixed precision lets forward and backward tensor operations that are suited to low precision use FP16 or BF16, while keeping reductions, optimizer state, and the usual master parameter copies—all more sensitive to numerical range—in FP32. The input is the same batch of data and parameters, and the output is still one gradient for the optimizer; this combination trades smaller memory and higher throughput for extra precision management, and exactly which operators remain FP32 is determined by the framework and hardware.</p><p><b>Global norm clipping</b>limits the length of the update direction from an anomalous gradient, primarily mitigating explosion;<b>Loss scaling</b>scales the loss up before low-precision backward to prevent small gradients from underflowing, then restores it before the update;<b>Finite-value detection</b>skips the update and adjusts the scaling when Inf/NaN occurs. They protect different stages and cannot "clip away" vanishing gradients, wrong objectives, or long-term excessively large peak learning rates.</p></section>
+
+<section class="dd-sec"><h2><span class="dd-n">9</span>Worked Example: How to Tell from Logs What the Updates Are Actually Doing<span class="dd-badge eng">Diagnosis</span></h2><p class="dd-lead">When you only see loss=1.23, why is it almost impossible to judge whether the optimizer is healthy?</p>
+<table class="dd-table"><thead><tr><th>Must record</th><th>Question answered</th><th>Warning sign</th></tr></thead><tbody><tr><td>Training/validation loss and breakdown</td><td>Whether the objective decreases and whether it generalizes</td><td>Training decreases while validation increases; sub-losses are masked by the total</td></tr><tr><td>Current learning rate</td><td>Where the scheduler actually is</td><td>Curves misalign after resuming training; warm-up repeats</td></tr><tr><td>Global and per-layer gradient norms</td><td>Whether the backward signal exists/explodes</td><td>Long-term zero, spikes, Inf</td></tr><tr><td>Clipping rate</td><td>How many steps have their direction or scale changed</td><td>Almost every step is clipped</td></tr><tr><td>Update norm / parameter norm</td><td>How much relative movement the gradient ultimately produces</td><td>Nonzero gradient but almost no update, or a single step jumps too far</td></tr><tr><td>Adam m/v and finite rate</td><td>Whether moment estimates and precision are healthy</td><td>Extreme v, frequent skipped updates</td></tr><tr><td>Sample throughput and global batch</td><td>Whether the configuration matches expectations</td><td>Gradient accumulation or parallel scaling errors</td></tr></tbody></table>
+<ol class="dd-steps"><li>First, use a few dozen samples to confirm overfitting, ruling out problems with the objective or the graph.</li><li>Run short experiments over several learning-rate orders of magnitude to determine the range of "start decreasing—stable—diverging".</li><li>Compare SGD/Momentum/AdamW with fixed data order and budget.</li><li>Then jointly search peak learning rate, decay, weight decay, and batch; do not change five things at once and then credit the optimizer name.</li><li>When scaling up, first run a small-scale trial and observe gradients, update ratio, and numerical overflow.</li></ol></section>
+
+<section class="dd-sec"><h2><span class="dd-n">10</span>Connecting the Entire Causal Chain<span class="dd-badge intuition">Synthesis</span></h2><p class="dd-lead">How does a reproducible training recipe connect gradients all the way to validation performance?</p><ol class="dd-chain"><li>Loss and data produce the target signal for the current mini-batch.</li><li>Backpropagation computes noisy gradients.</li><li>The state of Momentum or Adam extracts historical direction and scale.</li><li>The global learning rate determines the overall movement magnitude.</li><li>Warm-up protects early, and decay controls fine updates later.</li><li>AdamW and similar mechanisms independently impose parameter preferences.</li><li>Clipping and precision management prevent abnormal values from corrupting updates.</li><li>Training logs prove that updates actually occur, and the validation set judges whether the trajectory generalizes.</li><li>Any change in batch size, step count, or scale requires revalidating the entire combination.</li></ol></section>
+
+<section class="dd-sec"><h2><span class="dd-n">11</span>Common Misconceptions<span class="dd-badge intuition">Disambiguation</span></h2><table class="dd-table"><thead><tr><th>Misconception</th><th>More Accurate Statement</th></tr></thead><tbody><tr><td>Adam automatically finds a suitable learning rate</td><td>It performs per-parameter scaling, yet still relies on a global learning rate and schedule.</td></tr><tr><td>AdamW is just Adam plus L2</td><td>AdamW decouples parameter decay from adaptive gradient updates.</td></tr><tr><td>Warmup is only for drawing a smoother curve</td><td>It limits the update magnitude under unstable early statistics, often related to whether training is possible.</td></tr><tr><td>Gradient clipping solves all gradient problems</td><td>It mainly limits explosions, and cannot fix vanishing gradients, broken graphs, or objective misalignment.</td></tr><tr><td>An optimizer that reduces training loss faster is definitely better</td><td>It also requires validation, stability, memory, and final task metrics under the same budget.</td></tr></tbody></table></section>
+
+<section class="dd-sec dd-supplement"><h2><span class="dd-n">12</span>Supplementary Exercises: Check Whether You Really Understand<span class="dd-badge intuition">Supplementary</span></h2><ol class="dd-quiz"><li>In the running scenario, why does Momentum weaken lateral oscillation while accumulating longitudinal velocity?</li><li>What do Adam's first moment, squared-gradient second moment, and global learning rate each control?</li><li>Why is the L2 gradient not equivalent to uniform weight decay in Adam?</li><li>After resuming training, the loss jumps suddenly; which scheduler and optimizer states would you check?</li><li>After scaling up the global batch by 8 times, how do you design a fair recipe re-validation?</li></ol><details class="dd-answers"><summary>Reference Answers</summary><ol><li>Alternating gradients cancel each other in the exponential average; long-term same-sign components continue to accumulate.</li><li>The first moment smooths the direction, the second moment scales parameters by the historical magnitude, and the global learning rate controls the overall magnitude.</li><li>The L2 term is scaled together with the task gradient by the per-parameter denominator, so the regularization strength is no longer uniform; AdamW decays the parameters independently.</li><li>Check the global step, current learning rate, whether warmup is repeated, whether m/v are restored, loss scaling, and gradient accumulation count.</li><li>Clarify which budget is fixed—samples, compute, or wall-clock—rescan learning rate and warmup, and report update count, throughput, validation, and stability.</li></ol></details></section>
+
+<section class="dd-sec dd-supplement"><h2><span class="dd-n">13</span>Supplementary Route: Conceptual Dependencies and Further Learning<span class="dd-badge eng">Supplement</span></h2><table class="dd-table"><thead><tr><th>Direction</th><th>Read Next</th><th>What to Ask</th></tr></thead><tbody><tr><td>Where does the local direction come from?</td><td><a href="#" data-node="gradient-descent">Gradient Descent</a></td><td>What is the mathematical basis of negative gradients and learning rates?</td></tr><tr><td>How historical gradients are computed</td><td><a href="#" data-node="backprop">Backpropagation</a></td><td>Do layer-wise gradient anomalies originate from the computation graph?</td></tr><tr><td>Why weight decay is useful</td><td><a href="#" data-node="regularization">Regularization</a></td><td>How do parameter preferences affect unseen data?</td></tr><tr><td>Why deep-layer training is unstable</td><td><a href="#" data-node="vanishing-gradient">Vanishing Gradient Problem</a> and <a href="#" data-node="normalization">Layer Normalization and RMSNorm</a></td><td>How do structure and scale change optimizability?</td></tr><tr><td>Recipes after scaling up</td><td><a href="#" data-node="distributed-training">Distributed Training and Parallelism Strategies</a></td><td>How do global batch, communication, and optimizer state change together?</td></tr></tbody></table><div class="dd-note key"><b>Passing Criteria</b>　You can reconstruct the chain “gradient → optimizer state → effective update → schedule stage” from a training log, and explain whether a particular recipe change improved speed, stability, generalization, or merely changed the comparison baseline.</div></section>
+
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">Adam: A Method for Stochastic Optimization</a>: Adaptive moment estimation and bias correction.</li><li><a href="https://arxiv.org/abs/1711.05101" target="_blank" rel="noopener">Decoupled Weight Decay Regularization</a>: AdamW and decoupled weight decay.</li><li><a href="https://arxiv.org/abs/1706.02677" target="_blank" rel="noopener">Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour</a>: Large minibatch, linear scaling, and warmup.</li><li><a href="https://www.deeplearningbook.org/contents/optimization.html" target="_blank" rel="noopener">Deep Learning — Optimization for Training Deep Models</a>: Momentum, stochastic optimization, and condition number.</li></ul><p>The curves, numerical momentum examples, tables, and diagnostic workflows are all originally organized by this project.</p><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/optimizer-schedule">Explore connections on the map</a><a href="/zh/concepts/optimizer-schedule/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.querySelector('[transform]'))continue;
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if(text.children.length||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){probe.textContent=line+token;if(line&&probe.getComputedTextLength()>available){lines.push(line);line=token;}else line+=token;}
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
