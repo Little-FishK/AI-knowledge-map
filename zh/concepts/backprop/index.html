@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>反向传播：把一个结果的责任高效分回全部参数 · AI 知识地图</title>
 <meta name="description" content="从计算图、局部导数和上游梯度开始，完整手算一次反向遍历，并理解分叉累加、向量—雅可比积、激活缓存和梯度检查。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/backprop/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/backprop/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/backprop/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="反向传播：把一个结果的责任高效分回全部参数">
@@ -760,7 +762,7 @@
 <table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>反向的起点</td><td><a href="#" data-node="loss-function">损失函数</a></td><td>我们究竟在对什么标量求导？</td></tr><tr><td>梯度怎样被使用</td><td><a href="#" data-node="gradient-descent">梯度下降</a></td><td>方向算对后，步长和噪声怎样影响更新？</td></tr><tr><td>深层路径为何变弱</td><td><a href="#" data-node="vanishing-gradient">梯度消失</a></td><td>连续雅可比相乘为何导致指数缩放？</td></tr><tr><td>结构怎样帮助反传</td><td><a href="#" data-node="residual-connection">残差连接</a></td><td>恒等捷径怎样提供更短梯度路径？</td></tr><tr><td>内存如何权衡</td><td><a href="#" data-node="distributed-training">分布式训练</a></td><td>激活、梯度和优化器状态怎样分片或重算？</td></tr></tbody></table>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1502.05767" target="_blank" rel="noopener">Automatic Differentiation in Machine Learning: a Survey</a>：前向/反向模式自动微分与复杂度。</li><li><a href="https://www.deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">Deep Learning — Deep Feedforward Networks</a>：计算图与反向传播。</li><li><a href="https://pytorch.org/docs/stable/notes/autograd.html" target="_blank" rel="noopener">PyTorch Autograd Mechanics</a>：实际自动微分图、保存张量与梯度语义。</li><li><a href="https://arxiv.org/abs/1604.06174" target="_blank" rel="noopener">Training Deep Nets with Sublinear Memory Cost</a>：激活重计算的内存—算力权衡。</li></ul><p>计算图、手算、表格和调试流程均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/backprop">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/backprop">在地图中查看概念关系</a><a href="/en/concepts/backprop/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
