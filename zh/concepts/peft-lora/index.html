@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>PEFT / LoRA：冻结主干，只学习低秩权重增量 · AI 知识地图</title>
 <meta name="description" content="从 ΔW=BA、rank 与缩放，到可训练参数账、QLoRA、目标模块、合并版本和多适配器干扰。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/peft-lora/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/peft-lora/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/peft-lora/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="PEFT / LoRA：冻结主干，只学习低秩权重增量">
@@ -126,7 +128,7 @@
 <p>得到适配器之后，验证工作从“训练损失下降”转向“容量是否真的转化为泛化”：固定数据与训练 token，对 rank、层数和数据覆盖做消融，观察留出集增益是否随容量同步上升，还是只带来了过拟合与通用能力退化。部署时在分离与合并之间按工程边界选择——分离适合多任务切换与回滚，合并适合固定单一适配器，无论哪种都按完整配方记录基座哈希、rank、α 与量化顺序。最后以回归收尾：对目标、通用、长上下文、多语言、安全、工具调用与校准逐项评测，并把训练数据版本、适配器血缘一并记录在案。每一步的产出都是下一步的输入，任何一环省略，都会让后续的判断失去依据。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA</a>：低秩权重适配</li><li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">QLoRA</a>：量化基座上的高效微调</li><li><a href="https://arxiv.org/abs/1902.00751" target="_blank" rel="noopener">Parameter-Efficient Transfer Learning for NLP</a>：Adapter 参数高效迁移</li><li><a href="https://arxiv.org/abs/2303.10512" target="_blank" rel="noopener">AdaLoRA</a>：自适应秩分配</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/peft-lora">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/peft-lora">在地图中查看概念关系</a><a href="/en/concepts/peft-lora/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
