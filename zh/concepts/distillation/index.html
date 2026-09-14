@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>知识蒸馏：让小学生逼近教师的条件分布与行为 · AI 知识地图</title>
 <meta name="description" content="从软标签、温度与 KL，到 token/序列/特征蒸馏、覆盖缺口、容量上限和偏差继承。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/distillation/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/distillation/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/distillation/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="知识蒸馏：让小学生逼近教师的条件分布与行为">
@@ -120,7 +122,7 @@
 <div class="dd-agent-response"><p>把整条链连起来，可以看到知识蒸馏从一个模糊的&quot;把小模型变强&quot;愿望，落到一套有先后顺序的可验证流程上。第一步是定义能力切片：明确学生必须保留哪些能力——目标任务、长上下文、多语言、工具调用、安全行为、校准等，逐项列出。没有这一步，后面所有&quot;效果不错&quot;的说法都没有对照系。第二步是教师产生信号：教师针对这些切片输出分布、表示或示范，信号类型由可用接口决定。第三步是独立验证并构造覆盖课程：用规则、执行器或人工验证筛掉教师错误，按切片补齐真实流量、困难样本和对抗样本，保证数据覆盖与能力切片一一对应。第四步是学生联合拟合：在自身容量约束下同时拟合硬标签与教师信号，用温度与损失加权控制两者比例。第五步是逐样本比较：按 teacher-only-correct、student-only-correct、both-wrong 分类，定位能力迁移到哪、丢失在哪，教师答错的样本单独记账。第六步是系统收益与风险联合门禁：能力指标与 TTFT/TPOT、吞吐、显存、能耗、人工接管率等成本指标同时验收，被牺牲的能力必须明确列出且可路由或可回退，并保留升级路径应对发布后的流量漂移。六个步骤构成一条闭环：每个后续步骤都在检验前一步的承诺是否兑现，任何一环跳过，蒸馏的&quot;更便宜&quot;都可能只是把成本转移到了未测量的失败上。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Distilling the Knowledge in a Neural Network</a>：温度软标签与经典蒸馏</li><li><a href="https://arxiv.org/abs/1910.01108" target="_blank" rel="noopener">DistilBERT</a>：语言模型多目标蒸馏</li><li><a href="https://arxiv.org/abs/2306.08543" target="_blank" rel="noopener">MiniLLM</a>：生成式语言模型蒸馏目标</li><li><a href="https://arxiv.org/abs/1606.07947" target="_blank" rel="noopener">Sequence-Level Knowledge Distillation</a>：序列级示范蒸馏</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/distillation">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/distillation">在地图中查看概念关系</a><a href="/en/concepts/distillation/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
