@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Token 与分词：模型真正读写的离散语言 · AI 知识地图</title>
 <meta name="description" content="从 Unicode、预切分、BPE/Unigram、字节回退到特殊 token，理解同一句文本为何会变成不同长度、不同成本和不同能力边界。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/tokenization/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/tokenization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/tokenization/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="Token 与分词：模型真正读写的离散语言">
@@ -198,7 +200,7 @@
 <table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>ID 如何变向量</td><td><a href="#" data-node="embedding">嵌入</a></td><td>离散索引怎样通过训练获得几何关系？</td></tr><tr><td>顺序如何进入模型</td><td><a href="#" data-node="positional-encoding">位置编码</a></td><td>token 已切好后，模型怎样知道先后和距离？</td></tr><tr><td>长度为何昂贵</td><td><a href="#" data-node="self-attention">自注意力</a></td><td>序列长度怎样进入时间与显存复杂度？</td></tr><tr><td>协议怎样训练</td><td><a href="#" data-node="instruction-tuning">指令微调</a></td><td>角色和回答边界怎样成为监督信号？</td></tr><tr><td>上线怎样守住边界</td><td><a href="#" data-node="model-serving">模型服务</a></td><td>流式解码、截断和版本如何监控？</td></tr></tbody></table>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Neural Machine Translation of Rare Words with Subword Units</a>：BPE 子词方法。</li><li><a href="https://aclanthology.org/D18-2012/" target="_blank" rel="noopener">SentencePiece: A simple and language independent subword tokenizer and detokenizer</a>：原始文本上的 BPE/Unigram 实现。</li><li><a href="https://arxiv.org/abs/1909.03341" target="_blank" rel="noopener">Neural Machine Translation with Byte-Level Subwords</a>：字节级子词建模。</li><li><a href="https://www.unicode.org/reports/tr15/" target="_blank" rel="noopener">Unicode Standard Annex #15: Unicode Normalization Forms</a>：Unicode 规范化形式。</li></ul><p>流水线图、BPE 数值例子、工程检查表和对照表均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/tokenization">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/tokenization">在地图中查看概念关系</a><a href="/en/concepts/tokenization/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
