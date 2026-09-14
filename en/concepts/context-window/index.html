@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Context Window · AI Knowledge Map</title>
+<meta name="description" content="The maximum total number of tokens a model can “see” at once">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/context-window/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/context-window/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/context-window/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Context Window">
+<meta property="og:description" content="The maximum total number of tokens a model can “see” at once">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/context-window/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Context Window">
+<meta name="twitter:description" content="The maximum total number of tokens a model can “see” at once">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/context-window/#page","name":"Context Window","description":"The maximum total number of tokens a model can “see” at once","url":"https://ai-knowledge-map.com/en/concepts/context-window/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Context Window","item":"https://ai-knowledge-map.com/en/concepts/context-window/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Context Window</span></li></ol></nav><article id="dd-article" data-concept-id="context-window">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Context Window</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">The maximum total number of tokens a model can “see” at once</p>
+<p class="dd-ali">Context Window · Context Length</p>
+<p class="dd-metabar">Suggested 20–30 minutes · Beginner → Intermediate · Requires: Understanding “Token” and “Attention”</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The context window is the token budget that a model can directly condition on in a single request—system instructions, prompts, conversation history, retrieved material, tool results, and generated content together consume this budget. Information outside the window does not automatically participate in the current computation unless the application re-retrieves, summarizes, or injects it through external memory. The quadratic cost of standard global attention is one important constraint, but positional representations, training length, caches, hardware, and attention variants also jointly determine the usable window.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer on your own:</div>
+  <ul>
+    <li><b>What it is</b>—what exactly goes into the window.</li>
+    <li><b>Key clarification</b>—whether the model really “remembers” the conversation.</li>
+    <li><b>Why it is limited</b>—why not simply make it infinite.</li>
+    <li><b>Is filling it up good enough?</b>—if the window is large enough, can we stuff all the materials into it?</li>
+    <li><b>How to deal with it</b>—what methods are available when content exceeds the window.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>The context window is the token limit visible in a single pass, holding prompt+history+retrieval+output; what is outside the window cannot be seen.<span>(§1)</span></li>
+    <li>The model itself has no memory; “remembering earlier parts” is because the earlier parts are still in the window and are re-fed into it; once pushed out, they are truly forgotten.<span>(§2)</span></li>
+    <li>The window cannot be infinitely large: the quadratic cost of standard global attention, KV cache, hardware, positional representation, and training length together form the constraints.<span>(§3)</span></li>
+    <li>Computation, KV capacity, effective utilization, and application assembly are four different bottlenecks; declared length cannot substitute for them.<span>(§4)</span></li>
+    <li>Even if the window is long enough, filling it up is not the same as using it well: there are the Lost-in-the-middle Effect and noise dilution.<span>(§5)</span></li>
+    <li>Countermeasures: RAG only places relevant items, context engineering allocates the budget, compression and summarization, external memory.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Is a Context Window: A 16K Numerical Example<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Each time the model generates the next token, the total amount of input it can directly “see” is finite; this upper limit is the context window. Window size is usually expressed in tokens—16K is about 16,000 tokens—and it defines which information in a single call can directly affect subsequent generation: as long as it is still within the window, the model can use it; once it slides out, this generation can never directly use it again.</p>
+<p>The window contains far more than the sentence the user just typed; it is all the content that will be fed to the model together in this call. Specifically, it includes: system prompts and instructions (for example, rules like “You are a customer service assistant…”), conversation history (every sentence said in previous exchanges), retrieved material (document snippets fetched by RAG), and the model’s own response being generated—output also occupies the window.</p>
+<p>Therefore, the context window can be understood as the budget of content the model can directly see in a single call. It receives system rules, history, retrieved evidence, tool results, and output reservation; it is first counted by the tokenizer, then accepted, trimmed, or compressed according to product policy, ultimately forming a layout that does not exceed the upper limit.</p>
+<p>When the sum of the parts exceeds the upper limit, the system must reject, trim, or compress. If the application adopts a “drop the earliest content” strategy, the information at the beginning will disappear first, but the specific behavior depends on the product implementation; not all services do this. Window size only indicates the capacity upper limit, not that information at every position in the window can be used with equal accuracy.</p>
+<p>Figure 1 shows the budget allocation and over-budget rearrangement of a 16K token window. It emphasizes: the context window is a shared budget, not “up to 16K for input, output always counted separately”; actual counting rules vary by service, so when designing, input, output reservation, and tool round trips should be accounted for together.</p>
+<p>Let’s make this account clear with a numerical example: in a 16K budget, rules 1K + history 7K + evidence 6K + planned output 4K = 18K, exceeding by 2K. If you bluntly cut off the earliest 2K, you might just drop the user’s name or a key constraint; a more robust plan is to compress history to 3K and retrieve only 4K of high-value evidence, total occupancy 12K, leaving 4K of margin for tool-result fluctuations or longer answers.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 650 205" role="img" aria-label="Budget allocation and over-budget rearrangement for a sixteen-thousand-token window"><rect x="20" y="48" width="80" height="42" fill="#6b8cbe"/><rect x="100" y="48" width="210" height="42" fill="#d3a05a"/><rect x="310" y="48" width="180" height="42" fill="#4f9d78"/><rect x="490" y="48" width="120" height="42" fill="#cf6f6f"/><text x="60" y="74" text-anchor="middle" class="svg-tn" font-size="10">Rules 1K</text><text x="205" y="74" text-anchor="middle" class="svg-tn" font-size="10">History 7K</text><text x="400" y="74" text-anchor="middle" class="svg-tn" font-size="10">Evidence 6K</text><text x="550" y="74" text-anchor="middle" class="svg-tn" font-size="10">Output 4K</text><text x="325" y="35" text-anchor="middle" class="svg-t">Original plan 18K &gt; 16K: at least 2K cannot exist at the same time</text><rect x="20" y="132" width="80" height="42" fill="#6b8cbe"/><rect x="100" y="132" width="90" height="42" fill="#d3a05a"/><rect x="190" y="132" width="120" height="42" fill="#4f9d78"/><rect x="310" y="132" width="120" height="42" fill="#cf6f6f"/><rect x="430" y="132" width="180" height="42" fill="none" stroke="#6b7484" stroke-dasharray="5 4"/><text x="60" y="158" text-anchor="middle" class="svg-tn" font-size="10">Rules 1K</text><text x="145" y="158" text-anchor="middle" class="svg-tn" font-size="10">Summary 3K</text><text x="250" y="158" text-anchor="middle" class="svg-tn" font-size="10">Evidence 4K</text><text x="370" y="158" text-anchor="middle" class="svg-tn" font-size="10">Output 4K</text><text x="520" y="158" text-anchor="middle" class="svg-t" font-size="10">Margin 4K</text><text x="325" y="196" text-anchor="middle" class="svg-t" font-size="10">Compression and retrieval are not for filling it to capacity, but for leaving margin for key evidence, tool round trips, and output.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1: The context window is a shared budget, not “input up to 16K, output always counted separately.” Actual counting rules vary by service; when designing, account for input, output reservation, and tool round trips together.</figcaption></figure>
+<table class="dd-table">
+    <thead><tr><th>What's in the window</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>System prompts / instructions</td><td>“You are a customer service assistant…”</td></tr>
+      <tr><td>Conversation history</td><td>Every sentence said in previous exchanges</td></tr>
+      <tr><td>Retrieved material</td><td>Document snippets fetched by RAG</td></tr>
+      <tr><td>The response it is generating</td><td>Output also takes up window space</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Key Clarification: It’s Not “Memory”<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The real reason behind the opening example lies in a common misconception: does the model “remember” the conversation? The answer is no—basic inference calls are typically stateless. The model does not automatically retain the previous request; the application needs to put the relevant history, summary, or external memory back into the current input before the model can use them in this generation.</p>
+<p>A chat product can save sessions on the server side, so the user experience feels like it “remembers,” but what actually participates in the current generation is still the content assembled into this context. If a particular sentence was neither retained, summarized, nor retrieved back, the model cannot use it this time.</p>
+<p>Statelessness can be understood as: the model does not automatically retain the previous content on each call. It explains why the model appears to remember the conversation yet can suddenly forget—the so-called “remembering” is actually the application reassembling the relevant history, summary, or retrieved results into the input on each call, and then generating a response conditioned only on that content. If the response can mention old information, it means that information is still in the window this turn; if it was neither retained nor retrieved back, the model is not truly remembering it this time.</p>
+<p>This clarification also explains two things in passing. First, why when using an API for multi-turn conversations you have to send the history each time—because the model does not store it itself. Second, why long conversations become increasingly expensive as they go on—the longer the history, the more tokens are resent each time, and billing is calculated based on tokens.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Why It Can't Be Infinitely Large<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>Since larger windows are more convenient, why don't vendors simply make them infinite? The most direct constraint comes from how attention is computed. For standard global self-attention, n positions form n² attention scores, so the associated compute and memory of a naive implementation therefore grow quadratically with length.</p>
+<p>The source of the quadratic overhead is: every position must compute attention pairwise with every other position. Its input is the sequence length: first every position computes scores pairwise with all positions, then this score table is normalized, so the output computation and memory grow quadratically with length. If the length increases tenfold, the number of position pairs increases about a hundredfold, so the cost is superlinear—each time the window is stretched by one step, this cost must be paid. This is precisely the root cause of long contexts being slow and expensive.</p>
+<p>We can do a quick calculation: with an input of 1 thousand tokens, attention computes about 1 million pairs; with 100 thousand tokens, it's about 10 billion pairs.</p>
+<p>However, quadratic overhead is an important constraint, but it is not the only reason. Actual inference is also affected by the KV cache, bandwidth, positional extrapolation, and training distribution; sliding windows, sparse attention, and efficient kernels can change the complexity or constants. Therefore, the cost of making the window larger cannot be attributed solely to quadratic growth in attention; it is the result of multiple factors combined.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Attention computation, KV capacity, and effective context are not the same thing<span class="dd-badge math">Math</span><span class="dd-badge eng">Systems</span></h2>
+<div class="dd-agent-response"><p>Models that also claim to support 16K—why are some requests slow, some hit OOM as soon as concurrency rises, and others finish but answer incorrectly? Because behind the same claimed length lie four different constraints. The inputs for diagnosing such problems are request length, concurrency, hardware, evidence position, and task result: first account for computation and I/O, cache capacity, training length, and assembly separately, then locate the actual bottleneck before giving separate judgments for the four types of problems. A successful API response only means the input was accepted; it does not mean the model can effectively use the entire length, so one type of metric cannot substitute for another.</p>
+<p>The four constraints each constrain different things:</p>
+
+<p>KV cache capacity can be estimated with an approximation: B_KV ≈ 2 × L × H_KV × d_h × n × b. Here B_KV is the KV cache size in bytes for a single request; the factor 2 means each layer stores both Key and Value; L is the number of layers, H_KV is the number of KV heads per layer, d_h is the dimension of each head, n is the number of tokens already cached, and b is the number of bytes per numeric element. This approximation is only for estimating capacity and does not include model weights, temporary workspaces, or memory fragmentation.</p>
+<p>Plugging in a concrete configuration: 32 layers, 8 KV heads, head dimension 128, FP16, 16K tokens, gives 2×32×8×128×16000×2 ≈ 2.10×10⁹ bytes, about 1.95 GiB per request—and this still does not count model weights, activation workspace, or fragmentation. Using grouped-query attention, KV quantization, or paged management changes the numbers, but the relationship that “context length also consumes concurrency capacity” remains.</p>
+<p>This leads to a core distinction: declared window ≠ effective context. The API being able to accept a certain length only proves that the input was not immediately rejected; to truly evaluate it, you need to plot accuracy curves by length, evidence position, task type, and language, and at the same time record first-token latency, KV usage, and failure rate.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Constraint</th><th>What it constrains</th><th>Typical observation</th><th>What it cannot be replaced by</th></tr></thead>
+    <tbody>
+      <tr><td>Attention computation / IO</td><td>Time and intermediate reads/writes for processing long prefixes</td><td>The longer the input, the slower the first token</td><td>Fitting in VRAM does not mean it computes fast</td></tr>
+      <tr><td>KV cache</td><td>Active tokens and concurrent request capacity</td><td>Single request runs; concurrency causes OOM/eviction</td><td>FlashAttention does not eliminate long-term KV</td></tr>
+      <tr><td>Position and training distribution</td><td>Whether the model has learned to access information at that length</td><td>Good on short text; accuracy drops on long text</td><td>API accepting 16K does not prove effective use of 16K</td></tr>
+      <tr><td>Application assembly</td><td>Whether key evidence is included and placed in a usable position</td><td>Changing order or removing noise changes the answer</td><td>Switching to a longer window does not fix incorrect evidence</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula" data-formula-id="context-window-kv-bytes"><math display="block" aria-label="KV 缓存字节数 B 下标 K V 约等于二乘层数 L、KV 头数 H 下标 K V、头维度 d 下标 h、已缓存 token 数 n 和每元素字节数 b"><mrow><msub><mi>B</mi><mrow><mi>K</mi><mi>V</mi></mrow></msub><mo>≈</mo><mn>2</mn><mi>L</mi><msub><mi>H</mi><mrow><mi>K</mi><mi>V</mi></mrow></msub><msub><mi>d</mi><mi>h</mi></msub><mi>n</mi><mi>b</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>“Cramming it in” is not the same as “using it well”<span class="dd-badge intuition">Intuition</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Even if a model supports a very long context window, does cramming all the material in at once mean everything will be fine? Not at all. Long windows have two pitfalls.</p>
+<p>First, Lost-in-the-middle Effect: information placed in the middle of the context is used much less than information placed at the beginning or end; the model tends to “miss” the middle. Second, noise dilution: cramming in a lot of irrelevant content dilutes attention and mixes in noise, making the answer worse instead.</p>
+<p>Thus we can define effective context—the information that the model can actually access and use correctly in the current task. Its input is the candidate materials and their order: first, attention picks out clues from a large amount of content, then it answers based on that, outputting an answer with evidence. Placing the same material at the beginning, end, or middle significantly changes the result, showing that both position and noise are at play; a single correct answer does not mean the entire window is used reliably.</p>
+<p>In one sentence: long context is a capability, not a license to “mindlessly cram things in”. What you put in, how much you put in, and where you put it matter more than “how much can fit”—put key material at the beginning or end as much as possible.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>How to Cope with Window Limits<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>When the content to process exceeds the window, or a long conversation starts to lose memory, a set of methods can be used for window governance. Window governance is a set of methods for deciding what to keep, retrieve, compress, and order when content exceeds budget: its inputs are over-budget materials, task goals, and failure cost. First protect irreplaceable rules and the current task, then retrieve high-value evidence, compress recoverable history, and leave room for output, ultimately producing a usable window layout. Only when answer quality, evidence coverage, and cost improve together does it indicate that governance is effective; at the same time, be aware of its boundaries—summaries may miss details, and retrieval may miss recall.</p>
+<p>There are four specific methods, mutually complementary.</p>
+<p>Only include relevant content (RAG): do not cram the entire knowledge base in; instead, retrieve a small number of fragments most relevant to the current question and feed them to the model. It turns the problem of 'whether it fits' into the problem of 'which few to include.'</p>
+<p>Carefully allocate budget (context engineering): decide what exactly to put into the window for each call and in what order. This is higher-level than polishing a single prompt; it is the design of the overall context layout.</p>
+<p>Compression and summarization: compress overly long history into a summary and bring it along, freeing up window space for the current task and new evidence.</p>
+<p>External memory: let the Agent store information that cannot fit in the context window into external storage and retrieve it when needed, trading storage for window space.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connect the entire causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String together the previous steps and you get a causal chain that runs from the shared budget of a single call to statelessness, computational cost, effective utilization, and external memory.</p>
+<p>The context window is the upper limit of tokens that can be seen in a single call. It contains the prompt, history, retrieved material, and output; content outside the window cannot be seen. The model itself has no memory: "remembering earlier parts" is only because those earlier parts remain in the window and are fed back in by the application; once they are squeezed out of the window, they are truly forgotten.</p>
+<p>The window cannot be infinitely large: the quadratic cost of standard global attention, KV cache, hardware, positional representations, and training length together form constraints. Looking further, computation, KV capacity, effective utilization, and application assembly are four distinct bottlenecks; a claimed length cannot substitute for them.</p>
+<p>Even if the window is long enough, filling it up does not mean using it well: the lost-in-the-middle effect and noise dilution can both make long context "look like it can fit, but actually be unusable." The responses therefore split into four paths: RAG includes only the relevant chunks, context engineering allocates budget, compression and summarization free up space, and external memory stores what cannot fit outside and retrieves it on demand.</p>
+<p>This chain answers two key questions: why the model actually has no memory yet seems to remember the conversation—because the history is constantly reassembled into the window; and why the window cannot be infinitely large, and why filling it up does not mean using it well—because constraints such as quadratic cost limit capacity, while position and noise limit utilization.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Before studying this page, you first need to master the basic concepts of tokens and tokenization, attention mechanisms, and large language models—know how tokens are counted, how attention is computed pairwise, and how the model generates token by token according to context, so that you can truly understand where the context window limit comes from.</p>
+<p>The core concepts of this page are token budget, no memory, quadratic cost, Lost-in-the-middle Effect, and “cramming full ≠ using well.”</p>
+<p>The adjacent extended concepts include: Lost-in-the-middle Effect, RAG, context engineering, context compaction, and Agent memory—they are the elaboration of the coping strategies in this section and connect directly to one another. Further extensions are inference optimization, prompt caching, and chain of thought, which discuss how to further improve long-context reasoning in both engineering and effectiveness.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>tokens and tokenization, attention mechanisms, large language models</td></tr>
+      <tr><td><b>Core of this page</b></td><td>token budget, no memory, quadratic cost, Lost-in-the-middle Effect, cramming full≠using well</td></tr>
+      <tr><td>Immediate Extensions</td><td>Lost-in-the-middle Effect, RAG, context engineering, context compaction, Agent memory</td></tr>
+      <tr><td>Further</td><td>inference optimization, prompt caching, chain of thought</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Attention Is All You Need</a>: sequence length complexity of standard self-attention.</li>
+    <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>: the impact of information position in long contexts on task performance.</li>
+    <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>: memory access bottlenecks and optimization boundaries of exact attention.</li>
+    <li><a href="https://arxiv.org/abs/2308.14508" target="_blank" rel="noopener">Bai et al., LongBench</a>: cross-task, cross-language evaluation of long-context understanding.</li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/context-window">Explore connections on the map</a><a href="/zh/concepts/context-window/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.querySelector('[transform]'))continue;
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if(text.children.length||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){probe.textContent=line+token;if(line&&probe.getComputedTextLength()>available){lines.push(line);line=token;}else line+=token;}
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
