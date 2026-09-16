@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Reasoning Models · AI Knowledge Map</title>
+<meta name="description" content="Use more training and inference compute for search, verification, and correction in exchange for accuracy on hard problems.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/reasoning-models/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/reasoning-models/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/reasoning-models/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Reasoning Models">
+<meta property="og:description" content="Use more training and inference compute for search, verification, and correction in exchange for accuracy on hard problems.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/reasoning-models/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reasoning Models">
+<meta name="twitter:description" content="Use more training and inference compute for search, verification, and correction in exchange for accuracy on hard problems.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/reasoning-models/#page","name":"Reasoning Models","description":"Use more training and inference compute for search, verification, and correction in exchange for accuracy on hard problems.","url":"https://ai-knowledge-map.com/en/concepts/reasoning-models/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Reasoning Models","item":"https://ai-knowledge-map.com/en/concepts/reasoning-models/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Reasoning Models</span></li></ol></nav><article id="dd-article" data-concept-id="reasoning-models">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Reasoning Models</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Use more training and inference compute for search, verification, and correction in exchange for accuracy on hard problems.</p>
+<p class="dd-ali">Reasoning Models · Slow-Thinking Models</p>
+<p class="dd-metabar">Suggested 20–30 minutes · Intermediate · Requires: familiarity with “Chain of Thought” and “Scaling Laws”</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Reasoning models use specialized post-training to make the model better at spending its compute budget on decomposition, search, verification, and correction. At test time, you can give it higher reasoning effort: this may be a longer internal reasoning trace, or multiple candidates, search, or verifier collaboration. The key is not to write longer text, but to convert more inference-time compute into higher problem-solving success rates.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>What it is</b>—why a class of models that “answer slowly” is regarded as progress.</li>
+    <li><b>vs Chain of Thought</b>—isn't this just having the model write out a Chain of Thought, and what's the difference?</li>
+    <li><b>A new scaling axis</b>—why it is considered a major direction alongside “making models bigger”.</li>
+    <li><b>Cost</b>—what is the cost of thinking more?</li>
+    <li><b>Limitations</b>—does thinking longer necessarily mean being more correct?</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Reasoning Models learn through post-training to devote more computation to decomposition, search, verification, and correction.<span>(§1)</span></li>
+    <li>It is related to prompted Chain of Thought, but the raw trace can be hidden, and the computation is not just one long text chain.<span>(§2)</span></li>
+    <li>Test-time scaling can increase trace length, candidate count, search, or verification; benefits vary by task and diminish.<span>(§3)</span></li>
+    <li>Budget should be allocated according to task value, difficulty, and verifiability; benefits usually diminish.<span>(§4)</span></li>
+    <li>The costs are slowness, expense, and context window usage; simple tasks are not worth it.<span>(§5)</span></li>
+    <li>But thinking longer does not equal being correct; candidate coverage, verifiers, stopping rules, and evidence can all fail.<span>(§6–7)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Are Reasoning Models<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Everyday chat models, when given a problem, typically carry a relatively fixed computation budget and generate answers along the most direct path. Here, budget refers to the compute actually spent during decoding: how many tokens to generate and how many computation steps to take. Ordinary models treat simple and difficult problems equally and &quot;just keep writing&quot;; when they encounter problems requiring multi-step derivation or comparison of multiple paths, they easily make mistakes midway without realizing it.</p>
+<p>Reasoning models differ in the training stage. After specialized post-training, they learn to dynamically allocate intermediate computation according to the difficulty of the problem: break the problem into subproblems, compute step by step, switch to another path when hitting a dead end, and check and correct their intermediate results. Therefore, a reasoning model's &quot;slowness&quot; is not a malfunction but more compute spent on the process of finding the correct solution. Empirically, this extra computation budget often improves success rates on math, coding, and complex logical tasks.</p>
+<p>There is a point where the interface can be misleading: &quot;thinking&quot; is not the same as the text shown to the user. Some open models return the full reasoning trace, so users can see each step of the calculation; some products hide the raw trace and give only the final answer or a brief summary. Regardless of whether there is a &quot;thinking process&quot; panel in the interface, you cannot judge from it whether the model used reasoning computation internally—a product that hides the trace may well have done a great deal of decomposition, search, and verification internally, and only hand over the conclusion.</p>
+<p>From the input-output perspective, a reasoning model receives a task to be solved and the resources that go with it: available reasoning budget, candidate solution generation methods that can be called upon, and verification tools. What it outputs is not &quot;a paragraph written by feel&quot; but an answer that has gone through decomposition, search, checking, and correction. The key behind all this is the specialized processing during the training stage: the model learns to direct extra computation toward the process of solving difficult problems, not simply to make the visible explanation text longer. The raw trace may or may not be shown, but the internal computation process is what separates reasoning models from ordinary models.</p>
+<p>The scope and boundaries also deserve to be made clear. Extra budget often brings significant gains on tasks that are highly structured and have verifiable answers, such as math and coding; on other types of tasks, the gains depend on the nature of the task, the model's own capabilities, and the size of the budget. No mechanism guarantees that &quot;thinking longer is necessarily more correct&quot;; reasoning models improve the expected success rate, not a promise of correctness for every problem.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How it relates to Chain of Thought<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>&quot;Think first, then answer&quot; sounds almost the same as Chain-of-Thought, and the two are indeed closely related, but the dividing line lies in one question: who is making the model think.</p>
+<p>Chain-of-Thought is a prompting technique. What triggers it is the prompt itself—provide examples of step-by-step reasoning in the prompt, or directly ask the model to &quot;work step by step.&quot; After receiving such instructions, the model unfolds the process of originally producing an answer in one shot into visible intermediate steps. Its ability comes mainly from knowledge already accumulated in the model during the Pre-training stage: the model can already reason, and Chain-of-Thought prompting simply makes these capabilities explicit. In terms of computation, it usually generates a visible trace of intermediate steps, and users can see each step.</p>
+<p>Reasoning Models take another path. The mechanism that makes the model think is trained into the model itself: through post-training methods such as Reinforcement Learning, verifiable rewards, process supervision, or outcome supervision, what is optimized is the model's strategy for allocating a reasoning budget, rather than temporarily changing behavior through a single prompt. In use, the model and service provide a reasoning budget or effort level, and the model itself decides to compute more steps on difficult problems and spend less effort on simple ones; moreover, the original reasoning trace is not necessarily shown to the user. In terms of computation, a Reasoning Model can follow a longer single trajectory, and can also combine diverse sampling, search, verification, or even tool use, offering choices far richer than &quot;writing out the intermediate steps.&quot;</p>
+<p>When the two are compared side by side, the differences fall along four dimensions. Triggering method: Chain-of-Thought relies on examples in the prompt or a &quot;step-by-step&quot; request, while Reasoning Models rely on budgets and effort levels provided by the service. Source of ability: Chain-of-Thought mainly uses capabilities already present from Pre-training, while Reasoning Models rely on strategies learned through post-training. Computation method: Chain-of-Thought usually has only a single visible chain of intermediate steps, while Reasoning Models can use multiple candidates, search, verification, and tools. Trace visibility: the intermediate steps of Chain-of-Thought are presented directly, while Reasoning Models may hide the original trace.</p>
+<p>Therefore, to sum up in one sentence: Chain-of-Thought uses prompts to elicit intermediate steps, while Reasoning Models learn through post-training how to use a reasoning budget more effectively. The two are related but not equivalent, and they can be used together—a post-trained model can also accept Chain-of-Thought-style prompts. A confusing corollary follows: outputting a long explanation is neither a sufficient nor a necessary condition for being a Reasoning Model. Ordinary models can also be prompted to write verbose &quot;thinking,&quot; while a true Reasoning Model may only return a brief conclusion, even though it has internally searched and verified many paths.</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>Chain-of-Thought (prompting technique)</th><th>Reasoning Models (trained into the model)</th></tr></thead>
+    <tbody>
+      <tr><td>How triggered</td><td>Give reasoning examples in the prompt or require step-by-step</td><td>The model and service provide a reasoning budget/effort level, and the original trace may not be shown.</td></tr>
+      <tr><td>Where the ability comes from</td><td>Mainly uses existing capabilities of the Pre-trained model</td><td>Uses post-training such as Reinforcement Learning, verifiable rewards, and process/outcome supervision to optimize reasoning strategy</td></tr>
+      <tr><td>Computation method</td><td>Usually generates one visible chain of intermediate steps</td><td>Can use a longer single trajectory, or combine diverse sampling, search, verification, or tools</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Test-Time Scaling: Numerical Example<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Past efforts to make models stronger mainly used pre-training scaling: scaling up parameter count, training data volume, and training compute together during training, advancing along scaling laws. This path remains effective, but the cost is getting higher and higher—training costs continue to climb, while high-quality available data is approaching an upper limit. Reasoning models open up a second axis: test-time scaling (test-time scaling). It does not change training; instead, at answer time, it invests more compute in the same model or model system. Specific means include extending a single reasoning trajectory, sampling multiple candidate answers and then voting, searching in the solution space, calling tools for verification, or having a verifier filter candidates. More compute can indeed improve accuracy on many difficult problems, but it usually comes with diminishing returns; if the search strategy itself is wrong, the extra compute may also be wasted.</p>
+<p>Why multiple candidates might be useful can be seen in a purely intuitive numerical example. Assume each candidate answer is independent of the others, and the probability that a single candidate is correct is 35% (p = 0.35). When sampling 4 candidates, the probability that all 4 are wrong is (1 − 0.35)⁴, so the probability that &quot;at least one is correct&quot; is:</p>
+<p>1 − (1 − 0.35)⁴ ≈ 82%</p>
+<p>A single candidate has only a 35% chance, but after sampling several candidates, the event that &quot;one of them is correct&quot; becomes quite reliable. But this introduces a second component: the verifier. That a correct answer is hidden among the candidates does not mean the system can ultimately pick it out. Assume that when a correct answer exists, the verifier has an 80% probability of selecting it (q = 0.80); then the end-to-end upper bound is approximately:</p>
+<p>0.82 × 0.80 ≈ 66%</p>
+<p>In other words, to go from 35% to an upper bound of about 66%, the system pays nearly 4 times the computation. The meaning of each step in this example needs to be read carefully: 82% is the probability that &quot;at least one candidate is correct,&quot; and it depends only on the coverage ability of the candidates; 80% is the probability that the verifier selects the correct candidate when it exists, and it characterizes the reliability of the filtering stage; 66% is the end-to-end upper bound obtained by multiplying the two, meaning that no matter how complete the coverage is, the final result will still be truncated by verifier errors.</p>
+<p>Figure 1 shows this trade-off: a normal model receives a question and answers directly, while a reasoning model first invests in longer thinking before giving an answer, exchanging the extra computation spent at answer time for higher accuracy. Note that long reasoning is only one implementation method of test-time scaling; multi-candidate sampling, search, and verification also belong to test-time scaling.</p>
+<p>Abstract the inputs and outputs of this example: the inputs are the probability p that a single candidate is correct, the number of candidates k, the correlation between candidates, and the probability q that the verifier selects the correct candidate; the output is an end-to-end success estimate under additional computation. Under the independence assumption, the core formula is 1 − (1 − p)^k. Substituting p = 0.35 and k = 4 gives about 82%, and multiplying by q = 0.80 gives an upper bound of about 66%. The boundary is also clear: real-world candidate answers are highly correlated—multiple answers sampled by the same model using similar reasoning often tend to be all correct or all wrong—so the actual benefit is usually lower than the value given by the independence assumption. The role of this numerical example is to build budget intuition, not a performance guarantee; to truly improve, both a more accurate verifier and more diverse candidates are needed at the same time.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 120" role="img" aria-label="Normal model answers directly; reasoning model first thinks at length and then answers.">
+      <g>
+        <rect x="20" y="30" width="240" height="70" rx="8" fill="none" stroke="#6b7484"/>
+        <text x="140" y="52" text-anchor="middle" class="svg-t" font-size="12">Normal model</text>
+        <text x="140" y="76" text-anchor="middle" class="svg-tn" font-size="12">Question → Answer (seconds)</text>
+        <text x="140" y="94" text-anchor="middle" class="svg-t" font-size="10" fill="#cf6f6f">Fast, but often wrong on difficult problems.</text>
+      </g>
+      <g>
+        <rect x="300" y="30" width="240" height="70" rx="8" fill="none" stroke="#c25f5f"/>
+        <text x="420" y="52" text-anchor="middle" class="svg-t" font-size="12">Reasoning model</text>
+        <text x="420" y="76" text-anchor="middle" class="svg-tn" font-size="11">Question →〔long thinking〕→ Answer</text>
+        <text x="420" y="94" text-anchor="middle" class="svg-t" font-size="10" fill="#4f9d78">Slow, but more accurate on difficult problems.</text>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1　Trading answer-time computation for accuracy. Long reasoning is only one implementation; multi-candidate, search, and verification also belong to test-time scaling.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How to Allocate Budget So It's Worth It: A Step-by-Step Calculation<span class="dd-badge math">Derivation</span></h2>
+<div class="dd-agent-response"><p>How much additional success can one more round of thinking bring, and are these additional successes worth the extra latency and cost they require? This can be quantified with an expected-utility formula. Let b be the reasoning budget—it can be the number of candidates, the number of search steps, or the level of reasoning effort. The probability of task success at budget b is denoted P_success(b), the value brought by success is denoted V, and the budget incurs two kinds of cost: compute cost C_compute(b) and latency cost C_latency(b). The expected utility of budget b is then the success benefit minus the two kinds of cost:</p>
+<p>U(b) = P_success(b) × V − C_compute(b) − C_latency(b)</p>
+<p>The meaning of this formula is: adding budget raises the success probability, thereby raising expected benefit, but it also burns compute and slows down responses. What should actually be examined is not &quot;whether adding budget helps,&quot; but whether the marginal utility brought by one more level of budget—the additional success benefit minus the additional cost—is still positive.</p>
+<p>Use a simplified teaching example to get a feel for diminishing returns. Suppose that on the same batch of 100 problems, when the budget increases from level 1 to level 4, the number of correct answers rises from 48 to 67: an extra 300 units of compute buy 19 new correct answers, with each additional correct answer costing about 16 units of compute at the margin. When the budget is further increased from level 4 to level 8, the number correct only rises from 67 to 70, 3 more problems, but it costs another 400 units of compute, so each additional correct problem costs more than 130 units. This example does not represent any specific model, but the pattern it illustrates is universal: early budget spending has high return, while later spending becomes increasingly expensive and yields less. Since that is the case, a reasonable system should route budget according to problem difficulty, verifiability, and the cost of errors, rather than assigning the same highest budget to every request.</p>
+<p>To allocate budget according to the nature of the task, compare the following set of situations:</p>
+
+<p>The logical thread of this table is &quot;verifiability determines the value of budget&quot;. When answers can be quickly judged right or wrong by unit tests, substitution, or formal rules, the extra compute spent on multi-candidate search can quickly be converted into a higher success rate, so the budget is worth spending. When there is no external ground-truth signal, however, extending the same model’s thinking often merely polishes errors into a more complete and more confident form, and the value of the budget drops sharply. Obscure factual questions are typical of the latter: no matter how much longer the model thinks, it cannot conjure up evidence it does not already know, and the more effective approach at that point is to retrieve, cite, or directly refuse to answer. The lesson for high-impact decisions is slightly different: adding verification is correct, but if the verifier comes from the same source as the generation side, it may make the same mistakes, so the verification stage should introduce independent tools, formal rules, and human review rather than simply piling up reasoning length.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Task</th><th>Recommended budget</th><th>Reason</th><th>Primary verification</th></tr></thead>
+    <tbody>
+      <tr><td>Change date format</td><td>Low: single generation</td><td>Simple, deterministically checkable</td><td>Pattern matching and sample tests</td></tr>
+      <tr><td>Competition math problems</td><td>Medium-high: multiple candidates + verification</td><td>Difficult but answers are often verifiable</td><td>Substitution, symbolic computation, or proof checking</td></tr>
+      <tr><td>Obscure factual Q&A</td><td>Reasoning budget is not the main knob</td><td>More thinking cannot create missing evidence</td><td>Retrieval, citation, and refusal to answer</td></tr>
+      <tr><td>High-impact decisions</td><td>Increase verification by risk rather than just adding length</td><td>The verifier may also make the same mistakes from the same source</td><td>Independent tools, rules, and human review</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula" data-formula-id="reasoning-expected-utility" data-display="mathml"><math display="block" aria-label="推理预算的期望效用"><mi>U</mi><mo>(</mo><mi>b</mi><mo>)</mo><mo>=</mo><msub><mi>P</mi><mi>success</mi></msub><mo>(</mo><mi>b</mi><mo>)</mo><mo>×</mo><mi>V</mi><mo>−</mo><msub><mi>C</mi><mi>compute</mi></msub><mo>(</mo><mi>b</mi><mo>)</mo><mo>−</mo><msub><mi>C</mi><mi>latency</mi></msub><mo>(</mo><mi>b</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Cost<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Reasoning budget is not free; it is spent in three specific areas. First, slowness and cost: longer reasoning trajectories, more candidate answers, additional verification steps—each increases computational load, response latency, and billing costs. Second, resource occupation: regardless of whether reasoning tokens are shown to the user or hidden, candidate trajectories and tool-call results genuinely consume reasoning budget; whether these consumptions count toward the user-visible context is determined by each service's implementation and must be confirmed via the specific interface before use. The third type of cost is opportunity cost: not all tasks are worth these costs. For simple requests like &quot;format today's date&quot;, forcing it to think long is pure waste—slower, more expensive, but the answer will not be better.</p>
+<p>Therefore, the reasonable approach is to &quot;adapt the strategy to the task&quot;. Difficult multi-step reasoning tasks—mathematics, code, complex logic—are where reasoning models provide the best value, because the success-rate improvement brought by the budget is enough to cover the cost; for everyday simple Q&A, a single generation with a regular model is sufficient. Many products do exactly this: automatically switch whether to enter a &quot;think more&quot; mode based on problem difficulty, rather than uniformly enabling maximum reasoning for all requests.</p>
+<p>To engineer cost analysis, its inputs include trajectory length, number of candidates, number of verification passes, number of tool calls, latency SLO, and task difficulty; outputs are cost, response time, resource usage, and the routing decision made accordingly. The routing conclusion is consistent with the budget allocation section: simple formatting uses single-pass generation, difficult math problems enable multiple candidates plus verification, and high-impact tasks add independent checks rather than merely lengthening the text. A specific engineering caveat is that services differ in how they bill hidden reasoning tokens and how they handle context windows; you cannot assume from the public-facing interface—you must measure according to the interface actually used.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Limitations: Thinking longer ≠ necessarily correct<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Treating a high budget as a guarantee of correctness is the most important intuitive mistake to guard against when using reasoning models. The benefit of test-time scaling rests on two premises: the search direction is basically correct, and the verification step can distinguish good from bad. Once these two premises collapse, adding computation only amplifies errors—the model may search deeper and more confidently on a wrong premise, and the verifier may also be fooled by &quot;plausible-looking&quot; answers, thereby sending wrong candidates all the way to the output.</p>
+<p>Visibility creates an additional blind spot here. The explanations that reasoning models show users do not guarantee a faithful reflection of all their internal computation; the &quot;thinking process&quot; in the interface may be a summary, a rewrite, or even far from the actual computation path. Conversely, for products that hide the original traces, users have no entry point for direct auditing at all. Therefore, whether or not traces are displayed, you should not use &quot;it looks like it thought very hard&quot; to endorse an answer.</p>
+<p>Correct acceptance verification should be carried out independently for each task type, rather than relying on the model's own claims. Mathematical conclusions should be independently checked, for example by plugging the answer back into the original expression; code should actually be executed and tested, not judged correct after a glance; factual statements should be verified against sources, rather than believing that the more detailed the model is, the more reliable it is. Organize these methods into a limitation-assessment process: the inputs are the search premise, candidate coverage, verifier independence, available external evidence, and final tests; the output is one of four possible conclusions—accept the answer, continue searching, switch to retrieval, or refuse to answer. When the model searches deeper and deeper along a wrong premise, and the verifier and the generation side make mistakes from the same source, this external verification is the only gate that can stop the error.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Which Layer Does Failure Occur In?<span class="dd-badge eng">Diagnosis</span></h2>
+<div class="dd-agent-response"><p>&quot;High budget but still wrong&quot; is not a single fault, but a failure in one link of the entire pipeline. To fix it, you must first locate which layer the failure occurs in: candidate coverage, candidate correlation, verifier selection, stopping rule, or missing evidence. Each layer has its own observable symptoms and corresponding priority fixes:</p>
+
+<p>The diagnostic sequence given by this table is: first check whether a correct candidate appears, and then check whether it is selected after appearing. If you have sampled countless times without ever seeing a correct path, the problem lies in candidate coverage, and what should be changed is model capability, prompting, tools, or task decomposition strategy; if multiple candidates merely reword the same error, that is candidate correlation, requiring higher sampling diversity or heterogeneous methods; if a correct candidate is present but is outweighed by an incorrect answer, that is a verifier selection failure, and what should be supplemented is verification data, process checking, and independent rules. Stopping rules form a separate category: stopping too early misses a correct solution that has not yet appeared, while stopping too late continues to burn compute with no marginal benefit; both require the system to decide when to stop based on marginal benefit, confidence level, and a hard budget cap. The last category is missing evidence—the answer is logically coherent, but its factual premises cannot be verified at all. In this case the correct action is to retrieve, call tools, or refuse to answer, rather than letting the model continue introspection, because introspection cannot produce information about the external world.</p>
+<p>The verifier's status needs additional clarification: it is not an arbiter of truth. Process supervision can indeed help locate errors in intermediate steps, but the verifier itself is also limited by training distribution, coverage, and bias, and can make mistakes just like the generation side. Therefore, production evaluations should record two metrics separately: whether a correct candidate appears, and whether it is selected after appearing. Only by separating these two things can you know whether the next budget should be spent on the generation side or the verification side. The inputs to the entire diagnostic process are all candidates, the differences between candidates, the verifier's ranking, the stopping point, the budget curve, and external evidence; the output is attribution to the five failure layers above. First check &quot;is there a correct one&quot;, then check &quot;was the correct one selected&quot;; if there is no candidate, fix the model and decomposition tools; if a candidate was not selected, fix the verifier.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Failure layer</th><th>Observable symptom</th><th>What to fix first</th></tr></thead>
+    <tbody>
+      <tr><td>Candidate coverage</td><td>Many samples but no correct path</td><td>Model capability, prompting, tools, or decomposition strategy</td></tr>
+      <tr><td>Candidate correlation</td><td>Multiple answers reworded but sharing the same error</td><td>Increase sampling diversity or introduce heterogeneous methods</td></tr>
+      <tr><td>Verifier selection</td><td>Correct candidate exists but is outweighed by a wrong answer</td><td>Verification data, process checks, and independent rules</td></tr>
+      <tr><td>Stopping rule</td><td>Stopping early misses the correct solution, or continuing to burn compute with no benefit</td><td>Stop based on marginal benefit, confidence, and hard budget</td></tr>
+      <tr><td>Missing evidence</td><td>Logically coherent but factual premises unverifiable</td><td>Retrieval, tools, or refusal to answer, rather than continued introspection</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String the individual links together into a complete causal chain, and the entire logic of Reasoning Models becomes clear.</p>
+<p>The chain's starting point lies in post-training. Reasoning Models undergo specialized post-training and learn to direct more computation toward decomposition, search, verification, and correction, thereby dynamically allocating a reasoning budget on difficult problems. This distinguishes them from prompted chain-of-thought: the two are related, but the Reasoning Model's computational strategy is trained into the model itself; the raw trajectory can be hidden, and the form of computation is not only a stretched-out text chain—it can also involve multiple candidates, search, verification, and tool calls.</p>
+<p>Once this capability reaches the answering stage, it becomes test-time scaling: by increasing trajectory length, candidate count, search depth, or verification count, more compute is invested at answer time to trade for accuracy. The benefits vary by task and have diminishing returns—moving from low to medium budgets often yields clear gains, but beyond that the cost-effectiveness drops rapidly. Therefore the budget must be allocated according to task value, difficulty, and verifiability: simple tasks that can be deterministically checked use a single generation; difficult tasks with verifiable answers merit multiple candidates plus verification; tasks lacking facts rely on retrieval, citation, or refusal, not on thinking more. The cost of allocating this way is real: longer trajectories, more candidates, and extra verification bring higher compute, latency, and expense, and also take up Context Window—forcing long thinking on simple tasks is just slower, more expensive, and not necessarily better.</p>
+<p>The chain's endpoint is a reminder: thinking longer does not necessarily mean being correct. Insufficient candidate coverage, highly correlated candidates, a wrongly selected verifier, inappropriate stopping rules, missing factual evidence—if any of these links breaks, high budget will amplify errors rather than correct them. Therefore mathematics requires independent rechecking, code requires executing tests, and facts require source verification; the verifier is only one link, not the judge of truth.</p>
+<p>Conversely, tracing back from the endpoint to the starting point also reveals design points: production evaluation should separately record &quot;whether the correct candidate appears&quot; and &quot;whether it is selected after appearing&quot;, and then decide whether the next budget should go to the generation side or the verification side; every incremental increase or decrease of budget must be measured by marginal utility, not by assuming more is better. Mastering this chain means grasping the core of Reasoning Models: its difference from chain-of-thought lies in &quot;who makes it think&quot; and whether the computational strategy is trained into the model; and test-time scaling is a new scaling axis precisely because it does not rely on continuing to scale up training, but instead trades compute for accuracy at answer time, standing alongside Pre-training scaling as a direction for improving model capabilities.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Placed in the larger concept map, its position is clear.</p>
+<p>There are three prerequisite concepts: Chain of Thought (CoT), large language models, and scaling laws. Chain of Thought is the point of comparison for this page—only by understanding what it means to &quot;elicit intermediate steps through prompts&quot; can you clearly see the difference that reasoning models train reasoning strategies into the model itself; large language models provide foundational capability, and reasoning models are a further shaping of that capability; scaling laws provide the background—when pre-training scaling becomes increasingly expensive and data increasingly scarce, test-time scaling qualifies as a new scaling axis.</p>
+<p>The core concepts on this page form an interlocking cluster: reasoning post-training answers where capability comes from; reasoning budget characterizes the amount of computation invested when answering; long trajectories, multiple candidates, search, and verification are the specific ways the budget is spent; hidden CoT serves as a reminder of the difference between &quot;interface visibility&quot; and &quot;internal computation&quot;; diminishing returns sets an economic boundary on the budget. Stringing these five concepts together gives the complete logic of reasoning models from training to deployment.</p>
+<p>There are four adjacent extension directions. RLHF (reinforcement learning from human feedback) and reasoning post-training both belong to the post-training family; comparing them reveals how reward signals and supervision methods affect model behavior; self-consistency is a direct extension of the multiple-candidates-plus-voting idea, and the numerical examples on this page can transition smoothly to it; Tree of Thoughts (ToT) extends &quot;a single trajectory&quot; into an explicit search tree, deepening search-based test-time scaling; the context window is a tight engineering constraint—all visible or hidden reasoning tokens must occupy it, and the longer the reasoning, the more prominent the window and cost issues become.</p>
+<p>Extensions further afield are likewise naturally derived from this page's concepts: synthetic data relates to the training data issues of reasoning models; evaluation follows up on the engineering requirement that &quot;production environments must separately record whether correct candidates appear and whether they are selected&quot;; interpretability follows up on the blind spot that &quot;visible explanations may not faithfully reflect internal computation&quot;; AI Agent is the natural next step after reasoning models are paired with tool calling—the threads of &quot;verification&quot; and &quot;tools&quot; on this page will unfold there into complete action capabilities.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisite</td><td>Chain of Thought (CoT), large language models, scaling laws</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>reasoning post-training, reasoning budget, long trajectories/multiple candidates/search/verification, hidden CoT, diminishing returns</td></tr>
+      <tr><td>Adjacent Extensions</td><td>RLHF, self-consistency, Tree of Thoughts, context window</td></tr>
+      <tr><td>Further Afield</td><td>synthetic data, evaluation, interpretability, AI Agent</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://openai.com/index/learning-to-reason-with-llms/" target="_blank" rel="noopener">OpenAI: Learning to reason with LLMs (train-time and test-time compute)↗</a></li>
+    <li><a href="https://openai.com/index/evaluating-chain-of-thought-monitorability/" target="_blank" rel="noopener">OpenAI: Evaluating chain-of-thought monitorability (hidden reasoning and monitorability)↗</a></li>
+    <li><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al.: Self-Consistency Improves Chain of Thought Reasoning ↗</a></li>
+    <li><a href="https://arxiv.org/abs/2408.03314" target="_blank" rel="noopener">Snell et al.: Scaling LLM Test-Time Compute Optimally (allocating budget by difficulty)↗</a></li>
+    <li><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noopener">Lightman et al.: Let's Verify Step by Step (process supervision and verifiers)↗</a></li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-23</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/reasoning-models">Explore connections on the map</a><a href="/zh/concepts/reasoning-models/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.querySelector('[transform]'))continue;
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if(text.children.length||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){probe.textContent=line+token;if(line&&probe.getComputedTextLength()>available){lines.push(line);line=token;}else line+=token;}
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
