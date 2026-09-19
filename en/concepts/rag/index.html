@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>RAG Retrieval-Augmented Generation · AI Knowledge Map</title>
+<meta name="description" content="Before answering, first retrieve relevant materials, letting the model &#39;answer with the book open&#39; rather than making things up from memory.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/rag/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/rag/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/rag/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="RAG Retrieval-Augmented Generation">
+<meta property="og:description" content="Before answering, first retrieve relevant materials, letting the model &#39;answer with the book open&#39; rather than making things up from memory.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/rag/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RAG Retrieval-Augmented Generation">
+<meta name="twitter:description" content="Before answering, first retrieve relevant materials, letting the model &#39;answer with the book open&#39; rather than making things up from memory.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/rag/#page","name":"RAG Retrieval-Augmented Generation","description":"Before answering, first retrieve relevant materials, letting the model 'answer with the book open' rather than making things up from memory.","url":"https://ai-knowledge-map.com/en/concepts/rag/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"RAG Retrieval-Augmented Generation","item":"https://ai-knowledge-map.com/en/concepts/rag/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">RAG Retrieval-Augmented Generation</span></li></ol></nav><article id="dd-article" data-concept-id="rag" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">RAG Retrieval-Augmented Generation</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Before answering, first retrieve relevant materials, letting the model &#39;answer with the book open&#39; rather than making things up from memory.</p>
+<p class="dd-ali">RAG · Retrieval-Augmented Generation</p>
+<p class="dd-metabar">Recommended 25–35 minutes · Intermediate · Requires: familiarity with “large language models,” “retrieval,” and “context window”</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> RAG, before the model answers, first retrieves relevant material, then gives the model the material together with the question and has it answer based on the material. It turns the large model that “relies entirely on memory and fabricates” into one that is “open-book, with sources, and updatable”—a primary means of mitigating hallucination and injecting private and up-to-date knowledge.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>Why it is needed</b>—what are the three hard flaws of direct answers from large language models, and how RAG addresses them.</li>
+    <li><b>How it works</b>—what retrieval, augmentation, and generation do respectively.</li>
+    <li><b>What problems it solves</b>—why it can alleviate hallucinations, enable source tracing, and be updated.</li>
+    <li><b>vs fine-tuning</b>—likewise “making the model use my knowledge”: when to use RAG and when to use fine-tuning.</li>
+    <li><b>Where the bottleneck lies</b>—why whether RAG works well depends mostly not on the model.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Direct answers from large language models have three hard flaws: they hallucinate, their knowledge has a cutoff, and they cannot access private data.<span>(§1)</span></li>
+    <li>RAG turns “closed book” into “open book”: before answering, it retrieves material and puts it in front of the model.<span>(§1)</span></li>
+    <li>Three steps: retrieve relevant material → insert it into the prompt (augmentation) → the model generates based on the material.<span>(§2)</span></li>
+    <li>It alleviates hallucinations, makes knowledge updatable, and enables source tracing, turning “only trust the model” into “verify sources”.<span>(§3)</span></li>
+    <li>It provides “facts,” fine-tuning provides “behavior”; facts that cannot be memorized go to RAG, habits that cannot be changed go to fine-tuning.<span>(§4)</span></li>
+    <li>But the bottleneck is retrieval: with too much material, the model can get lost in the middle, and if the material itself is wrong, it will follow along and be wrong.<span>(§5)</span></li>
+    <li>Therefore, we need to separately measure necessary evidence coverage, context noise, assertion support, and the final task in order to locate which layer to fix.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why We Need Retrieval-Augmented Generation (RAG)<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>A language model reads through vast amounts of text during training and has broad knowledge; many questions can be answered plausibly when asked directly. So why do we still have it “look up materials” before answering? The key lies in its training objective: the model optimizes likelihood, that is, the probability of a piece of text appearing in a given context. Optimizing likelihood is to make continuation fluent and wording natural, not to verify whether a statement matches facts. Precisely because it models likelihood rather than truth, direct questioning exposes three unavoidable flaws:</p>
+
+<p>The first is hallucination. The model’s optimization objective has no constraint that “the fact is true,” so when it does not know something, it often will not admit it does not know, but instead fabricates a fluent but false answer according to language habits. The second is the knowledge cutoff. The model only knows content that appeared in the training corpus; events that occur after training ends and the latest published data are unknown to it. The third is private data. Internal enterprise documents never entered the training corpus, so the model naturally cannot answer.</p>
+<p>The idea of RAG is to change the way of answering from “closed-book” to “open-book”: rather than letting the model answer from memory left during training, before answering, first retrieve relevant materials from the knowledge base, place them in front of it, and then have it answer according to the materials. The reason open-book exams are more reliable than closed-book is that the answer does not need to rely on vague recollection, and each step can be annotated with its source for verification.</p>
+<p>Specifically, RAG accepts two types of input: the question posed by the user, and the external knowledge base that the user has permission to access. The system first retrieves evidence snippets related to the question from the knowledge base, places them in front of the model, and then the model generates an answer based on the materials. The output is an evidence-backed, updatable answer: the evidence points to specific entries in the knowledge base; after the knowledge base content is updated, the next retrieval can reflect new facts without retraining the model.</p>
+<p>At the same time, we must see its boundaries. Open-book answering makes answers more verifiable, but verifiable does not mean automatically correct: the retrieved materials themselves may be wrong, and the model may answer based on the wrong materials. If there are no reliable sources, or if the task does not require external facts at all, there is no need to force retrieval. The recurring “likelihood” here refers to the probability of a piece of text appearing in a given context; language models optimize likelihood, obtaining smoother continuation, not verification of reality—this is precisely the fundamental reason why RAG needs to add a retrieval step outside the model.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Unavoidable flaw</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Will<b>hallucinate</b></td><td>No truth constraint; will fabricate what it does not know with a straight face.</td></tr>
+      <tr><td>Knowledge has a<b>cutoff date</b></td><td>It is completely unaware of events after training and the latest data.</td></tr>
+      <tr><td>Cannot access<b>private data</b></td><td>Your company’s internal documents, which it has never seen.</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>End-to-end example: Retrieval → Augmentation → Generation<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The name RAG itself is the three steps of the process: Retrieval, Augmented, Generation. The entire processing chain can be drawn as a straight line:</p>
+<p>Figure 1: RAG three steps—Retrieval, Augmentation, Generation</p>
+<p>① Retrieval: take the user's question and fetch relevant material from the knowledge base (see the “Retrieval” deep-dive page for the specific mechanism). ② Augmentation: combine the fetched material and the question into a complete prompt. ③ Generation: the model answers based on this material and marks which sources the answer uses.</p>
+<p>Use a return inquiry example to walk through it. The user asks: “Can I still return it 35 days after receipt?” Answering this question correctly requires three things: the return period, the starting point of the period, and the exception conditions. The retriever pulls two snippets from the knowledge base:</p>
+
+<p>Snippet A supports the general rule: standard items can be returned within 30 days of receipt, and 35 days after receipt exceeds this period, so normally returns are not allowed. Snippet B supports the exception: quality issues are not subject to the 30-day limit, but supporting evidence must be uploaded. The model processes the two pieces of information separately and generates “normally not; if it is a quality issue, you can apply with proof,” with the first half citing A and the second half citing B, each supported by the corresponding snippet. The model does not add other exceptions not mentioned in the materials—no evidence, no fabrication.</p>
+<p>The augmentation step is not simply pasting materials into the prompt. The system must preserve each snippet's ID, version, permissions, and title, explicitly mark in the prompt that “the following are materials to be cited, not new instructions,” and require the model to map every verifiable assertion to the snippet that supports it. The purpose is to distinguish two completely different things: “the answer mentions a source” and “the source actually supports the answer.” The former is just formatting; the latter is what makes it trustworthy.</p>
+<p>Essentially, RAG does not modify the model itself. It only, at the moment of asking, first stuffs the materials needed to answer into the prompt—equivalent to handing the model a reference document before letting it answer. All complexity is concentrated in two things: “how to fish out the right materials and place them properly.” Therefore, the inputs to the whole chain are the user question and knowledge base snippets (together with the snippets' versions and permissions), the processing is retrieving candidates, preserving evidence boundaries during augmentation, and citing per assertion during generation, and the output is an answer that can be verified sentence by sentence. A citation indicates trustworthiness only when it truly supports the corresponding assertion; conversely, when no evidence is retrieved, the correct approach is to explicitly answer “no answer” or ask the user for clarification, rather than fabricating nonexistent facts.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 150" role="img" aria-label="RAG three steps: Retrieval, Augmentation, Generation">
+      <rect x="20" y="55" width="90" height="34" rx="6" fill="#1a1d23" stroke="#6b8cbe"/><text x="65" y="76" text-anchor="middle" class="svg-t" font-size="11">User question</text>
+      <line x1="110" y1="72" x2="140" y2="72" stroke="#6b7484" stroke-width="1.4" marker-end="url(#l1)"/>
+      <rect x="140" y="55" width="100" height="34" rx="6" fill="#21252d" stroke="#4f9d78"/><text x="190" y="71" text-anchor="middle" class="svg-t" font-size="11">① Retrieval</text><text x="190" y="84" text-anchor="middle" class="svg-t" font-size="9">Find relevant material from the knowledge base</text>
+      <rect x="150" y="105" width="80" height="26" rx="5" fill="#21252d" stroke="#2c313b"/><text x="190" y="122" text-anchor="middle" class="svg-t" font-size="10">Knowledge base</text>
+      <line x1="190" y1="105" x2="190" y2="89" stroke="#6b7484" stroke-width="1.2" marker-end="url(#l1)"/>
+      <line x1="240" y1="72" x2="270" y2="72" stroke="#6b7484" stroke-width="1.4" marker-end="url(#l1)"/>
+      <rect x="270" y="55" width="110" height="34" rx="6" fill="#21252d" stroke="#d3a05a"/><text x="325" y="71" text-anchor="middle" class="svg-t" font-size="11">② Augmentation</text><text x="325" y="84" text-anchor="middle" class="svg-t" font-size="9">Material + question combined into prompt</text>
+      <line x1="380" y1="72" x2="410" y2="72" stroke="#6b7484" stroke-width="1.4" marker-end="url(#l1)"/>
+      <rect x="410" y="55" width="130" height="34" rx="6" fill="#1a1d23" stroke="#6b8cbe" stroke-width="2"/><text x="475" y="71" text-anchor="middle" class="svg-tn" font-size="11">③ Generation</text><text x="475" y="84" text-anchor="middle" class="svg-t" font-size="9">Answer based on material + sources</text>
+      <defs><marker id="l1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1 ① Retrieval: take the question to the knowledge base to fetch relevant material (see the “Retrieval” deep-dive page). ② Augmentation: combine the fetched material and the question into a prompt. ③ Generation: the model answers based on this material and marks which sources were used.</figcaption>
+  </figure>
+<table class="dd-table"><thead><tr><th>End-to-end example</th><th>Content</th><th>What the system should judge</th></tr></thead><tbody><tr><td>Question</td><td>“Can I still return it 35 days after receipt?”</td><td>Needs return period, starting point, and exception conditions</td></tr><tr><td>Snippet A</td><td>“Standard items can be returned within 30 days of receipt.”</td><td>Directly supports the general rule</td></tr><tr><td>Snippet B</td><td>“Quality issues are not subject to the 30-day limit, and supporting evidence must be uploaded.”</td><td>Supports the exception; cannot be mixed with the general rule into one sentence.</td></tr><tr><td>Generation</td><td>“Normally not; if it is a quality issue, you can apply with proof.”</td><td>The two sentences cite A and B respectively; when there is no evidence, do not add other exceptions.</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>What exactly does it solve?<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>What does Retrieval-Augmented Generation (RAG) make up for each of the three hard flaws listed in Section 1?</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Capabilities supplemented</th><th class="dd-align-left">Corresponding mechanism</th></tr></thead><tbody><tr><td class="dd-align-left">Mitigates hallucination</td><td class="dd-align-left">With real material in hand, the model does not need to fabricate out of thin air—the answer is “anchored” to the given material (see “Hallucination”).</td></tr><tr><td class="dd-align-left">Updatable knowledge</td><td class="dd-align-left">Knowledge is stored in an external knowledge base; just update the documents without retraining the model, and the latest information can come in at any time.</td></tr><tr><td class="dd-align-left">Traceable to sources</td><td class="dd-align-left">Have the model mark which material each answer comes from (citations), allowing people to verify with one click—this is its key advantage over pure generation (see “Citations and Source Attribution”).</td></tr></tbody></table></div>
+<p>The mitigation of hallucination comes from a change in the way answers are produced. When the model has real material in hand, it no longer needs to piece together answers from training memory; the generation process is “anchored” to the given material: every assertion should be supported by the material, and content not mentioned in the material is no longer added. But this is mitigation rather than elimination—the material itself may be wrong, and the model may misinterpret the material. See the “Hallucination” deep-dive page for the detailed mechanism.</p>
+<p>The updatability of knowledge comes from a shift in storage location. Knowledge is no longer frozen in model weights but is placed in an external knowledge base. To add or correct a piece of information, you only need to update the document; the next retrieval will read it, without retraining the model, and the latest information can enter the answer at any time.</p>
+<p>Source traceability is a key advantage of RAG over pure generation. You can have the model mark in the answer which material each sentence comes from, so a person can verify the original text with one click. The mechanism behind this capability is discussed specifically on the “Citations and Source Attribution” deep-dive page.</p>
+<p>In one sentence: RAG turns “you can only trust the model” into “you can verify the sources.” For enterprise, customer service, and professional Q&A scenarios where reasons must be given and traceability is required, this is often more important than how smart the model itself is.</p>
+<p>So the capabilities that RAG adds can be summarized this way: it takes externally updatable knowledge and the current question as input, first moves the facts from model weights to evidence retrieved at runtime, then has the model answer based on the evidence, and outputs answers with fewer unsupported assertions, updatable and traceable back to their sources. The boundary must also be seen clearly: having a source usually means the answer can be checked, but being checkable does not mean the source itself is credible, nor that the reasoning is faithful to the source—the source may be wrong, and the model may also use the source incorrectly. RAG mitigates hallucination but cannot eliminate it.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Retrieval-Augmented Generation (RAG) vs Fine-Tuning: Feed Facts or Change Behavior<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>“Making the model use my knowledge” is not only RAG; fine-tuning can do the same. The two routes give the model fundamentally different things, and the choice depends on what you want to inject.</p>
+
+<p>RAG injects facts. Facts are stored externally in a knowledge base and retrieved on demand at answer time, not written into weights. Therefore knowledge updates are real-time: just edit the document and the next retrieval takes effect immediately, with no retraining; answers can also include sources for verification one by one. It suits changing, private, verifiable facts, such as the latest company policies, product parameters, and internal processes.</p>
+<p>Fine-tuning injects behavior. Through continued training, it writes style, format, and ways of working into the model weights. It is not responsible for remembering facts: when knowledge changes, retraining is required, and the model cannot say where the answer came from. It suits fixed tone, format, and ways of working, such as the tone of customer service scripts or the style of code comments.</p>
+<p>This leads to a rule of thumb: facts that can't be remembered go to RAG (retrieval); habits that can't be changed go to fine-tuning. “Want the model to know my company's latest documents” is almost always RAG; “want the model to consistently answer in a certain format or tone” is fine-tuning (see the fine-tuning deep-dive page). They are not mutually exclusive; in real systems they are often used together: fine-tuning fixes behavior, and RAG supplies facts.</p>
+<p>The input to selection is the thing to be injected itself: whether it is changing facts or stable behavior. First determine whether the knowledge changes frequently and whether traceability is needed, then decide which route to take; the output is a selection conclusion. The boundaries of the two directions must also be seen clearly: when knowledge changes frequently and requires traceability, retrieval is usually more appropriate; but retrieval cannot replace behavior training, and fine-tuning cannot reliably serve as a real-time database—writing frequently updated knowledge into weights has high update cost and cannot provide sources.</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>RAG</th><th>Fine-tuning</th></tr></thead>
+    <tbody>
+      <tr><td>Gives the model</td><td><b>Facts/Knowledge</b>(stored externally in a knowledge base)</td><td><b>Behavior/Style/Format</b>(written into weights)</td></tr>
+      <tr><td>Knowledge updates</td><td>Edit documents, real-time</td><td>Requires retraining</td></tr>
+      <tr><td>Traceability</td><td>Yes (with sources)</td><td>No</td></tr>
+      <tr><td>Suited for</td><td>Changing, private, verifiable facts</td><td>Fixed tone/format/ways of working</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Bottlenecks and Limitations<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Retrieval-Augmented Generation (RAG) is not a silver bullet. It fails most easily in four places.</p>
+<p>The deepest bottleneck is retrieval. If the retrieval stage does not pull up the correct material, the model has no correct answer available to use and can only answer incorrectly or fabricate — "garbage in, garbage out." Therefore, the ceiling on RAG performance is often in retrieval rather than in the model itself, which is also why retrieval deserves to be taken out separately for in-depth reading (see the "Retrieval" deep-dive page).</p>
+<p>Second, even when the material is provided, it may not be used well. Stuffing too much, too long material into the prompt triggers "Lost in the Middle": the model pays insufficient attention to content in the middle positions of long context, key material is ignored, and even if retrieval is correct, it still answers incorrectly (see the "Lost in the Middle" deep-dive page).</p>
+<p>Third, if the material itself is wrong, the model will follow the error. If the content in the knowledge base is incorrect, RAG will faithfully answer according to the erroneous material. What it guarantees is "having a basis," not "the basis is correct." Putting wrong documents into the knowledge base is equivalent to handing the model a wrong answer.</p>
+<p>Fourth, RAG can also "answer incorrectly with citations." Citations do not automatically equal faithfulness. The model may mistakenly apply the 30-day rule from snippet A to the exceptional case of quality problems; it may cite a snippet that is topically related but does not support the conclusion; it may also ignore document versions and treat a repealed provision as a current rule. Therefore the presence of citations is not proof of faithfulness; you must check item by item the correspondence between assertion and evidence, the timeliness of the evidence, and access permissions.</p>
+<p>The entire failure causal chain can be summarized as follows: input retrieval snippets, context assembly, and final answer; first look at whether the evidence was recalled and correctly assembled, then look at whether generation faithfully used the evidence, and the output is a localization of the failure cause. Boundaries are equally clear: the presence of citations usually indicates that the system attached sources, but does not prove that the sources truly support the assertion; outdated knowledge or permission errors cannot be fixed by switching to a stronger model — the problem lies in the evidence pipeline, not in generation capability.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>How to attribute failures to retrieval, context, or generation<span class="dd-badge math">Evaluation</span></h2>
+<div class="dd-agent-response"><p>When the final answer is wrong, why is “a drop in end-to-end accuracy” still insufficient to guide fixes? Because RAG has at least three layers that can fail independently, and end-to-end accuracy mixes these three layers together:</p>
+<ul><li>The retriever may have failed to recall the necessary evidence;</li><li>The assembler may have trimmed correct evidence, placed the wrong version, or mixed in unauthorized content;</li><li>The generator may ignore evidence, or incorrectly combine general rules and exceptions.</li></ul>
+<p>Only by attributing along the chain can you know what to fix. The approach is to save three things per question during evaluation: the target assertion, the relevant passages, and the final assertion, then compute three metrics separately.</p>
+<p>Continuing with the return case demonstration. Suppose retrieval returned 4 passages: general rule A, quality exception B, plus “arrival time” and an old policy; the model generated 3 verifiable assertions, of which “no proof required” is fabricated.</p>
+
+<p>The three metrics correspond to the three layers. Necessary evidence coverage measures the retrieval layer: whether all passages that should have been recalled came back. In this example, 2/2, so retrieval recall is acceptable. Context precision measures the assembly layer: how many of the passages that finally entered the prompt are actually useful. In this example, only 2 of 4 passages are useful, 50%; arrival time and old policy are noise. Assertion support rate measures the generation layer: how many of the model's verifiable assertions are actually supported by evidence. In this example, 2 of 3 assertions have evidence, about 67%—the model fabricated “no proof required”.</p>
+<p>The bottom row is the final task from a business perspective: the key exception lacks the proof condition, so the task fails. Failure cannot be offset by fluency or number of citations—the model can fluently fabricate assertions while attaching seemingly relevant citations to each assertion.</p>
+<p>The formula for assertion support rate: SupportRate = Ssupported ÷ Sverifiable, where Ssupported is the number of verifiable assertions supported by evidence, and Sverifiable is the total number of verifiable assertions.</p>
+<p>Two caveats. Here, “context precision” and “assertion support rate” are manual annotation definitions for teaching, and different evaluation frameworks may define them differently; the LLM judge is only another model, not ground truth. Before going live, keep a set of manually verified samples to calibrate the scorer, and observe separately by general rules, exceptions, time sensitivity, permissions, and no-answer questions.</p>
+<p>Finally, there is a diagnostic matrix that maps metric drops to repair directions: if necessary evidence is not recalled, fix query, chunking, and indexing; if it is recalled but does not enter the final context, fix filtering, reranking, and budget; if evidence is in context but assertions are unsupported, fix generation constraints, citation verification, or gracefully degrade; if the evidence itself is outdated, fix knowledge governance rather than replacing with a stronger model.</p>
+<p>The inputs to layered diagnosis are the target assertion, necessary evidence, final context, and generated assertions. First compute evidence coverage, context precision, and assertion support rate separately, then use them to localize the failure layer and output attributable repair directions. The boundary is: a drop in a metric usually indicates a problem in the corresponding layer, but a metric drop can only localize generation faithfulness and cannot alone prove that retrieval or the business task is acceptable.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Refund case</th><th>Count</th><th>Result</th><th>Explanation</th></tr></thead>
+    <tbody>
+      <tr><td>Necessary evidence coverage</td><td>Both general rule and quality exception recalled</td><td><b>2/2</b></td><td>Retrieval recall is acceptable in this case</td></tr>
+      <tr><td>Context precision</td><td>Only A and B of 4 passages are truly useful</td><td><b>2/4=50%</b></td><td>Arrival time and old policy are noise</td></tr>
+      <tr><td>Assertion support rate</td><td>2 of 3 verifiable assertions have evidence</td><td><b>2/3≈67%</b></td><td>The model fabricated “no proof required”</td></tr>
+      <tr><td>Final task</td><td>Key exception lacks proof condition</td><td><b>Failure</b></td><td>Cannot be offset by fluency or number of citations</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula"><math display="block" aria-label="可核验断言的证据支持率"><mi>SupportRate</mi><mo>=</mo><mfrac><mi>Ssupported</mi><mi>Sverifiable</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connect the Entire Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The entire causal chain begins with the model's knowledge boundary. Directly answering with a large model has three weaknesses: hallucination, a knowledge cutoff date, and inability to access private data (§1). RAG's countermeasure is to turn “closed-book” into “open-book”: retrieve material before answering and place the material in front of the model (§1). This countermeasure is implemented in three steps: retrieve relevant material → incorporate it into the prompt (augmentation) → the model generates based on the material (§2).</p>
+<p>This transformation brings three benefits: mitigating hallucination, making knowledge updatable, and enabling traceability, turning “can only trust the model” into “can verify the source” (§3). It also delineates the division of labor with fine-tuning: RAG provides “facts”, fine-tuning provides “behavior”; facts that cannot be remembered are handed to RAG, habits that cannot be changed are handed to fine-tuning (§4).</p>
+<p>But every step in the chain can fail: the bottleneck is in retrieval; too much material triggers the lost-in-the-middle effect, and if the material itself is wrong, the output will also be wrong (§5). Therefore, evaluation should separately measure necessary evidence coverage, context noise, assertion support, and the final task in order to locate which layer needs fixing (§6).</p>
+<p>If you can explain this chain clearly—explain clearly “why RAG can mitigate hallucination and enable traceability,” and accurately state “what to use RAG for and what to use fine-tuning for”—you have grasped the core of RAG.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Conceptual Dependencies and Further Learning<span class="dd-badge eng">Route</span></h2>
+<div class="dd-agent-response"><p>RAG sits in the middle of a conceptual network: understanding it requires several prerequisite concepts, and once you understand it, it leads to a set of extended topics. The hierarchy is as follows:</p>
+
+<p>The prerequisite concepts explain where each part of RAG comes from: large language models explain why the model hallucinates and why it needs to consult information; retrieval and semantic search, and embeddings explain how materials in the knowledge base are found; the context window determines how much material can be stuffed into the prompt, directly relating to the lost-in-the-middle effect in Section 5 and context precision in Section 6.</p>
+<p>The core of this page is a set of concepts centered on retrieval-augmented generation: open-book answering (present materials before answering), source attribution (answers include sources), RAG vs fine-tuning (feed facts or change behavior), retrieval as the bottleneck (the performance ceiling is mostly in retrieval).</p>
+<p>The immediate extensions are the next step from here: vector databases are the storage form of the knowledge base, document chunking determines the basic unit of retrieval, reranking optimizes the order after recall, advanced RAG handles multi-hop, complex assembly, and other problems; citations and source attribution and hallucination expand the two topics mentioned in Section 3 into independent deep-dive pages.</p>
+<p>The farther layer places RAG in a larger picture: knowledge graphs and GraphRAG use structured relationships to strengthen retrieval, context engineering develops material assembly into an independent craft, and AI Agent (Agentic RAG) allows the model to autonomously decide when to retrieve and what to retrieve during the answering process.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Large Language Models, Retrieval and Semantic Search, Embeddings, Context Window</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Retrieval-Augmented Generation, Open-book Answering, Source Attribution, RAG vs Fine-tuning, Retrieval as Bottleneck</td></tr>
+      <tr><td>Immediate Extensions</td><td>Vector Databases, Document Chunking, Reranking, Advanced RAG, Citations and Source Attribution, Hallucination</td></tr>
+      <tr><td>Farther</td><td>Knowledge Graphs and GraphRAG, Context Engineering, AI Agent (Agentic RAG)</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and Adaptation Notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al., Retrieval-Augmented Generation</a>: the original definition of RAG and the combination of retriever and generator.</li>
+    <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>: dual-encoder dense retrieval.</li>
+    <li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a>: even after retrieving material, long-context utilization can still fail.</li>
+    <li><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener">Es et al., RAGAS</a>: evaluates RAG in a layered manner based on context relevance, faithfulness, and answer quality.</li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/rag">Explore connections on the map</a><a href="/zh/concepts/rag/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=svg.querySelector('marker#ch1,marker#g28a,marker#mr1,marker#vd1')||
+      ['Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
