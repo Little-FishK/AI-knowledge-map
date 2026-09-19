@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>混合专家 MoE：让每个 token 只激活少数前馈网络 · AI 知识地图</title>
 <meta name="description" content="从 top-k 路由与加权输出，到负载均衡、容量溢出、all-to-all、专家专化和推理批处理。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/moe/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/moe/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/moe/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="混合专家 MoE：让每个 token 只激活少数前馈网络">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">混合专家 MoE：让每个 token 只激活少数前馈网络</span></li></ol></nav><article id="dd-article" data-concept-id="moe">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">混合专家 MoE：让每个 token 只激活少数前馈网络</span></li></ol></nav><article id="dd-article" data-concept-id="moe" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">混合专家 MoE：让每个 token 只激活少数前馈网络</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从 top-k 路由与加权输出，到负载均衡、容量溢出、all-to-all、专家专化和推理批处理。</p>
 
@@ -148,7 +150,7 @@
 <p>第五步，均衡与溢出控制作用于全程。辅助损失和 z-loss 在训练时防止路由坍缩、抑制 logits 发散；容量与转投策略在运行时兜住热点；推理侧还需按生产分布监控各层专家负载、路由熵与溢出率——因为推理流量的热点分布可能与训练完全不同。第六步，联合验收。判断一次 MoE 扩展是否值得，要看质量、通信、容量和切片四个维度在同一组受控条件下的共同表现：质量侧对齐激活 FLOPs 的稠密基线，系统侧测量吞吐、TTFT、TPOT 与 all-to-all 占比，容量侧核对总参数、激活参数与专家负载 CV，切片侧确认没有哪个语言或群体以退化换取整体数字。任何一环失衡，都会在链上留下具体的位置：路由坍缩看第四步前的梯度与均衡，通信瓶颈看第三步，溢出看第二步的容量设定，质量滑坡看第一步的路由语义。链是闭环的——验收暴露的问题，正是指向链条上对应环节的因果证据。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1701.06538" target="_blank" rel="noopener">Outrageously Large Neural Networks</a>：稀疏门控 MoE</li><li><a href="https://arxiv.org/abs/2006.16668" target="_blank" rel="noopener">GShard</a>：大规模专家并行与容量</li><li><a href="https://arxiv.org/abs/2101.03961" target="_blank" rel="noopener">Switch Transformers</a>：top-1 路由与均衡</li><li><a href="https://arxiv.org/abs/2202.08906" target="_blank" rel="noopener">ST-MoE</a>：稳定训练与迁移</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/moe">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/moe">在地图中查看概念关系</a><a href="/en/concepts/moe/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
