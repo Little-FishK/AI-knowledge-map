@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Information Theory and Entropy: From Probability to Coding Cost · AI Knowledge Map</title>
+<meta name="description" content="First distinguish the true distribution P from the model distribution Q, then derive cross-entropy, KL divergence, and perplexity step by step from self-information and entropy.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/information-theory/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/information-theory/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/information-theory/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Information Theory and Entropy: From Probability to Coding Cost">
+<meta property="og:description" content="First distinguish the true distribution P from the model distribution Q, then derive cross-entropy, KL divergence, and perplexity step by step from self-information and entropy.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/information-theory/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Information Theory and Entropy: From Probability to Coding Cost">
+<meta name="twitter:description" content="First distinguish the true distribution P from the model distribution Q, then derive cross-entropy, KL divergence, and perplexity step by step from self-information and entropy.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/information-theory/#page","name":"Information Theory and Entropy: From Probability to Coding Cost","description":"First distinguish the true distribution P from the model distribution Q, then derive cross-entropy, KL divergence, and perplexity step by step from self-information and entropy.","url":"https://ai-knowledge-map.com/en/concepts/information-theory/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Information Theory and Entropy: From Probability to Coding Cost","item":"https://ai-knowledge-map.com/en/concepts/information-theory/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Information Theory and Entropy: From Probability to Coding Cost</span></li></ol></nav><article id="dd-article" data-concept-id="information-theory" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Information Theory and Entropy: From Probability to Coding Cost</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">First distinguish the true distribution P from the model distribution Q, then derive cross-entropy, KL divergence, and perplexity step by step from self-information and entropy.</p>
+
+<p class="dd-metabar">Suggested 30–40 minutes · Intermediate · Requires: basic concepts of probability, weighted average, and logarithms</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Information theory converts “how much probability the model gives to real events” into an additive coding cost: entropy is the minimum average cost when the true distribution is known, cross-entropy is the average cost after switching to the model distribution, and KL is the difference between the two. These quantities measure only probability matching; they do not directly represent factuality, semantic value, or general intelligence.</div></header>
+<!-- source-body:start -->
+<div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer these yourself:</div>
+  <ul>
+    <li><b>What P and Q are</b>—what roles the true distribution and the model distribution each play.</li>
+    <li><b>Self-information and entropy</b>—the surprise of a single event, and the average uncertainty of the entire distribution.</li>
+    <li><b>Cross-entropy and KL</b>—how much extra cost you pay on average when you use the wrong distribution.</li>
+    <li><b>Perplexity</b>—exponentiating abstract average loss into an equivalent number of choices on observed data.</li>
+    <li><b>The boundaries of these quantities</b>—they measure probability match, not factuality, semantics, or intelligence.</li>
+  </ul>
+</div>
+
+<div class="dd-note key">
+  <b>The minimal example used throughout this page</b> Predict weather: the true weather follows <b>P=(sunny 1/2, rain 1/4, snow 1/4)</b> appears, but the model gives a different prediction <b>Q=(sunny 1/2, rain 3/8, snow 1/8)</b>. If we predict or encode according to Q, how much extra do we pay on average? The whole page revolves around this three-weather example.
+</div>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">1</span>First clarify P, Q, logarithms, and expectation<span class="dd-badge math">Starting Point</span></h2>
+  <p class="dd-lead">What objects do all the formulas that follow actually compute on?</p>
+  <p>Suppose an experiment may produce finitely many events, for example the weather set &Omega;={sunny, rain, snow}.<b>P(x)</b> represents the probability that event x actually occurs—in the long run, 25% of days will snow.<b>Q(x)</b> is the probability that the model assigns to event x—for example the model thinks only 12.5% of days will snow. Teaching examples give P directly, but in reality P is usually unknown and can only be approximated by sample frequencies. Q is given by the model.</p>
+  <p>All subsequent calculations follow one rule: events still occur according to P's frequencies, but the loss or code length is determined by Q, and then a weighted average is taken using P. This is “taking the expectation under P”—<b>E<sub>P</sub>[f(x)] = &Sigma;<sub>x</sub> P(x) f(x)</b>—using the probability of actual occurrence as weights.</p>
+  <div class="dd-note key"><b>Why use logarithms?</b>　We want rarer events to bring more information; also, when two independent events occur together, the probabilities multiply and the information amounts should add. Logarithms turn multiplication into addition: log<sub>2</sub>(ab) = log<sub>2</sub>a + log<sub>2</sub>b. Probabilities are no more than 1, logarithms are no greater than 0, and adding a minus sign gives non-negative information. This page uses <b>log<sub>2</sub></b> as the base, and the unit is <b>bit</b>. 1 bit represents the information provided by one ideal balanced binary distinction. If you use ln instead, the unit becomes nat, and the values only scale by a fixed factor.</div>
+  <div class="dd-note warn"><b>An easily overlooked premise:</b>P is usually unknown in reality; we can only approximate it using sample frequencies. Samples may be biased, and frequency is not equal to true probability. When you see P, first ask “according to what do events actually occur?”; when you see Q, first ask “what probability does the model give to this true event?”</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">2</span>Self-information: How surprising is a single outcome?<span class="dd-badge math">Self-information</span></h2>
+  <p class="dd-lead">Why does an event with smaller probability, once it occurs, bring more information?</p>
+  <div class="dd-formula">I<sub>P</sub>(x) = &minus;log<sub>2</sub> P(x)</div>
+  <p>If an event is certain to occur (P=1), observing it eliminates no uncertainty, and the information content is 0 bits. Halving the probability increases the self-information by 1 bit: as P goes from 1/2, 1/4 to 1/8, the self-information is 1, 2, 3 bits respectively.</p>
+  <p>Take the three weather outcomes as an example: the probability of sunny is 1/2, so when sunny occurs it is not surprising—I = &minus;log<sub>2</sub>(1/2) = 1 bit. The probability of snow is only 1/4, so when it snows I = &minus;log<sub>2</sub>(1/4) = 2 bits—rarer, so the information is greater.</p>
+  <p><b>What does this value represent?</b>It measures "degree of surprise," not importance. Rare sensor noise can have high self-information yet be worthless for a task. Self-information tells you only how rare this outcome is under P, not whether it deserves attention.</p>
+  <p><b>What it cannot imply:</b>High self-information does not mean the event is important, useful, or correct; it is purely a mathematical quantity about probability.</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">3</span>Entropy: The Average Uncertainty of the True Distribution Itself<span class="dd-badge math">Entropy</span></h2>
+  <p class="dd-lead">Single events vary in information content; how can we summarize how hard it is to predict a distribution as a whole?</p>
+  <div class="dd-formula">H(P) = E<sub>x&sim;P</sub>[&minus;log<sub>2</sub>P(x)] = &minus;&Sigma;<sub>x</sub> P(x) log<sub>2</sub> P(x)</div>
+  <p><b>Entropy is taking the self-information of each event and averaging it according to the true frequency P.</b>For P=(1/2, 1/4, 1/4), the information amounts of the three events are 1, 2, and 2 bits respectively, weighted average: H(P) = 1/2 &times; 1 + 1/4 &times; 2 + 1/4 &times; 2 = <b>1.5 bits/observation</b>. This means that over the long term, each observation requires an average of 1.5 bits to describe the result.</p>
+  <p>For n possible outcomes, the uniform distribution has the maximum entropy (log<sub>2</sub>n bits); the entropy of a deterministic distribution is 0. Entropy describes the average uncertainty of a distribution over repeated trials—used to aggregate the single-event unexpectedness of different events into a distribution-level quantity.</p>
+  <div class="dd-note intuition"><b>How to read entropy:</b>The higher H(P), the harder it is to predict on average over the long run. But high entropy does not mean every event is rare, nor does it evaluate whether a particular answer is correct. The “minimum average coding cost” is an idealized, long-run average lossless coding conclusion; the actual codeword for a single symbol is also affected by integer length, the encoder, and header overhead.</div>
+  <p><b>Boundary:</b>Here H(P) measures the uncertainty of the true data-generating distribution P, not whether a model's predictions are correct. A model can also give a highly concentrated Q, even making H(Q)=0, while placing all probability on the wrong outcome; this does not imply H(P)=0, only that the predictive distribution is very certain but may be wrong. The coding interpretation also relies on assumptions such as long-run, lossless, and distributional stability.</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>Cross-Entropy: Paying with Q for Data That Appears According to P<span class="dd-badge math">cross-entropy</span></h2>
+  <p class="dd-lead">When real events occur according to P, but the model assigns probabilities according to Q, what is the average loss?</p>
+  <p>The model does not know in advance what will appear next; it can only submit a whole set of predicted probabilities Q. After event x actually occurs, we only check the probability Q(x) that the model gives to this event, and convert it into logarithmic loss:<b>loss for event x = &minus;log<sub>2</sub> Q(x)</b>. The greater the probability Q gives to the real event, the smaller the loss; if Q very confidently misses the real event, the loss will be very large.</p>
+  <p>Since events actually still occur according to P, when averaging over the long term we must use P as weights, thus obtaining<b>cross-entropy</b>:</p>
+  <div class="dd-formula">H(P,Q) = E<sub>x&sim;P</sub>[&minus;log<sub>2</sub>Q(x)] = &minus;&Sigma;<sub>x</sub> P(x) log<sub>2</sub> Q(x)</div>
+  <p>The “cross” in the name comes from the two distributions each playing their own role:<b>P determines how often which events appear, Q determines how much loss the model pays for these events.</b>Continuing with the three-weather example: Q gives sunny a probability of 1/2, the same as P, so the loss for sunny days is still 1 bit; but Q gives snow only a probability of 1/8 (P gives 1/4), once snow occurs, the loss is &minus;log<sub>2</sub>(1/8) = 3 bit, which is exactly 1 bit more than the 2 bit that comes with P.</p>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Step</th><th>Who decides</th><th>What to do</th></tr></thead><tbody>
+  <tr><td>1. Event occurrence</td><td>true distribution P</td><td>determines how frequently sunny, rain, and snow each occur</td></tr>
+  <tr><td>2. Model reports probability</td><td>model distribution Q</td><td>assigns a predicted probability to each possible event</td></tr>
+  <tr><td>3. Compute single loss</td><td>Q(x) corresponding to the actual event</td><td>compute &minus;log<sub>2</sub>Q(x)</td></tr>
+  <tr><td>4. Take long-term average</td><td>P as weights</td><td>obtain cross-entropy H(P,Q)</td></tr>
+  </tbody></table></div>
+  <p><b>How to read the result:</b>A lower value indicates that Q on average assigns a higher probability to the real event. If exactly Q = P, cross-entropy degenerates to entropy—under the current event space, conditional information, and log loss caliber, the model distribution matches the true distribution, and the loss drops to the theoretical minimum; this does not mean the model has mastered the generative mechanism, semantics, or other capabilities. Values under different data distributions, logarithmic bases, or prediction units cannot be directly compared horizontally.</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>KL Divergence: The Extra Cost of Cross Entropy over Entropy<span class="dd-badge math">KL</span></h2>
+  <p class="dd-lead">KL does not need to be memorized out of thin air; it can be derived directly from “how much extra is spent by using the wrong Q.”</p>
+  <p>When the true distribution P is known, the average ideal code length is H(P); after switching to the model distribution Q, the average cost is H(P,Q). Subtracting the two gives the extra loss caused by placing model probability in the wrong places:</p>
+  <div class="dd-formula">H(P,Q) &minus; H(P) = &Sigma;<sub>x</sub> P(x) log<sub>2</sub>[P(x)/Q(x)] = D<sub>KL</sub>(P&parallel;Q)</div>
+  <p><b>KL divergence measures the number of extra bits paid on average per event after using Q in place of P.</b>Using the three-weather example to calculate: H(P) = 1.5 bit, H(P,Q) &asymp; 1.6038 bit, so D<sub>KL</sub>(P&parallel;Q) &asymp; 0.1038 bit/event—the model assigns too little probability to snow, causing about 0.1 extra bit per event on average.</p>
+  <p>KL has several key properties: it is never less than 0 (Gibbs' inequality), and it equals 0 only when Q and P are exactly identical.<b>The direction cannot be swapped</b>: D<sub>KL</sub>(P&parallel;Q) is weighted by P, focusing on penalizing Q for missing events that will actually occur; if some P(x) &gt; 0 while Q(x) = 0, the forward KL is positive infinity.</p>
+  <div class="dd-note intuition"><b>Minimizing cross entropy is equivalent to minimizing KL</b>—because H(P) is a constant. But the average loss on the training set is only an empirical estimate of the overall cross entropy; a decrease in training loss does not guarantee that the true KL on unseen data will definitely decrease.</div>
+  <p><b>Boundary:</b>The direction of KL cannot be swapped; when P is unknown it can only be estimated; Q assigning zero probability will make it diverge. Therefore KL is a comparison at the level of logarithmic cost, not a geometric distance, nor a comprehensive evaluation of “model quality.”</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6</span>KL and Euclidean distance answer different questions<span class="dd-badge math">Distance comparison</span></h2>
+  <p class="dd-lead">Since both P and Q can be written as probability vectors, why not directly calculate the straight-line distance between the two points?</p>
+  <p>Euclidean distance treats the two distributions as ordinary vectors and computes the square root of the sum of squared coordinate differences:</p>
+  <div class="dd-formula" data-display="mathml"><math display="block" aria-label="P 与 Q 的欧氏距离等于各事件概率之差的平方和再开平方"><mrow><msub><mi>d</mi><mn>2</mn></msub><mo>(</mo><mi>P</mi><mo>,</mo><mi>Q</mi><mo>)</mo><mo>=</mo><msqrt><mrow><munder><mo>&sum;</mo><mi>x</mi></munder><msup><mrow><mo>(</mo><mi>P</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>&minus;</mo><mi>Q</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow></math></div>
+  <p>It measures coordinate differences and is symmetric (d<sub>2</sub>(P,Q) = d<sub>2</sub>(Q,P)) and satisfies the triangle inequality. KL, in contrast, measures the average logarithmic cost caused by probability ratios—asymmetric and also not satisfying the triangle inequality, so strictly speaking it is a “divergence” rather than a mathematical distance.</p>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Question</th><th>Euclidean distance</th><th>KL(P&parallel;Q)</th></tr></thead><tbody>
+  <tr><td>What it focuses on</td><td>How far apart the probability coordinates are</td><td>How much extra logarithmic cost is paid when Q predicts P</td></tr>
+  <tr><td>Symmetric?</td><td>Yes</td><td>No</td></tr>
+  <tr><td>When Q misses a possible event of P</td><td>Still a finite number</td><td>If Q(x)=0, then it is positive infinity</td></tr>
+  <tr><td>Unit</td><td>Geometric scale of the probability vector</td><td>This page uses bit/event</td></tr>
+  </tbody></table></div>
+  <p>Taking P=(0.5, 0.25, 0.25) and Q=(0.5, 0.375, 0.125) as an example, the Euclidean distance is about 0.177, and the forward KL is about 0.104 bit.<b>The two numbers cannot be swapped or added</b>—they do not answer the same question.</p>
+  <p><b>The value of this comparison:</b>It prevents treating KL as an ordinary distance to calculate. Euclidean distance is not “wrong”; it simply does not express coding regret or logarithmic predictive loss. Smaller values can each indicate a kind of closeness, but the units and meanings differ, so one cannot claim from this that one metric is always better.</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>Perplexity: Converting Average Log Loss Back to a Probability Scale<span class="dd-badge math">Perplexity</span></h2>
+  <p class="dd-lead">An average loss of 1.6 bit/token is abstract; how can we convert it into a more intuitive equivalent number of choices?</p>
+  <div class="dd-formula">PPL = 2<sup>H(P,Q)</sup> (loss unit: bit/token)</div>
+  <p>If the average cross entropy is 2 bit/token, then PPL = 2<sup>2</sup> = 4.<b>What perplexity means:</b>It converts the average log loss on real data into an equivalent branching factor: for this average loss, it is comparable to a baseline scenario of facing 4 equally likely candidates at each step. What is exponentiated here is the Q loss weighted by P; unless Q=P, it does not equal the exponent of Q's own predictive entropy.</p>
+  <p><b>What it is not:</b>Perplexity is not vocabulary size, nor does it mean the model actually considers only a fixed number of words at each step. Lower PPL only indicates that the model assigns a higher average geometric mean probability to the actual tokens. It does not automatically prove better factuality, reasoning ability, or safety.</p>
+  <p>Here token is used ahead of time—for now, token can be understood as the text unit that the model predicts step by step; the formal tokenization mechanism will be learned in later nodes. Different tokenizers change the prediction unit and sequence length, so token-level PPL usually cannot be directly compared across tokenizers; when comparing across tokenizers, you can consider bits-per-byte or bits-per-character on a unified corpus.</p>
+  <div class="dd-note key"><b>The base must match:</b>If the training loss uses natural logarithms (unit: nat/token), use PPL = exp(loss); if using log<sub>2</sub>, only then use 2<sup>loss</sup>.</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>Three-symbol example: from P and Q all the way to perplexity<span class="dd-badge math">Complete hand calculation</span></h2>
+  <p class="dd-lead">Real weather P=(1/2, 1/4, 1/4), model Q=(1/2, 3/8, 1/8), how does each step correspond to the earlier definitions?</p>
+  <figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 245" role="img" aria-label="Encoding lengths of true distribution P and model distribution Q, cross entropy, and KL extra cost"><defs><marker id="it1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="35" width="170" height="152" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="103" y="59" text-anchor="middle" class="svg-t">True distribution P</text><text x="38" y="88" class="svg-t" font-size="10">Sunny: p=1/2 &rarr; 1 bit</text><text x="38" y="113" class="svg-t" font-size="10">Rain: p=1/4 &rarr; 2 bit</text><text x="38" y="138" class="svg-t" font-size="10">Snow: p=1/4 &rarr; 2 bit</text><text x="38" y="167" class="svg-t" font-size="10">H(P)=1.5 bit</text><path d="M188,110 L248,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="250" y="35" width="190" height="152" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="345" y="59" text-anchor="middle" class="svg-t">Model encoding Q</text><text x="270" y="88" class="svg-t" font-size="10">Sunny: q=1/2 &rarr; 1 bit</text><text x="270" y="113" class="svg-t" font-size="10">Rain: q=3/8 &rarr; 1.415 bit</text><text x="270" y="138" class="svg-t" font-size="10">Snow: q=1/8 &rarr; 3 bit</text><text x="270" y="163" class="svg-t" font-size="10">H(P,Q)&asymp;1.6038 bit</text><path d="M440,110 L500,110" stroke="#6b7484" marker-end="url(#it1)"/><rect x="502" y="57" width="160" height="108" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="582" y="82" text-anchor="middle" class="svg-t">Extra cost</text><text x="582" y="108" text-anchor="middle" class="svg-t" font-size="10">D<sub>KL</sub>(P||Q)</text><text x="582" y="131" text-anchor="middle" class="svg-t" font-size="10">&asymp;0.1038 bit</text><text x="340" y="224" text-anchor="middle" class="svg-t" font-size="10">P determines event frequencies, Q determines encoding costs; subtracting yields extra loss.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　The same set of P and Q produces entropy, cross entropy, KL, and PPL in turn. P is responsible for weighting, Q for cost.</figcaption></figure>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Event x</th><th>P(x)</th><th>&minus;log<sub>2</sub>P(x)</th><th>Q(x)</th><th>&minus;log<sub>2</sub>Q(x)</th><th>P(x)[&minus;log<sub>2</sub>Q(x)]</th></tr></thead><tbody>
+  <tr><td>Sunny</td><td>0.5</td><td>1</td><td>0.5</td><td>1</td><td>0.5000</td></tr>
+  <tr><td>Rain</td><td>0.25</td><td>2</td><td>0.375</td><td>1.415</td><td>0.3538</td></tr>
+  <tr><td>Snow</td><td>0.25</td><td>2</td><td>0.125</td><td>3</td><td>0.7500</td></tr>
+  </tbody></table></div>
+  <ol class="dd-steps">
+    <li>First average P's own code lengths: H(P) = 1.5 bit.</li>
+    <li>Q underestimates snow (1/8 vs P's 1/4), so when snow occurs the loss jumps to 3 bit.</li>
+    <li>Events still occur according to P; weight Q's code lengths by P: H(P,Q) &asymp; 1.6038 bit.</li>
+    <li>KL = H(P,Q) &minus; H(P) &asymp; 0.1038 bit/event — the misplaced probability for snow is the main source of extra cost.</li>
+    <li>Exponentiate: PPL = 2<sup>1.6038</sup> &asymp; 3.04.</li>
+  </ol>
+  <p><b>How to read this result:</b>Q assigns too much to rain and too little to snow; although the total probability is still 1, placing probability in the wrong location increases average loss. If Q sets snow to 0, then when snow occurs it produces infinite loss, and both cross entropy and forward KL become positive infinity.</p>
+  <p><b>Boundary:</b>This three-event example only verifies the arithmetic and interpretive chain. Real language models face large-scale discrete conditional distributions over tens of thousands of token types, and rely on finite-sample estimates; it is not a continuous distribution. The same formulas still apply, but estimation error, context conditioning, and tokenization conventions all affect the numerical values.</p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">9</span>Language Model Loss: Sample Average Is Not the True Distribution<span class="dd-badge eng">Language Model</span></h2>
+  <p class="dd-lead">In reality, P is unknown; how does the training procedure obtain the cross-entropy loss?</p>
+  <p>A language model splits a sentence into x<sub>1</sub>, &hellip;, x<sub>n</sub>, and at each step gives the true next-token probability Q(x<sub>t</sub> | x<sub>&lt;t</sub>).<b>Likelihood</b>Here it means how much probability the model assigns to the entire true token sequence, used to compare how well the model explains the observed text.<b>Log-likelihood</b>converts the product of step-by-step probabilities into a sum of logarithms for stable computation; then taking a negative sign turns "higher probability is better" into "lower loss is better":</p>
+  <div class="dd-formula">NLL = &minus;&Sigma;<sub>t</sub> log Q(x<sub>t</sub> | x<sub>&lt;t</sub>)</div>
+  <p>Dividing by the number of tokens n gives the average token loss; then averaging over the training batch gives the common empirical cross-entropy.<b>It approximates the unknown true distribution P using finite samples, rather than knowing P directly.</b></p>
+  <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Quantity</th><th>How obtained</th><th>Can it be directly observed?</th></tr></thead><tbody>
+  <tr><td>Population cross-entropy H(P,Q)</td><td>Takes expectation over the unknown true distribution P</td><td>Usually cannot be observed exactly</td></tr>
+  <tr><td>Training loss</td><td>Average negative log probability over training samples</td><td>Computable, but may overfit</td></tr>
+  <tr><td>Validation/test loss</td><td>Average over samples not used in parameter updates</td><td>Used to estimate performance on new data, but still has sampling error</td></tr>
+  </tbody></table></div>
+  <p>"A drop in training loss" only means the model fits the current training samples better. To judge whether true predictions improve, one also needs an independent validation set, distribution slices, and task metrics such as factuality, reasoning, and safety.<b>Training loss is an empirical estimate, not the true cross-entropy; validation loss is a better approximation, but it is also limited by sample size, distribution shift, and sampling bias.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">10</span>Connecting the whole causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+  <p class="dd-lead">Don't memorize formulas in isolation: each new quantity answers a question left unanswered by the previous step.</p>
+  <ol class="dd-chain">
+    <li>Event x occurs according to the true distribution P, and the model gives predictions using Q. P determines frequency, Q determines cost.<span>(&sect;1)</span></li>
+    <li>&minus;log<sub>2</sub>P(x) measures how surprising the event is under the true distribution—self-information.<span>(&sect;2)</span></li>
+    <li>Averaging &minus;log over P<sub>2</sub>P(x) yields the distribution's own average uncertainty—entropy H(P).<span>(&sect;3)</span></li>
+    <li>Averaging the model loss &minus;log over P<sub>2</sub>Q(x) yields the cross-entropy H(P,Q).<span>(&sect;4)</span></li>
+    <li>Subtracting entropy from cross-entropy gives the extra cost of the model placing probability in the wrong places—KL(P&parallel;Q).<span>(&sect;5)</span></li>
+    <li>KL and Euclidean distance address different questions: logarithmic cost vs. geometric coordinate difference.<span>(&sect;6)</span></li>
+    <li>Exponentiating the average cross-entropy gives the equivalent number of branches for the average log loss on observed data—perplexity PPL; it is not equivalent to Q's own predictive entropy.<span>(&sect;7)</span></li>
+    <li>The three-symbol example shows the numerical outcomes of the entire computational chain.<span>(&sect;8)</span></li>
+    <li>In reality P is unknown, and the training loss is an empirical estimate; it cannot automatically represent the true cross-entropy.<span>(&sect;9)</span></li>
+  </ol>
+  <div class="dd-note key"><b>Passing standard</b> If you can clearly explain 'why in cross-entropy P is used as the outer weight and Q is inside the logarithm', and can independently compute the complete chain from entropy to PPL using the three-weather example, then you have grasped its core.</div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">11</span>Common Misconceptions<span class="dd-badge intuition">Intuition</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Misconception</th><th>More Accurate Understanding</th></tr></thead>
+    <tbody>
+      <tr><td>P is the truth directly visible in the training set.</td><td>P is the unknown data-generating distribution; sample frequencies are only estimates and may also be affected by sampling bias.</td></tr>
+      <tr><td>Cross-entropy is just computing entropy once for each of the two distributions.</td><td>Event frequencies come from P, the per-event loss comes from Q, and the formula is &minus;&Sigma;P log<sub>2</sub>Q</td></tr>
+      <tr><td>KL is an ordinary distance between two probability vectors.</td><td>KL is a directional average log cost; it is asymmetric and does not satisfy the triangle inequality.</td></tr>
+      <tr><td>PPL = 20 means the model only considers 20 tokens.</td><td>It means the average log loss for real data corresponds to a baseline case of 20 equally probable candidates, not the actual number of candidates.</td></tr>
+      <tr><td>PPL is the exponential of Q's own uncertainty.</td><td>The usual test PPL exponentiates the cross-entropy weighted by the data distribution; only when Q=P does it coincide with the exponential of the true entropy.</td></tr>
+      <tr><td>A drop in PPL indicates responses are more truthful and smarter.</td><td>It only measures the average predicted probability of actual tokens; other capabilities require independent evaluation.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">12</span>Check whether you really understand<span class="dd-badge intuition">Self-test</span></h2>
+  <ol class="dd-quiz">
+    <li>Given P(rain) = 0.25, calculate the self-information of “it rains today” and state the unit.</li>
+    <li>Given P = (0.5, 0.5), calculate H(P); if changed to P = (1, 0), how does the entropy change?</li>
+    <li>In H(P,Q) = &minus;&Sigma;P(x) log<sub>2</sub>Q(x), why is the outer weight P(x) but inside the logarithm Q(x)?</li>
+    <li>How do you derive KL(P&parallel;Q) from H(P,Q) and H(P)? What does this difference represent?</li>
+    <li>Why can't Euclidean distance replace KL for expressing coding cost?</li>
+    <li>Assuming the average loss is 3 bit/token, calculate the perplexity. What does it not represent?</li>
+    <li>If training cross-entropy keeps decreasing but validation cross-entropy starts to increase, can you assert that the true KL is still decreasing?</li>
+    <li>Two language models use different tokenizers, A's PPL = 12, B's PPL = 15. Can you directly assert that A is better?</li>
+  </ol>
+  <details class="dd-answers"><summary>Reference answers</summary>
+    <ol>
+      <li>I(rain) = &minus;log<sub>2</sub>0.25 = 2 bit.</li>
+      <li>H(P) = 1 bit; when P = (1,0), H(P) = 0, because the outcome is already determined.</li>
+      <li>P determines the long-term frequency of true events and is responsible for the weighting; &minus;log<sub>2</sub>Q(x) is the model's per-sample loss, so Q is inside the logarithm.</li>
+      <li>Subtracting gives &Sigma;P(x) log<sub>2</sub>[P(x)/Q(x)], which represents the average extra number of bits paid when data are generated according to P but encoded using Q.</li>
+      <li>Euclidean distance only measures the difference in probability coordinates and is symmetric; KL measures probability-ratio cost weighted by P. In particular, when P(x)&gt;0 and Q(x)=0, the Euclidean distance is finite while the forward KL is positive infinity.</li>
+      <li>PPL = 8 means the average log loss on the observed data is equivalent to a baseline with 8 equally likely candidates at each step; it does not represent vocabulary size, the actual number of candidates, or factual, reasoning, or safety performance.</li>
+      <li>No. The training loss is the empirical average over training samples and may continue to decrease due to overfitting; an increase in validation loss instead indicates worse generalization. The true P is unknown.</li>
+      <li>No. Different tokenizers change the token units and sequence lengths; you should standardize the corpus and text normalization, use common units such as bits-per-character or bits-per-byte, and then combine with task metrics.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">13</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Path</span></h2>
+  <div class="dd-table-wrap"><table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Covered</th></tr></thead>
+    <tbody>
+      <tr><td>Before this page</td><td>Only need to be able to read probabilities and weighted averages; this page has supplemented logarithms, expectation, P and Q.</td></tr>
+      <tr><td><b>Core of this page</b></td><td>Self-information, entropy, cross-entropy, KL divergence, perplexity</td></tr>
+      <tr><td>Next Step</td><td>Loss Function, Gradient Descent, Token and Tokenization</td></tr>
+      <tr><td>Engineering Extensions</td><td>Pre-training, probability calibration, sampling parameters, model evaluation, and distribution shift</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf" target="_blank" rel="noopener">Shannon, A Mathematical Theory of Communication</a>: basic explanation of self-information, entropy, logarithm bases, and lossless coding.</li><li><a href="https://www.deeplearningbook.org/contents/prob.html" target="_blank" rel="noopener">Deep Learning &mdash; Probability and Information Theory</a>: cross-entropy, KL, asymmetry, and probability interpretations in machine learning.</li><li><a href="https://web.stanford.edu/class/stats311/OldSyllabi/full_notes.pdf" target="_blank" rel="noopener">Stanford STATS 311: Information Theory and Statistics</a>: formal definitions and properties of entropy, KL, and the coding view.</li></ul><div class="dd-src-date">Date accessed: 2026-07-28</div></div>
+<!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/information-theory">Explore connections on the map</a><a href="/zh/concepts/information-theory/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
