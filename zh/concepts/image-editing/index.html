@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>生成式图像编辑：改变目标属性，同时证明其余内容被保留 · AI 知识地图</title>
 <meta name="description" content="从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/image-editing/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/image-editing/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/image-editing/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="生成式图像编辑：改变目标属性，同时证明其余内容被保留">
@@ -58,8 +60,8 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">生成式图像编辑：改变目标属性，同时证明其余内容被保留</span></li></ol></nav><article id="dd-article" data-concept-id="image-editing">
-<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">生成式图像编辑：改变目标属性，同时证明其余内容被保留</h1><aside class="dd-publication-notice" data-review-status="needs-revision" role="note"><strong>持续修订中</strong><span>本页部分内容有待修订，建议结合参考资料阅读。</span></aside>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">生成式图像编辑：改变目标属性，同时证明其余内容被保留</span></li></ol></nav><article id="dd-article" data-concept-id="image-editing" lang="zh-Hans">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">生成式图像编辑：改变目标属性，同时证明其余内容被保留</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从遮罩重绘、img2img噪声强度、注意力控制和指令编辑，到反演、局部性、身份一致、可逆性与编辑来源。</p>
 
 
@@ -149,7 +151,7 @@
 <p>来源凭证在特定领域是硬性要求。新闻图片、证据材料、商品展示图和医疗图像，一旦经过生成式编辑，必须明确标注哪些区域被生成、用途受到什么限制。因为在这类场景里，读者或使用者的默认假设是“图像反映了真实情况”，生成区域的混入会破坏这种信任，标注是唯一能维持可信度的方式。</p>
 <p>编辑工具本身的治理同样不能忽略。上传到工具的图像可能被泄露，模型也可能复制了参考图中某个人的身份特征，因此整个流程要按隐私、版权和肖像授权来治理。这里有一个常见的侥幸心理：以为给导出的图打上水印或写进元数据就够了。但水印和元数据可以被轻易剥离，它们不是可靠的凭证。真正可靠的，是内部留存一份独立于像素图的审计记录——即便图片被二次裁剪、压缩、去元数据，审计记录仍然存在，仍然能回答“这张图从哪里来、经过了什么编辑”。把审计责任从“图片自身携带的标记”转移到“系统内部不可覆盖的记录”，才是来源可追溯的正确做法。</p></div>
 </section>
-<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2>
 <div class="dd-agent-response"><p>把前面各节串起来，生成式图像编辑的完整因果链是这样的：从一份模糊的自然语言请求出发，最终落到一张可以被验证、被追溯、被复现的图。</p>
 <p>第一步是把请求拆解成两份契约——目标变化和必须保护项。不经过这一步，模型没有理由守住任何区域。第二步是选择方法：需要精确几何边界时选遮罩重绘，需要整体风格调整时选 img2img，需要“替换已有对象但保持布局”时用注意力控制，只有一句话时用指令编辑。第三步，在动手编辑之前，先验证 VAE 编码与反演的无编辑重建上限，把基础重建误差与编辑带来的变化分开。第四步，用强度旋钮和条件真正执行编辑，强度决定了保留多少原图信息。第五步，处理遮挡、阴影和边界联动——把目标影响区域与对象分割区分开，别让影子留在原地、反射指向虚空。第六步，让结果分别通过目标成功门和保留门，两道门缺一不可。第七步，用差异热图和人类复核完成验收，确认哪些变化是允许的。第八步，保存原图、遮罩、参数和完整的来源历史，使结果可回滚、可追溯。</p>
 <p>有了这条链，就能回答“这个概念怎样从问题一路连接到可验证的实践”：它要求每一步都留下可观察的证据，而不是只交付一张图。</p>
@@ -162,7 +164,7 @@
       </tbody></table>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2208.01626" target="_blank" rel="noopener">Prompt-to-Prompt Image Editing</a>：跨注意力控制编辑</li><li><a href="https://arxiv.org/abs/2211.09800" target="_blank" rel="noopener">InstructPix2Pix</a>：自然语言指令图像编辑</li><li><a href="https://arxiv.org/abs/2108.01073" target="_blank" rel="noopener">SDEdit</a>：加噪—去噪引导编辑</li><li><a href="https://arxiv.org/abs/2211.09794" target="_blank" rel="noopener">Null-text Inversion</a>：真实图扩散反演与编辑</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/image-editing">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/image-editing">在地图中查看概念关系</a><a href="/en/concepts/image-editing/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
