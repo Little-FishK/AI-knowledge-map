@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Diffusion Models · AI Knowledge Map</title>
+<meta name="description" content="Learn “to denoise from a blob of noise step by step” and “develop” the image.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/diffusion/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/diffusion/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/diffusion/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Diffusion Models">
+<meta property="og:description" content="Learn “to denoise from a blob of noise step by step” and “develop” the image.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/diffusion/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diffusion Models">
+<meta name="twitter:description" content="Learn “to denoise from a blob of noise step by step” and “develop” the image.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/diffusion/#page","name":"Diffusion Models","description":"Learn “to denoise from a blob of noise step by step” and “develop” the image.","url":"https://ai-knowledge-map.com/en/concepts/diffusion/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Diffusion Models","item":"https://ai-knowledge-map.com/en/concepts/diffusion/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Diffusion Models</span></li></ol></nav><article id="dd-article" data-concept-id="diffusion" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Diffusion Models</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Learn “to denoise from a blob of noise step by step” and “develop” the image.</p>
+<p class="dd-ali">Diffusion Model · Diffusion Models · Denoising Diffusion</p>
+<p class="dd-metabar">Recommended 25–35 minutes · Intermediate · Requires: familiarity with “Neural Network” and “Self-supervised Learning”.</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Diffusion models define a forward process that gradually adds noise, and train a network to estimate the noise, score, or clean sample, thereby approximating the reverse generative process. During sampling, they start from Gaussian noise and iteratively update along discrete or continuous time trajectories. Modern systems often operate in a compressed latent space and use classifier-free guidance to trade off between conditional consistency and diversity.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer the following yourself:</div>
+  <ul>
+    <li><b>What's hard</b>— what is the difficulty in creating a realistic new image from scratch?</li>
+    <li><b>Core idea</b>— what are the two processes, “adding noise” and “denoising”?</li>
+    <li><b>Why break it into steps</b>— why not go from noise to image in a single step? Why does it have to take many steps?</li>
+    <li><b>How text controls it</b>— how does a sentence direct it to draw the corresponding image?</li>
+    <li><b>vs Generative Adversarial Network (GAN)</b>— what was lacking in previous image generation methods?</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Creating a coherent, realistic image out of thin air in one step is too hard.<span>(§1)</span></li>
+    <li>Diffusion models split it apart: forward noising creates training samples, and the reverse process learns to denoise.<span>(§2)</span></li>
+    <li>During generation, it repeatedly denoises from pure noise and develops the image; the reason for splitting into small steps is that each small step is simple and learnable.<span>(§2, §3)</span></li>
+    <li>Inject text as a condition into denoising, and use image-text alignment to make it generate in a direction that matches the description.<span>(§4)</span></li>
+    <li>Compared with GAN, diffusion models are more stable, more diverse, and more controllable, and have become mainstream (at the cost of being slow).<span>(§5)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The Problem It Aims to Solve<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The core problem diffusion models aim to solve is to let AI create an image out of thin air—a picture that &quot;no one has ever taken, yet is plausibly realistic.&quot; Here &quot;out of thin air&quot; is the key phrase: the model receives not an existing image to modify, but a training image distribution and a generation condition; what it must produce is a new sample from that same distribution that has never been seen before, and this new image must withstand human intuitive scrutiny.</p>
+<p>Where does the difficulty lie? It lies in the fact that &quot;getting it right in one step&quot; is nearly impossible. One image has several million pixels, and these pixels cannot act independently—a corgi's two eyes must be symmetrical, the hat must be worn on the head, the light and shadow must fall on the same side, and the coat color must match the background. The value of any one pixel does not matter; what is truly difficult is making several million pixels coordinate with each other while satisfying all the constraints simultaneously. Asking the model to output so many coordinated pixels in one go is equivalent to requiring it to compute all the joint relationships across the entire image correctly within one step, which is an extremely heavy burden for any generator.</p>
+<p>The cleverness of diffusion models is that they do not do this. They do not try to &quot;generate the entire image in one step&quot;; instead, they break generation into a series of small steps, each step handling only a small part of the change, allowing coordination among pixels to be established gradually. The value of this idea becomes fully apparent only after understanding the noise addition and denoising in later sections, but its motivation is already clear here: to avoid the infeasibility of getting it right in one step.</p>
+<p>At the same time, it is important to be clear about the boundaries of this matter. The output of a generative model only indicates that &quot;the relationships among pixels are as plausible as in the training data&quot;; it does not prove that the facts, text, or physical processes in the image are true. When a task requires exact reproduction, verifiable measurement, or deterministic answers, a generative model is not a reliable database and should not be used as a source of facts.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Core idea: Adding noise and denoising<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>Diffusion models turn the hard problem of &quot;generating from nothing&quot; into something learnable by relying on two opposite processes: adding noise and denoising.</p>
+<p>The forward process is adding noise. Take a clean real image and sprinkle noise onto it step by step, many steps, until it becomes a patch of pure noise. This process itself is extremely simple, but it also solves a key problem—where training samples come from. Each time noise is added, the &quot;before adding noise&quot; and &quot;after adding noise&quot; are a ready-made question and answer pair: the question is the image that already has a bit of noise, and the answer is its clearer appearance from the previous step. The whole process automatically generates a huge number of such pairs, without manual annotation. This is exactly the idea of Self-supervised Learning (see &quot;Self-supervised Learning&quot; for related content).</p>
+<p>The reverse process is denoising. Train a Neural Network to learn to reverse this process: give it a noisy image and have it predict which noise to remove, restoring it to a slightly clearer image. What the network learns is not a complete image generator, but a &quot;denoise one step&quot; operation: input a noisy sample, output a denoising direction.</p>
+<p>Once the network learns to denoise, generation follows naturally. Start from a blob of random noise—there is actually nothing in this noise—and simply have the model repeatedly perform denoising. Each time, the image becomes a little clearer, and step by step a completely new image is &quot;developed&quot;. This image never appeared in the training data, but each denoising step it goes through conforms to the image structure learned during training.</p>
+<p>Here each step has clear input and output boundaries. The forward process takes clean samples and random noise, and outputs training pairs at any noise timestep; the reverse network takes a noisy sample, the current timestep, and optional conditions, and outputs a denoising direction. The output of a single step should be interpreted as &quot;an estimate of the next update&quot;, not as the complete final image. Also note its limitations: if the noise schedule is unreasonable, or the training data coverage is insufficient, even if each step is done correctly, accumulating multiple steps can still produce a failed result.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 120" role="img" aria-label="From pure noise, step by step denoising, the image gradually emerges.">
+      <g>
+        <rect x="20" y="35" width="70" height="55" rx="6" fill="#3a4150"/><text x="55" y="108" text-anchor="middle" class="svg-t" font-size="10">Pure noise</text>
+        <rect x="130" y="35" width="70" height="55" rx="6" fill="#4a5160"/><text x="165" y="108" text-anchor="middle" class="svg-t" font-size="10">Remove a bit</text>
+        <rect x="240" y="35" width="70" height="55" rx="6" fill="#5a6472"/><text x="275" y="108" text-anchor="middle" class="svg-t" font-size="10">Clearer</text>
+        <rect x="350" y="35" width="70" height="55" rx="6" fill="#7d8a70"/><text x="385" y="108" text-anchor="middle" class="svg-t" font-size="10">Almost there</text>
+        <rect x="460" y="35" width="70" height="55" rx="6" fill="#c08a4a"/><text x="495" y="55" text-anchor="middle" class="svg-tn" font-size="11">Corgi</text><text x="495" y="108" text-anchor="middle" class="svg-t" font-size="10">Final image</text>
+      </g>
+      <g stroke="#6b7484" stroke-width="1.4">
+        <line x1="90" y1="62" x2="126" y2="62" marker-end="url(#o1)"/><line x1="200" y1="62" x2="236" y2="62" marker-end="url(#o1)"/><line x1="310" y1="62" x2="346" y2="62" marker-end="url(#o1)"/><line x1="420" y1="62" x2="456" y2="62" marker-end="url(#o1)"/>
+      </g>
+      <defs><marker id="o1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1　Generation process: starting from pure noise, the model removes only a little noise at each step. After dozens of steps, an image matching the description “develops” out. What it learns during training is exactly “how to remove a bit of noise”.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2.5</span>Numerical example: sampling one random step can learn the entire chain<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>Since the complete noising chain has so many steps, during training do we need to go from start to finish each time? No. The key is: given a clean sample x₀, we can directly sample a noisy sample at any time t without adding noise step by step. The specific formula is that the noisy sample xₜ equals the square root of ᾱₜ times the clean sample x₀, plus the square root of 1 − ᾱₜ times random noise ε. Here ᾱₜ is determined by the noise schedule, which describes how much signal remains and how much noise there is at time t. During training, the network εθ(xₜ, t, c) is usually trained to predict &quot;how much noise was originally added&quot; and minimize ||ε − εθ||²; the condition c can be text. Because noisy samples at any time can be constructed directly, one randomly sampled t can provide an unbiased training signal for the entire timeline, without needing to traverse the whole chain.</p>
+<p>Let's make this concrete with a one-dimensional numerical example. Take a clean value x₀ = 2, ᾱₜ = 0.64; then the square root of ᾱₜ is 0.8, and the square root of 1 − ᾱₜ is 0.6. If this time the random noise ε = −1, the noisy value is xₜ = 0.8 × 2 + 0.6 × (−1) = 1.0. Suppose the network predicts εθ = −0.8; then the noise loss on this sample is (−1 + 0.8)² = 0.04. From this, the inferred clean value is approximately (1.0 − 0.6 × (−0.8)) / 0.8 = 1.85. One prediction does not perfectly recover 2, which is exactly the point of multi-step sampling: each step's prediction is only an estimate of the reverse direction, and multi-step sampling will progressively correct along the model-estimated reverse direction, eventually approaching a plausible image.</p>
+<p>Here we need to clarify an intuition that can easily become fixed. &quot;Removing a little noise&quot; is only an intuitive description of the training objective, not the only parameterization. The model can also predict the clean sample itself, predict a velocity variable, or predict the score of the data distribution; different samplers can also approximate the reverse trajectory with fewer steps. The core is learning &quot;the direction of the reverse update&quot;, not having to erase a fixed noise point pixel by pixel.</p>
+<p>The boundary should also be made clear. The training inputs are a clean sample x₀, a random time t, and noise ε; the output is the network's prediction of the noise or an equivalent target. The formula is efficient because it directly constructs any time step, so there is no need to add noise step by step. However, a smaller loss only means that the model is closer to this particular known noise; it alone cannot guarantee that the final sample is on-topic, realistic, or diverse — that depends on the conditioning and guidance discussed in later chapters.</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="diffusion-formula-1"><math display="block" aria-label="带噪样本 x t 等于 alpha bar t 的平方根乘干净样本 x zero，加上一减 alpha bar t 的平方根乘随机噪声 epsilon"><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></msqrt><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></mrow></msqrt><mi>ε</mi><mo>,</mo><mspace width="1em"/><mi>ε</mi><mo>∼</mo><mi>𝒩</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>I</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Why Break It into Many Steps<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Since the goal is to get an image from noise, why not train a model to do it &quot;in one step&quot; instead of going through dozens of steps? The reason is the same as the &quot;one-step&quot; problem discussed in Section 1: jumping from pure noise to a perfect image in one step is equivalent to requiring the model to satisfy the coordination relationships among all pixels across the entire image in a single prediction—a burden so heavy that it is impractical.</p>
+<p>After breaking it into many small steps, the task of each step becomes much simpler. The model only needs to restore a &quot;more noisy image&quot; to a &quot;less noisy image&quot;—a small job the model can learn. The input of each small step is the current noisy state, and the output is the next state slightly closer to the data distribution; the sampler keeps repeating this transformation. Many simple small steps accumulate to complete the originally impossible big jump. This is the core causal chain of &quot;step splitting&quot;: breaking the unlearnable large goal into a series of learnable small goals, and then stacking the small goals one by one.</p>
+<p>This idea is often compared to Chain of Thought (CoT), and both can indeed be understood through &quot;breaking a big jump into small steps&quot;. But the boundary of this analogy must be made clear: diffusion is probabilistic modeling with an explicit forward stochastic process and a reverse generative model, while CoT is a discrete token trajectory. The analogy only explains the &quot;step-by-step&quot; intuition and cannot treat the two sets of mathematical mechanisms as the same.</p>
+<p>The number of steps also involves trade-offs. Increasing the number of steps usually reduces discretization error and makes the reverse trajectory closer to the continuous process, but it also increases latency—each additional step means one more forward pass through the network. More importantly, if the model learns the wrong update direction, then no matter how many more steps are taken, it will not automatically correct errors in knowledge and structure; it will only execute the wrong direction more times.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How Text Commands It<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The preceding denoising can only generate &quot;a plausible image&quot; but cannot decide which one to generate. To make the model draw the image the user wants, &quot;a corgi wearing a hat,&quot; the approach is to inject text as a condition into every denoising step—so that the model is not just &quot;denoising&quot; but &quot;denoising in a direction that matches this description.&quot;</p>
+<p>This depends on alignment between text and image. The model must know roughly what the phrase &quot;a corgi wearing a hat&quot; looks like in image space: which part is the hat, which part is the corgi, and how they should be combined. This alignment is exactly what CLIP-style image-text Contrastive Learning provides (see &quot;CLIP,&quot; &quot;Multimodal Models,&quot; and &quot;Embedding&quot; for related content). The text encoder first turns the prompt into a conditional representation, and the denoising network reads this representation at each step and outputs an update direction influenced by the condition.</p>
+<p>Thus the division of roles becomes clear: denoising decides &quot;how to draw a plausible image,&quot; and the text condition decides &quot;which image to draw.&quot; Together, they form text-to-image generation.</p>
+<p>It is also important to understand the correct way to interpret generation results. Generation results should be understood as the model's joint sampling of the condition and the training distribution, rather than verbatim execution of commands. For common combinations well covered by training, the condition can effectively steer generation toward the target content; however, rare combinations, precise counts, complex spatial relationships, and text layout can still go out of control—because the model learns associations at the distribution level, not item-by-item obedience to instructions.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Comparison with Generative Adversarial Network (GAN)<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Before diffusion models, the main force in image generation was GAN. The two have a fundamental difference in generation method: GAN makes the generator and discriminator compete against each other, and the generator outputs an image in one step; diffusion models start from noise and generate step by step through multi-step denoising.</p>
+<p>This difference directly brings their respective advantages and disadvantages. GAN generates quickly because one forward pass produces an image; but training is unstable and prone to falling into &quot;mode collapse&quot;—that is, the generator, in order to fool the discriminator, learns to generate only a few types of samples, losing diversity. Diffusion models are more stable, have more diverse samples, and are also more easily controlled by conditions such as text, but at the cost of requiring multiple steps and slower generation.</p>
+<p>The reason diffusion later took the lead is here: it breaks generation into many learnable small steps, making training more stable, samples more diverse, and also easier to guide with conditions. The speed shortcoming is greatly alleviated by &quot;latent space diffusion&quot;—performing denoising in a compressed small space first, rather than directly in the original pixel space (see &quot;Variational Autoencoder (VAE)&quot; for related content). For the detailed mechanism of GAN, see the &quot;Generative Adversarial Network (GAN)&quot; node.</p>
+<p>When comparing the two, maintain fairness: inputs should be the same data, resolution, compute, and evaluation slices, so that differences in output speed, quality, and coverage are interpretable. Also note two easily overlooked boundaries: GAN being fast in one forward pass does not mean training is cheap—the cost of adversarial training can be high; diffusion training being stable does not mean it is better on all tasks. Which one to choose depends on latency requirements, editing capabilities, diversity needs, and deployment budget.</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>GAN</th><th>Diffusion Models</th></tr></thead>
+    <tbody>
+      <tr><td>How it generates</td><td>Generator and discriminator<b>compete against each other</b>, one-step generation</td><td>From noise<b>multi-step denoising</b></td></tr>
+      <tr><td>Speed</td><td>Generates quickly</td><td>Requires multiple steps, slower</td></tr>
+      <tr><td>Stability/Diversity</td><td>Unstable training, prone to “mode collapse” (only generates a few types)</td><td>More stable, more diverse, more controllable</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5.5</span>Latent Space and Guidance: Trade-offs in Speed, Prompt Adherence, and Diversity<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>High-resolution pixel space is too expensive, and text conditioning may not be strong enough, so engineering uses two approaches to address this.</p>
+<p>The first is latent space diffusion. First, an encoder compresses the image into smaller latent variables; denoising is performed in this smaller space, and finally the result is decoded back to pixels, significantly reducing computational cost. The input to latent space diffusion is the compressed representation, and the output is the decoded image; what compression discards is detail information, which is the price paid for its speedup.</p>
+<p>The second is classifier-free guidance. It combines conditional prediction with unconditional prediction to alter the sampling direction: making the sampled result lean more toward the side that &quot;matches the text condition.&quot; Increasing the guidance scale usually makes the image adhere more closely to the prompt, but too high a value sacrifices diversity, causes oversaturation, or produces artifacts. This shows that &quot;being more obedient&quot; is not a free one-way gain, but a trade-off—a higher guidance score indicates stronger adherence to the conditional difference, not necessarily higher overall quality.</p>
+<p>Since both knobs involve trade-offs, systematic evaluation and failure diagnosis are needed. The approach is to fix a prompt set and random seeds, run grid experiments over sampling steps, scheduler, and guidance scale, and record latency, prompt adherence, sample diversity, and artifact rate. FID or image-text similarity can only serve as proxy metrics; you also need to specifically examine hard slices such as counting, text, hands, and identity consistency. When diagnosing, first determine which category the failure belongs to: if high guidance only improves similarity but makes samples converge, it should be attributed to the adherence–diversity trade-off; if structures are generally blurry, then check the denoiser, VAE decoding, and sampling steps separately. This distinguishes &quot;parameter tuning issues&quot; from &quot;model capability issues,&quot; avoiding blindly increasing any single parameter.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Connecting the Entire Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Connect the preceding sections into a complete causal chain, starting with &quot;one-step generation is too hard&quot;: creating a coordinated, realistic image out of thin air in one step is equivalent to predicting in one go the joint relationships among all pixels of the entire image—a burden so heavy as to be impractical (§1).</p>
+<p>Diffusion's response is to split it apart: forward noising, taking a clean real image and gradually adding noise step by step until it becomes pure noise, automatically generating a vast number of &quot;before noising / after noising&quot; training samples along the way; reverse learning to denoise, training the network to restore a noisy image to a slightly cleaner one (§2).</p>
+<p>During generation, start from pure noise and repeatedly denoise, letting the image gradually &quot;develop&quot;; the reason for breaking it into many small steps rather than completing it in one step is that each small step—&quot;from a bit more noise to a bit less noise&quot;—is simple and learnable, and many small steps accumulate to accomplish a large jump that was originally impossible. Moreover, training does not need to walk the entire chain step by step; you can directly construct noisy samples at any arbitrary time, and randomly sampling one time can provide training signal for the entire timeline (§2, §3).</p>
+<p>Next, text is injected into denoising as a condition, and through image-text alignment the model is steered to generate in a direction that matches the description; thus &quot;denoising decides how to draw a plausible image, and the condition decides which one to draw&quot; (§4).</p>
+<p>Compared with GAN, diffusion is more stable, more diverse, and more controllable, so it has become mainstream, at the cost of slower generation (§5); this speed weakness is in turn alleviated by latent-space diffusion, while the guidance scale makes a trade-off between adherence to the prompt and diversity (§6, §7).</p>
+<p>The sign of grasping the core is: being able to explain clearly why diffusion splits generation into many small steps of &quot;noising—denoising&quot; and how text directs the denoising direction.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Understanding diffusion models first requires several foundations: neural networks provide the skeleton of the reverse denoising network, self-supervised learning explains why the noising process can automatically produce training samples, and embeddings are the language through which text conditions enter the model (prerequisites).</p>
+<p>The core concepts on this page are noising–denoising, multi-step generation, text conditioning injection, and the comparison with GAN. These are the pivot points for understanding the entire mechanism.</p>
+<p>Immediately related extension concepts include: Image Generation as the broader task context, CLIP and Multimodal Models (providing alignment between text and images), Generative Adversarial Network (GAN) (the main image generation approach before diffusion, used for comparative understanding), and VAE (the compression and decoding mechanism that latent-space diffusion relies on).</p>
+<p>Further directions extend from &quot;generating a single image&quot; to Controllable Generation, Video Generation, Image Editing, and Super-resolution—they are all built on the same foundation of noising–denoising and conditional guidance, but expand the generation target from a single static image to more complex spaces.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Neural Networks, Self-supervised Learning, Embeddings</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Noising–Denoising, Multi-step Generation, Text Conditioning Injection, vs GAN</td></tr>
+      <tr><td>Immediate Extensions</td><td>Image Generation, CLIP, Multimodal Models, Generative Adversarial Network (GAN), VAE</td></tr>
+      <tr><td>Further</td><td>Controllable Generation, Video Generation, Image Editing, Super-resolution</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al., Denoising Diffusion Probabilistic Models</a>: forward noising, reverse denoising, and the training objective.</li>
+    <li><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., High-Resolution Image Synthesis with Latent Diffusion Models</a>: latent space diffusion and cross-attention conditional injection.</li>
+    <li><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans, Classifier-Free Diffusion Guidance</a>: classifier-free guidance and the conditional strength trade-off.</li>
+  </ul>
+  <div class="dd-src-date">Date accessed: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/diffusion">Explore connections on the map</a><a href="/zh/concepts/diffusion/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=svg.querySelector('marker#ch1,marker#g28a,marker#mr1,marker#vd1')||
+      ['Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
