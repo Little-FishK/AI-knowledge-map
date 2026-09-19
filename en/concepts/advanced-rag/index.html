@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process · AI Knowledge Map</title>
+<meta name="description" content="From query rewriting, hybrid retrieval, reranking, multi-hop, corrective retrieval, and answer citation, understand when to upgrade basic RAG.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/advanced-rag/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/advanced-rag/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/advanced-rag/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process">
+<meta property="og:description" content="From query rewriting, hybrid retrieval, reranking, multi-hop, corrective retrieval, and answer citation, understand when to upgrade basic RAG.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/advanced-rag/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process">
+<meta name="twitter:description" content="From query rewriting, hybrid retrieval, reranking, multi-hop, corrective retrieval, and answer citation, understand when to upgrade basic RAG.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/advanced-rag/#page","name":"Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process","description":"From query rewriting, hybrid retrieval, reranking, multi-hop, corrective retrieval, and answer citation, understand when to upgrade basic RAG.","url":"https://ai-knowledge-map.com/en/concepts/advanced-rag/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process","item":"https://ai-knowledge-map.com/en/concepts/advanced-rag/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process</span></li></ol></nav><article id="dd-article" data-concept-id="advanced-rag">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Advanced RAG: Making Retrieval a Diagnosable, Iterative Evidence Process</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From query rewriting, hybrid retrieval, reranking, multi-hop, corrective retrieval, and answer citation, understand when to upgrade basic RAG.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Advanced RAG is not about piling on more components, but improving query, retrieval, ranking, or generation for identified failure points; every added step should improve evidence coverage, faithfulness, or task success, otherwise it only increases latency and uninterpretability.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Diagnose layered Retrieval-Augmented Generation (RAG) failures; design hybrid and multi-query retrieval; understand HyDE/corrective retrieval; control multi-hop and loops.</div>
+<ol class="dd-chain"><li>Record basic RAG failures</li><li>Locate the query/retrieval/ranking/generation layers</li><li>Add components only for target failures</li><li>Save evidence and sources at each step</li><li>Limit multi-hop and handle conflicts</li><li>Validate end-to-end gains through ablation</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>First Locate the Failing Layer<span class="dd-badge intuition">Diagnosis</span></h2>
+<div class="dd-agent-response"><p>When the answer of a Retrieval-Augmented Generation (RAG) system is wrong, the most common impulse is to immediately add components: add a reranker, change the embedding model, enable multi-query. But the error can occur at any layer of the entire pipeline—parsing, chunking, query construction, retrieval, reranking, context utilization, or generation—and the new component is likely added at a position unrelated to the failure. Therefore, first answer the question “which layer deviated from expectations”, then decide what to change.</p>
+<p>The inputs to layered diagnosis are the artifacts of each layer in the pipeline: the original query, parsed document chunks, retrieved candidates, reranked results, assembled final context, and final answer; the output is the first layer that deviated from expectations, and a falsifiable repair hypothesis. Saving the artifacts of each layer and annotating them with evidence is the prerequisite for locating the bottleneck and the line of defense against blindly stacking components. When the candidate set does not contain the correct information at all, the problem lies in the query or retrieval; when the candidates cover the correct information but the answer is still wrong, the problem lies in assembly or generation; when citations conflict with each other, the problem often lies in old or incorrect versions mixed into retrieval.</p>
+<p>The falsifiable hypothesis is the core tool of this layered diagnosis. Saying vaguely that “retrieval quality is poor” cannot guide changes; each failure should be written as a specific assertion that can be overturned by experiment, for example “if quality exceptions are added to candidates, the answer will be correct” and “if old versions are filtered out, citation conflicts will disappear.” Then change only the layer the hypothesis points to, and rerun on the same query set. The same data and a single variable are the prerequisites for subsequent conclusions to hold: if multiple links are changed at once, gains cannot be attributed and failures cannot be located.</p>
+<p>There are two typical interpretations of rerun results. If candidate coverage increases while the answer remains unchanged, the bottleneck has shifted to assembly or generation, retrieval is no longer the main contradiction, and continuing to invest in retrieval is wasteful; if the answer improves but latency exceeds budget, there is no need to make all queries bear the cost of the complex pipeline—route the complex pipeline only to difficult queries. Diagnosis is therefore not only about finding the point of error, but also about deciding where to continue investing and where to stop.</p>
+<p>This explains why components cannot be directly stacked before the failure is located. Layered experiments—propose a hypothesis, change only one layer, rerun the same query set—better clarify where the gains come from than simultaneously enabling multi-query, HyDE, a reranker, and an AI Agent, and they preserve a safe fallback path: each layer has a clear before-and-after comparison, and rolling back any layer will not affect the other layers.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Query Rewriting and Expansion<span class="dd-badge eng">Query</span></h2>
+<div class="dd-agent-response"><p>The questions users ask are often not the best search terms: natural language mixes ambiguity, omitted entities, dates, and negation conditions, and the retrieval system may not be able to directly read from a single sentence what to look for. Query rewriting targets this gap. Common techniques include disambiguation, adding entities, generating multiple queries, and constructing hypothetical documents with HyDE. The common effect of these techniques is to complete the search expression and improve recall, but they may also introduce incorrect assumptions, so both the original question and the rewritten result should be retained and auditable.</p>
+<p>The input to the rewriter is the original question and the entities, dates, negations, and ambiguities that can be identified in it; the output is a structured rewrite or multiple subqueries that preserve these constraints. The key is that rewriting only supplements the search expression without replacing user intent. Therefore, the rewriter should output structured differences: which entity was added, which subquestions were split off, which dates and negation conditions were retained. If the differences are not written out, later reviewers cannot tell whether a retrieval shift was a deliberate expansion or an accident.</p>
+<p>The cost of dropping negation can be seen clearly with an example: after “Can’t I get a refund?” is changed to “refund process”, the retrieval results are highly similar in topic, but the eligibility judgment has been lost—the user is asking “Do I have refund eligibility?”, while the rewritten query looks for “how to go through the refund process”. Topic similarity masks the semantic deviation; even high recall is collecting evidence along the wrong premise. Similarly, newly added entities can also lead retrieval to the wrong premise, for example, binding a question to some unrelated product line.</p>
+<p>Therefore, rewriting and acceptance must be separated. The sole purpose of rewriting is to find evidence; the final generation must be accepted using the original question: whether the answer still answers what the user originally asked. HyDE also follows this rule—hypothetical documents are only a means of constructing a search representation. Using a generated “ideal answer” to match documents does not mean that this hypothetical content itself has binding force. Only by retaining the original question, retaining the rewrite differences, and retaining the sources can every expansion step be traceable and reversible.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Hybrid Recall and Fusion<span class="dd-badge math">Recall</span></h2>
+<div class="dd-agent-response"><p>Dense vector retrieval and keyword retrieval each have a region the other cannot reach: keyword retrieval excels at exact matching of names, model numbers, and digits, but is powerless against synonym rewriting; dense vectors excel at semantic-level rewrite matching, but tend to miss proper nouns and identifiers that must be matched verbatim. Hybrid recall runs two types of retrievers in parallel on the same query, then fuses the results into a candidate list, trading complementary coverage for recall rate.</p>
+<p>The difficulty of fusion lies in the fact that the scores of the two types of retrievers cannot be directly compared—BM25 scores and cosine similarity are on completely different scales. Reciprocal Rank Fusion (RRF) bypasses scores and uses only ranks. It takes as input the candidate ranks rⱼ(d) given by each of the J retrieval paths and a smoothing constant k, and outputs a fused score for each document d:</p>
+<p>RRF(d) = Σⱼ 1/(k + rⱼ(d))</p>
+<p>Here j is the retrieval path index, and rⱼ(d) is the rank of document d in the j-th retrieval path. Each path contributes a term according to 1/(k + rⱼ(d)): the higher a document is ranked, the smaller rⱼ(d), so the larger its contribution; documents ranked high in multiple paths accumulate a higher total score. k is a smoothing constant that prevents the top-ranked item from being too large and dominating the fusion, and also flattens the gap between adjacent ranks, reducing the impact of minor fluctuations in a single path on the fusion result. Fusing by rank rather than summing scores fundamentally avoids the problem of directly summing quantities with different scales.</p>
+<p>Fusion yields a re-ranked candidate set, and that is all. It does not judge the timeliness, permissions, or authenticity of documents; these attributes need to be handled separately in downstream stages of the pipeline. How the weights are allocated should also be verified by query type: which query types rely mainly on keywords and which on semantics needs actual validation, not guesswork. At the same time, the original ranks output by each retrieval path should be preserved—the fused score cannot explain a particular regression; only by tracing back the original rank each path assigned to a relevant document can we identify which retrieval path went wrong.</p></div>
+<div class="dd-formula"><math display="block" aria-label="倒数排名融合分数"><mi>RRF</mi><mo>(</mo><mi>d</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mo>+</mo><msub><mi>r</mi><mi>j</mi></msub><mo>(</mo><mi>d</mi><mo>)</mo></mrow></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Reranking and Context Assembly<span class="dd-badge eng">Ranking</span></h2>
+<div class="dd-agent-response"><p>Although the fused candidates are all relevant to the query, they may still be duplicates of one another, conflict with each other, or be only marginally related. What reranking and context assembly address is “what to do after relevance”: turning candidates into a context that a generative model can reliably use.</p>
+<p>Reranking is usually delegated to a cross-encoder. It feeds the query and document in pairs into the same model for joint encoding, judging relevance through token-by-token interaction, and is therefore more accurate than a bi-encoder that encodes each separately and then computes similarity; the downside is much greater computational load, so it can only be used on a small set after the number of candidates has been reduced. The scores output by fine ranking indicate “whether this passage is suitable for answering,” not “whether this passage is trustworthy”—being top-ranked and relevant only indicates suitability for answering, not trustworthiness.</p>
+<p>The inputs to the assembly stage are not just the reranking scores; they also include each candidate's source, adjacent chunks, version, and permissions. The output is a deduplicated context that preserves necessary conflicts and citations. Deduplicating by source can merge duplicate chunks from the same document that have been split apart, and expand adjacent chunks to restore fragments into complete paragraphs, preventing the generative model from seeing only half a sentence. At the same time, filter out expired content and content without access permission. Different viewpoints and temporal versions cannot simply be merged: conflicting authoritative evidence must be explicitly retained, and the conflict should be explained during generation, rather than silently discarding one side. Key evidence should be placed near the task-relevant location, with citations, so that every claim in the final answer can be traced back to a specific source in the context.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Multi-hop and Adaptive Retrieval<span class="dd-badge intuition">Agentic RAG</span></h2>
+<div class="dd-agent-response"><p>Some questions cannot be answered with a single retrieval: you must first find A before you know to look for B. For example, if you want to know “which university the scholar who proposed a certain theorem teaches at,” you first need to find the scholar associated with the theorem, then use the scholar’s name to search for their affiliated institution. Multi-hop retrieval breaks such questions into sub-questions, retrieves step by step, and records the intermediate entities discovered at each step into evidence slots; when the existing evidence is insufficient to answer, or when the evidence conflicts with each other, it triggers supplementary retrieval to continue.</p>
+<p>The input of a multi-hop loop is the original question, the already filled known evidence slots, and the current gap; the output is the next sub-query, the newly discovered intermediate entities, and the updated slot state. Each hop has reason to continue only when it fills a gap or resolves a conflict; if the current evidence is already sufficient, continuing retrieval only adds noise. Each step must also verify entities and sources, because erroneous entities cause subsequent retrieval to snowball: once the first hop writes the wrong intermediate entity into the slot, all subsequent queries will revolve around this incorrect premise, drifting further with each search, and later correct results also cannot easily undo the earlier deviation.</p>
+<p>Therefore, multi-hop retrieval must include hard boundaries: a maximum number of steps, a retrieval budget, and termination on no progress. Stop when the step limit is reached or the budget is exhausted, answer with the available evidence and explain the gap; if several consecutive hops fill no slots, it should likewise terminate. The value of multi-hop lies in turning retrieval into a verifiable, explainable evidence chain, rather than an endlessly extending search loop.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Is It Worth Upgrading?<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Advanced pipelines cannot prove themselves by 'feeling stronger.' The inputs to evaluation are a fixed query set, and comparisons between basic Retrieval-Augmented Generation (RAG) and each single-component variant; the outputs are differences in Recall, NDCG, evidence faithfulness, answer success, latency, and cost. A fixed query set ensures every change is measured on the same scale, and single-component variants constitute component ablation: each time only add or remove one component to see exactly which metric it improves.</p>
+<p>Component ablation answers end-to-end questions, not local questions. A component improving its own local metrics—such as higher recall or more accurate ranking—does not automatically mean the system is better. If reranking improves ranking quality but answer success does not change, it indicates the bottleneck is already in a later stage; at this point, you should examine context utilization instead of continuing to add components to the front end. Metrics must be tied to real outcomes: ranking and recall are intermediate metrics, while answer success and evidence faithfulness are the task itself; latency and cost are the price any improvement must pay, and all four must be reported together.</p>
+<p>"More retrieval does not equal more truth" is the most easily overlooked boundary in upgrade decisions. Expanding recall often brings duplicate chunks, outdated content, and low-credibility sources into the context together; noise is amplified as the number of candidates increases, thereby diluting the originally reliable evidence. Therefore, components without a stable net benefit should be removed: if ablation shows that a component has no repeatable positive contribution to answer, faithfulness, latency, and cost, it is not worth keeping in the pipeline.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>How a refund query is repaired layer by layer<span class="dd-badge math">Worked Example</span></h2>
+<div class="dd-agent-response"><p>“Can a quality problem 35 days after signing for delivery be refunded?” is not a query that can be answered simply by increasing top-k. It simultaneously involves general deadlines, quality exceptions, time and eligibility judgments; any single-path retrieval will miss half of the evidence. The Advanced RAG process starts from the original question, first performs query decomposition, then runs dual-path retrieval with BM25 and vectors, and after fusion and reranking goes through timeliness and permission checks, ultimately handing over only materials that pass governance to generation. The output of each step can be inspected independently, and problems found are routed back to the corresponding layer for repair—it is not a component pipeline that can only move forward.</p>
+<p>The rankings from dual-path retrieval and the fusion results can be fully recalculated. The table below lists, for candidates A through D, the BM25 rank, vector rank, and RRF score (k=60):</p>
+
+<p>RRF uses only ranks, avoiding direct addition of incomparable BM25 and cosine scores; but the scores for A, C, and D in the table are almost identical, indicating that fusion is not the final arbiter—it is only responsible for expanding the candidate pool, not for judging who actually answers the question. Reranking must make fine-grained relevance judgments around “refund eligibility,” and timeliness filtering must also remove the seemingly not-low-relevance outdated policy D. Only by retaining A, B, and the order date in the final context can the conclusion be drawn: the general deadline has passed, but the quality exception may still apply.</p>
+<p>This conclusion is reproducible. If only single-path top-2 were used, BM25 would give A+C, missing the quality exception; vectors would give B+D, missing the currently effective general rule. Fusion combines the evidence coverage of both paths, and reranking and timeliness rules then narrow the four candidates down to A+B, which together support the conclusion. The final answer can only cite materials that were actually retrieved and passed governance checks; any assertion not included in this set of evidence has no right to appear in the answer.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 220" role="img" aria-label="Advanced RAG process from original question through query decomposition, dual-path retrieval, fusion reranking to evidence-based answer"><defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="15" y="55" width="115" height="78" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="72" y="78" text-anchor="middle" class="svg-t">Original question</text><text x="72" y="99" text-anchor="middle" class="svg-t" font-size="10">35 days + quality problem</text><text x="72" y="117" text-anchor="middle" class="svg-t" font-size="10">Can it be refunded?</text><path d="M130,94 L174,94" stroke="#6b7484" marker-end="url(#ar1)"/><rect x="176" y="39" width="128" height="110" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="240" y="64" text-anchor="middle" class="svg-t">Query decomposition</text><text x="240" y="87" text-anchor="middle" class="svg-t" font-size="10">General deadline</text><text x="240" y="105" text-anchor="middle" class="svg-t" font-size="10">Quality exception</text><text x="240" y="123" text-anchor="middle" class="svg-t" font-size="10">Policy version</text><path d="M304,94 L348,94" stroke="#6b7484" marker-end="url(#ar1)"/><rect x="350" y="28" width="142" height="132" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="421" y="53" text-anchor="middle" class="svg-t">Dual-path retrieval + RRF</text><text x="421" y="77" text-anchor="middle" class="svg-t" font-size="10">BM25: number/30 days</text><text x="421" y="96" text-anchor="middle" class="svg-t" font-size="10">Vector: quality exception</text><text x="421" y="115" text-anchor="middle" class="svg-t" font-size="10">Deduplication · permission · timeliness</text><text x="421" y="137" text-anchor="middle" class="svg-t" font-size="10">Cross-encoder reranking</text><path d="M492,94 L536,94" stroke="#6b7484" marker-end="url(#ar1)"/><rect x="538" y="44" width="127" height="100" rx="8" fill="#21252d" stroke="#c77b72"/><text x="601" y="68" text-anchor="middle" class="svg-t">Assertion-by-assertion answer</text><text x="601" y="91" text-anchor="middle" class="svg-t" font-size="10">General rule + exception</text><text x="601" y="110" text-anchor="middle" class="svg-t" font-size="10">Order facts + citations</text><text x="601" y="129" text-anchor="middle" class="svg-t" font-size="10">If insufficient, refuse answer / supplement retrieval</text><path d="M602,145 C590,202 242,205 240,150" fill="none" stroke="#6b7484" marker-end="url(#ar1)"/><text x="422" y="198" text-anchor="middle" class="svg-t" font-size="10">When citations do not support the conclusion, attribute the failure back to the query, retrieval, or assembly layer</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  The value of Advanced RAG is that it makes the output of each layer inspectable and repairable via backflow; it is not a component pipeline that can only move forward.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>BM25 rank</th><th>Vector rank</th><th>RRF score (k=60)</th><th>Reranking judgment</th></tr></thead><tbody><tr><td>A: 30-day general rule</td><td>1</td><td>4</td><td>1/61+1/64=0.0320</td><td>Necessary but insufficient</td></tr><tr><td>B: quality problem exception</td><td>5</td><td>1</td><td>1/65+1/61=0.0318</td><td>Answer core</td></tr><tr><td>C: arrival time</td><td>2</td><td>3</td><td>1/62+1/63=0.0320</td><td>Close in topic but does not answer eligibility</td></tr><tr><td>D: outdated policy</td><td>3</td><td>2</td><td>1/63+1/62=0.0320</td><td>Excluded due to outdated version</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>When to Stop Error Correction and Multi-Hop<span class="dd-badge eng">Failure Boundary</span></h2>
+<div class="dd-agent-response"><p>When the system continues searching after discovering insufficient evidence, the greatest danger is not spending a few more retrieval attempts, but turning a single missing-evidence case into an endless loop. The first step to prevent losing control is to declare the still-missing evidence slots in each retrieval round, for example, "order facts known, general rules known, quality exception unknown", rather than vaguely asking to "find more". With the slot list, a new retrieval round counts as making progress only when it fills a slot, resolves a version conflict, or raises the source level; all other actions are idle.</p>
+<p>Apart from idling, wrong repair directions are also common; common situations and corresponding actions are as follows:</p>
+
+<p>Each row corresponds to the same principle: the fix should occur at the layer where the failure actually happens, not by making more forceful efforts elsewhere. When evidence conflicts, a majority of fragments are not necessarily correct; the right approach is to check dates, permissions, and authoritative sources.</p>
+<p>Stop conditions must be as hard as progress conditions. Preset maximum hop count, maximum query count, token or latency budget, and no-progress termination should be set in advance; after reaching any boundary, the output is divided into three parts: known, unknown, and items requiring human confirmation. Stop after two consecutive rounds with no new evidence slots and transparently report the insufficiency, instead of letting the Agent freely rewrite queries to continue looping.</p>
+<p>There is another failure boundary belonging to the evidence source itself: the "hypothetical document" generated by HyDE is only used to construct a search representation, not evidence. If the hypothetical text fabricates product names or clauses, subsequent retrieval may snowball around erroneous premises. Likewise, content written by the Agent itself cannot be elevated to evidence for the answer. Answers can only cite materials that were actually retrieved and have passed version and permission checks.</p></div>
+<table class="dd-table"><thead><tr><th>Observation</th><th>Correct action</th><th>What not to do</th></tr></thead><tbody><tr><td>Correct document never enters candidates</td><td>Fix query, chunking, or retrieval channel</td><td>Only change the generation prompt</td></tr><tr><td>Evidence in candidates but ranked low</td><td>Rerank, deduplicate, and filter by version</td><td>Expand context without limit</td></tr><tr><td>Evidence conflicts with each other</td><td>Check dates, permissions, and authoritative sources</td><td>Vote by majority of fragments</td></tr><tr><td>Two consecutive rounds with no new evidence slots</td><td>Stop and transparently report insufficiency</td><td>Let the Agent freely rewrite queries in a loop</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>All the techniques of Advanced RAG ultimately reduce to the same causal chain from problem to practice. The starting point of the chain is recording the real failures of basic RAG, not a preconceived list of solutions. Once you have failure samples, locate which layer they occur in—query, retrieval, ranking, or generation—and then add components only for the targeted failures you located, one change per failure. At each step, preserve evidence and sources so that the output of any layer can be re-examined and rolled back. Multi-hop and error-correction loops must set boundaries and handle conflicts explicitly, preventing retrieval from extending indefinitely on incorrect premises. Finally, use a fixed query set to perform component ablation, verifying that the added stage produces end-to-end gains rather than just improvements in a local metric that give false comfort. Each step forward in the chain answers the same question: which failure of which type of query disappeared because of this change, and at what cost.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2312.10997" target="_blank" rel="noopener">Retrieval-Augmented Generation for Large Language Models: A Survey</a>: RAG technology lineage</li><li><a href="https://arxiv.org/abs/2212.10496" target="_blank" rel="noopener">Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)</a>: hypothetical document retrieval</li><li><a href="https://arxiv.org/abs/2401.15884" target="_blank" rel="noopener">Corrective Retrieval Augmented Generation</a>: retrieval quality assessment and correction</li><li><a href="https://dl.acm.org/doi/10.1145/1571941.1572114" target="_blank" rel="noopener">Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods</a>: RRF rank fusion</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/advanced-rag">Explore connections on the map</a><a href="/zh/concepts/advanced-rag/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.querySelector('[transform]'))continue;
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
