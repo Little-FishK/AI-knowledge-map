@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal · AI Knowledge Map</title>
+<meta name="description" content="From demonstration data, preference comparisons, reward models, to policy optimization, understand what RLHF optimizes and why it cannot be equated with “making the model absolutely safe.”">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/rlhf/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/rlhf/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/rlhf/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal">
+<meta property="og:description" content="From demonstration data, preference comparisons, reward models, to policy optimization, understand what RLHF optimizes and why it cannot be equated with “making the model absolutely safe.”">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/rlhf/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal">
+<meta name="twitter:description" content="From demonstration data, preference comparisons, reward models, to policy optimization, understand what RLHF optimizes and why it cannot be equated with “making the model absolutely safe.”">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/rlhf/#page","name":"RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal","description":"From demonstration data, preference comparisons, reward models, to policy optimization, understand what RLHF optimizes and why it cannot be equated with “making the model absolutely safe.”","url":"https://ai-knowledge-map.com/en/concepts/rlhf/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal","item":"https://ai-knowledge-map.com/en/concepts/rlhf/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal</span></li></ol></nav><article id="dd-article" data-concept-id="rlhf" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">RLHF and Preference Alignment: Turning “What People Prefer” into a Trainable Signal</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From demonstration data, preference comparisons, reward models, to policy optimization, understand what RLHF optimizes and why it cannot be equated with “making the model absolutely safe.”</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The essence of RLHF is turning the relative preferences of a limited set of annotators for candidate answers into an optimizable proxy signal; the classic pipeline consists of SFT, preference comparison, reward modeling, and constrained policy optimization, so reward improvements must be rechecked by independent capability and safety evaluations.</div></header>
+<!-- source-body:start --><div class="dd-goals"><strong>After reading this, you should be able to:</strong>Draw the classic RLHF pipeline; explain how the reward model learns from pairwise comparisons; understand the role of the KL constraint; distinguish RLHF, SFT, and DPO; recognize the limitations of preference data.</div>
+<div class="dd-chain">Clarify goals and conflicts → Design annotation guidelines → Check consistency → Train the preference objective → Monitor reward/KL → Independent capability and safety evaluation → Red teaming and production monitoring</div>
+<section class="dd-sec" data-source="content-generation"><h3>1. Why can't we rely solely on “standard answers” for training?</h3>
+<div class="dd-agent-response"><p>Most open-ended tasks do not have a single unique correct answer. For requests such as “explain recursion,” “help me draft a refund email,” and “summarize this code,” a model can give countless plausible responses, and it is difficult to use a single “standard answer” to determine which one is correct. But when humans are faced with two candidate responses, they can usually compare which one is better: more accurate, more useful, more truthful, or more harmless. This intuition is exactly the starting point of RLHF—not to read out a hidden “full-score answer” to the model, but to turn the relative judgment of “which answer do people prefer?” into a trainable signal.</p>
+<p>Supervised fine-tuning (SFT) takes another path: it requires demonstrators to write out the ideal response by hand, and then uses these demonstrations to train the model directly. This path has two practical bottlenecks. First, cost is high: writing high-quality, comprehensive demonstrations requires a great deal of expert time. Second, coverage is limited: the scenarios demonstrators can think of are always finite, and when encountering new requests outside the distribution, the model may have no “standard answer” to refer to. Preference learning reformulates the problem as: given response A and response B, which better meets requirements such as helpfulness, truthfulness, and harmlessness? The model no longer needs to know absolute scores; it only needs to learn an optimizable direction from massive relative comparisons.</p>
+<p>Take a concrete example. Faced with “explain recursion,” response A is conceptually completely accurate but full of jargon, so beginners find it hard to follow; response B is equally accurate and includes a minimal code example to aid understanding. The annotator chooses B, which provides a relative preference—B is more suitable for this scenario than A—rather than declaring “what is the objective full-score value of recursion?” The key to RLHF lies in compressing this kind of comparative choice, turning the information “B is better” into a gradient signal that tells the model which direction to adjust, rather than trying to read out an absolute truth that does not exist.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>2. What are the stages of a classic RLHF pipeline?</h3>
+<div class="dd-agent-response"><p>The overall idea of a classic RLHF pipeline is to proceed in three steps: first teach the model basic behavior, then let the model learn human preferences, and finally move the policy toward high reward. These four steps can be seen as a processing chain from 'being able to speak' to 'speaking in a way that satisfies people.' [Translator’s note: The source describes three stages but then refers to four steps; the detailed pipeline enumerates four steps.]</p>
+<p>The first step is supervised fine-tuning (SFT). The base model has only learned to predict text and does not necessarily know how to 'follow instructions.' Train it with human demonstrations or high-quality instruction data so that it learns to understand a prompt and give an answer that meets the requirements. This step addresses basic behavior: the model begins to treat the input as a task rather than simply continuing the text.</p>
+<p>The second step is sampling and comparison. For the same prompt, let the current model generate multiple candidate responses, and then have people rank them or make pairwise choices. This step does not require annotators to write ideal answers; it only asks them to judge 'which one is better.' These relative judgments are the source of the preference signal to be learned later.</p>
+<p>The third step is reward modeling. Use the comparison data collected above to train a reward model, which outputs a relative score for the 'prompt + response' pair. What the reward model needs to learn is not absolute truth but a computable approximation of 'this response is generally more preferred under human comparison.' The order of scores should match human ranking as closely as possible.</p>
+<p>The fourth step is policy optimization. With the scores given by the reward model as the target, use reinforcement learning methods such as PPO to increase the model's expected reward; at the same time, constrain the policy during optimization from deviating too far from the reference model, so as not to degenerate into strange behavior in order to chase high scores. This step turns 'what people like' into a direction the model can actually move toward.</p>
+<p>It should be noted that these four steps are the classic InstructGPT route; it provides a general framework, not the only standard answer. Modern alignment systems do not necessarily use the same optimizer or the same annotation method; some methods omit independent reward modeling, and some use different forms of preference data, but most still follow the general order of 'basic behavior first, then preferences, then optimization.'</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>3. How does the reward model learn scores from “choosing one of two”?</h3>
+<div class="dd-agent-response"><p>The reward model needs to learn not the absolute value of an answer, but the relative win rate between two answers. Annotators give not “how many points this answer is worth” but “which of the two answers I prefer.” Therefore, the reward model’s goal is to make “the preferred answer’s score is higher than the rejected answer’s score” hold as often as possible.</p>
+<p>If annotators prefer answer y_w over y_l, this preference can be written in Bradley–Terry form as a probability: given prompt x, the probability that answer y_w beats answer y_l equals the value obtained by applying sigmoid to the reward difference between the two answers.</p>
+<p>P(y_w ≻ y_l | x) = σ( r(x, y_w) − r(x, y_l) )</p>
+<p>Here σ is the sigmoid function, which compresses any real number into the range 0 to 1; r(x, y) is the score that the reward model gives to the “prompt + answer” pair. The meaning of this formula is straightforward: the larger the reward difference between the two answers, the closer the preferred answer’s win probability is to 1; the closer the reward difference is to 0, the closer the probability is to 0.5, meaning the two are almost indistinguishable. Conversely, if the rejected answer’s score turns out to be higher instead, the probability drops below 0.5, indicating that the model’s judgment contradicts the human choice.</p>
+<p>When training the reward model, the goal is to increase the score difference between the preferred answer and the rejected answer. When the model sees a comparison of “A is better than B,” it adjusts its parameters to make r(x, A) − r(x, B) larger, thereby making P(A ≻ B | x) close to 1. What is optimized here is the relative ordering, not some absolute “quality score.”</p>
+<p>For this reason, reward scores are meaningful only within the current data, annotation guidelines, and candidate distribution. They are a relative ruler: a score of 8 points only means “within this candidate set and according to this group of annotators' guidelines, it usually ranks ahead,” and it cannot be interpreted as a fixed “quality score of 8” in the real world. Change the annotators, change the guidelines, or change the candidate distribution, and the same answer may receive a completely different score.</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="rlhf-formula-1"><math display="block" aria-label="给定提示 x，回答 y w 胜过回答 y l 的概率，等于二者奖励差经过 sigmoid"><mi>P</mi><mo>(</mo><msub><mi>y</mi><mi>w</mi></msub><mo>≻</mo><msub><mi>y</mi><mi>l</mi></msub><mo>|</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>σ</mi><mo>(</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>w</mi></msub><mo>)</mo><mo>−</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mi>l</mi></msub><mo>)</mo><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>4. Why does policy optimization need a KL constraint?</h3>
+<div class="dd-agent-response"><p>If the goal of policy optimization were only to push reward model scores higher, the policy would quickly learn to exploit this proxy metric. After all, the reward model is only an approximation; it can also give high scores to certain loophole-style answers—repetitively piling on pleasing wording, overconfidence, pandering to surface formatting. Once the model discovers that such answers can reliably obtain high rewards, it will go further and further down this path, eventually drifting away from the reference model that originally speaks like a human.</p>
+<p>To suppress this drift, the policy optimization objective function adds a constraint term in addition to reward. What is maximized is the expected reward of the answer, minus β times the KL divergence between the current policy and the reference policy:</p>
+<p>max π_θ 𝔼[ r(x, y) ] − β · KL( π_θ(· | x) ‖ π_ref(· | x) )</p>
+<p>This expression consists of two terms. The first term 𝔼[ r(x, y) ] encourages the model to generate high-reward answers and is the direct driving force of optimization. The second term KL( π_θ ‖ π_ref ) measures the distance between the output distributions of the current policy π_θ and the reference policy π_ref for a given prompt x, and is deducted from the objective as a penalty. The coefficient β controls the trade-off between the two: the larger β is, the less the model dares to deviate from the reference policy, and the more conservative the update; the smaller β is, the stronger the dominance of the reward score, and the more aggressively the model can pursue high scores.</p>
+<p>The role of the KL constraint is to make updates more conservative, thereby reducing the risks of language degeneration, mode collapse, and reward over-optimization. Language degeneration refers to the model beginning to repeat bizarre wording in order to chase scores; mode collapse refers to output diversity being sucked away by a few “high-score routines”; reward over-optimization refers to reward scores continuing to rise while true quality actually worsens. The KL term adds a speed bump to these phenomena.</p>
+<p>But the KL constraint itself is not a safety proof. It only keeps the policy from going too far at once; it does not guarantee that the direction it goes is correct. A key pitfall is: “reward increase” only means that the output better matches the reward model's judgment, not automatically that it is more truthful, safer, or more aligned with all users' expectations. The error of the reward model itself lies between reward scores and true quality; KL can only limit the magnitude of drift and cannot replace independent evaluation.</p></div>
+<div class="dd-formula" data-display="mathml" data-formula-id="rlhf-formula-2"><math display="block" aria-label="最大化回答奖励的期望，减去 beta 乘当前策略与参考策略的 KL 散度"><munder><mo>max</mo><msub><mi>π</mi><mi>θ</mi></msub></munder><mrow><mi>𝔼</mi><mo>[</mo><mi>r</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>]</mo></mrow><mo>−</mo><mi>β</mi><mo>·</mo><mi>KL</mi><mo>(</mo><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>∥</mo><msub><mi>π</mi><mtext>ref</mtext></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>x</mi><mo>)</mo><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>5. Why are human preferences also a noisy proxy?</h3>
+<div class="dd-agent-response"><p>Treating human preferences as a training signal does not mean obtaining an objective, unbiased yardstick. Annotators can only judge based on the responses in front of them and the guidelines at hand, and this judgment is affected by factors such as knowledge background, cultural habits, wording style, and time pressure. The so-called “what people prefer” is itself a noisy proxy, not pure ground truth.</p>
+<p>Noise first shows up as systematic bias. Annotators often favor longer responses, because length tends to give the impression of being “more careful and more complete”; favor more confident responses, even when the confidence rests on errors; and also favor responses with prettier formatting, even if the content has no substantive difference. These preferences are not always related to true quality, yet they steadily seep into the comparison data.</p>
+<p>Second, the limits of annotators’ abilities can create errors. When faced with specialized factual questions, annotators often cannot verify correctness on the spot, so they may mistake “sounds professional” for “factually correct.” Once such misjudgments enter the training data, they are learned by the reward model as valid signals.</p>
+<p>More fundamentally, different annotators assign different weights to “helpful” and “harmless.” Some think providing more information matters most, while others think avoiding any potential harm takes priority over satisfying the request. Two equally reasonable judgments may produce opposite comparison results for the same pair of responses. Forcing such disagreements into a single ranking itself loses information.</p>
+<p>In engineering, addressing this noise relies not on eliminating disagreements, but on making the noise explicit and controlling it: clarify annotation guidelines (rubric) so that judgment criteria are actionable; train annotators to narrow differences in understanding; measure annotator agreement to quantify the reliability of the data; preserve disagreements and do not forcibly flatten genuine value conflicts; and involve experts in judgment in high-risk domains. Preference data obtained this way still has noise, but the source, scope, and impact of the noise are made explicit as much as possible, rather than being treated by default as clean truth.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>6. What is the relationship between DPO and RLHF?</h3>
+<div class="dd-agent-response"><p>Direct Preference Optimization (DPO) and classic RLHF use the same kind of preference data—both are pairwise comparisons of the kind “response A is better than response B”, but DPO bypasses an explicit reward model and an online reinforcement learning loop. The classic route first trains a reward model, then uses algorithms such as PPO to optimize the policy in a reinforcement learning loop; DPO instead rewrites the preference objective directly as the log-probability difference between the policy and a reference policy, thereby directly increasing the relative probability of the preferred response. The intermediate standalone reward model is omitted.</p>
+<p>The benefit of this approach is that it is usually easier to train. A reinforcement learning loop involves repeated interactions of sampling, reward scoring, and gradient updates, which is complex to engineer and sensitive to hyperparameters. DPO falls back to an offline form more like ordinary supervised learning, with more stable training and simpler implementation, and is friendlier for scenarios that require stable, simple offline training.</p>
+<p>But DPO does not thereby escape the common dependencies of preference alignment. It still requires preference data, a reference model, and appropriate hyperparameters, and it may still inherit biases in the data—annotator bias and limitations of the candidate distribution do not automatically disappear just because one reward model is removed.</p>
+<p>Therefore, the accurate statement is: DPO is a preference alignment method, not a synonym for the classic “reward model + PPO” pipeline. The two share the goal of turning relative preferences into an optimization direction, but their implementation paths differ. A practical selection tip is: when the goal is stable, simple offline training, consider DPO first; when you need online exploration, combining complex rewards, or interaction with an environment, the reinforcement learning route still retains its value, because an explicit reward model and online sampling can support a more flexible objective structure.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>7. How can we verify that alignment actually improves the product?</h3>
+<div class="dd-agent-response"><p>Whether alignment actually improves the product cannot be concluded from reward scores during training, because the training reward is itself the object being optimized. Validation must rely on independent evaluation, and must be rechecked on tasks and risk sets that did not participate in training—those scenarios the model has never seen are where generalization ability is tested.</p>
+<p>A complete validation chain is roughly as follows: first clarify the goals and conflicts, understanding where “helpful” and “harmless” pull against each other; then design annotation guidelines to make the evaluation criteria actionable; next check annotation consistency to confirm the data itself is reliable; then train the preference objective and continuously monitor changes in reward and KL; afterwards use independent capability and safety evaluations to recheck on held-out sets; finally provide a backstop through red-team attacks and continuous monitoring after launch.</p>
+<p>During evaluation, you need to observe multiple dimensions at the same time rather than looking only at a single metric: task success rate measures whether the model accomplished what it was supposed to do; factuality measures whether the answer is truthful; safety violations measure whether harmful output is suppressed; over-refusal measures whether safety constraints have been overcorrected, causing questions that should normally be answered to be rejected outright; group differences measure whether systematic bias exists among different user groups; and human blind evaluation provides the final human judgment from the same source as the preference data.</p>
+<p>If a report provides only the reward model score, it cannot rule out two typical failures: one is reward hacking, where the model has learned to exploit loopholes in the reward model, so the score is inflated while the actual quality has not changed; the other is overfitting to a single evaluator, where the model specifically caters to the scoring habits of one automated evaluator, and its true colors are revealed as soon as a different evaluator is used. Only by viewing reward scores within a multi-dimensional, independent, and held-out evaluation system together can we judge whether alignment has actually improved the product.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>8. Which common claims need to be corrected?</h3>
+<div class="dd-agent-response"><p>There are several widely circulated claims about RLHF that need to be corrected.</p>
+<p>First, RLHF is not a one-time proof of values, but an engineering method for compressing a set of preferences into the model. What it does is turn the relative preferences under specific annotators, specific criteria, and a specific candidate distribution into a trainable proxy signal, rather than starting from some external truth and "hard-coding" values into the model once and for all. Preference data has noise, the reward model has error, and the optimization process has limitations; all of these determine that it can only be an iterative approximation engineering process, not a once-and-for-all proof.</p>
+<p>Second, RLHF is not equivalent to "making the model never make mistakes". It optimizes only a proxy signal on limited data, and there is no equal sign between the proxy signal and "being true, safe, and correct for all users". Increases in reward scores can be contaminated by reward hacking or data bias, and new errors in the real world can still appear.</p>
+<p>Third, SFT, reward modeling, and policy optimization have different roles; you cannot loosely call the entire process "reward model". Supervised fine-tuning is responsible for teaching the model to answer according to instructions, reward modeling is responsible for compressing human comparisons into scores, and policy optimization is responsible for moving the model in the direction of higher reward. The three are different stages in the pipeline, each with its own inputs and outputs; conflating them will obscure their respective failure modes.</p>
+<p>Fourth, the relationship between alignment and capability is not fixed. The two can promote each other—clearer answers are both more helpful and easier to evaluate correctly; they can also conflict—overly pursuing safety can suppress helpfulness, or overly pursuing helpfulness can relax safety. Therefore we cannot draw conclusions from a single dimension; we need to evaluate by dimensions, measuring capability, factuality, safety, and so on separately, and then judge whether the overall trade-offs are reasonable.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>9. Worked example: How do three refund responses become preference scores and policy updates?</h3>
+<div class="dd-agent-response"><p>Let’s use a refund scenario to tie together the previous steps. Suppose the model generated three candidate responses to the same refund request: A directly guarantees a refund, B verifies the order and then explains a quality exception, and C refuses in all cases. The annotators chose B among these three, on the grounds that it both verifies the order and gives a clear explanation of the quality exception.</p>
+<p>The first thing preference data does is turn these candidates from “three parallel responses” into a set of pairwise orderings, such as B ≻ A and B ≻ C. Then the reward model compresses each response into a scalar score, translating the pairwise comparisons into one-dimensional numerical values. Suppose the reward model gives r(B) = 1.2, r(A) = −0.6, and r(C) = −0.1; then the win probability for each comparison can be computed.</p>
+<p>For B versus A, the reward difference Δr = 1.2 − (−0.6) = 1.8; substituting into the sigmoid gives σ(1.8) ≈ 0.858, meaning the model predicts an 85.8% probability that B beats A. For B versus C, Δr = 1.2 − (−0.1) = 1.3, and σ(1.3) ≈ 0.786, meaning the model predicts a 78.6% probability that B beats C. For A versus C, Δr = −0.6 − (−0.1) = −0.5, and σ(−0.5) ≈ 0.378, meaning the probability that A beats C is only 37.8%; the model leans toward C, but this does not mean C is absolutely better, only that it is preferred relative to A.</p>
+<p>This example exposes two properties of scalar rewards. First, the zero point of the reward has no absolute meaning: adding 100 to all rewards at the same time leaves the differences Δr and all win probabilities completely unchanged, showing that scores are meaningful only in relative comparisons. Second, compressing multiple dimensions such as truthfulness, helpfulness, and appropriateness of refusal into a single one-dimensional r discards the structure between dimensions. Compression makes optimization convenient, but it also hides preference conflicts and minority opinions. Therefore, training should retain per-dimension evaluation to avoid the model learning only superficial features that most easily please annotators.</p>
+<p>This set of preference scores next drives the policy update: responses with high win probabilities like B receive more weight, and the policy moves in the direction of producing such responses more often, subject to the KL constraint. The whole process can be summarized as: human pairwise comparisons first provide an ordering, the reward model then compresses the ordering into a scalar, and constrained policy optimization then moves the model toward higher scores.</p>
+<p>Also be wary of a failure boundary: these candidates were sampled from the old policy, and the preference model has only seen this distribution. When the new policy starts generating out-of-distribution text in order to chase higher scores, the reward model is extrapolating when it assigns scores, and the risk of distortion rises significantly. The KL constraint, online spot checks, reward model ensembling, and independent final validation can together limit this risk, but none of them can prove that the system has no vulnerabilities.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 235" role="img" aria-label="RLHF process in which refund responses go through human pairwise comparison, the reward model, and KL-constrained policy optimization"><defs><marker id="rh1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="43" width="138" height="116" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="87" y="67" text-anchor="middle" class="svg-t">SFT policy sampling</text><text x="38" y="91" class="svg-t" font-size="10">A: Guarantees refund</text><text x="38" y="111" class="svg-t" font-size="10">B: Verifies order then explains exception</text><text x="38" y="131" class="svg-t" font-size="10">C: Refuses in all cases</text><text x="38" y="150" class="svg-t" font-size="10">Same prompt, candidates comparable</text><path d="M156,101 L202,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="204" y="43" width="132" height="116" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="270" y="67" text-anchor="middle" class="svg-t">Human preference</text><text x="270" y="92" text-anchor="middle" class="svg-t" font-size="10">B ≻ A</text><text x="270" y="112" text-anchor="middle" class="svg-t" font-size="10">B ≻ C</text><text x="270" y="132" text-anchor="middle" class="svg-t" font-size="10">A vs C has disagreement</text><text x="270" y="151" text-anchor="middle" class="svg-t" font-size="10">Retain annotator/reason</text><path d="M336,101 L382,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="384" y="43" width="132" height="116" rx="8" fill="#21252d" stroke="#c77b72"/><text x="450" y="67" text-anchor="middle" class="svg-t">Reward model</text><text x="450" y="92" text-anchor="middle" class="svg-t" font-size="10">r(A)=−0.6</text><text x="450" y="112" text-anchor="middle" class="svg-t" font-size="10">r(B)=+1.2</text><text x="450" y="132" text-anchor="middle" class="svg-t" font-size="10">r(C)=−0.1</text><text x="450" y="151" text-anchor="middle" class="svg-t" font-size="10">Scores are relative only within data</text><path d="M516,101 L562,101" stroke="#6b7484" marker-end="url(#rh1)"/><rect x="564" y="43" width="98" height="116" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="613" y="67" text-anchor="middle" class="svg-t">Policy optimization</text><text x="613" y="92" text-anchor="middle" class="svg-t" font-size="10">Increase P(B)</text><text x="613" y="112" text-anchor="middle" class="svg-t" font-size="10">KL constraint on drift</text><text x="613" y="132" text-anchor="middle" class="svg-t" font-size="10">Independent evaluation</text><text x="613" y="151" text-anchor="middle" class="svg-t" font-size="10">Check sycophancy/over-refusal</text><path d="M613,160 C607,214 270,215 270,161" fill="none" stroke="#6b7484" marker-end="url(#rh1)"/><text x="440" y="208" text-anchor="middle" class="svg-t" font-size="10">Find bias → fix rubric/sampling/annotation, rather than treating reward scores as ground truth</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 Preference data first turns candidates into pairwise orderings, and the reward model then compresses them into scalars; compression makes optimization convenient but also hides preference conflicts and minority opinions.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Comparison</th><th>Reward difference Δr</th><th>σ(Δr)</th><th>Explanation</th></tr></thead><tbody><tr><td>B ≻ A</td><td>1.2−(−0.6)=1.8</td><td>≈ 0.858</td><td>Model predicts B win probability 85.8%</td></tr><tr><td>B ≻ C</td><td>1.2−(−0.1)=1.3</td><td>≈ 0.786</td><td>Model predicts B win probability 78.6%</td></tr><tr><td>A vs C</td><td>−0.5</td><td>≈ 0.378</td><td>Leans toward C, but that does not mean C is absolutely better</td></tr></tbody></table>
+</section>
+<div class="dd-src"><strong>Sources and further reading:</strong><ul><li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al., Training language models to follow instructions with human feedback</a></li><li><a href="https://arxiv.org/abs/1706.03741" target="_blank" rel="noopener">Christiano et al., Deep Reinforcement Learning from Human Preferences</a></li><li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al., Direct Preference Optimization</a></li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/rlhf">Explore connections on the map</a><a href="/zh/concepts/rlhf/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
