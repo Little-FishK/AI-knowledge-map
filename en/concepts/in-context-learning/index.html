@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>In-context Learning · AI Knowledge Map</title>
+<meta name="description" content="Learn a new task using just a few examples in the prompt, without changing a single parameter">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/in-context-learning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/in-context-learning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/in-context-learning/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="In-context Learning">
+<meta property="og:description" content="Learn a new task using just a few examples in the prompt, without changing a single parameter">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/in-context-learning/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="In-context Learning">
+<meta name="twitter:description" content="Learn a new task using just a few examples in the prompt, without changing a single parameter">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/in-context-learning/#page","name":"In-context Learning","description":"Learn a new task using just a few examples in the prompt, without changing a single parameter","url":"https://ai-knowledge-map.com/en/concepts/in-context-learning/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"In-context Learning","item":"https://ai-knowledge-map.com/en/concepts/in-context-learning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">In-context Learning</span></li></ol></nav><article id="dd-article" data-concept-id="in-context-learning" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">In-context Learning</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Learn a new task using just a few examples in the prompt, without changing a single parameter</p>
+<p class="dd-ali">In-Context Learning · ICL · Few-shot Learning</p>
+<p class="dd-metabar">Suggested 25–35 min · Beginner → Intermediate · Prerequisite: understand how a large language model predicts the next word</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> In-context learning is a capability of large models: given just a few examples in the prompt, it can learn a new task on the spot—without updating any weights at any point. It is not “training,” but a direct extension of the ability to “predict the next word”: the model treats the prompt as a task manual and applies it immediately in a single forward pass.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer these questions yourself:</div>
+  <ul>
+    <li><b>What it is</b>—what zero-shot / few-shot actually mean, and what “learning without training” means.</li>
+    <li><b>Difference from fine-tuning</b>—although both “learn a new task,” what fundamental differences arise from whether weights are changed or not.</li>
+    <li><b>Why it works</b>—a model that only predicts the next word will follow suit after seeing a few examples; does this make sense mechanistically?</li>
+    <li><b>Counterintuitive finding</b>—why whether the example labels are “correct” is not as important as you might think.</li>
+    <li><b>How to use it well</b>—how the number, selection, order, and format of examples each affect performance.</li>
+    <li><b>Boundaries</b>—given how convenient it is, why is fine-tuning still needed; where is its ceiling?</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Write a few examples into the prompt, and the model will follow them after reading—this is in-context learning (zero / one / few-shot).<span>(§1)</span></li>
+    <li>The fundamental difference between it and fine-tuning is “whether weights are changed”: temporary adaptation vs permanent modification.<span>(§2)</span></li>
+    <li>It works because “predicting the next word” forced the model to learn “recognizing patterns and then continuing to write,” and examples tune it to the correct task channel.<span>(§3)</span></li>
+    <li>So examples mainly demonstrate “what the task looks like” (format / label set / input distribution), rather than instilling correct knowledge—individual label mismatches have little impact.<span>(§4)</span></li>
+    <li>Therefore, providing examples requires care: moderate number, choose similar ones with full coverage, shuffle the order, keep the format consistent.<span>(§5)</span></li>
+    <li>Replace the “look” of examples with reasoning processes, and you get few-shot chain-of-thought as a byproduct.<span>(§6)</span></li>
+    <li>But it is limited by the context window, unstable, not persistent, and prone to collapse outside the example range—this marks the boundary between it and fine-tuning.<span>(§7)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Is In-context Learning?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>In-context learning addresses a seemingly paradoxical question: without any additional training, how can the model "learn" a new task within a single request that it has never specifically practiced? The method is surprisingly simple—write a few examples of the task directly into the prompt, and the model follows them after reading them.</p>
+<p>First, look at inputs and outputs. The input of an in-context learning request consists of three parts: a task description, zero or more "input → output" examples, and a new query. The output is the answer generated by the model according to the pattern temporarily presented in the prompt. Throughout the process, the model only performs a single forward computation, using the examples to constrain generation, and parameters are not updated. A direct consequence of this is: the result only indicates that this particular request successfully followed the mapping given by the examples; if the examples are deleted or the request changes, this convention is not automatically retained.</p>
+<p>Based on how many examples are given in the prompt, it can be divided into three levels:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Level</th><th class="dd-align-left">Number of examples in prompt</th><th class="dd-align-left">Example</th></tr></thead><tbody><tr><td class="dd-align-left">zero-shot (zero examples)</td><td class="dd-align-left">0, only a task description</td><td class="dd-align-left">“Judge the sentiment of the following comment: expensive and unpalatable”</td></tr><tr><td class="dd-align-left">one-shot (one example)</td><td class="dd-align-left">1</td><td class="dd-align-left">Give 1 “review → sentiment” pair, then ask a new one</td></tr><tr><td class="dd-align-left">few-shot (a few examples)</td><td class="dd-align-left">a few</td><td class="dd-align-left">It is the minimal demonstration in Figure 1 below</td></tr></tbody></table></div>
+<p>A few-shot prompt consists of several examples plus one query. Its skeleton is: the first few lines use “input → output” pairs to demonstrate the task, and the last line gives only the input and leaves the output blank. For example, the first two lines give “Great → positive” and “Expensive and unpalatable → negative”, and the last line is “Service is very attentive → ”. What the model needs to do is still the only thing it does—predict the next token, and at that moment “the most likely next token” is exactly “positive”.</p>
+<h3>Working example: even the meaning of labels is temporarily defined by context</h3>
+<p>Replacing the familiar “positive/negative” with two arbitrary labels zorp / blip makes it clearer what the model actually recovers from the prompt. Here is such a prompt:</p>
+<ul><li>“Great” → zorp</li><li>“Expensive and unpalatable” → blip</li><li>“Service is very attentive” → ?</li></ul>
+<p>The model can extract from the first line that zorp is associated with positive sentiment, and from the second line that blip is associated with negative sentiment; following this temporary mapping, the third line should output zorp.</p>
+<p>It should be noted that this does not permanently write the new meaning of zorp into the weights; rather, it establishes a temporary mapping in the current token sequence by using the examples. After deleting the first two lines, the model has no reason to continue answering according to this convention in the next request: this mapping exists only in the reasoning process of this sequence and will not settle into any reusable parameter change.</p>
+<p>Therefore, the word “learning” should be used with caution. It does not “remember” knowledge as humans do: the “learning” here means following the examples on the spot, without changing a single weight throughout; once the conversation ends, it forgets, and next time you have to provide the examples again. This feature of “temporary convention, no parameter changes, discarded after use” is the fundamental dividing line between it and traditional training methods such as fine-tuning, and later chapters will explain this meaning thoroughly.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 180" role="img" aria-label="Composition of a few-shot prompt: several examples plus one query">
+      <text x="20" y="26" class="svg-t">A few-shot prompt = several “input → output” examples + one query to answer</text>
+      <g font-size="13">
+        <rect x="24" y="42" width="230" height="26" rx="4" fill="#21252d" stroke="#2c313b"/><text x="34" y="59" class="svg-tn" font-size="13">Review: This restaurant is great</text>
+        <text x="266" y="59" class="svg-t">→</text><rect x="284" y="42" width="70" height="26" rx="4" fill="#21252d" stroke="#4f9d78"/><text x="319" y="59" text-anchor="middle" class="svg-tn" font-size="13">positive</text>
+        <text x="380" y="59" class="svg-t">Example 1</text>
+
+        <rect x="24" y="76" width="230" height="26" rx="4" fill="#21252d" stroke="#2c313b"/><text x="34" y="93" class="svg-tn" font-size="13">Review: Expensive and unpalatable</text>
+        <text x="266" y="93" class="svg-t">→</text><rect x="284" y="76" width="70" height="26" rx="4" fill="#21252d" stroke="#cf6f6f"/><text x="319" y="93" text-anchor="middle" class="svg-tn" font-size="13">negative</text>
+        <text x="380" y="93" class="svg-t">Example 2</text>
+
+        <rect x="24" y="112" width="230" height="26" rx="4" fill="#1a1d23" stroke="#6b8cbe"/><text x="34" y="129" class="svg-tn" font-size="13">Review: Service is very attentive</text>
+        <text x="266" y="129" class="svg-t">→</text><rect x="284" y="112" width="70" height="26" rx="4" fill="#1a1d23" stroke="#d3a05a" stroke-dasharray="4 3"/><text x="319" y="129" text-anchor="middle" class="svg-t" font-size="13">?</text>
+        <text x="380" y="129" class="svg-t" fill="#d3a05a">Query: to be completed by the model</text>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1  The skeleton of a few-shot prompt: the first few lines use “input → output” to demonstrate the task, and the last line gives only the input and leaves the output blank. What the model needs to do is still the only thing it does—predict the next token, and at that moment “the most likely next token” is exactly “positive”.</figcaption>
+  </figure>
+<table class="dd-table">
+    <thead><tr><th>Level</th><th>Number of examples in prompt</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>zero-shot (zero examples)</td><td>0, only a task description</td><td>“Judge the sentiment of the following comment: expensive and unpalatable”</td></tr>
+      <tr><td>one-shot (one example)</td><td>1</td><td>Give 1 “review → sentiment” pair, then ask a new one</td></tr>
+      <tr><td>few-shot (a few examples)</td><td>a few</td><td>That is the minimal example above</td></tr>
+    </tbody>
+  </table>
+<table class="dd-table"><thead><tr><th>Prompt line</th><th>Information the model can extract</th></tr></thead><tbody><tr><td>“Great” → zorp</td><td>zorp is associated with positive sentiment</td></tr><tr><td>“Expensive and unpalatable” → blip</td><td>blip is associated with negative sentiment</td></tr><tr><td>“Service is very attentive” → ?</td><td>Output zorp according to the temporary mapping</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Its Fundamental Difference from Fine-tuning<span class="dd-badge intuition">Intuition</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>'Letting the model learn a new task'—isn't fine-tuning already available for that? What's the difference between the two? It comes down to one fundamental thing: whether weights are changed. Fine-tuning permanently reshapes the model's parameters during training; in-context learning temporarily adapts during use via a prompt, with parameters not moving at all.</p>
+<p>Along this main line, the two approaches diverge point by point in inputs, mechanisms, and applicable scenarios. The inputs being compared are task stability, sample size, latency, call volume, and maintenance constraints; the output is one of two approaches: temporary prompt adaptation, or a parameter training approach. In-context learning includes examples as tokens in forward computation each time, while fine-tuning updates weights via loss and gradients. The former suits quick experimentation, the latter suits long-term consolidation, and the two are not mutually exclusive—they can also be used together.</p>
+<p>Fine-tuning is a one-time 'model modification' engineering effort: its results are written into the weights and take effect for all subsequent requests. In-context learning is a one-time 'temporary borrowing': it is effective only within this prompt and disappears as soon as the request ends. Let's put several key dimensions together:</p>
+
+<p>Condense the division of labor into one sentence: in-context learning is temporary adaptation at runtime; fine-tuning is permanent modification at training time. When there are few tasks, you need them immediately, and they change frequently, choose the former; when the task is fixed, samples are plentiful, and you need long-term stability and cost savings, choose the latter.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 200" role="img" aria-label="Fine-tuning changes weights; in-context learning does not change weights">
+      <text x="20" y="24" class="svg-t">Fine-tuning (training time)</text>
+      <rect x="24" y="34" width="90" height="30" rx="6" fill="#21252d" stroke="#2c313b"/><text x="69" y="53" text-anchor="middle" class="svg-t">Labeled data</text>
+      <line x1="114" y1="49" x2="150" y2="49" stroke="#6b7484" stroke-width="1.6" marker-end="url(#b1)"/>
+      <rect x="150" y="34" width="80" height="30" rx="6" fill="#1a1d23" stroke="#d3a05a"/><text x="190" y="53" text-anchor="middle" class="svg-t">Training</text>
+      <line x1="230" y1="49" x2="266" y2="49" stroke="#6b7484" stroke-width="1.6" marker-end="url(#b1)"/>
+      <rect x="266" y="34" width="150" height="30" rx="6" fill="#21252d" stroke="#4f9d78"/><text x="341" y="53" text-anchor="middle" class="svg-tn" font-size="13">Weights changed (persistent)</text>
+
+      <text x="20" y="118" class="svg-t">In-context learning (during use)</text>
+      <rect x="24" y="128" width="120" height="30" rx="6" fill="#21252d" stroke="#2c313b"/><text x="84" y="147" text-anchor="middle" class="svg-t">Prompt (with examples)</text>
+      <line x1="144" y1="143" x2="180" y2="143" stroke="#6b7484" stroke-width="1.6" marker-end="url(#b1)"/>
+      <rect x="180" y="128" width="100" height="30" rx="6" fill="#1a1d23" stroke="#6b8cbe"/><text x="230" y="147" text-anchor="middle" class="svg-t">One forward pass</text>
+      <line x1="280" y1="143" x2="316" y2="143" stroke="#6b7484" stroke-width="1.6" marker-end="url(#b1)"/>
+      <rect x="316" y="128" width="80" height="30" rx="6" fill="#21252d" stroke="#4f9d78"/><text x="356" y="147" text-anchor="middle" class="svg-tn" font-size="13">Answer</text>
+      <text x="410" y="147" class="svg-t" fill="#6b8cbe">Weights unchanged</text>
+      <defs><marker id="b1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 2  Fine-tuning is a one-time 'model modification' engineering effort: its results are written into the weights and take effect for all subsequent requests; in-context learning is a one-time 'temporary borrowing' that is effective only within this prompt and disappears as soon as the request ends.</figcaption>
+  </figure>
+<table class="dd-table">
+    <thead><tr><th></th><th>In-context learning</th><th>Fine-tuning</th></tr></thead>
+    <tbody>
+      <tr><td>Does it change weights?</td><td>No</td><td>Yes</td></tr>
+      <tr><td>What it requires</td><td>A prompt with examples</td><td>A batch of labeled data + one training run</td></tr>
+      <tr><td>How quickly it takes effect</td><td>Immediate</td><td>Requires training, slow</td></tr>
+      <tr><td>How long it lasts</td><td>One-time; forgotten after use</td><td>Permanent; carried by all subsequent requests</td></tr>
+      <tr><td>Capacity</td><td>Limited by the context window; can't fit many examples</td><td>Can use massive samples</td></tr>
+      <tr><td>Cost structure</td><td>Each request pays tokens for examples</td><td>Expensive to train once; saves on each subsequent request</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Why It Works<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>This is the part that requires the most rigor: a model whose training objective is just “predicting the next word”—why would it follow a few examples without anyone ever teaching it to “learn”? First, lay out the doubts: the model has never been explicitly trained on the procedure of “reading examples, inducing patterns, and applying them to new inputs.” In-context learning is an ability that was not directly taught but emerged on its own. Where does it come from?</p>
+<p>The clue is hidden in the pre-training data. Internet text is full of repeated patterns: a consistently formatted list, a sequence of “Question: … Answer: …”, a question-and-answer dialogue, an “English–Chinese” lookup table. To guess the next word in such text accurately, the model has no choice but to learn one thing—recognize the pattern currently in progress and continue writing in that pattern. When it sees “A → X, B → Y” and needs to continue “C → ___”, the most likely next token is, of course, the one that corresponds to C according to the same mapping rule. A few-shot prompt artificially creates exactly this pattern: by giving several “input → output” pairs, the model recognizes “oh, we are now doing an X → Y mapping,” and then does the same for new inputs.</p>
+<p>So in-context learning is not a new ability that emerged out of thin air, but a by-product forced by the training objective of “predicting the next word”—just like reasoning and translation. The model has already seen countless texts of the sentiment-classification type; the real role of few-shot examples may not be “teaching you this task from scratch,” but telling the model: among the thousands of patterns you learned during pre-training, which one to invoke now. The example “tunes” it to that channel.</p>
+<p>From a mechanistic perspective, the input is a token sequence with a repeated format and a mapping relationship, and the output is a distribution over the next token that matches that local pattern: pre-training has let the model practice completing many lists, Q&A passages, and lookup tables, so examples can help it locate the current task pattern. This “task location” perspective can also explain the counterintuitive finding in the next section.</p>
+<p>But to be honest: what exactly happens inside in-context learning is still an active research topic, with multiple explanations—task location, implicitly performing gradient-descent-like updates during forward propagation, and so on—and no definitive conclusion. What was given above is a working model with strong explanatory power, one that is tenable and sufficient, not the only internal algorithm that has been proven, and even less a final conclusion.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Counterintuitive: Whether example labels are "correct" isn't that important<span class="dd-badge math">Math</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Since the model is "learning" from examples, must the example labels all be correct? The researchers' approach was to run controlled experiments: take the original few-shot prompt, then create versions with shuffled labels, disrupted formatting, replaced label sets, and changed input distributions, have the model run the task on each, and compare the performance drop caused by each change. A small drop indicates that this factor has weak influence in the current task—note that this is only a conclusion for the current task and does not mean it is unimportant in all tasks; specialized tasks and new knowledge mappings may still depend heavily on correct examples.</p>
+<p>The experimental results are surprising. Deliberately shuffling and randomly pairing the labels of few-shot examples—for example, giving a mismatch like "Great → Negative"—often causes model performance to drop only slightly. But changing the other three things causes performance to drop substantially:</p>
+
+<p>Taken together, these results lead to the conclusion that few-shot examples mainly demonstrate what the task "looks like"—what the input looks like, what format the answer should be, and what possible labels exist—rather than feeding the model item-by-item correct knowledge. This exactly corroborates the "task location" perspective: examples tune the model to the right channel, and the model already had the correct judgment from Pre-training.</p>
+<p>But don't misread this conclusion as "examples can be written carelessly." It says that individual label mismatches have little impact, not that you are encouraged to provide wrong examples: format, label set, and input distribution must all be correct and consistent, and on harder, more specialized tasks, the correctness of the examples themselves remains important. A more robust understanding is to treat examples as "providing a template" rather than "giving them casually."</p></div>
+<table class="dd-table">
+    <thead><tr><th>What is changed</th><th>Impact on performance</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td>Shuffle example labels (mismatch)</td><td>Small impact</td><td>Examples don't work by "providing correct knowledge"</td></tr>
+      <tr><td>Break output format (delimiters, messy layout)</td><td>Large impact</td><td>Examples demonstrate "what the answer looks like"</td></tr>
+      <tr><td>Replace the label set (positive/negative → unrelated words)</td><td>Large impact</td><td>Examples delimit "the range of possible answers"</td></tr>
+      <tr><td>Use an unrelated input distribution</td><td>Large impact</td><td>Examples demonstrate "what the input roughly looks like"</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>How to Give Good Examples<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Since the effect is almost entirely concentrated in these few examples, what is the most effective way to provide them? The task of example selection takes candidate examples, the current query, and a token budget as input, and outputs a prompt with a moderate number of examples, adequate class coverage, stable order, and consistent format. You can first ensure correctness and consistency, then prioritize samples that are similar to the query and cover boundary cases, and retest with multiple orderings; when judging results, look at stable gains on the target slice rather than just one particular arrangement. Specifically, break it down into four things.</p>
+<p>Quantity: Going from 0 to 1, then to a few, gives the most obvious improvement; beyond that marginal returns diminish, and each example consumes context window budget. Examples are not necessarily better with more; 0 → 1 → 2 usually yields the largest improvement, then it plateaus with more. Choosing accurately matters more than piling on many.</p>
+<p>Selection: Choose examples that are similar to the current query and high in quality; for classification tasks, try to cover all classes so the model does not mistakenly think there is only one possible answer.</p>
+<p>Order: Models are sensitive to example order and often exhibit a recency bias where the closer to the query, the greater the influence. Do not group similar examples together; interleaving them makes the arrangement more stable.</p>
+<p>Format: Use consistent, clear separators and layout, such as unified “Input: … Output: …”. The controlled experiments in Section 4 have already shown that consistent format often affects results more than individual label correctness.</p>
+<p>These four things belong to a larger layer: deciding which examples to put into the context window and how to arrange them is essentially part of context engineering; equipping a single prompt with examples is one of the most common moves in prompt engineering. In-context learning is the principle behind why this move works.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 520 200" role="img" aria-label="Number of examples and effectiveness: large gains from 0 to a few, then plateauing">
+      <line x1="50" y1="30" x2="50" y2="165" stroke="#2c313b"/><line x1="50" y1="165" x2="470" y2="165" stroke="#2c313b"/>
+      <polyline points="50,150 120,80 190,62 300,52 440,48" fill="none" stroke="#6b8cbe" stroke-width="2.4"/>
+      <g fill="#6b8cbe"><circle cx="50" cy="150" r="4"/><circle cx="120" cy="80" r="4"/><circle cx="190" cy="62" r="4"/><circle cx="300" cy="52" r="4"/><circle cx="440" cy="48" r="4"/></g>
+      <text x="46" y="182" text-anchor="middle" class="svg-t">0</text><text x="120" y="182" text-anchor="middle" class="svg-t">1</text><text x="190" y="182" text-anchor="middle" class="svg-t">2</text><text x="300" y="182" text-anchor="middle" class="svg-t">4</text><text x="440" y="182" text-anchor="middle" class="svg-t">8 …</text>
+      <text x="250" y="197" text-anchor="middle" class="svg-t">Number of examples</text>
+      <text x="30" y="90" class="svg-t" transform="rotate(-90 30,90)">Effectiveness</text>
+      <text x="150" y="120" class="svg-t" fill="#d3a05a">The first few bring the largest gains</text>
+      <text x="330" y="40" class="svg-t">After that, marginal returns decline and they also consume the context window.</text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 3　Examples are not necessarily better with more: 0→1→2 usually yields the largest improvement, then it plateaus as more are added, and each example spends context window budget. Choosing accurately matters more than piling on many.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>A special usage: having examples demonstrate “how to think”<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The previous examples only gave “input → answer.” What happens if the examples also write out “how to think of the answer step by step”? The model will answer new questions by following the pattern of “reason first, then give the answer”—this is few-shot chain-of-thought.</p>
+<p>The input to few-shot chain-of-thought is examples containing an intermediate reasoning format plus a new question, and the output is the steps and answer that the model generates by imitating that format. Its mechanism is pattern continuation: you are not teaching the model to reason; you are merely using examples to set the pattern that “the output should include reasoning steps,” and the model follows suit, and this continuation induces longer intermediate computation. Note that steps that look reasonable are not necessarily factually correct; acceptance should be based on the final answer, verifiable intermediate results, and task boundaries together.</p>
+<p>It is still in-context learning. Chain-of-thought can be triggered by a few examples precisely because in-context learning makes the model “continue in the manner of the examples”: when the examples look like “solutions with reasoning processes,” what the model continues to produce is also solutions with reasoning processes.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Boundaries and Costs<span class="dd-badge eng">Engineering</span><span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>In-context learning is so convenient and requires no training, so why is fine-tuning still needed? Where is its ceiling? When making this judgment, the inputs are window capacity, prompt sensitivity, knowledge freshness, request scale, and stability requirements; the output is a decision to continue with in-context learning, shift to fine-tuning, or use a combination of both. A practical signal is: if adding examples only increases token cost without improving bucketing quality, or changing the order crosses the business threshold, then temporary adaptation is already approaching its practical limit. Its limitations center on four areas.</p>
+<p>Limited by the window: examples are all crammed into the context window, so you can't fit too many; as examples increase, it gets slower and more expensive, and it may trigger “lost in the middle”—mid-context information gets ignored.</p>
+<p>Unstable: sensitive to example wording, order, and format; change the arrangement and results change, making it hard to reproduce and guarantee.</p>
+<p>Not persistent and doesn't update knowledge: nothing is written into weights; every request has to replay examples; it also doesn't really “remember” new knowledge from this.</p>
+<p>Not equal to true mastery: once a query exceeds the range covered by the examples, it can easily break down. When tasks are complex, proprietary, and have many samples, fine-tuning is usually more stable, and in the long run each request also costs fewer tokens.</p>
+<p>Put the trade-offs of the two scenarios side by side:</p>
+
+<p>The pragmatic approach is to view the two as a ladder, not opposites: first use in-context learning to quickly verify whether the model can do the task; once it works, volume grows, and you need long-term stability and cost savings, then consider solidifying it with fine-tuning.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Better suited for in-context learning</th><th>Better suited for fine-tuning</th></tr></thead>
+    <tbody>
+      <tr><td>Tasks vary and require immediate trial</td><td>Tasks are fixed and run long-term</td></tr>
+      <tr><td>Only a few examples</td><td>Have many labeled samples</td></tr>
+      <tr><td>Don't want to train or maintain models</td><td>Need stability, reproducibility, and low per-request cost</td></tr>
+      <tr><td>Prototype validation and temporary needs</td><td>Scaling up with strict format and style requirements</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connect the entire causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String the entire page's content into a chain, and check link by link where each conclusion comes from.</p>
+<p>The starting point is: write a few examples into the prompt, and after reading them the model follows suit—this is in-context learning, divided by the number of examples into zero-shot, one-shot, and few-shot. Its fundamental difference from fine-tuning lies in 'whether the weights are changed': in-context learning is temporary adaptation at runtime, while fine-tuning is permanent modification at training time.</p>
+<p>It holds because the training objective of 'predicting the next word' forces the model to learn to 'recognize the current pattern and continue writing'; few-shot examples artificially create a pattern that tunes the model to the right task channel. From this follows the finding in Section 4: examples mainly demonstrate 'what the task looks like'—format, label set, input distribution—rather than instilling individual pieces of correct knowledge, so individual label mismatches have little effect.</p>
+<p>Following this conclusion, providing examples requires care: moderate quantity, selecting ones similar to the query and covering all categories, shuffled order, and consistent format. And if you replace the 'form' of the examples with solutions that include a reasoning process, you readily get few-shot chain-of-thought—it is still in-context learning, just with the pattern to be continued changed to 'reason first, then give the answer'.</p>
+<p>The final link in the chain is boundaries: limited by the context window, sensitive to wording and order, not persistent, and prone to breaking down when the examples' coverage is exceeded. These costs mark the boundary between it and fine-tuning: first use examples to validate quickly, then use fine-tuning to consolidate as needed. If you can clearly explain 'why a model that only predicts the next word can learn a new task from a few examples' and say 'examples mainly demonstrate what the task looks like rather than instill knowledge,' you have grasped the core of in-context learning.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Viewed along the learning hierarchy, the concepts on this page each have their dependencies and destinations.</p>
+
+<p>The prerequisite concepts lay the mechanistic foundation of this page: In-context Learning is built on the objective of autoregressive generation, “predicting the next token,” and few-shot examples are precisely how this objective is used. The immediate extensions are the direct destinations of this page’s concepts—adding examples to prompts belongs to prompt engineering, arranging examples within the window belongs to context engineering, few-shot chain of thought advances from “what the examples demonstrate” to “demonstrating how to think,” and the capacity of the context window further defines the boundary on the number of examples. One level further out, whether examples can be replaced by retrieved material points to retrieval-augmented generation, and the capability that In-context Learning exhibits with model scale is connected to scaling laws and the emergent abilities debate.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Related Concepts</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisite</td><td>Large language models, predicting the next token, autoregressive generation, prompts</td></tr>
+      <tr><td><b>Core of this page</b></td><td>zero/one/few-shot, task location, example format and order, comparison with fine-tuning</td></tr>
+      <tr><td>Immediate extension</td><td>Prompt Engineering, Context Engineering, Chain of Thought (CoT), Context Window, fine-tuning</td></tr>
+      <tr><td>Further</td><td>Scaling Laws, Retrieval-Augmented Generation (RAG) (replacing “examples/materials” with retrieved ones), emergent abilities debate</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Language Models are Few-Shot Learners</a>: systematic experiments on few-shot in-context learning in large models.</li><li><a href="https://arxiv.org/abs/2202.12837" target="_blank" rel="noopener">Rethinking the Role of Demonstrations</a>: the role of labels, format, and input distribution in demonstrations.</li><li><a href="https://arxiv.org/abs/2111.02080" target="_blank" rel="noopener">An Explanation of In-context Learning as Implicit Bayesian Inference</a>: a theoretical explanation of the in-context learning mechanism.</li></ul><div class="dd-src-date">Date accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/in-context-learning">Explore connections on the map</a><a href="/zh/concepts/in-context-learning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=svg.querySelector('marker#ch1,marker#g28a,marker#mr1,marker#vd1')||
+      ['Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
