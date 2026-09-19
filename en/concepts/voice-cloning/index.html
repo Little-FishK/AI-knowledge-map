@@ -60,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Voice Cloning</span></li></ol></nav><article id="dd-article" data-concept-id="voice-cloning">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Voice Cloning</span></li></ol></nav><article id="dd-article" data-concept-id="voice-cloning" lang="en">
 <header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Voice Cloning</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
 <p class="dd-sub">Split &quot;what is said&quot; and &quot;who it sounds like&quot; into two conditions, then accept using intelligibility, naturalness, speaker similarity, and authorization together</p>
 <p class="dd-ali">Voice Cloning · Speech Cloning · Timbre Cloning · Zero-shot Voice Cloning</p>
@@ -89,7 +89,104 @@ require(consent_valid and provenance_attached and high_risk_action_blocked)</cod
 <section class="dd-sec"><h2><span class="dd-n">13</span>Self-test: Can you provide a chain of evidence for a single cloning?<span class="dd-badge eng">Self-test</span></h2><p class="dd-lead">Please do not use "sounds very similar" as the only reason; re-verify the complete example on this page.</p><div class="dd-quiz"><ol><li>What additional inputs, objectives, and risks does voice cloning introduce compared with ordinary TTS?</li><li>How do speaker embedding and acoustic prompt use reference audio, and what are they each prone to lose or carry along?</li><li>Why can't professional cloning be understood merely as 'instant cloning with longer processing'?</li><li>In the hand calculation example, how should similarity 0.96 and WER 16.7% be interpreted together?</li><li>Why does high similarity on training clips not prove the system can generate new content?</li><li>If the detector gives a high 'real person' score, why can this voice still not be used alone to approve a transfer?</li></ol></div><details class="dd-answers"><summary>Reference answers</summary><ol><li>The added input is a reference condition for the target speaker; the added objective is preserving identity; the added risks are voice biometrics, impersonation, and authorization.</li><li>The former compresses the reference into a fixed identity vector and may lose detail; the latter retains acoustic tokens and may carry along original content, noise, prosody, and device characteristics.</li><li>Professional cloning updates or adapts model parameters using target data, bringing different data coverage, overfitting, deletion, and governance issues.</li><li>The identity representation is very close to the target, but there is one critical substitution error in the text; this shows identity and content must be verified separately.</li><li>The model may memorize or replay training material; only unseen text, isolated sessions, and independent testing can verify compositional generalization.</li><li>Detectors can misjudge and drift when facing new attacks; high-risk actions must rely on independent identity factors, explicit authorization, and out-of-band confirmation.</li></ol></details></section>
 <div class="dd-src"><b>Sources and version boundaries (accessed on 2026-07-24):</b><ol><li><a href="https://arxiv.org/abs/1806.04558" target="_blank" rel="noopener">SV2TTS: Transfer Learning from Speaker Verification to Multispeaker TTS</a>—speaker encoder, unseen speakers, and verification evaluation.</li><li><a href="https://arxiv.org/abs/2301.02111" target="_blank" rel="noopener">VALL-E: Neural Codec Language Models are Zero-Shot TTS Synthesizers</a>—three-second acoustic prompt and the codec token route.</li><li><a href="https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning" target="_blank" rel="noopener">ElevenLabs Voice Cloning documentation</a>—product and technical boundaries of instant conditioning and professional adaptation; interfaces and quotas may change.</li><li><a href="https://www.ftc.gov/news-events/contests/ftc-voice-cloning-challenge" target="_blank" rel="noopener">FTC Voice Cloning Challenge</a>—impersonation, fraud, and pre- and post-generation intervention frameworks.</li><li><a href="https://www.asvspoof.org/asvspoof2021/asvspoof2021_evaluation_plan.pdf" target="_blank" rel="noopener">ASVspoof 2021 Evaluation Plan</a>—anti-spoofing tasks, EER, and t-DCF evaluation boundaries.</li></ol><p>The mechanism conclusions on this page come from papers and official technical documentation; specific minute counts, interfaces, model names, and service policies will be updated and should not be treated as permanent cross-platform parameters. Safety and legal requirements must also be verified separately according to user, region, and use case.</p></div><!-- source-body:end -->
 <nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/voice-cloning">Explore connections on the map</a><a href="/zh/concepts/voice-cloning/" lang="zh-Hans">阅读中文原文</a></nav>
-</article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
     <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
