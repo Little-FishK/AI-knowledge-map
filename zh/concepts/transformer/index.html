@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Transformer · AI 知识地图</title>
 <meta name="description" content="把注意力包装成可深度堆叠、可并行训练的标准积木">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/transformer/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/transformer/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/transformer/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="Transformer">
@@ -58,8 +60,8 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Transformer</span></li></ol></nav><article id="dd-article" data-concept-id="transformer">
-<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Transformer</h1><aside class="dd-publication-notice" data-review-status="needs-revision" role="note"><strong>持续修订中</strong><span>本页部分内容有待修订，建议结合参考资料阅读。</span></aside>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Transformer</span></li></ol></nav><article id="dd-article" data-concept-id="transformer" lang="zh-Hans">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Transformer</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">把注意力包装成可深度堆叠、可并行训练的标准积木</p>
 <p class="dd-ali">Transformer · 变换器</p>
 <p class="dd-metabar">建议 30–40 分钟 · 中级 · 需要：先读过「注意力机制」深读页</p>
@@ -69,7 +71,7 @@
   <ul>
     <li><b>它是什么</b>——注意力已经很强，为什么还要「Transformer」这层包装。</li>
     <li><b>一层里有什么</b>——四件套各自负责什么，为什么缺一不可。</li>
-    <li><b>位置编码</b>——注意力既然不看位置，模型怎么知道词序。</li>
+    <li><b>位置编码</b>——无顺序信号的全连接自注意力如何获得词序信息。</li>
     <li><b>三种搭法</b>——同样的积木怎么搭出理解型、生成型模型。</li>
     <li><b>模态无关</b>——为什么图像、音频也能用同一套架构。</li>
     <li><b>历史意义</b>——一句话，它到底改变了什么。</li>
@@ -80,7 +82,7 @@
     <li>每层四件套：多头注意力 + 前馈网络（两主角）+ 残差 + 层归一化（两配件）。<span>（§2）</span></li>
     <li>一次数值前向显示：注意力写入跨位置内容，前馈逐位置变换，残差保留主干。<span>（§3）</span></li>
     <li>残差提供短梯度路径，层归一化控制子层输入尺度，使深层堆叠更可优化。<span>（§4）</span></li>
-    <li>注意力本身不含完整词序，所以要额外注入位置表示。<span>（§5）</span></li>
+    <li>无顺序信号的全连接自注意力对排列等变；位置表示可提供词序，因果掩码也会限制顺序。<span>（§5）</span></li>
     <li>编码器/解码器/二者组合，通过可见范围与交叉注意力形成不同任务骨架。<span>（§6）</span></li>
     <li>只要对象能表示为 token 序列，架构可扩展到图像、音频等模态。<span>（§7）</span></li>
     <li>矩阵化并行与稳定堆叠共同提高可扩展性，但算力、数据和系统仍是约束。<span>（§8）</span></li>
@@ -94,7 +96,7 @@
 <section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>一层里的四件套<span class="dd-badge math">数学</span><span class="dd-badge intuition">直觉</span></h2>
 <div class="dd-agent-response"><p>一个典型的 Transformer 层可以按数据流拆成四类功能：多头注意力、前馈网络、残差连接和层归一化。常见结构先让输入经过多头注意力，再经过前馈网络；注意力和前馈两个子层各自配有一组残差连接与层归一化。把这样的完整层按相同结构堆叠 N 次，就得到一个多层 Transformer。</p>
 <p>多头注意力负责跨位置的信息交换。对于序列中的每个位置，它根据相关性从其他位置取得信息并汇总上下文；“多头”让这种信息汇总能够在多个投影空间中并行进行。其输出仍然对应原来的各个位置，但每个位置的表示已经融入了来自上下文的信息。</p>
-<p>前馈网络随后对每个位置独立进行非线性特征变换。“独立”是指不同位置使用同一套变换参数，但某个位置在这一步不会直接读取其他位置；跨位置信息已经由注意力汇入该位置的表示。部分事实关联可以在前馈网络中被定位，但模型的知识并不只存放在这里，也不能把前馈网络简单理解成唯一的知识仓库。</p>
+<p>前馈网络随后对每个位置独立进行非线性特征变换。“独立”是指不同位置使用同一套变换参数，但某个位置在这一步不会直接读取其他位置；跨位置信息已经由注意力汇入该位置的表示。</p>
 <p>残差连接把子层输入沿旁路直接送到输出端，再与子层计算结果相加。若子层函数记为 F，基本关系可写成 y = x + F(x)。这样，已有表示 x 不必完全经过复杂变换才能继续向后传播，梯度也获得更直接的路径。残差连接因此是把网络堆到很深的重要前提。</p>
 <p>层归一化把每层内部表示的数值尺度控制在较稳定的范围，降低层层堆叠时数值分布不断漂移并导致训练发散的风险。它与残差连接共同支撑深层优化：残差提供直接的信息与梯度通路，归一化提供受控的数值尺度。</p>
 <p>从功能上看，多头注意力和前馈网络是两个主要计算模块：前者跨位置传递信息，后者逐位置加工特征；残差连接和归一化则为这些计算能够稳定地反复堆叠提供结构条件。不过，“四件套”描述的是功能地图，而不是所有模型逐字相同的配方。现代实现可能用 RMSNorm 替代 LayerNorm，改变归一化在子层前后的位置，或加入门控结构；判断一个具体实现时，应关注这些功能如何实现以及数据按什么顺序流动。</p></div>
@@ -152,10 +154,11 @@
 <p>因此，移除残差连接或改变归一化的位置，并不是一个局部、无影响的替换。这样的变化会显著改变深层优化条件，往往需要连同初始化、学习率和残差缩放一起重新设计。一个已经验证有效的深层配方被改动后，不能仅因张量形状仍然匹配，就认为新结构与原结构等价。</p></div>
 </section>
 <section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>一个容易忽略的点：位置编码<span class="dd-badge intuition">直觉</span><span class="dd-badge math">数学</span></h2>
-<div class="dd-agent-response"><p>自注意力根据 token 表示之间的内容关系计算信息汇总，但如果完全不提供位置表示，它本身并不知道哪个 token 在前、哪个在后。此时，自注意力对输入排列具有等变性：把输入 token 按某种顺序重新排列，输出也只会按同样方式重新排列。也就是说，机制会跟着排列移动计算结果，却无法仅凭内容判断原始先后顺序。</p>
-<p>这一性质解释了为什么词序必须额外注入。“小明打小红”和“小红打小明”包含相同的一组词，但词的角色随顺序改变，含义也完全不同。若模型只能看到词本身而看不到位置，它就缺少区分这两种排列所必需的信号。</p>
+<div class="dd-agent-response"><p>先考虑不含位置表示、因果掩码或其他顺序信号的全连接自注意力：每个位置都能读取全部位置，信息汇总只依赖 token 内容。此时，自注意力对输入排列具有等变性：把输入 token 按某种顺序重新排列，输出也只会按同样方式重新排列。机制会跟着排列移动计算结果，却无法仅凭内容判断原始先后顺序。</p>
+<p>在上述无顺序信号的条件下，“小明打小红”和“小红打小明”包含相同的一组词，注意力会为同一个词汇总相同的内容，输出仅跟着词移动；但句中谁打谁已经改变。要让这些表示反映词的先后关系，就需要引入顺序信号。</p>
 <p>位置机制接收每个 token 的位置索引或 token 之间的相对距离，再产生顺序信号。这个信号可以加入输入表示，也可以作用于注意力分数。加入位置后，模型计算的不再只是“两个 token 的内容是否相关”，还能够利用“它们位于什么位置、谁在谁前面、相隔多远”等信息。于是，即使两段输入包含相同的词集合，不同排列也可以形成不同的关系表示。</p>
-<p>图 2 所表达的关键关系是：没有位置机制时，打乱词序只会让注意力输出随之重排，注意力本身对先后次序“无感”；在输入嵌入上叠加位置编码后，每个词还获得“自己排第几”的信息，模型才有条件区分顺序不同的句子。</p>
+<p>图 2 的词序例子、图中文字与图注，都只适用于上述不含任何顺序信号的全连接自注意力。“结果相同”应理解为同一个词的输出随它一起重排，而非每个固定位置上的输出数值不变。在这个例子中，给输入嵌入叠加位置编码，就能让表示利用词所处的位置。</p>
+<p>第 6 节的因果解码器不满足上述前提。固定因果掩码按位置限制可见范围：把 token 重排而保持掩码不变，同一个 token 能读取的前缀通常也会改变，输出一般不会只是原输出的同样重排。因此，不能从“没有显式位置编码”推出因果解码器无法区分词序；掩码本身已带入顺序限制。</p>
 <p>位置机制提供的是可供学习使用的顺序信号，并不保证模型自动掌握所有顺序关系。模型能否正确使用长距离的位置信息，仍取决于训练和评测。位置编码的设计还会影响模型能否外推到训练阶段未见过的更长序列，因此它也是长上下文模型需要处理的技术难点之一。</p></div>
 <figure class="dd-fig">
     <svg viewBox="0 0 560 130" role="img" aria-label="打乱词序注意力结果相同，所以要位置编码">
@@ -182,7 +185,7 @@
 <p>两条路径通过编码器—解码器注意力相连：解码器用当前表示形成查询，用编码器输出形成键和值，从而在产生每个输出位置时选择性读取输入序列。于是，编码器负责形成输入上下文，带掩码的解码器负责维护输出前缀，交叉注意力负责把两者连接成从输入序列到输出序列的转换过程。</p>
 <p>核对原始架构时，可以把数据流概括为：输入序列→编码器连续表示；右移的输出前缀→带掩码的解码器表示；编码器—解码器注意力→把输入信息写入输出过程。这个描述不需要借助后来模型家族的名称或用途分类。</p>
 <div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">搭法</th><th class="dd-align-left">典型代表</th><th class="dd-align-left">输入与输出</th><th class="dd-align-left">常见用途</th></tr></thead><tbody><tr><td class="dd-align-left">只用编码器</td><td class="dd-align-left">BERT 类</td><td class="dd-align-left">完整序列→每个位置的双向上下文表示</td><td class="dd-align-left">分类、抽取、判断</td></tr><tr><td class="dd-align-left">只用解码器</td><td class="dd-align-left">GPT 类</td><td class="dd-align-left">已有前缀→下一个 token 的概率分布</td><td class="dd-align-left">逐 token 生成</td></tr><tr><td class="dd-align-left">编码器＋解码器</td><td class="dd-align-left">T5 类</td><td class="dd-align-left">完整输入序列与输出前缀→下一个输出 token 的概率分布</td><td class="dd-align-left">翻译、摘要等转换任务</td></tr></tbody></table></div>
-<p>本节可由现有来源直接核验的结论，限于原始 Transformer 的编码器、带掩码解码器与编码器—解码器注意力。下方保留的既有表格包含后来模型家族名称和典型用途，只可当作术语索引；这些后续断言不能由本页固定来源直接核验，也不作为本节教学结论。</p></div>
+</div>
 <table class="dd-table">
     <thead><tr><th>搭法</th><th>代表</th><th>擅长</th></tr></thead>
     <tbody>
@@ -209,7 +212,7 @@
 <div class="dd-agent-response"><p>Transformer 把从 token 向量到深层可训练模型的过程组织成一条完整因果链。注意力首先解决位置之间如何传递信息，但只靠注意力还不是一个完整的大模型结构；还需要把信息交互、特征变换和深层优化所需的组件封装成能够反复堆叠的标准层。</p>
 <p>每一层包含两类主要计算与两类结构配件。多头注意力在不同位置之间读取和汇总内容，前馈网络再对每个位置独立进行非线性变换；残差连接保留进入子层前的主干表示，层归一化控制子层输入的数值尺度。一次前向传播中，注意力先把跨位置内容写入当前 token，前馈网络随后加工这个位置已有的特征，而两次残差相加都让原有信息继续沿主干传递。</p>
 <p>这四类组件之所以能形成闭环，是因为模型不仅要有表达能力，还要能够训练。注意力和前馈网络提供实际的信息处理能力；残差连接为反向传播提供较短的梯度路径，层归一化则减少输入尺度随深度失控的风险。前两者回答“一层能计算什么”，后两者回答“这样的层如何堆得更深并保持可优化”。</p>
-<p>token 的顺序还必须显式进入计算链。注意力本身不包含完整词序，因此模型需要额外注入位置表示，才能区分由相同 token 按不同顺序组成的输入。位置表示与 token 内容共同进入层内计算后，注意力汇总的不再只是内容关系，也能利用顺序关系。</p>
+<p>token 的顺序如何进入计算链，还取决于注意力的可见范围。不含位置表示、因果掩码等顺序信号的全连接自注意力对排列等变；加入位置表示后，模型能在内容关系之外利用顺序关系。固定因果掩码也会按位置限制可见前缀，因此不能把这一等变结论推广到所有缺少显式位置编码的解码器。</p>
 <p>同一标准层可以通过改变信息可见范围与连接方式形成不同任务骨架。编码器允许位置利用更完整的上下文；解码器用受限的可见范围支持逐步生成；编码器与解码器组合时，解码器还可通过交叉注意力读取编码后的输入。架构由此适配理解、生成和输入到输出的转换任务。</p>
 <p>这套结构并不只限于文字。只要对象能够表示成 token 序列，Transformer 就可以处理这些向量之间的关系，因此能扩展到图像、音频等模态。与此同时，序列位置计算可以组织为适合硬件的大规模矩阵运算，深层结构又有残差和归一化提供优化条件，两者共同提高了模型的可扩展性。</p>
 <p>整条链路可以概括为：原始对象→token 向量与位置表示→多头注意力进行跨位置汇总→前馈网络逐位置加工→残差保留主干、归一化控制尺度→标准层反复堆叠→按可见范围组合成不同架构。Transformer 相对单独的注意力机制多做的，正是把信息传递装入一个完整、可训练、可扩展的深层模块。它为大模型规模化提供了关键结构条件，但实际规模仍然受到算力、数据和系统条件的约束。</p></div>
@@ -237,9 +240,9 @@
     <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">Dao et al., FlashAttention</a>：标准注意力的内存访问瓶颈与精确高效实现。</li>
     <li><a href="https://arxiv.org/abs/2002.04745" target="_blank" rel="noopener">Xiong et al., On Layer Normalization in the Transformer Architecture</a>：Pre-LN/Post-LN 差异，说明“标准层”存在重要变体。</li>
   </ul>
-  <div class="dd-src-date">访问日期：2026-07-21</div>
+  <div class="dd-src-date">访问日期：2026-07-21<p><a href="https://arxiv.org/abs/2202.05262" target="_blank" rel="noopener noreferrer">Meng et al. — Locating and Editing Factual Associations in GPT (NeurIPS 2022)</a>：特定自回归 Transformer 中间层前馈模块参与事实关联存储、定位与编辑；不表示所有知识仅存在于前馈网络。</p><p><a href="https://arxiv.org/abs/1910.10683" target="_blank" rel="noopener noreferrer">Raffel et al. — Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (JMLR 2020)</a>：T5 的编码器—解码器文本到文本框架及问答、摘要等任务用途。</p></div>
 </div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/transformer">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/transformer">在地图中查看概念关系</a><a href="/en/concepts/transformer/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
