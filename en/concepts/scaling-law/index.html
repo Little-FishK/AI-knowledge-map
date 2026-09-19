@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute · AI Knowledge Map</title>
+<meta name="description" content="From log-log straight lines and diminishing marginal returns to compute-optimal allocation, and then to data quality, capability thresholds, and total lifecycle cost.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/scaling-law/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/scaling-law/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/scaling-law/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute">
+<meta property="og:description" content="From log-log straight lines and diminishing marginal returns to compute-optimal allocation, and then to data quality, capability thresholds, and total lifecycle cost.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/scaling-law/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute">
+<meta name="twitter:description" content="From log-log straight lines and diminishing marginal returns to compute-optimal allocation, and then to data quality, capability thresholds, and total lifecycle cost.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/scaling-law/#page","name":"Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute","description":"From log-log straight lines and diminishing marginal returns to compute-optimal allocation, and then to data quality, capability thresholds, and total lifecycle cost.","url":"https://ai-knowledge-map.com/en/concepts/scaling-law/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute","item":"https://ai-knowledge-map.com/en/concepts/scaling-law/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute</span></li></ol></nav><article id="dd-article" data-concept-id="scaling-law" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Scaling Laws: Using Power Laws to Plan Parameters, Data, and Compute</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From log-log straight lines and diminishing marginal returns to compute-optimal allocation, and then to data quality, capability thresholds, and total lifecycle cost.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Scaling laws are empirical regularities observed in a specific model family, data distribution, and training recipe: validation loss often decreases with parameters, data, or compute following a power law. They are suitable for budget planning and experimental extrapolation, but they are not natural constants; fitting range, data quality, training recipe, target metrics, and deployment cost all change the conclusion.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Derive the log-log line from the power law; hand-calculate the marginal benefit of a tenfold increase in compute; explain the N and D trade-off under fixed compute; identify extrapolation failures and metric misalignment.</div>
+<ol class="dd-chain"><li>Choose the same model family and a stable training recipe.</li><li>Train at multiple N, D, and C points.</li><li>Fit L∞, A, and α.</li><li>Find the N–D frontier for a fixed budget.</li><li>Use intermediate scale to test extrapolation.</li><li>Use task slices and lifecycle cost for acceptance.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Scaling Laws Describe Reducible Loss<span class="dd-badge math">Core Formula</span></h2>
+<div class="dd-agent-response"><p>If you increase model scale and feed more training data, validation loss will keep decreasing; yet no matter how far this curve is extended, it stays above some positive number and does not automatically go to zero. Scaling laws (scaling law) characterize the quantitative relationship behind this phenomenon: near a fixed model family, data distribution, and training recipe, by what rule roughly does the loss shrink each time resources are scaled up a notch? It is not a constant derived from physical laws, but a statistical fit to a set of training experiments—placing measurement results at different scales on an empirical curve and summarizing its trend with a few parameters.</p>
+<p>The form used for the fit is</p>
+<p>L(x) = L∞ + A·x⁻ᵅ</p>
+<p>Here, x represents scale, which can be parameter count N, training token count D, or compute C; L(x) is the target loss measured at that scale. L∞ is the lowest limit of this curve: under the current setting of task, data, and model family, the part of the loss that is hard to eliminate just by continuing to increase x; it marks the boundary between “can still be reduced” and “temporarily cannot be reduced further”. A determines the size of the reducible part at the reference scale, and α is a positive scaling exponent. Since x is in the negative exponent, A·x⁻ᵅ decreases monotonically as x increases; but note the rhythm of the decrease: each time you multiply the scale by the same factor, what is removed is only a fixed proportion of the remaining reducible loss, not a fixed amount. The loss therefore always approaches L∞ but never reaches it in one step.</p>
+<p>For this empirical curve, the inputs are a series of scale points and their validation results under the same conditions, and the outputs are the fitted parameters, as well as predictions and corresponding uncertainties near the measured scales. Before using it, you must confirm what the vertical axis actually is: training loss, validation cross-entropy, or downstream capability score. Different metrics cannot be mixed on the same curve—training loss can be lowered to much lower than validation loss, and capability scores need not even be monotonic, so plotting them in the same fit will only lead to misleading conclusions.</p></div>
+<div class="dd-formula" data-formula-id="scaling-law-reducible-loss" data-display="mathml"><math display="block" aria-label="规模 x 下的损失 L 等于不可约下限 L 无穷，加常数 A 乘 x 的负 alpha 次方"><mrow><mi>L</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msub><mi>L</mi><mo>∞</mo></msub><mo>+</mo><mi>A</mi><mo>·</mo><msup><mi>x</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Why a straight line appears on a log-log plot<span class="dd-badge math">Derivation</span></h2>
+<div class="dd-agent-response"><p>The same set of measurement points forms a slowly downward-curving decreasing curve on ordinary graph paper, but once both the horizontal and vertical axes are changed to logarithmic scales, they approximate a straight line. This change comes from two properties of logarithms: multiplication becomes addition under the logarithm, and exponentiation “drags” the exponent to the front as a coefficient. The power-law form of scaling laws is exactly straightened out under this set of rules.</p>
+<p>The specific procedure has two steps. First subtract the lower bound L∞ from the total loss, keeping only the reducible part; then take the logarithm of both sides of the equation with the same base. From L(x) = L∞ + A·x⁻ᵅ, we obtain L(x) − L∞ = A·x⁻ᵅ, and after taking logarithms:</p>
+<p>log(L − L∞) = log A − α·log x</p>
+<p>Treat log x as the horizontal-axis coordinate u, and log(L − L∞) as the vertical-axis coordinate v; the above equation is then v = log A − α·u: a straight line with slope −α and intercept log A. As long as both axes use the same logarithmic base, the conclusion about the slope remains unchanged—changing the base is equivalent to multiplying both coordinates by a constant, so the line is merely scaled overall, and its steepness remains −α. Figure 1 compares the same power law in two coordinate systems: in ordinary coordinates it is a decreasing curve, in double-logarithmic coordinates it is a straight line, and only after subtracting L∞ does the linear relationship on log-log strictly correspond to the formula. Therefore the slope of the straight line on a log-log plot directly gives the scaling exponent, and the intercept gives the logarithm of the constant A.</p>
+<p>The value of L∞ is critical to this way of reading the plot. If the lower bound is estimated inaccurately, what the vertical axis measures is no longer the true reducible loss, and the points in the plot will deviate from a straight line and show curvature, so the exponent estimated from them will also be distorted. Conversely, in practice the lower bound is often estimated by adjusting L∞ until the points line up as straight as possible.</p>
+<p>The inputs to this plot-reading procedure are multiple different scales x and their corresponding loss measurements; the outputs include the slope of the straight line, the intercept, the estimate of the lower bound, and the confidence interval of the fit. It is important to be cautious that the point sequence is only approximately straight within the limited interval that was measured; outside this interval, linear extrapolation is no longer guaranteed.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 720 285" role="img" aria-label="Decreasing curve in ordinary coordinates and straight line in logarithmic coordinates"><defs><marker id="sl-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#7b8494"/></marker></defs><rect x="22" y="25" width="315" height="225" rx="10" fill="#21252d" stroke="#596273"/><line x1="65" y1="215" x2="310" y2="215" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="65" y1="215" x2="65" y2="52" stroke="#8791a2" marker-end="url(#sl-arrow)"/><path d="M78,70 C120,115 165,150 225,174 C255,186 282,193 305,197" fill="none" stroke="#65a6d9" stroke-width="3"/><line x1="72" y1="200" x2="307" y2="200" stroke="#d48b78" stroke-dasharray="6 5"/><text x="186" y="239" text-anchor="middle" class="svg-t">scale x</text><text x="104" y="193" class="svg-t" font-size="11">L∞</text><text x="178" y="45" text-anchor="middle" class="svg-t">Ordinary coordinates: bending downward</text><rect x="382" y="25" width="315" height="225" rx="10" fill="#21252d" stroke="#596273"/><line x1="425" y1="215" x2="670" y2="215" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="425" y1="215" x2="425" y2="52" stroke="#8791a2" marker-end="url(#sl-arrow)"/><line x1="445" y1="78" x2="650" y2="190" stroke="#65a6d9" stroke-width="3"/><path d="M500,95 L500,129 L556,129" fill="none" stroke="#d3a05a"/><text x="522" y="120" class="svg-t" font-size="11">slope −α</text><text x="547" y="239" text-anchor="middle" class="svg-t">log x</text><text x="540" y="45" text-anchor="middle" class="svg-t">log-log: approximately straight line</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 The shape of the same power law in two coordinate systems; only after subtracting L∞ does the log-log linear relationship strictly correspond to the formula.</figcaption></figure>
+<div class="dd-formula" data-formula-id="scaling-law-log-linearization" data-display="mathml"><math display="block" aria-label="损失减下限的对数，等于 A 的对数减 alpha 乘规模 x 的对数"><mrow><mi>log</mi><mo>(</mo><mi>L</mi><mo>−</mo><msub><mi>L</mi><mo>∞</mo></msub><mo>)</mo><mo>=</mo><mi>log</mi><mi>A</mi><mo>−</mo><mi>α</mi><mo>·</mo><mi>log</mi><mi>x</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Numerical example: tenfold resources only reduce reducible loss by about one-fifth<span class="dd-badge math">Worked example</span></h2>
+<div class="dd-agent-response"><p>First plug in a concrete number to get a feel for the size of this exponent: take α = 0.10, and increase compute tenfold; how much reducible loss remains? The power law gives the answer:</p>
+<p>R₂/R₁ = (10C/C)⁻⁰·¹⁰ = 10⁻⁰·¹⁰ ≈ 0.794</p>
+<p>Here R = L − L∞ denotes reducible loss, R₁ and R₂ are the reducible parts remaining before and after increasing compute, C is the original compute amount, and the exponent −0.10 comes from the assumed scaling exponent α = 0.10. The ratio 0.794 means: after the increase, the remaining reducible loss is 79.4% of the original, so this round cuts only 20.6%. A tenfold increase in resources does not make the loss one-tenth—the power law's "discount" is far stingier than intuition would expect.</p>
+<p>Now consider an example that writes out the lower bound explicitly. Let L∞ = 1.50 and the current loss L = 2.00; then the reducible part is R = 2.00 − 1.50 = 0.50. The predicted loss after tenfold compute is</p>
+<p>L = 1.50 + 0.50 × 0.794 ≈ 1.897</p>
+<p>rather than the 1.59 obtained by multiplying 0.794 directly by the total loss—that would assume that even L∞ shrinks according to the power law, while L∞ is exactly the part that the power law cannot reach. If you scale up another tenfold, it only multiplies the reducible part remaining at that time by 0.794:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Compute multiplier</th><th class="dd-align-left">Reducible loss ratio</th><th class="dd-align-left">Prediction when L∞=1.50, starting from L=2.00</th></tr></thead><tbody><tr><td class="dd-align-left">1×</td><td class="dd-align-left">1.000</td><td class="dd-align-left">2.000</td></tr><tr><td class="dd-align-left">10×</td><td class="dd-align-left">0.794</td><td class="dd-align-left">1.897</td></tr><tr><td class="dd-align-left">100×</td><td class="dd-align-left">0.631</td><td class="dd-align-left">1.816</td></tr></tbody></table></div>
+<p>The ratio corresponding to 100 times the compute is 0.794² ≈ 0.631, and the predicted loss is 1.50 + 0.50 × 0.631 ≈ 1.816. Diminishing returns are very clear here: the first tenfold step reduces loss by about 0.103, while the second tenfold step reduces it by only about 0.081, but each step nibbles away at the remaining reducible loss by the same relative proportion.</p>
+<p>These numbers hold only under two conditions: the estimates of α and L∞ are reliable, and the scaled-up size still falls within the range used for fitting. They are extrapolations based on measured curves, not guarantees for any particular actual training result.</p></div>
+<table class="dd-table"><thead><tr><th>Compute multiplier</th><th>Reducible loss ratio</th><th>If L∞=1.50, starting from L=2.00</th></tr></thead><tbody><tr><td>1×</td><td>1.000</td><td>2.000</td></tr><tr><td>10×</td><td>0.794</td><td>1.897</td></tr><tr><td>100×</td><td>0.631</td><td>1.816</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="scaling-law-tenfold-example" data-display="mathml"><math display="block" aria-label="十倍计算后可约损失与原可约损失之比，等于十的负零点一次方，约为零点七九四"><mrow><mfrac><msub><mi>R</mi><mn>2</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mrow><mn>10</mn><mi>C</mi></mrow><mi>C</mi></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>0.10</mn></mrow></msup><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>0.10</mn></mrow></msup><mo>≈</mo><mn>0.794</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Fixed compute forces parameters and data to trade off against each other<span class="dd-badge math">Compute-optimal</span></h2>
+<div class="dd-agent-response"><p>When faced with a fixed training compute budget, parameter count N and training token count D become a pair of mutually squeezing variables: the budget is only enough to perform that many multiplication operations; giving more to parameters means less is left for data. For dense Transformers, the forward and backward computation for processing a single token is roughly proportional to the parameter count, so the total floating-point operations for the entire pre-training are often roughly written as C ≈ 6 × N × D. Here C represents the number of floating-point operations executed during the entire training process, commonly known as FLOPs; N is the number of model parameters; D is the total number of tokens processed during training. The coefficient 6 is a rough approximation of the forward plus backward cost for common dense Transformers, not a fixed constant that holds for all architectures.</p>
+<p>This approximation directly gives an intuitive conclusion: when the budget C is fixed, doubling N roughly halves D; increasing N by a factor of four leaves D at only one-fourth of its original value. The benefit of making the model larger is not free—it simultaneously takes away tokens that the data side could otherwise have seen more of. Degradation in the two directions has its own manifestations. When there are too few parameters, the model struggles to express the patterns in the data no matter how much data it sees; this is a capacity bottleneck. When there are too many parameters but only a small number of tokens have been seen, the parameters themselves have not been sufficiently trained, and convergence quality actually decreases; this is under-training. The optimal point under the same budget lies on the empirical balance between the two types of bottlenecks, rather than simply maximizing parameters.</p>
+<p>A comparison table at the same budget makes this clearer. Option A chooses a smaller model, with parameters counted as 1× and tokens as 8×; the typical risk is a capacity bottleneck. Option B takes the balance point, with parameters 2× and tokens 4×; whether it is truly optimal requires experimental confirmation. Option C chooses a larger model, with parameters 4× and tokens 2×; the typical risks are insufficient data and expensive inference. The three options consume the same total amount of floating-point operations; the differences in loss come entirely from different allocations of N and D.</p>
+<p>Therefore, the input to this type of experiment is a compute budget and several candidate combinations of N and D, and the output is the experimental frontier under equal-compute conditions—all points on the frontier correspond to the same C, and the level of loss reveals which allocation is more cost-effective under a fixed budget. It should be noted that this estimate only characterizes the amount of floating-point computation. Attention sequence length, sparse structure, gradient recomputation, and hardware utilization will all change the real wall-clock cost; identical FLOPs guarantee neither identical training time nor identical final quality.</p></div>
+<table class="dd-table"><thead><tr><th>Options under the same budget</th><th>Parameters N</th><th>Tokens D</th><th>Typical risk</th></tr></thead><tbody><tr><td>A: Smaller model</td><td>1×</td><td>8×</td><td>Capacity bottleneck</td></tr><tr><td>B: Balance point</td><td>2×</td><td>4×</td><td>Requires experimental confirmation</td></tr><tr><td>C: Larger model</td><td>4×</td><td>2×</td><td>Insufficient data, expensive inference</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="scaling-law-training-compute"><math display="block" aria-label="训练计算量 C 约等于六乘模型参数量 N 乘训练 token 数 D"><mrow><mi>C</mi><mo>≈</mo><mn>6</mn><mi>N</mi><mi>D</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Kaplan and Chinchilla Are Not Contradictory Slogans<span class="dd-badge intuition">Research History</span></h2>
+<div class="dd-agent-response"><p>Why did early conclusions lean toward making models larger, while later research in turn emphasized feeding more data? The two sets of conclusions are not as diametrically opposed as slogans suggest; the experimental settings behind them were different from the start: the range of model scales, the coverage of training points, the fitting methods, and their respective constraints all differed. Kaplan et al.'s experiments supported smooth power laws and accordingly gave a budget allocation that leaned toward increasing parameters; Chinchilla, by contrast, collected more scale points and performed joint fitting, pointing out that many large models were actually in a state of insufficient training tokens, and that under a fixed computational budget, parameters and data should be increased together. The core of the disagreement is not which side was wrong, but under what conditions each frontier was measured.</p>
+<p>Behind this lies a more practical lesson: there is no universal constant for how many tokens per parameter. The truly transferable approach is to use the current architecture, data, and optimizer to first run a set of small-scale equal-compute experiments, fit your own family's loss frontier, and then allocate budget according to that frontier. Taking the allocation ratio fitted in one paper and applying it unchanged to another model family often yields not a shortcut but an illusion.</p>
+<p>Also beware of drift in empirical exponents. If the model family changes, the tokenizer changes, the data filtering strategy changes, or the context length changes, the exponents in the power laws may shift accordingly, and you must re-measure them. Directly copying exponents across papers may be more dangerous than not fitting at all.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Nominal Tokens Do Not Equal Effective Data<span class="dd-badge eng">Data Quality</span></h2>
+<div class="dd-agent-response"><p>One trillion duplicated, contaminated, or low-quality tokens are by no means equal to one trillion tokens of new information. D in scaling laws is only a nominal count; what actually drives loss reduction is the amount of new information carried in the data. Every time repeated content appears once more, the marginal information decays by one unit; erroneous content may teach the model incorrect patterns; benchmark contamination will fabricate false capability scores. All three cases remind us: between token quantity and effective data volume lie data quality and composition.</p>
+<p>This is where the value of deduplication and quality filtering lies. Deduplication can reduce memorization burden and compute waste, but one must watch whether rare samples are mistakenly deleted; quality filtering improves the average signal, yet may shift domain or language coverage. Filtering is not a pure benefit; narrowing coverage may also amplify bias for certain languages or groups. Once the data mixture ratio changes, the effective data volume corresponding to the same D is no longer the same, and this is a hidden variable easily overlooked when comparing losses across experiments.</p>
+<p>The same limited data can also be squeezed by repeating multiple epochs, but diminishing returns are obvious, and after multiple epochs overfitting and rote memorization become the main risks. Synthetic data attempts to supplement the target skills, provided the generation quality is high enough; otherwise errors will flow back across generations, even inducing model collapse. Every step of data engineering brings both possible benefits and side effects that must be monitored; the two always come packaged together.</p></div>
+<table class="dd-table"><thead><tr><th>Change</th><th>Potential benefit</th><th>Must monitor</th></tr></thead><tbody><tr><td>Deduplication</td><td>Reduces memorization and waste</td><td>Whether rare samples are mistakenly deleted</td></tr><tr><td>Quality filtering</td><td>Improves average signal</td><td>Domain/language coverage shift</td></tr><tr><td>Repeating multiple epochs</td><td>Squeezes limited data</td><td>Overfitting and memorization</td></tr><tr><td>Synthetic data</td><td>Supplements target skills</td><td>Model collapse and error backflow</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Loss Declines Smoothly, but Capability Scores Can Still Jump<span class="dd-badge intuition">Metrics</span></h2>
+<div class="dd-agent-response"><p>Loss curves can decline more and more smoothly day by day, while a capability score on a leaderboard may suddenly jump up a step at some point. Seeing this kind of jump, it is easy to conclude that “a brand-new mechanism suddenly emerged inside the model,” but the measurement method itself may create steps. Cross-entropy is a continuous average quantity; scores such as accuracy, pass@1, or “all steps correct” have all-or-nothing thresholds. Suppose the model’s probability for the correct answer rises from 0.45 to 0.55: the loss improves continuously over this interval, while argmax accuracy flips from wrong to right at the point where the probability crosses 0.5. Sample mixing also brings a similar step effect.</p>
+<p>Conversely, sustained improvement in the average loss does not guarantee that factuality, safety, or rare capabilities improve in tandem; changes in these dimensions may not be guaranteed by the decrease in cross-entropy alone. Therefore, evaluation should plot continuous metrics, discrete metrics, and grouped results together, and increase the density of scale points near the threshold to observe whether the jump comes from the measurement method or a real mechanism. So-called emergence may be a real mechanism change inside the model, or it may merely be a product of discrete measurement; a discrete curve alone cannot distinguish the two.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Training optimality is not necessarily product lifecycle optimality<span class="dd-badge eng">Deployment</span></h2>
+<div class="dd-agent-response"><p>Budget allocation that focuses only on training loss often ends up paying back double during deployment. Training a model with fewer parameters may make the pre-training bill higher, but it can still lower total cost, because inference cost is recurring: when serving massive numbers of requests, the memory, latency, and energy consumption of each inference recur; the more requests, the more this cost is magnified. Conversely, for one-off research models with very low inference volume, the frontier training loss level is often more worth optimizing than inference cost.</p>
+<p>Express this as an equation: K_total = K_train + N_requests × K_infer + K_ops. K_total is the total cost over the planning period; K_train is the one-time training and experimentation cost; N_requests is the expected number of requests; K_infer includes the hardware, energy, and latency cost of each served request; K_ops covers deployment, monitoring, rollback, and error handling. This equation is meaningful only when all terms use the same time horizon and quality threshold; otherwise different candidates cannot be compared fairly.</p>
+<p>Thus the inputs to this kind of decision are not just training candidates, but also request scale, context length, concurrency, quantization scheme, hardware conditions, and quality constraints; the output is a lifecycle cost frontier that satisfies the quality condition. Only by comparing along the frontier will one discover that a strategy that only optimizes training FLOPs essentially shifts cost to the deployment stage.</p></div>
+<div class="dd-formula" data-formula-id="scaling-law-lifecycle-cost"><math display="block" aria-label="全生命周期总成本等于一次训练成本，加请求总数乘单次推理成本，再加运维与失败成本"><mrow><msub><mi>K</mi><mtext>total</mtext></msub><mo>=</mo><msub><mi>K</mi><mtext>training</mtext></msub><mo>+</mo><msub><mi>N</mi><mtext>requests</mtext></msub><mo>·</mo><msub><mi>K</mi><mtext>per-inference</mtext></msub><mo>+</mo><msub><mi>K</mi><mtext>operations and failures</mtext></msub></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>When Extrapolation Fails<span class="dd-badge eng">Boundaries</span></h2>
+<div class="dd-agent-response"><p>A straight line fitted from small models, once extended to unfamiliar scales, may quietly break at some point at any time. Breakpoints appear in different ways, and identifying them requires checking symptoms one by one. When the architecture or training recipe changes, newly measured points will depart from the old line; at this point you should fit piecewise and redo ablation experiments to confirm which change caused the shift. When data is exhausted or the distribution changes, gains will saturate earlier than expected; the response is to truthfully report the data mixture proportions and effective token count. Optimization instability can make large-scale points perform abnormally worse; in this case prioritize investigating learning rate, parallelism scheme, and numerical precision issues. When metrics hit ceiling or threshold effects occur, loss and task score become decoupled; you should switch to continuous metrics and do per-slice analysis on samples. If the prediction points are far beyond the fitting interval, the confidence interval will expand rapidly; adding intermediate-scale anchor points can constrain uncertainty.</p>
+<p>Putting together the sources of breakpoints, their manifestations, and responses reveals that they all point to the same discipline: extrapolation is reliable only within the range of 'similar systems, nearby scales.' Scaling laws are a map, not a guarantee. They can predict approximate trends for similar systems at adjacent scales, but cannot prove safety, reliability, or controllability, and can never replace real evaluation on the target task.</p></div>
+<table class="dd-table"><thead><tr><th>Sources of breakpoints</th><th>Manifestation</th><th>Response</th></tr></thead><tbody><tr><td>Architecture/recipe change</td><td>New points depart from the old line</td><td>Piecewise fitting and redo ablation</td></tr><tr><td>Data exhaustion or distribution shift</td><td>Gains saturate early</td><td>Report data mixture and effective tokens</td></tr><tr><td>Optimization instability</td><td>Large-scale points become abnormally worse</td><td>First investigate learning rate, parallelism, and numerical issues</td></tr><tr><td>Metric ceiling/threshold</td><td>Loss and task score decouple</td><td>Switch to continuous metrics and do slicing</td></tr><tr><td>Beyond the fitting interval</td><td>Confidence interval expands rapidly</td><td>Add intermediate-scale anchor points</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>From why loss can be reduced to how a budget should actually be spent, there lies a causal chain that can be verified link by link. The first step is to fix the experimental conditions: choose the same model family and a stable training recipe, excluding the interference introduced by the architecture and the optimizer. The second step is to actually train at multiple combinations of N, D, and C, giving the power-law fit enough observational support. Only the third step is fitting: estimate the three parameters L∞, A, and α—the irreducible loss lower bound, the power-law coefficient, and the scaling exponent—which respectively determine the curve’s lowest point, overall position, and rate of decline.</p>
+<p>Once fitting is complete, under a fixed budget, find the N–D allocation frontier along the curve, answering “How should this compute be allocated to minimize loss?” But the frontier is only an interpolation result; you must use intermediate-scale points to verify whether the extrapolation still holds, preventing the straight line from being extended into regions where it no longer holds. The final acceptance does not look at a single number; instead, it uses task slices and full-lifecycle cost as criteria, confirming that the loss reduction actually translates into an improvement in the target capability and that costs are not quietly shifted to the deployment stage. If any link in the chain breaks, the earlier fit loses its meaning; this is also why the entire process emphasizes that experiment, fitting, and validation must use the same set of conditions.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Scaling Laws for Neural Language Models</a>: empirical power laws for parameters, data, and compute</li><li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Training Compute-Optimal Large Language Models</a>: Chinchilla compute-optimal training</li><li><a href="https://arxiv.org/abs/2206.07682" target="_blank" rel="noopener">Emergent Abilities of Large Language Models</a>: observations of how abilities change with scale</li><li><a href="https://arxiv.org/abs/2304.15004" target="_blank" rel="noopener">Are Emergent Abilities of Large Language Models a Mirage?</a>: discrete metrics and threshold effects</li><li><a href="https://arxiv.org/abs/2401.00448" target="_blank" rel="noopener">Beyond Chinchilla-Optimal</a>: incorporating inference needs into lifecycle optimization</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/scaling-law">Explore connections on the map</a><a href="/zh/concepts/scaling-law/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=svg.querySelector('marker#ch1,marker#g28a,marker#mr1,marker#vd1')||
+      ['Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
