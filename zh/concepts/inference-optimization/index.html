@@ -4,13 +4,15 @@
 
 
 
+
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
 <link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>推理优化：先定位 prefill、decode、KV 还是排队瓶颈 · AI 知识地图</title>
 <meta name="description" content="从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/inference-optimization/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/inference-optimization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/inference-optimization/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
 <meta property="og:title" content="推理优化：先定位 prefill、decode、KV 还是排队瓶颈">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">推理优化：先定位 prefill、decode、KV 还是排队瓶颈</span></li></ol></nav><article id="dd-article" data-concept-id="inference-optimization">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">推理优化：先定位 prefill、decode、KV 还是排队瓶颈</span></li></ol></nav><article id="dd-article" data-concept-id="inference-optimization" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">推理优化：先定位 prefill、decode、KV 还是排队瓶颈</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从 TTFT/TPOT、算术强度和连续批处理，到 PagedAttention、FlashAttention、量化、推测解码与真实负载验收。</p>
 
@@ -157,7 +159,7 @@
 <p>最后一步是质量与成本联合门禁。任何可能改变输出的手段——量化、KV 压缩、上下文裁剪、近似解码——都必须过质量回归；同时用每成功任务的成本把吞吐、显存、功耗折算成同一个尺度。两者同时达标，优化才算完成。每一步的输出都是下一步的输入，任何一步被跳过，结论就失去依据。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">FlashAttention</a>：IO 感知精确注意力</li><li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">vLLM</a>：PagedAttention 与高吞吐服务</li><li><a href="https://www.usenix.org/conference/osdi22/presentation/yu" target="_blank" rel="noopener">Orca</a>：迭代级调度与连续批处理</li><li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Fast Inference from Transformers via Speculative Decoding</a>：保持目标分布的推测解码</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/inference-optimization">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/inference-optimization">在地图中查看概念关系</a><a href="/en/concepts/inference-optimization/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>
