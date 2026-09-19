@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero · AI Knowledge Map</title>
+<meta name="description" content="From JSON Schema, grammar states, and tokenizer boundaries to dead ends, complexity, streaming output, and semantic validation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/constrained-decoding/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/constrained-decoding/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/constrained-decoding/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero">
+<meta property="og:description" content="From JSON Schema, grammar states, and tokenizer boundaries to dead ends, complexity, streaming output, and semantic validation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/constrained-decoding/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero">
+<meta name="twitter:description" content="From JSON Schema, grammar states, and tokenizer boundaries to dead ends, complexity, streaming output, and semantic validation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/constrained-decoding/#page","name":"Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero","description":"From JSON Schema, grammar states, and tokenizer boundaries to dead ends, complexity, streaming output, and semantic validation.","url":"https://ai-knowledge-map.com/en/concepts/constrained-decoding/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero","item":"https://ai-knowledge-map.com/en/concepts/constrained-decoding/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero</span></li></ol></nav><article id="dd-article" data-concept-id="constrained-decoding" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Constrained Decoding: Using Automata to Set Illegal Token Probabilities to Zero</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From JSON Schema, grammar states, and tokenizer boundaries to dead ends, complexity, streaming output, and semantic validation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Constrained decoding compiles a schema, regex, or grammar into a state machine and at each step allows only tokens that can still reach an accepting state. It can guarantee that the generated result belongs to the specified formal language, but it cannot guarantee that fields are truthful, that cross-field business relationships hold, or that users have permission to perform actions.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>Explain state machines and token masks; manually compute a one-step constrained probability; identify tokenizer/grammar dead ends; design three-layer validation for syntax, semantics, and permissions.</div>
+<ol class="dd-chain"><li>Compile a minimal schema into a tokenizer-aware state machine.</li><li>Compute the legal set token by token and mask.</li><li>Renormalize and sample among legal candidates.</li><li>Commit complete objects only in accepting states.</li><li>Perform schema/business/fact/permission validation.</li><li>Record dead ends and limited recovery, and perform regression.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The Difference Between Prompt Requirements and Decoding Guarantees<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>If you write "only return JSON" in the prompt, even if it's bolded, capitalized, or repeated three times, the model will still produce malformed output in a large number of calls. The reason is that prompts can only change the model's probability distribution; they cannot delete any candidates. As long as some illegal token sequence retains even a tiny probability in the distribution, as sampling occurs many times, it will eventually be selected. Suppose the probability of a valid output is already as high as 99.9%, then in one million calls, it is still expected that about one thousand will produce malformed output; this is the mathematical root cause of why formatting errors cannot be eradicated by prompting alone.</p>
+<p>Constrained decoding changes where errors are eliminated: it no longer tries to make the model "more obedient", but directly intervenes at the sampler level. Its input consists of three things: the logits (unnormalized log scores) that the model gives for the next token, the sequence prefix generated so far, and a set of formal rules (usually a grammar or JSON schema). The output is a sequence sampled from the distribution as usual, but this sequence can only be composed of tokens that are legal at each step. Specifically, at each step, the probabilities of candidate tokens that violate the formal rules are set to zero, then the remaining candidates are renormalized, and sampling is performed from this trimmed distribution. Illegal tokens are therefore mechanistically impossible to select: it is not that "the model has learned not to select them", but rather those candidates no longer exist.</p>
+<p>The guarantee boundary obtained from this is very clear: constrained decoding guarantees that the output belongs to a certain formal language—the result is always valid JSON and always conforms to the shape of the given schema. It does not guarantee that field values are truthful, that the business relationships between fields hold, or that the caller has the authority to perform the action described by the output. Formal correctness and content trustworthiness are two different things.</p>
+<p>This characteristic determines its applicable scenarios: in locations such as tool call arguments, batch information extraction, and database interfaces, the output must be parsed by downstream programs, formal correctness is a hard prerequisite, and constrained decoding has the greatest value. Conversely, if free-form writing content forcibly applies a complex schema, it will sacrifice expressive flexibility, and masking and renormalization at each step will increase latency, resulting in a text that is structurally valid but whose content still requires human judgment.</p>
+<p>A practical layered boundary is: constrained decoding is responsible for form; business validation is responsible for relationships between fields; authentication and transaction control are responsible for the consequences of actions. The three layers each have their own roles, and no layer can replace the other two.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How Grammars Become Incremental State<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>At any moment the generation process sees only a prefix; it neither knows what will be generated in the future nor can it inspect the entire output at once. To determine whether the next token is legal, the rules must be compiled in advance into a parsing state that can advance step by step with the prefix.</p>
+<p>What the compilation stage does is translate constraint sources into automata. JSON Schema corresponds to a deterministic finite automaton (DFA), context-free grammars correspond to pushdown automata (PDA), and regular expressions are likewise compiled into DFAs; it is also possible to directly construct an equivalent parsing state. This parsing state records the structural information of the current position: where in the object it currently is, whether it is currently inside an array, a string, or a number, which required fields have already appeared, and what is allowed to appear next. The runtime behavior of the whole system is: each time a complete token byte string is accepted, it advances the state once; the state machine then returns the new state and the batch of tokens that are legal from that state. When generation ends, only prefixes in an accepting state may be allowed to terminate normally.</p>
+<p>To turn JSON Schema into such a state machine, each of its constraints must be mapped to grammar structures: type determines which kinds of values are allowed at the current position; enum becomes a set of allowed literals; required turns whether object fields have appeared into a state that must be tracked; additionalProperties determines whether unknown fields are rejected or allowed; an array's minItems and maxItems become counter lower and upper bounds; nested references ($ref and $defs) recursively embed sub-schemas into the state. However, not every implementation supports all keywords, and the compilation support table is a practical boundary. Remote references, overly complex regular expressions, and semantic constraints that cannot be expressed syntactically at the format level (such as a string having to be exactly a valid date or email address) usually can only be checked after generation.</p>
+<p>Different constraint sources have different expressive strengths and weaknesses. Regular expressions are best at expressing local string shapes but cannot express arbitrary nesting structures and cross-field relationships. JSON Schema is good at describing objects, types, enums, and required fields but cannot express facts such as “this record exists in the database” or “the caller has this permission.” Context-free grammars can describe recursive syntax and code structure but cannot express variable semantics and runtime results. Custom state machines can characterize protocols and finite flows but cannot express open-world facts. Therefore, state compilation addresses the judgment of “structurally legal”; any constraint beyond the expressive power of formal languages must be handed to post-generation business validation.</p></div>
+<table class="dd-table"><thead><tr><th>Constraint source</th><th>Easy to express</th><th>Usually cannot express</th></tr></thead><tbody><tr><td>Regular expression</td><td>Local string shape</td><td>Arbitrary nesting and cross-field relationships</td></tr><tr><td>JSON Schema</td><td>Objects, types, enums, required</td><td>Database existence and permissions</td></tr><tr><td>CFG</td><td>Recursive syntax, code structure</td><td>Variable semantics and runtime results</td></tr><tr><td>Custom state machine</td><td>Protocols and finite flows</td><td>Open-world facts</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>After Masking, Renormalization Is Required<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>Setting an illegal token's probability to zero is not simply "throwing away" probability and being done. The original model's distribution sums to 1; after directly deleting a batch of candidates, the sum of the remaining candidates' probabilities is less than 1 and is no longer a valid probability distribution. Therefore the standard constrained sampling process has two steps: first mask on the legal set, then renormalize on the legal set. The output is a new distribution: illegal items have probability exactly 0, and legal items' probabilities sum to exactly 1 again.</p>
+<p>This process can be written exactly as a formula. Let P(t|s) be the original probability that the model assigns to token t in parsing state s, and let M(s) be the set of tokens from state s that can still lead to a complete legal result. The constrained sampling probability is then:</p>
+<p>P′(t|s) = P(t|s) × 1[t ∈ M(s)] ÷ Σ_{u∈V} P(u|s) × 1[u ∈ M(s)]</p>
+<p>Here 1[·] is the indicator function: it is 1 when the condition holds and 0 otherwise; u ranges over all candidates in the vocabulary; the denominator is the sum of the probability mass of the remaining legal candidates and serves to perform normalization. When an illegal token is substituted in, the indicator function is 0, so the numerator as a whole is 0; when a legal token is substituted in, it receives its original probability divided by the total probability mass of the legal set, so the sum over the legal set returns to exactly 1. The degenerate case where the denominator is zero is discussed separately later.</p>
+<p>It is worth emphasizing that this transformation changes the shape of the distribution, not the model's capabilities. The constraint mechanism does not know the task answer; it only removes options that do not conform to the grammar. When the high-probability candidates the original model most wants to output happen to be all illegal tokens, the model is forced to choose among low-probability legal candidates. In that case, although the format is guaranteed to be correct, the content quality may deteriorate noticeably. This is precisely the mathematical expression of "structural legality does not equal content reliability."</p>
+<p>The sampling order also affects the result. The correct order is to first obtain the logits, then apply the grammar mask, and then sample over the legal set; temperature, top-k, and top-p truncation operations have semantic differences depending on the step at which they occur. If top-k is applied first and the truncation happens to delete all legal tokens, then no legal candidate remains in the remaining distribution, constituting an erroneous dead end. Therefore implementations must clearly specify and test the processing order they use.</p>
+<p>Finally, there is the case of an empty candidate set. If M(s) is empty in a certain state, it should not be treated as an occasional fluctuation that can be recovered by "trying again." It usually means there is an incompatibility among the schema, the tokenizer, the current prefix, or the truncation order, and the system should return a diagnosable failure state, exposing the conflict instead of silently retrying.</p></div>
+<div class="dd-formula" data-formula-id="constrained-decoding-renormalization"><math display="block" aria-label="状态 s 下 token t 的受限概率 P prime 等于原概率乘合法集合指示函数，再除以所有候选 u 的合法概率质量之和"><mrow><msup><mi>P</mi><mo>′</mo></msup><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>P</mi><mo>(</mo><mi>t</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mn>1</mn><mo>[</mo><mi>t</mi><mo>∈</mo><mi>M</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow><mrow><munder><mo>∑</mo><mi>u</mi></munder><mi>P</mi><mo>(</mo><mi>u</mi><mo>∣</mo><mi>s</mi><mo>)</mo><mn>1</mn><mo>[</mo><mi>u</mi><mo>∈</mo><mi>M</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow></mfrac></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: How a One-Step Refund Action Is Constrained<span class="dd-badge math">Step-by-Step Computation</span></h2>
+<div class="dd-agent-response"><p>Use a concrete single-step decision to see how the constraint decoder rewrites the distribution. Assume the current prefix is {&quot;action&quot;: , and the JSON state machine has advanced to state q₃, which is “currently generating the enumeration value for the action field”. The model's raw preferences for the next token are as follows: delete probability 0.50, refund probability 0.30, ask probability 0.15, and the remaining 0.05 is spread across other candidates. The schema specifies that the action field only allows the two enumeration values refund or ask.</p>
+<p>The constraint decoder first checks each candidate against the grammar. delete is not in the enumeration, so the indicator function returns 0, and its 0.50 probability mass is directly set to zero. The legal candidates are refund and ask; their raw probabilities total 0.30 + 0.15 = 0.45, and this 0.45 becomes the denominator for renormalization. Thus the constrained probability of refund is 0.30 ÷ 0.45 = 0.667, and the constrained probability of ask is 0.15 ÷ 0.45 = 0.333; the two sum exactly to 1. The model's originally most preferred delete completely disappears from the samplable set, and sampling can only land on refund or ask. This is an intuitive demonstration that constrained decoding changes the samplable set rather than the model's preferences.</p>
+<p>At the same time, it must be clear what this result guarantees and does not guarantee. The constraint decoder only proves that “the action name belongs to the enumeration allowed by the schema”; it does not discuss at all whether it is safe from a business perspective: refund still requires external systems to verify refund eligibility, whether the refund amount is correct, and whether the caller is authorized to execute it; ask still requires confirmation that the question posed is necessary and is not soliciting excessive privacy information. In the table, the “business safety” column is in an undiscussed state for delete, refund, and ask. In other words, constrained decoding blocks delete at the door, but it may still let the model output refund to an unqualified caller. The gap between structural validity and action safety must be filled by post-generation business validation and permission control.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 250" role="img" aria-label="JSON state machine masks candidate tokens for the refund action and renormalizes"><defs><marker id="cd1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="83" width="150" height="76" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="93" y="108" text-anchor="middle" class="svg-t">State q₃</text><text x="93" y="130" text-anchor="middle" class="svg-t" font-size="11">Prefix {“action”:</text><text x="93" y="149" text-anchor="middle" class="svg-t" font-size="11">Expecting enumeration string</text><path d="M168,121 L235,121" stroke="#6b7484" marker-end="url(#cd1)"/><rect x="237" y="38" width="175" height="166" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="324" y="62" text-anchor="middle" class="svg-t">Original candidate probabilities</text><text x="324" y="90" text-anchor="middle" class="svg-t" font-size="11">“delete” .50 → illegal×0</text><text x="324" y="116" text-anchor="middle" class="svg-t" font-size="11">“refund” .30 → keep</text><text x="324" y="142" text-anchor="middle" class="svg-t" font-size="11">“ask” .15 → keep</text><text x="324" y="168" text-anchor="middle" class="svg-t" font-size="11">Other .05 → illegal×0</text><text x="324" y="190" text-anchor="middle" class="svg-t" font-size="11">Legal mass = .45</text><path d="M412,121 L479,121" stroke="#6b7484" marker-end="url(#cd1)"/><rect x="481" y="64" width="200" height="114" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="581" y="90" text-anchor="middle" class="svg-t">Renormalization</text><text x="581" y="118" text-anchor="middle" class="svg-t" font-size="11">P′(refund)=.30/.45=.667</text><text x="581" y="143" text-anchor="middle" class="svg-t" font-size="11">P′(ask)=.15/.45=.333</text><text x="581" y="165" text-anchor="middle" class="svg-t" font-size="11">delete cannot be generated</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 Constrained decoding changes the samplable set, but does not prove that refund is actually eligible or authorized.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Original probability</th><th>Allowed by grammar</th><th>Constrained probability</th><th>Business safety</th></tr></thead><tbody><tr><td>delete</td><td>.50</td><td>No</td><td>0</td><td>Not discussed</td></tr><tr><td>refund</td><td>.30</td><td>Yes</td><td>.667</td><td>Still requires eligibility, amount, and permissions</td></tr><tr><td>ask</td><td>.15</td><td>Yes</td><td>.333</td><td>Still requires the question to be necessary and not solicit excessive privacy</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Tokens are not characters; the mask must understand tokenizer <span class="dd-badge eng">Boundaries</span></h2>
+<div class="dd-agent-response"><p>Grammar rules are written at the character level—quotes, commas, enum values, Unicode characters—but models sample token by token, and there is no one-to-one mapping between tokens and characters. Therefore a common mistaken implementation is to filter candidates by checking “whether the first character of the next token is legal.” This necessarily goes wrong, because token boundaries and character boundaries do not coincide.</p>
+<p>A token may contain an opening quote plus a string of characters, or even swallow multiple syntactic units at once such as a quote, field name, and comma; Unicode characters may span multiple bytes; escape sequences in turn change the relationship between surface text and underlying bytes. The truly reliable test is: take the complete byte string of the candidate token, run it starting from the current parsing state, and see whether after the run it lands in a state from which it can still continue and eventually reaches an accepting state. The object of judgment is the entire token, not its first character.</p>
+<p>This difference shows up directly with enum constraints. The enum value refund may happen to be split into one token, or it may be split into two tokens: ref and und. When the state machine expects to generate refund, a prefix token such as ref has not formed a complete enum value, but it is a prefix of a legal enum and must be allowed; the next step then verifies und. Conversely, a token that starts with r on the surface but cannot complete a legal enum through any subsequent combination should be masked no matter how correct its first character appears.</p>
+<p>This judgment depends on the target model's actual tokenizer. Different vocabularies will split the same string into different token sequences; therefore both the compilation stage and the testing stage must use the tokenizer used in actual deployment. After changing the model or tokenizer, if you continue to reuse the old mask cache, you will apply the legal set computed for the old vocabulary to the new vocabulary: the result will either block paths that should be legal or allow candidates that should be rejected. Recompiling after changing the tokenizer is not an optimization but a prerequisite for correctness.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Complex schemas create state and performance issues<span class="dd-badge eng">Complexity</span></h2>
+<div class="dd-agent-response"><p>Constrained decoding performance is not constant. The more complex the schema structure, the more states are compiled, and the greater the cost of computing the legal token set at each step; decoding slows down and jitter becomes more noticeable. To govern complexity, the inputs to focus on are schema structure, tokenizer, and resource limits; the outputs are the number of compiled states, per-step masking cost, and the reason when rejection occurs.</p>
+<p>Specifically, large enumerations, deep recursion, intersecting branches of oneOf/anyOf, and complex regular expressions all simultaneously increase compilation time and state space, and add to the computation of legal tokens at each step. The compiled artifacts can be cached, but the cache key must include both the schema hash and the tokenizer version — caching by schema hash alone will reuse artifacts built for the old vocabulary after changing tokenizers, thereby blocking valid paths or admitting incorrect candidates. In addition to caching, upper limits must be set: schema size, recursion depth, array length, and string length all need to be limited; otherwise a malicious or runaway schema can exhaust compilation resources.</p>
+<p>In practice, there is a clear correspondence between symptoms and causes. If the first token is very slow, it is usually caused by the initial grammar compilation, which can be resolved with precompilation and versioned caching. If every token is slow, it indicates that legal token set computation is too complex; you need to simplify branches and cache states. Empty candidates often arise because the implementation does not support a certain schema feature or the prefix conflicts with the grammar; you should run compatibility tests and return an explicit failure. Unbounded output length occurs because no upper limits were set for arrays and strings; you need to cap it with dual limits from schema boundaries plus total token count.</p>
+<p>Beyond these measures, the most effective governance is often to make the schema itself smaller. A minimal schema lets the model generate only the fields that truly require its judgment, with the server side filling in default values and derived fields. With fewer fields, the state space and per-step masking cost both decrease, and such configurations are usually more stable.</p></div>
+<table class="dd-table"><thead><tr><th>Symptom</th><th>Possible cause</th><th>Handling</th></tr></thead><tbody><tr><td>First token is very slow</td><td>Initial grammar compilation</td><td>Precompilation and versioned caching</td></tr><tr><td>Every token is slow</td><td>Legal token set computation is complex</td><td>Simplify branches, state caching</td></tr><tr><td>Empty candidates</td><td>Implementation does not support the feature or prefix conflict</td><td>Compatibility testing, explicit failure</td></tr><tr><td>Output too long</td><td>No array/string upper limits</td><td>Schema and total token dual limits</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Submission Boundaries for Streaming Output and Tool Calls<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>One tempting aspect of constrained decoding is that the prefix generated at each step is guaranteed to be extendable to a valid result, which makes it seem possible to use the output while generating it. But if you treat “the current prefix is valid” as “the object is already complete,” you will execute actions at the wrong time. The string is still continuing, the number may not yet be fully written, and the array can have elements appended at any time. A valid prefix only means there is a path to continue; it does not mean the object is closed. Network interruption makes the problem worse: the stream breaks in the middle, leaving half an object rather than a complete parseable value.</p>
+<p>Therefore the submission boundary must be tightened. The client can display streaming progress during generation, letting users see content taking shape gradually; but tool parameters should be committed atomically only after all three conditions are satisfied: the state machine reaches an accepting state, schema validation passes, and business validation passes. If any of the three is missing, no action may be executed.</p>
+<p>After a stream interruption, you must also distinguish among cancellation, timeout, and normal completion, handling each separately rather than treating them all alike. A particularly prohibited practice is automatically filling in truncated JSON and then executing it. The model does not know what the truncated half of the value was originally intended to be, and the content completed by the server may differ from the original intent; for an action involving funds, guessing half a value wrong can cause real loss.</p>
+<p>The boundary for retries lies in the idempotency key. A call may have already succeeded on the server, with only the response lost on the return path; if the client resends the identical request because it did not receive the response, duplicate execution can occur, for example the same refund being processed twice. Therefore retries must reuse the idempotency key so that the server can recognize that this is the same operation and refuse to execute it again.</p>
+<p>Finally, clarify the scope of the constraint: it only restricts the model's own output. Malicious content in the schema description text, retrieval results, and tool return values—these external inputs do not pass through decoding constraints and remain untrusted input. Sensitive free-text fields need separate content inspection and injection isolation. You must not relax protection against external text just because the overall output is valid JSON.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Format, schema, business, and permissions must be evaluated separately<span class="dd-badge eng">Validation</span></h2>
+<div class="dd-agent-response"><p>After JSON validity reaches 100%, a natural misconception is that evaluation is complete. But constrained decoding only guarantees the syntax layer; what teams truly need are layered metrics: send generated results sequentially through a parser, schema validation, authoritative fact-checking, subject permission checks, and tool feedback, recording pass rates separately for each layer. Syntax validity rate, schema pass rate, dead-end rate, additional TTFT (time to first token latency) and TPOT (time per output token latency), business validation pass rate, factual correctness rate, tool success rate, unauthorized access interception rate, and final task quality—these numbers must be kept separately. Reporting only parse success rate will make a system that is “format all correct, content all wrong” appear perfect, because failures in any subsequent checkpoint are not compensated by format validity rate.</p>
+<p>The specific division of labor in layered validation is clear. The parser only validates syntactic correctness and complete termination; schema validation checks fields, types, enums, and ranges; deterministic rules validate amounts, dates, and cross-field invariants; the database or evidence layer verifies entity existence and factual truth; the execution layer re-authenticates based on the current subject before the action actually occurs and limits side effects. High-risk actions must additionally verify that idempotency and unauthorized access interception actually take effect. If any layer fails, it should return a structured failure reason, then perform a limited number of retries or hand off to a human, rather than silently swallowing the failure.</p>
+<p>Evaluation use cases also need layered design. Adversarial regression sets should cover Unicode and escaping, extremely deep nesting, empty arrays, long enums, streaming disconnections, and keywords not supported by the implementation. These use cases strike different layers respectively: disconnection tests exercise submission boundaries, unsupported keywords test compilation compatibility, long enums and deep nesting test state size and performance, and empty arrays test upper bounds. Only by measuring each layer separately can we know whether the other layers have collapsed behind a perfect format score.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>By linking the previous parts in causal order, we can obtain a practical chain that starts from the problem and ends verifiably.</p>
+<p>The starting point is the nature of the problem: prompts can only change the probability distribution, not delete any candidate, so format errors inevitably appear periodically in large-scale calls. Constrained decoding moves the intervention point to the sampler level, using formal rules to prune the candidate set, thereby upgrading “output belongs to a formal language” from a probabilistic guarantee to a mechanistic guarantee. This is the first causal step: why errors occur determines where the intervention must happen.</p>
+<p>The second step is how rules enter the model. Compile the minimal schema into a tokenizer-aware state machine—tokenizer-aware because the unit of judgment is the complete token byte string, not characters. The compiled artifact records parsing states; the state preserves structural information about the current position and what is allowed next. This is one link in “rules becoming runtime state.”</p>
+<p>The third step is the per-token runtime loop: at each step, compute the legal token set under the current state, set the probabilities of illegal candidates to zero, then renormalize over the legal candidates and sample. Renormalization is the key to correctness—after removing candidates, the sum of remaining mass is less than 1; you must divide by the legal mass to restore a distribution summing to 1.</p>
+<p>The fourth step is the commit boundary: a valid prefix does not mean the object is complete. Only in an accepting state, and after both schema and business validation pass, do we atomically commit the complete object and execute the action. This step turns the mechanistic guarantee into protection for real actions.</p>
+<p>The fifth step is the validation layer: schema, business, facts, and permissions are evaluated and validated separately; failure in any layer is not compensated by format validity rate. The sixth step is closing the loop: record metrics such as dead-end rate, perform limited recovery from failures, and continuously run regression with adversarial cases.</p>
+<p>Every connection in the whole chain corresponds to a clear division of labor: compilation is responsible for the correctness premise, masking and renormalization for the mechanistic guarantee, accepting-state commit for the execution boundary, layered validation for content and safety, and regression for long-term stability. If any link is omitted, the guarantees of the remaining links lose their meaning.</p></div>
+</section>
+<div class="dd-src"><b>Source materials and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2109.05093" target="_blank" rel="noopener">PICARD</a>: Incremental parsing rejects illegal tokens.</li><li><a href="https://arxiv.org/abs/2212.06094" target="_blank" rel="noopener">LMQL</a>: Constrained language model queries and decoding.</li><li><a href="https://arxiv.org/abs/2501.10868" target="_blank" rel="noopener">JSONSchemaBench</a>: JSON Schema constraint coverage, efficiency, and quality.</li><li><a href="https://github.com/dottxt-ai/outlines" target="_blank" rel="noopener">Outlines</a>: Structured generation practices based on finite-state methods.</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/constrained-decoding">Explore connections on the map</a><a href="/zh/concepts/constrained-decoding/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
