@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It · AI Knowledge Map</title>
+<meta name="description" content="Understand where the generate–execute–observe loop’s capabilities come from, and the isolation boundary made up of processes, files, network, resources, credentials, and human authorization.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/code-execution/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/code-execution/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/code-execution/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It">
+<meta property="og:description" content="Understand where the generate–execute–observe loop’s capabilities come from, and the isolation boundary made up of processes, files, network, resources, credentials, and human authorization.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/code-execution/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It">
+<meta name="twitter:description" content="Understand where the generate–execute–observe loop’s capabilities come from, and the isolation boundary made up of processes, files, network, resources, credentials, and human authorization.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/code-execution/#page","name":"Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It","description":"Understand where the generate–execute–observe loop’s capabilities come from, and the isolation boundary made up of processes, files, network, resources, credentials, and human authorization.","url":"https://ai-knowledge-map.com/en/concepts/code-execution/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It","item":"https://ai-knowledge-map.com/en/concepts/code-execution/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It</span></li></ol></nav><article id="dd-article" data-concept-id="code-execution" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Code Execution and Sandboxing: Let the Model Compute, but Don’t Hand Over the Host to It</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Understand where the generate–execute–observe loop’s capabilities come from, and the isolation boundary made up of processes, files, network, resources, credentials, and human authorization.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Code execution converts a language model’s intentions into repeatable, deterministic computation, but any generated code should be treated as untrusted input; a reliable system depends on temporary sandboxes, least privilege, resource limits, output validation, and high-risk approval, not on the model’s promise of safety.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Explain why code tools improve reliability; draw the execution loop; list six types of isolation; distinguish sandboxes from virtual environments; securely handle dependencies, files, network, secrets, and output.</div>
+<ol class="dd-chain"><li>Break tasks into minimal executable, revertible, auditable, and replayable steps.</li><li>Configure isolation, permissions, and limits based on risk.</li><li>Execute and capture complete state.</li><li>On failure, provide only necessary feedback and limit the number of corrections.</li><li>Accept artifacts using tests, hashes, or business rules.</li><li>Re-authorize high-impact external actions outside the sandbox.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Kind of Capability Does the Code Tool Add?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>A model can fluently explain an algorithm yet give a wrong answer when computing a large number; this is not accidental. Language models are good at restating goals as programs, while interpreters are good at precise, repeatable execution of explicit rules. The two solve different problems: the former is responsible for "expressing intent," and the latter for "putting rules into practice." Handing deterministic tasks such as computation, data transformation, plotting, and testing over to code is essentially substituting the result of one actual execution for "guessing the result with language," and then using this observable result to correct the next judgment.</p>
+<p>Code execution is therefore a tool: it lets an interpreter run candidate programs and return observable evidence. Its inputs are the task, code, data, and runtime environment; its outputs are the run result, logs, and artifacts. Its working mode follows a loop of "generate—execute—observe—correct": first the model generates a candidate program, then the interpreter executes it, and the model observes the output and corrects its next step. The value of this loop is that it leaves behind the program, input, environment version, and output, allowing the entire process to be independently reviewed and deterministically replayed.</p>
+<p>What must be strictly distinguished is that a single execution result can only indicate "what this program produced in this environment during this run"; it cannot automatically prove the program correct or safe, nor does it equal obtaining release authorization. Correctness requires separate verification, security requires separate isolation, and release authorization requires separate decision-making. What code execution adds is the capability of "deterministic computation and observable feedback," not a final endorsement of the conclusion.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Minimal Execution Loop<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>For code to go from generation to being trusted, it must pass through these states in order: generation, boundary checking, isolated execution, observation and recording, feedback correction, and independent acceptance; each state is handled by a different party and cannot replace one another.</p>
+<p>The inputs to the loop are candidate code, read-only data, an execution policy, and a completion predicate. The so-called completion predicate is a condition that can independently determine, outside execution, whether the task has truly succeeded, rather than whether the process has exited normally. After the model proposes the code, input, expected artifacts, and this completion predicate, the host first performs static checks: it checks tools, dependencies, permissions, and resource policy; if the policy is not satisfied, the host should refuse to execute rather than letting the code downgrade itself to accommodate. Subsequently, the read-only input is copied into a brand-new sandbox and run under an unprivileged identity; the host captures stdout, stderr, exit codes, signals, resource peaks, network attempts, and file differences. These observations return to the AI Agent; on failure, only necessary diagnostic information is exposed, and the number of corrections is limited to prevent infinite retries.</p>
+<p>After execution comes independent acceptance: the host does not treat “successful process exit” as task success, and only exports artifacts that are permitted. Throughout the entire loop, the control plane is responsible for creating the environment, injecting the policy, and deciding what to export; the data plane only runs the candidate code. The candidate process can neither access the control plane's tokens nor modify its own limits; otherwise, the so-called sandbox is merely an agreement that the isolated object voluntarily complies with, and the boundary is effectively nonexistent.</p>
+<p>The key to understanding this loop is that the host first sets boundaries, then executes, observes, and accepts; exit code 0 only means the process ended normally, not that the task is complete. Once control tokens are visible to the candidate process, or the completion predicate cannot be independently checked externally, the loop loses its real boundary.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Why Code Must Be Assumed Harmful<span class="dd-badge intuition">Threat</span></h2>
+<div class="dd-agent-response"><p>The model has no malicious intent, yet the code it generates must still be treated as an attack payload, because the threat is determined not by the generator’s intent but by the code’s capabilities and the resources it can actually reach. Prompt injection, misspelled or misinstalled dependencies, snippets copied from web pages, and even ordinary programming errors can lead to deleting files, reading secrets, scanning the internal network, entering infinite loops, or exhausting resources. The fact that the author 'just wanted to compute an average' does not make these consequences any less real.</p>
+<p>Therefore, the threat model should start from the 'worst reachable impact' rather than from 'whether the author is well-intentioned'. It is necessary to confirm one by one: which paths the code can read, which addresses it can connect to, what identity it runs as, how many child processes it can create, and whether its output will trigger downstream parsers. Even if the main task is only to compute an average, as long as the runtime inherits cloud credentials and internal network access, it also possesses a huge attack surface unrelated to the task. The principle of least privilege requires first removing unneeded capabilities, not politely asking the code in a prompt 'not to use them'.</p>
+<p>eval is not a safe alternative to exec: both can execute untrusted expressions, and the security boundary must be built on an independent execution environment, not obtained by choosing a particular interpreter function.</p>
+<p>The inputs to this threat model are the capabilities the code can invoke, the files and networks it can reach, the identity it runs under, and downstream parsers; the outputs are the worst reachable impact and the permissions that should be removed. It addresses the misconception of 'whether it is safe if the author has no malicious intent'. The conclusions it produces are used to configure defenses, rather than to predict that a particular attack will definitely occur; unknown vulnerabilities and configuration errors may still penetrate known boundaries, so defense conclusions are the starting point for continuous tightening, not a once-and-for-all guarantee.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>What Resources Must the Sandbox Isolate?<span class="dd-badge eng">Security</span></h2>
+<div class="dd-agent-response"><p>Spawning a single new process is far from enough, because threats come from multiple orthogonal dimensions, and losing control of any single dimension can cause damage. The sandbox must establish boundaries on five categories of resources simultaneously and record the control evidence corresponding to each category.</p>
+<p>For files, use a temporary workspace and read-only input, prohibit access to host paths and devices, and record the mount list and final file differences. For network, default to network off or a target/protocol allowlist, block internal network metadata, and record DNS queries and connection attempts. For resources, set limits on CPU, memory, disk, process count, and wall-clock time, and record peak values, termination reason, and exceeded items. For identity, use a non-privileged user, carry no host credentials, restrict system calls, and record the effective uid, capability, and policy version. For lifecycle, rebuild the environment for each task, destroy it after use, clean up artifacts, and record the environment id and creation/destruction time.</p>
+<p>These controls must coexist: limiting only CPU cannot prevent secrets from being exfiltrated, disconnecting only the network cannot prevent overwriting host files, and using only a temporary directory cannot prevent a fork bomb. Output channels are also part of the boundary—stdout, images, archives, and spreadsheets must all have limits on size, type, and parsing method, otherwise the attack is simply shifted from the executor to the viewer.</p>
+<p>When using this isolation table, the inputs are the resources the task genuinely needs and the acceptable loss, and the outputs are the five categories of isolation policies and the corresponding audit records. The host sets limits on files, network, resources, identity, and lifecycle separately, then performs a joint check. Logs showing no boundary violations can only explain the behavior observed this time; they cannot prove that the shared kernel or the viewer has no unknown vulnerabilities.</p></div>
+<table class="dd-table"><thead><tr><th>Boundary</th><th>Control</th><th>Evidence to record</th></tr></thead><tbody><tr><td>Files</td><td>Temporary workspace, read-only input, prohibit host paths and devices</td><td>Mount list and final file differences</td></tr><tr><td>Network</td><td>Default network off or target/protocol allowlist, block internal network metadata</td><td>DNS and connection attempts</td></tr><tr><td>Resources</td><td>CPU, memory, disk, process count, and wall-clock limits</td><td>Peak values, termination reason, and exceeded items</td></tr><tr><td>Identity</td><td>Non-privileged user, no host credentials, minimal system calls</td><td>Effective uid, capability, and policy version</td></tr><tr><td>Lifecycle</td><td>Rebuild per task, destroy after use, and clean up artifacts</td><td>Environment id, creation/destruction time</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Virtual environments are not the same as security sandboxes<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>Python's venv or dependency containers do not automatically isolate the host. venv primarily isolates package versions; it does not restrict file access, network, or system calls. Containers provide namespaces and resource control, but incorrect mounts, privileged mode, or vulnerabilities in the shared kernel can still break isolation. In high-risk scenarios, you need a stronger combination: unprivileged containers, a read-only root filesystem, system call filtering, micro virtual machines, and external network policies.</p>
+<p>“Reproducibility” and “isolation” are not the same thing either. Lock files, fixed runtimes, and deterministic random seeds help replay results but do not restrict permissions; micro virtual machines strengthen boundaries but may still produce different results because dependencies are not locked. Reliable execution must answer two independent questions simultaneously: whether the program can escape or damage the environment, and whether the same input can be computed again to yield the same result.</p>
+<p>When making a choice, the inputs are reproducibility requirements, attack risk, and the capabilities that need to be exposed to the host; the output is a combination of dependency environments, containers, or micro virtual machines. venv solves package version conflicts, while sandboxing solves privilege escalation and blast radius—the two have different goals. A container itself is not a security conclusion; privileged mode, dangerous mounts, or overly broad outbound network permissions can all defeat isolation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Dependencies and Results Are Also Untrustworthy<span class="dd-badge eng">Supply Chain</span></h2>
+<div class="dd-agent-response"><p>Even if the code itself looks safe, risks can still enter through two paths: dependencies and artifacts. On the dependency side, an installation package may be typosquatted—using a package with a similar name but different content to impersonate the target package—or may execute arbitrary scripts during installation. On the artifact side, generated files may contain macros, formula injection, or huge amounts of data. The response is to constrain dependencies with allowlists, pinned versions, and internal mirrors, while scanning artifacts and limiting their type and size; only verified results are copied out of the sandbox.</p>
+<p>The input to the supply chain check is dependency name, version, source, and files to export; the output is an allow or deny decision and scan evidence. It blocks the risk of dependency and artifact smuggling through pinned versions, trusted mirrors, and type and size checks.</p>
+<p>It is important to remain clear that scanning only means that no known rules matched and cannot guarantee absolute safety; unknown malicious packages, macros, and parser vulnerabilities still exist, so least privilege and safe viewing must still be retained. Pinned versions and trusted mirrors reduce the probability that dependencies are replaced, while type and size limits reduce the probability that artifacts trigger risks in viewers; only together do they form an effective constraint on this hidden supply chain path.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Budgets must be computable, not written as “appropriate amount”<span class="dd-badge math">Derivation</span></h2>
+<div class="dd-agent-response"><p>With a per-turn time limit of 30 s and up to 3 retries, users may still wait two minutes, because end-to-end wait time is not the per-turn limit but the upper bound of the entire correction loop. The worst-case wall-clock time can be expressed as:</p>
+<p>T_worst ≤ (1 + N_retries) × T_turn + T_queue_and_startup</p>
+<p>The formula takes three inputs: N_retries is the maximum number of additional executions after the first failure, T_turn is the maximum wall-clock time allowed per turn, and T_queue_and_startup is the extra budget for waiting for resources and creating the sandbox; the output T_worst is the upper bound on the user's end-to-end wait. Here the “maximum retry count” does not include the initial execution. If each turn is 30 s, up to 3 additional attempts are allowed after failure, and queueing plus startup reserve a total of 12 s, then the worst-case end-to-end budget is (1+3)×30+12 = 132 s, not 30 s.</p>
+<p>Outputs must also be computable. If up to 20 files are allowed and each file is 5MB, file exports alone could theoretically reach 20×5 = 100MB; therefore an additional aggregate artifact limit is needed to prevent many small files from bypassing the per-file limit.</p>
+<p>Budgets need hard limits along multiple axes, with specified actions on limit violations. For compute, set 2 CPU, 512MB, 30 s; on limit violation, terminate the entire process group and record the exceeded item. For concurrency, set 64 processes or threads; refuse further creation to prevent fork bombs. For storage, set a 1GB temporary disk and a 40MB aggregate export; on limit violation, stop writing and do not export partial artifacts. For feedback, set stdout+stderr to 2MB total; on limit violation, truncate and preserve the hash and tail diagnostics. For attempts, set the initial attempt plus 3 corrections; on limit violation, stop the automatic loop and hand off to an external policy.</p>
+<p>Budgets should be two-layered: sandbox-internal limits constrain a single execution, while the controller’s end-to-end budget constrains the entire correction loop; missing either layer can lead to resource runaway. This upper bound depends on configuration assumptions; it is a constraining upper bound, not a prediction of actual elapsed time, and it does not cover time for external human approval.</p></div>
+<table class="dd-table"><thead><tr><th>Budget axis</th><th>Example hard limit</th><th>Action on limit violation</th></tr></thead><tbody><tr><td>Compute</td><td>2 CPU, 512MB, 30 s</td><td>Terminate the entire process group and record the exceeded item</td></tr><tr><td>Concurrency</td><td>64 processes/threads</td><td>Refuse further creation, prevent fork bombs</td></tr><tr><td>Storage</td><td>Temporary disk 1GB, aggregate export 40MB</td><td>Stop writing; do not export partial artifacts</td></tr><tr><td>Feedback</td><td>stdout+stderr 2MB</td><td>Truncate and preserve hash and tail diagnostics</td></tr><tr><td>Attempts</td><td>Initial attempt + 3 corrections</td><td>Stop the automatic loop, hand off to an external policy for decision</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="worst-case-wall-clock" data-display="mathml"><math display="block" aria-label="最坏墙钟时间小于等于一加最大重试次数，乘以单轮墙钟上限，再加排队与启动预算"><mrow><msub><mi>T</mi><mtext>worst</mtext></msub><mo>≤</mo><mo>(</mo><mn>1</mn><mo>+</mo><msub><mi>N</mi><mtext>retries</mtext></msub><mo>)</mo><mo>·</mo><msub><mi>T</mi><mtext>round</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>queue and startup</mtext></msub></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>From Intent to Trustworthy Results<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Making execution feedback improve capability rather than expand the blast radius relies on a chain that progressively tightens intent into trustworthy results. The first step is to decompose the task into minimally executable, revertible, auditable, and replayable steps; the second step is to configure isolation, permissions, and limits according to the risk level; the third step is to execute and capture the complete state; the fourth step is to provide only the necessary feedback on failure and limit the number of corrections; the fifth step is to accept the artifact using tests, hashes, or business rules; the sixth step, high-impact external actions must be re-authorized outside the sandbox.</p>
+<p>The inputs to this synthesis chain are the task intent, risk level, candidate code, and completion predicate; the outputs are a bounded artifact that passes acceptance, or a stopped result with evidence. Each step narrows the scope of actions while making the next step verifiable: decomposition bounds the damage surface of a single step, configuration bounds the capabilities of execution, capture bounds the traceable state, feedback bounds the scale of retries, acceptance bounds the exportable artifact, and re-authorization keeps truly dangerous actions outside the sandbox's trust boundary.</p>
+<p>Passing sandbox acceptance only means that the artifact meets the declared rules; it does not mean that it is allowed to be published, transferred, or written to production. Publishing, transferring, and writing to production are all high-impact external actions and must be re-authorized. What execution feedback improves is the model's ability to progressively correct its intent, while the blast radius is jointly constrained by the boundaries at each step and the final re-authorization.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>How a Cache Fix Is Proven in the Sandbox<span class="dd-badge math">Running Example</span></h2>
+<div class="dd-agent-response"><p>After a model proposes a fix with a composite cache key, you cannot write the patch directly into the production repository and declare it done, because between “proposing a solution” and “the solution has been proven viable” lies an entire verification chain. The patch must first pass through a host policy gate, enter a temporary sandbox for execution, and only after the artifacts pass validation is it up to the host to decide whether to export. The security boundary is configured by the host before execution and reviewed after execution; processes inside the sandbox cannot expand network, file, or credential permissions on their own.</p>
+<p>Observed evidence and what it can prove must be distinguished item by item. An exit code of 0 only proves that the test process terminated normally, not that the test coverage is complete or the business objective is correct. Tests passing 4/4 only proves that the declared isolation and hit behavior passed, not that hidden concurrency issues or cross-version issues do not exist. A resource peak of 310MB / 6.2s only proves that this run was below the 512MB / 30s limit, not that any input scale is safe. File differences showing 2 allowed files only proves that no out-of-bounds writes were observed this time, not that the code has no other security defects.</p>
+<p>Resource limits are not only for “defending against bad actors”: a single erroneous recursion can exhaust memory. In this example, allowing 3 corrections means at most 4 rounds of execution; the upper bound for the task execution part is 4×30 = 120 s; adding queueing and startup gives the complete budget.</p>
+<p>The failure boundary is: the sandbox reduces the blast radius, but it does not turn malicious code into safe code. Shared kernel vulnerabilities, incorrect mounts, overly broad outbound network permissions, and host proxy interfaces can all break through the boundary. High-risk systems need layered isolation, timely patching, and external policy checks rather than relying on a single sandbox to give absolute guarantees.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 235" role="img" aria-label="Flow of code candidates passing through host policy gate, temporary sandbox execution, artifact validation, then deciding whether to export"><defs><marker id="cex1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="16" y="52" width="116" height="82" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="74" y="77" text-anchor="middle" class="svg-t">Candidate Patch</text><text x="74" y="98" text-anchor="middle" class="svg-t" font-size="10">Composite Cache Key</text><text x="74" y="117" text-anchor="middle" class="svg-t" font-size="10">+ Regression Test</text><path d="M132,93 L178,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="180" y="39" width="132" height="108" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="246" y="64" text-anchor="middle" class="svg-t">Host Policy Gate</text><text x="246" y="86" text-anchor="middle" class="svg-t" font-size="10">Read-only Input Copy</text><text x="246" y="105" text-anchor="middle" class="svg-t" font-size="10">Disconnected · No Credentials</text><text x="246" y="124" text-anchor="middle" class="svg-t" font-size="10">2 CPU / 512MB / 30s</text><path d="M312,93 L358,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="360" y="28" width="140" height="130" rx="8" fill="#21252d" stroke="#c77b72"/><text x="430" y="53" text-anchor="middle" class="svg-t">Temporary Sandbox</text><text x="430" y="77" text-anchor="middle" class="svg-t" font-size="10">Apply Patch → Run Tests</text><text x="430" y="96" text-anchor="middle" class="svg-t" font-size="10">Capture exit/stdout/stderr</text><text x="430" y="115" text-anchor="middle" class="svg-t" font-size="10">Record file diff / resource peak</text><text x="430" y="136" text-anchor="middle" class="svg-t" font-size="10">Terminate and destroy immediately if limit exceeded</text><path d="M500,93 L546,93" stroke="#6b7484" marker-end="url(#cex1)"/><rect x="548" y="39" width="116" height="108" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="606" y="64" text-anchor="middle" class="svg-t">Independent Acceptance</text><text x="606" y="86" text-anchor="middle" class="svg-t" font-size="10">Isolation 2/2</text><text x="606" y="105" text-anchor="middle" class="svg-t" font-size="10">Hit 2/2</text><text x="606" y="124" text-anchor="middle" class="svg-t" font-size="10">No Out-of-Bounds Files</text><path d="M606,148 C600,214 430,216 430,160" fill="none" stroke="#6b7484" marker-end="url(#cex1)"/><text x="515" y="210" text-anchor="middle" class="svg-t" font-size="10">Failure evidence is only returned to the correction loop; passing artifacts only export the patch, without carrying sandbox secrets and temporary files.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　The security boundary is configured by the host before execution and reviewed after execution; processes inside the sandbox cannot expand network, file, or credential permissions on their own.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Observation</th><th>Value</th><th>What it can prove</th><th>What it cannot prove</th></tr></thead><tbody><tr><td>Exit code</td><td>0</td><td>Test process terminated normally</td><td>Test coverage complete, business objective correct</td></tr><tr><td>Tests</td><td>4/4</td><td>Declared isolation and hit behavior passed</td><td>Hidden concurrency or cross-version issues do not exist</td></tr><tr><td>Resource peak</td><td>310MB / 6.2s</td><td>This run is below 512MB / 30s</td><td>Safe for any input scale</td></tr><tr><td>File differences</td><td>2 allowed files</td><td>No out-of-bounds writes observed this time</td><td>Code has no other security defects</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>How to Prove the Policy Really Works<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Writing “network disconnected” in the config is not itself evidence; to prove the policy really works, tests should actively attempt to cross the boundary and observe results from outside the sandbox. Adversarial tests verify item by item whether isolation truly works. Each type of test corresponds to an expected observed result, and the location to check first when it fails.</p>
+<p>When reading the host secret decoy, expect the path to be invisible and no content leakage in audit logs; if it fails, first check mounts, environment variables, and proxy credential injection. When accessing public internet and cloud metadata addresses, expect connections to be rejected by the host network policy and leave traces; if it fails, first check DNS, IPv6, proxies, and side-channel interfaces. When a fork bomb or infinite loop occurs, expect the process count or wall clock to exceed limits and the whole process group to be cleaned up; if it fails, first check cgroup/job object and child process reclamation. When the disk is full or stdout is huge, expect quotas to be triggered and host services to remain available; if it fails, first check temporary disk, logs, and total export limits. When a symbolic link or archive path traversal occurs, expect the exporter to refuse targets outside the sandbox; if it fails, first check path normalization and unpacker. When correct programs are combined with business counterexamples, expect security tests to pass but incorrect artifacts to be intercepted by business predicates; if it fails, first check acceptance coverage rather than the isolation layer.</p>
+<p>This means there are two separate report cards that must be looked at separately: security evaluation asks “whether crossing the boundary is blocked,” while task evaluation asks “whether the result is correct.” A perfect score on one cannot substitute for the other. Adversarial testing can only add evidence for the tested policy; it cannot prove that no unknown escapes exist. Passing security tests does not mean the task is done correctly, and vice versa. The two report cards answer two different questions; both must hold at the same time for the policy to truly take effect.</p></div>
+<table class="dd-table"><thead><tr><th>Adversarial test</th><th>Expected observation</th><th>If failed, where to check first</th></tr></thead><tbody><tr><td>Read host secret decoy</td><td>Path invisible, no content leakage in audit logs</td><td>Mounts, environment variables, proxy credential injection</td></tr><tr><td>Access public internet and cloud metadata addresses</td><td>Connection rejected by host network policy and leaves a trace</td><td>DNS, IPv6, proxies, and side-channel interfaces</td></tr><tr><td>fork bomb / infinite loop</td><td>Process count or wall clock exceeds limit, whole process group cleaned up</td><td>cgroup/job object, child process reclamation</td></tr><tr><td>Fill disk / huge stdout</td><td>Quota triggered and host service remains available</td><td>Temporary disk, logs, and total export limits</td></tr><tr><td>Symbolic link or archive path traversal</td><td>Exporter refuses targets outside the sandbox</td><td>Path normalization and unpacker</td></tr><tr><td>Correct programs and business counterexamples</td><td>Security tests pass, but incorrect artifacts are intercepted by business predicates</td><td>Acceptance coverage rather than isolation layer</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Source and adaptation notes</b><ul><li><a href="https://csrc.nist.gov/publications/detail/sp/800-190/final" target="_blank" rel="noopener">NIST SP 800-190</a>: Application container security risks and controls.</li><li><a href="https://www.usenix.org/conference/nsdi20/presentation/agache" target="_blank" rel="noopener">Agache et al., Firecracker</a>: Isolation design and engineering trade-offs of micro virtual machines.</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">ToolEmu</a>: Risk simulation and evaluation of tool-using language models.</li><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct</a>: Reasoning, action, and environment observation loop.</li></ul><div class="dd-src-date">Date accessed: 2026-07-23</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/code-execution">Explore connections on the map</a><a href="/zh/concepts/code-execution/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
