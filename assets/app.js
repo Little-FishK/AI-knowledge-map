@@ -236,10 +236,6 @@
   function applyCurrentLanguage() {
     language.localize(document);
     renderLanguageSettings();
-    document.getElementById("locale-fallback-banner").classList.toggle(
-      "hidden",
-      language.getLocale() === I18N_MANIFEST.sourceLocale
-    );
     graphView.refreshLanguage();
     learningView.refreshLanguage();
     softwareView.refreshLanguage();
