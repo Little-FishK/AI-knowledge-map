@@ -100,7 +100,7 @@
       }).join('')}</ol>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
-      ${lesson.sections.map(([title, html], index) => `<section class="dd-sec"><h2><span class="dd-n" aria-hidden="true">${index + 1}</span>${escape(title)}</h2>${html}${index === 1 ? figure(lesson) : ''}</section>`).join('')}
+      ${lesson.sections.map(([title, html], index) => `<section class="dd-sec"><h2><span class="dd-n" aria-hidden="true">${index + 1}</span>${escape(title)}</h2>${html}${index === 1 && lesson.figure ? figure(lesson) : ''}</section>`).join('')}
       <details><summary>想一想（可选）：${escape(lesson.question)}</summary><p>${escape(lesson.answer)}</p></details>
       <aside class="dd-thesis">${escape(lesson.takeaway)}</aside>
       <footer class="dd-src">参考与继续阅读 · 本页为本站原创入门讲解<ul>${lesson.sources.map(([label, url]) => `<li><a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a></li>`).join('')}</ul></footer>
