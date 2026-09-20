@@ -84,7 +84,7 @@
     stopNodeMotion();
     const lesson = lessons[state.cursor];
     const isMap = view === 'map';
-    document.title = `${isMap ? '新手地图' : lesson.title}｜新手导览 · AI 知识地图`;
+    document.title = isMap ? (english() ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map' : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图') : `${lesson.title}｜新手导览 · AI 知识地图`;
     root.removeAttribute(isMap ? 'aria-labelledby' : 'aria-label');
     root.setAttribute(isMap ? 'aria-label' : 'aria-labelledby', isMap ? '六站新手地图' : 'onboarding-lesson-title');
     root.innerHTML = `<div class="onboarding-shell${isMap ? ' is-map' : ''}">

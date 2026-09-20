@@ -84,7 +84,9 @@
 
   function setDocumentTitle(label) {
     const siteTitle = t("app.title.graph");
-    document.title = label ? `${label}｜${siteTitle}` : siteTitle;
+    document.title = label ? `${label}｜${siteTitle}` : (language.getLocale() === 'en'
+      ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map'
+      : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图');
   }
 
   function goToRoute(route, options = {}) {
