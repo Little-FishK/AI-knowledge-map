@@ -7,7 +7,29 @@
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments · AI Knowledge Map</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script><title>PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments · AI Knowledge Map</title>
 <meta name="description" content="From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/peft-lora/">
@@ -28,8 +50,8 @@
 <meta name="twitter:description" content="From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/peft-lora/#page","name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","description":"From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.","url":"https://ai-knowledge-map.com/en/concepts/peft-lora/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","item":"https://ai-knowledge-map.com/en/concepts/peft-lora/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/peft-lora/#page","name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","description":"From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.","url":"https://ai-knowledge-map.com/en/concepts/peft-lora/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","item":"https://ai-knowledge-map.com/en/concepts/peft-lora/"}]}]</script>
+</head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">Skip to content</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -60,7 +82,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</span></li></ol></nav><article id="dd-article" data-concept-id="peft-lora">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</span></li></ol></nav><article id="dd-article" data-concept-id="peft-lora">
 <header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
 <p class="dd-sub">From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.</p>
 

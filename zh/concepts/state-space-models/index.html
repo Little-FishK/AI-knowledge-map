@@ -7,7 +7,29 @@
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>状态空间模型 SSM：用可控动态系统压缩长序列 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script><title>状态空间模型 SSM：用可控动态系统压缩长序列 · AI 知识地图</title>
 <meta name="description" content="从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/state-space-models/">
@@ -28,8 +50,8 @@
 <meta name="twitter:description" content="从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/state-space-models/#page","name":"状态空间模型 SSM：用可控动态系统压缩长序列","description":"从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。","url":"https://ai-knowledge-map.com/zh/concepts/state-space-models/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"状态空间模型 SSM：用可控动态系统压缩长序列","item":"https://ai-knowledge-map.com/zh/concepts/state-space-models/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/state-space-models/#page","name":"状态空间模型 SSM：用可控动态系统压缩长序列","description":"从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。","url":"https://ai-knowledge-map.com/zh/concepts/state-space-models/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"状态空间模型 SSM：用可控动态系统压缩长序列","item":"https://ai-knowledge-map.com/zh/concepts/state-space-models/"}]}]</script>
+</head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -60,7 +82,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">状态空间模型 SSM：用可控动态系统压缩长序列</span></li></ol></nav><article id="dd-article" data-concept-id="state-space-models" lang="zh-Hans">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">状态空间模型 SSM：用可控动态系统压缩长序列</span></li></ol></nav><article id="dd-article" data-concept-id="state-space-models" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">状态空间模型 SSM：用可控动态系统压缩长序列</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从连续状态方程、离散化与卷积等价，到选择性扫描、线性复杂度、稳定性和随机访问边界。</p>
 
