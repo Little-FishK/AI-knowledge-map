@@ -35,6 +35,20 @@
     bar.querySelector('[data-shell-search]').textContent = en ? 'Text directory / Search' : '文字目录 / Search';
     let notice = document.getElementById('reading-language-notice');
     if (article && contentLocale !== language.getLocale()) {
+      // Switch the article as well as the shell. Only use a counterpart that
+      // the publisher included in this page; missing translations keep the
+      // existing, explicitly labelled fallback.
+      const locale = language.getLocale();
+      const counterpart = document.querySelector(`.preview-next a[lang="${locale}"]`);
+      if (counterpart) {
+        const target = new URL(counterpart.href, location.href);
+        const expected = location.pathname.replace(/\/(zh|en)\/concepts\//, `/${locale === 'en' ? 'en' : 'zh'}/concepts/`);
+        if (target.origin === location.origin && target.pathname === expected && target.pathname !== location.pathname) {
+          target.searchParams.delete('lang');
+          location.assign(target.href);
+          return;
+        }
+      }
       if (!notice) { notice = document.createElement('p'); notice.id = 'reading-language-notice'; notice.className = 'release-notice'; article.before(notice); }
       notice.textContent = en ? 'This reading page is displayed in its original language. Available translations can be found below the article.' : '当前正文保持原文语言，可用的语言版本请见正文末尾。';
     } else notice?.remove();
