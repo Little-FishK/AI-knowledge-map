@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Neural Network · AI Knowledge Map</title>
+<meta name="description" content="From “Why We Need It” to “How It Learns Through Backpropagation”">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/neural-network/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/neural-network/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/neural-network/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Neural Network">
+<meta property="og:description" content="From “Why We Need It” to “How It Learns Through Backpropagation”">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/neural-network/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neural Network">
+<meta name="twitter:description" content="From “Why We Need It” to “How It Learns Through Backpropagation”">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/neural-network/#page","name":"Neural Network","description":"From “Why We Need It” to “How It Learns Through Backpropagation”","url":"https://ai-knowledge-map.com/en/concepts/neural-network/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"Search / Text directory","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Neural Network","item":"https://ai-knowledge-map.com/en/concepts/neural-network/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/search/">Search / Text directory</a></li><li><span aria-current="page">Neural Network</span></li></ol></nav><article id="dd-article" data-concept-id="neural-network" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Neural Network</h1>
+<p class="dd-sub">From “Why We Need It” to “How It Learns Through Backpropagation”</p>
+<p class="dd-ali">Neural Network · Artificial Neural Network · ANN</p>
+<p class="dd-metabar">Recommended 45–60 minutes · Beginner → Intermediate · Requires: algebra, functions, derivatives</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The essence of a neural network is not “many nodes,” but differentiable nonlinear function composition. Forward Propagation computes the answer, the Loss Function measures error, Backpropagation uses the chain rule to assign error to each parameter, and the optimizer then fine-tunes accordingly—four steps that form a closed loop capable of learning from data.</div></header>
+<!-- source-body:start -->
+<div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer for yourself:</div>
+  <ul>
+    <li><b>Necessity</b>—why linear models cannot handle problems such as images and language, while Neural Networks can.</li>
+    <li><b>Structure</b>—what the input layer, hidden layer, output layer, nodes, weights, biases, and activation functions are each responsible for.</li>
+    <li><b>Inference</b>—how an input becomes a prediction through weighted summation and nonlinear transformation.</li>
+    <li><b>Learning</b>—how Loss, Gradients, Chain Rule, Backpropagation, and Gradient Descent form a closed loop.</li>
+    <li><b>Mathematics</b>—read <code>z = Wx + b</code>, <code>a = φ(z)</code>, <code>θ ← θ − η∇L(θ)</code>, and be able to compute one update by hand.</li>
+    <li><b>Boundaries</b>—when to use it and when not to, and how to recognize Overfitting and training failure.</li>
+  </ul>
+</div>
+
+<div class="dd-note key">
+  <b>Minimal example used throughout the page</b> From beginning to end, we use only one network as an example:<b>2 inputs → 2 ReLU hidden nodes → 1 Sigmoid output</b>. In the previous sections it is used to explain structure and rationale; in Section 9 it is used for a complete numerical hand calculation. You do not need to memorize all symbols at once; just return here when you encounter them.
+</div>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">1</span>Why We Need Neural Networks<span class="dd-badge intuition">Intuition</span></h2>
+<p>The core understanding this section really aims to establish is:<b>Neural networks exist not because linear models are useless, but because many important relationships in the real world cannot be expressed with a “straight boundary”; neural networks enable models to describe these complex relationships by learning nonlinear intermediate features.</b></p>
+<p>First, look at what a linear model does. The formula</p>
+<div class="dd-formula">y' = w_1x_1+w_2x_2+…+w_nx_n+b</div>
+<p>It means the model multiplies all input features by their respective weights, adds them together, and finally adds a bias to obtain a prediction score. For example, to predict house prices based on area, age, and distance from city center, you can multiply the three features by their corresponding weights and add them. Weights represent the direction and strength of a feature’s effect on the outcome: positive weights usually mean that larger feature values lead to higher prediction scores; negative weights mean larger feature values lead to lower prediction scores. Bias <code>b</code> does not depend on any input; it adjusts the baseline position of the overall prediction result.</p>
+<p>In linear regression, this score can be used directly as the predicted value; in binary classification, the class can be determined by whether the score exceeds a certain threshold. Assuming zero is used as the threshold, the classification boundary is:</p>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 640 260" role="img" aria-label="A straight line cannot completely separate the inner blue points from the outer red points; the closed curve in the figure can.">
+      <g transform="translate(0,0)">
+        <rect x="20" y="20" width="280" height="210" rx="8" fill="none" stroke="#2c313b"/>
+        <text x="160" y="44" text-anchor="middle" class="svg-t">A straight line: cannot separate them</text>
+        <!-- outer ring (class B, red) -->
+        <g fill="#cf6f6f">
+          <circle cx="160" cy="205" r="4"/><circle cx="100" cy="120" r="4"/><circle cx="220" cy="120" r="4"/>
+          <circle cx="110" cy="185" r="4"/><circle cx="210" cy="185" r="4"/><circle cx="160" cy="95" r="4"/>
+          <circle cx="80" cy="150" r="4"/><circle cx="240" cy="150" r="4"/>
+        </g>
+        <!-- inner cluster (class A, blue) -->
+        <g fill="#6b8cbe"><circle cx="160" cy="150" r="4" fill="#6b8cbe" opacity="0"/>
+          <circle cx="150" cy="145" r="4"/><circle cx="170" cy="150" r="4"/><circle cx="160" cy="135" r="4"/><circle cx="158" cy="160" r="4"/>
+        </g>
+        <line x1="55" y1="215" x2="265" y2="70" stroke="#d3a05a" stroke-width="2" stroke-dasharray="5 4"/>
+      </g>
+      <g transform="translate(320,0)">
+        <rect x="20" y="20" width="280" height="210" rx="8" fill="none" stroke="#2c313b"/>
+        <text x="160" y="44" text-anchor="middle" class="svg-t">A curve: can separate them</text>
+        <g fill="#cf6f6f">
+          <circle cx="160" cy="205" r="4"/><circle cx="100" cy="120" r="4"/><circle cx="220" cy="120" r="4"/>
+          <circle cx="110" cy="185" r="4"/><circle cx="210" cy="185" r="4"/><circle cx="160" cy="95" r="4"/>
+          <circle cx="80" cy="150" r="4"/><circle cx="240" cy="150" r="4"/>
+        </g>
+        <g fill="#6b8cbe">
+          <circle cx="150" cy="145" r="4"/><circle cx="170" cy="150" r="4"/><circle cx="160" cy="135" r="4"/><circle cx="158" cy="160" r="4"/>
+        </g>
+        <ellipse cx="160" cy="150" rx="42" ry="38" fill="none" stroke="#4f9d78" stroke-width="2"/>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1 Left: Blue points are concentrated in the interior and red points are distributed around the outside; a straight line cannot completely separate the two classes. Right: The closed curve in the figure encloses the blue points inside and leaves the red points outside. Neural networks can learn nonlinear classification boundaries like this.</figcaption>
+  </figure>
+<div class="dd-formula">w_1x_1+w_2x_2+…+w_nx_n+b=0</div>
+<p>When the input has only two features, this boundary is a straight line; with three features, it is a plane; in higher dimensions, it is called a hyperplane. Although the names differ, the essence is the same: it can only perform a single “flat cut”.</p>
+<p>This reveals the fundamental limitation of linear models. Suppose there are two classes of points on a plane: one class is concentrated at the center, and the other class forms a ring around the center. No matter how you move or rotate a straight line, it cannot completely separate the inner and outer circles, because the correct boundary needs to bend around the center and close on itself. The difficulty here is not that the model has not yet found the “correct straight line”; rather,<b>the correct answer does not belong to the class of straight-line boundaries at all</b>. Continuing to train a linear model can only search for a relatively better one among many imperfect straight lines; it cannot fundamentally solve the problem.</p>
+<p>However, “the original data is not linearly separable” does not mean that linear models can never handle it. You can first manually construct new features. For example, if the difference between the inner and outer circles depends on the distance from a point to the center, then you can compute</p>
+<div class="dd-formula">r^2=x_1^2+x_2^2</div>
+<p>Then let the linear model classify based on <code>r^2</code> whether it exceeds a certain threshold. In the original <code>x_1,x_2</code> coordinates, the boundary is a circular curve; but on the new feature <code>r^2</code> it is just a simple threshold. This reveals a very important fact:<b>Many so-called nonlinear problems can be transformed into easier-to-handle problems through appropriate feature transformations.</b></p>
+<p>Traditional feature engineering is exactly the process of humans looking for such transformations. For problems with clear structure and a small number of features, this approach can be very effective. For example, when predicting an object’s motion, you can construct velocity and acceleration; when analyzing financial data, you can construct returns, moving averages, and volatility. The problem is that when the input is an image, a sound, or an article, the original dimensionality can reach thousands or even millions, and the truly useful combinations often cannot be enumerated in advance.</p>
+<p>Taking image recognition as an example, a single pixel usually does not carry much meaning by itself. To determine whether there is a cat in an image, you may first need to combine neighboring pixels to form edges, then combine edges to form textures and local shapes, then combine local shapes to form ears, eyes, and outlines, and finally integrate these structures to make a judgment. If you rely entirely on humans manually specifying which pixels should be combined and how, not only is the number of combinations enormous, but it is also very difficult to cover variations in lighting, angle, pose, and background.</p>
+<p>Therefore, the most important value of neural networks is not the superficial “having many layers,” but rather that during training they can<b>automatically learn a series of useful feature transformations</b>. After passing through the hidden layers, the original input is gradually represented as new intermediate features. Taking images as an example, the shallow layers may be sensitive to edges and color changes, the middle layers may combine textures or local structures, and deeper layers may form representations related to complete objects. Specific networks do not necessarily work strictly according to such human-nameable levels, but the core idea is: the model no longer requires people to design all key features in advance; instead, based on the training objective, it finds internal representations from the data that help reduce error.</p>
+<p>Next, we need to understand a point that is easy to get wrong: since a single linear layer has limited capacity, can we solve the problem simply by stacking many linear layers? The answer is no. Suppose the first layer is</p>
+<div class="dd-formula">h=W_1x+b_1</div>
+<p>The second layer is</p>
+<div class="dd-formula">y=W_2h+b_2</div>
+<p>where <code>x</code> is the original input,<code>h</code> is the intermediate result produced by the first layer,<code>y</code> is the final output. Substituting the first layer into the second layer, we get:</p>
+<div class="dd-formula">y =W_2(W_1x+b_1)+b_2; =(W_2W_1)x+(W_2b_1+b_2)</div>
+<p>If we let</p>
+<div class="dd-formula">W=W_2W_1, b=W_2b_1+b_2</div>
+<p>then the entire two-layer network becomes:</p>
+<div class="dd-formula">y=Wx+b</div>
+<p>It is still just a single affine transformation. More strictly speaking, the expression with bias <code>Wx+b</code> belongs to affine transformations; everyday explanations often broadly call it a linear layer. Regardless of the name, the key conclusion remains:<b>Multiple linear or affine layers without nonlinear activations can be combined into an equivalent layer.</b></p>
+<p>This means that even if such a network has one hundred layers, the types of functions it can express do not fundamentally change. Although many variables are produced in between, in the end it can still only form flat classification boundaries. Depth only adds parameter representation and computation; it does not increase the expressive capacity needed to solve complex nonlinear problems.</p>
+<p>What truly changes the situation is adding nonlinear functions between the linear transformations. The structure goes from</p>
+<div class="dd-formula">W_2(W_1x+b_1)+b_2</div>
+<p>to something like</p>
+<div class="dd-formula">W_2 σ(W_1x+b_1)+b_2</div>
+<p>where <code>σ</code> is a nonlinear activation function. Since <code>σ</code> cannot be simply eliminated by merging like matrix multiplication and addition, the two layers are no longer equivalent to a single linear layer. The network can repeatedly perform “linear combination—nonlinear transformation—recombination,” gradually constructing curved and complex functions and decision boundaries. From this we can see that the power of neural networks comes from the combination of two factors: linear layers are responsible for combining information, and nonlinear activations are responsible for breaking the limitation of only being able to perform flat transformations.</p>
+<p>We also need to avoid misinterpreting “neural networks can express complex relationships” as “any problem should use a neural network.” Whether a model is appropriate depends on the data and the task. Neural networks are usually suitable for high-dimensional data such as images, text, and speech, and for problems with complex nonlinear patterns and sufficient training data. But if the data size is very small, the data is mainly structured tables, the business rules can be expressed with a few clear rules, or the task requires strict interpretability at every step, then linear models, tree models, or rule systems may be less costly, faster to train, more stable, and easier to inspect.</p>
+<p>Therefore, this section can be condensed into a complete logical chain:</p>
+<div class="dd-note key"><b>Linear models can only form flat boundaries → manual feature transformations can solve some nonlinear problems → useful features in high-dimensional complex data are difficult for humans to exhaustively list → neural networks allow the model to learn intermediate features on its own → but simply stacking linear layers is still equivalent to a single layer → nonlinearity must be added for depth to truly gain new expressive power.</b></div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">2</span>Network structure: what it consists of<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+<p>As explained in the previous section, a neural network cannot gain new expressive power by just stacking linear transformations; it must add nonlinearity between linear transformations. This section further answers: how these transformations are organized in the network, and what roles the input layer, nodes, hidden layers, and output layer play.</p>
+<p>You can initially view a minimal neural network as an information-processing pipeline:</p>
+<div class="dd-formula">Input features → hidden layer → output layer → prediction result</div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 640 300" role="img" aria-label="A 2-2-1 fully connected feedforward network">
+      <!-- edges input->hidden -->
+      <g stroke="#3a4150" stroke-width="1.4">
+        <line x1="150" y1="95" x2="330" y2="95"/><line x1="150" y1="95" x2="330" y2="205"/>
+        <line x1="150" y1="205" x2="330" y2="95"/><line x1="150" y1="205" x2="330" y2="205"/>
+        <!-- hidden->output -->
+        <line x1="330" y1="95" x2="500" y2="150"/><line x1="330" y1="205" x2="500" y2="150"/>
+      </g>
+      <!-- highlight one weight -->
+      <line x1="150" y1="95" x2="330" y2="205" stroke="#d3a05a" stroke-width="2.4"/>
+      <text x="232" y="150" class="svg-t" fill="#d3a05a">w</text>
+      <!-- nodes -->
+      <g>
+        <circle cx="150" cy="95" r="22" fill="#21252d" stroke="#6b8cbe" stroke-width="2"/><text x="150" y="100" text-anchor="middle" class="svg-tn">x₁</text>
+        <circle cx="150" cy="205" r="22" fill="#21252d" stroke="#6b8cbe" stroke-width="2"/><text x="150" y="210" text-anchor="middle" class="svg-tn">x₂</text>
+        <circle cx="330" cy="95" r="22" fill="#21252d" stroke="#4f9d78" stroke-width="2"/><text x="330" y="100" text-anchor="middle" class="svg-tn">h₁</text>
+        <circle cx="330" cy="205" r="22" fill="#21252d" stroke="#4f9d78" stroke-width="2"/><text x="330" y="210" text-anchor="middle" class="svg-tn">h₂</text>
+        <circle cx="500" cy="150" r="22" fill="#21252d" stroke="#cf6f6f" stroke-width="2"/><text x="500" y="155" text-anchor="middle" class="svg-tn">ŷ</text>
+      </g>
+      <text x="150" y="255" text-anchor="middle" class="svg-t">Input layer</text>
+      <text x="330" y="255" text-anchor="middle" class="svg-t">Hidden layer (ReLU)</text>
+      <text x="500" y="255" text-anchor="middle" class="svg-t">Output layer (Sigmoid)</text>
+      <text x="150" y="40" text-anchor="middle" class="svg-t">Features go in</text>
+      <text x="500" y="40" text-anchor="middle" class="svg-t">Prediction comes out</text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 2　The minimal network used throughout the page. Each connection is a learnable weight <code>w</code>(the highlighted one is just one example); each non-input circle is a node: first weighted sum, then activation function.</figcaption>
+  </figure>
+<p>For example, a network has two inputs <code>x_1,x_2</code>, containing two nodes <code>h_1,h_2</code> in its hidden layer, and an output node <code>y-hat</code>. The inputs are first sent simultaneously to the two nodes in the hidden layer; each hidden node produces a response; these two responses are then passed to the output node, ultimately producing the prediction. Every connection in the figure carries a weight that can be adjusted through training, and each non-input node usually also has its own bias.</p>
+<p>The input layer is where the network receives data. It usually does not perform actual learning computations, but carries the feature vector that has been converted into numbers <code>x</code>. In tabular tasks, inputs may be age, income, and number of purchases; in image tasks, inputs may be pixel values; in text models, raw words are first converted into numeric vectors before entering subsequent networks. The role of the input layer is not to understand these numbers, but to make clear to the network "which values make up a sample".</p>
+<p>It is important to note that the meaning and organization of input numbers matter a great deal. A neural network cannot directly access real-world objects themselves; it always sees numeric representations. If the input representation loses critical information, no matter how complex the subsequent network is, it cannot recover it out of thin air. For example, if you give the model only the average brightness of an image but ask it to recognize the objects in the image, the input itself does not retain enough shape information.</p>
+<p>After the input enters an ordinary node, it first computes:</p>
+<div class="dd-formula">z=w· x+b=Σ_i w_ix_i+b</div>
+<p>Then it computes:</p>
+<div class="dd-formula">a=φ(z)</div>
+<p>These two steps correspond to the two stages inside a node.</p>
+<p>The first step is a weighted sum. Each input <code>x_i</code> is multiplied by a weight <code>w_i</code>, all the results are added together and then the bias is added <code>b</code>, giving <code>z</code>. This <code>z</code> is called the pre-activation value, because it is the result before entering the activation function.</p>
+<p>The second step is activation. The activation function <code>φ</code> to <code>z</code> transforms it, producing the output that the node actually passes to the next layer <code>a</code>. If the activation function is ReLU, then</p>
+<div class="dd-formula">a=max(0,z)</div>
+<p>Negative pre-activation values become zero, while positive values are retained. If the output layer uses Sigmoid, then</p>
+<div class="dd-formula">a=((1) / (1+e^(-z)))</div>
+<p>Any value of <code>z</code> will be compressed to between 0 and 1, so it is often used to represent a probabilistic output in binary classification.</p>
+<p>A node can be understood as a "learnable pattern detector," but this statement needs to be unpacked. The weight vector <code>w</code> describes the direction of the pattern the node cares about, and the dot product <code>w· x</code> measures how well the current input matches this direction, and the bias <code>b</code> adjusts the firing threshold, and the activation function decides how the matching result is converted into a response.</p>
+<p>Suppose the input has two features and a node's weight is</p>
+<div class="dd-formula">w=[2,-1]</div>
+<p>and its bias is <code>-0.5</code>, then it computes:</p>
+<div class="dd-formula">z=2x_1-x_2-0.5</div>
+<p>This means the node tends to produce a higher response when <code>x_1</code> is large and <code>x_2</code> is relatively small. If ReLU is used, only when</p>
+<div class="dd-formula">2x_1-x_2&gt;0.5</div>
+<p> does it output a positive number. The bias <code>-0.5</code> changes the triggering condition here: without a bias, the boundary must pass through the origin; after adding a bias, the boundary can be shifted as a whole. Thus, weights determine the detection direction, and bias determines the detection threshold.</p>
+<p>The statement "one node detects one pattern" is an approximation to aid understanding; it does not mean that each node must correspond to a concept that can be clearly named by humans. Some nodes may respond clearly to edges, colors, or word relationships, but many nodes learn dispersed and abstract mathematical features that are hard to name directly. What really matters is that different nodes can learn different weights and biases, thereby responding differently to different directions or combinations of the input.</p>
+<p>Real tasks usually cannot be accomplished by relying on a single pattern. Therefore, a hidden layer will contain multiple nodes that process the same input in parallel. Suppose this layer has <code>m</code> nodes, and each node computes its own pre-activation value and activation result:</p>
+<div class="dd-formula">z_1 =w_1· x+b_1, a_1 =φ(z_1); z_2 =w_2· x+b_2, a_2 =φ(z_2); ⋮ ⋮; z_m =w_m· x+b_m, a_m =φ(z_m)</div>
+<p>If you arrange their outputs, you get a new vector:</p>
+<div class="dd-formula">a= [a_1; a_2; ⋮; a_m]</div>
+<p>Therefore, the output of a layer is usually not a final answer, but a new representation made up of many node responses. Each output component summarizes some aspect of the input, and the next layer will treat this new vector as its input.</p>
+<p>This is exactly the core meaning of a hidden layer:<b>A hidden layer does not directly give the task answer; instead, it transforms the raw input into a representation that is more suitable for subsequent judgment.</b>For example, in an idealized interpretation of image recognition, the first layer may respond to horizontal edges, vertical edges, or color changes; the next layer combines these responses to form corners or textures; deeper layers continue to combine them into local shapes. The representations learned by real networks are usually more complex than this example, but the logic of transforming representations layer by layer is consistent.</p>
+<p>The word "hidden" does not mean these layers cannot be inspected; it means that the training data usually only directly specifies the input and target output, without telling the model one by one what each intermediate node should represent. Hidden layer representations form on their own during the process of optimizing the final task. For example, the training data only labels images as cat or dog, but does not additionally require that a particular node must detect ears; if ear-related features help reduce classification error, the network may form corresponding responses during training.</p>
+<p>When a layer contains many nodes, writing out formulas with the same structure one by one becomes tedious. Matrix notation simply combines these computations into a single expression. By placing each node's weight vector as a row of the matrix, we obtain the weight matrix <code>W</code>; arranging each node's bias into a vector <code>b</code>, the entire layer computation can be written as:</p>
+<table class="dd-table">
+    <thead><tr><th>Component</th><th>What it is</th><th>What it solves</th></tr></thead>
+    <tbody>
+      <tr><td>Input layer</td><td>Carries the feature vector x and usually does not perform learning computation</td><td>Converts real-world objects (pixels, words, numerical values) into a string of numbers</td></tr>
+      <tr><td>Weight w</td><td>A learnable coefficient on each connection</td><td>Determines whether information is amplified, suppressed, or reversed</td></tr>
+      <tr><td>Bias b</td><td>A learnable constant for each non-input node</td><td>Shifts the firing threshold so the node does not have to pass through the origin</td></tr>
+      <tr><td>Node / neuron</td><td>First weighted sum, then activation function</td><td>Detects a particular pattern and outputs the response strength</td></tr>
+      <tr><td>Hidden layer</td><td>An intermediate layer between input and output</td><td>Forms new representations layer by layer that are more useful for the task</td></tr>
+      <tr><td>Activation function φ</td><td>A nonlinear function applied to the weighted sum</td><td>Breaks the linear collapse where "multiple layers still equal one layer"</td></tr>
+      <tr><td>Output layer</td><td>Maps the final representation to the task output</td><td>Produces numerical values, probabilities, or class distributions</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula">z=Wx+b</div>
+<div class="dd-formula">a=φ(z)</div>
+<p>Suppose the input <code>x</code> has <code>n_(in)</code> components, and this layer has <code>n_(out)</code> nodes, then the shapes of the objects are:</p>
+<div class="dd-formula">x∈R^(n_(in))</div>
+<div class="dd-formula">W∈R^(n_(out)× n_(in))</div>
+<div class="dd-formula">b,z,a∈R^(n_(out))</div>
+<p>Matrix <code>W</code> 's <code>j</code> row is the <code>j</code> node's weight. Matrix multiplication <code>Wx</code> completes the dot products of all nodes at once. Therefore, matrices do not introduce new neural network principles; they are just an efficient way to organize parallel computation.</p>
+<p>The output layer is responsible for converting the representation formed by the last hidden layer into the result required by the task. Its specific form depends on the task:</p>
+<ul class="dd-steps"><li>Regression tasks may output just one unrestricted numerical value, such as predicting temperature or price;</li><li>Binary classification tasks usually output one numerical value, then convert it to a result between 0 and 1 through Sigmoid;</li><li>Multi-class classification tasks usually output a score for each class, then convert them into a class distribution through Softmax;</li><li>More complex tasks may output a sequence of words, multiple bounding boxes, or pixel results of the same size as the input.</li></ul>
+<p>Therefore, the output layer is not a fixed structure; it must match the meaning of the target. Even if the preceding hidden layers are exactly the same, changing the output layer allows the network to serve different types of tasks.</p>
+<p>Next, consider the number of parameters. For a fully connected layer, every input is connected to every output node. If there are <code>n_(in)</code> inputs and <code>n_(out)</code> nodes, the number of weights is:</p>
+<div class="dd-formula">n_(in)× n_(out)</div>
+<p>Each output node also has a bias, so the number of biases is:</p>
+<div class="dd-formula">n_(out)</div>
+<p>The total number of parameters is:</p>
+<div class="dd-formula">n_(in)× n_(out)+n_(out)</div>
+<p>For a network of "2 inputs → 2 hidden nodes → 1 output node", the number of parameters in the first layer is:</p>
+<div class="dd-formula">2×2+2=6</div>
+<p>There are 4 weights and 2 biases. The number of parameters in the second layer is:</p>
+<div class="dd-formula">2×1+1=3</div>
+<p>There are 2 weights and 1 bias. The entire network has:</p>
+<div class="dd-formula">6+3=9</div>
+<p> learnable parameters.</p>
+<p>Here, "learnable" means these parameters are not hard-coded one by one by the designer, but are continuously adjusted according to the error during training. The network structure determines how many layers there are, how many nodes are in each layer, and how the nodes are connected; training then finds suitable weights and biases within this pre-specified structure. The structure is the container, and the parameters are the specific values in the container that need to be learned.</p>
+<p>More parameters usually mean the network has greater representational capacity, because it has more degrees of freedom to adjust. But greater capacity does not necessarily mean better performance. Increasing parameters brings at least three kinds of costs: it requires more computation, so training and inference will be slower; it requires more storage space and video memory; and it is more likely to memorize accidental details in the training samples, causing overfitting. On the other hand, a network that is too small may not have enough capacity to express the patterns in the task, leading to underfitting.</p>
+<p>Therefore, what really needs to be balanced when designing a network is: make the model capacity sufficient to represent the patterns in the task, while also matching the data scale, computational resources, and generalization requirements. A network is not necessarily better just because it has more nodes or deeper layers.</p>
+<p>The structural relationships of this section can be summarized as:</p>
+<div class="dd-note key"><b>The input layer carries digitized features; weights select and combine information; biases shift the firing threshold of nodes; activation functions provide nonlinearity; multiple nodes work in parallel to form a layer's new representation; hidden layers gradually make the representation more suitable for the task; the output layer converts the final representation into the required answer; all weights and biases together constitute the parameters that training must learn.</b></div>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">3</span>Forward Propagation: How the Network Gives Answers<span class="dd-badge math">Math</span></h2>
+<p>The previous two sections have established two things: a neural network is composed of layers of nodes, and each node performs "weighted sum, then passes through an activation function"; nonlinear activation makes a multi-layer network no longer collapse into a linear model. Forward propagation aims to answer:<b>When the inputs and parameters are given, how does data pass through these layers and ultimately become a prediction result?</b></p>
+<p>"Forward" describes the direction of computation. Starting from the input layer, information flows through each hidden layer in turn and finally reaches the output layer, without going backward in between. Suppose the network has two learnable transformations; its complete computation can be written as:</p>
+<div class="dd-formula">z^((1))=W^((1))x+b^((1))</div>
+<div class="dd-formula">a^((1))=φ(z^((1)))</div>
+<div class="dd-formula">z^((2))=W^((2))a^((1))+b^((2))</div>
+<div class="dd-formula">y-hat=g(z^((2)))</div>
+<p>Here, the superscript <code>(1)</code> and <code>(2)</code> indicate different layers, not squares. <code>x</code> is the input fed into the network, <code>W^((1)),b^((1)),W^((2)),b^((2))</code> are the current parameters, <code>φ</code> is the hidden layer activation function, <code>g</code> is the transformation chosen by the output layer according to the task, <code>y-hat</code> is the prediction given by the network. The hat symbol is used to distinguish "the model's predicted result" from the true target <code>y</code>.</p>
+<p>The first step of forward propagation actually occurs before the network computation: converting real-world data into numbers suitable for the network to process. Different types of data require different preprocessing. For example, continuous numerical values may need standardization, categories may need encoding, image pixels may need scaling, and text needs to be converted into tokens and vectors first. Preprocessing is not trivial packaging, because the scale and representation of input values directly affect the information the network subsequently sees.</p>
+<p>Take numerical standardization as an example. If one feature ranges from 0 to 1 and another feature ranges from 0 to 1,000,000, the latter may naturally produce larger values in the weighted sum. Although the network can in theory compensate by adjusting its weights, training often becomes more difficult. Adjusting features to a more reasonable scale usually makes computation and learning more stable. Note that the same preprocessing rules must be used during training and actual use; otherwise, even if the network parameters do not change, the meaning of the inputs it receives will change.</p>
+<p>After obtaining the input vector <code>x</code>, the first hidden layer computes:</p>
+<div class="dd-formula">z^((1))=W^((1))x+b^((1))</div>
+<p>This is the weighted sum of all nodes in the layer. The matrix <code>W^((1))</code> has each row corresponding to the weights of one node, and the bias vector <code>b^((1))</code> provides an independent bias for each node. The computed <code>z^((1))</code> is the pre-activation value of all nodes in this layer.</p>
+<p>Then, the activation function is applied element-wise to these pre-activation values:</p>
+<div class="dd-formula">a^((1))=φ(z^((1)))</div>
+<p>If the hidden layer uses ReLU, then each component is processed according to <code>max(0,z)</code>. Positive values are retained, and negative values become zero. The resulting <code>a^((1))</code> is no longer just a linear combination of the original input, but a new representation extracted by the first hidden layer based on the current parameters.</p>
+<p>This new representation becomes the input to the next layer. In other words, the second layer no longer directly processes the original feature <code>x</code>, but instead processes the <code>a^((1))</code> produced by the first layer. If there are more hidden layers, continue repeating:</p>
+<div class="dd-formula">z^((l))=W^((l))a^((l-1))+b^((l))</div>
+<div class="dd-formula">a^((l))=φ^((l))(z^((l)))</div>
+<p>where <code>l</code> represents the current layer,<code>a^((l-1))</code> is the output of the previous layer. The first layer usually treats <code>a^((0))</code> as the original input <code>x</code>. Therefore, regardless of how many layers the network has, forward propagation can be understood as repeatedly performing "a linear transformation to produce pre-activation values, then a nonlinear function to produce a new representation".</p>
+<p>We can use the "2 inputs → 2 hidden nodes → 1 output node" network from the previous section to do a concrete calculation. Suppose the input is:</p>
+<div class="dd-formula">x=[2; -1]</div>
+<p>The hidden layer parameters are:</p>
+<div class="dd-formula">W^((1))= [1, 1; 2, -1], b^((1))= [0; -1]</div>
+<p>First compute the pre-activation values:</p>
+<div class="dd-formula">z^((1))= [1, 1; 2, -1] [2; -1] + [0; -1] = [1; 4]</div>
+<p>If the hidden layer uses ReLU, then:</p>
+<div class="dd-formula">a^((1))= [max(0,1); max(0,4)] = [1; 4]</div>
+<p>Next, suppose the output layer weights and bias are:</p>
+<div class="dd-formula">W^((2))=[1, -0.5], b^((2))=0</div>
+<p>The output layer's pre-activation value is:</p>
+<div class="dd-formula">z^((2))=1×1+(-0.5)×4=-1</div>
+<p>If this is a binary classification task and the output layer uses Sigmoid, the prediction is:</p>
+<div class="dd-formula">y-hat=((1) / (1+e^(-(-1))))≈0.269</div>
+<p>If we interpret <code>y-hat</code> as the predicted probability of belonging to the positive class, then the network currently thinks the likelihood of the positive class is about 26.9%. If the classification threshold is set to 0.5, it will predict the negative class. This example shows the entire process of forward propagation: each step is determined by the current input, weights, biases, and activation function, with no random guessing and no parameter modification during the computation.</p>
+<p>What transformation the output layer should adopt depends on the task requirements. A regression task may directly output <code>z</code>, because the target may be any real number; binary classification tasks often use Sigmoid to compress a score to between 0 and 1; mutually exclusive multi-class tasks often use Softmax to convert multiple class scores into a distribution that sums to 1. The output transformation must work together with the loss function and the meaning of the target; you cannot use a certain activation function just because it is common, regardless of the task.</p>
+<p>Forward propagation itself is just a computation process and does not mean the network is learning. During actual inference, the network usually does the following: receives a new input, uses the same preprocessing as during training, completes forward propagation with the determined parameters, and then outputs the prediction. Throughout the process, the weights and biases remain unchanged. The same parameters, given the same input, will produce the same result when there is no additional random mechanism.</p>
+<p>Training includes forward propagation but is not limited to it. During training, first forward propagation is used to obtain <code>y-hat</code>, then the prediction is compared with the true target <code>y</code> to calculate the loss. Next, determine how responsible each parameter is for the loss, and update the parameters in the direction that can reduce the loss. Therefore, the logical chain of training is:</p>
+<div class="dd-formula">input → forward propagation → prediction → compute loss → compute gradient → update parameters</div>
+<p>Pure inference usually only includes the first half:</p>
+<div class="dd-formula">input → forward propagation → prediction</div>
+<p>It is important to distinguish the two. Forward propagation answers "what will this network output when the parameters remain at their current values"; the loss function answers "how wrong is this output"; backpropagation answers "which parameters caused these errors and in what direction"; the optimizer answers "exactly how much to change the parameters next". Forward propagation provides the predictions and intermediate computation results needed for training, but it does not itself correct errors.</p>
+<p>This section can be summed up in one sentence:<b>Forward propagation is to let the input, according to the network's established structure and current parameters, go through "weighted sum and nonlinear transformation" layer by layer, and ultimately form a prediction that matches the task format; inference ends here, while training still needs to adjust the parameters in reverse based on the prediction error.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">4</span>Activation Functions: Where Nonlinearity Comes From<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+<p>An earlier key question remains: even if multiple linear or affine layers are stacked deeply, the whole can still be combined into a single affine transformation, so why can neural networks represent curved and complex relationships? The answer is to add activation functions between the linear layers.<b>Linear layers are responsible for recombining information, and activation functions are responsible for breaking linearity so that these combinations can produce turns, gating, and complex boundaries.</b></p>
+<p>A node usually first computes the pre-activation value:</p>
+<figure class="dd-fig"><div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg data-activation="relu" viewBox="0 0 260 240" role="img" aria-label="ReLU: horizontal axis z from negative 4 to 4, vertical axis is the function value; when z equals 0, the function value is 0" style="flex:1 1 190px;min-width:190px;max-width:100%;height:auto;display:block">
+<rect x="6" y="6" width="248" height="228" rx="8" fill="none" stroke="#2c313b"/>
+<text x="130" y="30" text-anchor="middle" fill="currentColor" font-size="16">ReLU</text>
+<line x1="36" y1="184" x2="228" y2="184" stroke="#687383"/>
+<line x1="130" y1="48" x2="130" y2="192" stroke="#687383"/>
+<line x1="126" y1="184" x2="134" y2="184" stroke="#687383"/><text x="119" y="189" text-anchor="end" fill="currentColor" font-size="13">0</text>
+<line x1="126" y1="120" x2="134" y2="120" stroke="#687383"/><text x="119" y="125" text-anchor="end" fill="currentColor" font-size="13">2</text>
+<line x1="126" y1="56" x2="134" y2="56" stroke="#687383"/><text x="119" y="61" text-anchor="end" fill="currentColor" font-size="13">4</text>
+<text x="230" y="200" fill="currentColor" font-size="13">z</text>
+<text x="42" y="207" text-anchor="middle" fill="currentColor" font-size="13">−4</text><text x="218" y="207" text-anchor="middle" fill="currentColor" font-size="13">4</text>
+<path d="M42.000,184.000 L43.100,184.000 L44.200,184.000 L45.300,184.000 L46.400,184.000 L47.500,184.000 L48.600,184.000 L49.700,184.000 L50.800,184.000 L51.900,184.000 L53.000,184.000 L54.100,184.000 L55.200,184.000 L56.300,184.000 L57.400,184.000 L58.500,184.000 L59.600,184.000 L60.700,184.000 L61.800,184.000 L62.900,184.000 L64.000,184.000 L65.100,184.000 L66.200,184.000 L67.300,184.000 L68.400,184.000 L69.500,184.000 L70.600,184.000 L71.700,184.000 L72.800,184.000 L73.900,184.000 L75.000,184.000 L76.100,184.000 L77.200,184.000 L78.300,184.000 L79.400,184.000 L80.500,184.000 L81.600,184.000 L82.700,184.000 L83.800,184.000 L84.900,184.000 L86.000,184.000 L87.100,184.000 L88.200,184.000 L89.300,184.000 L90.400,184.000 L91.500,184.000 L92.600,184.000 L93.700,184.000 L94.800,184.000 L95.900,184.000 L97.000,184.000 L98.100,184.000 L99.200,184.000 L100.300,184.000 L101.400,184.000 L102.500,184.000 L103.600,184.000 L104.700,184.000 L105.800,184.000 L106.900,184.000 L108.000,184.000 L109.100,184.000 L110.200,184.000 L111.300,184.000 L112.400,184.000 L113.500,184.000 L114.600,184.000 L115.700,184.000 L116.800,184.000 L117.900,184.000 L119.000,184.000 L120.100,184.000 L121.200,184.000 L122.300,184.000 L123.400,184.000 L124.500,184.000 L125.600,184.000 L126.700,184.000 L127.800,184.000 L128.900,184.000 L130.000,184.000 L131.100,182.400 L132.200,180.800 L133.300,179.200 L134.400,177.600 L135.500,176.000 L136.600,174.400 L137.700,172.800 L138.800,171.200 L139.900,169.600 L141.000,168.000 L142.100,166.400 L143.200,164.800 L144.300,163.200 L145.400,161.600 L146.500,160.000 L147.600,158.400 L148.700,156.800 L149.800,155.200 L150.900,153.600 L152.000,152.000 L153.100,150.400 L154.200,148.800 L155.300,147.200 L156.400,145.600 L157.500,144.000 L158.600,142.400 L159.700,140.800 L160.800,139.200 L161.900,137.600 L163.000,136.000 L164.100,134.400 L165.200,132.800 L166.300,131.200 L167.400,129.600 L168.500,128.000 L169.600,126.400 L170.700,124.800 L171.800,123.200 L172.900,121.600 L174.000,120.000 L175.100,118.400 L176.200,116.800 L177.300,115.200 L178.400,113.600 L179.500,112.000 L180.600,110.400 L181.700,108.800 L182.800,107.200 L183.900,105.600 L185.000,104.000 L186.100,102.400 L187.200,100.800 L188.300,99.200 L189.400,97.600 L190.500,96.000 L191.600,94.400 L192.700,92.800 L193.800,91.200 L194.900,89.600 L196.000,88.000 L197.100,86.400 L198.200,84.800 L199.300,83.200 L200.400,81.600 L201.500,80.000 L202.600,78.400 L203.700,76.800 L204.800,75.200 L205.900,73.600 L207.000,72.000 L208.100,70.400 L209.200,68.800 L210.300,67.200 L211.400,65.600 L212.500,64.000 L213.600,62.400 L214.700,60.800 L215.800,59.200 L216.900,57.600 L218.000,56.000" fill="none" stroke="#6b8cbe" stroke-width="2.4"/>
+<circle cx="130" cy="184" r="3.5" fill="#6b8cbe"/>
+<text x="130" y="225" text-anchor="middle" fill="currentColor" font-size="13">max(0, z)</text>
+</svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+<div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg data-activation="sigmoid" viewBox="0 0 260 240" role="img" aria-label="Sigmoid: horizontal axis z from negative 4 to 4, vertical axis is the function value; when z equals 0, the function value is 0.5" style="flex:1 1 190px;min-width:190px;max-width:100%;height:auto;display:block">
+<rect x="6" y="6" width="248" height="228" rx="8" fill="none" stroke="#2c313b"/>
+<text x="130" y="30" text-anchor="middle" fill="currentColor" font-size="16">Sigmoid</text>
+<line x1="36" y1="184" x2="228" y2="184" stroke="#687383"/>
+<line x1="130" y1="48" x2="130" y2="192" stroke="#687383"/>
+<line x1="126" y1="184" x2="134" y2="184" stroke="#687383"/><text x="119" y="189" text-anchor="end" fill="currentColor" font-size="13">0</text>
+<line x1="126" y1="120" x2="134" y2="120" stroke="#687383"/><text x="119" y="125" text-anchor="end" fill="currentColor" font-size="13">0.5</text>
+<line x1="126" y1="56" x2="134" y2="56" stroke="#687383"/><text x="119" y="61" text-anchor="end" fill="currentColor" font-size="13">1</text>
+<text x="230" y="200" fill="currentColor" font-size="13">z</text>
+<text x="42" y="207" text-anchor="middle" fill="currentColor" font-size="13">−4</text><text x="218" y="207" text-anchor="middle" fill="currentColor" font-size="13">4</text>
+<path d="M42.000,181.698 L43.100,181.582 L44.200,181.460 L45.300,181.333 L46.400,181.199 L47.500,181.059 L48.600,180.912 L49.700,180.757 L50.800,180.596 L51.900,180.426 L53.000,180.248 L54.100,180.062 L55.200,179.866 L56.300,179.661 L57.400,179.447 L58.500,179.222 L59.600,178.987 L60.700,178.740 L61.800,178.482 L62.900,178.212 L64.000,177.929 L65.100,177.634 L66.200,177.324 L67.300,177.001 L68.400,176.663 L69.500,176.309 L70.600,175.939 L71.700,175.553 L72.800,175.150 L73.900,174.729 L75.000,174.290 L76.100,173.832 L77.200,173.354 L78.300,172.856 L79.400,172.336 L80.500,171.795 L81.600,171.232 L82.700,170.646 L83.800,170.036 L84.900,169.401 L86.000,168.742 L87.100,168.057 L88.200,167.346 L89.300,166.608 L90.400,165.843 L91.500,165.050 L92.600,164.228 L93.700,163.378 L94.800,162.498 L95.900,161.589 L97.000,160.650 L98.100,159.680 L99.200,158.680 L100.300,157.649 L101.400,156.587 L102.500,155.494 L103.600,154.371 L104.700,153.217 L105.800,152.033 L106.900,150.819 L108.000,149.575 L109.100,148.303 L110.200,147.002 L111.300,145.673 L112.400,144.317 L113.500,142.935 L114.600,141.528 L115.700,140.097 L116.800,138.644 L117.900,137.169 L119.000,135.675 L120.100,134.162 L121.200,132.632 L122.300,131.087 L123.400,129.529 L124.500,127.959 L125.600,126.379 L126.700,124.791 L127.800,123.197 L128.900,121.600 L130.000,120.000 L131.100,118.400 L132.200,116.803 L133.300,115.209 L134.400,113.621 L135.500,112.041 L136.600,110.471 L137.700,108.913 L138.800,107.368 L139.900,105.838 L141.000,104.325 L142.100,102.831 L143.200,101.356 L144.300,99.903 L145.400,98.472 L146.500,97.065 L147.600,95.683 L148.700,94.327 L149.800,92.998 L150.900,91.697 L152.000,90.425 L153.100,89.181 L154.200,87.967 L155.300,86.783 L156.400,85.629 L157.500,84.506 L158.600,83.413 L159.700,82.351 L160.800,81.320 L161.900,80.320 L163.000,79.350 L164.100,78.411 L165.200,77.502 L166.300,76.622 L167.400,75.772 L168.500,74.950 L169.600,74.157 L170.700,73.392 L171.800,72.654 L172.900,71.943 L174.000,71.258 L175.100,70.599 L176.200,69.964 L177.300,69.354 L178.400,68.768 L179.500,68.205 L180.600,67.664 L181.700,67.144 L182.800,66.646 L183.900,66.168 L185.000,65.710 L186.100,65.271 L187.200,64.850 L188.300,64.447 L189.400,64.061 L190.500,63.691 L191.600,63.337 L192.700,62.999 L193.800,62.676 L194.900,62.366 L196.000,62.071 L197.100,61.788 L198.200,61.518 L199.300,61.260 L200.400,61.013 L201.500,60.778 L202.600,60.553 L203.700,60.339 L204.800,60.134 L205.900,59.938 L207.000,59.752 L208.100,59.574 L209.200,59.404 L210.300,59.243 L211.400,59.088 L212.500,58.941 L213.600,58.801 L214.700,58.667 L215.800,58.540 L216.900,58.418 L218.000,58.302" fill="none" stroke="#4f9d78" stroke-width="2.4"/>
+<circle cx="130" cy="120" r="3.5" fill="#4f9d78"/>
+<text x="130" y="225" text-anchor="middle" fill="currentColor" font-size="13">0 &lt; f(z) &lt; 1</text>
+</svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+<div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg data-activation="tanh" viewBox="0 0 260 240" role="img" aria-label="tanh: horizontal axis z from negative 4 to 4, vertical axis is the function value; when z equals 0, the function value is 0" style="flex:1 1 190px;min-width:190px;max-width:100%;height:auto;display:block">
+<rect x="6" y="6" width="248" height="228" rx="8" fill="none" stroke="#2c313b"/>
+<text x="130" y="30" text-anchor="middle" fill="currentColor" font-size="16">tanh</text>
+<line x1="36" y1="120" x2="228" y2="120" stroke="#687383"/>
+<line x1="130" y1="48" x2="130" y2="192" stroke="#687383"/>
+<line x1="126" y1="184" x2="134" y2="184" stroke="#687383"/><text x="119" y="189" text-anchor="end" fill="currentColor" font-size="13">-1</text>
+<line x1="126" y1="120" x2="134" y2="120" stroke="#687383"/><text x="119" y="125" text-anchor="end" fill="currentColor" font-size="13">0</text>
+<line x1="126" y1="56" x2="134" y2="56" stroke="#687383"/><text x="119" y="61" text-anchor="end" fill="currentColor" font-size="13">1</text>
+<text x="230" y="136" fill="currentColor" font-size="13">z</text>
+<text x="42" y="207" text-anchor="middle" fill="currentColor" font-size="13">−4</text><text x="218" y="207" text-anchor="middle" fill="currentColor" font-size="13">4</text>
+<path d="M42.000,183.957 L43.100,183.953 L44.200,183.948 L45.300,183.942 L46.400,183.936 L47.500,183.929 L48.600,183.922 L49.700,183.914 L50.800,183.905 L51.900,183.894 L53.000,183.883 L54.100,183.871 L55.200,183.858 L56.300,183.843 L57.400,183.826 L58.500,183.808 L59.600,183.788 L60.700,183.765 L61.800,183.741 L62.900,183.714 L64.000,183.684 L65.100,183.650 L66.200,183.614 L67.300,183.573 L68.400,183.528 L69.500,183.479 L70.600,183.424 L71.700,183.364 L72.800,183.298 L73.900,183.224 L75.000,183.143 L76.100,183.054 L77.200,182.955 L78.300,182.846 L79.400,182.726 L80.500,182.594 L81.600,182.448 L82.700,182.286 L83.800,182.109 L84.900,181.913 L86.000,181.698 L87.100,181.460 L88.200,181.199 L89.300,180.912 L90.400,180.596 L91.500,180.248 L92.600,179.866 L93.700,179.447 L94.800,178.987 L95.900,178.482 L97.000,177.929 L98.100,177.324 L99.200,176.663 L100.300,175.939 L101.400,175.150 L102.500,174.290 L103.600,173.354 L104.700,172.336 L105.800,171.232 L106.900,170.036 L108.000,168.742 L109.100,167.346 L110.200,165.843 L111.300,164.228 L112.400,162.498 L113.500,160.650 L114.600,158.680 L115.700,156.587 L116.800,154.371 L117.900,152.033 L119.000,149.575 L120.100,147.002 L121.200,144.317 L122.300,141.528 L123.400,138.644 L124.500,135.675 L125.600,132.632 L126.700,129.529 L127.800,126.379 L128.900,123.197 L130.000,120.000 L131.100,116.803 L132.200,113.621 L133.300,110.471 L134.400,107.368 L135.500,104.325 L136.600,101.356 L137.700,98.472 L138.800,95.683 L139.900,92.998 L141.000,90.425 L142.100,87.967 L143.200,85.629 L144.300,83.413 L145.400,81.320 L146.500,79.350 L147.600,77.502 L148.700,75.772 L149.800,74.157 L150.900,72.654 L152.000,71.258 L153.100,69.964 L154.200,68.768 L155.300,67.664 L156.400,66.646 L157.500,65.710 L158.600,64.850 L159.700,64.061 L160.800,63.337 L161.900,62.676 L163.000,62.071 L164.100,61.518 L165.200,61.013 L166.300,60.553 L167.400,60.134 L168.500,59.752 L169.600,59.404 L170.700,59.088 L171.800,58.801 L172.900,58.540 L174.000,58.302 L175.100,58.087 L176.200,57.891 L177.300,57.714 L178.400,57.552 L179.500,57.406 L180.600,57.274 L181.700,57.154 L182.800,57.045 L183.900,56.946 L185.000,56.857 L186.100,56.776 L187.200,56.702 L188.300,56.636 L189.400,56.576 L190.500,56.521 L191.600,56.472 L192.700,56.427 L193.800,56.386 L194.900,56.350 L196.000,56.316 L197.100,56.286 L198.200,56.259 L199.300,56.235 L200.400,56.212 L201.500,56.192 L202.600,56.174 L203.700,56.157 L204.800,56.142 L205.900,56.129 L207.000,56.117 L208.100,56.106 L209.200,56.095 L210.300,56.086 L211.400,56.078 L212.500,56.071 L213.600,56.064 L214.700,56.058 L215.800,56.052 L216.900,56.047 L218.000,56.043" fill="none" stroke="#d3a05a" stroke-width="2.4"/>
+<circle cx="130" cy="120" r="3.5" fill="#d3a05a"/>
+<text x="130" y="225" text-anchor="middle" fill="currentColor" font-size="13">−1 &lt; f(z) &lt; 1</text>
+</svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p></div><figcaption>Figure 3. The shapes of three common activation functions. What they have in common is<b>none of them are straight lines</b>—it is precisely this "bend" that gives the network the ability to express nonlinearity.</figcaption><p style="font-size:0.85em">The horizontal axis is the input z in all panels; each panel's vertical axis scale is labeled separately. The dots mark z=0: ReLU is 0, Sigmoid is 0.5, and tanh is 0. The figure shows only the input interval from −4 to 4.</p></figure>
+<div class="dd-formula">z=w· x+b</div>
+<p>Then the output is obtained through the activation function:</p>
+<div class="dd-formula">a=φ(z)</div>
+<p>If <code>φ(z)=z</code>, the activation function just lets it pass unchanged, and the network is still linear. Only when <code>φ</code> is a nonlinear function can the two adjacent layers not be simply combined. For example:</p>
+<div class="dd-formula">y=W_2φ(W_1x+b_1)+b_2</div>
+<p>Since <code>φ</code> is located between two linear transformations, the whole expression usually cannot be rearranged into a single <code>Wx+b</code>. This seemingly small change is exactly the key to deep networks gaining extra expressive power.</p>
+<p>One of the most common hidden-layer activations is ReLU:</p>
+<div class="dd-formula">ReLU(z)=max(0,z)</div>
+<p>When <code>z&lt;0</code>, it outputs 0; when <code>z&gt;0</code>, it outputs <code>z</code>. ReLU's graph consists of two straight line segments, but overall it is not a straight line, because at <code>z=0</code> it changes slope. This kink is the source of the nonlinearity.</p>
+<p>A single ReLU node, depending on whether <code>w· x+b</code> is positive or negative, divides the input space into two regions. In one region the node is off and outputs zero; in the other region the node is active and the output varies linearly with the input. Multiple ReLU nodes with different weights and biases create many boundaries at different positions. Their outputs, when combined by later layers, divide the input space into more regions.</p>
+<p>Therefore, the complex function formed by a ReLU network can be understood as "piecewise linear": inside each small region there is still a linear relationship, but after crossing the activation boundaries of different nodes, the function's slope changes. Just as many short straight line segments can approximate a circular arc, a large number of nodes and multiple layers can also use many locally flat pieces to piece together an overall curved decision boundary. This is not a case of one node drawing the complete curve by itself; rather, many nodes jointly provide turns, and later layers combine those turns.</p>
+<p>ReLU is simple in form and computationally cheap. On the positive half-axis, its derivative is 1, and it does not enter a saturation region where the gradient is close to zero as the positive input increases, unlike Sigmoid; but on the negative half-axis, both its output and derivative are 0. However, ReLU also has a clear risk: when <code>z&lt;0</code>, its output is exactly zero, and the gradient with respect to <code>z</code> is also zero. If a node lands on the negative half-axis for a long time on the training data, it may no longer receive effective updates and will continue to output zero; this is called the "dead ReLU".</p>
+<p>Leaky ReLU is a direct mitigation method:</p>
+<div class="dd-formula">LeakyReLU(z)=max(alpha z,z)</div>
+<p>where <code>alpha</code> is a small positive number. In this way, the negative half-axis is no longer completely flat but keeps a very gentle slope; nodes in the negative region can still receive gradients. However, <code>alpha</code> needs to be set manually or determined by some method, and it only mitigates some problems and does not guarantee that all training difficulties will disappear.</p>
+<p>The formula for Sigmoid is:</p>
+<div class="dd-formula">σ(z)=((1) / (1+e^(-z)))</div>
+<p>It compresses any real number into the range between 0 and 1. When <code>z</code> is large, the output is close to 1; when <code>z</code> is small, the output is close to 0; when <code>z=0</code>, the output is 0.5. This range makes it especially suitable for binary classification output, or for gating structures inside a network that need "how much on, how much off".</p>
+<table class="dd-table">
+    <thead><tr><th>Function</th><th>Formula / Range</th><th>Typical Use</th><th>Main Cost</th></tr></thead>
+    <tbody>
+      <tr><td>ReLU</td><td>max(0, z)</td><td>robust starting point for most hidden layers</td><td>gradient is 0 when z&lt;0; may "die"</td></tr>
+      <tr><td>Leaky ReLU</td><td>max(αz, z)</td><td>mitigates dead ReLU</td><td>still need to choose an α for the negative half-axis</td></tr>
+      <tr><td>Sigmoid</td><td>1/(1+e⁻ᶻ), 0~1</td><td>binary classification output probability, gating</td><td>saturates at both ends; hidden layers prone to vanishing gradients</td></tr>
+      <tr><td>tanh</td><td>−1~1</td><td>when zero-centered output is needed</td><td>still saturates</td></tr>
+      <tr><td>GELU</td><td>smooth gating</td><td>common in modern Transformer hidden layers</td><td>slightly more complex to compute</td></tr>
+      <tr><td>Softmax</td><td>eᶻⁱ / Σⱼeᶻʲ</td><td>output layer for mutually exclusive multi-class classification</td><td>when there are many classes, computation and calibration need attention</td></tr>
+    </tbody>
+  </table>
+<p>The problem with Sigmoid is saturation. When the input lies in a region of large positive or negative values, the curve becomes almost flat and the derivative is close to zero. When backpropagation passes through such a region, the gradient may be significantly reduced; if the network has many layers, this reduction accumulates layer by layer and easily leads to vanishing gradients. Therefore, although Sigmoid is common in binary classification output layers, it is usually not the default choice for hidden layers in modern deep networks.</p>
+<p>tanh can be written as:</p>
+<div class="dd-formula">tanh(z)=((e^z-e^(-z)) / (e^z+e^(-z)))</div>
+<p>It compresses the input to <code>-1</code> and 1. Compared with Sigmoid, tanh's output is zero-centered: negative inputs produce negative responses and positive inputs produce positive responses. This is more convenient in some models. However, both ends of tanh also flatten, so the problems of saturation and vanishing gradients still exist.</p>
+<p>GELU is a common choice in modern Transformer hidden layers. Unlike ReLU, it does not make a hard cutoff at zero; instead, it performs smooth gating based on the input magnitude: large positive values are mostly kept, large negative values are mostly suppressed, and the transition near zero is smooth. It preserves nonlinearity and is smoother than ReLU, but its computational expression is also more complex. Choosing GELU does not mean it is necessarily better than ReLU on all tasks; it should be understood as a common design validated in practice in certain modern architectures.</p>
+<p>Softmax does not process a single number but a set of class scores. For the <code>i</code>-th class, it computes:</p>
+<div class="dd-formula">Softmax(z)_i=((e^(z_i)) / (Σ_j e^(z_j)))</div>
+<p>Each output is between 0 and 1, and the sum of all outputs is 1. The larger a class score is relative to the other classes, the higher the output it receives. Therefore, Softmax is often used in multi-class classification tasks where the classes are mutually exclusive, such as an image that can only be classified as one of "cat, dog, bird".</p>
+<p>Softmax outputs are often called class probabilities, but this needs to be understood carefully. It first normalizes the relative scores into a distribution; whether these values actually match the true probabilities in reality also depends on the training data, the loss function, and whether the model is well calibrated. A model that outputs 0.99 does not automatically guarantee that it has 99% accuracy on all samples where it outputs 0.99.</p>
+<p>A point of easy confusion is that ReLU, Sigmoid, tanh, GELU, and Softmax may all be collectively called activation functions, but their roles in the network are not exactly the same.</p>
+<p>The question facing hidden layers is: "How do we turn the current representation into a new representation that the next layer can continue to combine?" Here we use ReLU, GELU, or tanh mainly to introduce nonlinearity. If none of the hidden layers has nonlinearity, the multiple affine computations from the hidden layers to the output transformation can be combined into a single affine transformation. If the output layer also has no nonlinearity, the whole network is still an affine function; if the output uses Sigmoid or Softmax, the final probability mapping is not an affine function, but the hidden layers still have not gained new nonlinear representational capacity.</p>
+<p>The question facing the output layer is: "What range and meaning should the final answer have?" Regression tasks may use a linear output, allowing the result to be any real number; binary classification may use Sigmoid to produce a value between 0 and 1; mutually exclusive multi-class classification may use Softmax to produce a class distribution. The output layer can use a linear mapping, or nonlinear transformations such as Sigmoid or Softmax. Which one to choose first depends on the output range and meaning required by the task.</p>
+<table class="dd-table">
+    <thead><tr><th>Position</th><th>Question it must answer</th><th>Common choices</th></tr></thead>
+    <tbody>
+      <tr><td>Hidden layer</td><td>How to produce complex, composable internal representations?</td><td>ReLU, GELU, tanh</td></tr>
+      <tr><td>Output layer</td><td>What range and meaning should the final answer have?</td><td>Linear, Sigmoid, Softmax</td></tr>
+    </tbody>
+  </table>
+<p>This distinction also explains why the output function cannot be chosen in isolation. The output layer, target encoding, and loss function must be compatible with one another. For example, binary classification often pairs a single output score, Sigmoid, and binary cross-entropy; mutually exclusive multi-class classification often pairs multiple class scores, Softmax, and multi-class cross-entropy; real-valued regression may use a linear output and mean squared error. If the combination does not match, the meaning of the model output, the way the loss is computed, and the direction of training may conflict with one another.</p>
+<p>Activation functions are not necessarily better just because they are more complex. The choice affects representational capacity, gradient propagation, computational cost, and training stability. For ordinary fully connected networks or convolutional networks, ReLU is often a robust starting point for hidden layers; when worried about completely losing gradients in the negative region, consider Leaky ReLU; GELU is common in Transformers; Sigmoid and Softmax are used more according to the output task or gating needs. The final choice should still be based on architecture, data, and actual validation.</p>
+<p>The logic of this section can be summarized as:<b>Linear layers can only linearly recombine information; activation functions create turns between these recombinations; the turns of many nodes, combined across layers, can piece together complex nonlinear functions. The main task of hidden-layer activations is to create composable internal representations, and the main task of the output-layer transformation is to convert the final numerical values into answers that match the task's meaning.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">5</span>Fundamental Principle: Differentiable Function Composition<span class="dd-badge intuition">Intuition</span></h2>
+<p>The first four sections respectively introduced why neural networks need nonlinearity, what components networks are made of, how predictions are computed forward, and how activation functions produce nonlinearity. Now we can unify these ideas into one core model:<b>A neural network decomposes a complex mapping into the composition of many simple functions and, as far as possible, makes these functions differentiable with respect to the parameters, so that it can both express complex relationships and be trained through gradients.</b></p>
+<p>Suppose a network has three layers, and each layer can be seen as a function:</p>
+<div class="dd-formula">f_1(x)=φ_1(W_1x+b_1)</div>
+<div class="dd-formula">f_2(h_1)=φ_2(W_2h_1+b_2)</div>
+<div class="dd-formula">f_3(h_2)=g(W_3h_2+b_3)</div>
+<p>The whole network is:</p>
+<div class="dd-formula">F(x)=f_3(f_2(f_1(x)))</div>
+<p>This relationship of “handing the output of one function to the next function” is called function composition. Input <code>x</code> is first <code>f_1</code> into <code>h_1</code>,<code>h_1</code> then by <code>f_2</code> into <code>h_2</code>, and finally by <code>f_3</code> becomes the prediction. The depth of the network, in essence, is how many levels this transformation has occurred consecutively.</p>
+<p>Why is function composition valuable? Because complex regularities can often be decomposed into several levels of relatively clear simple processing. When recognizing an image, jumping directly from millions of pixels to “this is a cat” is very difficult; if you first form representations of local changes, then combine them into texture and shape evidence, and finally aggregate them into a category judgment, the problem is divided into multiple levels of transformation. Neural networks do not necessarily literally follow the strict “edge–part–object” division of labor from human language, but function composition allows them to build this type of hierarchical computation.</p>
+<p>Every layer here is re-encoding information. Re-encoding is not simply copying, nor does it mean that the information necessarily becomes richer; rather, it transforms the previous layer's values into a coordinate system that is more convenient for subsequent tasks. For example, the same image is initially represented in pixel coordinates; after several layers, the network may internally form directions that are more sensitive to shape, texture, or category judgment. Samples that are originally difficult to separate with simple boundaries in pixel space may be easier to separate in the new representation space.</p>
+<p>We can analogize this change to reselecting the language used to describe the problem. Suppose the task is to distinguish points inside and outside a ring, in the original coordinates <code>(x_1,x_2)</code> you need a curved boundary; if you re-represent the input as “distance to the center of the circle,” classification may only need to compare a threshold. What the hidden layers of a neural network do is similar to automatically finding such useful new representations, but it is usually not specified in advance by humans as a concrete formula; instead, it searches through training for transformations that can reduce the error of the final task.</p>
+<p>This is representation learning. Traditional feature engineering has humans decide which features should be extracted; representation learning lets the model automatically adjust intermediate-layer parameters based on data and objectives, forming internal features that are helpful for the task. Here we must emphasize “helpful for the task”: the representation learned by the network is not necessarily good for all uses, nor does it necessarily correspond to concepts that are easy for humans to understand. A network trained for cat and dog classification may retain the information needed to distinguish the categories while ignoring background details irrelevant to the classification.</p>
+<p>Function composition provides expressive power, but the network must also be trainable. Training needs to answer: if the final prediction is wrong, in which direction should each layer and each parameter be adjusted? This is where “differentiability” comes into play.</p>
+<p>If the loss is denoted as <code>L</code>, network parameters are denoted as <code>θ</code>, training wants to know:</p>
+<div class="dd-formula">((∂ L) / (∂ θ))</div>
+<p>This derivative describes roughly how the loss changes when the parameter changes by a small amount. If the derivative is positive, increasing the parameter in the positive direction will cause the loss to rise locally; if the derivative is negative, increasing the parameter will cause the loss to fall locally. Optimization algorithms use these gradients to find update directions that can reduce the loss for a large number of parameters.</p>
+<p>Function composition is especially suitable for this kind of training because the chain rule can pass the final error back layer by layer along the composite relationship. For:</p>
+<table class="dd-table">
+    <thead><tr><th>Dimension</th><th>Increasing it usually means</th><th>Common Risks</th></tr></thead>
+    <tbody>
+      <tr><td>Width (number of nodes per layer)</td><td>Detect more patterns in parallel at the same level of abstraction</td><td>Parameters, memory, and overfitting increase</td></tr>
+      <tr><td>Depth (number of hidden layers)</td><td>Express hierarchical structure with more levels of composition</td><td>Gradient propagation and optimization become harder</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula">F(x)=f_3(f_2(f_1(x)))</div>
+<p>The influence of a certain early parameter on the final loss can be decomposed into its influence on the output of its own layer, the influence of that layer’s output on the next layer, and so on until the influence of the final output on the loss. This is exactly the mathematical basis of backpropagation. Forward propagation computes from input to output along the composite function; backpropagation uses the chain rule to compute the gradients of all parameters in reverse, starting from the loss.</p>
+<p>Strictly speaking, networks in practice do not require every point to have a derivative that is smooth and continuous in the ordinary sense. ReLU at <code>z=0</code> is not differentiable, but it is differentiable at other positions, and a conventional subgradient can be chosen at the kink, so gradient methods can still work. Therefore, “differentiable” here should be understood as: most of the network’s computation can provide local change information suitable for backpropagation, rather than requiring every function to be mathematically smooth everywhere.</p>
+<p>The width and depth of a network affect function composition in different ways. Width is the number of nodes per layer. A wider layer can form more responses in parallel, equivalent to providing more adjustable feature directions at the same stage. However, increasing nodes usually means more parameters, higher computation and memory requirements, and may also increase the risk of overfitting.</p>
+<p>Depth is the number of hidden layers. A deeper network can perform more levels of transformation, combining simple patterns layer by layer into complex patterns. For problems that themselves have hierarchical structure, this composition may be more effective than a single layer directly representing them. But depth also makes optimization difficult: gradients must propagate through more layers and may gradually become smaller, larger, or be disrupted by different layer scales. Techniques such as residual connections, normalization, and appropriate initialization largely serve to make deep function composition easier to train.</p>
+<p>Both width and depth can increase model capacity, but they cannot simply replace each other, and model quality cannot be judged solely by the number of parameters. Greater width may allow the same-level representation to contain more patterns, while greater depth allows more levels of sequential composition. What ratio is suitable for a specific task needs to be judged in combination with data structure, computational budget, and training stability.</p>
+<p>“Universal approximation” is one of the most easily exaggerated concepts when understanding neural networks. The general idea of the relevant theory is that, under certain conditions, a network with sufficient capacity can approximate many continuous functions to arbitrary precision. It shows that the family of functions represented by neural networks has strong expressive power, but it does not guarantee that the training algorithm will necessarily find the required parameters, nor does it specify how much data and computation are needed, nor does it guarantee that the model will still be correct when faced with new samples.</p>
+<p>Therefore, at least four questions must be separated:</p>
+<p>First, expressive power: does there exist a set of parameters for the network structure that can represent the target relationship?</p>
+<p>Second, optimizability: can existing training methods find sufficiently good parameters within a reasonable time?</p>
+<p>Third, sample efficiency: how much representative data is needed to learn this relationship?</p>
+<p>Fourth, generalization ability: is the model still effective on new samples outside the training data?</p>
+<p>A network may be theoretically capable of representing the answer, yet fail to train because of gradient problems; it may also fit the training set very well but merely memorize the samples and fail to generalize; it may also fail to learn a reliable relationship no matter how large the model is, because the key regularities were never contained in the data. The model can only utilize information present in the training signal; strong expressive power cannot create facts out of thin air.</p>
+<p>The final thing to remember from this section is:<b>The “neural” appearance of neural networks is not their most fundamental mathematical feature; a more essential description is a differentiable computational system composed of many parameterized small functions. Function composition allows it to learn representations layer by layer and express complex mappings, and differentiability allows the final error to be passed back to the parameters through the chain rule. Being able to represent, being able to train, learning efficiently, and being able to generalize are four interrelated but not conflatable issues.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">6</span>From Internal Values to Answers: Output Layer and Loss<span class="dd-badge math">Math</span></h2>
+<p>After the preceding network passes through multiple layers of transformations, the last hidden layer produces a set of internal values. These values are merely a representation formed by the model; they are not yet answers to the real-world task. For the network to be trainable, two consecutive translations must be performed:<b>The output layer first translates the internal representation into a prediction with task meaning, and the loss function then translates the difference between the prediction and the true answer into a scalar that can be optimized.</b></p>
+<p>Assume the last hidden layer output is <code>h</code>, and the output layer usually first computes a set of raw scores:</p>
+<div class="dd-formula">z = W<sub>out</sub>h + b<sub>out</sub></div>
+<p>These raw scores are often called logits. Next, whether to apply <code>z</code> a transformation, and what transformation to use, depends on what the task wants the output to express. The output layer is not a fixed component detached from the task; it is the interface between the model's internal values and the real-world answer.</p>
+<p>For regression tasks, the target is usually an arbitrary real number, such as house prices, temperature, or sales volume. The output layer often uses a linear output, that is, directly setting:</p>
+<div class="dd-formula">y-hat=z</div>
+<table class="dd-table">
+    <thead><tr><th>Task</th><th>Output Layer Transformation</th><th>Output Meaning</th><th>Why This Choice</th></tr></thead>
+    <tbody>
+      <tr><td>Regression</td><td>Linear / No Activation</td><td>Arbitrary Real Number</td><td>House prices and temperature should not be squeezed into 0~1</td></tr>
+      <tr><td>Binary Classification</td><td>Sigmoid</td><td>Positive Class Probability 0~1</td><td>Squeeze a real number into a probability</td></tr>
+      <tr><td>Mutually Exclusive Multiclass</td><td>Softmax</td><td>Class Probabilities, Sum to 1</td><td>Classes compete; only one can be chosen</td></tr>
+      <tr><td>Multilabel</td><td>Independent Sigmoid per Class</td><td>Probability for Each Label</td><td>Multiple labels can hold simultaneously</td></tr>
+    </tbody>
+  </table>
+<p>The "linear" or "no activation" here does not mean the entire network becomes a linear model, because the preceding hidden layers already contain nonlinearity; it only means the final step no longer restricts the output range. If Sigmoid is mistakenly used, predictions will be compressed between 0 and 1, clearly unable to directly represent typical house prices. Some regression targets do have range constraints, in which case a corresponding transformation can be chosen, but this choice must come from the target's meaning, not from mechanical application.</p>
+<p>For binary classification tasks, usually only one output score <code>z</code>, and then pass it through Sigmoid:</p>
+<div class="dd-formula">y-hat=σ(z)=((1) / (1+e^(-z)))</div>
+<p>This way <code>y-hat</code> is between 0 and 1 and can be interpreted as a probabilistic score assigned by the model to the positive class. For example, <code>y-hat=0.8</code> indicates the model strongly favors the positive class, and the corresponding score for the negative class is <code>1-0.8=0.2</code>. If a final class is needed, a threshold must be chosen; 0.5 is a common default, but in tasks where the cost of missed diagnoses differs from false positives, the most suitable threshold may not be 0.5.</p>
+<p>For mutually exclusive multiclass tasks, the network produces a logit for each class, denoted <code>z_1,…,z_K</code>, and then through Softmax:</p>
+<div class="dd-formula">p_k=((e^(z_k)) / (Σ_j e^(z_j)))</div>
+<p>All <code>p_k</code> are between 0 and 1, and their sum is 1. Increasing the relative score of one class affects the share occupied by other classes, reflecting competition among classes. This is suitable for tasks where "each sample can belong to only one class," such as choosing one among cat, dog, and bird in an image.</p>
+<p>Multilabel classification differs from mutually exclusive multiclass. An image can simultaneously contain "person," "car," and "night scene"; multiple labels can hold at the same time, so they cannot be made to compete for a share that sums to 1 via Softmax. The common practice is to set an independent logit for each label and use Sigmoid separately:</p>
+<div class="dd-formula">y-hat_k=σ(z_k)</div>
+<p>This way each label has its own 0-to-1 output, and increasing the probability of one label does not require lowering other labels. This shows that the difference between Softmax and multiple Sigmoids is not just a different formula; they express two different real-world assumptions: classes are mutually exclusive, or labels can coexist.</p>
+<p>After determining the meaning of the output, it is also necessary to define "how wrong." The model cannot directly optimize vague evaluations like "looks good" or "basically correct"; it needs a numerical objective. The loss function maps the prediction <code>y-hat</code> and the true answer <code>y</code> into a scalar <code>L</code>. In general, a smaller loss means the prediction better matches the training objective.</p>
+<p>Let all weights and biases of the network be <code>θ</code>, and the network prediction is written as <code>f(x;θ)</code>. For a training set containing <code>N</code> samples, the basic objective can be written as:</p>
+<div class="dd-formula">θ^*=argmin_θ((1) / (N))Σ_(i=1)^(N)L(f(x_i;θ),y_i)</div>
+<p>where <code>x_i</code> is the <code>i</code> input, <code>y_i</code> is its true answer, <code>L</code> is the loss for a single sample; after summing and dividing by <code>N</code> we get the average training loss.<code>argmin</code> asks not "what is the minimum loss" but "which set of parameters can make this objective as small as possible." The training process is to continuously adjust <code>θ</code> to try to approach such parameters.</p>
+<p>For regression, the common mean squared error, for a single scalar prediction, can be written as:</p>
+<div class="dd-formula">L_(MSE)=(y-hat-y)^2</div>
+<p>If the true value is 10 and the prediction is 12, the error is 2 and the squared loss is 4; if the prediction is 20, the error is 10 and the squared loss is 100. Squaring imposes a stronger penalty on large errors and avoids positive and negative errors canceling each other. It also has convenient differentiation properties. However, MSE is sensitive to unusually large errors; if the data contains severe outliers, other regression losses may need to be considered.</p>
+<p>For binary classification, binary cross-entropy is common:</p>
+<div class="dd-formula">L_(BCE)=-[ylny-hat+(1-y)ln(1-y-hat)]</div>
+<p>When the true label <code>y=1</code>, the second term disappears and the loss becomes:</p>
+<div class="dd-formula">L=-lny-hat</div>
+<p>The closer the probability the model assigns to the true positive class is to 1, the smaller the loss; if it very confidently gives a probability close to 0, the loss will be very large. When <code>y=0</code>, the loss becomes <code>-ln(1-y-hat)</code>, and the model should give a low probability to the positive class. Cross-entropy cares not only whether the final classification is correct, but also how much probability the model assigned to the correct class.</p>
+<p>For example, two models both classify samples above the threshold as positive: Model A outputs 0.51, Model B outputs 0.99. From an accuracy standpoint, both answer correctly once; but if the true label is positive, cross-entropy will consider B's prediction more consistent with the objective. Conversely, if the true label is negative, Model B's high-confidence error will receive a much larger penalty than A. This continuously varying penalty provides a detailed signal for gradient training.</p>
+<table class="dd-table">
+    <thead><tr><th>Loss</th><th>Example Formula</th><th>Intuition</th></tr></thead>
+    <tbody>
+      <tr><td>Mean Squared Error MSE</td><td>(ŷ − y)²</td><td>Large errors are squared and amplified, commonly used for regression</td></tr>
+      <tr><td>Binary Cross-Entropy BCE</td><td>−[y ln ŷ + (1−y) ln(1−ŷ)]</td><td>The lower the probability assigned to the correct class, the heavier the penalty</td></tr>
+      <tr><td>Multiclass Cross-Entropy</td><td>−Σₖ yₖ ln pₖ</td><td>Only focuses on the probability assigned to the true class</td></tr>
+    </tbody>
+  </table>
+<p>Mutually exclusive multiclass often uses multiclass cross-entropy:</p>
+<div class="dd-formula">L=-Σ_k y_kln p_k</div>
+<p>If the true label uses one-hot encoding, only the <code>y_k</code> corresponding to the true class is 1 and the rest are 0, so the formula actually simplifies to:</p>
+<div class="dd-formula">L=-ln p_(true class)</div>
+<p>That is to say, it mainly checks how much probability the model assigned to the true class. The higher the probability of the true class, the smaller the loss; if the model gave almost all probability to the wrong class, the loss is very large.</p>
+<p>In practice, implementations often directly combine logits and cross-entropy into one calculation, rather than first explicitly computing Sigmoid or Softmax and then taking the log. This usually has better numerical stability. For example, very large or very small logits may cause exponentiation to overflow, or cause probabilities to be rounded to exactly 0, and then computing <code>ln 0</code> will cause problems. The framework-provided "cross-entropy with logits" usually computes with an equivalent but more stable formula. This does not change the output meaning; it only improves the numerical implementation.</p>
+<p>The loss function and evaluation metrics must not be conflated. The loss is the signal minimized by the optimizer during training, and usually needs a usable gradient with respect to the model output. Accuracy, F1, and AUC are evaluation metrics mainly used by people to judge how well the model performs under a certain business criterion; they are not necessarily suitable for direct differentiation.</p>
+<p>Taking accuracy as an example, when a binary classification output changes from 0.49 to 0.48, if the threshold is 0.5, the classification result does not change and accuracy has no change; when it changes from 0.49 to 0.51, accuracy suddenly jumps. Such plateaus and jumps cannot provide a smooth direction for every tiny parameter update. Cross-entropy, by contrast, changes continuously with the predicted probability, so it is more suitable as a training signal.</p>
+<p>But a lower optimizable loss does not automatically mean actual evaluation is better. The average training loss may decrease while validation performance worsens, which is a sign of overfitting; the model may also have low cross-entropy but perform poorly on F1 due to an inappropriate threshold. Therefore, use the loss to guide parameter updates during training, and use metrics that match the actual objective during validation and testing; each has its own role.</p>
+<p>The basic objective formula also only states the average loss on the training set. Actual training often adds regularization, class weights, or other constraints, and what is really desired is a model that is also effective on unseen data, not simply pushing the training loss to the lowest possible value.<code>θ^*</code> In a complex neural network, this is usually not the globally optimal solution that can be solved for exactly, but a set of good enough parameters found by the optimization algorithm within a finite time.</p>
+<p>The complete logic of this section is:<b>The last hidden layer only produces an internal representation; the output layer converts it into a real number, a binary classification score, a mutually exclusive class distribution, or multiple independent labels according to task rules; the loss function then compresses the difference between the prediction and the true answer into a differentiable scalar; training updates parameters by minimizing this scalar, while metrics such as accuracy, F1, and AUC evaluate the model from the perspective of human task objectives.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">7</span>Gradient Descent: Why Move in the Opposite Direction of the Gradient?<span class="dd-badge math">Math</span></h2>
+<p>In the previous section, the loss function compressed prediction error into a scalar, but knowing “how wrong we currently are” is not enough. A neural network may have tens of thousands or even billions of parameters, so training must further answer:<b>For each parameter, should it increase or decrease, and by how much, to make the loss go down?</b>The gradient provides the local direction, and the learning rate controls the step size; together they form the basic update of gradient descent.</p>
+<p>Let’s start with the case of a single parameter <code>θ</code> to understand. The loss is written as <code>L(θ)</code>, and its derivative with respect to the parameter is:</p>
+<div class="dd-formula">((dL) / (dθ))</div>
+<p>This derivative describes how the loss changes near the current position when the parameter increases slightly. If the derivative is positive, increasing <code>θ</code> will cause the loss to rise, so the parameter should be decreased appropriately <code>θ</code>; if the derivative is negative, increasing <code>θ</code> will instead make the loss decrease, so the parameter should be increased appropriately <code>θ</code>. The two cases can be written in a unified way as:</p>
+<div class="dd-formula">θ←θ-η((dL) / (dθ))</div>
+<p>where <code>η&gt;0</code> is the learning rate. Subtracting the derivative automatically chooses the opposite direction: when the derivative is positive, the parameter decreases; when the derivative is negative, the parameter increases.</p>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 220" role="img" aria-label="Gradient descent on a one-dimensional loss curve">
+      <path d="M40,40 C160,240 400,240 520,40" fill="none" stroke="#3a4150" stroke-width="2"/>
+      <!-- points stepping down -->
+      <circle cx="120" cy="150" r="6" fill="#cf6f6f"/><circle cx="200" cy="192" r="6" fill="#d3a05a"/>
+      <circle cx="280" cy="205" r="6" fill="#4f9d78"/>
+      <line x1="120" y1="150" x2="185" y2="182" stroke="#6b8cbe" stroke-width="2" marker-end="url(#ah)"/>
+      <line x1="200" y1="192" x2="266" y2="203" stroke="#6b8cbe" stroke-width="2" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b8cbe"/></marker></defs>
+      <text x="280" y="228" text-anchor="middle" class="svg-t">Lowest point (minimum loss)</text>
+      <text x="90" y="140" class="svg-t" fill="#cf6f6f">Starting point</text>
+      <text x="470" y="70" class="svg-t">Loss L(θ)</text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 4: Think of the loss as a valley. The gradient points in the direction of “steepest uphill,” so each step goes in its <b>opposite direction</b> (steepest downhill) for a short distance, gradually approaching the valley floor.</figcaption>
+  </figure>
+<p>When there are many parameters, write all parameters as the vector <code>θ=[θ_1,θ_2,…,θ_m]^T</code>. The partial derivatives of the loss with respect to each parameter form the gradient:</p>
+<div class="dd-formula">∇_θ L= [((∂ L) / (∂θ_1)); ((∂ L) / (∂θ_2)); ⋮; ((∂ L) / (∂θ_m))]</div>
+<p>The gradient has the same shape as the parameter vector. Each component describes how the loss locally responds when the corresponding parameter changes slightly. The gradient is not a vague “error magnitude”; it is a list of local sensitivities for all parameters.</p>
+<p>Why does the gradient indicate the direction of fastest increase? Suppose from the current position we move a small step <code>u</code> along the unit direction <code>ε</code>, the loss can be approximated to first order as:</p>
+<div class="dd-formula">L(θ+ε u)≈ L(θ)+ε∇ L(θ)· u, \|u\|=1</div>
+<p>With the same step size, the change in loss is mainly determined by the dot product <code>∇ L· u</code>. According to the geometric property of the dot product, when <code>u</code> is in the same direction as the gradient, this value is largest, meaning the loss increases fastest; when <code>u</code> is opposite to the gradient direction, this value is smallest, meaning the loss decreases fastest. Therefore, the local steepest descent direction is:</p>
+<div class="dd-formula">-∇ L(θ)</div>
+<p>This is the direct reason behind the name “gradient descent”: the gradient itself points in the direction of local fastest increase, and taking the negative gives the direction of local fastest decrease.</p>
+<p>The “fastest” here has two limitations. First, it compares directions when taking small steps of the same length; if different directions were allowed arbitrary step sizes, they could not be compared directly. Second, it relies only on a first-order approximation near the current position, so it is a local conclusion and does not mean the gradient points directly to the global minimum. The loss surface may be curved, narrow, contain saddle points, or have multiple valley floors; the gradient only tells us which side is steepest under our feet, not an entire topographic map.</p>
+<p>The original text mentions that there is no unique “slowest descent direction,” which can also be seen from the dot product. If the direction <code>u</code> is perpendicular to the gradient, then:</p>
+<div class="dd-formula">∇ L· u=0</div>
+<p>Under the first-order approximation, the loss is almost unchanged. Choosing a direction nearly perpendicular to the gradient but slightly toward the descent side can make the decrease arbitrarily close to zero. Therefore, unlike the clear direction of “steepest descent,” there is no direction of “slowest descent” with the same unique meaning.</p>
+<p>The basic gradient descent update is written as:</p>
+<div class="dd-formula">θ←θ-η∇_θ L(θ)</div>
+<p>The negative gradient determines the direction, and the learning rate <code>η</code> determines the step size. Even if the direction is correct, the step size determines whether training succeeds, because the gradient is reliable only in a sufficiently small neighborhood; if a step is too large, the actual loss surface may already curve elsewhere.</p>
+<p>When the learning rate is too small, each step moves only a little, and the loss may decrease steadily, but training requires many steps with high time and computational cost. In flat regions, updates may even be so small as to be almost invisible. When the learning rate is too large, the parameters may overshoot the valley floor and oscillate between the two sides; in more severe cases, they may jump each time to a region of higher loss and larger gradient, eventually causing numerical divergence. An appropriate learning rate must balance speed and stability, and in actual training it is often adjusted as training progresses.</p>
+<p>Gradient descent does not guarantee finding the global optimum at every step. For deep networks, the loss surface is usually high-dimensional and non-convex, and may contain saddle points, flat regions, and many different low-loss regions. The realistic goal of training is usually not to prove that a unique global minimum has been found, but to find a set of parameters with low training loss and good validation performance within an acceptable computational budget.</p>
+<p>Full training begins with parameter initialization. If the incoming weights and biases of hidden nodes in the same layer are identical, they will produce the same response to the same input; if the corresponding downstream connections, optimizer states, and update rules also maintain node permutation symmetry, they will continue to receive the same gradients and remain duplicates. Different downstream weights may break this symmetry. Random initialization of weights is a common way to give different nodes the opportunity to learn different patterns; biases can often be initialized to zero, and not every parameter needs to be randomized. Setting all weights to zero risks symmetry or hindered gradients, but the specific behavior depends on the activation function, connections, and update rules. The scale of random numbers must still be reasonable; too large or too small may affect signal and gradient propagation.</p>
+<p>Next, a batch of data is taken for forward propagation. Why is a small batch commonly used instead of looking at only one sample at a time, or the entire training set each time? Gradients computed over the full training set are closer to the overall average direction, but each update is costly; single-sample updates are cheap but have large random fluctuations. Mini-batch training provides a compromise among computational efficiency, hardware parallelism, and gradient stability, and is a common practice in modern neural network training.</p>
+<p>For the current batch, the network completes forward propagation and obtains predictions, then computes the average loss over the samples in the batch. Backpropagation then uses the chain rule to compute the gradient of the loss with respect to each weight and bias. It is important to distinguish: Backpropagation is responsible for efficiently computing the gradient, while gradient descent or another optimizer uses the gradient to update parameters. They are closely connected but not the same step.</p>
+<p>The most basic stochastic mini-batch gradient descent updates parameters according to the current gradient; more common optimizers further process the gradient. For example, momentum methods combine past update directions to reduce oscillations, and Adam adjusts the effective step size for different parameters based on first- and second-order statistics of the gradient. No matter how complex the rule, the common input remains the gradient obtained by Backpropagation, and the purpose remains to find parameters with lower loss.</p>
+<p>A complete training step can be written as:</p>
+<table class="dd-table">
+    <thead><tr><th>Term</th><th>Accurate meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Parameter</td><td>inside the model<b>learned by training</b>weights and biases</td></tr>
+      <tr><td>Hyperparameter</td><td>the trainer<b>manually sets</b>learning rate, batch size, number of layers, etc.</td></tr>
+      <tr><td>batch</td><td>a small batch of samples used for one parameter update</td></tr>
+      <tr><td>epoch</td><td>the training set has been passed through completely once</td></tr>
+      <tr><td>iteration / step</td><td>one “forward + backward + update”</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula">Take a batch → forward propagation → compute loss → backpropagation → optimizer updates parameters</div>
+<p>This process is repeated many times. A batch is a small batch of samples used for one parameter update; an iteration or step usually represents completing one “forward, backward, update”; an epoch means that all samples in the training set have been roughly used once. If the training set has 10,000 samples and the batch size is 100, then one epoch usually contains about 100 steps.</p>
+<p>Parameters and hyperparameters must also be distinguished. Parameters are the internal values that the model learns during training, such as weights and biases; they are updated by the optimizer based on the gradient. Hyperparameters are set by the trainer or an external search process, such as learning rate, batch size, number of hidden layers, width of each layer, and regularization strength. Parameters are the answer the training process seeks; hyperparameters define the model structure and the way the answer is sought.</p>
+<p>During training, you must not focus only on training loss. If training loss continues to decrease while validation loss starts to increase, the model may be overfitting to the training data. Training curves can help detect oscillations caused by a learning rate that is too large, stagnation caused by a learning rate that is too small, numerical divergence, and overfitting. Gradient descent is responsible for reducing the current optimization objective; whether it generalizes to new data also depends on validation, regularization, data quality, and a reasonable stopping strategy.</p>
+<p>The final understanding to establish from this section is:<b>The gradient is not a map to the lowest point, but slope information at the current position; for small steps of the same length, the gradient points to the fastest increase, and the negative gradient points to the fastest decrease. The learning rate determines how far to go along the negative gradient, Backpropagation is responsible for computing the gradient, the optimizer uses the gradient, and many batches and epochs of repeated updates together constitute training.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">8</span>Backpropagation: How the Chain Rule Assigns Responsibility<span class="dd-badge math">Math</span></h2>
+<p>The previous section explained that the optimizer needs the gradient of the loss with respect to each parameter before it can decide the parameter update direction. However, a neural network's prediction is produced by many parameters together, and the loss function gives only a final value; it does not directly indicate how much each weight and bias contributed. Backpropagation solves exactly this computational problem:<b>It uses the chain rule to pass sensitivity layer by layer from the loss backward to earlier nodes, reusing already-computed downstream influences, and thereby obtains the gradients of all parameters in a single backward pass.</b></p>
+<p>First, we must distinguish between backpropagation and the optimizer. Backpropagation is responsible for computing:</p>
+<div class="dd-formula">∇_θ L</div>
+<p>That is, the gradient of the loss with respect to all parameters. Gradient descent, SGD with momentum, or Adam then read these gradients and update parameters according to their own rules. For example, the most basic gradient descent performs:</p>
+<div class="dd-formula">θ←θ-η∇_θ L</div>
+<p>Therefore, backpropagation answers “what is the gradient,” and the optimizer answers “how to change the parameters after obtaining the gradient.” Backpropagation itself usually does not modify the weights; it is inaccurate to call it an optimizer.</p>
+<p>First consider the simplest computation chain. Suppose a weight <code>w</code> affects the loss through the following process:</p>
+<div class="dd-formula">z=wx+b</div>
+<div class="dd-formula">a=φ(z)</div>
+<div class="dd-formula">y-hat=g(a)</div>
+<div class="dd-formula">L=ell(y-hat,y)</div>
+<p>From a causal perspective,<code>w</code> first affects <code>z</code>,<code>z</code> then affects <code>a</code>,<code>a</code> affects the prediction <code>y-hat</code>, and the prediction finally affects the loss <code>L</code>. The chain rule writes the entire influence chain as:</p>
+<div class="dd-formula">((∂ L) / (∂ w))= ((∂ L) / (∂y-hat))((∂y-hat) / (∂ a))((∂ a) / (∂ z))((∂ z) / (∂ w))</div>
+<p>Each term describes only the local influence between two adjacent steps. Multiplying these local derivatives gives the total influence of the parameter <code>w</code> on the final loss. This is the mathematical expression of “if the parameter changes a little, how much the node changes; how much the node's change makes the next step change; and ultimately how much the loss changes.”</p>
+<p>We can work through a concrete scalar example by hand. Let:</p>
+<div class="dd-formula">z=wx+b, a=ReLU(z), y-hat=va,</div>
+<p>The loss uses:</p>
+<div class="dd-formula">L=((1) / (2))(y-hat-y)^2</div>
+<p>Take <code>x=2,w=1,b=1,v=3,y=5</code>. Forward propagation gives:</p>
+<div class="dd-formula">z=1×2+1=3</div>
+<div class="dd-formula">a=ReLU(3)=3</div>
+<div class="dd-formula">y-hat=3×3=9</div>
+<div class="dd-formula">L=((1) / (2))(9-5)^2=8</div>
+<p>Next, compute backward from the loss. The derivative of the loss with respect to the prediction is:</p>
+<div class="dd-formula">((∂ L) / (∂y-hat))=y-hat-y=4</div>
+<p>The derivative of the prediction with respect to the activation is:</p>
+<div class="dd-formula">((∂y-hat) / (∂ a))=v=3</div>
+<p>Because currently <code>z=3&gt;0</code>, the derivative of ReLU here is:</p>
+<div class="dd-formula">((∂ a) / (∂ z))=1</div>
+<p>The derivative of the pre-activation value with respect to the weight is:</p>
+<div class="dd-formula">((∂ z) / (∂ w))=x=2</div>
+<p>So:</p>
+<div class="dd-formula">((∂ L) / (∂ w))=4×3×1×2=24</div>
+<p>This positive gradient indicates that near the current position, increasing <code>w</code> will make the loss rise, so gradient descent will decrease <code>w</code>. Similarly, we can compute:</p>
+<div class="dd-formula">((∂ L) / (∂ v))= ((∂ L) / (∂y-hat))((∂y-hat) / (∂ v))=4× a=12</div>
+<p>and:</p>
+<table class="dd-table">
+    <thead><tr><th>Method</th><th>How to estimate parameter influence</th><th>Main cost</th></tr></thead>
+    <tbody>
+      <tr><td>Try parameters one by one</td><td>Each time you change one parameter, redo one complete forward pass</td><td>The more parameters, the more repeated computation</td></tr>
+      <tr><td>Backpropagation</td><td>Starting from the loss, reuse the already-computed downstream influences layer by layer</td><td>One backward pass gives all gradients</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula">((∂ L) / (∂ b))=4×3×1×1=12</div>
+<p>This shows that a final error can be specifically distributed to multiple parameters through different local derivatives. The “responsibility” here is not responsibility in a moral sense, nor is it splitting the loss into several parts and requiring the sum to equal the loss; it represents the local sensitivity of the loss to each parameter.</p>
+<p>The sign and magnitude of the gradient must be interpreted relative to the current position. A positive gradient indicates that slightly increasing the parameter will locally increase the loss, and a negative gradient indicates that slightly increasing the parameter will locally decrease the loss. A larger absolute value indicates that the loss is more locally sensitive to changes in that parameter, but it does not necessarily mean that the parameter is globally “more important,” nor does it mean that it should be modified by an arbitrarily large amount. The actual update magnitude is also affected by the learning rate, optimizer state, regularization, and other factors.</p>
+<p>If we estimate the gradient using the most naive method, we can increase a parameter by a very small <code>ε</code>, redo a complete forward propagation, and then compare the change in the loss:</p>
+<div class="dd-formula">((∂ L) / (∂θ_i))≈ ((L(θ_i+ε)-L(θ_i)) / (ε))</div>
+<p>This is called finite difference approximation. It is useful for checking whether a small number of gradients are implemented correctly, but it is unsuitable for daily training. If a network has one million parameters, perturbing each parameter separately and recomputing the loss would require about one million extra forward calculations; the more parameters, the more serious the repeated computation.</p>
+<p>The key to backpropagation's efficiency is not the novelty of the chain rule itself, but the reuse of common downstream computations. Suppose many early parameters first affect the same intermediate value <code>a</code>, and then <code>a</code> affects the subsequent output and loss. The naive method would repeatedly compute for each early parameter “<code>a</code> how it affects the loss afterwards.” Backpropagation instead first computes once:</p>
+<div class="dd-formula">((∂ L) / (∂ a))</div>
+<p>Then take this already-obtained downstream sensitivity and multiply it by each local derivative entering <code>a</code> to obtain the gradients of earlier variables and parameters respectively. The common later part is computed only once, rather than walking the entire chain again for each parameter.</p>
+<p>The network is not always a chain without branches. If a variable affects the loss through multiple paths, then its total gradient is the sum of the contributions from each path. For example,<code>h</code> simultaneously enters two subsequent branches <code>u(h)</code> and <code>v(h)</code>, and the loss is <code>L(u,v)</code>, then:</p>
+<div class="dd-formula">((∂ L) / (∂ h))= ((∂ L) / (∂ u))((∂ u) / (∂ h))+ ((∂ L) / (∂ v))((∂ v) / (∂ h))</div>
+<p>Influences occurring in sequence along one path are connected by multiplication, and influences from multiple different paths are aggregated by addition. These two rules are sufficient to explain how gradients flow in complex networks: multiply along a chain, add across branches.</p>
+<p>In actual implementations, in addition to computing the prediction, forward propagation also saves the intermediate results needed for the backward computation, such as a layer's input, pre-activation values, or activation values. Backpropagation starts from the loss and processes each operation in the reverse order of the forward pass, computing the local derivative of each operation and passing the gradient coming from upstream further to earlier positions. Saving intermediate results consumes memory, which is one reason why training generally requires more GPU memory than inference alone.</p>
+<p>The “computation graph” is a tool for describing this dependency relationship: nodes represent values or operations, and edges represent how a result is used by subsequent computations. “Dynamic programming” emphasizes reusing already-computed sub-results. Understanding these terms helps analyze complex implementations, but the core of backpropagation does not depend on mastering them first. As long as you grasp “first compute downstream sensitivity once, then distribute it along all incoming paths,” you have understood the fundamental reason for its efficiency.</p>
+<p>Backpropagation can also explain the vanishing-gradient and exploding-gradient problems mentioned earlier. The gradient of early parameters often contains the product of local derivatives across many layers. In the simplified case of a scalar chain product, if the absolute value of each local derivative does not exceed some constant less than 1, the magnitude of the repeated multiplication will decay as the number of layers increases; sustained amplification may also make the gradient very large. Actual networks involve products of Jacobian matrices and multiple paths, so they also depend on the weights, activation states, and gradient propagation direction. This is not backpropagation making an error; rather, the chain rule faithfully reflects the sensitivity changes in deep function composition.</p>
+<p>Automatic differentiation frameworks do a large amount of differentiation and reuse for us, but they do not change the basic logic. The model first performs forward propagation and records the computational relationships; the loss produces the initial gradient; the backward process computes the gradients of all parameters according to the chain rule; and finally the optimizer reads the gradients and updates the parameters. Usually, old gradients should also be cleared or reset before the next batch of data to avoid unintentional accumulation; some training designs deliberately accumulate gradients over multiple batches, but that is an explicit choice.</p>
+<p>This section can be summarized as:<b>The loss gives only the final error. Backpropagation uses the chain rule to connect “parameter change—intermediate node change—prediction change—loss change.” It reuses common downstream influences from the output side backward, multiplying derivatives along the chain and adding contributions across branches, so that one backward traversal obtains the gradients of all parameters. Only after the gradients are computed does gradient descent or Adam update the parameters.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">9</span>Complete Manual Calculation: One Forward Pass + One Update<span class="dd-badge math">Math</span></h2>
+<p>This section ties together the previously separate topics of structure, activation functions, output layer, loss, backpropagation, and gradient descent into one complete training step. The goal is not to memorize these specific numbers, but to see clearly:<b>how a sample produces a prediction and loss, how the loss becomes the gradient for each parameter, and why the prediction changes after the parameters are updated.</b></p>
+<p>The task provides the input:</p>
+<div class="dd-formula">x=[1; 2]</div>
+<p>The true label is:</p>
+<div class="dd-formula">y=1</div>
+<p>The network has two inputs, two hidden nodes using ReLU, and one output node using Sigmoid. The initial parameters are:</p>
+<div class="dd-formula">W_1= [0.5, -0.25; 1.0, 0.5], b_1= [0; -1]</div>
+<div class="dd-formula">W_2=[1.2, -0.7], b_2=0.3</div>
+<p>Matrix <code>W_1</code> corresponds to one hidden node. Therefore, the first row <code>[0.5,-0.25]</code> are the weights of hidden node 1 for the two inputs, and the second row <code>[1.0,0.5]</code> are the weights of hidden node 2.</p>
+<p>First, complete the forward propagation. The hidden layer pre-activation values are:</p>
+<div class="dd-formula">z_1=W_1x+b_1</div>
+<p>The first hidden node gives:</p>
+<div class="dd-formula">z_(1,1)=0.5×1+(-0.25)×2+0=0</div>
+<p>The second hidden node gives:</p>
+<div class="dd-formula">z_(1,2)=1.0×1+0.5×2-1=1</div>
+<p>So:</p>
+<div class="dd-formula">z_1=[0; 1]</div>
+<p>The hidden layer uses ReLU:</p>
+<div class="dd-formula">a_1=ReLU(z_1) = [max(0,0); max(0,1)] = [0; 1]</div>
+<p>This means that with the current input and parameters, the first hidden node does not pass a positive response forward, and the second node outputs 1. The output layer receives <code>a_1</code>, not the original input <code>x</code>. Its pre-activation value is:</p>
+<div class="dd-formula">z_2=W_2a_1+b_2</div>
+<div class="dd-formula">z_2=1.2×0+(-0.7)×1+0.3=-0.4</div>
+<p>After the Sigmoid:</p>
+<div class="dd-formula">y-hat=σ(z_2)=((1) / (1+e^(-z_2)))=((1) / (1+e^(0.4)))≈0.4013</div>
+<p>The true label is 1, but the model only gives an output of about 0.4013 for the positive class, so the prediction is too low. Binary cross-entropy when <code>y=1</code> simplifies to:</p>
+<div class="dd-formula">L=-lny-hat</div>
+<p>Substituting the prediction:</p>
+<div class="dd-formula">L=-ln(0.4013)≈0.913</div>
+<p>At this point, forward propagation has answered 'what do the current parameters predict?', and the loss has answered 'how wrong is this prediction?'. Next, backpropagation starts from the loss to find the gradient of each parameter.</p>
+<p>When Sigmoid and binary cross-entropy are combined, the derivative of the loss with respect to the output layer logit can be simplified to:</p>
+<div class="dd-formula">((∂ L) / (∂ z_2))=y-hat-y</div>
+<p>This result can be obtained from the chain rule. Binary cross-entropy with respect to <code>y-hat</code> differentiated, then multiplied by the derivative of Sigmoid <code>y-hat(1-y-hat)</code>, where some terms cancel out, ultimately leaving <code>y-hat-y</code>. This simple and numerically well-behaved gradient is an important reason why Sigmoid and binary cross-entropy are often used together.</p>
+<p>Define the output layer error signal:</p>
+<div class="dd-formula">δ_2=((∂ L) / (∂ z_2))=0.4013-1=-0.5987</div>
+<p>The negative sign means that if <code>z_2</code> is increased slightly at the current position, the loss will decrease. This matches intuition: the true label is 1, and the prediction is too low, so the model needs to increase the output logit and the positive-class prediction.</p>
+<p>Because:</p>
+<div class="dd-formula">z_2=W_2a_1+b_2</div>
+<p>So the output weight gradient is:</p>
+<div class="dd-formula">((∂ L) / (∂ W_2))=δ_2a_1^T</div>
+<p>Substituting the values:</p>
+<div class="dd-formula">((∂ L) / (∂ W_2))=-0.5987[0, 1] =[0, -0.5987]</div>
+<p>The gradient of the first output weight is zero because the hidden node connected to it outputs zero. The input passed through this connection for the current sample is zero, so slightly changing this weight does not change the current output. The second hidden node outputs 1, so the second output weight receives a non-zero gradient.</p>
+<p>The output layer raw score <code>z_2</code> with respect to the output bias <code>b_2</code> has a local derivative of 1, so:</p>
+<div class="dd-formula">((∂ L) / (∂ b_2))=δ_2=-0.5987</div>
+<p>Next, pass the influence of the output layer back to the hidden layer. The gradient of the loss with respect to the hidden layer activations is:</p>
+<div class="dd-formula">((∂ L) / (∂ a_1))=W_2^Tδ_2</div>
+<div class="dd-formula">((∂ L) / (∂ a_1))= [1.2; -0.7] (-0.5987) = [-0.7184; 0.4191]</div>
+<p>This vector is still only the sensitivity of the loss to the ReLU output. To continue propagating to <code>z_1</code>, you also need to multiply by the local derivative of ReLU. Here we adopt the convention that ReLU at <code>z=0</code> has derivative 0; at positive values the derivative is 1. Therefore:</p>
+<div class="dd-formula">ReLU'(z_1)=[0; 1]</div>
+<p>The hidden layer error signal is the element-wise multiplication:</p>
+<div class="dd-formula">δ_1 = ((∂ L) / (∂ a_1))odot ReLU'(z_1) = [-0.7184; 0.4191] odot [0; 1] = [0; 0.4191]</div>
+<p>The downstream influence of the first hidden node was not originally zero, but it is cut off when passing through the ReLU derivative. Therefore, the first-layer parameters corresponding to this node have no gradient on this sample. The second hidden node is in the positive half-axis, so the gradient can continue to pass through.</p>
+<p>Because:</p>
+<div class="dd-formula">z_1=W_1x+b_1</div>
+<p>The first-layer weight gradient is the outer product of the hidden layer error signal and the input:</p>
+<div class="dd-formula">((∂ L) / (∂ W_1))=δ_1x^T</div>
+<div class="dd-formula">((∂ L) / (∂ W_1))= [0; 0.4191] [1, 2] = [0, 0; 0.4191, 0.8382]</div>
+<table class="dd-table">
+    <thead><tr><th>Parameter</th><th>Before update</th><th>Gradient</th><th>After update</th></tr></thead>
+    <tbody>
+      <tr><td>W₂ second element</td><td>−0.7000</td><td>−0.5987</td><td>−0.6401</td></tr>
+      <tr><td>b₂</td><td>0.3000</td><td>−0.5987</td><td>0.3599</td></tr>
+      <tr><td>Second row of W₁</td><td>[1.0, 0.5]</td><td>[0.4191, 0.8382]</td><td>[0.9581, 0.4162]</td></tr>
+      <tr><td>b₁ second element</td><td>−1.0000</td><td>0.4191</td><td>−1.0419</td></tr>
+    </tbody>
+  </table>
+<p>The first-layer bias gradient is:</p>
+<div class="dd-formula">((∂ L) / (∂ b_1))=δ_1 = [0; 0.4191]</div>
+<p>At this point, backpropagation has obtained the gradients of all parameters. Now gradient descent performs the update, with learning rate <code>η=0.1</code>:</p>
+<div class="dd-formula">θ_(new)=θ_(old)-0.1((∂ L) / (∂θ))</div>
+<p>The second weight of the output layer is updated to:</p>
+<div class="dd-formula">-0.7-0.1(-0.5987)=-0.6401</div>
+<p>The output bias is updated to:</p>
+<div class="dd-formula">0.3-0.1(-0.5987)=0.3599</div>
+<p>The second row weights of the first layer are updated to:</p>
+<div class="dd-formula">[1.0, 0.5] -0.1 [0.4191, 0.8382] = [0.9581, 0.4162]</div>
+<p>The first layer's second bias is updated to:</p>
+<div class="dd-formula">-1-0.1(0.4191)=-1.0419</div>
+<p>Parameters with zero gradient remain unchanged. Therefore, <code>W_2</code>'s first element, <code>W_1</code>'s first row and <code>b_1</code>'s first element did not change in this update. This does not mean they can never learn; with a different input, the first hidden node may enter the positive half-axis and thus receive a non-zero gradient.</p>
+<p>We can run forward propagation again with the new parameters to check whether this step actually improved the current sample. The new pre-activation value of the second hidden node is approximately:</p>
+<div class="dd-formula">0.9581×1+0.4162×2-1.0419≈0.7486</div>
+<p>After ReLU it is still about 0.7486. The new output logit is approximately:</p>
+<div class="dd-formula">z_2^(new) =(-0.6401)×0.7486+0.3599 ≈-0.1193</div>
+<p>So the new prediction is approximately:</p>
+<div class="dd-formula">y-hat_(new)=σ(-0.1193)≈0.4702</div>
+<p>The new loss is approximately:</p>
+<div class="dd-formula">L_(new)=-ln(0.4702)≈0.755</div>
+<p>The prediction rose from 0.4013 toward the true label 1 to about 0.4702, and the loss dropped from about 0.913 to about 0.755. This verifies that this update step is effective for this sample. However, gradient descent only provides a descent guarantee locally and with sufficiently small step sizes; in actual mini-batch training, a single step does not guarantee that the loss of every individual sample will decrease; what is optimized is the batch or overall objective.</p>
+<p>This update also reveals the true meaning of 'learning'. The network did not store 'the input <code>[1,2]</code> has the answer 1' completely in some node, nor did any single connection bear the learning alone. The output weight, output bias, and the input weight and bias of the second hidden node all underwent small interrelated changes. Together they changed the hidden representation and the final output, reducing the loss for the current target.</p>
+<p>The changes produced by a single update are usually small, and it only uses local information provided by one sample or a mini-batch. Training repeats 'forward—loss—backpropagation—update' through thousands of steps, allowing different samples to continuously influence the parameters. The resulting parameters are the product of many training signals acting together, and the network's internal representations gradually become useful for the task through these coordinated updates.</p>
+<p>This section can be summarized as:<b>Forward propagation uses the current parameters to compute the prediction and loss; backpropagation starts from the output error and uses the chain rule to obtain the gradients of each layer's parameters; the optimizer then updates the parameters along the negative gradient. Learning is not shoving the answer into a node, but rather causing all the parameters in the network that participate in the current computation to make coordinated fine-tuning, and through many repetitions gradually reduce the overall loss.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">10</span>Why Training Fails<span class="dd-badge eng">Engineering</span></h2>
+<p>Understanding forward propagation, loss, backpropagation, and parameter updates does not mean that actual training will necessarily succeed. The mathematical formulas describe how training should proceed, but engineering practice must also ensure correct data, numerical stability, gradient propagation, and that the model has not merely memorized the training samples.<b>"Training failure" is not a single problem: sometimes the parameters do not learn at all, sometimes values diverge, sometimes the program cuts off gradients, and sometimes the training set performs well but cannot generalize. The first step in diagnosis is to determine which kind of failure it is.</b></p>
+<p>Vanishing gradients occur when the gradients received by earlier layers become extremely small. Backpropagation uses the chain rule, and the gradients of early parameters typically include the product of many local derivatives across layers. When backpropagation is continuously compressed along the relevant direction as it passes through layers, the gradient reaching early layers can be very small. As an intuitive illustration using scalar products, this is multiple factors with magnitude less than 1 multiplied together; real networks must also consider the combined effect of matrices and multiple paths. At this point, layers near the output can still update, while layers near the input barely move, making it difficult for the network to learn effective low-level representations.</p>
+<p>Sigmoid and tanh have very small derivatives in saturated regions, so deep networks that use many of these activations are more prone to vanishing gradients. ReLU or GELU in appropriate operating ranges usually improve gradient propagation, but they are not a universal solution by themselves. Proper initialization, normalization, and residual connections control signal scale from different angles or shorten gradient propagation paths, making deep networks easier to train.</p>
+<p>Exploding gradients are the opposite phenomenon: factors in the chain product or weight scales are too large, causing gradients to grow rapidly as they propagate toward earlier layers. Parameter updates can suddenly become very large, the loss oscillates violently, and even infinity or NaN appears. Reducing the learning rate can reduce the size of each update; gradient clipping can limit the magnitude when the gradient norm exceeds a threshold; proper initialization and normalization try to avoid activation and gradient scales being amplified layer by layer from the source.</p>
+<table class="dd-table">
+    <thead><tr><th>Phenomenon</th><th>Root cause</th><th>Common responses</th></tr></thead>
+    <tbody>
+      <tr><td>Vanishing gradients</td><td>Deep chain propagation continuously shrinks gradient magnitude along the relevant direction (scalar intuitive example: multiplying multiple factors with absolute value less than 1)</td><td>ReLU/GELU, residual connections, proper initialization, and normalization</td></tr>
+      <tr><td>Exploding gradients</td><td>Excessive chain multiplication and weight scale</td><td>Lower learning rate, gradient clipping, normalization, proper initialization</td></tr>
+      <tr><td>dead ReLU</td><td>Node stays on the negative half-axis for a long time, with both output and gradient equal to 0</td><td>Lower learning rate, Leaky ReLU, check initialization</td></tr>
+      <tr><td>Training loss not decreasing</td><td>Wrong data/labels, inappropriate learning rate, broken gradients</td><td>First deliberately overfit a tiny dataset, then check values and gradients layer by layer</td></tr>
+      <tr><td>Good on training, poor on validation</td><td>Memorized training details instead of learning generalizable patterns</td><td>More data, regularization, early stopping, smaller model (see Section 11)</td></tr>
+    </tbody>
+  </table>
+<p>Note that gradient clipping is more like a safety guardrail. It can prevent extreme gradients from directly wrecking training, but it does not necessarily eliminate the root cause of the explosion. If training repeatedly triggers clipping, you should still check the learning rate, initialization, data anomalies, loss implementation, and network structure, rather than simply repeatedly lowering the clipping threshold.</p>
+<p>Dying ReLU refers to a ReLU node staying in the negative half-axis for a long time. Because:</p>
+<div class="dd-formula">ReLU(z)=0 (z&lt;0)</div>
+<p>And the derivative in this region is zero, so this node neither outputs a signal downstream nor can obtain gradients for its input parameters through the current sample. If an overly large update pushes many nodes into a long-term negative interval, or initialization makes them hard to activate from the start, the effective capacity of the network decreases.</p>
+<p>Lowering the learning rate can reduce the risk of parameters being pushed too far by a single update; proper initialization can make initial pre-activation values distributed in a more usable range; Leaky ReLU preserves a small gradient on the negative half-axis, giving the node a chance to recover. But a node occasionally outputting zero is not the same as dying ReLU. ReLU is by design allowed to turn off nodes for some inputs; only when a node remains inactive for almost all relevant data for a long time does it become a problem worth addressing.</p>
+<p>Another common phenomenon is that the training loss does not decrease from the start. The cause may be very basic: input-label misalignment, label encoding errors, inconsistent preprocessing, mismatch between loss function and output layer, parameters not passed to the optimizer, forgetting to perform updates, gradients disabled at the wrong locations, or parameters effectively frozen. It could also be that the learning rate is too small for changes to be observed, or too large, causing each step to overshoot the effective region.</p>
+<p>When troubleshooting this kind of problem, a very effective method is to deliberately overfit the model to a tiny dataset, for example taking only a few samples and training for many steps. A network with sufficient capacity should usually be able to drive the training loss on these few samples very low. If it cannot even fit the tiny dataset, the problem is more likely in the implementation, data pipeline, loss configuration, or optimization process, rather than "insufficient generalization".</p>
+<p>After failing the tiny dataset test, you can inspect the training chain segment by segment: whether the input values and labels are correct; whether the range and shape of forward outputs meet expectations; whether the loss is finite and changes with predictions; whether each parameter requires gradients; after backpropagation, whether gradients exist, are all zero, or are abnormally huge; and whether the parameters actually change after the optimizer update. Breaking complex training into these observable links is more effective than blindly swapping models or optimizers.</p>
+<p>There is also a situation where the training loss decreases normally and training metrics are good, but validation performance is markedly worse. This is usually not "the network cannot learn", but rather the network has learned to fit the training set too closely, including its accidental noise and details, forming overfitting. At this point, continuing to reduce training loss may further worsen validation performance.</p>
+<p>Mitigating overfitting can be approached from both the information side and the capacity side. More and more representative data helps the model distinguish stable patterns from accidental details; data augmentation can generate more variation under reasonable assumptions; regularization methods such as weight decay and Dropout limit excessive reliance on specific parameters or paths; early stopping stops training when validation performance no longer improves; and reducing the model directly lowers available capacity. The response depends on the task; you cannot always blame a large model for "gaps between training and validation", and you should also check whether the data distributions, preprocessing, and evaluation procedures for training and validation are consistent.</p>
+<p>Initialization is the starting point of training stability. Hidden nodes in the same layer with identical incoming weights and biases can only guarantee that they have the same forward response to the same input. If the corresponding downstream connections, optimizer states, and update rules also preserve node permutation symmetry—that is, swapping these nodes does not change the relevant computation and updates—then they will receive the same gradients and remain duplicated in subsequent updates, making it difficult to specialize in learning different patterns. Identical incoming parameters alone are not enough: for example, if the input is 1, two ReLU nodes both have incoming weight 1 and bias 0, but their linear output connection weights are 1 and 2 respectively, the output is 3. When the target is 0 and the loss is half the square of the output, the gradients of the two nodes' incoming weights are 3 and 6 respectively, and ordinary gradient descent will separate them. Randomly initializing weights is a common way to break symmetry; when weights are already properly initialized, biases can usually be set to zero. Setting all weights to zero may preserve symmetry or block gradients, so it cannot be used as a general initialization scheme.</p>
+<p>But random does not mean choosing an arbitrary scale. If initial weights are too small, signals and gradients may shrink layer by layer; if too large, activations may saturate or values may amplify layer by layer. Xavier or Glorot initialization controls weight variance based on the input and output widths and is often paired with activations such as tanh; He initialization adjusts scale mainly based on the input width and is often paired with ReLU-type activations. Their common goal is to prevent forward activations and backward gradients from amplifying or shrinking too quickly as they propagate across layers.</p>
+<p>Normalization methods also control intermediate values, but in different specific ways. Batch normalization uses statistics within a batch to standardize intermediate activations, then restores an appropriate scale through learnable parameters; it is common in convolutional networks, but its behavior is affected by batch size and the switch between training and inference modes. Layer normalization normalizes across the feature dimension of a single sample and does not depend on other samples in the same batch, so it is very common in Transformers.</p>
+<p>Normalization is not just about making numbers "look nice". It allows different layers to face more stable numerical ranges, making optimization less sensitive to parameter scale and learning rate, and helps train deep models. But the position, dimension, and training mode of normalization must be implemented correctly. For example, batch normalization uses batch statistics during training and usually uses accumulated statistics during inference; if the mode switch is wrong, validation results may be abnormal.</p>
+<p>A residual connection writes a certain transformation as:</p>
+<div class="dd-formula">y=x+F(x)</div>
+<p>rather than requiring this group of layers to directly learn the complete mapping from scratch <code>y=F(x)</code>. In this way, the transformation branch can learn "what correction needs to be added on top of the input". If the optimal operation is close to preserving the original, making the residual branch close to zero is relatively easy. More importantly, the addition provides a more direct path for signals and gradients, so the gradient does not have to rely entirely on the chain product of all local derivatives in the deep transformation.</p>
+<p>Residual connections do not eliminate all optimization problems and cannot guarantee effectiveness at any depth, but they significantly change the trainability of deep networks. Normalization, residual connections, proper initialization, activation function choice, and gradient clipping are not defining components that "a neural network must have to be a neural network"; a simple network can compute and learn without them. They belong to engineering structures: when facing deeper, larger, and harder-to-optimize models, they help turn theoretical trainability into stable training in practice.</p>
+<p>When diagnosing, distinguish symptoms from root causes. A NaN loss may come from exploding gradients, or from taking the logarithm of zero, dividing by zero, invalid data, or precision overflow; zero gradients may come from saturated activations, or from parameters being frozen or the computation graph being accidentally cut off; poor validation may be overfitting, or it may be inconsistent data processing between validation and training. Do not immediately apply a fixed answer based solely on a surface symptom; instead verify layer by layer through values, gradients, parameter changes, and data samples.</p>
+<p>A practical troubleshooting order is: first manually inspect a small number of inputs and labels; then confirm a simple baseline and evaluation logic; make the model overfit a tiny dataset; observe whether activations, loss, and gradients in each layer are finite and at reasonable scales; confirm that parameters actually change before and after updates; and only then systematically adjust learning rate, initialization, normalization, regularization, and model capacity. Eliminate correctness issues first, then address stability and generalization issues, to avoid repeatedly tuning parameters on incorrect code.</p>
+<p>The core insight of this section is:<b>Successful training requires not only that the network has expressive capacity and computable gradients, but also that gradients remain usable in deep structures, parameters break symmetry, numerical scales are stable, data and implementation are correct, and the model learns generalizable patterns. Initialization, normalization, and residual connections are engineering tools that make deep networks easier to optimize, while the gap between training and validation sets reminds us that fitting and generalizing are two different things.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">11</span>Generalization: Good on the Training Set Is Not Enough<span class="dd-badge intuition">Intuition</span><span class="dd-badge eng">Engineering</span></h2>
+<p>Good performance on the training set only shows that the model has successfully adapted to data it has already seen; after real deployment, it usually faces new samples unseen during training.<b>Generalization is the ability of a model to correctly apply patterns learned from training data to new data.</b>This is not an extra requirement after training is complete, but the real goal of supervised learning.</p>
+<p>Neural networks usually have a large number of parameters, so they may learn stable patterns or memorize incidental details in the training set. Suppose cats in training images mostly appear on sofas, while dogs mostly appear on grass; the network may classify using background colors instead of learning the animals' own features. It can still achieve high accuracy on the training set but will easily fail on a cat on grass. This shows that low training error does not automatically prove that the model has learned the patterns we hoped for.</p>
+<p>Overfitting means the model adapts excessively to the training data, including noise, incidental correlations, and sample-specific details, so that performance on new data worsens. Underfitting means the model has not even captured the main patterns in the training data, and both training and validation performance are poor. The remedies for the two often differ: overfitting usually requires more effective data, stronger constraints, or smaller capacity; underfitting may require more suitable features, a larger model, longer training, or more effective optimization.</p>
+<p>To observe generalization, data is usually split into training, validation, and test sets. The training set directly participates in gradient updates, and model parameters are learned from it. The validation set is not used to update weights but to compare choices such as architecture, learning rate, regularization strength, number of training epochs, and decision thresholds. The test set should be kept until all design choices are complete and used only to estimate the final solution's performance on unseen data.</p>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 220" role="img" aria-label="Training loss continues to decrease, validation loss first decreases then increases">
+      <line x1="50" y1="30" x2="50" y2="185" stroke="#2c313b"/><line x1="50" y1="185" x2="520" y2="185" stroke="#2c313b"/>
+      <path d="M55,60 C150,120 320,165 515,178" fill="none" stroke="#6b8cbe" stroke-width="2.4"/>
+      <path d="M55,75 C170,150 250,150 340,120 C420,95 470,80 515,70" fill="none" stroke="#cf6f6f" stroke-width="2.4"/>
+      <line x1="300" y1="30" x2="300" y2="185" stroke="#d3a05a" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <text x="300" y="24" text-anchor="middle" class="svg-t" fill="#d3a05a">Early stopping point</text>
+      <text x="470" y="172" class="svg-t" fill="#6b8cbe">Training loss</text>
+      <text x="430" y="60" class="svg-t" fill="#cf6f6f">Validation loss</text>
+      <text x="285" y="205" text-anchor="middle" class="svg-t">Training time →</text>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 5  A continuously decreasing training loss does not mean the model keeps improving. When validation loss starts to rise, the model is already “memorizing” rather than “learning”—that moment is exactly where to stop early.</figcaption>
+  </figure>
+<p>The division of labor among the three can be summarized as: the training set is used to learn parameters, the validation set is used to select solutions, and the test set is used for final evaluation. Although the validation set does not directly participate in backpropagation, repeatedly modifying the model based on validation results effectively makes the design process gradually adapt to the validation set. Therefore, you cannot continue tuning parameters after seeing test results and then claim the same test result as a completely independent estimate of generalization.</p>
+<p>Data splitting must reflect the real deployment scenario. If multiple records from the same person are randomly scattered across training and test sets, the model may indirectly recognize test samples through individual characteristics; if a time series is randomly shuffled before splitting, training data may contain information from after the test time points; if different crops of the same original image end up in different sets, near-duplicate leakage also occurs. These situations can make test metrics look good while overestimating actual generalization ability.</p>
+<p>During training, such curves often appear: training loss continues to decrease, while validation loss first decreases and then rises. In the early stage, the model learns patterns shared by the training and validation sets, so both improve; after continued training, the model increasingly fits details of the training set, so training loss keeps decreasing but validation loss begins to worsen. Near the lowest validation loss is usually an appropriate early stopping point.</p>
+<p>Early stopping does not mean terminating immediately upon seeing one validation fluctuation. Validation metrics themselves can be noisy; in practice, a certain patience is often set: stop only when several consecutive evaluations show no improvement. At the same time, you should save the model checkpoint with the best validation performance rather than directly using the parameters from the last step. Otherwise, even if later overfitting is correctly detected, what remains may still be a model that has already degraded.</p>
+<p>L2 regularization constrains the model by adding a squared weight penalty to the original training loss:</p>
+<div class="dd-formula">L_(total)=L_(data)+lambdaΣ_j w_j^2</div>
+<p>where <code>L_(data)</code> measures prediction error, and the second term penalizes larger weights,<code>lambda</code> controls the strength of the constraint. It tends to make the model use more diffuse and smaller weights rather than relying extremely heavily on a few connections. Intuitively, this often makes the function less sensitive to input changes, thereby reducing excessive fitting to training-sample details.</p>
+<p>Weight decay is implemented in many optimizers as directly shrinking the weights and is closely related to L2 regularization. In ordinary gradient descent, the two can correspond, but in adaptive optimizers such as Adam, decoupled weight decay and adding the L2 term directly to the loss are not always completely equivalent. The most important understanding for beginners is: both try to limit unconstrained weight growth, but the specific implementation should follow the definitions of the optimizer and framework used.</p>
+<p>Regularization strength also needs to be balanced.<code>lambda</code> too small may fail to suppress overfitting; too large will push useful weights too small as well, making the model unable to express even the training patterns, resulting in underfitting. Therefore, regularization strength is a hyperparameter that needs to be selected based on the validation set.</p>
+<p>Dropout randomly sets a portion of node outputs to zero during training, so the network cannot fully rely on the same set of internal paths at every step. Some nodes may be masked in one batch and restored in the next, forcing other nodes to also carry information representation and reducing fragile fixed co-adaptation among multiple features. It can be approximately understood as training many subnetworks with shared parameters and combining them into a complete network at inference.</p>
+<p>Dropout behaves differently during training and inference. During training it randomly masks; during inference you should turn off random masking, use all nodes, and handle scaling according to the chosen implementation. Modern frameworks typically use “inverted Dropout”: during training, retained outputs are automatically scaled up so that their expected scale matches the inference stage; at inference, you simply disable Dropout. If you forget to switch to inference mode, predictions will continue to change randomly and results are usually unreliable.</p>
+<p>Data augmentation does not directly constrain parameters; instead, it expands the effective training distribution by generating reasonable variations that conform to task invariances. For example, in image classification, slight cropping, flipping, or color perturbations may be used so the model cannot just memorize fixed pixel positions. Speech can include noise that matches the scenario, and text tasks may use carefully designed rewriting.</p>
+<p>Whether data augmentation is correct depends on whether the label still holds after the transformation. Horizontally flipping images of ordinary objects may be reasonable, but flipping traffic signs, text, or medical images with left-right semantics may change meaning; arbitrarily rotating the digit 6 may approach the digit 9. Incorrect augmentation provides contradictory training signals to the model. Therefore, augmentation policies must come from real task invariances, not simply applied because a method is common.</p>
+<table class="dd-table">
+    <thead><tr><th>Method</th><th>Mechanism</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>L2 / weight decay</td><td>Penalizes overly large weights, favoring smoother solutions</td><td>Too strong leads to underfitting</td></tr>
+      <tr><td>Dropout</td><td>Randomly masks some nodes during training, reducing co-adaptation</td><td>Turn off at inference and handle scaling</td></tr>
+      <tr><td>Early stopping</td><td>Stop when validation loss starts to worsen</td><td>Save the best validation checkpoint</td></tr>
+      <tr><td>Data augmentation</td><td>Creates reasonable variations that keep labels unchanged</td><td>Augmentation must match real task invariances</td></tr>
+      <tr><td>Reduce model size</td><td>Directly reduces capacity</td><td>May sacrifice expressive power</td></tr>
+    </tbody>
+  </table>
+<p>Reducing model size is the most direct form of capacity control. Reducing the number of layers or nodes usually reduces parameters and computation; sharing parameters in task-appropriate structures can also reduce the number of independent parameters and storage requirements. These adjustments change the model's expressive power but do not guarantee better generalization. However, too little capacity leads to underfitting. A larger model is not necessarily worse at generalizing; with appropriate data, optimization, and regularization, a large model may find a good solution. Model size should be determined jointly by task difficulty, data quantity, and deployment budget.</p>
+<p>These methods address overfitting from different angles: L2 or weight decay constrains parameter scale; Dropout perturbs internal paths and reduces co-adaptation; early stopping limits the time the model has to adapt to the training set; data augmentation expands the range of reasonable variations; reducing model size directly lowers capacity. They can be combined, but more methods does not automatically mean better. Overly strong stacked constraints may prevent the model from learning sufficiently.</p>
+<p>Generalization issues also cannot be judged only by the gap between training loss and validation loss. If the training and validation sets come from different distributions, poor validation performance may reflect distribution shift rather than ordinary overfitting; if label quality is poor, the model may be incorrectly supervised; if classes are severely imbalanced, overall accuracy alone may hide failures on minority classes. Therefore, evaluating generalization requires choosing metrics aligned with task costs and examining performance on different data slices.</p>
+<p>“Good performance on the test set” only provides evidence of generalization under the premise that the test set can represent future data. Deployment environments change over time; input devices, user behavior, language expressions, or business rules may all change. Real systems also need to monitor data drift, performance changes, and error types, rather than treating one offline test as a permanent guarantee.</p>
+<p>The core logic of this section is:<b>The goal of training is not to memorize the training set to the extreme but to extract stable patterns from limited samples that can be used on new data. The training set is responsible for learning parameters, the validation set for selecting solutions, and the test set for final evaluation; early stopping, weight decay, Dropout, data augmentation, and capacity control suppress overfitting from different directions, but reliable generalization also depends on leakage-free data splitting, appropriate evaluation metrics, and the representativeness of test data for the real environment.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">12</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<p>The previous sections have separately explained the components and training mechanisms of neural networks, but truly understanding them requires seeing that these concepts are not independent terms. Each link solves the problem left by the previous link and provides the condition for the next.<b>The whole chain starts from the numerical representation of real-world objects, goes through representation, prediction, error measurement, and parameter optimization, and finally must be tested on unseen data.</b></p>
+<p>The first step is to represent real-world objects as numerical inputs <code>x</code>. Images can be represented as pixel arrays, sound can be represented as sample values or spectra, text can be converted into tokens and vectors, and tabular objects consist of multiple numerical and categorical features. The network cannot directly process abstract objects like “cat,” “a sentence,” or “credit risk”; it can only perform operations on numbers. Therefore, the input representation determines what information the model can access and also limits what it can learn.</p>
+<p>If the input representation omits key information, the later network cannot recover it from nothing. For example, keeping only the average brightness of an image but requiring shape recognition means the information needed for the task has already been lost. Conversely, if the training input contains information that does not exist at deployment, the model may receive a falsely high score. This shows that data representation and data pipelines are not external chores outside the network, but the starting point of the entire learning chain.</p>
+<p>After having the input, the simplest method is to perform a weighted sum:</p>
+<div class="dd-formula">y'=w· x+b</div>
+<p>It can form predictions based on the importance of different features, but it can only express linear or affine relationships. In classification problems, this means the decision boundary is a straight line, plane, or high-dimensional hyperplane. Faced with complex patterns such as ring-shaped boundaries, image structures, and language relationships, a linear model is usually insufficient, so it is necessary to automatically construct more useful intermediate features.</p>
+<p>Neural networks accomplish this construction in parallel with many nodes. Each node computes a weighted sum and an activation:</p>
+<div class="dd-formula">z=w· x+b, a=φ(z)</div>
+<p>The weights determine which directions in the input a node cares about, the bias adjusts the triggering condition, and the activation function determines how the response is passed on. A single node can only provide one limited response, while many nodes can form multiple feature directions at the same time; their outputs are concatenated into a new vector and become the input for the next layer.</p>
+<p>Having nodes and layers alone is not enough. If each layer only performs affine transformations, multiple layers can still be collapsed into one, and depth will not increase the types of functions. Activation functions between layers break this linear collapse. Taking ReLU as an example, different nodes activate in different regions, causing the network to form many local pieces with different slopes; through multi-layer composition, these pieces can construct complex nonlinear mappings.</p>
+<p>Therefore, the work of hidden layers can be summarized as representation learning. Each layer re-encodes the information from the previous layer into a coordinate system that is more useful for the final task. Early layers do not necessarily correspond to human-nameable concepts, but as long as these representations help later layers reduce task error, they have training value. Depth provides multi-level function composition, and width allows more patterns to be detected in parallel at the same level.</p>
+<p>With the parameters fixed, forward propagation computes from input to output along the network structure:</p>
+<div class="dd-formula">x → z^((1)) → a^((1)) → … → z^((L)) → y-hat</div>
+<p>Hidden layers gradually form internal representations, and the output layer then translates the final internal numerical values into the answers required by the task. Regression may directly output real numbers, binary classification may output a value between 0 and 1 through Sigmoid, mutually exclusive multi-class classification may form a category distribution through Softmax, and multi-label tasks may use an independent Sigmoid for each label.</p>
+<p>Up to this point, the network can only give an answer but cannot judge whether the answer is correct. The loss function converts the prediction <code>y-hat</code> and the true target <code>y</code> into a scalar <code>L</code>. Regression can use mean squared error, and classification often uses cross-entropy. This scalar both makes different parameter states comparable and provides a clear objective for differentiation. Without a loss function, there is no mathematical definition of “getting better” for the optimizer to execute.</p>
+<p>But there is only one loss number, while network parameters may be many. Backpropagation uses the chain rule to propagate sensitivity from the loss to earlier layers and obtain:</p>
+<div class="dd-formula">∇_θ L</div>
+<p>Each component of the gradient indicates how the loss changes near the current position when the corresponding parameter changes slightly. Backpropagation reuses the common downstream influence, so a single backward pass can efficiently obtain the gradients of all parameters. It is responsible for computing gradients, not for actually modifying parameters.</p>
+<p>The optimizer reads the gradients and updates the parameters. The most basic gradient descent is:</p>
+<div class="dd-formula">θ←θ-η∇_θ L</div>
+<p>The gradient points in the direction of steepest local ascent, and the negative gradient gives the direction of steepest local descent. The learning rate <code>η</code> controls the step size. Optimizers such as Adam further use historical gradient and scale information, but they still rely on the gradients provided by backpropagation.</p>
+<p>One training step therefore forms an internal loop:</p>
+<div class="dd-formula">Take a batch of data → forward propagation → compute loss → backpropagation → update parameters</div>
+<p>The updated parameters will change the next forward propagation; new predictions produce new losses; new losses produce new gradients. Thousands of mini-batches repeatedly pass through this loop, hidden-layer representations and output behavior change together, and training loss usually decreases gradually. This is the direct mechanism by which the network “learns.”</p>
+<p>The training loop also depends on engineering conditions. Random initialization breaks node symmetry; appropriate weight scales, activation functions, and normalization help signals propagate stably; residual connections provide a more direct path for deep networks; gradient clipping can limit extreme updates. If the data is wrong, gradients break, the learning rate is improper, or numerical overflow occurs, actual training may still fail even if the theoretical chain is correct.</p>
+<p>However, a decrease in training loss only proves that the optimizer has found parameters more suitable for the training data. Because the network has large capacity, it may simultaneously learn stable patterns, accidental correlations, label noise, and even directly memorize samples. The training set alone cannot determine which of these components will be useful for future data.</p>
+<p>Therefore, the validation set must be at the end of the closed loop. The training set provides the parameter update signal, while the validation set does not participate in gradient updates but instead checks whether the current model also improves on data not used for training. If training loss decreases and validation loss also decreases, it means the current learning at least has some transfer value; if training continues to improve while validation worsens, overfitting may be occurring, and early stopping, regularization, data augmentation, capacity adjustment, or re-examining the data distribution should be considered.</p>
+<p>The test set, after the architecture, hyperparameters, and training strategy are determined, provides a more independent evaluation of the final solution. The validation set is used for development selection, and the test set is used for final estimation. If test results are repeatedly viewed and the model is modified accordingly, the test set gradually participates in selection and loses its original independence.</p>
+<p>The entire causal chain can be written as:</p>
+<ol class="dd-chain"><li>Real-world objects</li><li>Numerical inputs</li><li>Multi-layer nonlinear representations</li><li>Task outputs</li><li>Loss</li><li>Gradient</li><li>Parameter updates</li><li>Testing on unseen data</li></ol>
+<p>This chain also provides a troubleshooting order. If the model fails, you can ask in the reverse direction: Does the evaluation data represent the real task? Are training and validation distributions consistent and free of leakage? Does the loss match the meaning of the output? Do gradients exist and have reasonable scale? Are parameters actually updated? Do activations and inputs retain useful information? The problem may occur at any link, so you cannot directly blame the network structure just because the results are poor.</p>
+<p>Different levels of success should also be judged separately. If the network structure can represent the target relationship, it means the expressive capacity may be sufficient; if the training loss can decrease, it means the optimization chain is at least working; good validation performance provides evidence of generalization; sustained effectiveness after deployment also requires the real environment to be sufficiently consistent with the offline data and requires continuous monitoring. These levels increase step by step, and success at the previous level cannot replace checking the next level.</p>
+<p>Therefore, up to the point where “training loss becomes smaller,” the closed loop is still incomplete. The real goal has never been to make the model get high scores on known examples, but to make it form a mapping from known samples that is useful for unknown samples.<b>The complete logic of neural networks is: use multi-layer nonlinear functions to gain expressive capacity, use loss and backpropagation to gain trainability, use the optimizer to form parameters from data, and finally use unseen data to judge whether what is learned is a generalizable pattern or a memorization of training samples.</b></p>
+</section>
+
+<section class="dd-sec">
+  <h2><span class="dd-n">13</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<p>Neural networks involve many terms. If you learn by jumping around according to popularity, it is easy to know many names but not be able to explain the causal relationships between them. A more stable route is to divide knowledge into dependency layers: first master the mathematical and machine learning language used by the network, then understand the core computational loop, then dive into training engineering, expand to specific architectures, and finally handle trustworthiness and deployment issues.</p>
+<p>The first layer is prerequisite knowledge. Features and labels determine how a supervised learning problem is formulated: feature <code>x</code> is the input information the model can see, and label <code>y</code> is the target the model is expected to predict during training. Understanding this distinction allows you to see why the network uses <code>x</code> to compute <code>y-hat</code>, and why it needs to use <code>y</code> to compute the loss.</p>
+<p>Linear regression is the starting point for understanding weighted sums and continuous value prediction:</p>
+<div class="dd-formula">y-hat=w· x+b</div>
+<p>Logistic regression further demonstrates how to convert a linear score into a binary classification output through Sigmoid, and how to establish a training objective with cross-entropy. Neural networks can be viewed as adding multiple layers of learnable nonlinear representations before such simple models; therefore, if linear models and logistic regression are not yet clear, the meaning of hidden layers easily becomes pure memorization.</p>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Covered</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisite</td><td>Features, labels, linear regression, logistic regression, vectors and matrices, derivatives</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Nodes, weights, biases, hidden layers, activation functions, loss, forward propagation, backpropagation, gradient descent</td></tr>
+      <tr><td>Training In-Depth</td><td>Initialization, mini-batch, Adam, learning rate schedule, normalization, regularization, overfitting</td></tr>
+      <tr><td>Architecture Extension</td><td>Convolutional neural networks, recurrent neural networks, attention, Transformer, residual networks</td></tr>
+      <tr><td>Trustworthiness and Deployment</td><td>Interpretability, calibration, distribution shift, robustness, inference latency, model compression</td></tr>
+    </tbody>
+  </table>
+<p>Vectors and matrices are the language for describing parallel computation across an entire layer. There is no need to master all linear algebra theory at the beginning, but you should at least understand that a vector represents a group of features, each row of a matrix can represent the weights of a single node, and matrix multiplication <code>Wx</code> simultaneously computes the weighted sums of many nodes and can check whether the shapes of the input, weights, and output match.</p>
+<p>Derivatives and partial derivatives are the foundation for understanding training. A derivative describes how one quantity changes when another changes slightly; partial derivatives apply this idea to functions of multiple parameters; the gradient then assembles the partial derivatives of all parameters into a vector. You also need to understand the chain rule, because early weights do not directly affect the loss; their influence propagates step by step through pre-activations, activations, subsequent layers, and predictions.</p>
+<p>The second layer is the core loop of this page. Nodes use weights and biases to form pre-activation values:</p>
+<div class="dd-formula">z=Wx+b</div>
+<p>The activation function transforms it into a nonlinear representation:</p>
+<div class="dd-formula">a=φ(z)</div>
+<p>Many nodes form hidden layers, and multiple hidden layers create function composition. Forward propagation computes from input to output along these functions; the output layer converts internal values into predictions according to the task, and the loss function converts prediction errors into a scalar. Backpropagation then uses the chain rule to compute gradients for all parameters, and the optimizer updates weights and biases based on the gradients.</p>
+<p>This core layer should not be learned as eight unrelated definitions. You should be able to explain why each concept arises: weights are used to combine inputs, biases are used to shift response thresholds, multiple nodes are used to form different responses in parallel, activation functions prevent multiple layers from collapsing into a single layer, loss provides an optimizable objective, backpropagation efficiently computes responsibility, and gradient descent adjusts parameters based on local slope.</p>
+<p>The third layer is training in-depth. Initialization not only gives parameters a starting point but also breaks symmetry among nodes and controls the scale of forward signals and backward gradients. Xavier and He initialization design appropriate variances for different activations and layer widths. After understanding initialization, you can explain the risks of node symmetry or gradient blockage that all-zero weights may bring: only when the relevant weights, biases, downstream connections, optimizer states, and update rules all maintain symmetry among nodes will these nodes continue to give identical responses and receive identical updates. Merely having all weights zero does not mean the nodes will permanently learn identical content; overly large or small initial values can also cause numerical issues.</p>
+<p>Mini-batch training is a compromise between full-data gradient and single-sample stochastic gradient. Using only a small batch of samples at a time leverages hardware parallelism and updates parameters frequently. Batch size affects gradient noise, memory usage, and training speed, so it is not just a data-loading setting but also an optimization hyperparameter.</p>
+<p>Adam, momentum, and learning rate scheduling are further developments beyond basic gradient descent. Momentum accumulates historical directions to help reduce back-and-forth oscillations in narrow valleys; Adam adjusts effective step sizes for different parameters based on gradient statistics; learning rate scheduling allows larger steps for exploration early in training and smaller steps for refinement later. When learning these methods, always keep the common thread: backpropagation provides gradients, and the optimizer decides how to use them.</p>
+<p>Normalization, regularization, and overfitting form another group of knowledge for training stability and generalization. Batch normalization or layer normalization controls intermediate numerical scales; weight decay, Dropout, data augmentation, and early stopping limit the model from overfitting training details; train, validation, and test splits are used to distinguish parameter learning, scheme selection, and final evaluation. They answer not just “can the loss decrease?” but “is training stable, and can the decrease transfer to unseen data?”</p>
+<p>The fourth layer is architecture extension. Convolutional neural networks use local connections and parameter sharing to process data with spatial structure, such as images. They still perform linear operations, activation, loss, and backpropagation, but replace the fully connected matrix with convolution operations that better match spatial structure.</p>
+<p>Recurrent neural networks preserve hidden states over time for sequences, allowing early inputs to influence later outputs, but they also bring gradient problems along long paths. Attention mechanisms allow different positions to directly establish weighted connections based on content, reducing the restriction that information must pass step by step through the entire sequence. Transformers build deep architectures from components such as attention, feedforward networks, residual connections, and layer normalization.</p>
+<p>Residual networks focus on solving the problem that deep models are difficult to optimize, by:</p>
+<div class="dd-formula">y=x+F(x)</div>
+<p>This makes several layers learn corrections to the input and provides a more direct path for signals and gradients. These architectures look different, but they do not depart from the principles on this page: they are still compositions of parameterized functions, still produce predictions through forward propagation, define objectives through loss, and learn parameters through backpropagation and optimizers.</p>
+<p>Therefore, when learning a new architecture, the most effective question is not “what modules does it have?” but rather: what structural assumptions does it impose on the input; how does information flow between modules; where are parameters shared; where does nonlinearity arise; how are outputs and losses defined; which paths do gradients propagate through; and what limitations of ordinary fully connected networks does it address?</p>
+<p>The fifth layer is trustworthiness and deployment. Interpretability studies why a model makes a certain judgment, but internal activations do not naturally correspond one-to-one with human concepts, so interpretation methods themselves also need validation. Calibration concerns whether the confidence a model gives matches the true accuracy; a model with good accuracy may still be overconfident, affecting risk decisions and threshold selection.</p>
+<p>Distribution shift occurs when deployment inputs are no longer from the same distribution as the training data, such as changes in user groups, devices, time, or business rules. Robustness concerns whether the model is stable in the face of noise, perturbations, missing information, or adversarial inputs. These issues remind us: test set performance is only valid when the test data represents the future environment.</p>
+<p>Inference latency, throughput, memory, energy consumption, and model size determine whether the model can actually be used. Model compression can include quantization, pruning, distillation, or structural modification, but the compressed model still needs to be revalidated for accuracy, calibration, and performance on different data slices. A model with excellent offline metrics that cannot run on the target device within the time limit is not a complete engineering solution.</p>
+<p>This path does not require finishing all details of the previous layer before touching the next; it explains which layer to return to when encountering difficulties. If you cannot understand the tensor computations of convolutions and attention, go back to vectors, matrices, and shapes; if you do not understand optimizer differences, go back to gradients and learning rates; if you do not understand deep training problems, go back to the chain rule; if the model performs well offline but fails online, inspect data distribution, calibration, and deployment constraints.</p>
+<p>The true core passing criterion can be checked with one complete derivation. Given:</p>
+<div class="dd-formula">z=Wx+b</div>
+<p>you should be able to explain the roles of weights and biases, compute the activation <code>a=φ(z)</code>, then forward propagate the multi-layer results to the output <code>y-hat</code>, choose the loss according to the task <code>L(y-hat,y)</code>, use the chain rule to explain <code>∂ L/∂ W</code> how it is obtained, and then write out the parameter update:</p>
+<div class="dd-formula">W← W-η((∂ L) / (∂ W)), b← b-η((∂ L) / (∂ b))</div>
+<p>At the same time, you should also be able to explain why multiple layers without nonlinearity are still equivalent to a single layer, why gradients only provide local directions, and why a decrease in training loss does not equal generalization success. If you can explain these things naturally through causal relationships rather than reciting them sentence by sentence, you have crossed the threshold of neural network principles.</p>
+<p>What this section ultimately provides is not a rigidly executed curriculum but a dependency tree:<b>Linear models, matrices, and derivatives provide the language; nodes, activations, loss, backpropagation, and gradient descent form the core loop; initialization, optimizers, normalization, and regularization make the loop work stably; convolutional networks, recurrent networks, attention, Transformer, and residual networks organize the same principles into architectures suitable for different structures; interpretability, calibration, distribution shift, and deployment constraints determine whether the trained model can be used reliably.</b></p>
+</section>
+
+<div class="dd-src">
+  <b>Sources and Adaptation Notes</b> This page is an original Chinese teaching page for the AI Knowledge Map. Its structure and some teaching points reference Google Machine Learning Crash Course (content is licensed under CC BY 4.0 unless otherwise noted), and it has been reorganized, expanded, with hand calculations derived and original diagrams created; no interactive components were copied.
+  <ul>
+    <li><a href="https://developers.google.com/machine-learning/crash-course/neural-networks" target="_blank" rel="noopener">Google ML Crash Course: Neural networks ↗</a></li>
+    <li><a href="https://developers.google.com/machine-learning/crash-course/neural-networks/backpropagation" target="_blank" rel="noopener">Google: Training using backpropagation ↗</a></li>
+    <li><a href="https://developers.google.com/machine-learning/crash-course/linear-regression/gradient-descent" target="_blank" rel="noopener">Google: Gradient descent ↗</a></li>
+    <li><a href="https://developers.google.com/machine-learning/crash-course/overfitting/overfitting" target="_blank" rel="noopener">Google: Overfitting ↗</a></li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-20</div>
+</div>
+<!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/neural-network">Explore connections on the map</a><a href="/zh/concepts/neural-network/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
