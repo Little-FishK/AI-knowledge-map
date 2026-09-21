@@ -109,14 +109,14 @@
       if (!list) return;
       const hasNodes = !!list.querySelector(".learning-node");
       let empty = list.querySelector(".learning-empty");
-      if (hasNodes) {
+      if (hasNodes || isDone) {
         if (empty) empty.remove();
         return;
       }
       if (!empty) {
         empty = document.createElement("div");
         empty.className = "learning-empty";
-        empty.textContent = t(isDone ? "learning.empty.done" : "learning.empty.todo");
+        empty.textContent = t("learning.empty.todo");
         list.appendChild(empty);
       }
     }
