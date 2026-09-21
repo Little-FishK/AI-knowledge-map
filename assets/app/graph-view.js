@@ -1895,7 +1895,10 @@
       btn.addEventListener("click", () => {
         state.scope = btn.dataset.scope;
         applyFilters();
-        fitView();
+        cy.stop(true, false);
+        cy.zoom(state.scope === "core" ? 1 : 0.5);
+        const visibleNodes = cy.nodes().not(".hidden");
+        if (visibleNodes.length) cy.center(visibleNodes);
       });
     });
     document.getElementById("scope-collapse").addEventListener("click", () => {
