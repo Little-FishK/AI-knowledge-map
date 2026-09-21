@@ -420,6 +420,57 @@ html, body {
 #cy { position: absolute; inset: 0; }
 #map-side-curtains { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(circle var(--curtain-radius, 60vmin) at 50% 50%, transparent 78%, var(--bg) 100%); }
 
+.map-curtain-stars {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  /* Keep stars inside the dark curtain, leaving the graph's focal area clear. */
+  -webkit-mask-image: radial-gradient(circle var(--curtain-radius, 60vmin) at 50% 50%, transparent 85%, #000 106%);
+  mask-image: radial-gradient(circle var(--curtain-radius, 60vmin) at 50% 50%, transparent 85%, #000 106%);
+}
+.map-curtain-stars::before {
+  content: ''; position: absolute; inset: -5%;
+  /* Smooth gas clouds stay separate from the crisp, viewport-resolution stars. */
+  background: radial-gradient(ellipse at 4% 15%, rgba(99,117,195,.28), transparent 36%), radial-gradient(ellipse at 16% 76%, rgba(136,106,190,.25), transparent 30%), radial-gradient(ellipse at 91% 61%, rgba(112,94,179,.3), transparent 38%), linear-gradient(115deg, rgba(48,61,113,.3), rgba(41,35,76,.14) 48%, rgba(63,62,117,.32));
+  opacity: .8;
+  animation: map-nebula-breathe 28s ease-in-out infinite alternate;
+}
+.map-star-dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.map-star-field {
+  position: absolute; inset: -18px;
+  animation: map-star-drift 32s ease-in-out infinite alternate;
+}
+.map-star {
+  position: absolute; width: var(--star-size); height: var(--star-size);
+  border-radius: 50%; background: #c7dafa; opacity: .65;
+  animation: map-star-twinkle var(--star-duration) ease-in-out var(--star-delay) infinite;
+}
+.map-star-bright { background: #edf5ff; box-shadow: 0 0 7px 2px rgba(146,180,236,.42); }
+.map-star-bright::after {
+  content: ''; position: absolute; inset: -3px 1px; border-radius: 50%;
+  background: rgba(206,223,255,.65); transform: rotate(25deg);
+}
+.map-star-glimmer {
+  position: absolute; width: 70px; height: 1px; opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(185,215,255,.8));
+  animation: map-glimmer-pass 16s ease-out infinite;
+}
+.map-star-glimmer-left { left: 5%; top: 27%; animation-delay: -3s; }
+.map-star-glimmer-right { right: 14%; top: 62%; animation-delay: -11s; }
+.map-stars-paused .map-star-field, .map-stars-paused .map-star,
+.map-stars-paused .map-star-glimmer, .map-stars-paused .map-curtain-stars::before { animation-play-state: paused; }
+@keyframes map-star-twinkle { 0%, 100% { opacity: .12; } 50% { opacity: 1; } }
+@keyframes map-star-drift { from { transform: translate3d(-4px, 12px, 0); } to { transform: translate3d(9px, -12px, 0); } }
+@keyframes map-nebula-breathe { from { opacity: .72; transform: scale(1) translate3d(-4px, 3px, 0); } to { opacity: .92; transform: scale(1.045) translate3d(4px, -3px, 0); } }
+@keyframes map-glimmer-pass {
+  0%, 78%, 100% { opacity: 0; transform: translate3d(0, 0, 0) rotate(-32deg); }
+  81% { opacity: .65; }
+  91%, 99% { opacity: 0; transform: translate3d(100px, -62px, 0) rotate(-32deg); }
+}
+@media (max-width: 700px) { .map-star:nth-child(2n) { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .map-star-field, .map-star, .map-curtain-stars::before { animation: none; }
+  .map-star-glimmer { display: none; }
+}
+
 /* ───────── 设置 ───────── */
 .settings-overlay {
   position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px;
