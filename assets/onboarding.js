@@ -67,10 +67,11 @@
       button.addEventListener('blur', () => emphasize(false));
       animations.push(animation);
     });
-    const update = () => animations.forEach(animation => {
-      if (preference.matches || document.hidden || root.hidden) animation.pause();
-      else animation.play();
-    });
+    const update = () => {
+      const paused = preference.matches || document.hidden || root.hidden;
+      root.classList.toggle('motion-paused', paused);
+      animations.forEach(animation => paused ? animation.pause() : animation.play());
+    };
     preference.addEventListener('change', update);
     document.addEventListener('visibilitychange', update);
     update();
@@ -80,24 +81,46 @@
       document.removeEventListener('visibilitychange', update);
     };
   }
-  function render(focus = false) {
+  function render(focus = false, unlockedIndex = null) {
+    if (global.matchMedia('(prefers-reduced-motion: reduce)').matches) unlockedIndex = null;
     stopNodeMotion();
     const lesson = lessons[state.cursor];
     const isMap = view === 'map';
-    document.title = isMap ? (english() ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map' : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图') : `${lesson.title}｜新手导览 · AI 知识地图`;
+    document.title = isMap
+      ? (english() ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map' : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图')
+      : `${lesson.title}｜新手导览 · AI 知识地图`;
     root.removeAttribute(isMap ? 'aria-labelledby' : 'aria-label');
     root.setAttribute(isMap ? 'aria-label' : 'aria-labelledby', isMap ? '六站新手地图' : 'onboarding-lesson-title');
     root.innerHTML = `<div class="onboarding-shell${isMap ? ' is-map' : ''}">
-      <header class="onboarding-top">${isMap ? '' : '<div class="onboarding-brand"><span aria-hidden="true">◈</span>AI 知识地图</div>'}
+      <header class="onboarding-top"><div class="onboarding-brand"><span class="onboarding-brand-symbol" aria-hidden="true">✳</span><div>AI 知识地图<small>THE KNOWLEDGE ATLAS</small></div></div>
         <button class="onboarding-skip btn" type="button" data-skip>${english() ? 'Back to map' : '返回地图'}</button><button class="btn icon-btn" type="button" data-settings aria-label="设置" aria-haspopup="dialog" aria-controls="settings-dialog">${document.getElementById('btn-settings').innerHTML}</button></header>
       ${isMap ? '' : '<nav class="onboarding-reader-nav" aria-label="新手导览"><button class="onboarding-prev" type="button" data-map>← 返回新手地图</button></nav>'}
       ${isMap ? '' : `<p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。</p>`}
-      ${isMap ? `<ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
-        if (index > state.read) return '';
+      ${isMap ? `<div class="onboarding-hero">
+        <div class="onboarding-hero-copy">
+          <h1 id="onboarding-title">看懂 AI，<br>从<span>这里</span>开始。</h1>
+          <p class="onboarding-lead">不必先懂算法，也不用追赶每一个新名词。<br>从六个简单的问题出发，建立属于你的知识地图。</p>
+          <div class="onboarding-hero-actions"><button class="onboarding-launch" type="button" data-start>${state.read >= count ? '重温第一站' : state.read ? '继续我的探索' : '开启第一站'}<span aria-hidden="true">↗</span></button>${state.read ? `<span class="onboarding-journey-note">已完成 ${state.read} / ${count} 站</span>` : ''}</div>
+          <div class="onboarding-metrics"><span><strong>${String(count).padStart(2, '0')}</strong> 入门章节</span><span><strong>${global.GRAPH?.nodes?.length || 130}</strong> 概念节点</span><span><strong>${String(global.GRAPH?.recommendedLearningPath?.length || 9).padStart(2, '0')}</strong> 官方推荐阶段</span></div>
+        </div>
+        <div class="onboarding-universe" aria-hidden="true">
+          <div class="atlas-cross atlas-cross-one">+</div><div class="atlas-cross atlas-cross-two">+</div>
+          <div class="atlas-orbit atlas-orbit-outer"></div><div class="atlas-orbit atlas-orbit-inner"></div>
+          <div class="atlas-sphere"><svg viewBox="0 0 300 300" fill="none"><defs><radialGradient id="atlas-glow"><stop stop-color="#96bfff" stop-opacity=".26"/><stop offset="1" stop-color="#8ecaff" stop-opacity=".02"/></radialGradient></defs><circle cx="150" cy="150" r="139" fill="url(#atlas-glow)" stroke="#9dbed2" stroke-opacity=".25"/><g stroke="#acd9e9" stroke-opacity=".22"><ellipse cx="150" cy="150" rx="100" ry="139"/><ellipse cx="150" cy="150" rx="50" ry="139"/><ellipse cx="150" cy="150" rx="139" ry="44"/><ellipse cx="150" cy="150" rx="139" ry="94"/><path d="M11 150h278M150 11v278"/></g></svg><div class="atlas-core"><span>AI</span><small>CONNECT THE DOTS</small></div></div>
+          <div class="atlas-satellite atlas-satellite-one"><span>✦</span><div>从好奇出发<small>START WITH WHY</small></div></div>
+          <div class="atlas-satellite atlas-satellite-two"><span>⌘</span><div>让知识连接<small>BUILD CONNECTIONS</small></div></div>
+          <div class="atlas-coordinate">EXPLORE / UNDERSTAND / CREATE</div>
+        </div>
+      </div>
+      <div class="onboarding-route-heading"><div><span class="onboarding-kicker">YOUR LEARNING JOURNEY</span><h2>六站，走进 AI 的世界</h2></div></div>
+      <ol class="onboarding-route" aria-label="六站新手地图">${lessons.map((item, index) => {
         const read = index < state.read;
+        const locked = index > state.read;
+        const unlocking = index === unlockedIndex;
+        const lock = locked || unlocking ? `<span class="onboarding-lock${unlocking ? ' is-unlocking' : ''}" aria-hidden="true"><svg viewBox="0 0 24 26" fill="none"><path class="onboarding-lock-shackle" d="M7 12V8a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="4" y="11" width="16" height="12" rx="3" fill="currentColor"/><path d="M12 15v4" stroke="#182638" stroke-width="2" stroke-linecap="round"/></svg></span>` : ''; 
         const src = `assets/node-art/${nodeArtwork[index]}.png?v=2`;
-        return `<li class="${read ? 'is-read' : 'is-current'}"><button type="button" data-visit="${index}" ${!read ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true"><img class="onboarding-face" src="${src}" alt=""><span class="onboarding-hover-band"></span><span class="onboarding-ring"><img class="onboarding-ring-spin" src="${src}" alt=""></span></span><span class="onboarding-node-name">${escape(item.short)}</span></button></li>`;
-      }).join('')}</ol>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
+        return `<li class="${read ? 'is-read' : locked ? 'is-locked' : 'is-current'}"><button type="button" ${locked ? 'disabled' : `data-visit="${index}"`} ${!read && !locked ? 'aria-current="step"' : ''}><span class="onboarding-dot" aria-hidden="true"><img class="onboarding-face" src="${src}" alt=""><span class="onboarding-hover-band"></span><span class="onboarding-ring"><img class="onboarding-ring-spin" src="${src}" alt=""></span>${lock}</span><span class="onboarding-node-copy"><span class="onboarding-node-status">0${index + 1} / ${read ? '已完成' : locked ? '待解锁' : '现在出发'}</span><span class="onboarding-node-name">${escape(item.short)}</span><span class="onboarding-node-description">${escape(item.title)}</span></span><span class="onboarding-card-arrow" aria-hidden="true">${read ? '✓' : locked ? '·' : '↗'}</span></button></li>`;
+      }).join('')}</ol><footer class="onboarding-map-footer"><span>AI KNOWLEDGE MAP <b>✳</b></span></footer>` : `<article class="onboarding-reader" aria-labelledby="onboarding-lesson-title"><div class="dd-hero">
         <div class="dd-eyebrow">第 ${state.cursor + 1} 站 / 共 ${count} 站</div><h2 id="onboarding-lesson-title" class="dd-h1" tabindex="-1">${escape(lesson.title)}</h2>
         <p class="dd-sub">${escape(lesson.subtitle)}</p><div class="dd-thesis"><span class="dd-thesis-l">先记住</span>${escape(lesson.thesis)}</div></div>
       ${lesson.sections.map(([title, html], index) => `<section class="dd-sec"><h2><span class="dd-n" aria-hidden="true">${index + 1}</span>${escape(title)}</h2>${html}${index === 1 && lesson.figure ? figure(lesson) : ''}</section>`).join('')}
@@ -108,23 +131,13 @@
         <button class="onboarding-next" type="button" data-read>已读</button></div>
       </article>`}${isMap ? '' : '<p class="onboarding-status">进度仅保存在当前浏览器。清除网站数据或更换浏览器后，新手路线会重新出现。</p>'}</div>`;
     if (isMap) startNodeMotion();
-    syncToolbar();
     if (focus) {
-      root.querySelector(isMap ? '[data-skip]' : '#onboarding-lesson-title').focus({preventScroll: true});
-      root.scrollTop = 0;
+      const target = root.querySelector(isMap ? (unlockedIndex === null ? '[data-skip]' : `[data-visit="${unlockedIndex}"]`) : '#onboarding-lesson-title');
+      target.focus({preventScroll: true});
+      if (isMap && unlockedIndex !== null) target.scrollIntoView({block: 'nearest', behavior: 'auto'});
+      else root.scrollTop = 0;
     }
   }
-  function syncToolbar() {
-    for (const [source, target] of [['btn-onboarding','[data-skip]'],['btn-settings','[data-settings]']]) {
-      const button=root.querySelector(target);
-      if (!button) continue;
-      const rect=document.getElementById(source).getBoundingClientRect();
-      Object.assign(button.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',zIndex:'2'});
-    }
-  }
-  const toolbarObserver=new ResizeObserver(syncToolbar);
-  ['topbar','btn-onboarding','btn-settings'].forEach(id=>toolbarObserver.observe(document.getElementById(id)));
-  global.addEventListener('resize',syncToolbar);
   function open() {
     if (isOpen()) return;
     returnFocus = document.activeElement;
@@ -159,17 +172,22 @@
       persist(); close();
     } else if (button.hasAttribute('data-map')) {
       view = 'map'; render(true);
-    } else if (button.hasAttribute('data-visit')) {
-      const index = Number(button.dataset.visit);
+    } else if (button.hasAttribute('data-visit') || button.hasAttribute('data-start')) {
+      const index = button.hasAttribute('data-start') ? (state.read >= count ? 0 : state.read) : Number(button.dataset.visit);
       if (!Number.isInteger(index) || index < 0 || index >= count || index > state.read) return;
       state = model.visit(state, index, count); persist();
       view = 'reader'; render(true);
     } else if (button.hasAttribute('data-read')) {
+      const previouslyRead = state.read;
       state = model.advance(state, count); persist();
-      view = 'map'; render(true);
+      const newlyUnlocked = state.read > previouslyRead && state.read < count ? state.read : null;
+      view = 'map'; render(true, newlyUnlocked);
     } else if (button.hasAttribute('data-prev')) {
       state = model.visit(state, state.cursor - 1, count); persist(); render(true);
     }
+  });
+  root.addEventListener('animationend', event => {
+    if (event.animationName === 'onboarding-unlock' && event.target.matches('.onboarding-lock.is-unlocking')) event.target.remove();
   });
   root.addEventListener('keydown', event => {
     // Keep map shortcuts dormant while revisiting the introduction.

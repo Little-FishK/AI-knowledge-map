@@ -1,14 +1,14 @@
 /* AI 知识地图 — 样式 */
 
 :root {
-  --bg:        #14161a;
-  --bg-panel:  #1a1d23;
-  --bg-raise:  #21252d;
-  --line:      #2c313b;
-  --line-soft: #23272f;
-  --fg:        #dfe3ea;
-  --fg-dim:    #9aa2b1;
-  --fg-faint:  #7f8999;
+  --bg:        #0b1118;
+  --bg-panel:  #121c25;
+  --bg-raise:  #1b2934;
+  --line:      #2b3b47;
+  --line-soft: #21303b;
+  --fg:        #e5ecee;
+  --fg-dim:    #a7b7c3;
+  --fg-faint:  #90a3b2;
   --accent:    #7aa2d8;
   --controls-width: 224px;
   --lyr-base:     #6b8cbe;
@@ -946,3 +946,81 @@ html, body {
 /* Reader feedback belongs to the reading interface, outside controlled article content. */
 .dd-feedback { margin: 28px 0; padding: 16px; border: 1px solid currentColor; border-radius: 8px; }
 .dd-feedback p { margin: 8px 0 0; font-size: .9em; }
+
+/* ───────── Knowledge Atlas visual system ───────── */
+::selection { background: #7aa2d838; color: #eef5ff; }
+* { scrollbar-width: thin; scrollbar-color: #3b505f transparent; }
+#topbar { background: linear-gradient(115deg,#16242c,#0e171f 70%); border-bottom: 1px solid #9bb8c329; box-shadow: 0 6px 30px #0003; height: 64px; flex-basis: 64px; padding-inline: 22px; gap: 18px; }
+.brand-mark { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #7aa2d838; border-radius: 8px; color: var(--accent); background: #8eafe00a; }
+.brand-name { font-weight: 650; letter-spacing: .025em; }
+.brand-ver { font-family: ui-monospace,Consolas,monospace; }
+.mode-nav { padding: 4px; border-radius: 30px; background: #080e15a6; border-color: #7b9cad2c; }
+.mode-nav-btn { border-radius: 24px; padding: 6px 12px; transition: color .18s,background .18s; }
+.mode-nav-btn.active { color: #d1e2fc; background: #7aa2d818; box-shadow: inset 0 0 0 1px #7aa2d837; }
+#search { border-radius: 24px; background: #09111999; border-color: #748fa342; min-height: 35px; padding-left: 15px; }
+#search:focus { border-color: #a7cce6; box-shadow: 0 0 0 3px #a7cce613; }
+#search-results { border-radius: 14px; box-shadow: 0 15px 40px #0008; }
+.btn { border-radius: 7px; transition: border-color .18s,background .18s,color .18s; }
+#btn-onboarding { border-color: #8cacdb52; color: #c4dafa; background: #7aa2d80a; }
+#stage { background: radial-gradient(ellipse at 52% 44%,#1a303e80,transparent 62%), radial-gradient(#7397ac24 .65px,transparent .85px); background-size: auto,26px 26px; }
+#controls { background: linear-gradient(160deg,#17242cf5,#0e171ff8); border-right-color: #8fb0c32e; box-shadow: 8px 0 35px #0002; }
+.ctl-group { padding: 18px 16px; }
+.ctl-group h3 { color: #bacdd5; font-size: 10px; letter-spacing: .16em; }
+.ctl-hint { color: #93a7b4; line-height: 1.8; }
+.seg { border-radius: 8px; overflow: hidden; }
+.domain-group { padding-block: 3px; }
+.learning-panel { background: linear-gradient(130deg,#7aa2d806,transparent); }
+.learning-overview strong { color: var(--accent); font-family: ui-monospace,Consolas,monospace; }
+.learning-progress { height: 4px; border-radius: 9px; }
+.learning-progress > span { background: linear-gradient(90deg,#82b8d3,#7aa2d8); }
+.official-path-toggle { border-radius: 8px; }
+#detail { background: linear-gradient(155deg,#192831,#101b24); border-left-color: #93b4c53d; box-shadow: -12px 0 45px #0004; }
+#detail-body { padding: 26px 24px 40px; }
+#detail-body h2 { letter-spacing: -.025em; }
+.dd-open { border-radius: 9px; padding-block: 12px; background: #8ac2d710; }
+.controls-toggle, .detail-toggle { background: #16242df2; }
+.settings-dialog, .progress-account-dialog { border-radius: 18px; border-color: #a6c7d044; background: linear-gradient(145deg,#1a2a34,#101a24); box-shadow: 0 30px 100px #0009; }
+.settings-head { background: #8fc2ce05; }
+#software-view, #library-view { padding: 36px 36px 64px; background: radial-gradient(ellipse at 80% 0,#2343424d,transparent 48%),var(--bg); }
+.sw-head, .sw-cat { max-width: 1180px; margin-inline: auto; }
+.sw-head, .lib-head { padding-bottom: 22px; margin-bottom: 26px; border-bottom: 1px solid #a4bfcc26; }
+.sw-head h2, .lib-head h2 { font-size: clamp(25px,3vw,36px); font-weight: 600; letter-spacing: -.04em; margin-bottom: 10px; }
+.sw-head p, .lib-head p { color: var(--fg-dim); font-size: 13px; line-height: 1.8; margin-bottom: 0; }
+.sw-cat { margin-bottom: 34px; }
+.sw-cat h3 { padding-bottom: 12px; font-size: 14px; }
+.sw-grid, .lib-grid { gap: 16px; }
+.sw-card { position: relative; padding: 22px 20px; border-radius: 12px; background: linear-gradient(145deg,#1b2a35,#131e28); min-height: 140px; transition: transform .2s,border-color .2s,box-shadow .2s; }
+.sw-card:hover, .lib-card:hover { transform: translateY(-3px); border-color: #9cbdca; box-shadow: 0 12px 24px #0003; background: linear-gradient(145deg,#213541,#15232d); }
+.sw-name { font-size: 17px; letter-spacing: -.02em; }
+.sw-by { margin: 4px 0 12px; }
+.sw-sum { font-size: 13px; line-height: 1.8; }
+.lib-card { border-radius: 12px; padding: 20px; background: linear-gradient(145deg,#1b2934,#131e28); transition: transform .2s,border-color .2s,box-shadow .2s; }
+.lib-title { font-size: 17px; line-height: 1.55; }
+.lib-summary { font-size: 13px; line-height: 1.8; }
+.lib-card-top { margin-bottom: 14px; }
+.lib-card-foot { padding-top: 12px; }
+.lib-sources, .lib-subnav { border-radius: 12px; background: #14212b; }
+.lib-source { padding-block: 10px; border-radius: 7px; }
+.lib-source.active { background: #a2c5d812; }
+.lib-platform-profile { border-radius: 12px; background: linear-gradient(130deg,#22333d,#131e28); }
+.lib-search { border-radius: 8px; padding: 10px 13px; background: #0e1922; }
+.lib-count { border: 1px solid #9cbee930; padding: 6px 12px; border-radius: 25px; color: #bed2ec; background: #86a9d808; }
+@media (max-width: 1100px) {
+  #topbar { gap: 10px; padding-inline: 14px; }
+  .brand-ver { display: none; }
+  .mode-nav-btn { padding-inline: 9px; }
+}
+@media (max-width: 760px) {
+  #topbar { min-height: 64px; height: auto; flex-basis: auto; flex-wrap: wrap; padding: 12px; gap: 10px; }
+  #topbar .search-wrap { order: 4; flex-basis: 100%; max-width: none; }
+  #topbar .topbar-actions { display: flex; gap: 6px; }
+  #topbar .brand { white-space: nowrap; }
+  #software-view, #library-view { padding: 24px 16px 50px; }
+  .sw-grid, .lib-grid { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .sw-head, .lib-head { margin-bottom: 20px; padding-bottom: 18px; }
+  .lib-head { flex-wrap: wrap; align-items: start; gap: 12px; }
+  .sw-card { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-card:hover, .lib-card:hover { transform: none; }
+}
