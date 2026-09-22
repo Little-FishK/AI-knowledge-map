@@ -74,6 +74,8 @@ The material is under continuous revision. Coverage does not mean every page has
 
 ## 本地开发与维护说明
 
+文档入口：[分类索引](docs/README.md) · [源码、运行时与发布边界](docs/REPOSITORY_LAYOUT.md) · [工具目录](tools/README.md)。历史发布记录已集中到 `docs/archive/`。
+
 一个可离线打开的 AI 学习知识网：用有方向、有类型的关系连接概念，并把概念原理、软件目录、专业资料库、使用教程和学习进度放在同一个静态网站里。
 
 > 正式网站：[ai-knowledge-map.com](https://ai-knowledge-map.com/)。本文运行说明于 2026-09-20 核对。阶段记录见 [docs/WEBSITE_MATURITY_PROGRESS.md](docs/WEBSITE_MATURITY_PROGRESS.md)；其中的阶段日期和 [docs/STATUS.md](docs/STATUS.md) 属于历史记录，不代表当前部署版本。内容覆盖不等于教学质量认证。

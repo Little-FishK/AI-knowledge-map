@@ -4,8 +4,8 @@
  * 将历史页面中的裸文本根号转换为有明确被开方范围的语义标记。
  *
  * 用法：
- *   node tools/normalize-inline-radicals.js
- *   node tools/normalize-inline-radicals.js --check
+ *   node tools/deepdive/migrations/normalize-inline-radicals.js
+ *   node tools/deepdive/migrations/normalize-inline-radicals.js --check
  *
  * 核心展示公式应直接编写为 MathML <msqrt>。这个工具只负责迁移历史正文、
  * 表格和短公式，避免普通 “√” 字形无法覆盖完整被开方表达式。
@@ -14,7 +14,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const root = path.join(__dirname, "..");
+const root = require("../../shared/project-root").resolveProjectRoot();
 const deepDiveDir = path.join(root, "data", "deepdive");
 const checkOnly = process.argv.includes("--check");
 

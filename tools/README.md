@@ -13,6 +13,10 @@ the server should start without opening a browser window.
 
 ## Directories
 
+- `graph/browser/`: optional browser-console layout experiments (`find-seed.js`, `dump-positions.js`); these are not production commands. Apply graph changes only through the authorized controller.
+- `graph/gen-disc-layout.js`: deterministic layout generator; callers and tests use this canonical path.
+- `deepdive/migrations/`: historical migration utilities, not the current content publication pipeline. Automated content changes still require the Stage 2 MCP controller.
+
 - `shared/`: project-wide path and process helpers with no domain state.
 - `graph/`: read-only graph storage diagnostics, canonical semantic
   fingerprinting, guarded shard-shadow generation, fail-closed dual-read validation,

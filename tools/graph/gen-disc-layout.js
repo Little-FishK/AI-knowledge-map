@@ -5,7 +5,7 @@
  * 生成后复用 assets/layout-quality.js 的碰撞消解，保证同区节点视觉框不重叠、
  * 无节点被遮挡超过 3/4；再把结果居中、取整、写回 data/graph.js。
  *
- * 用法：node tools/gen-disc-layout.js
+ * 用法：node tools/graph/gen-disc-layout.js
  * 数据（节点/大区/学习路径）变动后重跑即可，无需浏览器。
  */
 "use strict";
@@ -13,9 +13,9 @@ const path = require("path");
 const {
   prepareGraphAuthorityWrite,
   writeGraphAuthority,
-} = require("./graph/shadow");
+} = require("./shadow");
 
-const ROOT = path.resolve(process.env.GRAPH_ROOT || path.join(__dirname, ".."));
+const ROOT = require("../shared/project-root").resolveProjectRoot("GRAPH_ROOT");
 const GRAPH_FILE = path.join(ROOT, "data", "graph.js");
 const graphBaseline = prepareGraphAuthorityWrite(ROOT);
 

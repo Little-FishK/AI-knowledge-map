@@ -39,7 +39,7 @@ try {
   buildGraphShadow(fixture, beforeDigest);
   promoteGraphWriteAuthority(fixture, beforeDigest);
 
-  const result = spawnSync(process.execPath, [path.join(projectRoot, "tools", "gen-disc-layout.js")], {
+  const result = spawnSync(process.execPath, [path.join(projectRoot, "tools", "graph", "gen-disc-layout.js")], {
     cwd: fixture,
     encoding: "utf8",
     env: { ...process.env, GRAPH_ROOT: fixture },

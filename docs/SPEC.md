@@ -112,7 +112,7 @@
 
 双读门禁使用 `npm run graph:dual-read -- --expected-source-digest <完整语义指纹>`。运行时仍返回兼容 `data/graph.js`，同时连续两次从磁盘校验并重组权威分片，再比较深度等价、整体及区块指纹、节点顺序和边顺序；还要求 `graph.js` 的字节内容等于确定性生成结果。验证期间任一侧变化、任何分片异常或人工直接修改生成物都会失败关闭。项目级 `npm run validate` 包含该门禁。
 
-写入权威已切换到分片。新节点原子应用/回滚、Stage 2 新节点正式发布，以及 `tools/gen-disc-layout.js` 的坐标重算，都先在临时目录生成并完整验证新分片、替换权威目录，再生成 `graph.js` 并运行原有门禁；任一步失败都会恢复旧权威分片和旧生成物。写入回执记录更新前后语义指纹。`npm run graph:materialize -- --expected-source-digest <指纹>` 可从权威分片恢复兼容生成物，但不能反向用 `graph.js` 覆盖分片。
+写入权威已切换到分片。新节点原子应用/回滚、Stage 2 新节点正式发布，以及 `tools/graph/gen-disc-layout.js` 的坐标重算，都先在临时目录生成并完整验证新分片、替换权威目录，再生成 `graph.js` 并运行原有门禁；任一步失败都会恢复旧权威分片和旧生成物。写入回执记录更新前后语义指纹。`npm run graph:materialize -- --expected-source-digest <指纹>` 可从权威分片恢复兼容生成物，但不能反向用 `graph.js` 覆盖分片。
 
 ## 4. 半自动入库流程
 1. 你提供资料（网址/视频链接/文档路径）。
