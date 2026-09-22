@@ -13,7 +13,7 @@
 
 构建仍检查可渲染内容、活动 HTML、路径、资源哈希、完整页面集合、内部链接和 SEO。预览仍不可作为生产产物部署。生产公开阅读页必须带状态提示，不能伪装成已审核页。
 
-流程：`node tools/build-website.js production` 通过 MCP 构建，再用 `node tools/verify-website.js <产物目录> --production` 检查；`node tools/promote-website.js <产物目录>` 保存旧版本备份后更新 `site-release/`。当前线上仍使用 `gh-pages /`，按 `docs/PHASE8_RELEASE_RUNBOOK.md` 将精确产物复制到干净的隔离发布分支，提交后通过 Git 归档回读验证，再推送 `gh-pages`。主分支及审核材料不随网站部署推送。仓库内的 Actions 发布工作流保留待以后启用。
+流程：`node tools/build-website.js production` 通过 MCP 构建，再用 `node tools/verify-website.js <产物目录> --production` 检查；`node tools/promote-website.js <产物目录>` 保存旧版本备份后更新 `site-release/`。当前线上仍使用 `gh-pages /`，按 `docs/operations/PHASE8_RELEASE_RUNBOOK.md` 将精确产物复制到干净的隔离发布分支，提交后通过 Git 归档回读验证，再推送 `gh-pages`。主分支及审核材料不随网站部署推送。仓库内的 Actions 发布工作流保留待以后启用。
 
 回归检查：`node tests/tooling/website-publication.test.js`、`node tests/tooling/website-artifact.test.js`、`node tests/tooling/website-release.test.js site-release`。本策略不修改理解页内容质量门禁。
 

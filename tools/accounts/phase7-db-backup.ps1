@@ -1,7 +1,7 @@
 param([ValidateSet('Inventory','Backup','Restore')][string]$Mode='Inventory', [string]$BackupDirectory)
 $ErrorActionPreference='Stop'
 $privateRoot=Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'ai-knowledge-map\backup-private'
-$cert=(Resolve-Path (Join-Path $PSScriptRoot 'certs/supabase-prod-ca-2021.crt')).Path
+$cert=(Resolve-Path (Join-Path $PSScriptRoot '../certs/supabase-prod-ca-2021.crt')).Path
 $utf8=[System.Text.UTF8Encoding]::new($false)
 
 function Invoke-DockerBytes([string[]]$DockerArguments,[byte[]]$InputBytes=@()) {
@@ -109,7 +109,7 @@ if($Mode -eq 'Restore') {
         if($fingerprints.Trim() -cne $expectedFingerprint.Trim()){throw 'Restored account data does not match source fingerprints'}
         # Run synthetic fixtures only in the network-isolated restore, inside
         # the existing rollback transaction. Original restored rows survive.
-        $regression=[System.IO.File]::ReadAllText((Join-Path $PSScriptRoot '../supabase/tests/progress.sql'))
+        $regression=[System.IO.File]::ReadAllText((Join-Path $PSScriptRoot '../../supabase/tests/progress.sql'))
         $fixture="begin;`nTRUNCATE public.learning_progress, public.learning_operations, auth.users CASCADE;`nINSERT INTO auth.users(id) VALUES ('00000000-0000-4000-8000-000000000001'),('00000000-0000-4000-8000-000000000002');"
         $regression=[regex]::Replace($regression,'(?m)^begin;',$fixture,1)
         [void](Invoke-DockerBytes @('exec','-i',$name,'psql','-U','postgres','-X','-v','ON_ERROR_STOP=1') ($utf8.GetBytes($regression)))

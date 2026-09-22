@@ -34,7 +34,7 @@ data/graph.js
 
 **只抽够格当节点的**，判据是 SPEC §3.1：有独立身份、值得单独一张卡片、能与其他概念连线。
 
-沿用 `tools/concept-checklist.md` 的筛选规则：
+沿用 `docs/tooling/concept-checklist.md` 的筛选规则：
 
 - ❌ 产品名、厂商名（Pinecone、LangChain…）→ 进详情页的「代表实现」，或作 emerging 节点
 - ❌ 参数细项 → 合并进已有的聚合节点（如「采样与解码参数」）

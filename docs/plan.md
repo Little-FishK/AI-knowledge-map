@@ -67,7 +67,7 @@ ai_knowledge_map/
 | # | 任务 | 产出 |
 |---|---|---|
 | M0-1 ✅ | 建立独立本地 Git 仓库与目录骨架 | 可版本化、可回退 |
-| M0-2 ✅ | 调研 aiknowledgemap、llm-course、roadmap.sh 并形成映射/来源笔记 | `tools/import-notes.md`、`tools/source-survey.md` |
+| M0-2 ✅ | 调研 aiknowledgemap、llm-course、roadmap.sh 并形成映射/来源笔记 | `docs/tooling/import-notes.md`、`docs/tooling/source-survey.md` |
 | M0-3 ✅ | 建立用途分区的网状知识结构 | `data/graph.js`：129 节点、411 条边、11 种关系 |
 | M0-4 ✅ | 取消三层结构，改用 stable/evolving 轻量成熟度标签 | 107 stable、22 evolving |
 | M0-5 ✅ | Cytoscape 渲染、离线 fcose 布局、按大区和关系着色、坐标固化 | 可离线打开的静态网页 |
@@ -126,7 +126,7 @@ ai_knowledge_map/
 ### 节点粒度：写作时才能发现的那一半
 **清单定骨架，写作发现器官。**
 
-节点清单（`tools/concept-checklist.md`）是在动笔之前定的，且颗粒度继承自外部目录
+节点清单（`docs/tooling/concept-checklist.md`）是在动笔之前定的，且颗粒度继承自外部目录
 （roadmap.sh / aiknowledgemap）。这导致一个系统性偏差：**外部目录里没有的概念，
 清单里也不会有**——即使它对理解这个领域很关键。
 

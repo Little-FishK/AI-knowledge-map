@@ -174,7 +174,7 @@ node tests/app/concept-preview.test.js
 ## 第五批：英文任务包与 DeepSeek 计划
 
 - 已通过专用英文翻译 MCP 核对当前快照，导出 13 个完整任务包，共 376 单元（HTML 371 + 页头 5）。固定提示词和正文结构保留，准备前后源快照均为 prepared。
-- 已盘点 2 幅 SVG、7 个表格、1 个 details 自测区、31 个代码保护片段和 6 个参考链接。英文资源、语义及浏览器验收清单见 [监督学习英文样板](SUPERVISED_LEARNING_EN_PILOT.md)。这只是准备清单，不是已完成验收。
+- 已盘点 2 幅 SVG、7 个表格、1 个 details 自测区、31 个代码保护片段和 6 个参考链接。英文资源、语义及浏览器验收清单见 [监督学习英文样板](translation/SUPERVISED_LEARNING_EN_PILOT.md)。这只是准备清单，不是已完成验收。
 - 用户指定使用 DeepSeek API V4 Pro；通过 MCP 生成离线计划 `sha256:793c89b38f24ae6cc92047db5879fad3df337f739b7209e8532cdce05b5d8e17`。high 推理、13 个请求、每章一次、保守预留约 3.08 美元，提出单计划 5 美元预算待确认。
 - 已识别既有 deepseek-main 账号标签和加密凭据配置路径，没有展示密钥。尚无实际 API 权限、余额或响应的验证。
 - 当前英文接收 0/13；没有付费、语义审查或发布。M1 完成项计数不变。
@@ -186,7 +186,7 @@ node tests/app/concept-preview.test.js
 - 经 MCP 建立独立质量记录，发现并受控修正一处“100 分”被改成“100%”的数字表达。返修后来源、内容覆盖、结构保护、数字符号检查全部通过，未改中文或伪造语义审核。
 - 当前 awaiting-independent-review；仍须独立审核术语、翻译忠实性、整页表达，处理两个待审提示，并完成资源和发布级浏览器验收。
 - 已生成英文待审独立预览 `http://127.0.0.1:4991/preview/en/concepts/supervised-learning/`，基础桌面/手机浏览器测试通过并查看首屏截图。暂未公开部署、未正式发布英文，也没有真实用户学习效果结果。
-- 具体回执、版本与测试边界见 [监督学习英文样板](SUPERVISED_LEARNING_EN_PILOT.md)。M1 仍为 5/8 项完成、2 项部分完成、1 项待开始。
+- 具体回执、版本与测试边界见 [监督学习英文样板](translation/SUPERVISED_LEARNING_EN_PILOT.md)。M1 仍为 5/8 项完成、2 项部分完成、1 项待开始。
 
 ## 第七批：独立语义复验通过，图表预览整改完成
 

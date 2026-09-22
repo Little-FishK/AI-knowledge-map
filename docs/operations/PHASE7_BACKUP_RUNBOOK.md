@@ -13,13 +13,13 @@
 
 仍未完成：完整 Supabase 服务恢复及 OTP 重新登录、异地且可跨机器解密的备份、定时运行与失败通知。此本机 DPAPI 包和凭据都依赖当前 Windows 账号；不能把它称为异地灾难恢复。完整 dump 包含的平台 schema 与扩展（如 Vault）尚未在兼容 Supabase 环境恢复；外部 Storage 对象、SMTP 密钥和平台加密根密钥不因数据库 dump 而自动具备恢复能力。
 
-工具：`tools/phase7-db-backup.ps1 -Mode Inventory|Backup|Restore`。Restore 要求显式私有备份目录，只能创建随机命名的无网络本机测试容器，没有接受远程恢复地址的参数。详细证据保存在该备份目录的 `manifest.json` 和 `restore-report.json`。
+工具：`tools/accounts/phase7-db-backup.ps1 -Mode Inventory|Backup|Restore`。Restore 要求显式私有备份目录，只能创建随机命名的无网络本机测试容器，没有接受远程恢复地址的参数。详细证据保存在该备份目录的 `manifest.json` 和 `restore-report.json`。
 
-凭据验证更新：`tools/phase7-verify-db-credential.ps1` 已使用保存的 Windows 加密凭据，通过 Session pooler 成功连接正式数据库，执行 `BEGIN READ ONLY` 中的只读查询；结果为 database=postgres、serverVersion=17.6、readOnly=on。密码有效。首次尝试因客户端证书信任未就绪而失败，未将其误判为密码错误。随后从 Supabase 控制台提供的 `https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt` 获取公开 CA，启用 verify-full 后验证通过。CA 文件 SHA-256：`700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7`。验证未修改数据库，不代表备份或恢复已经完成。
+凭据验证更新：`tools/accounts/phase7-verify-db-credential.ps1` 已使用保存的 Windows 加密凭据，通过 Session pooler 成功连接正式数据库，执行 `BEGIN READ ONLY` 中的只读查询；结果为 database=postgres、serverVersion=17.6、readOnly=on。密码有效。首次尝试因客户端证书信任未就绪而失败，未将其误判为密码错误。随后从 Supabase 控制台提供的 `https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt` 获取公开 CA，启用 verify-full 后验证通过。CA 文件 SHA-256：`700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7`。验证未修改数据库，不代表备份或恢复已经完成。
 
 下文为执行前计划与边界，完成状态以上方实际记录为准。
 
-2026-09-09 维护者确认暂无备份存储、保存着数据库密码。先进行本机加密备份与恢复演练；异地存储仍待后续落实。已从控制台 Connect 核实 Session pooler 为 `aws-0-us-east-1.pooler.supabase.com:5432`、用户 `postgres.jjmihlewnbkfwpfgtfqi`、数据库 `postgres`。凭据输入脚本 `tools/phase7-store-db-credential.ps1` 使用隐藏字符的本机窗口，将密码通过 Windows DPAPI 加密保存到 `%LOCALAPPDATA%/ai-knowledge-map/backup-private/supabase-db.credential.xml`，目录仅当前 Windows 用户访问。脚本的模拟密码加密/解密与无明文检查已通过；不表示正式数据库已连接。此凭据文件绑定当前 Windows 账号，不是可迁移的灾难恢复备份。
+2026-09-09 维护者确认暂无备份存储、保存着数据库密码。先进行本机加密备份与恢复演练；异地存储仍待后续落实。已从控制台 Connect 核实 Session pooler 为 `aws-0-us-east-1.pooler.supabase.com:5432`、用户 `postgres.jjmihlewnbkfwpfgtfqi`、数据库 `postgres`。凭据输入脚本 `tools/accounts/phase7-store-db-credential.ps1` 使用隐藏字符的本机窗口，将密码通过 Windows DPAPI 加密保存到 `%LOCALAPPDATA%/ai-knowledge-map/backup-private/supabase-db.credential.xml`，目录仅当前 Windows 用户访问。脚本的模拟密码加密/解密与无明文检查已通过；不表示正式数据库已连接。此凭据文件绑定当前 Windows 账号，不是可迁移的灾难恢复备份。
 
 ## 已确定边界
 

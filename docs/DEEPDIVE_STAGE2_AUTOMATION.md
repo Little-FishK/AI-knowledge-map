@@ -2,13 +2,13 @@
 
 2026-09-08审核机制升级：新任务采用[统一审核v4](UNIFIED_AUDIT_V4.md)，整页概念审核补充适用的六项教学要素、逐章节证据和三项独立评价。任务合同、候选门禁与发布验证使用同一规则版本；历史v2/v3记录保留且升级须独立补审。下文历史自动发布及章节门禁描述仅适用于对应旧合同；v4普通页面也先进入manual-review。内容生成固定提示词与单页隔离、唯一返修和人工终审约束保持有效。
 
-英文翻译准备使用独立的 `translation` MCP 能力配置，不复用中文任务租约或内容生成权限。阶段 4—6 的快照、准入、章节合同和隔离测试见 [DEEPDIVE_TRANSLATION_PREPARATION.md](DEEPDIVE_TRANSLATION_PREPARATION.md)。该配置目前没有 Batch 调用、审核提交和发布能力。
+英文翻译准备使用独立的 `translation` MCP 能力配置，不复用中文任务租约或内容生成权限。阶段 4—6 的快照、准入、章节合同和隔离测试见 [DEEPDIVE_TRANSLATION_PREPARATION.md](translation/DEEPDIVE_TRANSLATION_PREPARATION.md)。该配置目前没有 Batch 调用、审核提交和发布能力。
 
 ## 1. 结论
 
-DeepSeek V4 Pro 使用独立逐章调用适配层，复用翻译检查与发布门禁，不冒充 OpenAI 托管 Batch。接口、预算和独立授权见 [DEEPDIVE_TRANSLATION_DEEPSEEK.md](DEEPDIVE_TRANSLATION_DEEPSEEK.md)。
+DeepSeek V4 Pro 使用独立逐章调用适配层，复用翻译检查与发布门禁，不冒充 OpenAI 托管 Batch。接口、预算和独立授权见 [DEEPDIVE_TRANSLATION_DEEPSEEK.md](translation/DEEPDIVE_TRANSLATION_DEEPSEEK.md)。
 
-英文阶段 9 的重组、前端回退、独立发布权限及用户参与清单见 [DEEPDIVE_TRANSLATION_PUBLICATION.md](DEEPDIVE_TRANSLATION_PUBLICATION.md)。英文发布不能替代中文 L3 或人工批准。
+英文阶段 9 的重组、前端回退、独立发布权限及用户参与清单见 [DEEPDIVE_TRANSLATION_PUBLICATION.md](translation/DEEPDIVE_TRANSLATION_PUBLICATION.md)。英文发布不能替代中文 L3 或人工批准。
 
 第二阶段不是同时常驻六个 Agent，也不是把 130 页重新写一遍。系统每次只启动一个全新 Codex 任务，只处理一页的一个阶段：
 

@@ -13,6 +13,7 @@ the server should start without opening a browser window.
 
 ## Directories
 
+- `accounts/`: database backup and credential management commands. Local credentials remain outside the repository.
 - `graph/browser/`: optional browser-console layout experiments (`find-seed.js`, `dump-positions.js`); these are not production commands. Apply graph changes only through the authorized controller.
 - `graph/gen-disc-layout.js`: deterministic layout generator; callers and tests use this canonical path.
 - `deepdive/migrations/`: historical migration utilities, not the current content publication pipeline. Automated content changes still require the Stage 2 MCP controller.

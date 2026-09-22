@@ -20,10 +20,12 @@
 ## 文档与工具
 
 - `docs/README.md`：当前文档分类入口。
+- `docs/translation/`、`docs/operations/`、`docs/tooling/`：翻译、运维和工具说明。
 - `docs/archive/`：历史阶段验收与发布记录，仅供追溯。
 - `docs/deepdive-audits/`、`docs/deepdive-reviews/`：控制器约定的审核与章节材料，不是普通说明文档。它们的路径被协议使用，必须通过控制器迁移，不能用文件整理绕过契约。
 - `tools/README.md`：各领域工具入口；布局实验位于 `tools/graph/browser/`，历史正文迁移工具位于 `tools/deepdive/migrations/`。
 - `tests/`：按领域组织的测试；目录迁移同步更新调用路径。
+- `assets/app/graph-layout-presets.js`：局部关系布局的展示预设，由 `graph-view.js` 调用；并非图谱源记录。
 
 ## 只留在本机的文件
 

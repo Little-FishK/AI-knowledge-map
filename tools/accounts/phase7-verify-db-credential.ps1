@@ -15,7 +15,7 @@ $start.RedirectStandardError = $true
 $query = "BEGIN READ ONLY; SELECT json_build_object('connected',true,'database',current_database(),'serverVersion',current_setting('server_version'),'readOnly',current_setting('transaction_read_only')); COMMIT;"
 # SQL contains single quotes, so pass it via a non-secret environment variable.
 $command = 'IFS= read -r encoded; PGPASSWORD="$(printf ''%s'' "$encoded" | base64 -d)"; export PGPASSWORD; unset encoded; exec psql -X -w -v ON_ERROR_STOP=1 -At -c "$AKM_VERIFY_QUERY"'
-$rootCertificate=(Resolve-Path (Join-Path $PSScriptRoot 'certs/supabase-prod-ca-2021.crt')).Path
+$rootCertificate=(Resolve-Path (Join-Path $PSScriptRoot '../certs/supabase-prod-ca-2021.crt')).Path
 $arguments = @('run','--rm','-i','--mount',('type=bind,source=' + $rootCertificate + ',target=/tmp/supabase-ca.crt,readonly'),'--env','PGHOST=aws-0-us-east-1.pooler.supabase.com','-e','PGPORT=5432','-e','PGDATABASE=postgres','-e','PGUSER=postgres.jjmihlewnbkfwpfgtfqi','-e','PGCONNECT_TIMEOUT=15','-e','PGSSLMODE=verify-full','-e','PGSSLROOTCERT=/tmp/supabase-ca.crt','-e',('AKM_VERIFY_QUERY=' + $query),'postgres:17.6','sh','-c',$command)
 foreach ($argument in $arguments) { $start.ArgumentList.Add($argument) }
 $process = [System.Diagnostics.Process]::new()

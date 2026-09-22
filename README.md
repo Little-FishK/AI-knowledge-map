@@ -98,7 +98,7 @@ The material is under continuous revision. Coverage does not mean every page has
 
 访客学习进度保存在浏览器本地存储中；清除浏览器数据会清除本地进度。网站也提供账号和跨设备同步：登录后通过 Supabase Auth 与数据库同步学习进度。登录、云同步和账号删除需要网络，离线浏览不等于这些在线功能可用。不同浏览器、`file://` 和正式网站的存储相互独立。
 
-账号前端位于 `assets/progress-*.js`，数据库迁移位于 `supabase/migrations/`，账号删除服务位于 `supabase/functions/delete-account/`。部署自己的实例时，需要配置相应服务；说明见 [docs/PHASE7_ACCOUNTS.md](docs/PHASE7_ACCOUNTS.md)。
+账号前端位于 `assets/progress-*.js`，数据库迁移位于 `supabase/migrations/`，账号删除服务位于 `supabase/functions/delete-account/`。部署自己的实例时，需要配置相应服务；说明见 [docs/operations/PHASE7_ACCOUNTS.md](docs/operations/PHASE7_ACCOUNTS.md)。
 
 页面使用离线兼容的 Hash URL：理解原理页、软件、教程和资料详情会更新地址栏。普通地图节点详情属于临时探索状态，不改变网址；复制完整地址即可分享或收藏真正的内容页，刷新以及浏览器前进、后退也会恢复对应视图。
 
