@@ -102,6 +102,18 @@ async function exerciseApp(browser, baseUrl, label) {
 
   try {
     await page.goto(`${baseUrl}#/map`, { waitUntil: "load" });
+    await page.locator('#onboarding [data-skip]').click();
+    // Verify the textured node renderer actually starts in both modes; a
+    // removed/failed decorative canvas must not pass as a working map.
+    await page.waitForFunction(() => {
+      const canvas = document.getElementById('node-ring-motion');
+      const cy = document.getElementById('cy')?._cyreg?.cy;
+      return canvas && canvas.width > 300 && cy && cy.nodes().length === 130
+        && cy.nodes().every(node => !node.backgrounding());
+    });
+    if (!/图谱数据|Graph data/.test(await page.locator('#meta-ver').textContent())) {
+      throw new Error(`${label}：图谱数据版本缺少明确标注`);
+    }
     await page.locator("#controls-toggle").click();
     if (await page.locator("#controls-toggle").getAttribute("aria-expanded") !== "false") {
       throw new Error(`${label}：左侧栏无法收起`);
@@ -204,8 +216,8 @@ async function exerciseApp(browser, baseUrl, label) {
     if (await page.evaluate(() => localStorage.getItem("ai-knowledge-map.locale.v1")) !== "en") {
       throw new Error(`${label}：英文选择没有保存`);
     }
-    if (await page.locator("#locale-fallback-banner").evaluate(element => element.classList.contains("hidden"))) {
-      throw new Error(`${label}：英文内容回退提示没有显示`);
+    if (await page.locator("#locale-fallback-banner").count()) {
+      throw new Error(`${label}：过时的全局翻译进度提示仍然存在`);
     }
     await languageSelect.selectOption("zh-Hans");
     await page.waitForFunction(() => document.documentElement.lang === "zh-Hans");
@@ -229,7 +241,7 @@ async function exerciseApp(browser, baseUrl, label) {
 
     await page.locator("#search").fill("神经网络");
     await page.locator('#search-results [data-id="neural-network"]').click();
-    if (!page.url().endsWith("#/map")) throw new Error(`${label}：普通节点选择改变了 URL`);
+    if (new URL(page.url()).hash !== "") throw new Error(`${label}：普通节点选择改变了 URL`);
     await page.locator("#detail h2").filter({ hasText: "神经网络" }).waitFor();
 
     await page.locator('[data-dd="neural-network"]').click();
@@ -240,7 +252,7 @@ async function exerciseApp(browser, baseUrl, label) {
       throw new Error(`${label}：学习进度按钮没有更新`);
     }
     await page.goBack();
-    await waitForHash("#/map");
+    await waitForHash("");
     await page.locator("#detail h2").filter({ hasText: "神经网络" }).waitFor();
 
     await page.goto(`${baseUrl}#/software`, { waitUntil: "load" });

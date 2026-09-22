@@ -28,7 +28,7 @@ const root=path.resolve(__dirname,'../..');
   await context.close();
  }
  const page=await browser.newPage();page.on('pageerror',e=>errors.push(e.message));
- await page.goto(origin+'/AI-knowledge-map/en/concepts/supervised-learning/');await page.locator('.preview-next a').first().click();await page.waitForFunction(()=>window.__cy?.nodes('.sel').map(n=>n.id()).join()==='supervised-learning');
+ await page.goto(origin+'/AI-knowledge-map/en/concepts/supervised-learning/');await page.locator('.preview-next a').first().click();await page.locator('#onboarding [data-skip]').click();await page.waitForFunction(()=>window.__cy?.nodes('.sel').map(n=>n.id()).join()==='supervised-learning');
  await page.locator('[data-dd="supervised-learning"]').click();await page.locator('#dd-article[lang="en"] h1').waitFor();await page.locator('.dd-static-link').click();assert(page.url().endsWith('/AI-knowledge-map/en/concepts/supervised-learning/'));
  const sitemap=await page.request.get(origin+'/AI-knowledge-map/sitemap-concepts.xml');assert.equal(sitemap.status(),200);assert((await sitemap.text()).includes('/en/concepts/supervised-learning/'));
  const privateResponse=await page.request.get(origin+'/.stage2/state.json');assert.equal(privateResponse.status(),404);

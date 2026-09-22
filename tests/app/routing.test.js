@@ -25,6 +25,7 @@ const routes = cases.slice(1).map(([, route]) => route);
 routes.forEach(route => assert.deepStrictEqual(router.parse(router.format(route)), route));
 assert.strictEqual(router.format({ name: "concept", id: "含 空格" }), "#/concept/%E5%90%AB%20%E7%A9%BA%E6%A0%BC");
 assert.strictEqual(router.format({ name: "map", id: "含 空格" }), "#/map/%E5%90%AB%20%E7%A9%BA%E6%A0%BC");
-assert.strictEqual(router.format({ name: "not-found" }), "#/map");
+assert.strictEqual(router.format({ name: "not-found" }), "");
+assert.strictEqual(router.format({ name: "map" }), "");
 
 console.log(`✓ URL 路由解析与生成测试通过（${cases.length} 个有效路径）`);

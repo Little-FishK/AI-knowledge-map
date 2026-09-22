@@ -4,6 +4,9 @@
 (async function () {
   "use strict";
 
+  // Keep the existing map and deep links dormant until the local introduction ends.
+
+
   const G = window.GRAPH;
   const ROUTER = window.APP_ROUTER;
   const APP = window.AIMap;
@@ -35,6 +38,9 @@
     console.error(error);
     await language.setLocale(I18N_MANIFEST.sourceLocale);
   }
+  const {renderLanguageSettings} = window.createMapSettings({language, content, manifest: I18N_MANIFEST});
+  if (window.AI_ONBOARDING) await window.AI_ONBOARDING.ready;
+
   const DOMAINS = G.domains;
   const ETYPES = G.edgeTypes;
 
@@ -78,7 +84,9 @@
 
   function setDocumentTitle(label) {
     const siteTitle = t("app.title.graph");
-    document.title = label ? `${label}｜${siteTitle}` : siteTitle;
+    document.title = label ? `${label}｜${siteTitle}` : (language.getLocale() === 'en'
+      ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map'
+      : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图');
   }
 
   function goToRoute(route, options = {}) {
@@ -103,7 +111,7 @@
     navigate: goToRoute,
     onShowNode: (id, jumped) => showNodeOnMap(id, jumped),
     onSelectionChange: id => syncMapSelectionUrl(id),
-    isActive: () => mode === "graph",
+    isActive: () => mode === "graph" && !window.AI_ONBOARDING?.isOpen(),
     t,
     content,
   });
@@ -199,49 +207,37 @@
     t,
   });
 
+  const detailToggle = document.getElementById("detail-toggle");
+  function syncDetailToggle() {
+    const expanded = !detail.classList.contains("collapsed");
+    const visible = mode === "graph" && !detail.classList.contains("closed");
+    detailToggle.classList.toggle("hidden", !visible);
+    detailToggle.setAttribute("aria-expanded", String(expanded));
+    const label = language.getLocale() === "en"
+      ? (expanded ? "Collapse introduction" : "Expand introduction")
+      : (expanded ? "收起基础介绍" : "展开基础介绍");
+    detailToggle.title = label;
+    detailToggle.setAttribute("aria-label", label);
+    detailToggle.style.right = (visible ? detail.getBoundingClientRect().width : 0) + "px";
+    detail.inert = visible && !expanded;
+  }
+  function toggleIntroduction() {
+    detail.classList.toggle("collapsed");
+    syncDetailToggle();
+    cy.resize();
+  }
+  detailToggle.addEventListener("click", toggleIntroduction);
+  new MutationObserver(syncDetailToggle).observe(detail, {attributes:true, attributeFilter:['class']});
+  new ResizeObserver(syncDetailToggle).observe(detail);
+  language.subscribe(syncDetailToggle);
   document.getElementById("detail-close").addEventListener("click", () => {
-    if (mode === "graph") clearGraphSelection();
+    if (mode === "graph") toggleIntroduction();
     else goToRoute({ name: mode === "software" ? "software" : "library" });
   });
-
-  const settingsButton = document.getElementById("btn-settings");
-  const settingsOverlay = document.getElementById("settings-overlay");
-  const settingsDialog = document.getElementById("settings-dialog");
-  const settingsClose = document.getElementById("settings-close");
-  const settingsBackdrop = document.getElementById("settings-backdrop");
-  const languageSelect = document.getElementById("settings-language-select");
-  const languageStatus = document.getElementById("settings-language-status");
-  const topbar = document.getElementById("topbar");
-  const main = document.getElementById("main");
-  let settingsReturnFocus = null;
-
-  function renderLanguageSettings() {
-    language.localize(settingsButton);
-    language.localize(settingsOverlay);
-    const currentLocale = language.getLocale();
-    const unavailableSuffix = language.t("settings.language.unavailableSuffix");
-    const fragment = document.createDocumentFragment();
-    language.getSupportedLocales().forEach(locale => {
-      const meta = I18N_MANIFEST.locales[locale];
-      const option = document.createElement("option");
-      option.value = locale;
-      option.disabled = meta.selectable === false;
-      option.textContent = meta.selectable === false
-        ? `${meta.nativeLabel} — ${unavailableSuffix}`
-        : meta.nativeLabel;
-      fragment.appendChild(option);
-    });
-    languageSelect.replaceChildren(fragment);
-    languageSelect.value = currentLocale;
-  }
 
   function applyCurrentLanguage() {
     language.localize(document);
     renderLanguageSettings();
-    document.getElementById("locale-fallback-banner").classList.toggle(
-      "hidden",
-      language.getLocale() === I18N_MANIFEST.sourceLocale
-    );
     graphView.refreshLanguage();
     learningView.refreshLanguage();
     softwareView.refreshLanguage();
@@ -256,80 +252,13 @@
   applyCurrentLanguage();
   language.subscribe(applyCurrentLanguage);
 
-  languageSelect.addEventListener("change", async () => {
-    const requested = languageSelect.value;
-    if (!requested || requested === language.getLocale()) return;
-    languageSelect.disabled = true;
-    languageStatus.textContent = language.t("settings.language.changing");
-    try {
-      await content.ensureLocale(requested);
-      await language.setLocale(requested);
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("lang")) {
-        url.searchParams.set("lang", language.getLocale());
-        window.history.replaceState(null, "", url.href);
-      }
-      languageStatus.textContent = "";
-    } catch (error) {
-      languageSelect.value = language.getLocale();
-      languageStatus.textContent = language.t("settings.language.error");
-      console.error(error);
-    } finally {
-      languageSelect.disabled = false;
-    }
-  });
-
-  function openSettings() {
-    if (!settingsOverlay.classList.contains("hidden")) return;
-    settingsReturnFocus = document.activeElement;
-    settingsOverlay.classList.remove("hidden");
-    settingsOverlay.setAttribute("aria-hidden", "false");
-    settingsButton.setAttribute("aria-expanded", "true");
-    topbar.inert = true;
-    main.inert = true;
-    settingsClose.focus();
-  }
-
-  function closeSettings() {
-    if (settingsOverlay.classList.contains("hidden")) return;
-    settingsOverlay.classList.add("hidden");
-    settingsOverlay.setAttribute("aria-hidden", "true");
-    settingsButton.setAttribute("aria-expanded", "false");
-    topbar.inert = false;
-    main.inert = false;
-    if (settingsReturnFocus && typeof settingsReturnFocus.focus === "function") settingsReturnFocus.focus();
-    settingsReturnFocus = null;
-  }
-
-  settingsButton.addEventListener("click", openSettings);
-  settingsClose.addEventListener("click", closeSettings);
-  settingsBackdrop.addEventListener("click", closeSettings);
-  settingsOverlay.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeSettings();
-      return;
-    }
-    if (event.key === "Tab") {
-      const focusable = settingsDialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])');
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  });
-
   async function setMode(m) {
     mode = m;
     const isSW = m === "software";
     const isLibrary = m === "library";
     const isGraph = m === "graph";
+    detail.classList.toggle("graph-detail", isGraph);
+    detail.classList.remove("collapsed");
     document.getElementById("cy").classList.toggle("hidden", !isGraph);
     document.getElementById("legend").classList.toggle("hidden", !isGraph);
     graphView.zoomRoot.classList.toggle("hidden", !isGraph);
@@ -459,9 +388,16 @@
       goToRoute({ name: targetMode === "software" ? "software" : targetMode === "library" ? "library" : "map" });
     }));
 
-  window.addEventListener("hashchange", () => applyRoute());
-  if (window.location.hash) applyRoute();
-  else goToRoute({ name: "map" }, { replace: true });
+  function applyLocationRoute() {
+    const route = ROUTER.parse(window.location.hash);
+    // Old bookmarks remain valid; ordinary map URLs have no fragment.
+    if (route.name === "map" && !route.id && window.location.hash) {
+      ROUTER.navigate(route, { replace: true });
+    }
+    applyRoute(route);
+  }
+  window.addEventListener("hashchange", applyLocationRoute);
+  applyLocationRoute();
 
   // 暴露给调试用
   window.__cy = cy;

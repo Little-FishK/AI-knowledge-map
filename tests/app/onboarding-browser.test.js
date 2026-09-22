@@ -48,9 +48,10 @@ async function main() {
     await page.goto(base);
     await page.locator('#onboarding').waitFor();
     await page.waitForFunction(()=>!!window.AI_SETTINGS);
-    for (const [source,target] of [['#btn-onboarding','[data-skip]'],['#btn-settings','[data-settings]']]) {
-      await page.waitForFunction(([a,b])=>JSON.stringify(document.querySelector(a).getBoundingClientRect())===JSON.stringify(document.querySelector(b).getBoundingClientRect()),[source,target]);
-      assert.deepEqual(await page.locator(source).boundingBox(),await page.locator(target).boundingBox(),'tutorial toolbar matches map toolbar');
+    for (const selector of ['[data-skip]','[data-settings]']) {
+      assert.equal(await page.locator(selector).isVisible(),true);
+      const rect=await page.locator(selector).boundingBox();
+      assert(rect.width>=36 && rect.height>=36,'welcome actions remain usable');
     }
     await page.locator('[data-settings]').click();
     assert.equal(await page.locator('#settings-overlay').isVisible(),true);
@@ -63,12 +64,14 @@ async function main() {
     assert.equal(await page.locator('.onboarding-route').count(), 1);
     assert.equal(await page.locator('.onboarding-reader').count(), 0);
     assert.equal(await page.locator('[data-visit]').count(), 1);
-    assert.equal((await page.locator('#onboarding').innerText()).replace(/\s+/g,' ').trim(), '返回地图 认识AI');
-    assert.deepEqual(await page.locator('.onboarding-face').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('src'))),['assets/node-art/foundations.png?v=2']);
+    assert.equal(await page.getByRole('heading',{name:'看懂 AI， 从这里开始。'}).count(),1);
+    assert.equal(await page.locator('.onboarding-route > li').count(),6,'the entire route is visible before unlocking');
+    assert.equal(await page.locator('.onboarding-route button:disabled').count(),5);
+    assert.equal(await page.locator('.onboarding-launch').isVisible(),true);
+    assert.deepEqual(await page.locator('.onboarding-face').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('src'))),['foundations','building','coding','generation','safety','frontier'].map(name=>`assets/node-art/${name}.png?v=2`));
     await page.waitForFunction(()=>[...document.querySelectorAll('.onboarding-dot img')].every(img=>img.complete&&img.naturalWidth>0));
-    assert.equal(await page.locator('.onboarding-dot').first().evaluate(n=>{const r=n.getBoundingClientRect();return r.x+r.width/2-innerWidth/2;}),0);
-    assert.equal(await page.locator('.onboarding-dot').first().evaluate(n=>{const r=n.getBoundingClientRect();return r.y+r.height/2-innerHeight/2;}),0);
-    assert.equal((await page.locator('.onboarding-dot').first().boundingBox()).width,72);
+    assert.equal(await page.locator('.onboarding-route').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length),3);
+    assert.equal(await page.evaluate(()=>document.querySelector('#onboarding').scrollWidth<=innerWidth),true);
     const firstRing=page.locator('.onboarding-ring-spin').first();
     assert.equal(await firstRing.evaluate(n=>n.getAnimations()[0].effect.getTiming().duration),48000);
     const angle=await firstRing.evaluate(n=>getComputedStyle(n).transform);
@@ -83,7 +86,15 @@ async function main() {
     await page.mouse.move(0,0);
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.waitForFunction(()=>document.querySelector('.onboarding-ring-spin').getAnimations()[0].playState==='paused');
+    assert.equal(await page.locator('.atlas-orbit-outer').evaluate(n=>getComputedStyle(n).animationName),'none');
     await page.emulateMedia({reducedMotion:'no-preference'});
+    assert.equal(await page.locator('[data-motion]').count(),0);
+    assert.equal(await page.locator('.is-locked .onboarding-lock').count(),5);
+    assert.equal(await page.locator('.onboarding-lock').first().evaluate(n=>getComputedStyle(n).color),'rgb(255, 255, 255)');
+    assert.equal(await page.locator('.onboarding-launch').evaluate(n=>getComputedStyle(n).backgroundColor===getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || getComputedStyle(n).backgroundColor==='rgb(122, 162, 216)'),true);
+    const intro=await page.locator('#onboarding').innerText();
+    for(const removed of ['一个起点，连接整个 AI 世界','零基础友好 · 按自己的节奏','循序解锁 · 随时回看','保持好奇，让理解发生','暂停动效']) assert(!intro.includes(removed));
+    assert(intro.includes('官方推荐阶段'));
     assert.equal(await page.getByText(/已读过 \d+ \/ \d+ 站/).count(), 0);
     await page.locator('[data-skip]').focus();
     await page.keyboard.press('Shift+Tab');
@@ -92,7 +103,7 @@ async function main() {
     assert.equal(await page.locator('[data-skip]').evaluate(node=>node===document.activeElement),true);
     assert.equal(await page.evaluate(() => document.querySelector('#app').inert && !window.__cy), true);
     await page.screenshot({path:path.join(shots, 'desktop-first.png')});
-    await page.locator('[data-visit="0"]').click();
+    await page.locator('[data-start]').click();
     assert.equal(await page.locator('.onboarding-route').count(), 0);
     await page.locator('[data-map]').click();
     assert.equal(await page.locator('[data-visit]').count(), 1);
@@ -102,16 +113,23 @@ async function main() {
     await page.locator('[data-read]').click();
     assert.equal(await page.locator('.onboarding-route').count(),1);
     assert.equal(await page.locator('[data-visit]').count(),2);
+    const newLock=page.locator('[data-visit="1"] .onboarding-lock');
+    assert.equal(await newLock.evaluate(n=>getComputedStyle(n).animationName),'onboarding-unlock');
+    assert.equal(await page.locator('[data-visit="1"]').evaluate(n=>n===document.activeElement),true);
+    await newLock.waitFor({state:'detached'});
+    assert.equal(await page.locator('.onboarding-lock').count(),4);
     await page.reload();
     assert.equal(await page.locator('.onboarding-reader').count(), 0);
     assert.equal(await page.locator('[data-visit]').count(), 2);
-    const positions=await page.locator('.onboarding-dot').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().y));
-    assert(positions[1]<positions[0],'newly unlocked node appears above the first');
+    assert.equal(await page.locator('.onboarding-route button:disabled').count(),4);
+    assert.equal(await page.locator('[data-visit="1"]').getAttribute('aria-current'),'step');
+    assert.equal(await page.locator('.onboarding-lock.is-unlocking').count(),0,'reload does not replay unlock');
     await page.locator('[data-visit="1"]').click();
     await page.getByRole('heading', {name:'AI为什么能回答、写作和画画？',exact:true}).waitFor();
     await page.locator('[data-prev]').click();
     await page.locator('[data-read]').click();
     assert.equal(await page.evaluate(k => JSON.parse(localStorage.getItem(k)).read, key), 1);
+    assert.equal(await page.locator('.onboarding-lock.is-unlocking').count(),0,'rereading does not replay unlock');
     for (let i=1;i<6;i++) {
       assert.equal(await page.locator('[data-visit]').count(),i+1);
       await page.locator(`[data-visit="${i}"]`).click();
@@ -120,7 +138,13 @@ async function main() {
         await page.screenshot({path:path.join(shots, 'desktop-answer.png')});
       }
       assert.equal(await page.locator('.onboarding-route').count(), 0);
+      if (i===1) await page.emulateMedia({reducedMotion:'reduce'});
       await page.locator('[data-read]').click();
+      if (i===1) {
+        assert.equal(await page.locator('.onboarding-lock.is-unlocking').count(),0);
+        assert.equal(await page.locator('[data-visit="2"] .onboarding-lock').count(),0);
+        await page.emulateMedia({reducedMotion:'no-preference'});
+      }
       assert.equal(await page.locator('.onboarding-route').count(),1);
       assert.equal(await page.locator('.onboarding-reader').count(),0);
     }
@@ -207,12 +231,12 @@ async function main() {
     await small.goto(base + '?lang=en#/map/supervised-learning');
     await small.locator('#onboarding').waitFor();
     await small.waitForFunction(()=>!!window.AI_SETTINGS);
-    await small.waitForFunction(()=>document.querySelector('#btn-onboarding').getBoundingClientRect().width===document.querySelector('[data-skip]').getBoundingClientRect().width);
-    assert.deepEqual(await small.locator('#btn-onboarding').boundingBox(),await small.locator('[data-skip]').boundingBox());
+    assert.equal(await small.locator('[data-skip]').isVisible(),true);
+    assert.equal(await small.locator('[data-settings]').isVisible(),true);
     await small.locator('[data-settings]').click();
     await small.locator('#settings-close').click();
     assert.equal(await small.locator('[data-visit]').count(),1);
-    assert.equal(await small.locator('.onboarding-dot').first().evaluate(n=>{const r=n.getBoundingClientRect();return r.x+r.width/2-innerWidth/2;}),0);
+    assert.equal(await small.locator('.onboarding-route').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length),2);
     await small.screenshot({path:path.join(shots,'mobile-first.png')});
     assert.equal(await small.evaluate(()=>document.querySelector('#onboarding').scrollWidth <= innerWidth),true);
     await small.locator('[data-visit="0"]').click();
@@ -232,7 +256,7 @@ async function main() {
     await small.screenshot({path:path.join(shots,'mobile-map.png')});
     await small.locator('#btn-onboarding').click();
     await small.locator('[data-visit="2"]').click();
-    await small.getByRole('heading',{name:'怎样让AI听明白我的意思？',exact:true}).waitFor();
+    await small.getByRole('heading',{name:'How do I help AI understand what I mean?',exact:true}).waitFor();
     await small.locator('[data-skip]').click();
     assert.equal(await small.locator('html').getAttribute('lang'),'en');
     assert.equal(await small.locator('#btn-settings').isVisible(),true);

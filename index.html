@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-Hans" dir="ltr">
+<html lang="zh-Hans" dir="ltr" class="onboarding-pending">
 <head>
 <meta charset="utf-8">
+<meta name="baidu-site-verification" content="codeva-tGdVIxA5TA" />
+<meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#0b1118;color:#e5ecee}body{background:#0b1118}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-i18n="app.title.graph">AI 知识地图</title>
+<title>零基础免费学 AI | Learn AI from Scratch · AI 知识地图</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/reading.css">
   <link rel="stylesheet" href="assets/progress.css">
+  <link rel="stylesheet" href="assets/onboarding.css">
 </head>
 <body>
 
-<div id="app">
+<div id="app" inert>
 
   <!-- 顶栏 -->
   <header id="topbar">
@@ -31,6 +34,7 @@
     </div>
     <div class="topbar-actions">
       <button id="btn-reset" class="btn" title="重置视图" data-i18n="controls.reset" data-i18n-title="controls.reset">重置</button>
+      <button id="btn-onboarding" class="btn" type="button" data-i18n="onboarding.open">新手导览</button>
       <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
               aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
               data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
@@ -42,17 +46,12 @@
     </div>
   </header>
 
-  <div id="locale-fallback-banner" class="locale-fallback-banner hidden" role="status" data-i18n="i18n.contentFallback">
-    知识内容的英文翻译仍在准备中；未翻译的内容将显示中文原文。
-  </div>
-
   <div id="main">
 
     <!-- 左侧控制栏 -->
     <aside id="controls">
       <section class="ctl-group">
-        <h3 data-i18n="controls.view.title">视图</h3>
-        <p class="ctl-hint" data-i18n="controls.view.hint">默认只显示各大区的骨干概念；点任一节点会揭开它的邻居</p>
+        <h3><span class="sidebar-heading-text" data-i18n="controls.view.title">视图</span></h3>
         <div class="seg">
           <button data-scope="core" class="on" data-i18n="controls.scope.core">核心</button>
           <button data-scope="all" data-i18n="controls.scope.all">全部</button>
@@ -62,12 +61,12 @@
       </section>
 
       <section class="ctl-group">
-        <h3 data-i18n="controls.domains">大区</h3>
+        <h3><span class="sidebar-heading-text" data-i18n="controls.domains">大区</span></h3>
         <div id="domain-list"></div>
       </section>
 
       <section class="ctl-group learning-panel" aria-labelledby="learning-heading">
-        <h3 id="learning-heading" data-i18n="learning.title">学习</h3>
+        <h3 id="learning-heading"><span class="sidebar-heading-text" data-i18n="learning.title">学习</span></h3>
         <div class="learning-overview">
           <div><strong id="learning-done-count">0</strong><span id="learning-total-count"> / 0 个节点</span></div>
           <span id="learning-percent">0%</span>
@@ -85,17 +84,15 @@
           <summary><span data-i18n="learning.todo">未学习</span> <em id="learning-todo-label">0</em></summary>
           <div id="learning-todo-list" class="learning-node-list"></div>
         </details>
-        <p class="ctl-hint learning-storage-note" data-i18n="learning.storage">进度保存在当前浏览器</p>
       </section>
 
       <section class="ctl-group">
         <h3 class="ctl-toggle-heading">
           <button id="edge-section-toggle" type="button" aria-expanded="true" aria-controls="edge-section-content">
-            <span data-i18n="controls.relationships">关系类型</span><span class="ctl-chevron" aria-hidden="true">⌄</span>
+            <span class="sidebar-heading-text" data-i18n="controls.relationships">关系类型</span><span class="ctl-chevron" aria-hidden="true">⌄</span>
           </button>
         </h3>
         <div id="edge-section-content">
-          <p class="ctl-hint" data-i18n="controls.relationships.hint">跨领域的联系是这张图的重点</p>
           <div class="edge-actions">
             <button class="mini" id="edge-all" data-i18n="controls.selectAll">全选</button>
             <button class="mini" id="edge-none" data-i18n="controls.selectNone">全不选</button>
@@ -105,12 +102,7 @@
         </div>
       </section>
 
-      <section class="ctl-group">
-        <h3 data-i18n="controls.focus.title">聚焦</h3>
-        <p class="ctl-hint" data-i18n="controls.focus.hint">点节点后只显示其邻域</p>
-        <label class="chk"><input type="checkbox" id="focus-on" checked> <span data-i18n="controls.focus.mode">聚焦模式</span></label>
-        <label class="range"><span data-i18n="controls.focus.hops">跳数</span> <input type="range" id="focus-hops" min="1" max="3" value="1"><b id="hops-val">1</b></label>
-      </section>
+
     </aside>
 
     <button id="controls-toggle" class="controls-toggle" type="button"
@@ -138,6 +130,9 @@
       <button id="detail-close" title="关闭" data-i18n-title="common.close" data-i18n-aria-label="common.close">×</button>
       <div id="detail-body"></div>
     </aside>
+    <button id="detail-toggle" class="detail-toggle hidden" type="button" aria-controls="detail" aria-expanded="true" aria-label="收起基础介绍" title="收起基础介绍">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+    </button>
 
   </div>
 
@@ -154,6 +149,7 @@
                 data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
       </header>
       <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
         <section class="settings-group" aria-labelledby="settings-language-title">
           <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
           <div class="settings-row">
@@ -185,6 +181,9 @@
 </div>
 
 <!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
+<script defer src="assets/onboarding-content.js"></script>
+<script defer src="assets/onboarding-model.js"></script>
+<script defer src="assets/onboarding.js"></script>
 <script defer src="assets/vendor/cytoscape.min.js"></script>
 <script defer src="assets/vendor/supabase-2.115.0.min.js"></script>
 <script defer src="assets/progress-model.js"></script>
@@ -204,7 +203,7 @@
 <!-- 软件目录 / 专业资料库 / 使用教程数据不在首屏加载，切到对应视图时按需注入。 -->
 <script defer src="assets/app/shared.js"></script>
 <script defer src="assets/app/runtime-loader.js"></script>
-<script defer src="assets/app/graph-view.js"></script>
+<script defer src="assets/app/graph-view.js?v=20260912-layout-batch-42"></script>
 <script defer src="assets/app/learning-view.js"></script>
 <script defer src="assets/app/deepdive-view.js"></script>
 <script defer src="assets/reading.js"></script>
@@ -212,6 +211,7 @@
 <script defer src="assets/app/software-view.js"></script>
 <script defer src="assets/app/library-view.js"></script>
 <script defer src="assets/router.js"></script>
+<script defer src="assets/shared-settings.js"></script>
 <script defer src="assets/app.js"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ window.AI_LOCALES["zh-Hans"] = Object.freeze({
   locale: "zh-Hans",
   revision: "2026-09-03-stage4",
   messages: Object.freeze({
+    "onboarding.open": "新手导览",
     "app.title.graph": "AI 知识地图",
     "app.title.library": "专业资料库",
     "app.title.software": "AI 软件目录",

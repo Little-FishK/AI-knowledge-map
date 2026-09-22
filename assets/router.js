@@ -38,14 +38,14 @@
     const value = route || { name: "map" };
     const id = value.id == null ? "" : encodeURIComponent(String(value.id));
     switch (value.name) {
-      case "map": return id ? `#/map/${id}` : "#/map";
-      case "concept": return id ? `#/concept/${id}` : "#/map";
+      case "map": return id ? `#/map/${id}` : "";
+      case "concept": return id ? `#/concept/${id}` : "";
       case "software": return "#/software";
       case "software-item": return id ? `#/software/${id}` : "#/software";
       case "tutorial": return id ? `#/tutorial/${id}` : "#/software";
       case "library": return "#/library";
       case "library-item": return id ? `#/library/${id}` : "#/library";
-      default: return "#/map";
+      default: return "";
     }
   }
 
@@ -61,6 +61,14 @@
       } catch (_) {
         window.location.replace(nextHash);
       }
+    } else if (!nextHash) {
+      // Preserve a real history entry without leaving a trailing '#'.
+      // pushState does not emit hashchange, which the application uses to render.
+      const oldURL = window.location.href;
+      const nextUrl = new URL(oldURL);
+      nextUrl.hash = "";
+      window.history.pushState(null, "", nextUrl.href);
+      window.dispatchEvent(new HashChangeEvent("hashchange", { oldURL, newURL: nextUrl.href }));
     } else {
       window.location.hash = nextHash.slice(1);
     }

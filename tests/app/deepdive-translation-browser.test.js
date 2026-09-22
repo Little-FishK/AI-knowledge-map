@@ -6,7 +6,7 @@ const { fixture, hash } = require("../stage2/translation-publication-fixture");
 const { assemble } = require("../../tools/deepdive-stage2/lib/translation-publication");
 const root = path.resolve(__dirname, "../..");
 const source = fixture().snapshot.capture.page;
-const envelope = { ...assemble(fixture()), status: "human-approved" };
+const envelope = { ...assemble(fixture()), status: process.argv.includes('--machine-reviewed') ? 'machine-reviewed' : 'human-approved' };
 const files = ["assets/style.css", "assets/app/runtime-loader.js", "assets/app/deepdive-view.js", "data/locales/en/ui.js", "data/locales/zh-Hans/ui.js"];
 const content = new Map(files.map(file => [`/${file}`, fs.readFileSync(path.join(root, file))]));
 const artifacts = fs.mkdtempSync(path.join(os.tmpdir(), "translation-browser-stage9-"));

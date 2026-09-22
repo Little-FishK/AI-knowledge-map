@@ -174,6 +174,9 @@
             "background-color": ele => NODE_ART[ele.data("domain")] || "#888",
             "background-image": ele => NODE_ART[ele.data("domain")]
               ? new URL(`assets/node-art/${ele.data("domain")}.png?v=2`, document.baseURI).href : "none",
+            // Local images load normally through <img>, but file origins cannot
+            // satisfy Cytoscape's default anonymous CORS request.
+            "background-image-crossorigin": global.location.protocol === "file:" ? "null" : "anonymous",
             "background-fit": "contain",
             "background-width": "100%",
             "background-height": "100%",
@@ -351,6 +354,60 @@
     const curtains = document.createElement('div');
     curtains.id = 'map-side-curtains';
     curtains.setAttribute('aria-hidden', 'true');
+    const stars = document.createElement('div');
+    stars.className = 'map-curtain-stars';
+    const starDust = document.createElement('canvas');
+    starDust.className = 'map-star-dust';
+    stars.appendChild(starDust);
+    let dustSize = '';
+    function paintStarDust(width, height) {
+      const dpr = Math.min(global.devicePixelRatio || 1, 2);
+      const key = `${width}:${height}:${dpr}`;
+      if (dustSize === key) return;
+      dustSize = key;
+      starDust.width = Math.round(width * dpr);
+      starDust.height = Math.round(height * dpr);
+      const context = starDust.getContext('2d');
+      if (!context) return;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Draw at the viewport's native density, with repeatable positions on resize.
+      // The dense diagonal band echoes a galaxy without enlarging a bitmap.
+      let seed = 73921;
+      const random = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+      // Thousands of subpixel stars form the reference's dense dust texture.
+      // Rasterize only on resize; the existing bright stars animate separately.
+      const count = Math.min(100000, Math.round(width * height / 24));
+      for (let i = 0; i < count; i++) {
+        const x = random() * width, y = random() * height;
+        const band = Math.exp(-Math.pow((x / width - .18 - .65 * y / height) / .16, 2));
+        if (random() > .66 + band * .34) continue;
+        const radius = .22 + Math.pow(random(), 3) * .6;
+        const alpha = .22 + random() * .56;
+        context.fillStyle = `rgba(${190 + Math.round(random() * 50)},${205 + Math.round(random() * 40)},255,${alpha})`;
+        context.beginPath(); context.arc(x, y, radius, 0, Math.PI * 2); context.fill();
+      }
+    }
+    const starField = document.createElement('div');
+    starField.className = 'map-star-field';
+    // Stable positions avoid a distracting reshuffle each time the map opens.
+    for (let i = 0; i < 640; i++) {
+      const star = document.createElement('i');
+      const offset = ((i * 73 + 19) % 997) / 997 * 32;
+      const x = i % 2 ? 100 - offset : offset;
+      const y = ((i * 137 + 53) % 991) / 991 * 100;
+      const bright = i % 53 === 0;
+      star.className = bright ? 'map-star map-star-bright' : 'map-star';
+      // More small twinkles, with independent phases; keep large flares sparse.
+      star.style.cssText = `left:${x}%;top:${y}%;--star-size:${bright ? 3 : i % 3 === 0 ? 1.7 : 1.1}px;--star-duration:${2.4 + ((i * 37) % 480) / 100}s;--star-delay:-${((i * 97) % 1300) / 100}s`;
+      starField.appendChild(star);
+    }
+    stars.appendChild(starField);
+    for (const side of ['left', 'right']) {
+      const glimmer = document.createElement('div');
+      glimmer.className = `map-star-glimmer map-star-glimmer-${side}`;
+      stars.appendChild(glimmer);
+    }
+    curtains.appendChild(stars);
     cy.container().appendChild(curtains);
     let cullingDirty = true;
     function updateCurtainCulling() {
@@ -364,6 +421,7 @@
       const width = cy.container().clientWidth;
       const height = cy.container().clientHeight;
       if (!width || !height) return;
+      paintStarDust(width, height);
       // Keep the fade bands rendered; cull only entire node/label bounds that
       // have moved behind a fully opaque curtain. Never alter graph positions.
       const cx = width / 2, cyCenter = height / 2, radius = Math.min(width, height) * .6;
@@ -500,6 +558,7 @@
       ringContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       ringContext.clearRect(0, 0, w, h);
       const active = isActive() && !document.hidden;
+      curtains.classList.toggle('map-stars-paused', !active);
       if (ringActive !== active) {
         ringActive = active;
         cy.nodes().toggleClass('motion-art', active);
@@ -1839,7 +1898,10 @@
       btn.addEventListener("click", () => {
         state.scope = btn.dataset.scope;
         applyFilters();
-        fitView();
+        cy.stop(true, false);
+        cy.zoom(state.scope === "core" ? 1 : 0.5);
+        const visibleNodes = cy.nodes().not(".hidden");
+        if (visibleNodes.length) cy.center(visibleNodes);
       });
     });
     document.getElementById("scope-collapse").addEventListener("click", () => {
@@ -1954,12 +2016,11 @@
 
     function renderLegend() {
       document.getElementById("legend").innerHTML = tr("map.legend");
+      document.getElementById("meta-ver").textContent =
+        `${document.documentElement.lang === "en" ? "Graph data" : "图谱数据"} ${G.meta.version} · ${G.meta.updatedAt}`;
     }
 
     renderLegend();
-
-    document.getElementById("meta-ver").textContent =
-      `${G.meta.version} · ${G.meta.updatedAt}`;
 
     applyFilters();
     restorePresetLayout();
