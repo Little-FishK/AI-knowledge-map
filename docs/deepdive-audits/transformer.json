@@ -1,45 +1,28 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "pageId": "transformer",
-  "pageHash": "sha256:b31c4891ced7ef09ee4e3aa5984d63e8d7ddf011701c3d65106749744a8c6495",
-  "reviewedAt": "2026-08-13",
+  "pageHash": "sha256:94fc1994397858bdce9c016edd3dc8e73249dca5687e8a994f73c7802dafb1db",
+  "reviewedAt": "2026-09-19",
   "mode": "verification",
-  "decision": "fail",
-  "blockingFindings": [
-    {
-      "type": "content-audit",
-      "code": "source-support-blocked",
-      "findingId": "sha256:7da3c8c279d750f37",
-      "section": 6,
-      "sections": [
-        6
-      ],
-      "concept": null,
-      "claim": "第6节仍把 BERT、GPT、T5 模型家族映射到典型架构与用途。",
-      "message": "第6节仍保留两张以 BERT、GPT、T5 为代表并映射到分类、生成、翻译与摘要用途的表格；固定来源仅能直接支持原始 Transformer 的编码器—解码器结构，不能支持这些后续模型家族断言。",
-      "evidence": "下方保留的既有表格包含后来模型家族名称和典型用途，只可当作术语索引；这些后续断言不能由本页固定来源直接核验，也不作为本节教学结论。",
-      "rationale": "返修正文自己明确承认这些后续模型家族与用途不能由本页固定来源直接核验，但仍在同节保留两张承载这些断言的表格，因此首轮要求的移除或收缩没有完成。",
-      "acceptanceCriteria": "移除或收缩第6节仍保留的 BERT、GPT、T5 模型家族与用途断言，使保留内容均可由固定来源直接核验。",
-      "sourceUrls": [
-        "https://arxiv.org/abs/1810.04805",
-        "https://arxiv.org/abs/1910.10683"
-      ]
-    }
-  ],
+  "decision": "pass",
+  "blockingFindings": [],
   "warnings": [],
+  "policyId": "whole-page-teaching-v4",
+  "policyHash": "sha256:8b5b0c8008056147c6bfc43d6ed6ed3f3268562025063cd1e4721d4ecaaeb865",
+  "verificationScopeHash": "sha256:2ba5b5a1b5d45e75c037185f7b7617f77147cc0ee5ccdb7e56f47ac29fb3f2de",
   "coreConcepts": [],
   "verificationResults": [
     {
       "findingId": "sha256:7da3c8c279d750f37",
-      "resolved": false,
-      "evidence": "下方保留的既有表格包含后来模型家族名称和典型用途，只可当作术语索引；这些后续断言不能由本页固定来源直接核验，也不作为本节教学结论。",
-      "rationale": "未解决。返修正文承认后续模型家族与用途不能由固定来源核验，却仍保留两张 BERT/GPT/T5 与分类、生成、翻译、摘要用途的表格；把它们称为术语索引并未移除或收缩这些断言。"
+      "resolved": true,
+      "evidence": "原始 Transformer 由编码器栈和解码器栈连接而成。编码器把输入符号序列变成一串连续表示；解码器读取这些表示与已经产生的输出前缀，逐步给出后续输出。",
+      "rationale": "当前候选已包含用户授权追加的 T5 原始论文，审计未改动来源。独立核验该论文第 2.1、3.2.1 节及图 3、4：其明确介绍 BERT 的全可见注意力与分类输出、编码器用于分类和跨度预测、因果解码器的下一步预测与生成，以及 T5 编码器—解码器的文本到文本框架；图 1 与实验任务覆盖翻译和摘要。因此第 6 节保留的三类骨架及典型用途已获当前来源支持，原始 Transformer 数据流亦有原论文支持。核验地址：https://www.jmlr.org/papers/volume21/20-074/20-074.pdf 。"
     },
     {
       "findingId": "sha256:0628a41f893901265",
       "resolved": true,
-      "evidence": "本页现有来源只支持原始 Transformer 中 token 嵌入、位置编码以及编码器—解码器的数据流，不能据此推出图像切块、ViT、音频、视频、蛋白质或跨模态注意力等后续方案。",
-      "rationale": "已解决。第7节已删除 ViT 图像切块示例及音频、视频、蛋白质和跨模态能力结论，并明确把教学范围收缩到固定来源可支持的 token 嵌入、位置编码与向量序列接口。"
+      "evidence": "这里需要严格区分“核心层接收向量序列”和“任意原始数据都已被证明可直接使用同一架构”。本页现有来源只支持原始 Transformer 中 token 嵌入、位置编码以及编码器—解码器的数据流，不能据此推出图像切块、ViT、音频、视频、蛋白质或跨模态注意力等后续方案。",
+      "rationale": "第 7 节已删除原先以图像切块和跨模态应用作为既成事实的教学段落，改为说明 token 嵌入、位置表示、统一宽度与层间序列接口。现有正文明确指出不能由这些接口事实推出 ViT、音频、视频、蛋白质或跨模态注意力方案，并要求相应模态材料另行支持。保留的数据流事实与当前原始 Transformer 来源吻合；本项原先限定于第 7 节的来源缺口已解决。核验地址：https://arxiv.org/abs/1706.03762 。"
     }
   ]
 }
