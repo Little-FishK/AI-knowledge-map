@@ -6,7 +6,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$serverScript = Join-Path $PSScriptRoot "run-public-site-preview.js"
+$serverScript = Join-Path $PSScriptRoot "run-local-release.js"
+$baseline = Get-Content -LiteralPath (Join-Path $projectRoot '.tmp/translation-deployments/baseline.json') -Raw | ConvertFrom-Json
 $siteMarker = 'data-i18n="app.title.graph"'
 
 function Test-ProjectSite {
@@ -16,6 +17,7 @@ function Test-ProjectSite {
         $response = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:$Port/index.html" -TimeoutSec 1
         return $response.StatusCode -eq 200 `
             -and $response.Content.Contains($siteMarker) `
+            -and $response.Headers["X-AIMap-Local-Release"] -eq $baseline.commit `
             -and $response.Headers["Cache-Control"] -eq "no-store"
     }
     catch {
@@ -61,7 +63,7 @@ if (-not (Test-ProjectSite -Port $port)) {
 
     $node = (Get-Command node -ErrorAction Stop).Source
     $process = Start-Process -FilePath $node `
-        -ArgumentList @($serverScript, $port) `
+        -ArgumentList @(('"' + $serverScript + '"'), $port) `
         -WorkingDirectory $projectRoot `
         -WindowStyle Hidden `
         -PassThru

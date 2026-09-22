@@ -1,0 +1,23 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
+const {execFileSync}=require('node:child_process');
+const {receiptHtml,receiptExpectation,matchesExpected}=require('../../tools/readiness/deploy-translation-page');
+(async()=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'deployment-receipt-'));
+  const git=(...args)=>execFileSync('git',['-c','safe.directory='+root.replace(/\\/g,'/'),'-c','user.name=Receipt test','-c','user.email=test@example.invalid','-c','core.autocrlf=false',...args],{cwd:root,encoding:'utf8',windowsHide:true});
+  git('init','--quiet');
+  const relative='en/concepts/example/index.html';fs.mkdirSync(path.dirname(path.join(root,relative)),{recursive:true});
+  const html='  <html>exact publication</html>  \n\n';fs.writeFileSync(path.join(root,relative),html);
+  git('add','.');git('commit','--quiet','-m','fixture');const commit=git('rev-parse','HEAD').trim();
+  assert.equal(await receiptHtml({pageId:'example',output:root,commit},root),html);
+  assert.equal(await receiptHtml({pageId:'example',output:path.join(root,'pruned-output'),commit},root),html);
+  await assert.rejects(()=>receiptHtml({pageId:'../example',commit},root),/Invalid receipt/);
+  await assert.rejects(()=>receiptHtml({pageId:'example',commit:'HEAD'},root),/exact receipt commit/);
+  await assert.rejects(()=>receiptHtml({pageId:'missing',commit},root),/failed/);
+  const pageContentSha256='sha256:'+require('node:crypto').createHash('sha256').update(html).digest('hex');
+  const expected=await receiptExpectation({pageContentSha256,output:'missing'});
+  assert(matchesExpected(html,expected));assert(matchesExpected(html.replace(/\n/g,'\r\n'),expected));
+  assert(!matchesExpected(html+'modified',expected));
+  await assert.rejects(()=>receiptExpectation({pageContentSha256:'invalid'}),/Invalid receipt content hash/);
+  console.log('PASS: pruned publication receipt reads exact Git blob, including whitespace, and rejects unsafe references');
+})().catch(e=>{console.error(e);process.exitCode=1});

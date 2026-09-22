@@ -1,10 +1,12 @@
 "use strict";
 const fs=require('node:fs'),path=require('node:path');
 const {safeFile,digest}=require('./readiness/site-artifact');
+const {policy:publicationPolicy,canPublish}=require('./readiness/publication-policy');
 function verify(directory,production=false) {
   const root=path.resolve(directory),manifest=JSON.parse(fs.readFileSync(safeFile(root,'release-manifest.json'),'utf8'));
   if(manifest.schemaVersion!==1 || !['preview','production'].includes(manifest.mode))throw Error('Invalid release manifest');
-  if(production && (manifest.mode!=='production'||!manifest.pages.length||manifest.pages.some(p=>!p.eligible)))throw Error('Only a qualified production artifact can deploy');
+  const accessPolicy=publicationPolicy(manifest.publicationPolicy);
+  if(production && (manifest.mode!=='production'||!manifest.pages.length||manifest.pages.some(p=>!canPublish(p,accessPolicy))))throw Error('Only an authorized production artifact can deploy');
   const actual=[];
   function walk(relative='') {for(const name of fs.readdirSync(relative?safeFile(root,relative):root)){const rel=relative?relative+'/'+name:name,file=safeFile(root,rel);if(fs.statSync(file).isDirectory())walk(rel);else actual.push(rel);}}
   walk();
@@ -30,9 +32,11 @@ function verify(directory,production=false) {
     const html=fs.readFileSync(safeFile(root,page.path),'utf8');
     if(!html.includes('source-body:start')||!/<h1\b/.test(html))throw Error('Missing full HTML body');
     if(manifest.mode==='preview'&&!html.includes('noindex'))throw Error('Preview indexing guard missing');
+    if(!page.eligible && manifest.mode==='production'
+      && !html.includes(`class="dd-publication-notice" data-review-status="${page.reviewStatus}"`))throw Error('Public reading review notice missing');
   }
   const sizes=Object.entries(manifest.files).sort((a,b)=>b[1].bytes-a[1].bytes).slice(0,5).map(([file,r])=>({file,bytes:r.bytes}));
-  return {status:'pass',mode:manifest.mode,pages:manifest.pages.length,files:actual.length,bytes:Object.values(manifest.files).reduce((n,r)=>n+r.bytes,0),largestFiles:sizes};
+  return {status:'pass',mode:manifest.mode,publicationPolicy:accessPolicy,pages:manifest.pages.length,underReview:manifest.pages.filter(p=>!p.eligible).length,files:actual.length,bytes:Object.values(manifest.files).reduce((n,r)=>n+r.bytes,0),largestFiles:sizes};
 }
 if(require.main===module)try{console.log(JSON.stringify(verify(process.argv[2],process.argv.includes('--production')),null,2));}catch(e){console.error(e.message);process.exitCode=1;}
 module.exports={verify};

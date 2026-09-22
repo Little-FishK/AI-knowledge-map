@@ -7,7 +7,7 @@ async function main(){
   const hash=value=>'sha256:'+crypto.createHash('sha256').update(value).digest('hex');
   const remote=await fetch(new URL('release-manifest.json',manifest.siteUrl),{signal:AbortSignal.timeout(20000),redirect:'error'});
   if(!remote.ok||hash(JSON.stringify(await remote.json()))!==hash(JSON.stringify(manifest)))throw Error('Exact release is not live yet');
-  const names=[...manifest.seoPages.map(p=>p.file),'sitemap.xml','robots.txt','assets/social/site-card.png',...Object.keys(manifest.files).filter(f=>/^[a-f0-9]{32}\.txt$/.test(f))];
+  const names=[...manifest.seoPages.map(p=>p.file),...(manifest.verificationFiles||[]),'sitemap.xml','robots.txt','assets/social/site-card.png',...Object.keys(manifest.files).filter(f=>/^[a-f0-9]{32}\.txt$/.test(f))];
   const responses=[];
   for(const name of names){
     const url=new URL(name.replace(/index\.html$/,''),manifest.siteUrl).href;

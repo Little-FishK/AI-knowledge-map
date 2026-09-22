@@ -22,7 +22,10 @@ function head(meta,siteUrl,preview=false) {
     else schema.isPartOf={'@id':siteUrl+'#website'};
     if(meta.breadcrumbs.length)schemas.push({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:meta.breadcrumbs.map((crumb,index)=>({'@type':'ListItem',position:index+1,name:crumb.name,item:crumb.url}))});
   }
-  return `<title>${esc(meta.title)} · ${brand(meta.locale)}</title>\n<meta name="description" content="${esc(meta.description)}">\n<meta name="robots" content="${preview||!meta.indexable?'noindex, nofollow':'index, follow'}">\n`+
+  // Concept search titles are already complete, locale-specific search phrases.
+  // Other site pages retain the compact site-name suffix.
+  const documentTitle=meta.kind==='LearningResource'?meta.title:`${meta.title} · ${brand(meta.locale)}`;
+  return `<title>${esc(documentTitle)}</title>\n<meta name="description" content="${esc(meta.description)}">\n<meta name="robots" content="${preview||!meta.indexable?'noindex, nofollow':'index, follow'}">\n`+
     (meta.indexable?`<link rel="canonical" href="${esc(meta.canonical)}">\n`+meta.alternates.map(a=>`<link rel="alternate" hreflang="${esc(a.locale)}" href="${esc(a.url)}">`).join('\n')+`\n<meta property="og:type" content="website">\n<meta property="og:site_name" content="${brand(meta.locale)}">\n<meta property="og:title" content="${esc(meta.title)}">\n<meta property="og:description" content="${esc(meta.description)}">\n<meta property="og:url" content="${esc(meta.canonical)}">\n<meta property="og:locale" content="${meta.locale==='en'?'en_US':'zh_CN'}">\n<meta property="og:image" content="${esc(image)}">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="${esc(meta.title)}">\n<meta name="twitter:description" content="${esc(meta.description)}">\n<meta name="twitter:image" content="${esc(image)}">\n<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">\n`:'')+
     (schemas.length?`<script type="application/ld+json">${JSON.stringify(schemas).replace(/</g,'\\u003c')}</script>\n`:'');
 }

@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const {authorizeSourceChange:allow}=require('../tools/readiness/scoped-source-release');
+const a='sha256:'+'a'.repeat(64),b='sha256:'+'b'.repeat(64),c='sha256:'+'c'.repeat(64);
+const before={sourceHash:a},after={sourceHash:b},en={sourceHash:b,englishVerified:true},permit={one:{before:a,after:b}};
+assert.equal(allow('one',before,before,en),false);
+assert.throws(()=>allow('one',before,after,en),/changed/);
+assert.equal(allow('one',before,after,en,permit),true);
+assert.throws(()=>allow('two',before,after,en,permit),/changed/);
+assert.throws(()=>allow('one',before,{sourceHash:c},en,permit),/changed/);
+assert.throws(()=>allow('one',before,after,{sourceHash:a,englishVerified:true},permit),/changed/);
+assert.throws(()=>allow('one',before,after,{sourceHash:b,englishVerified:false},permit),/changed/);
+console.log('PASS exact Chinese source authorization, English binding and unrelated/stale source rejection');

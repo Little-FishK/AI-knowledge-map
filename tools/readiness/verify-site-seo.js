@@ -8,7 +8,13 @@ function verifySeo(root,manifest) {
   if(!Array.isArray(pages)||!pages.length)fail('missing page registry');
   const byUrl=new Map(pages.map(p=>[p.canonical,p]));
   if(byUrl.size!==pages.length||new Set(pages.map(p=>p.file)).size!==pages.length)fail('duplicate URL or file');
-  const htmlFiles=Object.keys(manifest.files).filter(file=>file.endsWith('.html')).sort();
+  const verificationFiles=manifest.verificationFiles || [];
+  if(!Array.isArray(verificationFiles)||new Set(verificationFiles).size!==verificationFiles.length)fail('invalid verification file registry');
+  for(const file of verificationFiles){
+    if(!Object.hasOwn(manifest.files,file))fail('missing verification file');
+    require('./site-verification').validate(file,fs.readFileSync(path.join(root,file)));
+  }
+  const htmlFiles=Object.keys(manifest.files).filter(file=>file.endsWith('.html')&&!verificationFiles.includes(file)).sort();
   if(JSON.stringify(htmlFiles)!==JSON.stringify(pages.map(p=>p.file).sort()))fail('metadata must cover every HTML page');
   const share=fs.readFileSync(path.join(root,'assets/social/site-card.png'));
   if(share.length<24||share.subarray(0,8).toString('hex')!=='89504e470d0a1a0a'||share.readUInt32BE(16)!==1200||share.readUInt32BE(20)!==630)fail('share image dimensions differ from metadata');

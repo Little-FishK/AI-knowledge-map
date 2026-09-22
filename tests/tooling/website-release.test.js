@@ -4,8 +4,13 @@ const root=path.resolve(process.argv[2]||'site-release');
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
 const manifest=JSON.parse(read('release-manifest.json'));
 assert.equal(manifest.mode,'production');
-assert.deepEqual(manifest.pages.map(p=>({id:p.id,locale:p.locale,eligible:p.eligible})),[{id:'supervised-learning',locale:'zh',eligible:true}]);
-assert.equal(manifest.excluded.length,129);
+assert.equal(manifest.publicationPolicy,'open-reading');
+assert.equal(manifest.pages.length,130);
+assert.equal(manifest.pages.every(p=>p.locale==='zh'&&p.publicAccess===true),true);
+assert.equal(new Set(manifest.pages.map(p=>p.id)).size,130);
+assert.equal(manifest.excluded.length,0);
+assert(manifest.pages.some(p=>p.id==='supervised-learning'&&p.eligible===true));
+for(const p of manifest.pages.filter(p=>!p.eligible))assert(read(p.path).includes(`data-review-status="${p.reviewStatus}"`));
 const home=read('index.html'),concept=read('zh/concepts/supervised-learning/index.html'),search=read('search/index.html'),notFound=read('404.html');
 assert.equal(manifest.siteUrl,'https://ai-knowledge-map.com/');
 assert.equal(read('CNAME').trim(),'ai-knowledge-map.com');
@@ -23,9 +28,9 @@ if(manifest.seoPages?.some(p=>p.kind==='AboutPage')){
   const about=read('about/index.html');assert(about.includes('LittleFishK'));assert(about.includes('CC BY 4.0'));assert(about.includes('/licenses/MIT.txt'));assert(home.includes('href="/about/"'));
 }
 const navigation={};vm.runInNewContext(read('assets/concept-pages.js'),{window:navigation});
-assert.deepEqual(Object.keys(navigation.AI_STATIC_CONCEPTS),['supervised-learning']);
+assert.deepEqual(Object.keys(navigation.AI_STATIC_CONCEPTS).sort(),manifest.pages.map(p=>p.id).sort());
 assert.deepEqual(Object.keys(navigation.AI_STATIC_CONCEPTS['supervised-learning']),['zh-Hans']);
 const searchIndex=JSON.parse(read('assets/site-search-index.json'));
-assert.equal(searchIndex.filter(item=>item.kind==='中文理解页').length,1);
+assert.equal(searchIndex.filter(item=>item.kind==='中文理解页').length,130);
 assert.equal(searchIndex.some(item=>item.kind==='English reading'),false);
-console.log('PASS: qualified single-page release, canonical/schema/sitemap, no fake English, production copy and 404 indexing policy');
+console.log('PASS: 130 public reading pages, truthful review status, full navigation/search/sitemap, no fake English, production and 404 policy');
