@@ -7,7 +7,8 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/reading.css">
   <link rel="stylesheet" href="assets/progress.css">
-<title>AI 全貌与基础原理 · AI 知识地图</title>
+  <link rel="stylesheet" href="assets/onboarding.css">
+<script defer src="assets/publication-notice.js"></script><title>AI 全貌与基础原理 · AI 知识地图</title>
 <meta name="description" content="面向 AI 初学者和非技术读者的免费知识项目，通过知识地图、概念解释和学习进度记录，认识 AI 世界的全貌与基础逻辑。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/">
@@ -31,7 +32,7 @@
 </head>
 <body><a class="preview-skip" href="#stage">跳到地图 / Skip to map</a>
 
-<div id="app">
+<div id="app" inert>
 
   <!-- 顶栏 -->
   <header id="topbar">
@@ -52,6 +53,7 @@
     </div>
     <div class="topbar-actions">
       <button id="btn-reset" class="btn" title="重置视图" data-i18n="controls.reset" data-i18n-title="controls.reset">重置</button>
+      <button id="btn-onboarding" class="btn" type="button" data-i18n="onboarding.open">新手导览</button>
       <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
               aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
               data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
@@ -126,12 +128,7 @@
         </div>
       </section>
 
-      <section class="ctl-group">
-        <h3 data-i18n="controls.focus.title">聚焦</h3>
-        <p class="ctl-hint" data-i18n="controls.focus.hint">点节点后只显示其邻域</p>
-        <label class="chk"><input type="checkbox" id="focus-on" checked> <span data-i18n="controls.focus.mode">聚焦模式</span></label>
-        <label class="range"><span data-i18n="controls.focus.hops">跳数</span> <input type="range" id="focus-hops" min="1" max="3" value="1"><b id="hops-val">1</b></label>
-      </section>
+
     </aside>
 
     <button id="controls-toggle" class="controls-toggle" type="button"
@@ -159,6 +156,9 @@
       <button id="detail-close" title="关闭" data-i18n-title="common.close" data-i18n-aria-label="common.close">×</button>
       <div id="detail-body"></div>
     </aside>
+    <button id="detail-toggle" class="detail-toggle hidden" type="button" aria-controls="detail" aria-expanded="true" aria-label="收起基础介绍" title="收起基础介绍">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+    </button>
 
   </div>
 
@@ -175,6 +175,7 @@
                 data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
       </header>
       <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
         <section class="settings-group" aria-labelledby="settings-language-title">
           <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
           <div class="settings-row">
@@ -206,6 +207,9 @@
 </div>
 
 <!-- 首屏只加载地图渲染必需的脚本；全部 defer，并行下载、按序在解析后执行。 -->
+<script defer src="assets/onboarding-content.js?v=a4eed1f49a147ed0"></script>
+<script defer src="assets/onboarding-model.js"></script>
+<script defer src="assets/onboarding.js?v=b75617f600790e61"></script>
 <script defer src="assets/vendor/cytoscape.min.js"></script>
 <script defer src="assets/vendor/supabase-2.115.0.min.js"></script>
 <script defer src="assets/progress-model.js"></script>
@@ -225,7 +229,7 @@
 <!-- 软件目录 / 专业资料库 / 使用教程数据不在首屏加载，切到对应视图时按需注入。 -->
 <script defer src="assets/app/shared.js"></script>
 <script defer src="assets/app/runtime-loader.js"></script>
-<script defer src="assets/app/graph-view.js"></script>
+<script defer src="assets/app/graph-view.js?v=20260912-layout-batch-42"></script>
 <script defer src="assets/app/learning-view.js"></script>
 <script defer src="assets/app/deepdive-view.js"></script>
 <script defer src="assets/reading.js"></script>
@@ -233,6 +237,7 @@
 <script defer src="assets/app/software-view.js"></script>
 <script defer src="assets/app/library-view.js"></script>
 <script defer src="assets/router.js"></script>
+<script defer src="assets/shared-settings.js"></script>
 <script defer src="assets/app.js"></script>
 <script defer src="assets/release-navigation.js"></script></body>
 </html>

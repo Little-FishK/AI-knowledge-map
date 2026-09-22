@@ -48,7 +48,9 @@
       article.lang = page.contentLocale || "zh-Hans";
       const languageNotice = page.translationFallback
         ? `<div class="dd-language-notice" role="status" lang="en">${esc(t("deepdive.translationFallback"))}</div>` : "";
-      const provisionalPublication = page.publication
+      const websiteNotice = page.websitePublication && global.AI_PUBLICATION_NOTICE
+        ? global.AI_PUBLICATION_NOTICE.render(page.websitePublication.reviewStatus, article.lang) : null;
+      const provisionalPublication = websiteNotice === null && page.publication
         && ["published-provisional", "published-editorial-draft"].includes(page.publication.status)
         ? page.publication
         : null;
@@ -69,7 +71,7 @@
       const hero = `<div class="dd-hero">
           <div class="dd-eyebrow">${esc(t("deepdive.eyebrow"))}</div>
           <h1 class="dd-h1${provisionalPublication ? " dd-h1-provisional" : ""}">${esc(page.title)}</h1>
-          ${provisionalNotice}
+          ${websiteNotice === null ? provisionalNotice : websiteNotice}
           ${page.subtitle ? `<div class="dd-sub">${esc(page.subtitle)}</div>` : ""}
           ${page.aliases ? `<div class="dd-ali">${esc(page.aliases)}</div>` : ""}
           ${page.meta ? `<div class="dd-metabar">${esc(page.meta)}</div>` : ""}
