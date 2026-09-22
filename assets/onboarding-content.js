@@ -1,0 +1,163 @@
+/* Original beginner lessons; separate from graph nodes and Stage 2 understanding pages. */
+(function (global) {
+  'use strict';
+  const google = ['Google AI Essentials · 课程介绍', 'https://grow.google/ai-essentials/'];
+  const elements = ['Elements of AI · 认识AI', 'https://course.elementsofai.com/1/1/'];
+  const learning = ['Elements of AI · 机器学习入门', 'https://course.elementsofai.com/4/1/'];
+  const society = ['Elements of AI · 社会影响', 'https://course.elementsofai.com/6/2/'];
+  global.AI_ONBOARDING_LESSONS = [
+    {
+      id: 'meet-ai', short: '认识AI', title: 'AI能帮我做什么？', subtitle: '从整体和底层出发，认识这个正在改变每个人的新工具。',
+      thesis: 'AI是一类让计算机从信息中寻找规律，并用这些规律完成识别、预测、生成或工作任务的技术。但这不等于它像人一样理解、思考或拥有意识；它的能力取决于所使用的模型、数据、工具和具体任务。',
+      sections: [
+        ['为什么现在要认识AI？', '<p>如今，AI的发展速度前所未有，这项技术已经冲击到我们的各行各业，带来无数技术进步的同时，对这个时代的所有人，尤其是想要为自己的生活和社会做出足够贡献的人带来了前所未有的考验，那就是强迫我们必须学习和拥抱AI。</p><p>对于学习者，AI打破了知识壁垒和行业壁垒，能将无穷的曼妙知识用最简洁和最耐心的方式教给任何人。对于工作者，AI解放工作时间的同时，带来了百倍千倍的工作效率。而最重要的一点是，AI越发达，用起来越简单，越亲切！这个曾经属于高级工程师和程序员的游戏如今已经对每一个人开放，而在一段时间后，世界上所有人都将因此受益。</p><p>但是至少现在，AI对大多数人还是一个一知半解的东西，一团笼罩在明天的乌云，因为它太宏伟浩大了。不管我怎样去学习，也好像盲人摸象一般只能触及AI的一个方面。正因如此，对初学者来说从整体出发，从底层出发才如此重要——当AI大树的叶子开了又落时，你能够扶着树干说：它就在这里，永远都在。</p>'],
+        ['平时的帮手', '<p>你现在就想学新知识，不仅想学，还想出产一份漂亮的笔记，并把它分享到朋友圈。这时AI可以直接教你关于新知识的任何内容，也可以直接推荐互联网上相关的所有教学资源。而生成笔记和PPT更是小菜一碟。在熟练使用一些AI技术后，只需要一个命令就能把笔记瞬间分享到朋友圈，QQ以及任何你喜欢的平台，当然，文案也是配好的。</p><p>总体来看，AI有四类基本功能：认识，预测，创造和工作。认识和介绍概念，图转文，翻译，预测未来走向或干脆总结别人的预测，文生图，生成音乐，以及永远解决一些重复性工作。这些都是入门的用法，一个任务可能同时包含几种不同的用法，而且AI可以和任何现存的应用结合。</p>'],
+        ['人需要做什么？', '<p>AI不知道你真正喜欢什么，也不能替你决定要表达什么。你来说明目标，提供准确的信息，再从它的建议中挑选并优化。总之，AI负责帮助你，你负责决定结果是否适合。</p>']
+      ],
+      question: '如果现在让AI帮你做一件事，你会让它帮什么，又由你来决定什么？', answer: '你可以让AI帮助学习、整理、创作或处理重复工作，但目标是什么、采用哪个结果以及结果是否合适，仍然由你决定。',
+      takeaway: 'AI负责帮助你，你负责说明目标、挑选结果，并判断它是否适合。', sources: [google, elements]
+    },
+    {
+      id: 'understand-generation', short: '理解生成', title: 'AI为什么能回答、写作和画画？', subtitle: '认识“从例子中学习”和“生成新内容”。',
+      thesis: 'AI通过训练从大量例子中形成规律；使用时，它根据这些规律和当前输入生成结果，而不是从某处直接搬来答案。',
+      sections: [
+        ['一个水果的例子', '<p>AI自程序而来。如果要教一个程序分辨苹果和香蕉，我们可以准备很多苹果和香蕉的照片，并告诉程序哪些是苹果，哪些是香蕉。这个过程不断调整程序，直到它形成特定的规律和辨别能力——比如苹果可能是红的或青的，香蕉通常是黄的。这就是一种AI的学习方式，叫作<strong>监督学习</strong>。之后，我们还会了解更多学习方式。</p>'],
+        ['训练和使用，是两个过程', '<p>我们大部分接触到的模型已经被训练好了，而我们只是在使用它们。“训练”和“使用”是不同的：你和AI的对话会影响它在当前话题中的回答，但不会因此改变所有人使用的模型。</p><p>许多模型会使用来自互联网等来源的大量信息进行训练。AI的回复通常依据训练中学到的规律和当前对话生成，并不是凭空从它自己的意识里冒出来。</p>'],
+        ['“生成”与“找到”有什么不同？', '<p><strong>生成式AI</strong>能够根据要求产生文字、图片或声音。让它“写一首关于纸飞机的新童谣”，得到的是按要求生成的内容；让工具查找一本书里已有的童谣，则需要检索原文。生成过程也可能复现已有片段，所以生成不自动等于独一无二。</p><p>有些工具把搜索和生成结合起来：先查材料，再组织回答。但一段话看起来像百科，不代表它真的查过资料。讲故事时可以想象，介绍真实人物和事件时则需要核查。下一站，我们先学会怎样把要求说清楚。</p>']
+      ],
+      figure: {flow: true, caption: '上方是训练得到模型，下方是使用模型产生结果。一次聊天不等于重新训练整个模型。', cards: [['训练：从许多例子中学习', '例如照片与对应的名称'], ['得到模型', '用于处理新输入的一套规律'], ['使用：提供新的输入', '一张照片，或一段创作要求'], ['得到结果', '一个判断，或一份生成内容']]},
+      question: '让AI写一首新童谣，需要和查找原有童谣一样的检查吗？', answer: '不完全一样。新童谣要检查是否符合主题、读起来是否顺畅；查找已有童谣则要核对原文、作者和出处。两者都不能只看回答是否流畅。',
+      takeaway: '生成了内容，不代表内容已经经过事实核实。', sources: [learning, google]
+    },
+    {
+      id: 'say-what-you-need', short: '说清需求', title: '怎样让AI听明白我的意思？', subtitle: '不用特殊咒语，像交代一件事情那样表达。',
+      thesis: '说清楚要做什么、有哪些背景、希望得到什么样的结果，再根据回答继续调整。',
+      sections: [
+        ['先说任务，再补充必要信息', '<p>如果你只说“帮我设计一个活动”，AI不知道活动给谁参加、在哪里举行、需要多久。它可能给出一个很热闹却根本做不了的方案。问题不一定在于你没有用高级词语，而是它缺少决定方案所需的信息。</p><p>发给AI的要求和相关材料，通常叫作<strong>提示词</strong>，英文是Prompt。你可以记住三个部分：<strong>任务＋必要背景＋结果要求</strong>。不必每次写成长篇，也不必给它安排一个夸张的身份。能力较强的AI通常更能理解自然表达，但把任务和条件说清楚，仍然可以减少误解。</p>'],
+        ['看一个说清楚的例子', '<p>下面用一个纸飞机活动来演示：</p><blockquote class="onboarding-example">请帮我设计一个在教室里进行的纸飞机活动，参与者是四年级学生，活动时间共20分钟，只用普通纸。请给出3个步骤，每步不超过两句话。</blockquote><p>“设计纸飞机活动”是任务；年级、场地、时间和材料是背景与限制；“3个步骤，每步不超过两句话”是结果要求。如果希望答案采用某种格式，也可以再给一个简短示例。</p><p>第一次只说“帮我设计一个活动”，得到的方案可能简略而且方向很多。补充教室、普通纸和20分钟后，范围就清楚了一些。看到回答后，再检查人数、每人尝试次数、怎样比较结果等细节，并继续追问。</p><p>记住两点：第一，关键细节越明确，结果通常越贴近目标，但不必一次塞入所有细节，可以根据回答逐步补充；第二，一个好的示例能让AI更清楚你期待的格式和风格，这与重新训练模型不是一回事。对话很长时，AI也可能遗漏较早的条件，必要时可以简要重申。</p>'],
+        ['清晰、严谨，继续追问', '<p>假如AI给出的活动第二步是“比较同学们纸飞机的飞行距离”，你可以继续说：</p><blockquote class="onboarding-example">第二步不够清楚，请补充用什么工具、怎样比较飞行距离。</blockquote><p>明确指出哪里需要改、想怎样改，就能让整个方案一步步变好。一次只调整关键问题，往往更容易判断结果是否合适；如果一次交给AI很多彼此不同的任务，它可能漏掉其中一些要求。</p><p>清楚的断句和一致的用词也能减少歧义。在同一段对话中，尽量用同一个词描述同一个概念。个别标点错误通常不会决定回答质量，但含义不清时，应先把句子改明白。</p><p>清楚的要求能帮助结果更贴近目标，却不能保证事实正确。不要把“回答更像我想要的”当成“回答一定可信”。下一站，我们来看如何检查AI的答案是否正确。</p>']
+      ],
+      figure: {flow: true, caption: '教学示意：补充条件和反馈，让对话逐步贴近目标，不保证事实自动正确。', cards: [['第一次：提出任务', '“帮我设计一个活动”'], ['补充：背景与结果要求', '教室、普通纸、20分钟、3步'], ['收到草稿：检查哪里不合适', '第二步没有说明比较的方法'], ['再沟通：指出具体修改', '补充方法，其他部分保持简短']]},
+      question: '把“帮我写点东西”改成一个具体请求，你会补充什么？', answer: '先说写什么、给谁看，再说明需要的长度或格式。例如：“把这段读书活动通知缩短，保留时间和地点，控制在100字以内。”',
+      takeaway: '说清任务、背景和要求；不合适就指出具体修改。', sources: [google]
+    },
+    {
+      id: 'check-answers', short: '检查答案', title: '我能相信AI的答案吗？', subtitle: '看起来很有把握，也要找到核对的依据。',
+      thesis: '表达流畅不代表内容正确，重要信息要找到能核对的依据。',
+      sections: [
+        ['先看一条很像真的通知', '<p>你给AI的材料只有：“读书分享会将在周五举行，请带一本喜欢的书。”它整理后的通知却写着：“周五下午3点，我们在二楼图书室集合，请带一本喜欢的书。”句子很完整，但原材料根本没有时间和地点。</p><p>这类看似合理、实际没有根据或不成立的生成内容，常被称为<strong>幻觉</strong>。这不需要先假设AI故意骗人。对我们来说，关键是发现新增了哪些细节，并找到证据。</p>'],
+        ['它可能在哪些地方出错？', '<p>除了编造，AI还可能使用过时信息、误解你的问题，或在计算和推理中犯错。即使提供了材料，它也可能遗漏限制条件。不能只凭自信的语气、整齐的表格或专业词语判断答案可靠。</p><p>检查方法要跟任务匹配。编故事时，看人物和情节是否符合要求；改通知时，对照原文确认时间、地点有没有改变；算费用时，重新核对数字和计算。你需要的是适合当前任务的检查，不是每次都做同一张大清单。</p>'],
+        ['按三步检查关键内容', '<p><strong>第一步，找出关键说法。</strong>圈出日期、数字、人物、来源，以及会影响行动的结论。<strong>第二步，对照依据。</strong>活动信息回到主办方通知，引用回到原文，数字用可靠方法重新计算。<strong>第三步，保留不确定性。</strong>没查到的部分可以删去，或明确写成“待确认”。</p><p>让同一个AI再回答“你确定吗”，不能代替核查。它给出链接时，也要打开看看：页面是否存在，里面是否真的支持这个说法。越是会影响重要决定的内容，越需要可靠来源和能够负责的人参与检查。</p><p>总结或引用文章时，尤其要审核AI产出的内容。幻觉目前不能被彻底消除，但可以降低风险：让AI只依据指定资料或知识库回答，并要求标出对应出处；针对常见错误设置检查清单；为重复任务写一份说明书，列出步骤、限制和常见问题。知识库和任务说明能帮助限定范围，却不能保证内容正确，最终仍要回到原文和可靠来源核查。</p>']
+      ],
+      figure: {flow: true, caption: '教学示例：原通知没有具体时间和地点，应向主办方核实，不能采用AI补出的细节。', cards: [['找出说法', '“周五下午3点，二楼图书室”'], ['对照原始材料', '原文只写了“周五举行”'], ['处理无法确认的信息', '删去新增细节，向主办方核实']]},
+      question: 'AI说“我非常确定”，足以确认下午3点集合吗？', answer: '不够。应查看原始通知或询问主办方。重复的保证不是新的证据；没有确认前，不要把这个时间传给别人。',
+      takeaway: '先找关键说法，再查依据；没有依据就不要装作确定。', sources: [google]
+    },
+    {
+      id: 'use-responsibly', short: '负责使用', title: '怎样用AI，才不会给自己和别人添麻烦？', subtitle: '在输入、采用结果和分享之前，各停下来想一想。',
+      thesis: '保护不该分享的信息，尊重别人，并对自己采用和传播的结果负责。',
+      sections: [
+        ['输入前：哪些信息不该交出去？', '<p>让AI整理一张活动名单，不代表它需要知道每个人的家庭住址、电话和密码。先检查材料里有没有与任务无关的私人信息，删去后再决定是否使用。课堂练习可以直接用“小甲、小乙”等虚构人物。</p><p>私人照片、聊天记录也涉及别人。不要因为上传很方便，就默认自己可以随意提供。工具怎样保存和使用数据，需要看它的说明和设置；不清楚时，可以换成不含私人信息的例子。</p>'],
+        ['使用时：看看谁被遗漏了', '<p>AI可能沿用数据中的偏差。比如活动方案默认所有人都能跑跳，就没有照顾行动不便的同学；人物介绍总把某类工作分给某一种人，也可能重复刻板印象。检查结果时，除了问“对不对”，还可以问“有没有漏掉谁”。</p><p>学习时，你可以请AI解释难词、给一点提示，再自己试一遍。按照老师或任务的要求使用，并保留自己的思考过程。如果只是把答案交出去，却说不出为什么，学习目标就没有完成。</p>'],
+        ['分享和操作前：最后由你把关', '<p>生成的照片可能非常逼真，但不能直接当成真实事件的证据。不用它冒充别人说话，也不拿虚构的图片误导他人。在容易造成误解时，说明内容有AI参与，并核查具体使用场景的要求。</p><p>有些工具不只回答问题，还能发消息、整理文件或发布内容。这些动作可能影响别人。在执行前，看清内容、对象和范围。就像请人帮忙寄信，也要先确认信里写了什么、寄给谁。AI参与了制作，不会让你采用和传播结果的责任自动消失。</p>']
+      ],
+      figure: {flow: true, caption: '三个停顿点：减少不必要的信息输入，检查结果是否公平适用，再确认分享与操作。', cards: [['输入前', '删去电话、住址等无关信息'], ['使用时', '看看方案有没有遗漏某些人'], ['分享前', '确认真假、对象和操作范围']]},
+      question: '想让AI排一个活动表，需要上传同学的家庭住址吗？', answer: '通常不需要。只提供安排活动必需的条件，例如人数、时间和可用材料。使用虚构名字，往往也能完成练习。',
+      takeaway: '少给无关的私人信息，多检查结果，分享和操作前自己把关。', sources: [google, society]
+    },
+    {
+      id: 'start-exploring', short: '开始探索', title: '工具这么多，我该从哪里开始？', subtitle: '带着一个小任务，走进完整知识地图。',
+      thesis: '想清楚任务，再选合适的工具；遇到想弄懂的问题，就去知识地图继续探索。',
+      sections: [
+        ['先选任务，再选工具', '<p>想把通知写清楚，可以直接问AI；想查证一条消息，要找方便查看来源的检索工具；想做海报，可以找AI图片生成应用；处理录音或编程，则可以选择支持相应材料的AI工具，并与其他应用配合。</p><p>生成式AI的输出可能变化。对于需要严格、重复执行的步骤，堆叠很多AI智能体不一定更好，普通程序或固定流程有时更可靠。不要为了使用AI而把每一步都交给AI。</p><p>目前有许多AI工具，我们也可以快速搭建个人定制的小应用。选择前，可以请AI列出候选工具和行业中的常见做法，但它可能弄错功能、价格或使用条件，因此还要查看产品的官方说明并亲自试用。</p>'],
+        ['用四个问题作选择', '<p><strong>我的任务最不能少的能力是什么？</strong>例如多人共享、导出文件，或提供<strong>API</strong>——让不同应用交换信息的接口。<strong>它能处理我的材料吗？</strong>例如文字、照片还是录音。<strong>它能给出需要而且方便检查的结果吗？</strong>例如可编辑的文字、能打开的引用，还是一张图片。<strong>使用条件适合我吗？</strong>看看费用、隐私设置，以及是否符合自己的使用场景。</p><p>即使应用是AI推荐的，推荐理由也可能有错。先用一份不含私人信息的小材料试一试，检查输入、结果和费用，再决定是否用于完整任务。这样能及早发现不合适的地方，减少之后返工。</p>'],
+        ['这张AI知识地图怎么用？', '<p>完整地图里的每个<strong>节点</strong>代表一个概念，连线表示概念之间的关系。先点击一个感兴趣的节点，读基础介绍；想继续弄懂机制，再打开“理解原理”页，其中有些内容会进一步讲到数学原理，也可以在AI的辅助下学习。暂时看不懂的术语可以先放下，不需要一次读完整张地图。</p><p>这张地图希望覆盖AI技术整体的基础概念，让我们不再只学习一两个概念或某个工具的用法，而能发现不同技术和应用背后相通的逻辑。浏览基础概念后，再选择感兴趣的方向继续深入。如果不知道从哪里开始，可以按照左侧栏中的推荐学习路径前进。</p><p>网站还提供专业资料库和软件使用教程，可以通过页面左上方的导航切换。右上角的设置可以切换语言或登录；登录后，可以在支持的设备和浏览器中同步学习进度。</p>']
+      ],
+      figure: {flow: true, caption: '从一个具体问题开始，再逐步加深。此图是阅读路线示意，不是正式图谱中的关系边。', cards: [['我的问题', '怎样让AI更明白我的需求？'], ['地图中的概念', '搜索并点击“提示工程”'], ['先读基础介绍', '认识它能解决什么问题'], ['按需要继续', '打开“理解原理”深入阅读']]},
+      question: '进入地图后，你想先探索什么？', answer: '可以先搜“提示工程”“幻觉”或“监督学习”，也可以去软件目录寻找适合你的小任务的工具。没有必须立即读懂全部节点的要求。',
+      takeaway: '你已经完成新手路线。带着自己的问题，开始探索吧。', sources: [google, elements]
+    }
+  ];
+})(window);
+
+/* English uses the same lesson structure and renderer as the Chinese original. */
+(function (global) {
+  'use strict';
+  const google = ['Google AI Essentials · Course overview', 'https://grow.google/ai-essentials/'];
+  const elements = ['Elements of AI · What is AI?', 'https://course.elementsofai.com/1/1/'];
+  const learning = ['Elements of AI · Introduction to machine learning', 'https://course.elementsofai.com/4/1/'];
+  const society = ['Elements of AI · Social implications', 'https://course.elementsofai.com/6/2/'];
+  global.AI_ONBOARDING_LESSONS_EN = [
+    {
+      id: 'meet-ai', short: 'Meet AI', title: 'What can AI help me do?', subtitle: 'Start with the big picture and the basics to understand a tool that is changing our lives.',
+      thesis: 'AI is a family of technologies that lets computers find patterns in information and use them to recognize, predict, generate, or carry out tasks. This does not mean it understands, thinks, or has consciousness like a person. Its abilities depend on the model, data, tools, and task.',
+      sections: [
+        ['Why learn about AI now?', '<p>AI is developing at an unprecedented pace, reaching industries of every kind. Alongside countless technological advances, it presents a new challenge for everyone, especially those who want to contribute to their own lives and to society: learning about AI and embracing it is becoming a necessity.</p><p>For learners, AI breaks down barriers between subjects and professions, explaining a wealth of fascinating knowledge simply and patiently. For workers, it frees up time and can multiply productivity many times over. Most of all, as AI becomes more advanced, it becomes easier and more approachable to use. What was once the preserve of skilled engineers and programmers is now open to everyone, with the promise of benefits reaching people around the world over time.</p><p>Yet for many people, AI remains only partly understood: a cloud hanging over tomorrow, too vast to take in. However much we learn, it can feel like touching only one part of an elephant without seeing the whole animal. That is why beginners need both the big picture and the foundations. As the leaves of the AI tree grow and fall, you can hold on to its trunk and say: here it is, still here.</p>'],
+        ['An everyday helper', '<p>Suppose you want to learn something new, turn it into attractive notes, and share them with friends. AI can explain the subject and suggest relevant learning resources online. Creating notes and slides is another common use. Once you are familiar with suitable AI tools and integrations, a single instruction can even share your notes on X (Twitter), Instagram, or another platform you use, complete with a caption.</p><p>Broadly speaking, AI has four basic uses: recognition, prediction, creation, and getting work done. These include explaining concepts, extracting text from images, translating, forecasting trends or summarizing other forecasts, generating images and music, and handling repetitive work. These are starting points. A single task can combine several uses, and AI can be integrated with existing applications.</p>'],
+        ['What is your part?', '<p>AI does not know what you truly like, and it cannot decide what you want to express. You explain the goal, provide accurate information, and choose and improve its suggestions. AI helps; you decide whether the result is suitable.</p>']
+      ],
+      question: 'If AI could help you with one thing right now, what would you ask it to do, and what would you decide yourself?', answer: 'AI can help you learn, organize, create, or handle repetitive work. You still decide the goal, which result to use, and whether it is suitable.',
+      takeaway: 'AI helps. You explain the goal, choose the result, and judge whether it fits.', sources: [google, elements]
+    },
+    {
+      id: 'understand-generation', short: 'Understand generation', title: 'How can AI answer, write, and draw?', subtitle: 'Explore learning from examples and generating new content.',
+      thesis: 'During training, AI learns patterns from many examples. When you use it, it generates results from those patterns and the current input, rather than simply copying an answer from somewhere.',
+      sections: [
+        ['A fruit example', '<p>AI starts with computer programs. To teach a program to distinguish apples from bananas, we can give it many photos labeled as apples or bananas. Training repeatedly adjusts the program until it learns patterns that help it tell them apart: apples may be red or green, while bananas are usually yellow. This is one way AI learns, called <strong>supervised learning</strong>. We will encounter other ways of learning later.</p>'],
+        ['Training and use are different processes', '<p>Most models we encounter have already been trained; we are simply using them. Training and use are different: your conversation with AI affects its responses in that conversation, but does not thereby change the model everyone uses.</p><p>Many models are trained on large amounts of information from sources such as the internet. Their responses usually come from patterns learned during training and the current conversation, rather than from a consciousness of their own.</p>'],
+        ['How is generating different from finding?', '<p><strong>Generative AI</strong> can produce text, images, or audio in response to a request. Asking it to write a new nursery rhyme about paper airplanes produces generated content. Asking a tool to find an existing rhyme in a book requires retrieving the original text. Generation can also reproduce existing passages, so generated does not automatically mean unique.</p><p>Some tools combine search and generation: they look up material, then compose an answer. But a passage that sounds like an encyclopedia entry has not necessarily been researched. Imagination is welcome in storytelling; real people and events need fact-checking. Next, we will learn how to make our requests clear.</p>']
+      ],
+      figure: {flow: true, caption: 'The upper steps show training a model; the lower steps show using it. One conversation does not retrain the entire model.', cards: [['Training: learn from examples', 'Photos paired with their labels'], ['A trained model', 'Patterns for processing new input'], ['Use: provide new input', 'A photo or a creative request'], ['A result', 'A prediction or generated content']]},
+      question: 'Does writing a new rhyme need the same checks as finding an existing one?', answer: 'Not exactly. For a new rhyme, check the theme and how well it reads. For an existing rhyme, verify the original wording, author, and source. Fluency alone is not enough in either case.',
+      takeaway: 'Generated content has not necessarily been fact-checked.', sources: [learning, google]
+    },
+    {
+      id: 'say-what-you-need', short: 'Explain your needs', title: 'How do I help AI understand what I mean?', subtitle: 'No magic words needed. Explain it as you would explain a task to someone.',
+      thesis: 'Explain the task, the relevant background, and the result you want. Then refine your request based on the response.',
+      sections: [
+        ['Start with the task, then add what matters', '<p>If you only say “Help me design an activity,” AI does not know who it is for, where it will happen, or how long it should take. It may suggest something lively but impractical. The problem is not necessarily a lack of sophisticated wording; it is missing information needed to design the activity.</p><p>The instructions and relevant material you give AI are usually called a <strong>prompt</strong>. Remember three parts: <strong>task + essential context + output requirements</strong>. You do not need a long essay every time, or an elaborate role for AI to play. More capable AI can usually understand natural language better, but clear tasks and constraints still reduce misunderstandings.</p>'],
+        ['A clear example', '<p>Consider a paper airplane activity:</p><blockquote class="onboarding-example">Help me design a classroom paper airplane activity for fourth-grade students. We have 20 minutes and only ordinary paper. Give me 3 steps, with no more than two sentences per step.</blockquote><p>Designing the activity is the task. The grade, setting, time, and materials provide context and constraints. Three steps with no more than two sentences each describes the required output. If you want a particular format, you can also provide a short example.</p><p>A first request that only asks for an activity may produce a brief plan with many possible directions. Adding the classroom, ordinary paper, and 20-minute limit narrows the scope. After reading the response, check details such as group size, attempts per student, and how to compare results, then ask follow-up questions.</p><p>Remember two things. First, clearer key details usually bring results closer to your goal, but you can add them gradually rather than all at once. Second, a good example can clarify the format and style you want; this is different from retraining the model. In a long conversation, AI may miss earlier conditions, so briefly restate them when needed.</p>'],
+        ['Be clear, be precise, and follow up', '<p>Suppose the second step says “Compare how far the students’ paper airplanes fly.” You can follow up with:</p><blockquote class="onboarding-example">Step two is not clear enough. Please explain what tools to use and how to compare flight distances.</blockquote><p>Pointing out what needs changing and how to change it improves the plan step by step. Focusing on one key issue at a time often makes the result easier to judge. Giving AI many unrelated tasks at once may cause it to miss some requirements.</p><p>Clear sentences and consistent terminology also reduce ambiguity. Try to use the same word for the same concept throughout a conversation. An occasional punctuation mistake will not usually determine the quality of an answer, but unclear meaning is a reason to rewrite a sentence.</p><p>Clear requests help results match your goal; they do not guarantee factual accuracy. An answer that sounds more like what you wanted is not necessarily trustworthy. Next, we will look at how to check AI answers.</p>']
+      ],
+      figure: {flow: true, caption: 'Adding constraints and feedback brings a conversation closer to your goal. It does not automatically make the facts correct.', cards: [['First: state the task', '“Help me design an activity”'], ['Add context and requirements', 'Classroom, paper, 20 minutes, 3 steps'], ['Check the draft', 'Step two lacks a comparison method'], ['Ask for a specific change', 'Add the method; keep the rest brief']]},
+      question: 'How would you turn “Help me write something” into a specific request?', answer: 'Say what to write and who will read it, then specify length or format. For example: “Shorten this reading-event announcement to under 100 words, keeping the time and location.”',
+      takeaway: 'Explain the task, context, and requirements. If the result does not fit, ask for specific changes.', sources: [google]
+    },
+    {
+      id: 'check-answers', short: 'Check the answers', title: 'Can I trust AI answers?', subtitle: 'Even a confident answer needs evidence you can check.',
+      thesis: 'Fluent writing does not guarantee correct content. Find evidence for important information.',
+      sections: [
+        ['An announcement that sounds convincing', '<p>The only material you give AI says: “The book-sharing event is on Friday. Please bring a book you like.” Its revised announcement says: “Meet us at 3 p.m. on Friday in the second-floor library. Please bring a book you like.” The sentence reads well, but the source never specified a time or location.</p><p>Plausible-looking generated content that is unsupported or incorrect is often called a <strong>hallucination</strong>. We do not need to assume AI is deliberately lying. What matters is noticing added details and finding evidence.</p>'],
+        ['Where can it go wrong?', '<p>Besides inventing details, AI can use outdated information, misunderstand your question, or make errors in calculation and reasoning. Even with source material, it can miss constraints. Confidence, neat tables, and technical language are not proof of reliability.</p><p>Match the check to the task. For a story, check the characters and plot against the request. For an announcement, compare the time and location with the original. For a cost estimate, recheck the numbers and arithmetic. You need checks that fit the task, rather than the same long checklist every time.</p>'],
+        ['Check key content in three steps', '<p><strong>First, identify key claims.</strong> Mark dates, numbers, people, sources, and conclusions that could affect what you do. <strong>Second, compare them with evidence.</strong> Check event details against the organizer’s notice, quotations against the original, and numbers with a reliable calculation. <strong>Third, keep uncertainty visible.</strong> Remove unverified details or label them “to be confirmed.”</p><p>Asking the same AI “Are you sure?” is not a substitute for verification. If it provides a link, open it: does the page exist, and does it actually support the claim? The more a statement affects an important decision, the more it needs reliable sources and review by someone who can take responsibility.</p><p>Be especially careful when AI summarizes or quotes an article. Hallucinations cannot currently be eliminated entirely, but risk can be reduced: ask AI to answer only from specified materials or a knowledge base and cite the relevant sources; create checks for common errors; and document the steps, constraints, and common issues for repeated tasks. A knowledge base and task instructions can narrow the scope, but they do not guarantee accuracy. You must still check the original material and reliable sources.</p>']
+      ],
+      figure: {flow: true, caption: 'The original notice gives no exact time or location. Check with the organizer instead of using details added by AI.', cards: [['Identify the claim', '“Friday, 3 p.m., second-floor library”'], ['Check the source', 'It only says “on Friday”'], ['Handle unverified details', 'Remove additions; ask the organizer']]},
+      question: 'Is “I am very sure” enough to confirm a 3 p.m. meeting?', answer: 'No. Read the original notice or ask the organizer. Repeated reassurance is not new evidence. Do not pass on that time before it is confirmed.',
+      takeaway: 'Find key claims, then check the evidence. Do not present uncertainty as certainty.', sources: [google]
+    },
+    {
+      id: 'use-responsibly', short: 'Use AI responsibly', title: 'How can I use AI without causing trouble?', subtitle: 'Pause before entering information, using a result, or sharing it.',
+      thesis: 'Protect information that should not be shared, respect others, and take responsibility for the results you use and distribute.',
+      sections: [
+        ['Before entering information: what should stay private?', '<p>Asking AI to organize an activity roster does not mean it needs everyone’s home address, phone number, or password. Check for private information unrelated to the task, remove it, and then decide whether to use the tool. For a classroom exercise, you can use fictional people such as Alex and Sam.</p><p>Private photos and chat histories involve other people too. Easy uploading does not mean you are free to share them. Read the tool’s information and settings to learn how it stores and uses data. If you are unsure, use an example without private information.</p>'],
+        ['When using a result: who has been left out?', '<p>AI can reproduce biases in its data. An activity plan that assumes everyone can run and jump leaves out students with limited mobility. Descriptions that always assign a certain job to one kind of person can reinforce stereotypes. As well as asking “Is this correct?”, ask “Has anyone been overlooked?”</p><p>When learning, you can ask AI to explain difficult terms or give you a hint, then try for yourself. Follow your teacher’s or task’s requirements and retain your own reasoning. Submitting an answer without being able to explain it does not meet the learning goal.</p>'],
+        ['Before sharing or taking action: you make the final check', '<p>A generated photo can look very real, but it is not evidence of a real event. Do not use AI to impersonate someone or mislead others with fictional images. When confusion is possible, explain that AI helped create the content and check the requirements for its intended use.</p><p>Some tools can do more than answer questions: they can send messages, organize files, or publish content. These actions can affect others. Check the content, recipients, and scope before proceeding. Just as you would when asking someone to mail a letter, confirm what it says and who it goes to. AI involvement does not remove your responsibility for the results you use and share.</p>']
+      ],
+      figure: {flow: true, caption: 'Three points to pause: minimize unnecessary input, check whether the result is fair and suitable, then confirm sharing and actions.', cards: [['Before entering information', 'Remove unrelated private details'], ['When using the result', 'Check whether anyone is left out'], ['Before sharing', 'Check facts, recipients, and scope']]},
+      question: 'Do you need to upload classmates’ home addresses to plan an activity?', answer: 'Usually not. Provide only what the activity needs, such as the number of people, time, and available materials. Fictional names are often enough for practice.',
+      takeaway: 'Share less irrelevant private information, check results carefully, and review sharing and actions yourself.', sources: [google, society]
+    },
+    {
+      id: 'start-exploring', short: 'Start exploring', title: 'With so many tools, where should I start?', subtitle: 'Bring a small task with you into the full knowledge map.',
+      thesis: 'Decide on your task, then choose a suitable tool. When you want to understand more, keep exploring the knowledge map.',
+      sections: [
+        ['Choose the task before the tool', '<p>To clarify an announcement, you can ask AI directly. To verify a claim, choose a search tool that makes sources easy to inspect. For a poster, try an AI image-generation application. For recordings or programming, choose tools that support your materials and combine them with other applications.</p><p>Generative AI outputs can vary. For strict, repeated steps, adding many AI agents is not necessarily better: an ordinary program or a fixed workflow can be more reliable. Do not give every step to AI simply for the sake of using it.</p><p>There are many AI tools, and we can also quickly build small applications tailored to our needs. Before choosing, you can ask AI for candidate tools and common practices in the field. But it may get features, prices, or conditions wrong, so check the official product information and try the tool yourself.</p>'],
+        ['Use four questions to choose', '<p><strong>Which capability is essential for my task?</strong> Examples include collaboration, file export, or an <strong>API</strong>: an interface that lets applications exchange information. <strong>Can it handle my materials?</strong> For example, text, photos, or recordings. <strong>Can it produce the result I need in a form I can check?</strong> Such as editable text, working citations, or an image. <strong>Do its terms of use suit me?</strong> Consider cost, privacy settings, and whether it fits your situation.</p><p>Even when AI recommends an application, its reasons may be wrong. First try a small sample without private information. Check the input, result, and cost before using it for the full task. This helps catch poor fits early and reduces rework.</p>'],
+        ['How do I use this AI knowledge map?', '<p>Each <strong>node</strong> in the full map represents a concept; lines show relationships between concepts. Click a node that interests you and read the basic introduction. To understand the mechanism, open its “Understand the principles” page. Some pages go further into mathematics, which you can also study with AI’s help. Set unfamiliar terms aside for now if needed. You do not have to read the whole map at once.</p><p>This map aims to cover foundational concepts across AI, helping us move beyond one or two ideas or the use of a single tool to see the logic shared by different technologies and applications. Browse the basics, then follow the directions that interest you. If you are unsure where to start, follow the recommended learning path in the left sidebar.</p><p>The site also has a professional resource library and software tutorials, available through the navigation at the top left. Settings at the top right let you change languages or sign in. After signing in, you can sync learning progress across supported devices and browsers.</p>']
+      ],
+      figure: {flow: true, caption: 'Start with a specific question and gradually go deeper. This is a reading route, not a set of relationship edges from the official graph.', cards: [['My question', 'How can AI understand my needs?'], ['A concept in the map', 'Find and select “Prompt engineering”'], ['Read the introduction', 'Learn which problems it addresses'], ['Go further if needed', 'Open “Understand the principles”']]},
+      question: 'What would you like to explore first?', answer: 'Try searching for “Prompt engineering,” “Hallucination,” or “Supervised learning,” or browse the software directory for a tool that fits your small task. You do not need to understand every node immediately.',
+      takeaway: 'You have completed the beginner route. Bring your own questions and start exploring.', sources: [google, elements]
+    }
+  ];
+})(window);
