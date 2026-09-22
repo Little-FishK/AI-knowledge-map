@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('node:assert/strict'),r=require('../../tools/deepdive-stage2/lib/translation-review-rounds'),b=require('../../tools/deepdive-stage2/lib/translation-review-batches');
+const units=Array.from({length:1989},(_,i)=>({key:`section-${Math.floor(i/100)}/u${i}`,source:'source '+i,translation:'translation '+i}));
+const record={roundReview:true,revision:'before',audit:{findings:[{unitKey:units[5].key}]}};
+assert.equal(b.plan('before',units,record).length,1);assert.equal(b.plan('before',units,record)[0].unitKeys.length,1989);
+record.verificationBase=r.base(record,units);const changed=structuredClone(units);changed[5].translation='updated';
+const plan=b.plan('after',changed,record);assert.equal(plan.length,1);assert.equal(plan[0].phase,'verification');assert.equal(plan[0].unitKeys.length,100);assert(plan[0].unitKeys.includes(changed[5].key));assert(!plan[0].unitKeys.includes(changed[500].key));
+changed[500].translation='another update';assert(b.plan('after',changed,record)[0].unitKeys.includes(changed[500].key));
+const packet=b.packet('after',changed,[],{},record);assert.equal(packet.contractVersion,'translation-rounds-v1');const evidence=b.normalizeResponse(packet,{completed:true,findings:[],summary:'Changed chapters and related references were checked.'}).evidence;b.validate(b.plan('after',changed,record)[0],evidence,changed);
+console.log('PASS 1989 units reviewed in one round; verification covers every changed chapter without repeating unchanged chapters');

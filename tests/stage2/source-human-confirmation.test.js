@@ -95,7 +95,7 @@ try {
     write("assets/figure.svg", "<svg></svg>");
   });
   test("workflow changes, blockers, revocation and leases invalidate or block use", () => {
-    for (const change of [{ state: "repair-queued" }, { state: "manual-review" }, { publication: { status: "published-provisional" } }, { blockers: ["defect"] }, { publication: { revoked: true } }, { finalReview: { humanApproved: false } }]) {
+    for (const change of [{ state: "repair-queued" }, { state: "manual-review", blockers: ['defect'] }, { publication: { status: "published-editorial-draft" } }, { blockers: ["defect"] }, { publication: { revoked: true } }, { finalReview: { humanApproved: false } }]) {
       store.saveState(root, { ...state, pages: { alpha: { ...state.pages.alpha, ...change } } });
       assert.equal(capture().approvalEvidence.sourceEligibleForEnglishReview, false);
       assert.throws(() => register(), /blockers|revoked|ineligible/);
@@ -104,8 +104,29 @@ try {
     assert.throws(() => register(), /busy/);
     write(".stage2/state.json", originalState);
   });
+  test("provisional source requires fresh exact confirmation and preserves Chinese status", () => {
+    const provisional={...state,pages:{alpha:{...state.pages.alpha,publication:{status:'published-provisional'}}}};
+    store.saveState(root,provisional);
+    const unchanged=fs.readFileSync(store.stateFile(root),'utf8');
+    assert.equal(capture().approvalEvidence.sourceEligibleForEnglishReview,false);
+    assert.throws(()=>register({humanConfirmed:false}),/Explicit/);
+    register();
+    assert.equal(capture().approvalEvidence.sourceEligibleForEnglishReview,true);
+    assert.equal(capture().publicationAllowed,false);
+    assert.equal(fs.readFileSync(store.stateFile(root),'utf8'),unchanged);
+    write('.stage2/state.json',originalState);
+  });
+  test('manual-review without blockers accepts only explicit current-source confirmation',()=>{
+    store.saveState(root,{...state,pages:{alpha:{...state.pages.alpha,state:'manual-review'}}});
+    const unchanged=fs.readFileSync(store.stateFile(root),'utf8');
+    assert.equal(capture().approvalEvidence.sourceEligibleForEnglishReview,false);
+    assert.throws(()=>register({humanConfirmed:false}),/Explicit/);
+    register();assert.equal(capture().approvalEvidence.sourceEligibleForEnglishReview,true);
+    assert.equal(fs.readFileSync(store.stateFile(root),'utf8'),unchanged);
+    write('.stage2/state.json',originalState);
+  });
   test("tampered confirmation fails closed", () => {
-    const directory = path.join(root, ".translation/human-confirmations/alpha"), file = path.join(directory, fs.readdirSync(directory)[0]);
+    const directory = path.join(root, ".translation/human-confirmations/alpha"), file = path.join(directory, fs.readdirSync(directory).find(name=>JSON.parse(fs.readFileSync(path.join(directory,name),'utf8')).receiptId===receipt.receiptId));
     const text = fs.readFileSync(file, "utf8"), tampered = JSON.parse(text); tampered.statement = "changed";
     fs.writeFileSync(file, JSON.stringify(tampered)); assert.throws(capture, /integrity/);
     fs.writeFileSync(file, text);

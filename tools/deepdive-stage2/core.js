@@ -74,6 +74,7 @@ const translationStorageDirectory = root => path.resolve(root) === path.resolve(
   ? path.join(resolveLocalDataRoot(), "deepdive-translation")
   : path.join(path.resolve(root), ".translation");
 const {
+  inspectTranslationSourceBinding,
   registerSourceHumanConfirmation,
   exportTranslationSnapshot,
   readTranslationSnapshot,
@@ -112,6 +113,12 @@ const translationPublication = createTranslationPublication({
   storageDirectory: translationStorageDirectory,
   withTranslationQualityMaterial: translationQuality.withTranslationQualityMaterial,
   withCurrentTranslationSnapshot,
+  automaticVerifier: require('./lib/translation-browser-verifier').verifyTranslationBrowser,
+});
+const translationCampaign = require('./lib/translation-campaign').createTranslationCampaign({
+  storageDirectory: translationStorageDirectory, readTranslationSnapshot, prepareTranslationTask,
+  checkTranslationSnapshot, quality: translationQuality,
+  autoPublish: translationPublication.autoPublishTranslation,
 });
 const { stateStorageReport } = createStateDiagnostics({
   defaultRoot: ROOT,
@@ -620,14 +627,17 @@ function nextRecommendedPage(root = ROOT, startOrder = "1.3") {
 }
 
 module.exports = {
-  buildWebsite: require('./lib/website-build').createWebsiteBuild({acquireLock,loadState,readJson,withinRoot}),
+  buildWebsite: require('./lib/website-build').createWebsiteBuild({acquireLock,loadState,readJson,withinRoot, publishedTranslation:translationPublication.publishedTranslation}),
   ...createAuditUpgrade({acquireLock,loadState,currentPage,readJson,withinRoot,writeJson,saveState,clone,sha256}),
   applyInformationTheoryAuthorizedRepair: createAuthorizedRepair({acquireLock,loadState,currentPage,writeJson,withinRoot,saveState}),
+  applyTransformerAuthorizedSources: require('./lib/transformer-authorized-sources').createAuthorizedSources({acquireLock,loadState,currentPage,writeJson,withinRoot,saveState}),
+  inspectTranslationSourceBinding,
   registerSourceHumanConfirmation,
   translationQuality,
   translationPublication,
   translationBatch,
   translationDeepSeek,
+  translationCampaign,
   exportTranslationSnapshot,
   readTranslationSnapshot,
   prepareTranslationTask,
@@ -668,7 +678,7 @@ module.exports = {
   readTaskPacketPart,
   refreshBlockers,
   diagnoseCandidateGate,
-  createReadinessCheckpoint: (root = ROOT) => createReadinessCheckpoint({root,runtimeDirectory,acquireLock,loadState}),
+  createReadinessCheckpoint: (root = ROOT, options = {}) => createReadinessCheckpoint({root,runtimeDirectory,acquireLock,loadState,prunePrevious:options.prunePrevious===true}),
   releaseLease,
   renderEditorialMarkdown,
   resetManualReview,

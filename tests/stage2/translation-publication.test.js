@@ -8,9 +8,9 @@ const { createTranslationQuality } = require("../../tools/deepdive-stage2/lib/tr
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "translation-publication-"));
 let count = 0;
 function test(name, action) { action(); count++; console.log(`PASS ${name}`); }
-function setup() {
+function setup(replacementAuthorization) {
   const value = fixture(); let authorization = "", stale = false;
-  const controller = createTranslationPublication({ authorization: () => authorization,
+  const controller = createTranslationPublication({ authorization: () => authorization, replacementAuthorization,
     withTranslationQualityMaterial: (_root, _id, _review, action) => action(value),
     withCurrentTranslationSnapshot: (_root, _id, _snapshot, action) => { if (stale) throw new Error("Stale source"); return action(); } });
   const preview = () => controller.previewTranslation(root, "sample", "fixture-review");
@@ -22,6 +22,14 @@ function setup() {
     publish(acceptance = approval()) { return controller.publishTranslation(root, "sample", "fixture-review", acceptance.artifactHash, acceptance); } };
 }
 try {
+  test("layout-only draft preview cannot bypass publication assembly", () => {
+    const value=fixture(); value.report.defects=[{rule:4,reason:'Unresolved translation defect'}];
+    const preview=require('../../tools/deepdive-stage2/lib/translation-publication').layoutPreview(value);
+    assert.equal(preview.publicationAllowed,false);
+    assert.throws(()=>assemble(value),/defective/);
+    value.report.state='stale';
+    assert.throws(()=>require('../../tools/deepdive-stage2/lib/translation-publication').layoutPreview(value),/Stale/);
+  });
   test("assembly preserves structure, code, links, SVG and self-test; translates header/attributes", () => {
     const result = assemble(fixture()); assert(result.payload.page.html.includes('<code>const value = 2;</code>'));
     assert(result.payload.page.html.includes('href="#check" title="Go to self-test"')); assert(result.payload.page.html.includes("Input → Output"));
@@ -67,6 +75,29 @@ try {
   });
   test("existing different English release is never silently overwritten", () => {
     const f = setup(); f.value.material.chapters[0].output.translations["title:0"] = "New title"; f.authorize(); assert.throws(() => f.publish(), /replacement/);
+  });
+  test("source refresh requires exact replacement binding, preserves old release, and retains gates", () => {
+    const file = path.join(root, 'data/content-locales/en/deepdive/sample.json');
+    const old = JSON.parse(fs.readFileSync(file, 'utf8'));
+    let grant = { before: 'sha256:' + '0'.repeat(64), snapshotId: 'sha256:' + '1'.repeat(64) };
+    const f = setup(() => ({ sample: grant }));
+    f.value.material.snapshotId = grant.snapshotId;
+    f.value.snapshot.capture.sourceContentHash = 'sha256:' + '2'.repeat(64);
+    f.value.material.chapters[0].output.translations['title:0'] = 'Updated source translation';
+    f.authorize();
+    assert.throws(() => f.publish(), /replacement authorization/);
+    grant.before = old.artifactHash; grant.snapshotId = 'sha256:' + '3'.repeat(64);
+    assert.throws(() => f.publish(), /replacement authorization/);
+    grant.snapshotId = f.value.material.snapshotId;
+    f.value.report.gates[0].status = 'blocked';
+    assert.throws(() => f.publish(), /gates/);
+    assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')), old);
+    f.value.report.gates[0].status = 'pass';
+    assert.equal(f.publish().state, 'published-English');
+    assert.equal(f.publish().state, 'already-published');
+    const archive = path.join(root, '.translation/publication-history/sample', old.artifactHash.slice(7) + '.json');
+    assert.deepEqual(JSON.parse(fs.readFileSync(archive, 'utf8')), old);
+    assert.notEqual(JSON.parse(fs.readFileSync(file, 'utf8')).artifactHash, old.artifactHash);
   });
   test("real quality controller feeds publication and holds its revision lock", () => {
     const value = fixture(); value.snapshot.capture.glossary = { terms: {} }; value.snapshot.capture.approvalEvidence = { sourceEligibleForEnglishReview: true };

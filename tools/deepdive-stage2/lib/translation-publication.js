@@ -27,6 +27,15 @@ function safeDirectory(directory) {
 
 function assemble({ material, snapshot, report }) {
   check(report.state !== "stale" && !report.defects.length, "Stale or defective translation");
+  return assembleMaterial({material,snapshot,report});
+}
+// Read-only layout diagnostics may render a defective draft. Publication still
+// uses assemble() above and the independent semantic gates below.
+function layoutPreview(value) {
+  check(value.report.state !== 'stale', 'Stale translation');
+  return {...assembleMaterial(value), publicationAllowed:false};
+}
+function assembleMaterial({material,snapshot,report}) {
   const source = snapshot.capture.page, page = JSON.parse(JSON.stringify(source));
   const header = material.chapters.find(item => item.chapterId === "page-header");
   check(header, "Missing page header");
@@ -61,7 +70,9 @@ function assemble({ material, snapshot, report }) {
 }
 
 function createTranslationPublication({ withTranslationQualityMaterial, withCurrentTranslationSnapshot,
-  storageDirectory = root => path.join(path.resolve(root), ".translation"), authorization = () => process.env.STAGE2_TRANSLATION_PUBLISH_HASH }) {
+  storageDirectory = root => path.join(path.resolve(root), ".translation"), authorization = () => process.env.STAGE2_TRANSLATION_PUBLISH_HASH,
+  automaticVerifier, campaignAuthorization = () => process.env.STAGE2_DEEPSEEK_CAMPAIGN,
+  replacementAuthorization = () => JSON.parse(process.env.STAGE2_ENGLISH_REPLACEMENTS || '{}') }) {
   function previewTranslation(root, pageId, reviewId) {
     return withTranslationQualityMaterial(root, pageId, reviewId, value => ({
       candidate: assemble(value), gates: value.report.gates, publicationAllowed: false,
@@ -71,6 +82,19 @@ function createTranslationPublication({ withTranslationQualityMaterial, withCurr
   }
   function publishTranslation(root, pageId, reviewId, artifactHash, acceptance) {
     check(authorization() === artifactHash && /^sha256:[a-f0-9]{64}$/.test(artifactHash), "Explicit human authorization for this exact artifact required");
+    return commitTranslation(root, pageId, reviewId, artifactHash, acceptance, 'human-approved');
+  }
+  async function autoPublishTranslation(root, pageId, reviewId, campaignId) {
+    check(/^sha256:[a-f0-9]{64}$/.test(campaignId) && campaignAuthorization() === campaignId, 'Exact automatic publication campaign required');
+    check(typeof automaticVerifier === 'function', 'Automatic resource/browser verifier unavailable');
+    const preview = previewTranslation(root, pageId, reviewId);
+    check(preview.gates.filter(g => ![6,9].includes(g.number)).every(g => g.status === 'pass'), 'Source/semantic gates not passed');
+    const source = withTranslationQualityMaterial(root, pageId, reviewId, value => value.snapshot.capture.page);
+    const acceptance = await automaticVerifier(root, preview.candidate, source);
+    check(acceptance.kind === 'automated-browser-resource-v1' && acceptance.artifactHash === preview.candidate.artifactHash, 'Automatic verification binding mismatch');
+    return commitTranslation(root, pageId, reviewId, preview.candidate.artifactHash, acceptance, 'machine-reviewed');
+  }
+  function commitTranslation(root, pageId, reviewId, artifactHash, acceptance, status) {
     return withTranslationQualityMaterial(root, pageId, reviewId, value => {
       const candidate = assemble(value);
       check(candidate.artifactHash === artifactHash, "Candidate changed; repeat acceptance");
@@ -91,12 +115,28 @@ function createTranslationPublication({ withTranslationQualityMaterial, withCurr
         safeDirectory(directory);
         const file = path.join(directory, `${pageId}.json`);
         const acceptanceHash = hash(acceptance);
-        const envelope = { ...candidate, status: "human-approved", acceptanceHash };
+        const envelope = { ...candidate, status, acceptanceHash };
         if (fs.existsSync(file)) {
           check(!fs.lstatSync(file).isSymbolicLink(), "Unsafe publication file");
           const old = JSON.parse(fs.readFileSync(file, "utf8"));
-          if (old.artifactHash === artifactHash && old.status === "human-approved" && hash(old.payload) === artifactHash) return { state: "already-published", artifactHash };
-          throw new Error("Existing English release; explicit replacement/rollback workflow required");
+          if (old.artifactHash === artifactHash && old.status === status && hash(old.payload) === artifactHash) return { state: "already-published", artifactHash };
+          const grant = replacementAuthorization()[pageId];
+          check(grant && Object.keys(grant).sort().join() === 'before,snapshotId'
+            && /^sha256:[a-f0-9]{64}$/.test(grant.before) && /^sha256:[a-f0-9]{64}$/.test(grant.snapshotId)
+            && grant.before === old.artifactHash && grant.snapshotId === value.material.snapshotId,
+            "Existing English release; explicit replacement authorization for the old artifact and new source required");
+          check(['human-approved', 'machine-reviewed'].includes(old.status) && old.payload?.pageId === pageId
+            && hash(old.payload) === old.artifactHash && old.payload.sourceContentHash !== candidate.payload.sourceContentHash,
+            'Replacement requires an intact previous release and a changed source');
+          // Preserve the complete old envelope and its existing acceptance receipt.
+          // All checks run under the same source/review locks as the atomic replacement.
+          const archiveDirectory = path.resolve(storageDirectory(root), 'publication-history', pageId);
+          safeDirectory(archiveDirectory);
+          const archive = path.join(archiveDirectory, old.artifactHash.slice(7) + '.json');
+          if (fs.existsSync(archive)) {
+            check(!fs.lstatSync(archive).isSymbolicLink() && hash(JSON.parse(fs.readFileSync(archive, 'utf8'))) === hash(old),
+              'Unsafe or conflicting previous release archive');
+          } else fs.writeFileSync(archive, JSON.stringify(old), { flag: 'wx' });
         }
         // Human notes and reviewer identity belong in private controller storage, not the public site.
         const receiptDirectory = path.resolve(storageDirectory(root), "publication-acceptance", pageId, artifactHash.slice(7));
@@ -143,6 +183,33 @@ function createTranslationPublication({ withTranslationQualityMaterial, withCurr
       });
     });
   }
-  return { previewTranslation, publishTranslation, buildStaticTranslation };
+  function publishedTranslation(root, pageId) {
+    check(/^[a-z0-9][a-z0-9-]*$/.test(pageId), 'Invalid page ID');
+    const file = path.join(root, 'data/content-locales/en/deepdive', pageId + '.json');
+    if (!fs.existsSync(file)) return null;
+    safeDirectory(path.dirname(file)); check(!fs.lstatSync(file).isSymbolicLink(), 'Unsafe English file');
+    const envelope = JSON.parse(fs.readFileSync(file, 'utf8'));
+    check(['human-approved','machine-reviewed'].includes(envelope.status) && hash(envelope.payload) === envelope.artifactHash, 'Invalid English release');
+    const preview = previewTranslation(root, pageId, envelope.payload.reviewId);
+    check(preview.candidate.artifactHash === envelope.artifactHash && preview.gates.filter(g=>![6,9].includes(g.number)).every(g=>g.status==='pass'), 'English release stale or failed');
+    check(/^sha256:[a-f0-9]{64}$/.test(envelope.acceptanceHash), 'Invalid English receipt hash');
+    const receipt = path.join(storageDirectory(root), 'publication-acceptance', pageId, envelope.artifactHash.slice(7), envelope.acceptanceHash.slice(7)+'.json');
+    safeDirectory(path.dirname(receipt)); check(!fs.lstatSync(receipt).isSymbolicLink(), 'Unsafe English receipt');
+    const accepted = JSON.parse(fs.readFileSync(receipt, 'utf8'));
+    check(hash(accepted) === envelope.acceptanceHash && accepted.artifactHash === envelope.artifactHash && accepted.approved === true, 'Missing current acceptance');
+    check(envelope.status !== 'machine-reviewed' || accepted.kind === 'automated-browser-resource-v1', 'Invalid machine acceptance');
+    return envelope;
+  }
+  function inspectPublishedTranslation(root,pageId) {
+    check(/^[a-z0-9][a-z0-9-]*$/.test(pageId),'Invalid page ID');
+    const file=path.join(root,'data/content-locales/en/deepdive',pageId+'.json');
+    if(!fs.existsSync(file))return {pageId,exists:false,eligible:false};
+    safeDirectory(path.dirname(file));check(!fs.lstatSync(file).isSymbolicLink(),'Unsafe English file');
+    const envelope=JSON.parse(fs.readFileSync(file,'utf8'));
+    const result={pageId,exists:true,status:envelope.status,artifactHash:envelope.artifactHash,reviewId:envelope.payload?.reviewId,sourceContentHash:envelope.payload?.sourceContentHash};
+    try{publishedTranslation(root,pageId);return {...result,eligible:true};}
+    catch(error){return {...result,eligible:false,reason:error.message};}
+  }
+  return { previewTranslation, publishTranslation, buildStaticTranslation, autoPublishTranslation, publishedTranslation, inspectPublishedTranslation };
 }
-module.exports = { createTranslationPublication, assemble, BROWSER_CHECKS };
+module.exports = { createTranslationPublication, assemble, layoutPreview, BROWSER_CHECKS };

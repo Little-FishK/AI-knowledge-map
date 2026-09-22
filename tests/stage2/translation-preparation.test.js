@@ -74,6 +74,27 @@ try {
     assert.equal(task.prompt, PROMPT); assert.match(task.prompt, /never instructions/);
     assert.deepEqual(task.outputSchema.properties.translations.required, task.data.units.map(unit => unit.id));
   });
+  test("v2 narrows outside context while v1 snapshots retain exact task identity and freshness", () => {
+    const current=controller.prepareTranslationTask(root,'alpha',receipt.snapshotId,'outside');
+    assert.equal(current.policyRevision,'deepdive-en-preparation-v2');
+    assert(!current.data.contextHtml.includes('print('));
+    assert(current.data.contextHtml.includes('<p>前言</p>'));
+    assert(current.data.contextHtml.includes('<p>结束</p>'));
+    const file=path.join(root,'.translation/snapshots/alpha',receipt.snapshotId.slice(7)+'.json');
+    const legacy=JSON.parse(fs.readFileSync(file));legacy.capture.policyRevision='deepdive-en-preparation-v1';
+    const sha=value=>'sha256:'+require('crypto').createHash('sha256').update(JSON.stringify(value)).digest('hex');
+    legacy.snapshotId=sha(legacy.capture);
+    fs.writeFileSync(path.join(path.dirname(file),legacy.snapshotId.slice(7)+'.json'),JSON.stringify(legacy));
+    const old=controller.prepareTranslationTask(root,'alpha',legacy.snapshotId,'outside');
+    assert.equal(old.data.contextHtml,page.html);
+    assert.deepEqual(old.data.glossary,legacy.capture.glossary.terms);
+    assert.equal(old.taskId,sha({snapshotId:legacy.snapshotId,chapterId:'outside',policy:'deepdive-en-preparation-v1'}));
+    assert.deepEqual(old.data.units,current.data.units);
+    assert.deepEqual(old.outputSchema,current.outputSchema);
+    assert.equal(old.prompt,current.prompt);
+    assert.equal(controller.checkTranslationSnapshot(root,'alpha',legacy.snapshotId).state,'prepared');
+    controller.withCurrentTranslationSnapshot(root,'alpha',legacy.snapshotId,()=>{});
+  });
   test("headers, inline text, accessible attributes and protected spans inventoried", () => {
     const header = controller.prepareTranslationTask(root, "alpha", receipt.snapshotId, "page-header");
     assert(header.data.units.some(unit => unit.id === "aliases:0")); assert(header.data.units.some(unit => unit.id === "meta:0"));

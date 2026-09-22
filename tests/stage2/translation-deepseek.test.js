@@ -69,7 +69,9 @@ function setup(configOverrides = {}) {
   });
   await test("one chapter per call, fixed destination, no tools, explicit thinking and JSON", async () => {
     const f = setup(); f.authorize(); const result = await f.run(); assert.equal(result.received, 1); assert.equal(f.calls.length, 1);
-    const call = f.calls[0], body = JSON.parse(call.options.body);
+      assert(Number.isFinite(result.attempts[0].durationMs) && result.attempts[0].durationMs >= 0);
+      assert(result.attempts[0].startedAt && result.attempts[0].finishedAt);
+      const call = f.calls[0], body = JSON.parse(call.options.body);
     assert.equal(call.url, "https://api.deepseek.com/chat/completions"); assert.equal(call.options.redirect, "error");
     assert(!Object.hasOwn(call.options.headers, "OpenAI-Project")); assert.equal(body.response_format.type, "json_object");
     assert.equal(body.reasoning_effort, "high"); assert.equal(body.thinking.type, "enabled"); assert(!body.tools); assert.equal(body.stream, false);
@@ -120,7 +122,8 @@ function setup(configOverrides = {}) {
   await test("HTTP/timeout/unreadable response stays uncertain, without leaked errors or resend", async () => {
     for (const transport of [() => { throw new Error("SECRET SOURCE KEY"); }, () => new Response("SECRET", { status: 429 }), () => new Response("bad json")]) {
       const f = setup(); f.authorize(); f.transport(transport); const result = await f.run(); assert.equal(result.state, "needs-operator-review");
-      assert(!JSON.stringify(result).includes("SECRET")); f.restart(); await assert.rejects(f.run(true), /Uncertain/); assert.equal(f.calls.length, 1);
+        assert(Number.isFinite(result.attempts[0].durationMs) && result.attempts[0].finishedAt);
+        assert(!JSON.stringify(result).includes("SECRET")); f.restart(); await assert.rejects(f.run(true), /Uncertain/); assert.equal(f.calls.length, 1);
     }
   });
   await test("missing usage is unknown, not free; underestimated usage stops further calls", async () => {

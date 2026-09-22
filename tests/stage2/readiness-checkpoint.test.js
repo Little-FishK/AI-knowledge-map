@@ -8,6 +8,9 @@ let released=0,active=false;
 const deps={root,runtimeDirectory:()=>runtime,acquireLock:()=>()=>released++,loadState:()=>({pages:{x:{lease:active?{}:null}}})};
 const r=createReadinessCheckpoint(deps);assert.equal(r.fileCount,2);assert.equal(r.restoredFilesVerified,2);assert.equal(r.excludedCount,1);assert.equal(released,1);assert(!JSON.stringify(r).includes('private'));assert(!fs.existsSync(path.join(r.directory,'saved','runtime','credentials')));
 assert.equal(fs.readFileSync(path.join(r.directory,'restore-check','project','data','example.json'),'utf8'),'private body');
-active=true;assert.throws(()=>createReadinessCheckpoint(deps),/active content lease/);assert.equal(released,2);
+const next=createReadinessCheckpoint({...deps,prunePrevious:true});
+assert.equal(next.prunedCheckpoints,1);assert(!fs.existsSync(r.directory));assert(fs.existsSync(next.directory));
+assert.equal(fs.readFileSync(path.join(next.directory,'restore-check','project','data','example.json'),'utf8'),'private body');
+active=true;assert.throws(()=>createReadinessCheckpoint(deps),/active content lease/);assert.equal(released,3);
 // Fixture is retained in the OS temporary folder; no production restoration or deletion occurs.
 console.log('✓ Checkpoint copies and independently restores files, excludes credentials, blocks active leases');

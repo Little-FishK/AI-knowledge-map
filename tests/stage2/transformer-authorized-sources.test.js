@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const {amendSources,createAuthorizedSources,APPROVED_HASH,SOURCES}=require('../../tools/deepdive-stage2/lib/transformer-authorized-sources');
+const page={title:'Transformer',html:'<section>unchanged<table><tr><td>T5</td></tr></table></section><div class="dd-src"><p>Existing reference</p></div><footer>unchanged</footer>'};
+const changed=amendSources(page);
+assert.equal(changed.title,page.title);
+assert(changed.html.startsWith(page.html.split('<div class="dd-src">')[0]));
+assert(changed.html.endsWith('</div><footer>unchanged</footer>'));
+assert(changed.html.includes('<p>Existing reference</p>'));
+for(const url of SOURCES)assert.equal(changed.html.split(url).length,2);
+assert.throws(()=>amendSources(changed),/Unexpected source list/);
+let released=false,wrote=false;
+const apply=createAuthorizedSources({acquireLock:()=>()=>released=true,loadState:()=>({pages:{transformer:{state:'audit-queued',editorialWorkflow:{}}}}),currentPage:()=>page,writeJson:()=>wrote=true});
+assert.throws(()=>apply('.',APPROVED_HASH),/candidate changed/);assert(released);assert.equal(wrote,false);
+console.log('PASS source-only addition, original preservation, duplicate rejection and stale candidate refusal');

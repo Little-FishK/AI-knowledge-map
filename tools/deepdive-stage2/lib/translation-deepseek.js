@@ -62,7 +62,8 @@ function createTranslationDeepSeek({ storageDirectory, readTranslationSnapshot, 
       model: job.plan.config.model, state: job.state, requestCount: job.plan.requests.length, received: Object.keys(job.results).length,
       estimateUsd: job.plan.estimateUsd, reservedUsd: job.reservedUsd, budgetUsd: job.plan.config.budgetUsd,
       estimateBasis: "configured peak/cache-miss reservation; not an invoice or provider-enforced spending limit", publicationAllowed: false,
-      attempts: job.attempts.map(({ chapterId, number, state, usage, costEstimateUsd }) => ({ chapterId, number, state, usage: usage ?? null, costEstimateUsd: costEstimateUsd ?? null })) };
+      attempts: job.attempts.map(({ chapterId, number, state, usage, costEstimateUsd, startedAt, finishedAt, durationMs }) => ({ chapterId, number, state, usage: usage ?? null, costEstimateUsd: costEstimateUsd ?? null,
+        startedAt: startedAt ?? null, finishedAt: finishedAt ?? null, durationMs: durationMs ?? null })) };
   }
   function buildDeepSeekTranslation(root, pageId, snapshotId, inputConfig) {
     const config = configuration(inputConfig); fresh(root, { pageId, snapshotId });
@@ -90,6 +91,29 @@ function createTranslationDeepSeek({ storageDirectory, readTranslationSnapshot, 
     return view(load(root, pageId, plan.planId));
   }
   function inspectDeepSeekTranslation(root, pageId, planId) { return view(load(root, pageId, planId)); }
+  // Called only by the campaign's exact operator-authorized recovery path.
+  // Preserve both the failed attempt and its reservation; never accept a lost response.
+  function replaceUncertainTranslation(root, pageId, planId, requestHash, reason) {
+    const dir=directory(root,pageId,planId),lock=path.join(dir,'operation.lock');
+    fs.closeSync(fs.openSync(lock,'wx'));
+    try {
+      const job=load(root,pageId,planId);fresh(root,job.plan);
+      check(typeof reason==='string'&&reason.length>=40,'Explicit replacement reason required');
+      const requests=job.plan.requests.filter(r=>hash(r.body)===requestHash);
+      check(requests.length===1,'Exact unique translation request required');
+      const request=requests[0], attempts=job.attempts.filter(a=>a.customId===request.customId);
+      if(attempts.some(a=>a.state==='abandoned-unknown'&&a.replacementRequestHash===requestHash))return view(job);
+      check(!Object.hasOwn(job.results,request.customId),'Completed chapter cannot be replaced');
+      check(attempts.length>0&&attempts.length<job.plan.config.maxAttempts,'Chapter retry limit reached');
+      const attempt=attempts.at(-1);
+      check(attempt.state==='uncertain'&&!attempt.receiptHash&&!attempt.usage,'Saved response requires reconciliation');
+      check(!fs.existsSync(path.join(dir,`${request.customId}-${attempt.number}.json`)),'Saved receipt requires reconciliation');
+      check(!job.attempts.some(a=>a!==attempt&&['sending','uncertain','usage-review'].includes(a.state)),'Other unsettled chapter calls exist');
+      attempt.state='abandoned-unknown';attempt.replacementRequestHash=requestHash;
+      attempt.resolution={reason,at:new Date().toISOString(),actualUsageKnown:false};
+      job.state='needs-explicit-retry';save(path.join(dir,'job.json'),job);return view(job);
+    } finally {fs.unlinkSync(lock);}
+  }
   async function runDeepSeekTranslation(root, pageId, planId, retry = false) {
     const dir = directory(root, pageId, planId); safeDirectory(dir);
     const lock = path.join(dir, "operation.lock"), fd = fs.openSync(lock, "wx"); fs.closeSync(fd);
@@ -99,15 +123,20 @@ function createTranslationDeepSeek({ storageDirectory, readTranslationSnapshot, 
       check(!job.attempts.some(item => ["sending", "uncertain", "usage-review"].includes(item.state)), "Uncertain call or usage requires operator review; resend forbidden");
       const request = plan.requests.find(item => !Object.hasOwn(job.results, item.customId));
       if (!request) return view(job);
+      // Campaign admission precedes the single-page sending record. A refusal
+      // before network dispatch is not an uncertain provider request.
+      if(client.preflight)client.preflight(plan,request.body);
       const previous = job.attempts.filter(item => item.customId === request.customId);
       check(!previous.length || retry === true, "Explicit retry required for failed chapter");
       check(previous.length < plan.config.maxAttempts, "Chapter retry limit reached");
       check(job.reservedUsd + request.reserveUsd <= plan.config.budgetUsd, "Cumulative reservation exceeds budget");
       const attempt = { customId: request.customId, chapterId: request.chapterId, number: previous.length + 1, state: "sending" };
+      const finishTiming = require('./translation-timing').startTiming(attempt);
       job.attempts.push(attempt); job.reservedUsd += request.reserveUsd; job.state = "running"; persist();
       let response;
       try { response = await client.complete(plan, request.body); }
-      catch (_) { attempt.state = "uncertain"; job.state = "needs-operator-review"; persist(); return view(job); }
+      catch (_) { finishTiming(); attempt.state = "uncertain"; job.state = "needs-operator-review"; persist(); return view(job); }
+      finishTiming();
       // Retain only response fields needed for traceability/validation; reasoning_content is never stored or exposed.
       const receipt = { id: response?.id ?? null, model: response?.model ?? null, usage: response?.usage ?? null,
         choices: Array.isArray(response?.choices) ? response.choices.map(choice => ({ finish_reason: choice.finish_reason,
@@ -146,6 +175,6 @@ function createTranslationDeepSeek({ storageDirectory, readTranslationSnapshot, 
     return { provider: "deepseek", pageId, planId, snapshotId: job.plan.snapshotId,
       generation: { model: job.plan.config.model, reasoningEffort: job.plan.config.reasoningEffort }, chapters };
   }
-  return { buildDeepSeekTranslation, inspectDeepSeekTranslation, runDeepSeekTranslation, translationReviewMaterial };
+  return { buildDeepSeekTranslation, inspectDeepSeekTranslation, runDeepSeekTranslation, translationReviewMaterial, replaceUncertainTranslation };
 }
 module.exports = { createTranslationDeepSeek, normalizedOutput, configuration };

@@ -8,14 +8,17 @@ const {
   inspectAuditUpgrade,
   queueAuditUpgrade,
   applyInformationTheoryAuthorizedRepair,
+  applyTransformerAuthorizedSources,
   diagnoseCandidateGate,
   createReadinessCheckpoint,
   loadState,
+  inspectTranslationSourceBinding,
   registerSourceHumanConfirmation,
   translationPublication,
   translationQuality,
   translationBatch,
   translationDeepSeek,
+  translationCampaign,
   exportTranslationSnapshot,
   readTranslationSnapshot,
   prepareTranslationTask,
@@ -73,7 +76,7 @@ let qualityDelivery = null;
 let qualitySubmitted = false;
 
 const allTools = [
-  {name:'stage2_build_website',description:'控制器构建独立网站产物；中文独立于翻译，预览保留未核验标记，生产要求当前人工批准与完整审核；不部署、不改变内容状态。',inputSchema:{type:'object',required:['siteUrl','mode'],properties:{siteUrl:{type:'string'},mode:{type:'string',enum:['preview','production']}},additionalProperties:false}},
+  {name:'stage2_build_website',description:'控制器按网站发布配置构建独立产物；可绑定单页英文摘要供后续限定范围合并；不部署、不改变审核状态。',inputSchema:{type:'object',required:['siteUrl','mode'],properties:{siteUrl:{type:'string'},mode:{type:'string',enum:['preview','production']},englishPageId:{type:'string',pattern:'^[a-z0-9][a-z0-9-]*$'},expectedEnglishArtifactHash:{type:'string',pattern:'^sha256:[a-f0-9]{64}$'}},additionalProperties:false}},
   ...[
     ["stage2_build_deepseek_translation", "离线生成独立 DeepSeek 单页计划；必须明确模型、账号标签、峰时价格、预算和推理强度，不上传。", { snapshotId: { type: "string" }, config: { type: "object", additionalProperties: false,
       required: ["model", "accountId", "contextWindow", "maxOutputTokens", "reasoningEffort", "inputUsdPerMillion", "outputUsdPerMillion", "priceBasis", "budgetUsd", "maxAttempts", "requestTimeoutMs"],
@@ -109,6 +112,7 @@ const allTools = [
   ].map(([name, description, properties, required]) => ({ name, description, inputSchema: { type: "object", additionalProperties: false,
     required: ["pageId", ...required], properties: { pageId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, ...properties } } })),
   ...[
+    ["stage2_inspect_translation_source_binding", "只读返回当前中文页用于人工确认的精确页面与内容摘要；不返回正文，不登记确认，不改变审核或发布状态。", {}, []],
     ["stage2_register_source_human_confirmation", "登记维护者对当前中文版本的明确确认；仅写独立凭证，不改变正文、机器审计或发布状态。必须使用绑定页面及完整内容摘要的专用授权进程。", {
       expectedSourceHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
       expectedContentHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
@@ -141,14 +145,24 @@ const allTools = [
     inputSchema: {type:"object",required:["expectedCandidateHash"],properties:{expectedCandidateHash:{type:"string",pattern:"^sha256:[a-f0-9]{64}$"}},additionalProperties:false},
   },
   {
+    name: "stage2_apply_transformer_authorized_sources",
+    description: "按用户明确授权为精确 Transformer 候选追加 ROME 与 T5 两项来源；保持独立复核待完成，不发布。",
+    inputSchema: {type:"object",required:["expectedCandidateHash"],properties:{expectedCandidateHash:{type:"string",pattern:"^sha256:[a-f0-9]{64}$"}},additionalProperties:false},
+  },
+  {
     name: "stage2_create_readiness_checkpoint",
     description: "完整控制器创建本机项目与受控运行材料的隔离备份，逐文件验证独立恢复；不返回正文或私有文件名，不改正式状态，活动租约期间拒绝。",
-    inputSchema: {type:"object",properties:{},additionalProperties:false},
+    inputSchema: {type:"object",properties:{prunePrevious:{type:"boolean",description:"仅在用户明确要求清理旧备份时启用；新备份恢复校验通过后删除旧控制器检查点。"}},additionalProperties:false},
   },
   {
     name: "stage2_inventory_page_assets",
     description: "完整控制器只读列出当前网页各页来源摘要、图表编号摘要、外链与英文文件存在性，不返回正文或审核答案，不验证质量或发布资格。",
     inputSchema: {type:"object",properties:{},additionalProperties:false},
+  },
+  {
+    name: "stage2_inspect_published_translation",
+    description: "只读核对本地英文发布产物的精确身份和当前发布资格，返回阻断原因，不返回正文或更改状态。",
+    inputSchema: {type:"object",required:["pageId"],properties:{pageId:{type:"string",pattern:"^[a-z0-9][a-z0-9-]*$"}},additionalProperties:false},
   },
   {
     name: "stage2_status",
@@ -595,6 +609,15 @@ const allTools = [
   },
 ];
 
+allTools.push(
+  {name:'stage2_amend_translation_units',description:'精确授权绑定当前版本，仅修正已定位英文缺陷单元；保存修改记录并撤销当前审核，必须独立复审，不发布。',inputSchema:{type:'object',additionalProperties:false,required:['pageId','reviewId','revision','replacements','reason'],properties:{pageId:{type:'string'},reviewId:{type:'string'},revision:{type:'string'},replacements:{type:'object',additionalProperties:{type:'string'}},reason:{type:'string'}}}},
+  {name:'stage2_amend_duplicate_formula',description:'精确人工授权后仅移除已定位英文单元重复的2P，保留原审核并进入独立复审。',inputSchema:{type:'object',additionalProperties:false,required:['pageId','reviewId','revision','unitKey','replacement'],properties:{pageId:{type:'string'},reviewId:{type:'string'},revision:{type:'string'},unitKey:{type:'string'},replacement:{type:'string'}}}},
+  {name:'stage2_adjudicate_translation_findings',description:'精确授权并绑定当前版本后记录误报裁定或明确标注的源文矛盾注释授权；保留原审核，不修改译文或伪造机器审核。',inputSchema:{type:'object',additionalProperties:false,required:['pageId','reviewId','revision','decisions'],properties:{pageId:{type:'string'},reviewId:{type:'string'},revision:{type:'string'},decisions:{type:'array',minItems:1,items:{type:'object',additionalProperties:false,required:['findingHash','reason'],properties:{findingHash:{type:'string'},reason:{type:'string'},disposition:{type:'string',enum:['authorized-source-note']}}}}}}},
+  {name:'stage2_handover_translation_campaign',description:'精确授权后等待当前请求完成，在请求之间独占队列供旧运行器退出，并设置最多5页并行；不发送API请求。',inputSchema:{type:'object',additionalProperties:false,required:['campaignId'],properties:{campaignId:{type:'string',pattern:'^sha256:[a-f0-9]{64}$'}}}},
+  {name:'stage2_diagnose_translation_campaign',description:'只读定位已有翻译任务的合同缺陷和本地浏览器失败；不调用模型、不提交审核、不发布。',inputSchema:{type:'object',additionalProperties:false,required:['campaignId'],properties:{campaignId:{type:'string',pattern:'^sha256:[a-f0-9]{64}$'},pageIds:{type:'array',minItems:1,uniqueItems:true,items:{type:'string',pattern:'^[a-z0-9-]+$'}}}}},
+  {name:'stage2_build_translation_campaign',description:'离线冻结多页 DeepSeek 队列和统一预算；不调用 API。',inputSchema:{type:'object',additionalProperties:false,required:['pages','config'],properties:{pages:{type:'array',minItems:1,maxItems:130,items:{type:'object',additionalProperties:false,required:['pageId','snapshotId'],properties:{pageId:{type:'string'},snapshotId:{type:'string'}}}},config:allTools.find(t=>t.name==='stage2_build_deepseek_translation').inputSchema.properties.config}}},
+  ...['inspect','step'].map(action=>({name:`stage2_${action}_translation_campaign`,description:action==='inspect'?'查看多页翻译状态与共享费用，不返回正文。':'仅在精确队列获授权后推进一个阶段；自动独立审核、最多两轮返修及实际浏览器检查后发布英文产物，不部署。',inputSchema:{type:'object',additionalProperties:false,required:['campaignId'],properties:{campaignId:{type:'string',pattern:'^sha256:[a-f0-9]{64}$'}}}}))
+);
 const controllerTools = new Set([
   "stage2_status",
   "stage2_next_recommended_page",
@@ -612,6 +635,7 @@ if (provisionalPublishAuthorized) {
 }
 
 const capabilityTools = {
+  'translation-campaign':new Set(['stage2_build_translation_campaign','stage2_inspect_translation_campaign','stage2_step_translation_campaign']),
   'website-build': new Set(['stage2_build_website']),
   "human-confirmation": new Set(["stage2_register_source_human_confirmation"]),
   "translation-deepseek": new Set(["stage2_build_deepseek_translation", "stage2_inspect_deepseek_translation", "stage2_run_deepseek_translation"]),
@@ -655,6 +679,9 @@ if (pageLockedProfile && !/^[a-z0-9][a-z0-9-]*$/.test(lockedPageId)) {
 }
 if (capabilityProfile === "human-confirmation" && process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== "hold") {
   throw new Error("Human confirmation requires explicit manual-review action hold; publication is outside this capability");
+}
+if (capabilityProfile === 'translation-campaign' && process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== 'hold') {
+  throw new Error('Translation campaign requires explicit Chinese manual-review action hold');
 }
 if (["translation-review", "translation-repair"].includes(capabilityProfile) && !String(process.env.STAGE2_MCP_WORKER_ID || "").trim()) {
   throw new Error("Translation review/repair requires an explicit independent STAGE2_MCP_WORKER_ID");
@@ -740,6 +767,13 @@ async function handle(message) {
       return response(id, restrictedError(`This controller process is locked to page ${lockedPageId}`));
     }
     try {
+      if(name==='stage2_build_translation_campaign')return response(id,toolResult(translationCampaign.build(root,args.pages,args.config)));
+      if(name==='stage2_inspect_translation_campaign')return response(id,toolResult(translationCampaign.inspect(root,args.campaignId)));
+      if(name==='stage2_diagnose_translation_campaign')return response(id,toolResult(await translationCampaign.diagnose(root,args.campaignId,args.pageIds)));
+      if(name==='stage2_handover_translation_campaign')return response(id,toolResult(await translationCampaign.handover(root,args.campaignId)));
+      if(name==='stage2_step_translation_campaign')return response(id,toolResult(await translationCampaign.step(root,args.campaignId)));
+      if (name === "stage2_inspect_translation_source_binding") return response(id, toolResult(inspectTranslationSourceBinding(root, args.pageId)));
+      if (name === "stage2_inspect_published_translation") return response(id,toolResult(translationPublication.inspectPublishedTranslation(root,args.pageId)));
       if (name === "stage2_register_source_human_confirmation") {
         if (args.pageId !== lockedPageId || !/^sha256:[a-f0-9]{64}$/.test(String(process.env.STAGE2_HUMAN_CONFIRMATION_HASH || ""))
           || process.env.STAGE2_HUMAN_CONFIRMATION_HASH !== args.expectedContentHash) throw new Error("Exact source human confirmation authorization required");
@@ -769,6 +803,9 @@ async function handle(message) {
         return response(id, toolResult(translationPublication.publishTranslation(root, args.pageId, args.reviewId, args.artifactHash, args.acceptance)));
       }
       if (name === "stage2_begin_translation_quality") return response(id, toolResult(translationQuality.beginTranslationQuality(root, args.pageId, args.planId, args.provider)));
+      if (name === "stage2_amend_duplicate_formula") {if(submitAttempted)throw Error('One amendment per process');submitAttempted=true;return response(id,toolResult(translationQuality.amendDuplicateFormula(root,args.pageId,args.reviewId,args.revision,args.unitKey,args.replacement)));}
+      if (name === "stage2_amend_translation_units") {if(submitAttempted)throw Error('One amendment per process');submitAttempted=true;return response(id,toolResult(translationQuality.amendTranslationUnits(root,args.pageId,args.reviewId,args.revision,args.replacements,args.reason)));}
+      if (name === "stage2_adjudicate_translation_findings") return response(id,toolResult(translationQuality.adjudicate(root,args.pageId,args.reviewId,args.revision,args.decisions)));
       if (name === "stage2_inspect_translation_quality") return response(id, toolResult(translationQuality.inspectTranslationQuality(root, args.pageId, args.reviewId)));
       if (name === "stage2_read_translation_quality_packet") {
         const role = capabilityProfile === "translation-repair" ? "repair" : "review";
@@ -826,7 +863,11 @@ async function handle(message) {
         if(process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== 'hold')throw Error('Authorized repair requires hold');
         return response(id,toolResult(applyInformationTheoryAuthorizedRepair(root,args.expectedCandidateHash)));
       }
-      if (name === "stage2_create_readiness_checkpoint") return response(id, toolResult(createReadinessCheckpoint(root)));
+      if (name === "stage2_apply_transformer_authorized_sources") {
+        if(process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION!=='hold'||process.env.STAGE2_AUTHORIZED_TRANSFORMER_SOURCES!==args.expectedCandidateHash)throw Error('Exact source amendment authorization required');
+        return response(id,toolResult(applyTransformerAuthorizedSources(root,args.expectedCandidateHash)));
+      }
+      if (name === "stage2_create_readiness_checkpoint") return response(id, toolResult(createReadinessCheckpoint(root,args)));
       if (name === 'stage2_build_website') {
         if (process.env.STAGE2_MCP_MANUAL_REVIEW_ACTION !== 'hold') throw Error('Website builds require manual-review hold');
         if (submitAttempted) throw Error('One website build per controller process');
@@ -1021,3 +1062,4 @@ process.stdin.on("data", chunk => {
     }
   }
 });
+

@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {merge}=require('../../tools/deepdive-stage2/lib/translation-review-correction');
+const units=[{key:'one'},{key:'two'}],unchanged={unitKey:'one',sourceQuote:'原文',translationQuote:'source',rationale:'Existing independently written rationale.'};
+const prior={keys:['two'],evidence:{checkedUnits:[unchanged,{unitKey:'two',rationale:'short'}]}};
+const patch={checkedUnits:{two:['第二','second','A new substantive correction written by the reviewer.']},findings:[],wholePageRationale:'New complete whole-page assessment by independent reviewer.'};
+const result=merge(prior,patch,units);
+assert.deepEqual(result.checkedUnits[0],unchanged);assert.equal(prior.evidence.checkedUnits[1].rationale,'short');
+assert.equal(result.checkedUnits[1].rationale,patch.checkedUnits.two[2]);
+assert.throws(()=>merge(prior,{...patch,checkedUnits:{}},units),/coverage/);
+assert.throws(()=>merge(prior,{...patch,checkedUnits:{...patch.checkedUnits,one:['a','b','c']}},units),/coverage/);
+assert.throws(()=>merge(null,patch,units),/coverage/);
+console.log('PASS correction preserves untouched evidence and rejects missing or out-of-scope replacements');
