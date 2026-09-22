@@ -70,7 +70,7 @@ const server = spawn(process.execPath, [
   path.join(PROJECT_ROOT, "tools", "deepdive-stage2", "mcp-server.js"),
 ], {
   cwd: fixture,
-  env: { ...process.env, DEEPDIVE_STAGE2_ROOT: fixture },
+  env: { ...process.env, DEEPDIVE_STAGE2_ROOT: fixture, STAGE2_MCP_PROFILE: "full", STAGE2_MCP_MANUAL_REVIEW_ACTION: "hold" },
   stdio: ["pipe", "pipe", "pipe"],
 });
 
@@ -116,9 +116,14 @@ server.stdout.on("data", chunk => {
     const dualReadResponse = byId.get(9);
     const cutoverResponse = byId.get(10);
     assert.strictEqual(initializeResponse.result.serverInfo.name, "ai-knowledge-map-stage2");
+    const toolNames = toolsResponse.result.tools.map(tool => tool.name);
+    assert.strictEqual(new Set(toolNames).size, toolNames.length, "MCP tool names must be unique");
+    // Independent API contract: deriving this list from the server would hide
+    // accidental additions/removals. Tool ordering is not part of the contract.
     assert.deepStrictEqual(
-      toolsResponse.result.tools.map(tool => tool.name),
+      [...toolNames].sort(),
       [
+        "stage2_build_website",
         "stage2_build_deepseek_translation",
         "stage2_inspect_deepseek_translation",
         "stage2_run_deepseek_translation",
@@ -131,17 +136,20 @@ server.stdout.on("data", chunk => {
         "stage2_submit_translation_batch",
         "stage2_reconcile_translation_batch",
         "stage2_collect_translation_batch",
+        "stage2_inspect_translation_source_binding",
         "stage2_export_translation_snapshot",
         "stage2_read_translation_snapshot",
         "stage2_prepare_translation_task",
         "stage2_check_translation_snapshot",
-    "stage2_inventory_pages",
-    "stage2_inspect_audit_upgrade",
-    "stage2_queue_audit_upgrade",
-    "stage2_diagnose_candidate_gate",
-    "stage2_apply_information_theory_authorized_repair",
-    "stage2_create_readiness_checkpoint",
-    "stage2_inventory_page_assets",
+        "stage2_inventory_pages",
+        "stage2_inspect_audit_upgrade",
+        "stage2_queue_audit_upgrade",
+        "stage2_diagnose_candidate_gate",
+        "stage2_apply_information_theory_authorized_repair",
+        "stage2_apply_transformer_authorized_sources",
+        "stage2_create_readiness_checkpoint",
+        "stage2_inventory_page_assets",
+        "stage2_inspect_published_translation",
         "stage2_status",
         "stage2_state_storage_report",
         "stage2_build_state_v2_shadow",
@@ -173,7 +181,15 @@ server.stdout.on("data", chunk => {
         "stage2_validate_audit_result",
         "stage2_validate_page_result",
         "stage2_submit_result",
-      ],
+        "stage2_amend_translation_units",
+        "stage2_amend_duplicate_formula",
+        "stage2_adjudicate_translation_findings",
+        "stage2_handover_translation_campaign",
+        "stage2_diagnose_translation_campaign",
+        "stage2_build_translation_campaign",
+        "stage2_inspect_translation_campaign",
+        "stage2_step_translation_campaign",
+      ].sort(),
     );
     const claimTool = toolsResponse.result.tools.find(tool => tool.name === "stage2_claim_task");
     assert.strictEqual(claimTool.inputSchema.properties.pageId.pattern, "^[a-z0-9][a-z0-9-]*$");
