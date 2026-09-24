@@ -36,6 +36,7 @@
       "data/library-openreview.js",
       "data/library-acl-anthology.js",
       "data/library-cvf-open-access.js",
+      "data/library-ieee-xplore.js",
       "data/software.js",
     ];
 
