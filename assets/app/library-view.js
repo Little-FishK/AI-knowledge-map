@@ -21,11 +21,21 @@
     let built = false;
     let selectedClass = "all";
     let selectedSubcategory = "all";
+    let selectedTopicCategory = "all";
     let query = "";
 
     const bundle = [
-      "data/library.js",
+      "data/library.js?v=20260924-openai-anthropic-topics-1",
       "data/library-official-technical.js",
+      "data/library-official-openai-importance-01.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-openai-importance-02.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-openai-importance-03.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-openai-importance-04.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-openai-importance-05.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-anthropic-importance-01.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-anthropic-importance-02.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-anthropic-importance-03.js?v=20260924-openai-anthropic-topics-1",
+      "data/library-official-anthropic-importance-04.js?v=20260924-openai-anthropic-topics-1",
       "data/library-official-china.js",
       "data/library-platform-profiles.js",
       "data/library-source-meta.js",
@@ -52,15 +62,26 @@
       if (sourceClass) {
         selectedClass = sourceClass.getAttribute("data-library-class");
         selectedSubcategory = "all";
+        selectedTopicCategory = "all";
         view.querySelectorAll("[data-library-class]").forEach(button => button.classList.toggle("active", button === sourceClass));
         renderSubcategories();
+        renderTopicCategories();
         renderItems();
         return;
       }
       const subcategory = event.target.closest("[data-library-subcategory]");
       if (subcategory) {
         selectedSubcategory = subcategory.getAttribute("data-library-subcategory");
+        selectedTopicCategory = "all";
         renderSubcategories();
+        renderTopicCategories();
+        renderItems();
+        return;
+      }
+      const topic = event.target.closest("[data-library-topic]");
+      if (topic) {
+        selectedTopicCategory = topic.getAttribute("data-library-topic");
+        renderTopicCategories();
         renderItems();
       }
     });
@@ -77,9 +98,11 @@
       const dropdown = event.target.closest(".lib-sub-select");
       if (!dropdown || !dropdown.value) return;
       [selectedClass, selectedSubcategory] = dropdown.value.split("::");
+      selectedTopicCategory = "all";
       view.querySelectorAll("[data-library-class]").forEach(button =>
         button.classList.toggle("active", button.getAttribute("data-library-class") === selectedClass));
       renderSubcategories();
+      renderTopicCategories();
       renderItems();
     });
 
@@ -183,6 +206,34 @@
       return [item].concat(item.relatedMaterials || []);
     }
 
+    function topicCategoryLabel(id) {
+      return id ? t(`library.openaiTopic.${id}`) : "";
+    }
+
+    function renderTopicCategories() {
+      const container = view.querySelector(".lib-topic-nav");
+      if (!container || !library) return;
+      const categories = (library.topicTaxonomies && library.topicTaxonomies[selectedSubcategory]) || [];
+      const visible = selectedClass === "official" && categories.length > 0;
+      if (!visible) {
+        selectedTopicCategory = "all";
+        container.hidden = true;
+        container.innerHTML = "";
+        return;
+      }
+      const source = sourceClassById("official");
+      const subcategory = subcategoryById(source, selectedSubcategory) || { label:selectedSubcategory };
+      const topicItems = (library.items || []).filter(item => item.sourceClass === "official" && item.sourceSubcategory === selectedSubcategory);
+      const counts = {};
+      topicItems.forEach(item => { counts[item.primaryCategory] = (counts[item.primaryCategory] || 0) + 1; });
+      container.hidden = false;
+      container.innerHTML = `<div class="lib-topic-head"><div><b>${esc(t("library.topicCategories", { source:subcategory.label }))}</b><span>${esc(t("library.topicCategories.hint"))}</span></div></div>
+        <div class="lib-topic-chips" role="group" aria-label="${esc(t("library.topicCategories.aria", { source:subcategory.label }))}">
+          <button class="lib-topic-chip${selectedTopicCategory === "all" ? " active" : ""}" type="button" data-library-topic="all">${esc(t("common.all"))} <span>${topicItems.length}</span></button>
+          ${categories.map(category => `<button class="lib-topic-chip${selectedTopicCategory === category ? " active" : ""}" type="button" data-library-topic="${esc(category)}">${esc(topicCategoryLabel(category))} <span>${counts[category] || 0}</span></button>`).join("")}
+        </div>`;
+    }
+
     function matchesSource(record) {
       return (selectedClass === "all" || record.sourceClass === selectedClass) &&
         (selectedSubcategory === "all" || record.sourceSubcategory === selectedSubcategory);
@@ -196,10 +247,11 @@
       const normalizedQuery = query.trim().toLocaleLowerCase();
       const items = (library.items || []).filter(item => {
         if (!sourceRecords(item).some(matchesSource)) return false;
+        if (selectedTopicCategory !== "all" && item.primaryCategory !== selectedTopicCategory) return false;
         if (!normalizedQuery) return true;
         const source = sourceClassById(item.sourceClass);
         const subcategory = subcategoryById(source, item.sourceSubcategory);
-        return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label]
+        return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label, topicCategoryLabel(item.primaryCategory)]
           .concat(item.tags || [], (item.relatedMaterials || []).flatMap(record => [record.title, record.summary, ...(record.tags || [])])).join(" ").toLocaleLowerCase().includes(normalizedQuery);
       });
       if (note) note.textContent = t("library.itemCount", { count: items.length });
@@ -210,6 +262,7 @@
         return `<article class="lib-card" data-library-item="${esc(canonicalItem.id)}" style="--source-color:${source.color}" tabindex="0">
           <div class="lib-card-top">
             <span class="lib-badge">${esc(source.label)}</span><span class="lib-subbadge">${esc(subcategory.label)}</span>
+            ${item.primaryCategory ? `<span class="lib-topicbadge">${esc(topicCategoryLabel(item.primaryCategory))}</span>` : ""}
             ${item.discoveryOnly ? `<span class="lib-discovery">${esc(t("library.discoveryOnly"))}</span>` : ""}${item.regulatoryStatus ? `<span class="lib-discovery">${esc(t(`library.regulatoryStatus.${item.regulatoryStatus}`))}</span>` : ""}<span class="lib-tier">${esc(item.authorityTier)}</span>
           </div>
           <h3 class="lib-title">${esc(item.title)}</h3>
@@ -242,6 +295,7 @@
         </nav>
         <section class="lib-content">
           <div class="lib-subnav"></div>
+          <div class="lib-topic-nav" hidden></div>
           <div class="lib-toolbar">
             <input class="lib-search" type="search" placeholder="${esc(t("library.search.placeholder"))}" aria-label="${esc(t("library.search.aria"))}">
             <span class="lib-filter-note"></span>
@@ -252,6 +306,7 @@
       view.querySelector(".lib-search").value = query;
       built = true;
       renderSubcategories();
+      renderTopicCategories();
       renderItems();
     }
 
@@ -274,6 +329,7 @@
         <div class="d-summary">${esc(item.summary)}</div>
         <div class="d-sec"><h4>${esc(t("library.sourceRecord"))}</h4><dl class="lib-detail-meta">
           <dt>${esc(t("library.primarySourceClass"))}</dt><dd>${esc(source.label)}</dd><dt>${esc(t("library.secondarySourceClass"))}</dt><dd>${esc(subcategory.label)}</dd>
+          ${item.primaryCategory ? `<dt>${esc(t("library.topicCategory"))}</dt><dd>${esc(topicCategoryLabel(item.primaryCategory))}</dd>` : ""}
           <dt>${esc(t("library.publisher"))}</dt><dd>${esc(item.publisher)}</dd><dt>${esc(t("library.collection"))}</dt><dd>${esc(item.collection)}</dd>
           <dt>${esc(t("library.reviewStatus"))}</dt><dd>${esc(item.reviewStatus)}</dd><dt>${esc(t("library.primarySource"))}</dt><dd>${esc(t(item.primarySource ? "common.yes" : "common.no"))}</dd>
           ${item.officialIdentifier ? `<dt>${esc(t("library.officialIdentifier"))}</dt><dd>${esc(item.officialIdentifier)}</dd>` : ""}

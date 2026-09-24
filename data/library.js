@@ -5,6 +5,32 @@ window.PRO_LIBRARY = {
     updatedAt: "2026-09-24",
     note: "官方技术资料按知识矩阵重建：取消品牌篇数配额和混合兜底分类，只保留具有知识增量或会影响理解、使用、选型与比较的品牌差异证据。来源治理元数据见 library-source-meta.js。"
   },
+  topicTaxonomies: {
+    openai: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
+    ],
+    anthropic: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
+    ]
+  },
   sourceClasses: [
     {
       id: "academic", order: 1, label: "学术投稿", short: "论文、正式出版与预印本", color: "#7797c7", authority: "A2–R",
