@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints? Explained Simply</title>
+<meta name="description" content="From task distribution, strong-model upper bound, and multidimensional gates, to cost per successful task, Pareto frontier, and exit strategy.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/model-selection/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/model-selection/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/model-selection/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints? Explained Simply">
+<meta property="og:description" content="From task distribution, strong-model upper bound, and multidimensional gates, to cost per successful task, Pareto frontier, and exit strategy.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/model-selection/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints? Explained Simply">
+<meta name="twitter:description" content="From task distribution, strong-model upper bound, and multidimensional gates, to cost per successful task, Pareto frontier, and exit strategy.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/model-selection/#page","name":"What Is Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints? Explained Simply","description":"From task distribution, strong-model upper bound, and multidimensional gates, to cost per successful task, Pareto frontier, and exit strategy.","url":"https://ai-knowledge-map.com/en/concepts/model-selection/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints","item":"https://ai-knowledge-map.com/en/concepts/model-selection/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints</span></li></ol></nav><article id="dd-article" data-concept-id="model-selection" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Model Selection and Cost: Finding the Minimal Viable Solution That Satisfies Constraints</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From task distribution, strong-model upper bound, and multidimensional gates, to cost per successful task, Pareto frontier, and exit strategy.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Model selection is not about picking the leaderboard champion; it is about first satisfying hard constraints on quality, safety, privacy, and latency on representative tasks, then minimizing lifecycle cost among feasible candidates. The real economic metric is the complete cost of each successful task and the failure loss, not the per-call or per-token unit price.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Write model selection as constrained optimization; calculate cost per successful task; understand strong model baselines and controlled ablations; use Pareto frontiers and slice thresholds for decisions.</div>
+<ol class="dd-chain"><li>Define the task distribution and hard constraints</li><li>Use strong models to establish architecture upper bounds</li><li>Compare per-sample differences under fixed conditions</li><li>Filter out candidates that do not meet thresholds</li><li>Calculate complete cost per successful task</li><li>Canary release and re-evaluate/exit based on triggers</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>“Which model is best” lacks an objective function<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Questions like “which model is best” come up repeatedly in model selection discussions, but it is not an answerable question: it lacks an objective function. A model can only be compared after the task is specified and what counts as “good” is defined; leaderboard rankings detached from the task do not provide a basis for model selection. The same leaderboard conclusion has no shared explanatory power across three types of tasks—invoice extraction, marketing copywriting, and refund approval—because these tasks differ completely in how they define “correct,” in the cost of errors, in required context, in output structure, and in permission requirements. Invoice extraction cares about whether fields are complete and accurate; copywriting cares about whether the expression is clear and effective, and errors are usually tolerable and easy to correct; refund approval is a high-risk decision with permissions, where a single mistaken “approve” can directly cause a financial loss. Measuring them with the same score is equivalent to assuming that errors across these three task types can be converted into one another, when in fact they are not even in the same unit of measure.</p>
+<p>Therefore, the first step in model selection is not to find a model, but first to pin down the task conditions. It is necessary to explicitly write out: input distribution—where requests come from and what they look like; success event—what output counts as a success; high-risk slices—which subsets have an extremely high error cost and must be measured separately; latency SLO—for example, a p95 latency upper bound; data boundary—where data is allowed to be stored and whether it can cross a specified region; throughput and budget—peak request volume and total affordable cost. Only after these conditions are fixed do the scores obtained by different models become comparable evidence; when conditions are inconsistent, differences in scores cannot be attributed to the model itself being better or worse.</p>
+<p>Among these conditions, some are hard constraints and some are optimizable objectives. Taking a refund assistant as an example, the hard thresholds might be: unauthorized operation rate ≤ 0.5% (the proportion of unauthorized operations must be kept very low), quality issue eligibility accuracy ≥ 90% (accuracy when determining whether it qualifies for a refund), p95 latency ≤ 1.8 s, and data must not leave the designated region. These thresholds do not allow “partial satisfaction”: a model with a 0.7% unauthorized operation rate cannot use a lower price to “make up for” the unauthorized operation risk, no matter how much cheaper each call is. A hard constraint failure is failure; a lower price or a higher score on ordinary samples cannot offset it. In contrast, “explanation clarity” and “cost” are optimizable objectives—among candidates that satisfy all hard constraints, the clearer the explanation and the lower the cost, the better, but they can never be traded against hard constraints.</p>
+<p>Thus the model selection problem can be stated precisely as: within the constraint set C, which “model—prompt—tool” configuration has the lowest long-term total cost? Note that the decision object here is the entire configuration, not the model name. The model name is only part of the solution: the same model paired with different prompts and different tool integration methods can produce completely different constraint satisfaction and costs. Calling model selection “which model to choose” is an oversimplification; the real output of model selection is a set of candidate configurations.</p>
+<p>This gives the inputs and outputs of the model selection process. The inputs are the six categories of conditions: task distribution, success definition, risk slices, SLO, data boundary, and budget; the output is the set of candidate configurations that satisfy all hard constraints. The order of the process cannot be reversed: first define “success” and the non-compensable hard thresholds, then compare candidates within those thresholds. Leaderboard scores are interpretable only when all these conditions are the same—when two models are evaluated under the same input distribution, the same success definition, and the same risk slices, differences in scores reflect real capability differences. Conversely, any hard constraint failure cannot be offset by a lower price or a higher score on ordinary samples.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>First use a strong model to establish the system's upper bound<span class="dd-badge eng">Diagnosis</span></h2>
+<div class="dd-agent-response"><p>When prototype performance falls short, the most common confusion is whether the model is not strong enough, or whether retrieval, prompts, or the process itself is flawed. These two diagnoses point to completely different directions for fixing the issue: switch to a stronger model, or fix the data, prompts, and pipeline. The way to separate them is to first use a strong candidate to establish the system's upper bound.</p>
+<p>The specific approach: choose a candidate with strong capability, sufficient context, and stable tool integration, run it on a representative sample, and give it complete evidence—that is, the 'correct' context and tool results in the oracle sense. The score measured in this run is the achievable upper bound for the current architecture (retrieval method, prompt structure, tool chain, acceptance criteria) when model capability is sufficient. Then examine the results in two cases.</p>
+<p>If the strong model still fails under oracle evidence, it means the bottleneck is not the model but the task itself: task definition, data quality, tools, or acceptance criteria have problems, and you should fix these first rather than continue changing models. If the strong model passes, it means the current architecture itself can do the task well, the upper bound holds, and then you can start ablation: swap in smaller models one by one, reduce context, reduce the reasoning budget, and measure the resulting loss each time something is saved. The principle of ablation is to hold the remaining variables constant and replace only one model or one reasoning configuration at a time; otherwise changes in performance cannot be attributed. The entire comparison process must freeze the evaluation set and the scorer; you cannot change questions while comparing—once the questions and scoring criteria change, scores measured earlier and later are no longer comparable.</p>
+<p>The value of the strong model baseline is also reflected in error analysis. Retain the per-sample comparison differences and examine error migration between old and new configurations: which samples were originally correct but wrong after the configuration change, and which were originally wrong but correct after the change. The error migration map can show on which types of inputs the cost of each 'saving' specifically falls. At the same time, evaluation must cover the end-to-end fallback chain, not just measure the accuracy of a single output—if one step is correct but the whole chain is wrong, it is still a failure in a real system.</p>
+<p>It should be emphasized that the strong model baseline is not the default production solution. It is only a diagnostic reference: the upper bound tells you how good this architecture can be at most and what the per-sample error distribution is. Privacy requirements, latency budgets, or licensing restrictions may prevent this strong model from being deployed from the start; the purpose of the upper bound is to calibrate the improvement space and locate bottlenecks, not to automatically become a production recommendation. The baseline's input is a frozen evaluation set, sufficient evidence, and stable tools; its output is the achievable quality upper bound of the current architecture and per-sample errors. When it fails, fix the task, data, or tools first; when it passes, replace variables one by one to perform ablation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Model selection is constrained multi-objective optimization<span class="dd-badge math">mechanism</span></h2>
+<div class="dd-agent-response"><p>When putting quality, risk, latency, and cost into the same decision, the easiest mistake is to arbitrarily weight them into a single total score. Where do the weights come from? Who decides that 1 quality point equals how many yuan of cost? Once a recognized conversion rate is lacking, any weighted total score is an artificial construct, and the ranking result will reverse as the weights are fine-tuned. Model selection should be expressed as constrained multi-objective optimization: minimize TotalCost(m) over candidate configurations m (i.e., “model—prompt—tool” configs), while satisfying a set of hard constraints—Qualityₖ(m) ≥ Qₖ (the k-th key quality is not lower than the lower bound Qₖ), Riskⱼ(m) ≤ Rⱼ (the j-th risk is not higher than the upper bound Rⱼ), P95(m) ≤ L (p95 latency does not exceed upper bound L), Privacy(m) ∈ C (privacy category falls within the allowed set C). Quality, risk, latency, and privacy enter the problem in the form of thresholds; first execute these hard constraints to filter out the feasible region, then compare cost, throughput, and maintenance burden within the feasible region. Candidates that fail thresholds are directly eliminated, no matter how outstanding they are on other dimensions.</p>
+<p>For thresholds to be truly executable, each dimension needs a measurable expression and must clarify what it cannot be offset by. Critical quality is expressed as slice pass rate and confidence interval—the pass rate and its uncertainty on high-risk slices are the evidence, not offset by average improvement on ordinary samples. Safety and permissions are expressed as event rate and severity—the frequency and consequence level of events such as unauthorized access and leakage cannot be offset by more natural writing style. Latency is expressed as TTFT, p95/p99, and timeouts—tail latency and timeouts determine user experience, not offset by average latency. Cost is expressed as cost per successful task and peak capacity—how much is actually paid for a successful task and whether it can hold up at peak, not offset by token unit price. Governance is expressed as region, retention, audit, and exit capability—whether data can remain in the specified region, whether retention policies are compliant, whether audit is possible, whether exit is possible, not offset by model capability score.</p>
+<p>Within the feasible region, if there is no recognized conversion rate among multiple objectives, use the Pareto frontier for further screening. A candidate is dominated if there exists another candidate that is no worse in all dimensions and strictly better in at least one; the Pareto frontier is all non-dominated candidates in the feasible region. Being on the frontier does not mean automatic victory: it only indicates that this candidate is not comprehensively dominated and is worth further discussion combining business weights; the final trade-off still requires the business side to take a position among quality, risk, latency, and cost, while the frontier shrinks the “candidates worth serious consideration” from the full set to a small set.</p>
+<p>The input to the entire process is the candidate set m, each quality Qualityₖ, each risk Riskⱼ, p95 latency, privacy category Privacy, and the corresponding thresholds Qₖ, Rⱼ, L, C; the output is the solution with the lowest total cost TotalCost in the feasible region. The order is fixed: first execute hard thresholds to filter out the feasible region, then look at Pareto frontier and cost. Being on the frontier only means not comprehensively dominated, not automatic victory.</p></div>
+<table class="dd-table"><thead><tr><th>Dimension</th><th>Suggested expression</th><th>Cannot be offset by</th></tr></thead><tbody><tr><td>Critical quality</td><td>Slice pass rate and interval</td><td>Average improvement on ordinary samples</td></tr><tr><td>Safety/permissions</td><td>Event rate and severity</td><td>More natural writing style</td></tr><tr><td>Latency</td><td>TTFT, p95/p99, timeouts</td><td>Average latency</td></tr><tr><td>Cost</td><td>Per successful task and peak capacity</td><td>token unit price</td></tr><tr><td>Governance</td><td>Region, retention, audit, exit capability</td><td>Model capability score</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="模型选型的受约束优化"><munder><mi>min</mi><mi>m</mi></munder><mi>TotalCost</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>,</mo><mi>s.t.</mi><msub><mi>Quality</mi><mi>k</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≥</mo><msub><mi>Q</mi><mi>k</mi></msub><mo>,</mo><msub><mi>Risk</mi><mi>j</mi></msub><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><msub><mi>R</mi><mi>j</mi></msub><mo>,</mo><mi>P95</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>≤</mo><mi>L</mi><mo>,</mo><mi>Privacy</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>∈</mo><mi>C</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Calculating full cost from the request flow, not the price list.<span class="dd-badge math">Economics</span></h2>
+<div class="dd-agent-response"><p>If one model's per-call cost is only a quarter of another's, is using it really cheaper? The price list only describes the marginal price of a single call, but a complete request flow for a real task includes many steps: initial answer, retrieval, retries after failure, escalation to a stronger model, tool calls, manual review, and failure remediation. After switching to a cheaper model, the usage of these steps changes—more initial-answer failures, more retries and escalations, longer manual review queues. There are also fixed costs: deployment redundancy, monitoring, evaluation, supplier integration, and migration. Attribute all of these to mature business results, not just to the unit price on the price list.</p>
+<p>The core formula for full cost is: full cost per successful task CostPerSuccess = (Ccall + Ctool + Cretry + Chuman + Cinfra + Closs) / Nsuccess. The numerator aggregates resources and losses across the entire task pipeline: Ccall is the model call cost, Ctool is the retrieval and tool cost, Cretry is the cost of retries and escalation to a stronger model, Chuman is the manual review cost, Cinfra is the infrastructure cost, Closs is the loss caused by failures; the denominator Nsuccess is the number of genuinely successful tasks independently confirmed, not the number of tasks the system itself claims to have completed.</p>
+<p>The choice of denominator is the most error-prone part of the formula. If you only count tasks the system claims to have completed, you miss two types of outcomes: users who give up and wrong automatic approvals. A user leaves before getting a result, but the system records it as “completed”; a task with wrong automatic approval is treated as success by the system, while the business side has already suffered a loss. Success must be defined by business state independent of the system, and the denominator counts only real business success, so that costs fall on the actual results produced.</p>
+<p>The failure loss Closs in the numerator may not be precisely priceable. The expected loss from wrongly approving a refund, the reputational loss from a single unauthorized action, often cannot be converted into a reliable monetary amount; for such high-risk scenarios, using a hard threshold is more honest than forcing a price. But even if failure loss is not monetized, the accounting should at least show labor and retries: if they are hidden, comparisons reward solutions that shift costs to the operations team—the model is cheaper, but overtime increases, and total cost is actually higher. This is the mechanism of “a smaller model is cheaper per call but more expensive in the end”: a low per-call price brings more retries, escalations, labor, and failures; these increments all go into the numerator, while the denominator shrinks due to lower success rate, so CostPerSuccess rises. High-risk losses that cannot be priced should be kept as hard thresholds rather than converted into the cost formula.</p></div>
+<div class="dd-formula"><math display="block" aria-label="每成功任务完整成本"><mi>CostPerSuccess</mi><mo>=</mo><mfrac><mrow><mi>Ccall</mi><mo>+</mo><mi>Ctool</mi><mo>+</mo><mi>Cretry</mi><mo>+</mo><mi>Chuman</mi><mo>+</mo><mi>Cinfra</mi><mo>+</mo><mi>Closs</mi></mrow><mi>Nsuccess</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Worked Example: How a Cheaper Model Loses to a More Expensive Model<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>Run the previous formulas through a concrete scenario: process 1000 refund tasks. Candidate S costs ¥0.02 per call, candidate M ¥0.08 per call, and candidate L ¥0.18 per call (¥180 for 1000 calls). Looking only at the price list, S is obviously the cheapest; looking at the full cost per successful task, the conclusion is the opposite. The comparison has two steps: first pass the hard thresholds, then perform the full economic accounting. A cheap candidate whose over-authorization rate exceeds the limit cannot enter the cost track at all and is eliminated directly; after entering the track, compare by CostPerSuccess.</p>
+<p>The accounting process is shown in the table below. In each row, add the call cost, manual review (¥1 each), and failure remediation (¥3 each) to get the numerator, then use the actual number of successful tasks as the denominator:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Candidate</th><th class="dd-align-left">Per call</th><th class="dd-align-left">Cost for 1000 calls</th><th class="dd-align-left">Success rate (success count)</th><th class="dd-align-left">Manual review</th><th class="dd-align-left">Failure remediation</th><th class="dd-align-left">Cost per successful task</th></tr></thead><tbody><tr><td class="dd-align-left">S small model</td><td class="dd-align-left">¥0.02</td><td class="dd-align-left">¥20</td><td class="dd-align-left">78% = 780</td><td class="dd-align-left">180 times × ¥1 = ¥180</td><td class="dd-align-left">40 times × ¥3 = ¥120</td><td class="dd-align-left">(20 + 180 + 120) ÷ 780 = ¥0.410</td></tr><tr><td class="dd-align-left">M medium model</td><td class="dd-align-left">¥0.08</td><td class="dd-align-left">¥80</td><td class="dd-align-left">90% = 900</td><td class="dd-align-left">65 times × ¥1 = ¥65</td><td class="dd-align-left">2 times × ¥3 = ¥6</td><td class="dd-align-left">151 ÷ 900 = ¥0.168</td></tr><tr><td class="dd-align-left">L strong model</td><td class="dd-align-left">¥0.18</td><td class="dd-align-left">¥180</td><td class="dd-align-left">93% = 930</td><td class="dd-align-left">35 times × ¥1 = ¥35</td><td class="dd-align-left">1 time × ¥3 = ¥3</td><td class="dd-align-left">218 ÷ 930 = ¥0.234</td></tr></tbody></table></div>
+<p>S's failure mechanism is clear at a glance: calls cost only ¥20, but a 78% success rate means many tasks require manual work and remediation—¥180 manual plus ¥120 remediation, for a total expenditure of ¥320 spread over 780 successful tasks, or ¥0.41 per successful task. M's call cost is four times S's (¥80), but its success rate is higher and manual work and remediation are lower, so the total expenditure of ¥151 spread over 900 successful tasks is about ¥0.168. L has the strongest capability and also the highest call cost (¥180), with a 93% success rate and further reductions in manual work and remediation, so the total expenditure of ¥218 spread over 930 successful tasks is about ¥0.234. Under the given assumptions, M wins: it is neither the cheapest to call nor the most capable, but it has the lowest cost per successful task.</p>
+<p>This conclusion is sensitive to assumptions. If the manual unit price rises from ¥1, or the failure remediation unit price changes, the relative ranking of M and L will shift; if the traffic structure changes—for example, the proportion of difficult problems in the input distribution rises and S's success rate falls further—the conclusion likewise changes. Therefore, the accounting is not a one-time task: after obtaining the cost per successful task, you must perform sensitivity analysis on the manual unit price and traffic structure to confirm that the winner still holds under parameter perturbations. The input to the case is 1000 refunds and the threshold, call, success, manual, and remediation data for S, M, and L; the output is the feasible candidates and their cost per successful task—first eliminate those that fail on over-authorization or latency, then calculate and compare using the formula, and finally test the stability of the conclusion with sensitivity analysis.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 250" role="img" aria-label="Three model candidates undergo hard-threshold screening and per-successful-task cost comparison"><defs><marker id="ms1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="52" width="145" height="142" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="92" y="77" text-anchor="middle" class="svg-t">Candidates S / M / L</text><text x="92" y="102" text-anchor="middle" class="svg-t" font-size="11">Same evaluation set and tools</text><text x="92" y="124" text-anchor="middle" class="svg-t" font-size="11">Record quality/risk/latency</text><text x="92" y="146" text-anchor="middle" class="svg-t" font-size="11">Record retries/manual/failures</text><path d="M165,123 L238,123" stroke="#6b7484" marker-end="url(#ms1)"/><rect x="240" y="52" width="160" height="142" rx="9" fill="#21252d" stroke="#c77b72"/><text x="320" y="77" text-anchor="middle" class="svg-t">Hard threshold screening</text><text x="320" y="103" text-anchor="middle" class="svg-t" font-size="11">S: over-authorization 0.8% → eliminated</text><text x="320" y="126" text-anchor="middle" class="svg-t" font-size="11">M: passes all</text><text x="320" y="149" text-anchor="middle" class="svg-t" font-size="11">L: latency 2.4s → eliminated</text><text x="320" y="172" text-anchor="middle" class="svg-t" font-size="11">Total scores cannot be used to compensate for each other</text><path d="M400,123 L474,123" stroke="#6b7484" marker-end="url(#ms1)"/><rect x="476" y="52" width="204" height="142" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="578" y="77" text-anchor="middle" class="svg-t">Comparison within feasible region</text><text x="578" y="103" text-anchor="middle" class="svg-t" font-size="11">M: ¥151 / 900 successes</text><text x="578" y="126" text-anchor="middle" class="svg-t" font-size="11">≈ ¥0.168 / successful task</text><text x="578" y="149" text-anchor="middle" class="svg-t" font-size="11">Keep fallback and re-evaluation plan</text><text x="578" y="172" text-anchor="middle" class="svg-t" font-size="11">Not a permanent champion</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1: First screen hard constraints, then compare full economic viability; a cheap but over-authorizing candidate will not enter the cost track.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Per call</th><th>Success rate</th><th>Manual rate × ¥1</th><th>Failure remediation</th><th>Per successful task</th></tr></thead><tbody><tr><td>S small model</td><td>¥20</td><td>78%=780</td><td>180×1=¥180</td><td>40×¥3=¥120</td><td>(20+180+120)/780=¥0.410</td></tr><tr><td>M medium model</td><td>¥80</td><td>90%=900</td><td>65×1=¥65</td><td>2×¥3=¥6</td><td>¥151/900=¥0.168</td></tr><tr><td>L strong model</td><td>¥180</td><td>93%=930</td><td>35×1=¥35</td><td>1×¥3=¥3</td><td>¥218/930=¥0.234</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Vendors and operating modes are also part of the candidate set<span class="dd-badge eng">Governance</span></h2>
+<div class="dd-agent-response"><p>When the output quality of two endpoints is similar on the evaluation set, the decision turns to non-behavioral dimensions such as contracts, versions, and exit capability. Items that need to be compared item by item include: whether data is used for training, data retention period, data region, encryption method, audit capability, model version locking, rate limits, SLA, batch pricing, content policy, and service termination terms. Self-hosting also needs to additionally account for GPU utilization, patch maintenance, on-call duty, and disaster recovery costs—what is saved is pay-per-use, what is added is the entire operations surface. Open weights provide control, but control does not automatically bring licensing, data provenance, or security guarantees: being able to modify a model does not mean you have the right to commercial use, nor does it mean the training data and dependent components are clean and auditable.</p>
+<p>Vendor assessment can be carried out item by item according to 'question—evidence'. To determine whether the version can be locked, the evidence is snapshot identifiers, change notifications, and regression windows—silent model updates can quietly invalidate a configuration that has already passed evaluation, so you must know which snapshot is running in production, whether there was notification before the change, and whether there is a regression window after the change. For data destination, the evidence is contracts, regions, retention terms, and the list of sub-processors. For capacity assurance, the evidence is quotas, burst policies, SLA, and historical failure records—even after signing an SLA, you must also check whether it is sufficient to cover peaks and bursts. For exit cost, the evidence is actual testing of alternative endpoints, migration scripts, and recorded compatibility differences.</p>
+<p>Exit capability cannot rely on assumptions; it must rely on drills. Conduct an exit drill: export prompts and evaluation sets, switch to a backup endpoint, verify output contracts and tool compatibility, and measure actual recovery time. The 'equivalent model' claimed by a vendor may differ in format, refusal behavior, and tokenization; the abstract interface layer can only reduce migration costs, not eliminate behavioral differences. Having the same interface does not guarantee the same format, refusal behavior, and tokenization; the time actually taken to switch and restore service is the most credible evidence of exit capability.</p>
+<p>The inputs to vendor assessment are model behavior, contracts, regions, retention periods, versions, capacity, licensing, and exit drill results; the outputs are governable operating plans and alternative paths. Similar quality is only a necessary condition; what ultimately determines the final outcome is often these governance dimensions.</p></div>
+<table class="dd-table"><thead><tr><th>Question</th><th>Evidence needed</th></tr></thead><tbody><tr><td>Can the version be locked?</td><td>Snapshot identifiers, change notifications, and regression windows</td></tr><tr><td>Data destination</td><td>Contracts, regions, retention, and sub-processors</td></tr><tr><td>Capacity assurance</td><td>Quotas, burst policies, SLA, and failure records</td></tr><tr><td>Exit cost</td><td>Actual testing of alternative endpoints, migration scripts, and compatibility differences</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>An application can statically compose multiple models<span class="dd-badge eng">architecture</span></h2>
+<div class="dd-agent-response"><p>"Choosing one model" is often not the final system design, because different steps in an application have completely different difficulty and risk: intent classification, query rewriting, core reasoning, code execution, and safety review each have different requirements for capability, latency, and trustworthiness. Having a single large model handle all steps means using the same level of capability to deal with all levels of risk, which is both expensive and difficult to verify step by step. The alternative is to statically divide responsibilities by component: deterministic rules check permissions first, a small model extracts order fields, a medium model interprets policy, and high-risk exceptions are routed to humans. Each component is independently responsible and independently verified—permission checks are verified by the unauthorized access rate, extraction is verified by field accuracy, and high-risk judgment is verified by recall of cases routed to humans—the whole chain is more testable than a single large model and makes it easier to locate which component failed.</p>
+<p>Dynamic routing is another approach: predict difficulty at the request level, then decide which model to send it to. It may save further cost compared with static division of labor, because simple requests no longer go through a strong model. But it introduces three new problems: erroneous downgrading—difficult requests are misjudged by the router as simple requests and sent to a small model; cascading latency—the routing judgment itself takes time, and with possible multi-level retries, tail latency deteriorates; router drift—the router model's own distribution changes with traffic, and routing decision quality degrades over time. Therefore dynamic routing must not be evaluated together with the underlying model: first establish a static baseline and confirm that each component's threshold is met, then evaluate routing as an independent system separately; the cost savings brought by routing belong to the router and cannot be credited as gains of the underlying model.</p>
+<p>Tools are not a free add-on to model capabilities either. Within the same toolchain, different candidates differ in schema compliance, error recovery, and context utilization: a model that performs well on pure question answering may perform poorly on schema validation and retry strategies after tools are connected. Therefore any candidate with tools must be tested on the same end-to-end toolchain, not extrapolated from tool-free evaluation scores.</p>
+<p>The inputs of static model composition are the difficulty, risk, structure, and tool requirements of each component; the output is the division of responsibilities among rules, small models, medium models, strong models, or humans. By fixing responsibility per component, permission checks, field extraction, and high-risk judgment can be verified separately; dynamic routing is a subsequent independent system built on top of the static baseline, and its benefits must be attributed separately.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Fallback, degradation, and exit must be included in evaluation<span class="dd-badge eng">Reliability</span></h2>
+<div class="dd-agent-response"><p>When the preferred model times out, is rate-limited, has low confidence, or outputs invalid results, what does the user actually experience? This question must be answered at the selection stage, not left to be answered when a production incident occurs. Fallback design must define in advance the branches corresponding to each exception: retry the same endpoint, upgrade to a stronger model, switch to deterministic code, ask the user for additional information, return a cached result, transfer to a human, or fail explicitly. Each branch must have a budget—total tokens, total latency, and side effects. Pay particular attention to cascade contamination: content generated by the first response must not be passed to subsequent models without review; otherwise errors or injections in the first response will spread along the chain, and the upgrade branch itself will also be contaminated.</p>
+<p>Evaluation of the fallback chain relies on fault injection: proactively create supplier 429 rate limiting, stream interruption, tool timeout, schema changes, and regional unavailability, and see how the system ultimately performs under these conditions. What needs to be measured is not whether the branches 'look reasonable,' but the final task success rate, p95 latency, number of repeated actions, and human load under fault conditions. A 99.9% available primary model does not mean the entire cascade is equally reliable—each dependency in the fallback chain is connected before or after the primary model, and if any one is unavailable, end-to-end availability is affected.</p>
+<p>The availability of serial independent dependencies is approximately the product of the availability of each dependency: Asystem ≈ ∏ᵢ Aᵢ, where Aᵢ is the availability of the i-th dependency. Even when each component is very reliable, the product still declines level by level: for three serial dependencies each at 99.9%, end-to-end availability is only about 99.7%; for ten, it is only about 99%, and it drops below 99% only at the eleventh. This approximation explains the common phenomenon of 'components individually reliable, but end-to-end availability significantly lower.' It is only an approximation: in real systems, failures are often correlated—a regional outage may take down both the model and the tools simultaneously—so real correlated failures, repeated side effects, and total latency cannot be derived from the product; they must be directly verified through fault injection experiments.</p>
+<p>The inputs to fallback design are the trigger conditions—timeout, rate limiting, low confidence, invalid output—and the availability Aᵢ of the i-th dependency; the outputs are the specific strategies for the branches—retry, upgrade, deterministic code, ask, human, or failure—and an estimate of system availability Asystem. The selection decision must include this branch table and its fault injection results: a candidate that performs well only under normal conditions, paired with an untested fallback chain, is equivalent to leaving the worst-case cost until after launch.</p></div>
+<div class="dd-formula"><math display="block" aria-label="串行独立依赖的近似可用率"><mi>Asystem</mi><mo>≈</mo><munder><mo>∏</mo><mi>i</mi></munder><msub><mi>A</mi><mi>i</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Selection expires and needs triggered reassessment<span class="dd-badge intuition">Lifecycle</span></h2>
+<div class="dd-agent-response"><p>Today's optimal model may no longer be viable next month: price adjustments, model version updates, context length changes, supplier policy modifications, traffic language structure drift, task rule changes, and labor cost fluctuations—any one of these can overturn the previous conclusion. Model selection is not a one-time comparison at procurement time, but an ongoing process with triggers. Trigger conditions that must be preset include: model snapshot updates, price changes, pass-rate drift on critical risk slices, error budget exhaustion, issuance of new risk requirements, and backup endpoint failover failure. Once a trigger occurs, rerun the frozen evaluation set and real traffic sampling, rather than waiting until an incident has occurred and then evaluating ad hoc.</p>
+<p>Every reassessment and every original decision must be recorded on a decision card, including: candidate list, exclusion reason for each candidate, data version, thresholds, confidence intervals, cost assumptions, approver and reassessment date, and exit plan. The value of the decision card is to prevent memory loss: a candidate was once eliminated due to privacy or unauthorized access, and months later when a new version leaderboard appears, the team may forget the original exclusion reason and want to reintroduce it based solely on leaderboard scores. The decision card preserves this causal chain; when reintroducing, one must first re-examine whether the original exclusion reason still holds.</p>
+<p>Evaluation data itself must also be protected from contamination. Public leaderboards can only be used to generate candidate lists, not to replace a private representative evaluation set—the leaderboard composition is unrelated to your task distribution, and its scores are not interpretable when task conditions differ. Conversely, private sets have their own pitfall: repeatedly tuning parameters, changing prompts, and swapping models against the same private set will also overfit to that set, and evaluation scores no longer represent real traffic. Periodically mixing in real samples and updating the private set when necessary are standard means to combat contamination in both directions.</p>
+<p>Inputs to lifecycle reassessment are changes in price, model version, task distribution, policy, labor cost, and error budget; the output is one of four decisions: continue use, re-compare, canary switch, or exit. Historical optimality holds only for the task distribution, prices, and assumptions at that time; it cannot be permanently inherited by inertia—reassessment is not to overturn old decisions, but to ensure that “current optimal” always corresponds to current conditions.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connecting the causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Connect the previous steps in causal order. From the question "which model is best" to verifiable production practice, model selection consists of six steps, each providing the premise for the next.</p>
+<p>Step one: Define the task distribution and hard constraints. Write out the input distribution, success events, high-risk slices, latency SLO, data boundaries, and budget, and express the hard thresholds for quality and risk as measurable expressions. Without this step, none of the subsequent comparisons has a common coordinate system.</p>
+<p>Step two: Use a strong model to establish an architectural upper bound. Run the strong candidate on a frozen evaluation set with sufficient evidence: if it still fails under oracle evidence, the bottleneck is in the task, data, or tools—go back and fix that first; if it passes, the current architecture is feasible and the upper bound holds.</p>
+<p>Step three: Compare per-sample differences under fixed conditions. Replace only one variable at a time—model or inference configuration—while keeping all other conditions unchanged, and record the error migration between the old and new configurations: which samples newly fail, which are corrected, and which input types bear the cost.</p>
+<p>Step four: Eliminate candidates that do not meet the thresholds. Use hard constraints to carve out the feasible region: unauthorized operation rate, slice pass rate, latency p95, privacy categories—any one failing means immediate elimination; low price and high scores on ordinary samples cannot offset threshold failures.</p>
+<p>Step five: Calculate the full cost per successful task. For feasible candidates, compute using CostPerSuccess: the numerator is the full-chain expenditure on calls, tools, retry escalation, human labor, infrastructure, and failure losses; the denominator is the number of true successes confirmed by independent business state. When a low unit price brings more retries, human labor, and failures, the final cost is actually higher; if necessary, combine Pareto frontier and sensitivity analysis to determine the winner.</p>
+<p>Step six: Roll out gradually, reevaluate according to triggers, and exit. The winner is first validated on a small traffic share, while recording the decision card and setting triggers for price, version, slice drift, error budget, etc.; when triggers fire, rerun the frozen set and real sampling to decide whether to continue use, re-compare, shift traffic, or exit. The historical best holds only for the data and assumptions at that time; model selection is a cyclical chain, not a one-time answer.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2305.05176" target="_blank" rel="noopener">FrugalGPT</a>: Cost and quality optimization of cascaded calls</li><li><a href="https://arxiv.org/abs/2406.18665" target="_blank" rel="noopener">RouteLLM</a>: Preference-data-driven model routing</li><li><a href="https://arxiv.org/abs/2211.09110" target="_blank" rel="noopener">HELM</a>: Multi-scenario, transparent model evaluation</li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI RMF</a>: Risk constraints and lifecycle governance</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/model-selection">Explore connections on the map</a><a href="/zh/concepts/model-selection/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Model Evaluation and Benchmarks: Turning &quot;Stronger&quot; into Reproducible Evidence? Explained Simply</title>
+<meta name="description" content="From estimation target, sampling budget, and pass@k, to contamination, judge bias, confidence intervals, and release thresholds.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/model-evaluation/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/model-evaluation/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/model-evaluation/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Model Evaluation and Benchmarks: Turning &quot;Stronger&quot; into Reproducible Evidence? Explained Simply">
+<meta property="og:description" content="From estimation target, sampling budget, and pass@k, to contamination, judge bias, confidence intervals, and release thresholds.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/model-evaluation/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Model Evaluation and Benchmarks: Turning &quot;Stronger&quot; into Reproducible Evidence? Explained Simply">
+<meta name="twitter:description" content="From estimation target, sampling budget, and pass@k, to contamination, judge bias, confidence intervals, and release thresholds.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/model-evaluation/#page","name":"What Is Model Evaluation and Benchmarks: Turning \"Stronger\" into Reproducible Evidence? Explained Simply","description":"From estimation target, sampling budget, and pass@k, to contamination, judge bias, confidence intervals, and release thresholds.","url":"https://ai-knowledge-map.com/en/concepts/model-evaluation/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Model Evaluation and Benchmarks: Turning \"Stronger\" into Reproducible Evidence","item":"https://ai-knowledge-map.com/en/concepts/model-evaluation/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Model Evaluation and Benchmarks: Turning &quot;Stronger&quot; into Reproducible Evidence</span></li></ol></nav><article id="dd-article" data-concept-id="model-evaluation" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Model Evaluation and Benchmarks: Turning &quot;Stronger&quot; into Reproducible Evidence</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From estimation target, sampling budget, and pass@k, to contamination, judge bias, confidence intervals, and release thresholds.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Model evaluation is not about assigning a model a single total score; it is about estimating an uncertainty-aware capability profile after fixing the task distribution, tools, prompts, sampling budget, and scoring rules. The conclusion holds only if the questions are not leaked, the conditions are comparable, and the metrics align with how the model is used; otherwise, even a score precise to decimal places may have no decision value.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>distinguish model evaluation from application evaluation; manually calculate confidence intervals for accuracy and pass@k; identify contamination and judge bias; design a reproducible evaluation card.</div>
+<ol class="dd-chain"><li>Define the target task distribution</li><li>Freeze data and inference conditions</li><li>Choose complementary scorers</li><li>Run and retain per-question results</li><li>Estimate differences and uncertainty</li><li>Check slices/contamination/cost, then decide</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Clarify Exactly What Is Being Estimated<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p># Clarify Exactly What Is Being Estimated</p>
+<p>Does a single model have a "true ability score" that is independent of context? No. Any number produced by an evaluation is not an intrinsic property of the model, but rather an estimate of performance under the combined influence of a particular question distribution, a particular prompt template, particular tool permissions, a particular inference budget, and a particular scorer. Treating this estimate as a fixed ability of the model is the easiest and most expensive mistake in evaluation.</p>
+<p>Take a refund assistant as an example. When we place it in a scenario, what we really care about are several mutually independent behaviors: whether policy Q&A is accurate, whether cited evidence is adequate, whether amount calculations are error-free, whether it refuses when it should refuse unauthorized requests, and whether it can clarify over multiple turns when information is insufficient. These five abilities each have their own failure modes. A generic knowledge leaderboard cannot cover all of them simultaneously, nor can it replace direct measurement within the scenario. Conversely, a refund assistant's rank on a generic leaderboard cannot be directly converted into its performance in real refund conversations—if the questions change, the tools change, or the evaluation criteria change, the score may shift as a whole.</p>
+<p>Therefore, rigorous reports never write "Model M has a score of 82," but rather "an estimate of metric Y for model M on test set D under configuration C." Every item in this sentence carries actual weight. The model name is only part of the experimental subject; the system prompt, temperature, maximum token count, reasoning effort, number of candidates, and available tools all belong to the treatment conditions. The same weight snapshot at temperature 0 and at temperature 1 yields two different experimental results, not the same ability measured twice. Raising the temperature introduces randomness; increasing the number of candidates means the model can make several guesses and then choose; enlarging the inference budget allows a longer chain of thought—all of these change the final score, but they change the measurement conditions, not the object being measured itself.</p>
+<p>The cognitive anchor should be fixed: evaluation is not taking a photograph of an ability, but measuring future usage performance with a limited sample. The photograph-like view makes people believe the score is intrinsic to the object; the measurement-based view reminds us that the sample may not be representative, the instrument itself may be biased, and what we get is always an estimate with uncertainty.</p>
+<p>Write this principle as an input-output relationship: the inputs to model evaluation are model snapshot M, test distribution D, inference configuration C, and target metric Y; the output is an ability estimate for Y with uncertainty. A score is valid only for the given questions, prompts, tools, and budget; it is not a context-independent true ability constant. After the question distribution or inference configuration changes, old scores cannot be directly extrapolated—to answer a new question, you must re-estimate under new D and C.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Model evaluation and application evaluation cannot substitute for each other<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p># Model evaluation and application evaluation cannot substitute for each other</p>
+<p>The bare model answers better, so why might it still perform worse after being built into a product? Because the product places the model in a different pipeline: retrieval first proposes candidate clauses, reranking decides which ones enter the context, system prompts constrain permissions, business processes decide when it must refuse and when to transfer to a human, and users also care about latency and citation trustworthiness. Answering questions correctly is only one link in this chain; a high score on that link does not mean the whole chain is fault-free. To understand this gap, we need to break evaluation into four levels, each with different things fixed and different questions answered.</p>
+<p>The first level is model evaluation. It fixes the prompt, tools, and question set, and only has candidate models compared with each other under these same conditions, answering "which one is better at this type of question." In the refund assistant, the typical question at this level is: given the same policy passage, which of Model A and Model B judges "whether a refund is possible" more accurately. Because all conditions are fixed, score differences can only be attributed to the model itself.</p>
+<p>The second level is component evaluation. It reverses this by fixing the model, and each time replaces only one component in the pipeline, answering "does this component bring improvement?" For example, keeping the model unchanged, swap in a different retrieval or reranking scheme to see whether the correct clause can enter top-5. If the top-5 hit rate rises, the improvement comes from the retrieval side; if it stays the same, the bottleneck is elsewhere. The reason this level can locate the source of a problem is that only one variable is changed at a time.</p>
+<p>The third level is application evaluation. It runs the complete version within the business process, answering "does the end-to-end system achieve its goal?" What is accepted here is no longer answer accuracy, but whether citations are real and verifiable, whether permissions are strictly followed, whether latency is within an acceptable range for users, and whether the final user outcome is qualified. Even if the refund assistant answers correctly, if it cites hallucinated clauses or says compensation it has no authority to promise, application evaluation should judge it as unqualified.</p>
+<p>The fourth level is online experiment. It uses traffic-splitting rules to divide real traffic between the new and old versions, with guardrails in place, answering "can offline gains really transfer?" In offline evaluation, the transfer-to-human rate may decrease, but online you must verify whether this decrease actually happens, whether erroneous promises decrease, and whether guardrails intercept abnormal behavior. The gap between offline and online can only be tested at this level.</p>
+<p>The division of labor among these four levels forms a clear causal chain: model evaluation isolates capability, facilitating attribution; application evaluation preserves the real pipeline, facilitating decision-making. The two should be used in combination like unit tests and end-to-end tests, not as either/or. Doing only model evaluation misses failures outside the model such as permissions, latency, and retrieval failures; doing only application evaluation cannot locate whether a problem is due to the model or a component.</p>
+<p>Write the level analysis as input and output: the input is the object to be compared and the fixed conditions; the output is an evaluation conclusion at one of the four levels—model, component, application, or online experiment. Model evaluation fixes system conditions to isolate candidate capabilities; application evaluation preserves the complete pipeline to judge business results—the former is responsible for attribution, the latter supports release. A high score from a bare model can never replace end-to-end acceptance of permissions, latency, and user outcomes.</p></div>
+<table class="dd-table"><thead><tr><th>Level</th><th>What is fixed</th><th>What question it answers</th><th>Refund assistant example</th></tr></thead><tbody><tr><td>Model evaluation</td><td>Prompt, tools, and question set</td><td>Which candidate model is better under the same conditions</td><td>Given the same policy passage, which one judges more accurately</td></tr><tr><td>Component evaluation</td><td>Model, replacing one component</td><td>Whether retrieval or reranking improves</td><td>Whether the correct clause can enter top-5</td></tr><tr><td>Application evaluation</td><td>Complete version and business process</td><td>Whether end-to-end achieves the goal</td><td>Whether citations, permissions, latency, and user outcomes meet standards</td></tr><tr><td>Online experiment</td><td>Traffic-splitting rules and guardrails</td><td>Whether offline gains can transfer</td><td>Whether the transfer-to-human rate and erroneous promises decrease</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Which Variables Need to Be Fixed for a Fair Comparison<span class="dd-badge eng">Experimental Design</span></h2>
+<div class="dd-agent-response"><p># Which Variables Need to Be Fixed for a Fair Comparison</p>
+<p>Two reports both say “accuracy 80%”, so why might they be completely incomparable? Because “accuracy” is just a number calculated at the end, while the variables that determine that number number more than a dozen; if any one differs, the meaning of 80% is different. The first step in a fair comparison is to align all of these variables: the question set and its version, few-shot examples, system prompt, output parsing method, context fed to the model, available tools, token limit, stopping condition, temperature, number of candidates, failure retry rules, and the scorer used for final grading. Every link in this chain directly changes the score — a different question version means the model is not seeing the same set of questions; different few-shot examples mean different demonstrations; different output parsing means the same generated text may be read as correct or incorrect.</p>
+<p>Budget variables especially require caution. If the purpose of the comparison is cost–benefit, then the inference budget itself is an independent variable; you cannot use cheap single-shot generation on one side and expensive multiple sampling on the other, and then report the most favorable point for each. The correct approach is to draw a quality–cost curve: the horizontal axis is cost or compute, the vertical axis is quality, and the two models are compared across the whole curve. Picking only the most favorable point for each yields not a comparison but two advertisements.</p>
+<p>The choice of metric must likewise be decided before the results. A fair experiment pre-registers the primary metric, key slices, and failure threshold, for example declaring in advance: “Using refund-amount judgment accuracy as the primary metric, slicing by amount range and language, and any slice below 80% constitutes failure.” The point of doing so is to prevent picking a more presentable metric after seeing the results — choosing a metric after the fact makes the experimenter both player and referee.</p>
+<p>Reproducibility requires fixing the environment as well. The experimental configuration should be saved as an executable script, while recording the model snapshot, data hash, and random seed; if a hosted model is used, at least record the date and version number, because server-side updates may quietly change behavior. The run order should also be interleaved or randomized, alternating the two models, to avoid service updates, rate limiting, or time drift being concentrated on one model.</p>
+<p>Failures and timeouts are the places most easily exploited. Retries must be scored according to pre-written rules: whether a timeout counts as wrong or is retried once before scoring must be decided before the experiment begins; silently discarding timed-out samples inflates quality, because the discarded ones are often the questions the model could not answer. The existence of pre-defined rules ensures that the attribution of failed samples is not decided by post-hoc emotions.</p>
+<p>The most common sleight of hand hides among these variables: Model A generates one output per question, while Model B generates 100 candidates per question and then picks the best. Even if the final scores are the same, it absolutely does not mean the two are equally reliable under interactive single-shot use — B’s score purchased a large amount of resampling; A’s did not. Calling single-shot generation versus best-of-100 picking a fair comparison is like putting “guessing once” and “guessing a hundred times and selecting the correct one” in the same table.</p>
+<p>Write the fair experiment as input and output: the inputs are the same question version, few-shot examples, prompt, tools, token, temperature, candidates, retries, and scorer; the output is comparable per-question results and a quality-cost curve. Different budgets mean different treatment conditions; you cannot compare single-shot generation against best-of-100 picking. Failures and timeouts must be scored according to pre-registered rules, and hosted models must also record the date and version. Without any one of these alignment items, the “comparison” between two 80% scores is merely coincidence.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: How Certain Is the Gap on 100 Refund Questions?<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p># Worked Example: How Certain Is the Gap on 100 Refund Questions?</p>
+<p>If Model A answers 82 questions correctly and Model B answers 78 correctly, can we directly declare A stronger? First unfold the entire process: start from a fixed task, obtain two point estimates, then perform slice analysis separately and provide confidence intervals, and only then judge whether the gap is stable. Figure 1 shows exactly this chain, and its first message is: a difference in point estimates does not equal a stable difference, and paired results on the same set of questions carry more information than two independent accuracies.</p>
+<p>First compute the uncertainty. The standard error of a binomial proportion is SE = <math class="dd-inline-root" aria-label="根号 phat × (1 − phat) / n"><msqrt><mtext>phat × (1 − phat) / n</mtext></msqrt></math>, where phat is the proportion correct and n is the number of questions. A answered 82 questions correctly, phat = 0.82, n = 100, SE = <math class="dd-inline-root" aria-label="根号 0.82 × 0.18 / 100"><msqrt><mtext>0.82 × 0.18 / 100</mtext></msqrt></math> ≈ 0.038. The rough 95% confidence interval is phat ± 1.96 × SE, i.e., 0.82 ± 0.075, about 74.5%–89.5%; calculated with the more precise Wilson interval, A is about 73%–88%. B's phat = 0.78, Wilson interval about 69%–85%. The two intervals overlap substantially. Overlap does not mean 'absolutely no difference', but it shows that with only 100 questions and a 4 percentage point gap it is hard to draw a strong conclusion—this batch of data is compatible both with 'A is truly stronger' and with 'the two are about the same, and the 4 points are just sampling fluctuation'.</p>
+<p>If the two models answer the same set of questions, the paired information can reduce the uncertainty. After aligning question by question, there are 12 questions that only A answered correctly and 8 questions that only B answered correctly; on the remaining questions both are correct or both are wrong. The information that truly distinguishes the two models comes mainly from these 20 discordant samples; the concordant correct and concordant wrong questions contribute nothing to the comparison. For this paired structure, one can use the McNemar test to judge whether the 12 vs. 8 difference is significant, or use bootstrap to estimate the interval for the difference 'A-only correct proportion minus B-only correct proportion'. The paired comparison is stronger than independent comparison precisely because it holds the difficulty of each question fixed—on the hard questions both models are wrong, and this no longer gets mixed into the overall gap.</p>
+<p>Slice analysis can also overturn the overall conclusion. Look at the high-risk 'unauthorized refund' slice: out of 10 questions, A answered only 2 correctly and B 8. A, with a higher total score, is clearly worse on this slice, and this slice corresponds exactly to a real business risk—once an unauthorized refund is allowed through, its cost far exceeds getting an ordinary question wrong. So the conclusion reverses: A has a higher overall score but cannot be deployed. The lesson at this layer is that confidence intervals under the overall metric and slices can give different answers, and a high-risk slice can independently veto an overall advantage.</p>
+<p>Write the accuracy example as input-output: the inputs are sample size n, proportion correct phat, and the same-question paired results; the outputs are standard error SE, 95% interval, and paired difference evidence. SE = <math class="dd-inline-root" aria-label="根号 phat × (1 − phat) / n"><msqrt><mtext>phat × (1 − phat) / n</mtext></msqrt></math>, the rough interval is phat ± 1.96 × SE; A's 82% and B's 78% intervals overlap substantially, showing that one hundred questions are not enough to make a strong assertion. When the question distribution or high-risk slices impose additional requirements, an advantage in overall score must yield to evidence from slices.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 230" role="img" aria-label="Flow of refund question evaluation from fixed task to slices and confidence intervals"><defs><marker id="me1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="75" width="128" height="72" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="82" y="101" text-anchor="middle" class="svg-t">100 frozen questions</text><text x="82" y="122" text-anchor="middle" class="svg-t" font-size="11">Eligibility/Amount/Permission slices</text><path d="M146,111 L205,111" stroke="#6b7484" marker-end="url(#me1)"/><rect x="207" y="32" width="142" height="64" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="278" y="57" text-anchor="middle" class="svg-t">Model A: 82/100</text><text x="278" y="78" text-anchor="middle" class="svg-t" font-size="11">95% CI approx. 73%–88%</text><rect x="207" y="132" width="142" height="64" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="278" y="157" text-anchor="middle" class="svg-t">Model B: 78/100</text><text x="278" y="178" text-anchor="middle" class="svg-t" font-size="11">95% CI approx. 69%–85%</text><path d="M349,64 L420,91" stroke="#6b7484" marker-end="url(#me1)"/><path d="M349,164 L420,137" stroke="#6b7484" marker-end="url(#me1)"/><rect x="422" y="76" width="128" height="76" rx="9" fill="#21252d" stroke="#c77b72"/><text x="486" y="101" text-anchor="middle" class="svg-t">Intervals overlap substantially</text><text x="486" y="122" text-anchor="middle" class="svg-t" font-size="11">Weak evidence for a 4-point gap</text><text x="486" y="140" text-anchor="middle" class="svg-t" font-size="11">Also check paired difference</text><path d="M550,114 L608,114" stroke="#6b7484" marker-end="url(#me1)"/><rect x="610" y="82" width="72" height="64" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="646" y="107" text-anchor="middle" class="svg-t">Increase sample size</text><text x="646" y="128" text-anchor="middle" class="svg-t" font-size="11">Check slices</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1. A difference in point estimates does not equal a stable difference; paired results on the same set of questions carry more information than two independent accuracies.</figcaption></figure>
+<div class="dd-formula"><math display="block" aria-label="二项比例标准误与粗略置信区间"><mi>SE</mi><mo>(</mo><mi>phat</mi><mo>)</mo><mo>≈</mo><msqrt><mfrac><mrow><mi>phat</mi><mo>×</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>phat</mi><mo>)</mo></mrow><mi>n</mi></mfrac></msqrt><mo>;</mo><mi>CI95</mi><mo>≈</mo><mi>phat</mi><mo>±</mo><mn>1.96</mn><mo>×</mo><mi>SE</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>pass@k Mixes Model Quality and Compute Budget Together<span class="dd-badge math">Sampling</span></h2>
+<div class="dd-agent-response"><p># pass@k Mixes Model Quality and Compute Budget Together</p>
+<p>A code model reports pass@100 = 90%. Why might a user still frequently fail with a single generation? Because pass@k describes not the “success rate of a single generation” but rather “the probability of finding at least one usable answer among k candidates.” The gap between these two numbers is bought by compute budget.</p>
+<p>Let p be the probability of success on a single independent generation. The idealized “at least one success in k attempts” is 1 − (1 − p)^k. Each step of this formula is intuitive: (1 − p) is the probability of a single failure, (1 − p)^k is the probability that all k attempts fail, and subtracting it from 1 gives the probability of at least one success. When p = 0.1, pass@1 = 10%, while pass@10 = 1 − 0.9^10 ≈ 65.1%. The single-shot success rate is only 10%, yet after tenfold sampling the probability that “there is a correct one in the candidate pool” exceeds 65%. The jump in the number comes mainly from the tenfold sampling budget, not from the single-shot model suddenly becoming smarter. This formula is only an ideal upper bound: real generated errors are correlated with each other—the same model tends to make the same kind of mistake on the same problem, so k attempts are not k independent chances; moreover, having “a correct one” in the candidate pool does not mean the system can pick it out—a reliable verifier is still needed to select the correct one from the candidates. The verifier can be mistaken, and the correct candidate may also be discarded.</p>
+<p>Precisely because pass@k mixes model quality and sampling budget together, reporting a metric must also answer “what does the user actually get.” pass@1 promises a single-sample hit, corresponding to a real user’s single-click experience; disclosing it requires noting the temperature, token, and prompt. pass@k promises at least one hit in the candidate pool, and must disclose k, total token consumption, and candidate correlation—the larger k is and the more expensive the tokens, the farther this metric is from a single user experience. One level further down is post-selection success rate: the rate at which the verifier actually delivers the correct candidate to the user, which depends on verification cost and the mis-selection rate. The final level is end-to-end success rate: the rate at which the complete flow actually works, counting tool calls, timeouts, and failed retries in the denominator.</p>
+<p>The same applies when comparing reasoning models. A fixed-token comparison may be unfair, because the two models have different efficiency at converting tokens into answers; a fixed-price or fixed-latency comparison answers different questions—one asks “who is stronger for the same money,” the other asks “who is stronger under the same speed.” The most honest approach is to report the Pareto frontier: plot quality as a function of budget, let readers choose a point on the curve according to their own budget, rather than choosing one budget for everyone and reporting a single number.</p>
+<p>Write pass@k as input and output: the input is the single-shot independent success probability p and the number of samples k, and the output is the ideal probability of at least one success, pass@k = 1 − (1 − p)^k. When p = 0.1 and k = 10, it is about 65.1%; this improvement comes mainly from the tenfold compute budget. Real errors are correlated and a verifier still needs to choose correctly, so the formula is only an upper-bound intuition. Any pass@k report must also disclose k, total token, latency, and the selector, otherwise the reader cannot know how much of this number belongs to the model and how much belongs to the budget.</p></div>
+<table class="dd-table"><thead><tr><th>Report</th><th>What the user gets</th><th>Must also disclose</th></tr></thead><tbody><tr><td>pass@1</td><td>Single-sample hit</td><td>Temperature, token, and prompt</td></tr><tr><td>pass@k</td><td>At least one hit in the candidate pool</td><td>k, total token, candidate correlation</td></tr><tr><td>Post-selection success rate</td><td>Verifier actually delivers the correct candidate</td><td>Verification cost and mis-selection rate</td></tr><tr><td>End-to-end success rate</td><td>Real flow completes</td><td>Tools, timeouts, failed retries</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="独立采样至少一次成功的概率"><mtext>pass@k</mtext><mo>=</mo><mn>1</mn><mo>−</mo><msup><mrow><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow><mi>k</mi></msup></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Why Public Benchmarks Get Contaminated and Overfit<span class="dd-badge eng">Failure</span></h2>
+<div class="dd-agent-response"><p># Why Public Benchmarks Get Contaminated and Overfit</p>
+<p>Can a set of questions be considered “unseen” just because it was never explicitly used for fine-tuning? No. The original problem statements, standard answers, web mirrors, solution explanations, translations into various languages, and even derivative texts generated by other models may all have already entered the pre-training corpus. During pre-training, the model has seen many variants of the problem statement and answer; it is just that those moments of exposure were not recorded in the fine-tuning logs. Thus, between “not used for fine-tuning” and “unseen” lies the entire pre-training corpus.</p>
+<p>More insidious is overfitting at the organizational level. Teams repeatedly adjust data mixes and training recipes based on public leaderboards: when the ranking drops a little, they change data, modify prompts, or tune sampling parameters until the score recovers. This process is different from training directly on the test set, but the effect is similar—each time the leaderboard is checked and an adjustment is made, the test set loses a bit of its independent judgment. After many rounds of iteration, a high score may reflect not that the model is better at solving the problems, but that the team is better at fitting to this particular problem set.</p>
+<p>Detecting contamination is harder than one might think. Literal deduplication can only catch exactly identical text; it cannot catch rewriting: a question may have words replaced, word order changed, or be translated into another language and back, with zero string overlap, yet semantically it is the same question. Conversely, an unusually high score alone cannot prove memorization—it could be genuine ability, or it could simply be that the answers were memorized. These two points together mean that neither “it has been deduplicated” nor “the score is suspicious” alone can establish contamination; more structured evidence is needed.</p>
+<p>Defenses therefore need to be layered. First, construct new questions with time-based validity: if a question is released after the model's training cutoff date, it cannot possibly be in the pre-training corpus. Second, keep a set of private tests: model authors cannot access the question content, cutting off leakage channels. Third, screen public question sets using semantic nearest neighbors: retrieve semantically similar text for each question and check for suspicious solution traces—for example, a fragment like “the answer to this question is C” appearing in the corpus. Fourth, completely separate the development set used for hyperparameter tuning from the final gate set: the development set can be examined repeatedly, while the gate set is used only once before release. Fifth, record the number of times test results are viewed: the view count itself is a monitoring metric for overfitting—the more views, the closer the gate set becomes to the development set. For question sets that saturate quickly, they should also be replaced periodically rather than permanently using an old set that the entire industry has been grinding on for years.</p>
+<p>This governance also has clear boundaries: private is not automatically representative. If the refund questions are all written by internal experts in standardized phrasing, then real users' colloquial language, typos, missing information, and roundabout expressions are all absent from the question distribution; no matter how well the model performs on a private set, after deployment it may still encounter ways of speaking it has never seen. Private sets only reduce leakage risk; they do not guarantee coverage of the real user distribution.</p>
+<p>Write contamination governance as input and output: the inputs are questions, answers, mirrors, translations, explanations, and semantic nearest neighbors; the output is a contamination risk judgment and a decision to keep, replace, or downweight. Never being explicitly fine-tuned does not mean pre-training has not seen it, and literal deduplication cannot catch rewriting; only time-based new questions, private gate sets, and semantic screening working together can bring contamination risk into a controllable range.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Automated Metrics, Large Language Model (LLM) Judges, and Human Blind Evaluation<span class="dd-badge intuition">Measurement Bias</span></h2>
+<div class="dd-agent-response"><p># Automated Metrics, Large Language Model (LLM) Judges, and Human Blind Evaluation</p>
+<p>The scorer outputs a number. Why should the scorer itself be evaluated? Because no scoring instrument is perfectly transparent; each has its own blind spots. If the scorer is not validated, the scores the model receives will be contaminated by the scorer's bias. To design a credible scoring system, first understand what each instrument is suitable for, what its main biases are, and how to calibrate them.</p>
+<p>Exact match is the cheapest and most reproducible, but it wrongly penalizes equivalent expressions: if the model says "should refund 35 yuan" and "the refund amount is 35 yuan" mean the same thing, character comparison judges one correct and one wrong. Programmatic tests are strong on code and structural problems, can directly run assertions to check executable results, but they only cover the written assertions—correct or incorrect things outside the assertions are invisible. An LLM judge can understand semantics, making it suitable for evaluating attributes without standard answers such as helpfulness, completeness, and style, but it has built-in biases: it prefers answers that appear first or are longer, is more lenient toward text similar to its own style, is friendlier to outputs from its own model family, and can be led astray by prompt injection instructions in the output content. Domain human evaluation is closest to real judgment, suitable for high-risk and novel failure modes, but humans get tired, standards drift, and two annotators may give different conclusions on the same answer.</p>
+<p>Calibration methods should correspond one-to-one with biases. The weakness of deterministic rules and programmatic tests is insufficient coverage, which can be supplemented with mutation testing and counterexamples: deliberately inject known-wrong amounts and fabricated reference IDs to see whether the rules catch them. An LLM judge's order bias is eliminated by swapping positions—evaluate the same pair of answers in both orders once; if the conclusion flips with the order, the judge is biased. Length and style biases are calibrated through blinding and human gold-standard calibration—anonymize the answers, align lengths, and use samples with existing human conclusions to check whether the judge keeps up with human judgment. Disagreement in domain human evaluation is resolved through double annotation and arbitration: the same answer is independently annotated by two people, disagreements are submitted to experts for arbitration, and annotation quality is monitored with consistency statistics.</p>
+<p>The scoring combination for the refund scenario can be built like this: First, use programmatic checks for amounts, permissions, and reference IDs—these are executable, reproducible hard constraints; then have a blinded judge evaluate explanation clarity, handling language quality beyond the hard constraints; finally, for high-risk samples and samples where the judge and program disagree, hand them over to experts for arbitration. The reason for layering is that each instrument can only see its own dimension: the program cannot see whether the expression is good, the judge is unreliable on whether the amount is correct, and humans are too expensive and too slow to use on every question.</p>
+<p>To understand the meaning of this combination, one intuition needs correcting: Putting multiple instruments together is not to vote and manufacture ground truth, but to make each one's blind spots visible. When the program catches an amount error that the judge missed, it shows the judge is not trustworthy on numbers; when the judge sees expression confusion that the program cannot judge, it shows the rules have insufficient coverage; when experts intervene on disagreements between the two, it shows the disagreement itself is a signal.</p>
+<p>Written as input and output, the scoring combination takes deterministic rules, executable tests, an LLM judge, and domain human evaluation as input, and outputs scores for each attribute, disagreement records, and arbitration results. Rules are reproducible but have limited coverage; an LLM judge understands semantics but has order, length, and same-source biases; humans are qualified but get tired. Blinding, order swapping, double annotation, and gold-standard calibration together keep these biases within a visible range. Each instrument participates with its own error, but after combination, error can no longer slip through unnoticed.</p></div>
+<table class="dd-table"><thead><tr><th>Instrument</th><th>Suitable for</th><th>Main biases</th><th>Validation method</th></tr></thead><tbody><tr><td>Deterministic rules/tests</td><td>Numerical values, schema, executable results</td><td>Insufficient coverage</td><td>Mutation testing and counterexamples</td></tr><tr><td>LLM judge</td><td>Helpfulness, completeness, style</td><td>Order/length/same-source bias</td><td>Swapping positions, blinding, human gold standard</td></tr><tr><td>Domain human</td><td>High-risk and novel failure</td><td>Disagreement and fatigue</td><td>Double annotation, arbitration, consistency</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>From Leaderboards to Release Gates<span class="dd-badge eng">Decision</span></h2>
+<div class="dd-agent-response"><p># From Leaderboards to Release Gates</p>
+<p>After a model's overall score improves, how do you turn evidence into a decision about whether to switch models? Leaderboards only answer “who is stronger”; release decisions must answer “will switching to it cause problems, is it worth it, and if something goes wrong, how do we roll it back.” These three questions each have their own gates, and the order cannot be reversed.</p>
+<p>The first step is to define hard gates that must not regress. Dimensions such as the rate of unauthorized actions, privacy leakage, and critical language slices do not accept compensation from the overall score: even if the new model is ten points higher overall, as long as the unauthorized refund rate rises, or a critical language clearly degrades, it cannot replace the old model wholesale. Hard gates come first because once these risks occur, they cannot be hedged by average performance.</p>
+<p>Only after passing the hard gates does the benefit comparison come: task quality, cost, p95 latency, and throughput must be considered together. Quality differences should be expressed as an interval from paired bootstrap rather than a single point estimate; also list the failure migration list—which errors from the old model were fixed and which new errors the new model introduced. Fixing ten old errors and adding eight new ones tells you more about the real consequences of switching models than a net difference of two points. No matter how complete offline comparison is, it only becomes release evidence after shadow deployment or small-traffic validation on representative real traffic. Shadow mode lets the new model observe real requests through a side channel, while small-traffic rollout routes only a small subset of users; both limit the impact radius of errors.</p>
+<p>The carriers of evidence are the evaluation card and the results page. The evaluation card freezes the data version, configuration, and primary metrics to ensure that release review sees the same reproducible experiment; the results page reports overall results, slices, intervals, cost, and error examples together—missing any one of them leaves reviewers only a cropped number. The release policy must specify rollback thresholds: which line an online metric falls below triggers automatic or manual rollback, rather than leaving only a leaderboard. New failures exposed in production must flow back into the candidate set and, after human review, enter the next development cycle—these newly flowed-back questions must never be added directly to the current gating set, otherwise the judgment basis for this release is contaminated by post-release findings.</p>
+<p>The inputs to a release decision are the interval for overall and slice differences, cost, latency, error migration, and online validation; the outputs are a plan to replace, route, retain, or roll back. An easily overlooked conclusion is that a “best model” often does not exist. One model may win in low-latency scenarios, another may be more stable in high-risk safety scenarios, and a third may excel at long context; when each of the three dimensions has its own winner, model routing is more appropriate than wholesale replacement—route requests by scenario to the model that is best at each, rather than forcing one model to win on all dimensions.</p>
+<p>The last rule leaves no room: gating set failures cannot be cleared by deleting questions or changing metrics. Deleting questions the model cannot pass, or switching to a metric that happens to be more presentable, both lower the release gate itself. The value of a gate lies precisely in its immutability; otherwise evaluation turns from evidence into ritual.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p># Connecting the Causal Chain</p>
+<p>Evaluation runs from “Is this question worth testing?” all the way to “Can we release now?”. Every step builds on the previous one; if any link is missing, the final decision has no basis.</p>
+<p>The first step is to define the target task distribution. The object of evaluation is never an abstract capability, but performance in a specific scenario: a refund assistant must be tested on policy Q&A, evidence citation, amount calculation, refusal to exceed authority, and multi-turn clarification, not on an overall ranking on a generic leaderboard. Only when the distribution is clearly defined do all subsequent steps have a common target.</p>
+<p>The second step is to freeze data and inference conditions. The question version, few-shot, system prompt, temperature, token, number of candidates, retry rules, and scorer are all aligned and recorded as a snapshot; hosted models must also record the date and version. Only when conditions are frozen can the score difference between two models be attributed to the model itself, rather than to one run using single generation and another using the best of a hundred attempts.</p>
+<p>The third step is to choose complementary scorers. Programmatic rules check amounts, permissions, and citation IDs; blinded judges evaluate explanation quality; experts arbitrate high-risk and disagreement samples. Putting multiple instruments together is not voting, but making each other’s blind spots visible.</p>
+<p>The fourth step is to run and retain per-question results. The total score is temporarily set aside; per-question correctness is the raw material for all subsequent analysis: paired differences, slice performance, and failure migration are all computed from per-question records. Data that only keeps the total score is equivalent to discarding information at the source.</p>
+<p>The fifth step is to estimate the difference and uncertainty. Use standard error and confidence intervals to assess whether a four-point gap on one hundred questions is credible, and use paired bootstrap to give an interval for the difference. Only a conclusion with an interval allows people to distinguish between “genuinely stronger” and “sampling fluctuation.”</p>
+<p>The sixth step is to check slices, contamination, and cost before making a decision. The unauthorized-refund slice can veto an overall advantage; contamination screening determines whether the question set is trustworthy; the quality-cost curve determines whether this gap is worth the money. Offline wins must also pass shadow or small-traffic validation; a gating failure cannot be released by deleting questions or changing metrics.</p>
+<p>After the six steps are completed, the output is no longer a score, but an executable decision: replace, route, retain, or roll back. The value of the entire chain lies in that every step can be independently checked, so the final conclusion can also be independently overturned or confirmed.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2211.09110" target="_blank" rel="noopener">HELM: Holistic Evaluation of Language Models</a>: multi-scenario, transparent, and reproducible evaluation</li><li><a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Evaluating Large Language Models Trained on Code</a>: pass@k estimation and code evaluation</li><li><a href="https://arxiv.org/abs/2306.05685" target="_blank" rel="noopener">Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</a>: model-as-judge and bias</li><li><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench</a>: real repository tasks and execution-based evaluation</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/model-evaluation">Explore connections on the map</a><a href="/zh/concepts/model-evaluation/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

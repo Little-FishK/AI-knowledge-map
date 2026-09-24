@@ -30,7 +30,18 @@ const DATA_SCRIPTS = [
   "data/tutorials-video-generated.js",
   "data/library.js",
   "data/library-official-technical.js",
+  "data/library-official-china.js",
   "data/library-platform-profiles.js",
+  "data/library-source-meta.js",
+  "data/library-new-sources.js",
+  "data/library-arxiv.js",
+  "data/library-neurips-proceedings.js",
+  "data/library-pmlr.js",
+  "data/library-openreview.js",
+  "data/library-acl-anthology.js",
+  "data/library-cvf-open-access.js",
+  "data/library-ieee-xplore.js",
+  "data/library-acm-digital-library.js",
 ];
 
 function read(relativePath) {
@@ -246,7 +257,11 @@ function buildLocaleInventory(graph) {
   const sourceMessages = packs[manifest.sourceLocale]?.messages || {};
   const sourceKeys = Object.keys(sourceMessages).sort();
   const usedKeys = collectUsedMessageKeys();
-  const missingUsedKeys = usedKeys.filter(key => !Object.prototype.hasOwnProperty.call(sourceMessages, key));
+  // A literal ending in "." can never be a message key: it is a dynamic-key prefix
+  // such as t("library.health." + health). It counts as resolved only when at least
+  // one defined key extends it, so a mistyped prefix still fails this gate.
+  const missingUsedKeys = usedKeys.filter(key => !Object.prototype.hasOwnProperty.call(sourceMessages, key)
+    && !(key.endsWith(".") && sourceKeys.some(candidate => candidate.startsWith(key))));
   const locales = Object.keys(manifest.locales).map(locale => {
     const messages = packs[locale]?.messages || {};
     const keys = Object.keys(messages).sort();

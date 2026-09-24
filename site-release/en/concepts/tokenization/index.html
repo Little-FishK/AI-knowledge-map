@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is a Token in AI? Tokens and Tokenization Explained Simply</title>
+<meta name="description" content="From Unicode, pre-tokenization, BPE/Unigram, byte fallback, and special tokens, understand why the same text yields different lengths, different costs, and different capability boundaries.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/tokenization/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/tokenization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/tokenization/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is a Token in AI? Tokens and Tokenization Explained Simply">
+<meta property="og:description" content="From Unicode, pre-tokenization, BPE/Unigram, byte fallback, and special tokens, understand why the same text yields different lengths, different costs, and different capability boundaries.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/tokenization/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is a Token in AI? Tokens and Tokenization Explained Simply">
+<meta name="twitter:description" content="From Unicode, pre-tokenization, BPE/Unigram, byte fallback, and special tokens, understand why the same text yields different lengths, different costs, and different capability boundaries.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/tokenization/#page","name":"What Is a Token in AI? Tokens and Tokenization Explained Simply","description":"From Unicode, pre-tokenization, BPE/Unigram, byte fallback, and special tokens, understand why the same text yields different lengths, different costs, and different capability boundaries.","url":"https://ai-knowledge-map.com/en/concepts/tokenization/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Tokens and Tokenization: The Discrete Language That Models Actually Read and Write","item":"https://ai-knowledge-map.com/en/concepts/tokenization/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Tokens and Tokenization: The Discrete Language That Models Actually Read and Write</span></li></ol></nav><article id="dd-article" data-concept-id="tokenization" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Tokens and Tokenization: The Discrete Language That Models Actually Read and Write</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From Unicode, pre-tokenization, BPE/Unigram, byte fallback, and special tokens, understand why the same text yields different lengths, different costs, and different capability boundaries.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Tokenizer is a deterministic compiler before the weights: it converts a raw Unicode string into token IDs, which are then looked up in the embedding matrix. Once the vocabulary order, normalization, special tokens, or chat template changes, the meaning of the IDs changes; therefore, the tokenizer is not a replaceable preprocessing plugin, but part of the model interface and weights.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer:</div><ul><li>Why are characters, bytes, subwords, and tokens not the same thing?</li><li>How does BPE gradually learn subwords from character sequences?</li><li>Why can a larger vocabulary shorten sequences but not necessarily make the model stronger?</li><li>Why does changing the tokenizer make the original embedding weights meaningless?</li><li>How do you test Unicode, special tokens, offsets, and streaming stop boundaries?</li></ul></div>
+<ol class="dd-chain"><li>The user produces a Unicode string, which may contain combining characters and invisible symbols.</li><li>Normalization and pre-tokenization determine candidate boundaries.</li><li>BPE, Unigram, or byte-level rules cover text with finite vocabulary segments.</li><li>The vocabulary maps segments to integer IDs, and the template inserts control tokens.</li><li>The embedding matrix looks up rows by ID, and the model computes only on this discrete sequence.</li><li>Segmentation granularity changes sequence length, training frequency, and the composition paths to be learned.</li><li>Decoding and streaming services restore tokens to bytes and visible text.</li><li>Any artifact or boundary rule change must be validated and released together with the weights.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Which gates must a piece of text pass through?<span class="dd-badge intuition">Overview</span></h2>
+<div class="dd-agent-response"><p>A piece of text entered by the user passes through a fixed conversion pipeline in sequence before entering the model:</p>
+<p><strong>Unicode text → normalization → pre-tokenization → subword combination → vocabulary lookup → template insertion → token ID → embedding vector</strong></p>
+<p>The input side is the Unicode text that the user sees and inputs; the output side is a sequence of discrete token IDs. The model then uses these IDs to look up the corresponding embedding vectors. Strings that look the same or similar on screen are not guaranteed to yield the same ID sequence after going through this pipeline.</p>
+<p>Normalization first handles character representation. Some characters that are visually identical or semantically equivalent may have different Unicode representations, and normalization rules can unify some of them. What it changes is the character sequence that subsequent steps actually receive, so it must be consistent with the rules used during model training.</p>
+<p>Pre-tokenization then establishes candidate boundaries, commonly based on spaces and regular-expression rules. It is not equivalent to final tokenization; instead, it first restricts the ranges within which the subword algorithm continues processing. The subword algorithm then combines characters or smaller units within these boundaries, turning the text into a sequence of symbols that the vocabulary can represent.</p>
+<p>Vocabulary lookup maps each symbol to a unique integer ID. After that, the chat template or task protocol may also insert BOS, EOS, role markers, or tool tokens into the sequence. The complete ID sequence finally obtained is the input that the model actually receives; each ID is then converted to a vector through the embedding table and fed into the neural network.</p>
+<p>Every step in this chain affects the next step. As long as any boundary or rule differs, the subsequent symbol combinations, vocabulary lookup results, and the number and position of IDs may change accordingly. Therefore, the normalization rules, pre-tokenization rules, subword model, vocabulary, and template of the tokenization pipeline must all be versioned as a whole. A “roughly the same” implementation is not precise enough.</p>
+<p>Different models may use different pipelines, and the same visible text may produce tokens of different counts, different boundaries, and different values across models. The character count is only a display-level length and cannot be used to directly infer the number of tokens; to know what a model actually reads, you must run a conversion with the complete tokenization pipeline that matches that model.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 250" role="img" aria-label="Tokenization pipeline from Unicode text to embedding vectors"><defs><marker id="tok-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8Z" fill="currentColor"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2" marker-end="url(#tok-arrow)"><path d="M130 112H180"/><path d="M290 112H340"/><path d="M450 112H500"/><path d="M610 112H660"/></g><g stroke="currentColor" stroke-width="2"><rect x="20" y="70" width="110" height="84" rx="12" fill="#8b5cf6" opacity=".22"/><rect x="180" y="70" width="110" height="84" rx="12" fill="#0ea5e9" opacity=".22"/><rect x="340" y="70" width="110" height="84" rx="12" fill="#10b981" opacity=".22"/><rect x="500" y="70" width="110" height="84" rx="12" fill="#f59e0b" opacity=".22"/><rect x="660" y="70" width="80" height="84" rx="12" fill="#ef4444" opacity=".22"/></g><g class="svg-t" text-anchor="middle"><text x="75" y="103">Unicode</text><text x="75" y="129">Raw text</text><text x="235" y="103">Normalization</text><text x="235" y="129">Pre-tokenization</text><text x="395" y="103">BPE /</text><text x="395" y="129">Unigram</text><text x="555" y="103">Vocab lookup ID</text><text x="555" y="129">Add special symbols</text><text x="700" y="103">Embedding</text><text x="700" y="129">Vector</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Every step must be versioned; a “roughly the same” implementation is not enough, because one boundary difference changes all subsequent IDs.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>What Are Characters, Bytes, Subwords, and IDs Respectively?<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>“Character,” “byte,” “subword,” and “token ID” belong to different levels. Conflating them is what leads to the mistaken judgment that “one character is one token.” This statement holds only when certain inputs and a particular tokenizer happen to produce single-character boundaries; it is not a universal rule.</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">层级</th><th class="dd-align-left">例子</th><th class="dd-align-left">能保证什么</th><th class="dd-align-left">不能保证什么</th></tr></thead><tbody><tr><td class="dd-align-left">Unicode 码点</td><td class="dd-align-left">“猫”、é</td><td class="dd-align-left">用抽象编号表示字符</td><td class="dd-align-left">一个视觉字形只包含一个码点</td></tr><tr><td class="dd-align-left">UTF-8 字节</td><td class="dd-align-left">“猫”编码为 3 个字节</td><td class="dd-align-left">任意 Unicode 文本都能编码</td><td class="dd-align-left">字节边界与人类看到的字符边界一致</td></tr><tr><td class="dd-align-left">子词片段</td><td class="dd-align-left"><code>token</code> + <code>ization</code></td><td class="dd-align-left">用有限词表组合开放文本</td><td class="dd-align-left">每个片段自身都有完整语义</td></tr><tr><td class="dd-align-left">token ID</td><td class="dd-align-left">31415</td><td class="dd-align-left">可用于索引嵌入矩阵中的某一行</td><td class="dd-align-left">换一个 tokenizer 后仍表示同一片段</td></tr></tbody></table></div>
+-->
+<p>Unicode code points describe abstract characters, but a glyph that a user sees is not necessarily composed of only one code point. Combining diacritical marks display a base character together with additional symbols; emoji skin tone modifiers change the preceding emoji; zero-width joiners can also connect multiple code points into one visual whole. Therefore, the number of visible characters is not equal to the number of code points.</p>
+<p>UTF-8 in turn encodes code points into byte sequences. For example, “猫” occupies 3 bytes after encoding. Byte encoding guarantees that any Unicode text has a representation that can be stored and transmitted, but it does not guarantee that one byte corresponds to one character, nor that byte boundaries are the character boundaries as understood by users.</p>
+<p>Subword pieces are the compositional units that a tokenizer uses to represent open-ended text with a finite vocabulary.<code>tokenization</code> can be represented as <code>token</code> and <code>ization</code>, but the actual boundary depends on the specific tokenizer. The role of subwords is to participate in composition; each piece is not required to have complete semantics when taken out of context.</p>
+<p>A token ID is an integer index within a vocabulary. For example, the meaning of ID 31415 comes from the current tokenizer’s vocabulary: the model uses it to index a particular row in the embedding matrix. This number has no fixed meaning across tokenizers; 31415 in another vocabulary may point to a completely different piece.</p>
+<p>Therefore, a piece of text goes through different representation layers: “visible glyph—code point—byte—subword—ID.” The boundaries of any one layer cannot be directly passed off as the boundaries of another. A reliable system should preserve the original text and maintain a mapping between tokens and character offsets in the original text; when displaying selections, annotations, or locating errors, it should return to the text coordinates that the user sees, rather than directly treating token boundaries as character boundaries.</p></div>
+<table class="dd-table"><thead><tr><th>Layer</th><th>Example</th><th>Guarantees</th><th>Does not guarantee</th></tr></thead><tbody><tr><td>Unicode code point</td><td><code>猫</code>, <code>é</code></td><td>Abstract character numbering</td><td>A single visual glyph contains only one code point</td></tr><tr><td>UTF-8 bytes</td><td><code>猫</code> encoded as 3 bytes</td><td>Any Unicode can be encoded</td><td>Boundaries match human characters</td></tr><tr><td>Subword pieces</td><td><code>token</code>+<code>ization</code></td><td>A finite vocabulary can compose open-ended text</td><td>Pieces themselves have complete semantics</td></tr><tr><td>token ID</td><td><code>31415</code></td><td>Can index a particular row in the embedding matrix</td><td>Represents the same piece across tokenizers</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Computing BPE by hand: how high-frequency adjacent pairs become new symbols<span class="dd-badge math">Numerical example</span></h2>
+<div class="dd-agent-response"><p>What BPE learns is not a human-defined dictionary but an ordered set of adjacent-symbol merge rules. Training starts from smaller basic units, repeatedly counts how often pairs of adjacent symbols appear in the current representation, and merges the most frequent pair into a new symbol. This process lets frequently co-occurring fragments gradually become larger tokens.</p>
+<p>Suppose the toy corpus contains only <code>low</code> 5 times, <code>lower</code> 2 times. Initially, split each word into characters and add an end-of-word symbol <code>&lt;/w&gt;</code>:</p>
+<ul><li><code>l o w &lt;/w&gt;</code>, with weight 5;</li><li><code>l o w e r &lt;/w&gt;</code>, with weight 2.</li></ul>
+<p>When counting adjacent pairs, you must multiply by word frequency. Thus <code>l + o</code> appears in both words, giving a total frequency of 5 + 2 = 7. Merge it into <code>lo</code>, then recount adjacent pairs in the current representation.</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">轮次</th><th class="dd-align-left">最高频相邻对</th><th class="dd-align-right">频次</th><th class="dd-align-left">合并后的表示</th></tr></thead><tbody><tr><td class="dd-align-left">0</td><td class="dd-align-left"><code>l + o</code></td><td class="dd-align-right">7</td><td class="dd-align-left"><code>lo w &lt;/w&gt;</code>；<code>lo w e r &lt;/w&gt;</code></td></tr><tr><td class="dd-align-left">1</td><td class="dd-align-left"><code>lo + w</code></td><td class="dd-align-right">7</td><td class="dd-align-left"><code>low &lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr><tr><td class="dd-align-left">2</td><td class="dd-align-left"><code>low + &lt;/w&gt;</code></td><td class="dd-align-right">5</td><td class="dd-align-left"><code>low&lt;/w&gt;</code>；<code>low e r &lt;/w&gt;</code></td></tr></tbody></table></div>
+-->
+<p>The first round yields the rule <code>l + o → lo</code>. In the second round, <code>lo + w</code> also appears in all 7 word occurrences, so we get <code>lo + w → low</code>. The third round requires distinguishing the end-of-word position: <code>low + &lt;/w&gt;</code> only in the standalone <code>low</code> appears 5 times, while <code>lower</code> in <code>low</code> is followed by <code>e</code>. Therefore, the complete end-of-word form <code>low&lt;/w&gt;</code> is merged into one token, <code>lower</code> is still composed of <code>low</code>, <code>e</code>, <code>r</code> and other units.</p>
+<p>This example shows the causal chain of BPE: corpus word frequency determines adjacent-pair frequency, frequency determines the next merge rule, and a rule that has already been applied changes the next round's representation and statistics. The larger symbols in the final vocabulary come from this continuous merging process, not from the system knowing in advance whether a fragment is a “word”.</p>
+<p>Real training is also affected by pre-tokenization, tie-breaking for equal frequencies, and implementation-specific rules, so the same corpus may show small differences across implementations. However, the core mechanism remains the same: repeatedly adding merges that cover high-frequency adjacent combinations, allowing common fragments to be represented with fewer symbols while retaining the ability to compose other text from smaller units.</p></div>
+<table class="dd-table"><thead><tr><th>Round</th><th>Most frequent adjacent pair</th><th>Frequency</th><th>Representation after merging</th></tr></thead><tbody><tr><td>0</td><td><code>l + o</code></td><td>7</td><td><code>lo w &lt;/w&gt;</code>; <code>lo w e r &lt;/w&gt;</code></td></tr><tr><td>1</td><td><code>lo + w</code></td><td>7</td><td><code>low &lt;/w&gt;</code>; <code>low e r &lt;/w&gt;</code></td></tr><tr><td>2</td><td><code>low + &lt;/w&gt;</code></td><td>5</td><td><code>low&lt;/w&gt;</code>; <code>low e r &lt;/w&gt;</code></td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>What BPE, Unigram, and Byte-Level Schemes Are Optimizing<span class="dd-badge math">Method</span></h2>
+<div class="dd-agent-response"><p>BPE, Unigram, and byte-level subword schemes can all represent open text as subword sequences from a finite vocabulary, but they differ in how they construct the vocabulary and choose segmentations. When comparing them, it is not enough to look only at "whether subwords are used"; one must also examine what the training process searches for, how choices are made during encoding, and how they degrade when a segment of text cannot be directly covered.</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方法</th><th class="dd-align-left">训练思路</th><th class="dd-align-left">编码特点</th><th class="dd-align-left">典型风险</th></tr></thead><tbody><tr><td class="dd-align-left">BPE</td><td class="dd-align-left">从小符号集出发，逐步向上合并</td><td class="dd-align-left">按固定合并序列得到确定切分</td><td class="dd-align-left">贪心合并规则没有直接优化语言模型目标</td></tr><tr><td class="dd-align-left">Unigram</td><td class="dd-align-left">从较大的候选词表出发，逐步向下剪枝</td><td class="dd-align-left">按片段概率选择高似然切分，也可采样多种切分</td><td class="dd-align-left">概率模型与剪枝实现更复杂</td></tr><tr><td class="dd-align-left">字节级子词</td><td class="dd-align-left">以 256 个字节作为完备底座，再学习更大的合并</td><td class="dd-align-left">任意输入都能回退到字节，因此没有真正无法编码的字符</td><td class="dd-align-left">低覆盖语言或罕见字符串可能被切得很长</td></tr></tbody></table></div>
+-->
+<p>BPE starts from a small set of symbols. During training, it repeatedly selects adjacent symbols to merge, producing a sequence of ordered rules; at encoding time, it combines input according to these rules, so it can produce deterministic segmentations. What it directly favors is high-frequency local combinations in the training corpus, but this greedy choice itself is not equivalent to directly optimizing the objective of the downstream language model.</p>
+<p>Unigram goes in the opposite direction: it first prepares a larger set of candidate pieces, then evaluates segmentations according to a probabilistic model, and gradually removes candidates that contribute less. At encoding time, a piece of text may have multiple valid segmentations; the system selects a high-likelihood scheme based on piece probabilities, and it can also sample from these schemes. The cost is that it needs to maintain a probabilistic model and handle pruning of the candidate vocabulary, making the training and implementation logic more complex.</p>
+<p>Byte-level subword approaches first build a complete base using 256 byte values, and then merge common byte sequences into larger tokens. Because any Unicode text can ultimately be encoded as bytes, they never encounter characters that truly cannot be represented. However, "being encodable" and "encoding efficiently" are two different things: when a certain language, rare character, or special string is not covered by larger vocabulary pieces, it falls back to multiple byte tokens.</p>
+<p>This fallback has two layers of impact. First, the same visible text consumes more tokens, and therefore occupies more context positions; second, the model receives more fragmented evidence and must learn how to reassemble it from multiple smaller units. Therefore, when evaluating a tokenizer, whether unknown tokens disappear is only the lowest-level coverage metric; one must also observe whether sequences are excessively lengthened, and whether the target text receives sufficiently complete and stable piece representations.</p></div>
+<table class="dd-table"><thead><tr><th>Method</th><th>Training approach</th><th>Encoding characteristics</th><th>Typical risks</th></tr></thead><tbody><tr><td>BPE</td><td>Merges upward from a small symbol set</td><td>Deterministic segmentation from a fixed merge sequence</td><td>Greedy rules do not directly optimize the language model objective</td></tr><tr><td>Unigram</td><td>Prunes downward from a large candidate vocabulary</td><td>Selects high-likelihood segmentation by piece probability; can sample multiple segmentations</td><td>Probabilistic model and pruning are more complex to implement</td></tr><tr><td>Byte-level subword</td><td>Uses 256 bytes as a complete base, then merges</td><td>No truly unknown characters</td><td>Low-coverage languages or rare strings can be very long</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Vocabulary size is a parameter—sequence length exchange<span class="dd-badge math">Trade-off</span></h2>
+<div class="dd-agent-response"><p>Vocabulary size is not simply bigger-is-better or smaller-is-better; it involves trading off model parameters, sequence length, and training sparsity. Let the vocabulary size be |V|, the embedding dimension be d, and the post-tokenization sequence length be L. Two approximate relationships can first make the main costs clear:</p>
+<p><strong>Embedding parameter count ≈ |V| × d</strong></p>
+<p><strong>Attention pair count ≈ L²</strong></p>
+<p>As |V| increases, the vocabulary can directly accommodate more common segments. Fragments that originally required multiple tokens may be merged into a single token, so the average sequence length L of the same corpus may decrease. Because attention needs to form pairs between sequence positions, a decrease in L makes the approximately L² pair count drop significantly, potentially saving sequence processing cost.</p>
+<p>The cost occurs in vocabulary-related parameters. The input embedding matrix needs to store a d-dimensional vector for each token, so its size grows linearly with |V|; the output-side matrix used to classify over the entire vocabulary also expands as the vocabulary grows. If the input embedding and output weights are shared, the exact parameter accounting differs, but the coverage benefit of a larger vocabulary and the training sparsity problem still exist.</p>
+<p>Expanding the vocabulary also distributes training evidence across more tokens. High-frequency fragments may thereby receive compact representations, but rare tokens appear less often and receive fewer parameter updates. Thus, a shorter sequence does not automatically mean better learning: the model may also pay a larger vocabulary parameter cost and need to learn some vocabulary entries well from sparser data.</p>
+<p>Conversely, a smaller vocabulary can reduce vocabulary parameters and give basic units denser updates, but it may split text into more pieces, increasing L, so that the same content occupies more context positions and computation. When choosing vocabulary size, the real question is: does the sequence shortening gained by increasing |V| sufficiently offset the parameter growth and insufficient training of rare items?</p>
+<p>Therefore, one cannot just compare “tokens per character” or a single compression ratio. Effective evaluation should report, at the same time, vocabulary-related parameter counts, the distribution of sequence lengths on actual corpora, processing throughput, downstream task quality, and results for different language slices. A higher compression ratio only indicates that the text uses fewer tokens; it does not mean the model necessarily learns better semantic representations.</p></div>
+<div class="dd-formula">Embedding parameter count ≈ |V| × d; attention pair count ≈ L²</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Why Tokenization Efficiency Affects Multilingual Fairness<span class="dd-badge eng">Coverage</span></h2>
+<div class="dd-agent-response"><p>Tokenization efficiency determines how many tokens a piece of information occupies, while context window, inference cost, and truncation are usually counted in tokens. Therefore, semantically similar content that produces token sequences of different lengths in different languages may consume different context budgets and face different truncation risks.</p>
+<p>This difference first comes from the vocabulary's training data. The vocabulary forms from frequency patterns in the training corpus: common word forms that occur repeatedly in high-resource languages are more likely to be learned as longer, more complete tokens; languages with less coverage may fall back more to character- or byte-level units. For visible text of the same length, the latter may be split into more tokens.</p>
+<p>Fertility can be counted by language, that is, the number of tokens per word or per character, or compression rate can be compared. They can describe how a tokenizer allocates sequence length, but they cannot alone give a conclusion about fairness. Different languages have different morphological structures and writing systems; a language producing more tokens cannot be directly interpreted as discrimination. It is also necessary to observe whether this length difference actually translates into differences in cost, truncation, or task quality.</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">要测什么</th><th class="dd-align-left">为什么要测</th><th class="dd-align-left">要避免的误判</th></tr></thead><tbody><tr><td class="dd-align-left">每种语言的序列长度分布</td><td class="dd-align-left">估计实际成本与被截断概率</td><td class="dd-align-left">只看混合语料的全局平均</td></tr><tr><td class="dd-align-left">数字、姓名、代码等切片</td><td class="dd-align-left">检查复制能力和边界处理</td><td class="dd-align-left">只测试自然段落</td></tr><tr><td class="dd-align-left">任务准确率随 token 长度的变化</td><td class="dd-align-left">区分语言因素与长度因素</td><td class="dd-align-left">把所有质量差异都归因于 tokenizer</td></tr></tbody></table></div>
+-->
+<p>Per-language length distributions are more informative than a single average, because the average may hide long-tail inputs. If a language more often produces long sequences for the same content, it will use up a fixed context window more quickly and may also more easily lose tail information at the length limit.</p>
+<p>Numbers, names, and code need to be tested separately, because they are especially sensitive to exact boundaries and copying. Testing only fluent natural passages cannot show whether the tokenizer splits sequences too finely on such structured or rare inputs, nor can it reflect whether the model can stably preserve the original form.</p>
+<p>Finally, task accuracy and token length should be observed together. If quality declines as sequences become longer, it is necessary to further distinguish whether language-specific data and task factors are at work, or whether the extra length caused by the tokenizer is. The goal of fairness evaluation is not to eliminate all language differences, but to measure segment by segment the causal chain "corpus frequency → tokenization granularity → sequence budget → truncation and task performance", avoiding conclusions based only on token counts or a single quality metric.</p></div>
+<table class="dd-table"><thead><tr><th>What to measure</th><th>Why</th><th>Misjudgments to avoid</th></tr></thead><tbody><tr><td>Per-language length distribution</td><td>Estimate cost and truncation probability</td><td>Only look at the global average</td></tr><tr><td>Numbers, names, and code slices</td><td>Check copying and boundary ability</td><td>Only test natural passages</td></tr><tr><td>Task accuracy versus token length</td><td>Separate language and length factors</td><td>Attribute all differences to the tokenizer</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Why special tokens and chat templates belong to the model protocol<span class="dd-badge eng">interface</span></h2>
+<div class="dd-agent-response"><p>Special tokens are not merely abbreviations for ordinary strings; they are control symbols in the model's input protocol. During pre-training or instruction fine-tuning, certain fixed IDs appear repeatedly in specific positions, thereby taking on structural meanings such as “sequence start,” “user start,” “assistant start,” or “tool result.” What the model learns is the pattern formed by these IDs and their contextual positions.</p>
+<p>Chat templates are responsible for converting human-readable conversation structure into the token sequences the model saw during training. They determine the order in which role markers appear, the line breaks between segments, the message termination position, and whether an assistant prefix is needed before generation begins. As a result, the same user question, if wrapped with different role markers or boundaries, can produce a different sequence of IDs actually received by the model, and generation behavior may change accordingly.</p>
+<p>This difference comes from a clear causal chain:</p>
+<p><strong>Conversation messages → template arrangement → special token and text token sequence → roles and boundaries recognized by the model → generation result</strong></p>
+<p>If the assistant prefix is omitted, the model may not recognize “now the assistant should continue” at the familiar position; repeatedly inserting BOS creates a structure at the beginning of the sequence that is uncommon in training; treating EOS as ordinary text confuses content with the end signal. Even if the message text itself does not change, these errors put the model into an input state that is unfamiliar in the training distribution.</p>
+<p>Adding a new special token also cannot merely register a string in the vocabulary. After the vocabulary gains an entry, the input embedding matrix and output classification matrix need to be extended with corresponding new rows; these new parameters must also be trained before they can acquire representations and output behaviors consistent with the intended control meaning. Having only the string name does not automatically make the model understand that it represents a role, tool, or concept.</p>
+<p>Therefore, chat templates, tokenizer files, vocabulary hashes, and model weights should be treated as a single release unit. Replacing only one of them, even if the interface can still output integer IDs, may break the protocol correspondence established during model training. During deployment and reproduction, the versions of these components need to be checked together to ensure the same message is always encoded into the complete control sequence the model expects.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Why Numbers, Code, and Copying Tasks Are Sensitive to Boundaries<span class="dd-badge intuition">Capability</span></h2>
+<div class="dd-agent-response"><p>Tokenization alone does not determine whether a model can do arithmetic, write code, or copy text, but it changes the representation pathways these capabilities must learn. If boundaries are not aligned with the basic structure of the task, the model must first recover structure from inside tokens before performing the task; overly fine boundaries, in turn, can make sequences significantly longer.</p>
+<p>Long numbers are a typical example. If a digit string is split into fragments of unstable length, the same decimal place can end up at different internal positions within tokens in different inputs. When a model performs digit-by-digit arithmetic or exact copying, it must learn not only the relationships among digits but also how to recover the digit-position structure from different fragments. Tokenization does not make the operation impossible, but it adds boundary variation that must be handled at the same time.</p>
+<p>Code is equally sensitive to indentation, line breaks, and operator boundaries. If these structures are merged with nearby content into unstable fragments, the model must simultaneously understand the program content and infer the formatting boundaries hidden inside tokens. During exact generation, missing a single space, newline, or operator character can change the result. However, unconditionally splitting everything into single characters is not a universal solution either, because sequence length increases markedly and consumes more context positions.</p>
+<p>A reasonable tokenization scheme is a trade-off between structural visibility and sequence length. Whether a scheme is good cannot be judged solely by whether tokens look like "human words"; it should be measured on real tasks: whether numeric operations preserve digit relationships, whether code preserves formatting and operators, whether copying tasks can reproduce targets byte by byte or character by character, and how long a token sequence these capabilities require.</p>
+<p>The generation phase also faces token boundaries. The model generates one token at a time, but when the service outputs to the user it must convert the data corresponding to the token back into text. A streaming block may contain only part of the bytes of a UTF-8 character and cannot yet be decoded independently; a stop string may also span two or more tokens, or even across adjacent output blocks.</p>
+<p>Therefore, the server side cannot treat each token or network block as an independent, complete text. The byte decoder must preserve cross-block state and wait until the bytes needed for a character are complete before outputting; the stop matcher must also keep the tail of the previous block and judge together with the new block whether a stop string has occurred. This is how to avoid garbled text, missed stops, or mistakenly sending part of the stop string to the user.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Unicode and Offsets: How They Create Silent Failures<span class="dd-badge eng">Security</span></h2>
+<div class="dd-agent-response"><p>Text that looks the same on screen is not necessarily the same sequence of Unicode code points underneath. For example, a precomposed character <code>é</code> can be represented by one code point, or by <code>e</code> combining accent marks; the two may look the same visually but differ in the underlying sequence. Fullwidth characters, invisible control characters, and characters that look similar across different writing systems can also create “looks the same, compares different” situations.</p>
+<p>This difference propagates along the processing chain. String matching, regular-expression rules, pre-tokenization, and vocabulary lookup actually receive the underlying sequence, not the screen rendering. As a result, visually identical inputs may follow different token boundaries, producing different tokens and IDs; look-alike or invisible characters may also bypass rules written only for literal strings.</p>
+<p>Unicode normalization can unify some of these equivalent representations, reducing unnecessary divergence. However, normalization itself changes the underlying text, and this change may be unacceptable in tasks that require verbatim fidelity, exact reproduction, or preservation of original evidence. A system must explicitly adopt a specific Unicode form and distinguish “normalized text for model processing” from “original text that must be preserved as-is”; it cannot assume normalization is always lossless.</p>
+<p>Offsets further amplify the problem. Different components may record positions in different units:</p>
+<ul><li>An annotation tool may count by user-visible characters;</li><li>Some systems count by UTF-16 code units;</li><li>Storage or network components may count by UTF-8 bytes;</li><li>Tokenizer also outputs its own offset mapping, mapping tokens back to input ranges.</li></ul>
+<p>These units often coincide exactly in pure ASCII text, so errors remain hidden for a long time; they diverge only when encountering multibyte characters, combining characters, or symbols that require multiple UTF-16 code units. If start and end positions in one unit are used as if they were in another, entity highlighting shifts, training labels fall on the wrong span, and audit evidence may point to the wrong text. Because the numbers are still valid integers, such failures usually do not trigger exceptions; they silently produce incorrect results.</p>
+<p>A reliable approach is to explicitly annotate each offset with its unit and the corresponding text version, and to perform explicit conversions at component boundaries. The relationships among the original text, normalized text, and token offset mapping must be saved together; during highlighting, training, and auditing, the coordinate system should be confirmed first, and then ranges should be mapped to the target text. This avoids failures where “the string displays correctly, but labels and evidence are silently misaligned.”</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>How to conduct a reproducible tokenizer acceptance<span class="dd-badge eng">checklist</span></h2>
+<div class="dd-agent-response"><p>The goal of a reproducible tokenizer acceptance is not to prove that it "can run," but to prove that the same artifact produces expected results across different times, implementations, and input boundaries. Being able to encode and then decode ordinary English only covers the simplest path and cannot show whether Unicode, templates, offsets, and streaming handling are reliable.</p>
+<p>First, pin down the complete artifact. You need to save the vocabulary, merge rules or tokenization model, normalization rules, pre-tokenization rules, special token definitions, chat template, and corresponding hashes. The tokenizer's behavior is jointly determined by these components; recording only the vocabulary name or version number cannot guarantee that the same processing pipeline is reconstructed later.</p>
+<p>Round-trip tests should cover boundary inputs beyond ordinary text, including empty strings, newlines, combining characters, emoji, CJK, right-to-left text, code, and random bytes. The tests should observe whether encoding and then decoding restores the input according to the interface contract, and distinguish allowed normalization changes from unexpected data loss.</p>
+<p>Checking only the decoded text is still not enough, because different ID sequences can sometimes be restored to the same displayed text. You need to establish golden ID tests: fix several representative strings and their exact token ID sequences, and compare them item by item across different implementation languages or deployment environments. Any difference in ID, order, or special markers means that the actual input fed to the model has changed.</p>
+<p>Offset mapping should also be verified separately. Each token's offset should be mapped back to the original text, checking whether the resulting range covers the correct segment, with particular attention to combining characters and surrogate pairs. Here you must also confirm both the offset unit and the text version at the same time, to avoid results whose values are legal but that land in the wrong position.</p>
+<p>Chat template verification should directly print the complete ID sequence after applying the template. Role markers, BOS, EOS, and tool boundaries should appear only at the agreed positions and the expected number of times. This can reveal duplicate BOS, a missing assistant prefix, an incorrect end token, or misplaced tool message boundaries, without waiting until the model behavior becomes abnormal and then working backwards.</p>
+<p>The acceptance should also report actual distributions, not just a few examples. Statistics on token length, truncation rate, unknown character or byte fallback, and latency should be collected by language and task in order to determine whether an implementation significantly lengthens sequences, increases truncation, or reduces processing efficiency on particular inputs.</p>
+<p>Finally, streaming output should pass random chunking tests. Cut the same output into network chunks at different positions, maintain UTF-8 decoding and stop-string matching state across chunks, and ensure the final decoded text and stop positions remain unchanged. If changing the chunking changes the result, the service is incorrectly treating the transport chunks as complete character or token boundaries.</p>
+<p>Together, these tests establish reproducibility: the fixed artifact defines "which tokenizer is being tested," golden ID and template tests define what the model actually receives, offset and round-trip tests verify text mapping, distribution statistics verify real workloads, and random chunking verifies service boundaries. Only when all these layers are stable does the interface not only handle ordinary examples but also provide deployable deterministic behavior.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The complete causal chain of text processing by a model begins with a Unicode string produced by the user and ends with the visible text that the service outputs again. Each intermediate representation conversion constrains the next step, and any change in artifacts or boundary rules can alter the discrete sequences that the model actually receives and generates.</p>
+<p>User input is first a sequence of Unicode data, which may contain combining characters, invisible symbols, or multiple underlying representations. Normalization rules decide whether to unify certain representations, and pre-tokenization rules then establish candidate boundaries based on whitespace, regular expressions, or other conventions. Together these two steps determine the input units and the combinable range that the subword algorithm actually faces.</p>
+<p>Then BPE, Unigram, or byte-level rules cover the text with segments from a finite vocabulary. The algorithm and the vocabulary together determine which common sequences can be a single token and which inputs must be split into multiple smaller units. This segmentation granularity directly changes sequence length, and also changes the frequency of each token in the training corpus, as well as how many compositional steps the model must learn to recover numbers, word forms, code boundaries, or other structures.</p>
+<p>The vocabulary maps each segment to an integer ID, and the chat template inserts role, start, end, or tool control tokens according to the protocol. At this point the model no longer directly sees the characters in the user interface, but only receives this complete sequence of IDs. The embedding matrix looks up the corresponding row for each ID, converting discrete symbols into vectors; subsequent neural network computation is built entirely on this sequence of positions and vectors.</p>
+<p>Therefore, even a seemingly small change at the front end propagates into later stages:</p>
+<p><strong>Unicode input → normalization and pre-tokenization → subword coverage → vocabulary ID → template control token → embedding vector → model computation</strong></p>
+<p>If normalization changes the code point, the pre-tokenization boundaries may change; boundary changes alter the subword combinations; different subwords change the IDs, sequence length, and embedding rows; the model thus computes different representations at different positions. Even if the displayed text appears nearly identical, the final behavior may differ.</p>
+<p>The generation direction returns along the opposite path. The model first predicts token IDs, the tokenizer restores them to segments and bytes, and the streaming service then performs UTF-8 decoding and stop-string detection across output chunks, ultimately forming the text the user sees. Here token boundaries, byte boundaries, and display character boundaries likewise are not guaranteed to coincide, and the service must preserve cross-chunk state.</p>
+<p>A tokenizer is therefore not a preprocessing tool that can be arbitrarily replaced apart from the weights. Normalization, pre-tokenization, the subword model, the vocabulary, special tokens, the chat template, decoding, and streaming boundary handling together define the model's text protocol. If any part changes, it should be validated together with the model weights and delivered as a consistent release unit.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>Concept Dependencies and Further Learning <span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>After understanding the tokenizer, subsequent concepts can be developed along the path of “how discrete IDs enter the model, how they interact inside the model, and how they are reliably returned to text.” Each direction picks up one interface in the tokenization pipeline.</p>
+<!--stage2-repair: duplicate generated table suppressed
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">方向</th><th class="dd-align-left">接下来读</th><th class="dd-align-left">关键问题</th></tr></thead><tbody><tr><td class="dd-align-left">ID 如何变成向量</td><td class="dd-align-left">嵌入</td><td class="dd-align-left">离散索引怎样通过训练获得几何关系？</td></tr><tr><td class="dd-align-left">顺序如何进入模型</td><td class="dd-align-left">位置编码</td><td class="dd-align-left">token 已切好后，模型怎样知道先后和距离？</td></tr><tr><td class="dd-align-left">长度为何昂贵</td><td class="dd-align-left">自注意力</td><td class="dd-align-left">序列长度怎样进入时间与显存复杂度？</td></tr><tr><td class="dd-align-left">协议怎样训练</td><td class="dd-align-left">指令微调</td><td class="dd-align-left">角色和回答边界怎样成为监督信号？</td></tr><tr><td class="dd-align-left">上线怎样守住边界</td><td class="dd-align-left">模型服务</td><td class="dd-align-left">流式解码、截断和版本怎样监控？</td></tr></tbody></table></div>
+-->
+<p>The vocabulary maps fragments to IDs, but the integers themselves serve only as indices. Embeddings explain how the model uses IDs to look up vectors and, during training, allow these vectors to form geometric relationships usable in computation. Here it is necessary to distinguish between “the vocabulary specifies which fragment an ID points to” and “the model weights determine what that ID’s vector learns.”</p>
+<p>The tokenizer outputs an ordered ID sequence, but the token content alone is not enough to express position. Positional encoding further explains how the model adds positional information such as order and distance to the representation, so that the same token can participate in different computations when it appears at different positions.</p>
+<p>Sequence length is directly affected by segmentation granularity, and self-attention explains why this length translates into time and memory costs. Only by understanding the connection between the two can changes in the tokenizer’s compression ratio be interpreted as actual computational changes, rather than stopping at “more or fewer tokens.”</p>
+<p>Role markers, assistant prefixes, and response boundaries become meaningful protocols only through training. Instruction tuning shows how these control tokens co-occur with inputs, target responses, and supervision signals, so that the model learns to perform the corresponding role after specific boundaries.</p>
+<p>Finally, model serving is responsible for keeping these agreements at the deployment boundary. Streaming decoding needs to handle cross-chunk byte state, truncation must be performed according to actual token length, and version management must ensure consistency of weights, vocabulary, normalization, and templates. Online monitoring should be able to detect whether these interfaces drift.</p>
+<p>Meeting the standard of practical applicability means that, when faced with a multilingual text and a model package, you can trace each step from raw bytes to token IDs, manually compute a BPE merge based on corpus frequency, and point out the interfaces that must be revalidated after changing the vocabulary, chat template, or normalization rules. In this way, tokenization is no longer just a function call, but a model input-output protocol that can be explained, reproduced, and validated.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Next Read</th><th>Key Question</th></tr></thead><tbody><tr><td>How IDs become vectors</td><td><a href="#" data-node="embedding">Embedding</a></td><td>How do discrete indices acquire geometric relationships through training?</td></tr><tr><td>How order enters the model</td><td><a href="#" data-node="positional-encoding">Positional Encoding</a></td><td>After tokens are segmented, how does the model know order and distance?</td></tr><tr><td>Why Length Is Expensive</td><td><a href="#" data-node="self-attention">Self-Attention</a></td><td>How does sequence length enter time and memory complexity?</td></tr><tr><td>How Protocols Are Trained</td><td><a href="#" data-node="instruction-tuning">Instruction Tuning</a></td><td>How do role and response boundaries become supervision signals?</td></tr><tr><td>How Deployment Guards Boundaries</td><td><a href="#" data-node="model-serving">Model Serving</a></td><td>How are streaming decoding, truncation, and versions monitored?</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Source and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Neural Machine Translation of Rare Words with Subword Units</a>: BPE subword method.</li><li><a href="https://aclanthology.org/D18-2012/" target="_blank" rel="noopener">SentencePiece: A simple and language independent subword tokenizer and detokenizer</a>: BPE/Unigram implementation on raw text.</li><li><a href="https://arxiv.org/abs/1909.03341" target="_blank" rel="noopener">Neural Machine Translation with Byte-Level Subwords</a>: Byte-level subword modeling.</li><li><a href="https://www.unicode.org/reports/tr15/" target="_blank" rel="noopener">Unicode Standard Annex #15: Unicode Normalization Forms</a>: Unicode normalization forms.</li></ul><p>The pipeline diagram, BPE numerical example, engineering checklist, and comparison table are original to this project.</p><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/tokenization">Explore connections on the map</a><a href="/zh/concepts/tokenization/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

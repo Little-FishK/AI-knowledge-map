@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing? Explained Simply</title>
+<meta name="description" content="From TTFT/TPOT, arithmetic intensity, and continuous batching, to PagedAttention, FlashAttention, quantization, speculative decoding, and real-workload validation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/inference-optimization/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/inference-optimization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/inference-optimization/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing? Explained Simply">
+<meta property="og:description" content="From TTFT/TPOT, arithmetic intensity, and continuous batching, to PagedAttention, FlashAttention, quantization, speculative decoding, and real-workload validation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/inference-optimization/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing? Explained Simply">
+<meta name="twitter:description" content="From TTFT/TPOT, arithmetic intensity, and continuous batching, to PagedAttention, FlashAttention, quantization, speculative decoding, and real-workload validation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/inference-optimization/#page","name":"What Is Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing? Explained Simply","description":"From TTFT/TPOT, arithmetic intensity, and continuous batching, to PagedAttention, FlashAttention, quantization, speculative decoding, and real-workload validation.","url":"https://ai-knowledge-map.com/en/concepts/inference-optimization/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing","item":"https://ai-knowledge-map.com/en/concepts/inference-optimization/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing</span></li></ol></nav><article id="dd-article" data-concept-id="inference-optimization" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Inference Optimization: First Locate Whether the Bottleneck Is Prefill, Decode, KV, or Queuing</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From TTFT/TPOT, arithmetic intensity, and continuous batching, to PagedAttention, FlashAttention, quantization, speculative decoding, and real-workload validation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> LLM serving is not a single uniform bottleneck: input prefill is often more compute-intensive, per-token decode is often more memory-bandwidth-bound, KV capacity limits concurrency, and scheduling determines queuing and tail latency. Optimization must first use real workloads to locate the main cause, and then be jointly accepted by quality, p95/p99, throughput, GPU memory, and cost per successful task.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>Distinguish TTFT, TPOT, and completion time; identify compute/bandwidth/KV/queue bottlenecks; derive batching and speculative decoding benefits; design realistic load benchmarks and regression gates.</div>
+<ol class="dd-chain"><li>Measure by slicing by request phase and length</li><li>Identify the dominant compute/bandwidth/KV/queue cause</li><li>Select kernel/batching/caching/low-precision solutions</li><li>Perform ablation under controlled load</li><li>Stress-test tail latency and overload under real concurrency</li><li>Joint quality and cost-per-successful-task gate</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Break down end-to-end time first<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The first step in optimizing an inference service is not swapping compute kernels, but breaking the time from request entry to exit into segments, because different segments correspond to completely different bottlenecks. The same "slow" can happen in queueing, in input prefill, or in token-by-token generation; without breaking it down, you won't know where to change.</p>
+<p>The path of a generative inference request is roughly: after arrival, the request first waits in queue, then the system performs prefill on all input tokens—completing forward computation for all inputs in one pass and establishing the KV (key-value cache). After that it enters the decode phase, where each step generates only one token until output ends; retrieval, tool calling, and network transfer may also be interspersed in between. These stages have different sensitivities to workload shape: long-input, short-output requests place pressure mainly on prefill and KV establishment, while long-output requests occupy decode slots for a long time and continuously read model weights and KV. Therefore, long-input short-answer and short-input long-answer require optimizations in different directions—the former emphasizes batch prefill and cache efficiency, while the latter emphasizes per-step decode latency and concurrency capacity.</p>
+<p>To locate problems, you need to slice requests along four dimensions: input length, output length, concurrency, and cache hits. Without first doing this slicing, a single "average slow" metric cannot tell you whether to change the compute kernel, the scheduler, the caching strategy, or the model.</p>
+<p>After slicing, you can compute two core metrics. Time to First Token (TTFT) measures the latency from when the request is sent to when the user sees the first token:</p>
+<p>TTFT = Q + Ccontext + Tprefill + Tfirst</p>
+<p>where Q is queueing wait time, Ccontext is context preparation time (for example, loading conversation history from external storage), Tprefill is the computation time for prefilling all inputs, and Tfirst is the time for the first decode step to produce the first token. Time per Output Token (TPOT) measures the average interval between each new token after the first token, determined mainly by the per-step forward computation in the decode phase and the time to read weights and KV. The end-to-end time for a complete request can be written as:</p>
+<p>T_complete ≈ TTFT + (N − 1) × TPOT + Texternal</p>
+<p>N is the total number of output tokens, and Texternal is the time taken by tool calling and transfer. The longer the output, the greater the weight of the (N − 1) term, and the more critical the efficiency of TPOT and the decode phase becomes.</p>
+<p>These two metrics point to different bottlenecks and correspond to different experience goals. In interactive scenarios, the user stares at the screen waiting for the first token; TTFT and its jitter (high-percentile latency matters more than the average) determine perceived experience. Offline batch tasks, on the other hand, prioritize overall throughput and cost per unit of output. A single tokens/s figure cannot represent user experience—it mixes queueing, first token, and per-token generation into one number and is likely to mask real problems in interactive scenarios. First break down the end-to-end time as described above and record logs for each stage (how much queueing, input length, output length, tools, and transfer each account for), then output TTFT, TPOT, and end-to-end completion time. Subsequent optimization methods each act on only one of these items, and this decomposition is the basis for judging the value of each investment.</p></div>
+<div class="dd-formula"><math display="block" aria-label="首 token 与完成时间分解"><mi>TTFT</mi><mo>≈</mo><mi>Q</mi><mo>+</mo><mi>Ccontext</mi><mo>+</mo><mi>Tprefill</mi><mo>+</mo><mi>Tfirst</mi><mo>;</mo><mi>Tcomplete</mi><mo>≈</mo><mi>TTFT</mi><mo>+</mo><mo>(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>×</mo><mi>TPOT</mi><mo>+</mo><mi>Texternal</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>prefill and decode differ in hardware personality<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>The same Transformer model faces completely different hardware constraints in the prefill and decode phases: one consumes compute, the other consumes bandwidth. Understanding this difference is the common prerequisite for judging the effectiveness of various optimization techniques.</p>
+<p>In the prefill phase, all input tokens must be processed at once. Tokens at different positions can be computed in parallel during this phase, forming large matrix multiplications; matrix multiplications have high arithmetic intensity—each unit of data movement corresponds to a large number of floating-point operations—and therefore can more easily fully utilize the GPU's compute units. The decode phase is the opposite: each step generates only one new token for the current batch, both the batch dimension and token dimension are small, the computation per step is small, but each step must read all model weights and the ever-growing KV from memory once. The ratio of data movement to computation rises sharply, and at this point the bottleneck is often not compute but the bandwidth of HBM (high-bandwidth memory).</p>
+<p>This trade-off can be quantified using the roofline model. For each phase, four inputs are counted separately: FLOPs (the total number of floating-point operations required by that phase), BytesIO (the total number of bytes that need to be moved from memory), ComputePeak (the hardware's peak compute), and Bandwidth (the hardware's memory bandwidth). From these, the arithmetic intensity is calculated:</p>
+<p>AI = FLOPs ÷ BytesIO</p>
+<p>That is, the average number of floating-point operations completed per byte of data moved. The performance upper bound for that phase given by roofline is:</p>
+<p>Perfmax = min(ComputePeak, AI × Bandwidth)</p>
+<p>The meaning is: when arithmetic intensity is high enough that AI × Bandwidth exceeds the compute peak, the upper bound is determined by compute, and the phase is compute-limited; when arithmetic intensity is low, the upper bound is determined by AI × Bandwidth, and the phase is bandwidth-limited. The large matrix multiplications of prefill usually fall on the compute-limited side, and the per-token small-step inference of decode usually falls on the bandwidth-limited side. It should be clear that roofline is an intuitive tool for locating bottlenecks, not a precise prediction of the latency of each specific kernel.</p>
+<p>Following the same breakdown, the work, bottlenecks, and optimization techniques for each phase of an inference request can be mapped as follows:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Phase</th><th class="dd-align-left">Main work</th><th class="dd-align-left">Common bottleneck</th><th class="dd-align-left">Typical optimization</th></tr></thead><tbody><tr><td class="dd-align-left">Queueing</td><td class="dd-align-left">Waiting for scheduling</td><td class="dd-align-left">Capacity, batch policy</td><td class="dd-align-left">Scaling out, priority, backpressure</td></tr><tr><td class="dd-align-left">prefill</td><td class="dd-align-left">Input parallel matrix/attention</td><td class="dd-align-left">Compute, long-sequence I/O</td><td class="dd-align-left">FlashAttention, prefix caching</td></tr><tr><td class="dd-align-left">decode</td><td class="dd-align-left">Per-token weight/KV reads</td><td class="dd-align-left">Bandwidth, serial steps</td><td class="dd-align-left">Batching, quantization, speculative decoding</td></tr><tr><td class="dd-align-left">Tools</td><td class="dd-align-left">External requests</td><td class="dd-align-left">Network/service</td><td class="dd-align-left">Parallelism, timeouts, caching</td></tr></tbody></table></div>
+<p>This mapping explains why optimization techniques cannot be arbitrarily stacked. Increasing the batch improves reuse of weights in the decode phase—the same weights serve more requests, amortizing the read overhead per token—but a larger batch also leads to longer queueing times and greater KV usage; quantization compresses each value into fewer bytes, reducing the amount of data that needs to be moved, targeting the bandwidth bottleneck; FlashAttention reduces the memory round-trips of intermediate matrices in attention computation, targeting long-sequence I/O. The three act on different bottlenecks; applying a technique to the wrong stage provides almost no benefit to performance.</p></div>
+<table class="dd-table"><thead><tr><th>Phase</th><th>Main work</th><th>Common bottleneck</th><th>Typical optimization</th></tr></thead><tbody><tr><td>Queueing</td><td>Waiting for scheduling</td><td>Capacity/batch policy</td><td>Scaling out, priority, backpressure</td></tr><tr><td>prefill</td><td>Input parallel matrix/attention</td><td>Compute, long-sequence I/O</td><td>FlashAttention, prefix caching</td></tr><tr><td>decode</td><td>Per-token weight/KV reads</td><td>Bandwidth, serial steps</td><td>Batching, quantization, speculative decoding</td></tr><tr><td>Tools</td><td>External requests</td><td>Network/service</td><td>Parallelism, timeouts, caching</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="算术强度与 roofline 性能上限"><mi>AI</mi><mo>=</mo><mfrac><mi>FLOPs</mi><mi>BytesIO</mi></mfrac><mo>;</mo><mi>Perfmax</mi><mo>≈</mo><mi>min</mi><mo>(</mo><mi>ComputePeak</mi><mo>,</mo><mi>AI</mi><mo>×</mo><mi>Bandwidth</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Continuous batching uses dynamic scheduling to fill empty slots<span class="dd-badge eng">Scheduling</span></h2>
+<div class="dd-agent-response"><p>The inefficiency of static batching comes from an intuitive fact: the GPU computation for each batch cannot finish until every sequence in the batch has produced an end-of-sequence token. Even if a request generates only three tokens and finishes answering, the row of computation slots it occupies remains empty for the rest of the batch's lifetime, and the GPU still reserves that seat for it. The greater the difference in sequence lengths, the more empty slots there are and the more noticeable the throughput loss becomes. Continuous batching replaces the rhythm of "start the whole batch, end the whole batch": the scheduler checks the status of all current requests at finer granularity at each scheduling step, immediately removes finished sequences from computation, and selects new requests from the waiting queue to insert into the freed capacity. Each GPU iteration only faces the requests that are actually still alive, so utilization is no longer held back by the single longest request.</p>
+<p>The costs are equally clear. Scheduling frequency changes from "once per batch" to "once per step", and the scheduler itself must be cheap enough; latency is no longer measured uniformly across the batch but fluctuates per request with its own length; when a batch has limited capacity, the scheduler must also make trade-offs between long and short requests, making fairness an objective that must be explicitly designed.</p>
+<p>To use continuous batching safely, a set of supporting capacity constraints is required. The maximum number of batch tokens allowed per step provides a hard upper bound, preventing too many requests from being crammed in at once and causing per-step latency to spiral out of control; prefill is executed in chunks so that very long prompt inputs can be digested over multiple steps instead of one prefill monopolizing the GPU while all decode requests wait on the sidelines; priority and preemption mechanisms ensure that high-priority requests can be inserted and low-priority requests can be paused and later resumed. Under mixed load, interactive queues and offline queues are best scheduled in separate pools, with dedicated capacity reserved for critical tenants; otherwise a flood of offline tasks will crowd out interactive requests that need low time-to-first-token latency.</p>
+<p>Batching wait time is a tunable knob with a strong directional effect: the longer the scheduler waits to form batches, the more likely it is to assemble a larger effective batch, usually increasing throughput; but the wait itself directly adds to each request's TTFT. Increasing this window improves throughput and worsens time-to-first-token latency; decreasing it does the opposite. There are no free parameters.</p>
+<p>Under overload, continuous batching has another danger: if the waiting queue has no upper bound, the scheduler will instinctively fill the GPU, making throughput appear to reach its maximum, but queue length and queuing latency inflate together, and p99 tail latency becomes completely uncontrollable. At this point a throughput optimizer actually turns into a latency amplifier. The real protection comes from admission control, which decides at request entry time whether to accept or reject based on capacity; from backpressure, which sends the full-load signal upstream to cause callers to slow down; and from fairness boundaries between tenants to prevent a single tenant's traffic spike from consuming all shared capacity.</p>
+<p>From an interface perspective, the inputs to a continuous batching scheduler are the set of waiting requests, the available token capacity per step, and the priority of each request; the output is the scheduling decision for that step: which sequences are removed, which new requests are inserted, which prefills are chunked, and which low-priority sequences are preempted. Finished sequences immediately yield their slots to new requests, so empty slots are dynamically filled. But it is important to remember what this optimization actually guarantees: GPU utilization and throughput. Higher throughput does not automatically bring improved tail latency; in overload, average latency and p99 can even move in opposite directions. Therefore continuous batching must be deployed together with admission control, backpressure, and tenant fairness boundaries to be a complete solution.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>KV cache is the hidden budget for concurrency capacity<span class="dd-badge math">Memory</span></h2>
+<div class="dd-agent-response"><p>A common confusion is: the model weights clearly fit, so why does OOM occur as soon as concurrent requests arrive? The answer is that GPU memory has a second large expense—KV cache. During attention computation, each token at each layer produces its own K and V vectors for subsequent tokens to use when computing attention. If they are not cached, every newly generated token would require recomputing the entire history, which is prohibitively expensive; therefore these vectors are retained. KV cache memory usage grows approximately linearly with the number of concurrent requests and sequence length, while weights are fixed, so when concurrency increases, the first limit to be hit is often KV cache rather than weights.</p>
+<p>Its capacity can be precisely estimated. Let Nlayer be the number of layers, NKVhead be the number of KV heads per layer, d be the head dimension, Ntoken be the number of tokens per request, B be the number of concurrent requests, and b be the number of bytes per element; then the KV cache memory MKV is approximately:</p>
+<p>MKV = Nlayer × NKVhead × d × Ntoken × B × b × 2</p>
+<p>The final multiplication by 2 is because K and V are each stored once. Taking a configuration with 32 layers, 8 KV heads, 128 dimensions, and FP16 (2 bytes per element) as an example, a single 8k-token request occupies approximately 32 × 8 × 128 × 8000 × 2 × 2 ≈ 1.05 GB; 16 concurrent requests would be about 16.8 GB, not yet counting model weights, intermediate activations, and workspace. This estimate directly answers where OOM comes from and also gives the order of magnitude of the concurrency limit.</p>
+<p>PagedAttention is a common means of handling KV memory management. It places the KV cache into fixed-size blocks and allocates by block, reducing GPU memory fragmentation caused by repeated allocation and deallocation, and also supports sharing the same prefix across requests (such as a common system prompt) as well as more flexible eviction policies. But its boundary must be clear: PagedAttention improves the efficiency of memory management; the KV vectors themselves still exist, and it does not eliminate the KV data itself.</p>
+<p>The means of truly compressing the KV data are another category. KV quantization replaces cache elements with low-precision representations, reducing capacity and GPU memory bandwidth, but it may hurt quality under long context and requires regression validation; sliding windows retain only the KV within the most recent window, truncating historical context; compressed cache summarizes long history into fewer representations. The latter two change the history actually visible to the model and are essentially algorithmic changes, so they cannot be treated as pure engineering optimizations and must be evaluated together with quality.</p>
+<p>So the input for KV cache capacity estimation is the number of layers, number of KV heads, head dimension, number of tokens, number of concurrent requests, and bytes per element; the output is total cache memory. It is used to explain the source of OOM and the concurrency limit, rather than to give a final answer—PagedAttention only reduces fragmentation; quantization or sliding windows still require quality regression, and any means of compressing the KV data must first answer its impact on output quality.</p></div>
+<div class="dd-formula"><math display="block" aria-label="KV 缓存内存估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>B</mi><mo>×</mo><mi>b</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Worked example: why average latency improves but p99 gets worse after optimization<span class="dd-badge math">Case walkthrough</span></h2>
+<div class="dd-agent-response"><p>A refund assistant service nearly doubled its throughput after enabling large-batch processing, yet interactive users started complaining. This seemingly contradictory phenomenon is worth breaking down: inference requests start from the queue, pass through prefill and decode stages before returning to the user; batching squeezes more requests into the same GPU iteration, increasing throughput, but individual requests' waiting and execution times can be stretched. Improvements in resource utilization do not automatically guarantee tail latency experience—scheduling parameters must be chosen based on SLO, not on peak throughput.</p>
+<p>The comparison table below measures three batching strategies under the same workload:</p>
+
+<p>The order in which you read this table matters. Start with throughput: static small batches get only 40 tok/s, showing low GPU utilization; aggressive continuous batching reaches 78 tok/s, nearly doubling, and this column alone is very tempting. Then look at the latency distribution: its TTFT p50 is 470ms, even better than the static small batch's 520ms—so the average user is indeed faster. But TTFT p99 worsens from 1.8s to 3.2s: a few requests are stuck behind batching waits and long-input prefill, and the first token is slow to appear; this is exactly the source of interactive users' complaints. A TPOT p95 of 58ms indicates that once generation starts, the token rhythm is not bad; the problem is concentrated in queueing and prefill. The approach using separate pools plus chunk prefill achieves 70 tok/s, slightly lower than the aggressive approach, but it brings TTFT p99 back down to 1.6s and p50 down to 430ms, keeping all interactive SLOs within constraints—a truly better choice.</p>
+<p>The input to this case is three batching strategies with their throughput, TTFT, and TPOT metrics; the output is the decision of which one meets the interactive SLOs. The judgment method is not to look at averages: first compare throughput, then examine p50 and p99; aggressive continuous batching, although faster on average, fails p99 due to batching waits and long-input blocking. Also note the boundaries of the conclusion: these numbers apply only to the workload distribution at the time; once the request length composition, concurrency pattern, or tenant structure changes, the same parameters may produce completely different results, and the system must be re-tested after the workload changes.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 710 260" role="img" aria-label="Inference requests travel from the queue through prefill and decode; batching improves throughput but may increase tail latency."><defs><marker id="io1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="90" width="120" height="70" rx="8" fill="#21252d" stroke="#c77b72"/><text x="78" y="115" text-anchor="middle" class="svg-t">Request queue</text><text x="78" y="138" text-anchor="middle" class="svg-t" font-size="11">Batching wait 0–400ms</text><path d="M138,125 L203,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="205" y="90" width="140" height="70" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="275" y="115" text-anchor="middle" class="svg-t">chunked prefill</text><text x="275" y="138" text-anchor="middle" class="svg-t" font-size="11">Chunking long inputs to fill gaps</text><path d="M345,125 L410,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="412" y="90" width="140" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="482" y="115" text-anchor="middle" class="svg-t">continuous decode</text><text x="482" y="138" text-anchor="middle" class="svg-t" font-size="11">Insert new sequence when complete</text><path d="M552,125 L617,125" stroke="#6b7484" marker-end="url(#io1)"/><rect x="619" y="90" width="74" height="70" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="656" y="115" text-anchor="middle" class="svg-t">Streaming</text><text x="656" y="138" text-anchor="middle" class="svg-t" font-size="11">delta</text><text x="355" y="205" text-anchor="middle" class="svg-t">Throughput 40→78 tok/s; average TTFT 520→470ms [Source discrepancy: the caption says average, whereas the table identifies the statistic as median.]; p99 TTFT 1.8→3.2s (batching/long-input blocking)</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　Improved resource utilization does not guarantee tail experience; scheduling parameters must be chosen based on SLO, not peak throughput.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Approach</th><th>Throughput</th><th>TTFT p50</th><th>TTFT p99</th><th>TPOT p95</th><th>Conclusion</th></tr></thead><tbody><tr><td>Static small batch</td><td>40 tok/s</td><td>520ms</td><td>1.8s</td><td>62ms</td><td>Stable but low utilization</td></tr><tr><td>Aggressive continuous batching</td><td>78 tok/s</td><td>470ms</td><td>3.2s</td><td>58ms</td><td>Fails interactive SLO</td></tr><tr><td>Separate pools + chunk prefill</td><td>70 tok/s</td><td>430ms</td><td>1.6s</td><td>60ms</td><td>Better within constraints</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>FlashAttention Reduces IO, Does Not Approximate Attention Results<span class="dd-badge eng">Kernel</span></h2>
+<div class="dd-agent-response"><p>Attention computation has a huge intermediate product: the N×N score matrix. Each of its rows first passes through softmax and then is multiplied with V, where N is the sequence length; for long sequences this matrix is much larger than the input itself. An ordinary implementation writes it completely into high-bandwidth memory HBM, writes it once, reads it once, and then writes the result; the IO round trips consume most of the time. FlashAttention's approach is to split Q, K, and V into small blocks, load only a small block into GPU on-chip SRAM each time, complete the computation needed for that block on-chip, and simultaneously maintain the softmax row maximum and normalization sum online—these two statistics are sufficient to make the block results reassemble into the correct value of the full softmax. The intermediate score matrix never needs to be written back to HBM in its entirety.</p>
+<p>It is worth emphasizing that it does not perform approximation. Softmax can inherently be decomposed using the row maximum and normalization sum; FlashAttention only changes the order of computation so that numerical values are iteratively combined across blocks. Within numerical precision, it computes the same attention result as the standard implementation, rather than an approximate target like sparse attention. Therefore, the answer to the question "Can it still compute exactly without storing the full N×N matrix?" is: yes, because what is omitted is only the intermediate copy that travels to and from HBM, not the computation itself.</p>
+<p>The magnitude of the benefit depends on the scenario. The longer the sequence and the higher the proportion of attention IO in total time, the more obvious the benefit; with short sequences or when the entire inference is dominated by other operators, the benefit of switching kernels may be negligible, because the bottleneck is not here at all. The benefit also varies with hardware, precision dtype, and implementation details. Upgrading the kernel is a low-level change; numerical, quality, and stability regression must be performed to confirm that the output matches the old implementation and that no edge-case bugs have been introduced.</p>
+<p>Its boundaries should also be drawn clearly: FlashAttention reduces the IO of attention computation; it does not change the long-term capacity of the KV cache—what needs to be stored still needs to be stored; nor does it solve queue waiting and the latency of external tool calls—those times occur outside the GPU kernel. To decide whether to prioritize the upgrade, first check whether the attention IO of long prefill actually dominates; if p99 mainly comes from queuing, switching to a faster kernel only treats the symptom, and the metrics will not improve significantly.</p>
+<p>In summary, FlashAttention's inputs are the same as ordinary attention—the same set of Q, K, and V; its output is the same attention result within numerical precision, but HBM round trips are greatly reduced. It changes the order of computation rather than the target of approximation. The benefit means attention IO is reduced, not that KV capacity, queue latency, or tool latency has been solved; under short sequences and non-attention bottlenecks there may be no visible benefit.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Quantization reduces bytes, but this is a quality-related change<span class="dd-badge eng">Low precision</span></h2>
+<div class="dd-agent-response"><p>Changing FP16 weights to INT4 reduces the number of bytes per parameter to one quarter, simultaneously lowering memory usage and weight read bandwidth. This yields two kinds of benefits: the model can fit on smaller devices, decode-stage throughput constrained by memory bandwidth can improve, and the same memory can accommodate a larger batch. But quantization is not as simple as making numbers smaller—low-bit-width tensors usually need to be dequantized back to a higher precision before computation, and this step itself has kernel overhead; if the hardware lacks native support for that bit width, the benefits will be greatly reduced; under small batch sizes, weight bandwidth was not the bottleneck in the first place, so the saved bytes do not translate into speed. Therefore, 'faster after quantization' is not an inevitable conclusion: it may be faster or slower, depending on whether the dequantization kernel, hardware support, and bottleneck under small batch actually match.</p>
+<p>You also need to distinguish the targets of quantization: weights, activations, and KV have different effects.</p>
+
+<p>Weight quantization saves model resident memory and read bandwidth; the risk is that a few channels with abnormal value ranges introduce errors, as well as the extra overhead of the dequantization kernel. Activation quantization affects operator execution speed and distributed communication; the risk comes from the large dynamic range of activations and error concentration when calibration data is poorly chosen. KV quantization saves KV cache capacity and bandwidth in long-context scenarios; the risk is reduced retrieval accuracy for distant tokens and error accumulation over the sequence.</p>
+<p>Average perplexity is only the coarsest reference line; service quality regressions must be examined separately by task type, language, long context, probability calibration, and tool parameter slices: a drop in a language slice, long-context retrieval failure, model output probabilities that are no longer calibrated (for example, confidence score distortion), or broken tool calling parameter format can all occur on a model whose overall average still looks acceptable. The quantization selection process takes as input the quantization object (weights, activations, or KV), target bit width, hardware kernels, and task slices, and outputs a low-precision model along with its differences in memory, speed, and quality. It is a quality-related change, not a pure engineering optimization—lower bit width reduces storage and bandwidth, while dequantization and calibration add overhead; 'faster' holds only when hardware support is good and bottlenecks match, and before adoption you must regress by language, long context, tool parameters, and high-risk tasks.</p></div>
+<table class="dd-table"><thead><tr><th>Object</th><th>Main benefit</th><th>Main risk</th></tr></thead><tbody><tr><td>Weights</td><td>Model memory/bandwidth</td><td>Outlier channel errors, kernel overhead</td></tr><tr><td>Activations</td><td>Operator speed/communication</td><td>Dynamic range and calibration</td></tr><tr><td>KV</td><td>Long-context concurrency/bandwidth</td><td>Distant retrieval and accumulated errors</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Speculative Decoding Uses Parallel Verification to Reduce Serial Steps<span class="dd-badge math">Speculative</span></h2>
+<div class="dd-agent-response"><p>A fundamental constraint of autoregressive generation is that it is serial: each time a token is generated, the target model must finish one forward pass. Speculative decoding uses a smaller, faster draft model to break this serial dependency. The draft model first quickly guesses the next k tokens according to its own distribution; the target model takes these k candidate positions, evaluates the probabilities at all positions simultaneously with one parallel forward pass, and then corrects them one by one according to accept/reject rules—if a draft token at a position matches the target model's judgment, it is accepted; otherwise it is rejected and the target model samples its own token from that position onward, and all subsequent draft tokens are discarded. As long as the accept/reject rules are designed correctly, the final produced token sequence still follows the target model's original distribution in probability, so the acceleration does not change the model's behavior itself.</p>
+<p>The per-round output can be estimated using the acceptance rate a (the per-token probability that a draft token is accepted by the target model). The first token is always produced, the second is produced with probability a, the third with probability a², and so on. The approximate output of one round is 1 + a + a² + … + a^k. For example, when a = 0.8 and k = 4, it is about 1 + 0.8 + 0.64 + 0.512 + 0.4096 = 3.36 tokens/round. But this is an idealized account: the draft model itself takes time, and the verification batch also has cost, so the actual speedup is always less than 3.36.</p>
+<p>The acceptance rate a determines everything. The closer the draft model's distribution is to the target model's distribution, the higher a becomes. Once there is a domain mismatch—such as a specialized task the draft model has never seen—or a very high temperature setting makes sampling more random, or the capability gap between the two models is too large, a drops sharply. Each round then actually produces close to 1 token, while still incurring the double overhead of draft and verification, making it slower than not using speculative decoding.</p>
+<p>We should also recognize what it optimizes: speculative decoding improves TPOT and overall throughput by targeting the serial steps in the decode phase; it cannot do anything about the computation of long-input prefill. When combined with streaming output, there is another engineering detail: the verification batch emits multiple tokens at once. If smoothing is not applied, users will see output appear suddenly in chunks, and this visible burst jitter should be avoided.</p>
+<p>Let's go through the interface once more: the inputs to speculative decoding are the draft model, the target model, the draft length k, and the per-token acceptance rate a; the output is the token sequence after verification by the target model. The draft first proposes candidates in parallel, and the target model verifies them in batch and accepts or corrects them according to the rules. The approximate per-round output is 1 + a + … + a^k. Keeping the correct target distribution depends on using the correct correction rules, while low acceptance rates or high verification costs will make the overall process slower.</p></div>
+<div class="dd-formula"><math display="block" aria-label="推测解码每轮近似产出"><mi>Edraft</mi><mo>≈</mo><mn>1</mn><mo>+</mo><mi>a</mi><mo>+</mo><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><mo>…</mo><mo>+</mo><msup><mi>a</mi><mi>k</mi></msup></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Real workload benchmarks and quality gates are both indispensable.<span class="dd-badge intuition">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Can a 2x improvement in offline single-request tokens/s show that production has really gotten better? Not directly. The gap between production load and single-request load testing lies in the joint distribution of input/output lengths, concurrency levels, burstiness of request arrivals, KV cache hit rate, and priority composition—single-request load testing flattens all of them. A benchmark that can be transferred to production must replay these real characteristics and report a full set of metrics: p50/p95/p99 for TTFT, TPOT, and end-to-end latency, throughput, timeout rate, KV cache and GPU memory usage, power consumption, and cost per successful task. Reporting only an average tokens/s cannot support any conclusion.</p>
+<p>Load scenarios must also be constructed deliberately. Beyond steady state, you also need to run burst traffic, overload, and single-node failure: steady state shows regular performance, bursts show queue absorption capacity, overload shows whether admission control and backpressure take effect, and node failure shows recovery behavior. Any change that can alter output, such as quantization, KV compression, context pruning, or approximate decoding, must run full application evaluation rather than model-level metrics; a claim of 'quality unchanged' must include task slices and confidence intervals, otherwise it is equivalent to no evidence. Kernel and scheduling changes can also go wrong—numerical errors, request starvation, tenant fairness violations—these will not show up in average latency.</p>
+<p>Benchmark cheating tricks can be enumerated: fixing short outputs so results always look good; pre-warming caches to hide cold-start costs; ignoring queueing and testing only a single request; reporting only the best batch configuration; not counting failed requests. Any one of these will make benchmark results impossible to transfer to production. Conversely, a usable production benchmark has real length distributions, concurrency, bursts, cache hits, priorities, and fault injection as inputs, and latency percentiles, throughput, resource usage, failure rate, quality, and cost per successful task as outputs. The approach is to compare alternatives under a fixed load and cover three types of scenarios: steady state, overload, and node failure. An average tokens/s improvement alone cannot prove production is better; any algorithmic or low-precision change must pass a quality gate.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connect the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String together the previous techniques: inference optimization is a causal chain from problem to verifiable practice, where each step provides the basis for the next; skipping a step leads to choosing the wrong solution.</p>
+<p>The first step is measurement, and you must slice by request phase and length. First split end-to-end time into prefill and decode, then stratify by input and output length: long inputs point to prefill, long outputs point to decode, and short requests point to queuing. Only the metric distribution after slicing will tell you where time is being lost.</p>
+<p>The second step is to identify the primary cause. High latency may be due to insufficient compute (compute bound), insufficient GPU memory bandwidth (bandwidth bound), KV cache capacity being filled up and limiting concurrency, or queues growing without bound under overload. The four categories of primary causes require completely different solutions, and must be judged from the first step's sliced data rather than intuition.</p>
+<p>The third step is to choose a solution, and the solution must match the primary cause. Only long prefill dominated by attention I/O is worth considering a kernel upgrade; only when there are many empty slots and low utilization should you adopt continuous batching; only when GPU memory is squeezed by KV cache should you touch cache management; only when bytes and bandwidth are both tight and you are willing to accept quality risk should you consider low precision. Conversely, if p99 comes from queuing but you go change the kernel, you are applying the solution in the wrong place.</p>
+<p>The fourth step is to perform ablation under a controlled load. Fix the same load, change only one variable at a time, and record the net change in throughput and latency percentiles to confirm that the benefit truly comes from that change, not from environmental noise or compounding effects.</p>
+<p>The fifth step is to validate under real concurrency. Replay the production length distribution, burst arrivals, and cache hit patterns, and stress-test tail latency and overload behavior; the earlier example has already shown that being faster on average and meeting p99 are two different things, and that performing well in steady state and not collapsing under overload are also two different things.</p>
+<p>The final step is a joint quality and cost gate. Any technique that can change the output—quantization, KV compression, context truncation, approximate decoding—must pass quality regression; at the same time, use the cost per successful task to convert throughput, GPU memory, and power consumption into the same scale. Only when both meet the bar is the optimization complete. The output of each step is the input to the next; if any step is skipped, the conclusion loses its basis.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">FlashAttention</a>: IO-aware exact attention</li><li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">vLLM</a>: PagedAttention and high-throughput serving</li><li><a href="https://www.usenix.org/conference/osdi22/presentation/yu" target="_blank" rel="noopener">Orca</a>: iteration-level scheduling and continuous batching</li><li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Fast Inference from Transformers via Speculative Decoding</a>: speculative decoding that preserves the target distribution</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/inference-optimization">Explore connections on the map</a><a href="/zh/concepts/inference-optimization/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

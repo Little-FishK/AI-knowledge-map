@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>计算机使用智能体：在观察、动作与状态验证之间闭环 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>计算机操作是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/computer-use/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/computer-use/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/computer-use/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="计算机使用智能体：在观察、动作与状态验证之间闭环">
+<meta property="og:title" content="计算机操作是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/computer-use/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="计算机使用智能体：在观察、动作与状态验证之间闭环">
+<meta name="twitter:title" content="计算机操作是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/computer-use/#page","name":"计算机使用智能体：在观察、动作与状态验证之间闭环","description":"从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。","url":"https://ai-knowledge-map.com/zh/concepts/computer-use/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"计算机使用智能体：在观察、动作与状态验证之间闭环","item":"https://ai-knowledge-map.com/zh/concepts/computer-use/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/computer-use/#page","name":"计算机操作是什么？原理通俗讲解 | AI 知识地图","description":"从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。","url":"https://ai-knowledge-map.com/zh/concepts/computer-use/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"计算机使用智能体：在观察、动作与状态验证之间闭环","item":"https://ai-knowledge-map.com/zh/concepts/computer-use/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">计算机使用智能体：在观察、动作与状态验证之间闭环</span></li></ol></nav><article id="dd-article" data-concept-id="computer-use">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">计算机使用智能体：在观察、动作与状态验证之间闭环</span></li></ol></nav><article id="dd-article" data-concept-id="computer-use" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">计算机使用智能体：在观察、动作与状态验证之间闭环</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从截图、DOM与可访问性树的动作接地，到焦点、幂等、权限和恢复，理解为什么“会点按钮”远不等于可靠完成任务。</p>
 
@@ -159,7 +161,7 @@
 <p>它同样揭示了为什么这些机制必须同时存在。状态差分闭环需要语义定位器和业务回执作为输入；语义检查点需要已验证的状态差分作为依据；动作接地为&quot;该不该执行&quot;提供判定，而轨迹审计为&quot;执行之后如何证明和复盘&quot;提供依据。把因果链连起来的最终意义是：可靠的计算机使用不是任何单一技巧的堆砌，而是一条从目标定义、到观察、到动作、到验证、再到恢复与审计的闭合回路——每一环都以前一环的输出为输入，最终回到&quot;业务是否真正完成&quot;这个唯一可信的判定标准上。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2307.13854" target="_blank" rel="noopener">WebArena</a>：网页智能体真实环境评测</li><li><a href="https://arxiv.org/abs/2404.07972" target="_blank" rel="noopener">OSWorld</a>：跨操作系统任务环境</li><li><a href="https://arxiv.org/abs/2306.06070" target="_blank" rel="noopener">Mind2Web</a>：通用网页任务数据</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/computer-use">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/computer-use">在地图中查看概念关系</a><a href="/en/concepts/computer-use/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

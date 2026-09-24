@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Agent 循环 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>Agent 是什么？循环原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="把一次回答变成可观察、可校验、能停下来的状态机">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/agent-loop/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/agent-loop/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/agent-loop/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="Agent 循环">
+<meta property="og:title" content="Agent 是什么？循环原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="把一次回答变成可观察、可校验、能停下来的状态机">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/agent-loop/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Agent 循环">
+<meta name="twitter:title" content="Agent 是什么？循环原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="把一次回答变成可观察、可校验、能停下来的状态机">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/agent-loop/#page","name":"Agent 循环","description":"把一次回答变成可观察、可校验、能停下来的状态机","url":"https://ai-knowledge-map.com/zh/concepts/agent-loop/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"Agent 循环","item":"https://ai-knowledge-map.com/zh/concepts/agent-loop/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/agent-loop/#page","name":"Agent 是什么？循环原理通俗讲解 | AI 知识地图","description":"把一次回答变成可观察、可校验、能停下来的状态机","url":"https://ai-knowledge-map.com/zh/concepts/agent-loop/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"Agent 循环","item":"https://ai-knowledge-map.com/zh/concepts/agent-loop/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">Agent 循环</span></li></ol></nav><article id="dd-article" data-concept-id="agent-loop">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">Agent 循环</span></li></ol></nav><article id="dd-article" data-concept-id="agent-loop" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">Agent 循环</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">把一次回答变成可观察、可校验、能停下来的状态机</p>
 <p class="dd-ali">Agent Loop · Observe–Decide–Act · 感知—行动循环</p>
@@ -147,7 +149,7 @@
 <p>把这条链串起来，结论自然浮现：可靠的 Agent 循环本质上是一个受约束、可观测、可终止的状态机。受约束，指目标、预算与授权不被循环内的动作改写；可观测，指状态版本、候选动作、校验决定、工具结果与验证结论都可追溯；可终止，指五类出口由控制器强制执行。三者同时成立，Agent 才谈得上可靠，而不只是一台会连续输出的模型。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>：推理、行动与观察交错的经典框架。</li><li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>：语言模型学习何时调用外部工具。</li><li><a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">Wang et al., LLM-based Autonomous Agents Survey</a>：规划、记忆、行动与评测组件。</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">Ruan et al., ToolEmu</a>：工具型智能体风险与失败轨迹评测。</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/agent-loop">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/agent-loop">在地图中查看概念关系</a><a href="/en/concepts/agent-loop/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

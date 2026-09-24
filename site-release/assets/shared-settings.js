@@ -76,7 +76,9 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
     topbar.inert = false;
     main.inert = false;
     if (document.getElementById("onboarding")) document.getElementById("onboarding").inert = false;
-    if (settingsReturnFocus && typeof settingsReturnFocus.focus === "function") settingsReturnFocus.focus();
+    const focusTarget = settingsReturnFocus?.isConnected ? settingsReturnFocus
+      : global.AI_ONBOARDING?.isOpen() ? document.querySelector('#onboarding [data-settings]') : settingsButton;
+    focusTarget?.focus();
     settingsReturnFocus = null;
   }
 

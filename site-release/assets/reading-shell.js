@@ -11,13 +11,13 @@
   window.createMapSettings({language,manifest:window.I18N_MANIFEST,content:{ensureLocale:async () => {}}});
   const route = (hash, extra = '') => `${base}?lang=${encodeURIComponent(language.getLocale())}${extra}${hash}`;
   bar.querySelectorAll('[data-mode]').forEach(button => {
-    button.onclick = () => location.assign(route('#/' + (button.dataset.mode === 'graph' ? 'map' : button.dataset.mode)));
+    button.onclick = () => location.assign(route(button.dataset.mode === 'graph' ? '' : '#/' + button.dataset.mode));
   });
-  document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('#/map')));
-  document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('#/map', '&onboarding=1')));
+  document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('')));
+  document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('', '&onboarding=1')));
   const brand = bar.querySelector('.brand');
   brand.setAttribute('role','link'); brand.tabIndex = 0;
-  brand.onclick = () => location.assign(route('#/map'));
+  brand.onclick = () => location.assign(route(''));
   brand.onkeydown = event => { if (event.key === 'Enter') brand.click(); };
   const search = document.getElementById('search');
   search.addEventListener('keydown', event => {
@@ -35,6 +35,20 @@
     bar.querySelector('[data-shell-search]').textContent = en ? 'Text directory / Search' : '文字目录 / Search';
     let notice = document.getElementById('reading-language-notice');
     if (article && contentLocale !== language.getLocale()) {
+      // Switch the article as well as the shell. Only use a counterpart that
+      // the publisher included in this page; missing translations keep the
+      // existing, explicitly labelled fallback.
+      const locale = language.getLocale();
+      const counterpart = document.querySelector(`.preview-next a[lang="${locale}"]`);
+      if (counterpart) {
+        const target = new URL(counterpart.href, location.href);
+        const expected = location.pathname.replace(/\/(zh|en)\/concepts\//, `/${locale === 'en' ? 'en' : 'zh'}/concepts/`);
+        if (target.origin === location.origin && target.pathname === expected && target.pathname !== location.pathname) {
+          target.searchParams.delete('lang');
+          location.assign(target.href);
+          return;
+        }
+      }
       if (!notice) { notice = document.createElement('p'); notice.id = 'reading-language-notice'; notice.className = 'release-notice'; article.before(notice); }
       notice.textContent = en ? 'This reading page is displayed in its original language. Available translations can be found below the article.' : '当前正文保持原文语言，可用的语言版本请见正文末尾。';
     } else notice?.remove();

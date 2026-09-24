@@ -24,8 +24,6 @@
     "standards/iso-iec": platform("https://www.iso.org/artificial-intelligence.html", "国际通用标准及 AI 联合技术标准的发布体系。", "ISO 与 IEC 通过 ISO/IEC JTC 1 及其 SC 42 等委员会制定 AI、数据和软件相关国际标准。", "ISO 与 IEC 两个国际非政府标准组织。", "由各国标准机构共同组成，没有单一创始团队。"),
     "standards/ieee-standards": platform("https://standards.ieee.org/", "工程技术标准、工作组和标准开发流程平台。", "IEEE Standards Association 延续 IEEE 工程标准传统，AI 领域覆盖伦理、透明度、治理和系统工程。", "IEEE Standards Association。", "源自 IEEE 会员和标准委员会体系，不对应单一创始人。"),
     "standards/eu-institutions": platform("https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "欧盟 AI 法规、实施规则和政策文件的官方入口集合。", "欧盟委员会、议会、理事会及相关机构共同形成 AI Act 等监管体系。", "欧盟机构体系。", "超国家公共机构集合，没有公司或创业创始团队。"),
-    "standards/us-regulators": platform("https://www.usa.gov/federal-agencies", "美国联邦监管机构及其 AI 相关规则、指南和执法文件集合。", "FTC、FDA、EEOC、SEC 等机构按各自法定职权处理 AI 的消费者保护、医疗、就业和金融问题。", "美国联邦政府各独立部门与监管机构。", "法定机构集合，没有统一创始团队。"),
-    "standards/china-standards-regulators": platform("https://www.gov.cn/zhengce/", "中国国家法规、政策、国家标准和技术文件的官方来源集合。", "国务院、国家网信办、国家标准化管理委员会及相关技术委员会分别承担政策、监管与标准工作。", "中国政府及国家标准体系相关机构。", "公共机构集合，没有统一商业创始团队。"),
     "standards/oecd": platform("https://oecd.ai/", "政府间 AI 政策、指标、原则和政策观察平台。", "OECD 于 2019 年通过 AI Principles，OECD.AI 用于汇总政策、数据与跨国实践。", "Organisation for Economic Co-operation and Development。", "由成员经济体组成的政府间组织，没有公司创始人。"),
     "standards/un-agencies": platform("https://www.un.org/en/global-issues/artificial-intelligence", "联合国系统内 AI 治理、伦理、通信和发展议题的官方资料集合。", "UNESCO、ITU、联合国秘书处等机构在各自授权范围内发布建议、决议和技术资料。", "联合国及其专门机构。", "多边公共机构集合，没有统一创始团队。"),
 
@@ -37,17 +35,13 @@
     "official/nvidia": platform("https://developer.nvidia.com/", "GPU、CUDA、AI 框架、模型和部署技术资料的一手来源。", "NVIDIA 于 1993 年成立，随后由图形计算扩展到通用 GPU 计算和 AI 基础设施。", "NVIDIA Corporation。", "Jensen Huang、Chris Malachowsky、Curtis Priem 共同创立。"),
     "official/hugging-face-official": platform("https://huggingface.co/docs", "Hugging Face 平台、Transformers 等官方库和课程资料的一手来源。", "Hugging Face 于 2016 年成立，后来发展为模型、数据集、应用和开源工具协作平台。", "Hugging Face, Inc.。", "Clément Delangue、Julien Chaumond、Thomas Wolf 共同创立。"),
     "official/aws": platform("https://aws.amazon.com/ai/", "AWS 云端 AI、Bedrock、SageMaker 和基础设施资料的一手来源。", "Amazon Web Services 于 2006 年正式推出，随后形成覆盖训练、推理、托管模型和企业服务的云平台。", "Amazon Web Services，隶属 Amazon。", "由 Amazon 内部团队创建，早期业务建设由 Andy Jassy 等领导；不是独立创业公司。"),
-    "official/vendor-docs-other": collection("尚未单列的厂商官方文档、模型卡、系统卡和更新日志。", "用于容纳经过逐一登记但数量不足以独立成类的厂商；不能把厂商官网整体视为可信。", "随具体资料记录实际公司、研究机构和产品团队。"),
 
     "knowledge-base/mitre-atlas": platform("https://atlas.mitre.org/", "面向 AI 系统的对抗威胁战术、技术和案例知识库。", "MITRE 于 2020 年前后公开 ATLAS，并与政府、企业和研究社区持续维护攻击技术与案例。", "The MITRE Corporation 及 ATLAS 社区。", "由 MITRE 研究团队与合作机构发起，不属于商业创业平台。"),
     "knowledge-base/mlcommons": platform("https://mlcommons.org/", "面向机器学习训练、推理、存储和安全的公共基准组织。", "MLCommons 于 2020 年围绕 MLPerf 等项目形成工程与研究联盟，推动可比较的公开测量。", "MLCommons Association，非营利工程联盟。", "由 MLPerf 社区、产业和学术参与者共同组建，不对应单一创始人。"),
     "knowledge-base/stanford-crfm": platform("https://crfm.stanford.edu/", "基础模型研究、透明度、评测和 HELM 基准平台。", "Stanford CRFM 于 2021 年在 Stanford HAI 体系内成立，推动基础模型的系统研究与社会分析。", "Stanford Center for Research on Foundation Models。", "由 Percy Liang 等 Stanford 研究者和跨学科团队发起。"),
     "knowledge-base/lmsys-arena": platform("https://lmarena.ai/", "通过匿名模型对战和用户偏好收集开展开放式大模型评测。", "Chatbot Arena 于 2023 年由 LMSYS / UC Berkeley SkyLab 团队推出，2024 年迁移到独立站点并继续扩展评测范围。", "Arena 团队；与 LMSYS 非营利研究组织保持合作。", "Lianmin Zheng、Wei-Lin Chiang 等研究者，与 Ion Stoica、Joseph E. Gonzalez 等导师团队共同发起。"),
-    "knowledge-base/papers-with-code": platform("https://paperswithcode.com/", "把机器学习论文、代码实现、数据集和基准结果连接起来的索引。", "平台于 2018 年前后出现，后进入 Meta AI 生态；资料适合作发现和定位实现，排行榜仍需回到原论文与代码核验。", "Papers with Code / Meta AI 生态。", "由 Robert Stojnic 等团队创建并发展。"),
     "knowledge-base/artificial-analysis": platform("https://artificialanalysis.ai/", "独立比较 AI 模型能力、价格、速度、延迟和开放程度的评测平台。", "面向快速变化的模型市场建立统一方法和实测数据，提供模型与供应商对比。", "Artificial Analysis。", "由独立 AI 分析与工程团队创建；公开页面未把全部历史归于单一创始人。"),
     "knowledge-base/nvd-cve": platform("https://nvd.nist.gov/", "公开漏洞标识、影响范围和安全元数据的权威数据库体系。", "CVE 于 1999 年由 MITRE 推出；NVD 由 NIST 在 CVE 基础上补充分析、评分和检索能力。", "NIST 运营 NVD；MITRE 管理 CVE 项目。", "美国公共安全基础设施项目，由 MITRE 与 NIST 团队建设。"),
-    "knowledge-base/benchmark-other": collection("尚未单列的专项基准、红队平台和独立测试组织。", "只接收公开测试方法、样本范围、版本与局限的评测来源；榜单本身不等于事实。", "随具体条目记录评测机构、资助关系和维护团队。"),
-
     "industry-analysis/stanford-ai-index": platform("https://hai.stanford.edu/ai-index", "用年度报告和公开数据追踪 AI 研究、产业、经济、政策与社会影响。", "AI Index 项目于 2017 年启动，后来纳入 Stanford HAI，依靠跨机构专家和数据伙伴编制年度报告。", "Stanford Institute for Human-Centered Artificial Intelligence。", "由 Stanford 学术团队和早期指导委员会发起，报告由年度编辑、研究与数据团队共同完成。"),
     "industry-analysis/epoch-ai": platform("https://epoch.ai/", "研究 AI 模型、算力、数据、算法进展和潜在经济影响。", "Epoch 于 2021 年从志愿者数据研究小组起步，在 2022 年训练算力趋势研究后扩展为正式机构。", "Epoch AI，独立非营利研究机构。", "由 Jaime Sevilla 等早期研究者和志愿者团队发起，后形成跨学科研究团队。"),
     "industry-analysis/gartner": platform("https://www.gartner.com/en/artificial-intelligence", "面向企业决策者的技术市场研究、供应商分析和咨询。", "Gartner 于 1979 年成立，以 IT 市场研究和 Magic Quadrant 等方法闻名。", "Gartner, Inc.。", "Gideon Gartner 创立。"),

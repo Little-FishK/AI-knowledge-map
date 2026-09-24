@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules? Explained Simply</title>
+<meta name="description" content="From impurity, information gain, and pruning to random forests and gradient boosting, understand the advantages of tree models for tabular data and the risk of leakage.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/decision-tree/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/decision-tree/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/decision-tree/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules? Explained Simply">
+<meta property="og:description" content="From impurity, information gain, and pruning to random forests and gradient boosting, understand the advantages of tree models for tabular data and the risk of leakage.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/decision-tree/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules? Explained Simply">
+<meta name="twitter:description" content="From impurity, information gain, and pruning to random forests and gradient boosting, understand the advantages of tree models for tabular data and the risk of leakage.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/decision-tree/#page","name":"What Is Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules? Explained Simply","description":"From impurity, information gain, and pruning to random forests and gradient boosting, understand the advantages of tree models for tabular data and the risk of leakage.","url":"https://ai-knowledge-map.com/en/concepts/decision-tree/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules","item":"https://ai-knowledge-map.com/en/concepts/decision-tree/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules</span></li></ol></nav><article id="dd-article" data-concept-id="decision-tree" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Decision Trees and Ensemble Methods: Combining Nonlinear Decisions with Split Rules</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From impurity, information gain, and pruning to random forests and gradient boosting, understand the advantages of tree models for tabular data and the risk of leakage.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Decision trees recursively select feature thresholds to make child nodes purer, forming interpretable piecewise rules; a single tree has high variance, random forests use parallel averaging to reduce variance, and gradient boosting uses sequential residuals to reduce bias.</div></header>
+<!-- source-body:start -->
+        <div class="dd-goals"><b>After reading this you should be able to:</b>Calculate split gain; explain the high variance of trees; distinguish bagging from boosting; avoid leakage and incorrect importance.</div>
+        
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">1</span>Recursive Partitioning of Feature Space<span class="dd-badge intuition">Intuition</span></h2><p class="dd-lead">How does a tree turn a complex boundary into a series of if/else rules?</p><p><b>Decision Tree</b>is a predictive model composed of condition nodes and leaves. The input is a row of features; starting from the root node, each node checks a rule, such as “amount ≤ 500,” and sends the sample to the left or right subtree; upon reaching a leaf, a classification tree outputs a class or class probabilities, while a regression tree outputs a numerical mean.</p><p>During training, the algorithm compares different features and thresholds at the current node, chooses the cut that best improves the objective, and then repeats the same process on child nodes until stopping conditions such as depth, sample count, or gain are triggered. Repeated axis-aligned splits divide the space into rectangular leaf regions and combine to form step-like nonlinear boundaries.</p><p>A path can explain which rules the model executed this time, but it is not equivalent to a causal reason; correlated features and training perturbations may produce alternative paths. Rotated or smooth boundaries may also require many levels, and trees are not compact for all structures.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">2</span>Impurity and Gain<span class="dd-badge math">Math</span></h2><p class="dd-lead">How do we compare candidate splits?</p><p><b>Impurity I</b>Measures how mixed the target is in a node: for classification you can use Gini or entropy; for regression you can use target variance. A candidate split divides the parent node into left and right child nodes; it should be weighted by the number of samples on each side, rather than looking only at the purer side.</p><div class="dd-formula">Gain=I(parent)−(nL/n)I(L)−(nR/n)I(R)</div><p><code>Gain</code> is the impurity decrease;<code>I(parent)</code> is the parent node impurity,<code>I(L)</code> and <code>I(R)</code> are the left and right node impurities;<code>n</code> is the parent node sample count,<code>nL</code> and <code>nR</code> are the left and right sample counts. The larger the gain, the more it indicates that the split makes the weighted child nodes more homogeneous.</p><p>For continuous features, valid thresholds are usually scanned between adjacent sorted values; for categorical features, candidate groupings need to be defined. The greedy algorithm only selects the best split for the current node and does not guarantee the entire tree is globally optimal; high-cardinality features may also obtain inflated gain because they have more candidate opportunities.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">3</span>Why a Single Tree Overfits<span class="dd-badge intuition">Boundaries</span></h2><p class="dd-lead">What happens if a tree keeps splitting until every leaf has one sample?</p><p>A single tree still takes training samples as input and outputs a set of split rules and leaf predictions. When the tree keeps splitting until leaves have very few samples, it fits not only stable patterns but also exploits chance details such as noise, IDs, and missingness patterns to drive training error very low.</p><p>Such a model has<b>high variance</b>: slight changes in the training data may alter early thresholds, and the whole subsequent subtree rearranges accordingly. In practice, it is common to see near-perfect training performance and clearly worse validation, many leaf probabilities close to 0 or 1, and unstable structure across resampling.</p><p>You can limit maximum depth, minimum leaf samples, and minimum gain, or grow the tree first and then prune, and use independent validation to choose the strength. Overly strong limits cause underfitting; if the problem stems from data leakage, regularization and pruning cannot repair contaminated evidence.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">4</span>Random Forest: Parallel Variance Reduction<span class="dd-badge eng">Bagging</span></h2><p class="dd-lead">Why is averaging many high-variance trees more stable?</p><p><b>Random Forest</b>is a bagging method that trains many decision trees in parallel and then aggregates their outputs. The input is the same training set; each tree draws a bootstrap subset from the samples with replacement, and at each split looks only at a random feature subset; at output time it votes for classification and averages for regression.</p><p>Averaging can cancel out the random errors of different trees, but the premise is that the trees should not be highly correlated. Bootstrap changes the samples seen, and random features let trees explore alternative splits; together they reduce correlation. If every tree relies on the same strong leakage feature, adding more trees will not solve the problem.</p><p>Results should be evaluated by independent validation, out-of-bag estimation, inter-tree correlation, memory, and latency. Random forest is usually more stable than a single tree, but the model is larger and the explanation of an individual prediction is more indirect; time series or entity-grouped data also cannot be bootstrapped arbitrarily.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">5</span>Gradient Boosting: Stepwise Residual Correction<span class="dd-badge math">Boosting</span></h2><p class="dd-lead">What are the later trees learning?</p><p><b>Gradient boosting</b>Gradient boosting adds weak trees sequentially. The input consists of the samples, the current ensemble prediction, and the loss function; each round computes the negative gradient of the loss with respect to the current prediction, fits a new tree to these correction targets, then multiplies by the learning rate and adds it to the existing model, producing an updated ensemble prediction.</p><p>Under squared loss, the negative gradient is exactly equal to "true value − current prediction", so it is often said that later trees fit residuals; under other losses, the target is the corresponding negative gradient, not necessarily an ordinary numeric residual. A small learning rate with more rounds is usually more stable, and tree depth controls the order of interactions a single round can express.</p><p>A continuously decreasing training loss does not mean that unseen performance continues to improve; too many rounds, overly deep trees, or an excessively large learning rate will all chase noise. You should use an entity- and time-isolated validation set for early stopping, and jointly tune sampling, L1/L2, and tree structure.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">6</span>Engineering Pitfalls of Tabular Data<span class="dd-badge eng">Engineering</span></h2><p class="dd-lead">Does not needing standardization for trees mean data preparation is not important?</p><p>Trees compare individual features by thresholds and generally do not need standardization for numerical scale; however, inputs must still satisfy availability at prediction time, stable meaning, and split independence. Time leakage, full-data target encoding, after-the-fact fields, duplicate entities, missingness mechanisms, and high-cardinality IDs can all be quickly exploited by trees.</p><p>The feature importance produced by training also has different definitions: impurity-decrease importance favors variables with many values and many split opportunities; permutation importance measures the performance change after shuffling a field; SHAP allocates contributions to the current model prediction. All three describe model dependence, not automatically a causal effect.</p><p>Acceptance should include feature-availability-time audits, out-of-time validation, entity grouping, target-shuffling tests, and sensitive slicing, and monitor missingness rate and category-set drift. If online missingness routing or new category changes occur, the model still outputs, but the meaning of the path may have already become invalid.</p><div class="dd-note warn"><b>Feature importance does not equal causality.</b>　It only indicates the current model's predictive dependence on that variable or its surrogate variables.</div></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">7</span>Complete hand calculation: how much does one threshold reduce Gini impurity?<span class="dd-badge math">Step-by-step calculation</span></h2><p class="dd-lead">Six sample labels [churn, churn, stay, stay, stay, churn]; is splitting by the amount threshold worthwhile?</p><p>Parent node has 3 churn and 3 stay, Gini=1−(3/6)²−(3/6)²=<b>0.5</b>The candidate threshold puts the two records on the left both as “churn,” and the four records on the right contain 1 churn and 3 stay.</p><div class="dd-formula">Gini<sub>L</sub>=0;　Gini<sub>R</sub>=1−(1/4)²−(3/4)²=0.375</div><div class="dd-formula">Gain=0.5−(2/6)×0−(4/6)×0.375=<b>0.25</b></div><p>The tree compares all valid features/thresholds and selects the maximum gain. If a high-cardinality ID can nearly isolate samples one by one, it may get a spurious high gain, so you need to limit leaf samples and prevent leakage.</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Node</th><th>churn/stay</th><th>Gini</th></tr></thead><tbody><tr><td>Parent</td><td>3/3</td><td>0.500</td></tr><tr><td>Left</td><td>2/0</td><td>0</td></tr><tr><td>Right</td><td>1/3</td><td>0.375</td></tr></tbody></table></div></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">8</span>Original figure: Axis-aligned splits combine into stepwise boundaries<span class="dd-badge intuition">Visualization</span></h2><p class="dd-lead">Each node has only one threshold—how can the entire tree represent nonlinearity?</p><figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 735 300" role="img" aria-label="Three axis-aligned splits in a two-dimensional feature space and the corresponding tree"><rect x="25" y="35" width="310" height="230" rx="10" fill="#21252d" stroke="#596273"/><line x1="70" y1="230" x2="300" y2="230" stroke="#778293"/><line x1="70" y1="230" x2="70" y2="70" stroke="#778293"/><line x1="175" y1="70" x2="175" y2="230" stroke="#65a6d9" stroke-width="3"/><line x1="175" y1="145" x2="300" y2="145" stroke="#d3a05a" stroke-width="3"/><line x1="245" y1="70" x2="245" y2="145" stroke="#cf7c72" stroke-width="3"/><text x="175" y="282" text-anchor="middle" class="svg-t">Multiple axis-aligned splits form rectangular leaf regions</text><rect x="430" y="40" width="160" height="45" rx="8" fill="#21252d" stroke="#65a6d9"/><text x="510" y="68" text-anchor="middle" class="svg-t">Amount ≤ 500?</text><line x1="470" y1="85" x2="420" y2="130" stroke="#778293"/><line x1="550" y1="85" x2="610" y2="130" stroke="#778293"/><rect x="365" y="132" width="110" height="42" rx="7" fill="#21252d" stroke="#5d9f79"/><text x="420" y="158" text-anchor="middle" class="svg-t">Leaf: Refund</text><rect x="555" y="132" width="120" height="42" rx="7" fill="#21252d" stroke="#d3a05a"/><text x="615" y="158" text-anchor="middle" class="svg-t">Count ≤ 3?</text><line x1="590" y1="174" x2="545" y2="220" stroke="#778293"/><line x1="640" y1="174" x2="685" y2="220" stroke="#778293"/><text x="510" y="244" class="svg-t">stay</text><text x="675" y="244" class="svg-t">churn</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  A single rule is linear and readable; multi-layer combinations produce staircase-like nonlinearity; rotated boundaries may require many layers.</figcaption></figure></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">9</span>Pre-pruning and post-pruning control leaf degrees of freedom<span class="dd-badge math">Pruning</span></h2><p class="dd-lead">Why is growing fully and then pruning sometimes better than limiting depth at the start?</p><p>Pre-pruning uses max_depth, min_samples_leaf, and min_gain to stop early; it is computationally cheap but may miss “weak first, then strong” combined splits. Cost-complexity pruning grows a large tree first, then selects a subtree:</p><div class="dd-formula">R<sub>α</sub>(T)=R(T)+α|leaves(T)|</div><p>Increasing α prefers fewer leaves. You must generate the pruning path on the training fold, select α on validation, then evaluate on the test set. Leaf probabilities are estimated from finite sample frequencies, and deep leaves are often extremely overconfident; smoothing and calibration can be added.</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Control</th></tr></thead><tbody><tr><td>Perfect training score, poor validation</td><td>Leaves too small</td><td>Prune / minimum leaf</td></tr><tr><td>Too many probabilities of 0 or 1</td><td>High leaf frequency variance</td><td>Smoothing / calibration</td></tr><tr><td>Structure changes dramatically across samples</td><td>High variance</td><td>Random forest / Bagging</td></tr></tbody></table></div></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">10</span>Missing Values, Categorical Variables, and Time Leakage Determine Real Reliability<span class="dd-badge eng">Data Boundary</span></h2><p class="dd-lead">Trees don't require standardization, so why can the data pipeline still ruin the model?</p><p>Missingness may itself have business meaning, or it may be caused by collection failures; you can use explicit missing-value branches, surrogate splits, or within-fold imputation. High-cardinality categorical variables will directly leak labels if target encoding uses the full data; temporal data must be split by occurrence time, and future statistics must not enter past samples.</p><p>Trees can easily memorize proxies such as user IDs, postal codes, or timestamps. Before launch, perform feature availability point-in-time audits, target shuffling detection, out-of-time validation, and sensitive attribute slicing. When missing rates or category sets drift, even if the model still outputs, the routing path may completely change.</p><div class="dd-note warn"><b>"No standardization needed" is not the same as "no governance needed."</b>Trees are especially good at exploiting leakage fields.</div></section>
+      <section class="dd-sec" data-section-role="reference"><h2><span class="dd-n">11</span>Common Misconceptions and Learning Path<span class="dd-badge intuition">Misconceptions and Dependencies</span></h2><p class="dd-lead">Readable rules do not automatically equal stability, causality, or fairness.</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Misconception</th><th>More Accurate Understanding</th></tr></thead><tbody><tr><td>A single tree naturally does not overfit</td><td>Deep trees can memorize individual samples</td></tr><tr><td>Greedy splitting yields the globally optimal tree</td><td>Each step only optimizes the current node</td></tr><tr><td>Feature importance represents causal influence</td><td>It only reflects the current model's prediction dependence</td></tr><tr><td>In random forests, the stronger each tree is, the better</td><td>Decorrelation is also needed to reduce variance</td></tr><tr><td>Boosting is just many trees voting</td><td>Later trees correct errors according to the current loss gradient</td></tr></tbody></table></div><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Level</th><th>Dependencies and Extensions</th></tr></thead><tbody><tr><td>Prerequisites</td><td>Probability, entropy/Gini, bias–variance</td></tr><tr><td><b>This page's core</b></td><td>Greedy splitting, pruning, leaf probability</td></tr><tr><td>Ensemble</td><td>Random forest, gradient boosting, XGBoost</td></tr><tr><td>Governance</td><td>Time leakage, calibration, fairness, drift</td></tr></tbody></table></div></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">12</span>Random forest reduces variance by reducing the correlation between trees<span class="dd-badge math">Bagging mechanism</span></h2><p class="dd-lead">Why is simply training several identical trees not necessarily effective?</p><p>If each tree has variance σ² and the correlation between the errors of two trees is ρ, the variance of the average of B trees is approximately ρσ²+(1−ρ)σ²/B. Increasing B only removes the uncorrelated part; if all trees always use the same strong feature, ρ is high and the benefit saturates quickly.</p><div class="dd-formula">Var(mean)≈ρσ²+(1−ρ)σ²/B</div><p>Bootstrap changes the training samples, and random feature subsets enable different trees to explore alternative splits, thus reducing ρ. Out-of-bag samples can estimate generalization and permutation importance, but time series or grouped data cannot be arbitrarily bootstrapped; otherwise leakage still occurs. Increasing the number of trees usually does not increase bias, but it increases memory and latency.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">13</span>Gradient boosting advances in small steps along the negative gradient in function space<span class="dd-badge math">Boosting mechanism</span></h2><p class="dd-lead">Why is “fitting residuals” only a special case under regression squared loss?</p><p>In the formula <code>i</code> is the sample index,<code>m</code> is the boosting round;<code>yᵢ</code> is the true target,<code>xᵢ</code> is the input;<code>Fₘ₋₁</code> is the previous round’s ensemble prediction function,<code>L</code> is the loss,<code>rᵢₘ</code> is this round’s negative gradient target;<code>hₘ</code> is the new tree,<code>η</code> is the learning rate.</p><div class="dd-formula">rᵢₘ=−[∂L(yᵢ,F(xᵢ))/∂F(xᵢ)]<sub>F=Fₘ₋₁</sub>; Fₘ=Fₘ₋₁+ηhₘ</div><p>The negative gradient of the squared loss equals y−F, so the new tree fits the residuals; logistic loss instead fits the gradient on the probability scale. A small learning rate η with more rounds is usually more stable, tree depth controls interaction order, and row/column sampling plus L1/L2 limit overfitting.</p><div class="dd-table-wrap"><table class="dd-table"><thead><tr><th>Knob</th><th>Main effect when increased</th><th>Risk</th></tr></thead><tbody><tr><td>Tree depth</td><td>Higher-order interactions</td><td>Overfitting, latency</td></tr><tr><td>Learning rate</td><td>Larger correction per round</td><td>Overshoots the stable solution</td></tr><tr><td>Rounds</td><td>More complete fitting</td><td>Chases noise in later rounds</td></tr><tr><td>Sampling rate</td><td>Uses more data/features</td><td>Increases correlation between trees</td></tr></tbody></table></div><p>Early stopping requires a validation set that is temporally and entity-isolated; the test set cannot double as early-stopping monitoring.</p></section>
+      <section class="dd-sec" data-section-role="core"><h2><span class="dd-n">14</span>Explaining a Single Path Still Requires Describing Alternative Paths and Related Features<span class="dd-badge eng">Interpretation boundary</span></h2><p class="dd-lead">Is “rejected because the amount is greater than 500” a complete reason?</p><p>The path only describes the model's execution rule for the current input; related features may substitute for one another, and slightly changing the training sample may switch to another threshold. Local SHAP, permutation importance, and path explanation answer different questions, and none are causal conclusions. The explanation should simultaneously provide the prediction version, input values, missing value handling, adjacent threshold sensitivity, and appealable rules, avoiding packaging proxy variables as true causes.</p></section>
+        <section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">15</span>Connecting the causal chain<span class="dd-badge intuition">Synthesis</span></h2><p class="dd-lead">How does this concept connect from the problem all the way to verifiable practice?</p><ol class="dd-chain"><li>Candidate thresholds partition the samples</li><li>Impurity gain selects the split</li><li>Recursion forms piecewise rules</li><li>A single tree has high variance</li><li>bagging averages or boosting corrects errors step by step</li><li>Temporal splitting and independent validation determine generalization</li></ol></section>
+        <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">16</span>Misconceptions and Self-test<span class="dd-badge intuition">Self-test</span></h2><p class="dd-lead">Can you explain its mechanism, boundaries, and validation methods without memorizing terminology?</p><div class="dd-quiz"><ol><li>What does split gain measure?</li><li>Why is a single tree unstable?</li><li>How does random forest decorrelate?</li><li>What do the trees learn after Boosting?</li><li>Does importance equal causality?</li><li>Suppose “Decision Trees and Ensemble Methods: combining nonlinear decisions with split rules” performs normally on offline examples, but after going live the core results decline. How would you localize the problem according to input, internal transformation, output feedback, and applicable boundaries?</li><li>How would you design a minimal controlled experiment for “Decision Trees and Ensemble Methods: combining nonlinear decisions with split rules” to prove that the observed improvement comes from the core mechanism, not from simultaneous changes in data, prompts, permissions, or evaluation criteria?</li></ol></div><details class="dd-answers"><summary>Reference answers</summary><ol><li>The decrease in impurity of child nodes relative to the parent node.</li><li>High variance; sample perturbations can change the structure.</li><li>Bootstrap samples and random feature subsets.</li><li>The residual or negative gradient of the current loss.</li><li>Not equal.</li><li>First save the same failing sample and environment, and confirm that the input, permissions, and preconditions have not drifted; then record key intermediate states and check whether the mechanism completes the transformation as described on this page; then compare the raw output against independent metrics and manual final verification; finally retest with boundary examples and controlled experiments. Only after locating the first step that deviates from expectation can you determine whether to modify data, mechanism, evaluation, or usage boundaries.</li><li>Fix the data, model version, prompts, permissions, budget, and evaluation; change only one factor directly related to the core mechanism, and repeat across multiple samples and random seeds; at the same time, save intermediate states and failure samples. If the difference appears stably only when the target factor changes, then it supports the mechanism explanation; otherwise continue investigating confounding variables.</li></ol></details></section>
+        <div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://link.springer.com/article/10.1023/A:1010933404324" target="_blank" rel="noopener">Random Forests</a>: Random Forests</li><li><a href="https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boosting-machine/10.1214/aos/1013203451.full" target="_blank" rel="noopener">Greedy Function Approximation: A Gradient Boosting Machine</a>: Gradient Boosting</li><li><a href="https://arxiv.org/abs/1603.02754" target="_blank" rel="noopener">XGBoost</a>: Scalable regularized boosted trees</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/decision-tree">Explore connections on the map</a><a href="/zh/concepts/decision-tree/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

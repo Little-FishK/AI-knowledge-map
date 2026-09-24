@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Prompt Caching: Reusing KV Computation for Shared Prefixes? Explained Simply</title>
+<meta name="description" content="From longest common token prefix, KV footprint, and hit value, to prompt ordering, routing affinity, invalidation, and tenant isolation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/prompt-caching/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/prompt-caching/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/prompt-caching/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Prompt Caching: Reusing KV Computation for Shared Prefixes? Explained Simply">
+<meta property="og:description" content="From longest common token prefix, KV footprint, and hit value, to prompt ordering, routing affinity, invalidation, and tenant isolation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/prompt-caching/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Prompt Caching: Reusing KV Computation for Shared Prefixes? Explained Simply">
+<meta name="twitter:description" content="From longest common token prefix, KV footprint, and hit value, to prompt ordering, routing affinity, invalidation, and tenant isolation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/prompt-caching/#page","name":"What Is Prompt Caching: Reusing KV Computation for Shared Prefixes? Explained Simply","description":"From longest common token prefix, KV footprint, and hit value, to prompt ordering, routing affinity, invalidation, and tenant isolation.","url":"https://ai-knowledge-map.com/en/concepts/prompt-caching/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Prompt Caching: Reusing KV Computation for Shared Prefixes","item":"https://ai-knowledge-map.com/en/concepts/prompt-caching/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Prompt Caching: Reusing KV Computation for Shared Prefixes</span></li></ol></nav><article id="dd-article" data-concept-id="prompt-caching" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Prompt Caching: Reusing KV Computation for Shared Prefixes</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From longest common token prefix, KV footprint, and hit value, to prompt ordering, routing affinity, invalidation, and tenant isolation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Prompt caching reuses across requests the KV state produced by the same token prefix in each layer of the model, reducing repeated prefill. It does not cache the final answer, nor does it reduce the new suffix and output decoding; the net benefit is determined by hit length × reuse frequency × prefill cost − lookup/movement/residency cost.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>Distinguish between intra-request and cross-request KV cache; calculate the longest common prefix and its benefit; design cache-friendly prompt layout; handle capacity, invalidation, and privacy isolation.</div>
+<ol class="dd-chain"><li>Measure prefill ratio and repeated prefixes.</li><li>Reorder context by stability and permissions.</li><li>Construct keys from configuration/tenant/token prefixes.</li><li>Value-aware storage and routing hits.</li><li>Atomic invalidation on version changes.</li><li>Joint acceptance using hit length/TTFT/GPU memory/quality.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Duplicate computation occurs in input prefill<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Each round of Agent conversation carries nearly identical system rules and tool schemas. If each round has the GPU process all this input from scratch, computation is wasted on exactly the same content. To see where the waste occurs, first unpack the autoregressive serving process: it first processes all input tokens in parallel, generating corresponding K/V intermediate tensors for each layer; this step is called prefill. Then it generates output token by token, which is called decoding. Adjacent requests often share the system prompt, tool definitions, and early conversation history. These token sequences are identical verbatim, but the default implementation still recomputes their K/V for each new request.</p>
+<p>Cross-request prefix caching addresses exactly this repeated computation: save the intermediate tensors already computed for a request. When a new request arrives, first find which saved prefix its input matches. Once found, continue prefill directly from the end of the shared prefix, computing K/V only for the new suffix tokens. In this way, the repeated part only needs to be computed once, and all subsequent requests reuse it.</p>
+<p>What is stored in the cache is not an archive of natural language answers, nor a semantic retrieval result index. It is valid only for the exact token prefix under a specific model, specific tokenizer, specific weights (including adapters), and specific positional configuration. Change the model version, change the tokenization method, or even have the same text cut into a different token sequence, and the cache cannot be reused directly.</p>
+<p>The main benefits are on the input side: reduce repeated input computation, lower first-token latency (TTFT), and release throughput originally occupied by repeated prefill for new requests. The boundary is equally clear: only input prefill is skipped. The token-by-token decoding process for long outputs is completely unchanged—still generating one token at a time. There is no “cache acceleration” for the output part.</p>
+<p>From the input-output relationship perspective: the input to prompt caching is the model configuration and the precise token prefix shared by multiple requests; the output is the intermediate KV state that can be reused by subsequent requests. The server-side processing order is—first find the longest available cached prefix, then compute only for the new suffix. A “hit” only means that some input computation was saved; it does not mean the answer was cached, nor does it guarantee that the output is necessarily correct. It only applies to requests whose model, tokenizer, positional configuration, and security domain are consistent; if any dimension is inconsistent, the cache should be considered unavailable.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Don't Confuse the Three Types of Caches<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>In prompt processing systems, “cache” refers to at least four mutually distinct mechanisms: intra-request KV cache, cross-request prefix cache, response (semantic) cache, and application data cache. It is dangerous to mix them under a single “cache hit rate” number, because the latter two types no longer store pure computational state but content that may be stale or unauthorized. To distinguish them, you only need to answer three questions: What object is saved? In what scope is it reused? Which computation stage is skipped? Using the answers to these three questions as classification input, the output falls into one of the four types.</p>
+<p>Intra-request KV cache stores the key-value state of historical tokens already computed during the same generation process. The reuse scope is strictly limited to the current sequence itself; the hit condition is that these states belong to the sequence being decoded, and what changes is the token-by-token decoding phase. It is the purest form of compute reuse: when decoding each subsequent token, it no longer recomputes the entire prefix, and the saved and reused material never leaves this request, carrying no cross-request semantics.</p>
+<p>Cross-request prefix cache stores input state corresponding to the common beginning of different requests. Its reuse scope is across requests; the key is composed of the model plus the exact token prefix; and what changes is the input prefill phase. It still reuses computational state, but generalizes “already computed for this request” to “computed in a previous request and identical token-by-token from the beginning.” Whether it hits is determined by prefix consistency before the answer is produced, so it does not introduce content-level correctness issues.</p>
+<p>Response cache, also called semantic cache, stores the final answer to identical or similar questions; its key consists of the request itself or its semantic representation plus version, and it may skip part or all of the generation phase. Application data cache stores retrieval results or tool call results; its key consists of the query plus permission and freshness constraints, and the skipped phase is in an external component. The common point of these two types is that the saved and reused object has become “content.” When question semantics are similar but the asker is different, permissions differ, or external data has changed, directly returning cached content may produce a stale or unauthorized answer; the correctness risk is far higher than the pure computation-state reuse of the first two types.</p>
+<p>For this reason, these four mechanisms cannot share the same hit-rate measure: a prefix cache hit means a batch of prefill computations was saved, while a semantic cache hit means an old answer was returned directly; the benefits and risks of the two are completely opposite. To determine which type a specific cache belongs to, look at what it reuses—current generation history, common input state, final answer, or tool result. From this you can explain where its benefits come from and also clarify its correctness boundaries.</p></div>
+<table class="dd-table"><thead><tr><th>Mechanism</th><th>Reuse Scope</th><th>Key/Condition</th><th>Altered Phase</th></tr></thead><tbody><tr><td>Intra-request KV cache</td><td>Historical tokens from the same generation</td><td>Current sequence</td><td>Token-by-token decoding</td></tr><tr><td>Cross-request prefix cache</td><td>Common beginning of different requests</td><td>Model + exact token prefix</td><td>Input prefill</td></tr><tr><td>Response/semantic cache</td><td>Answers to identical or similar questions</td><td>Request/semantics + version</td><td>Skip part or all of generation</td></tr><tr><td>Application data cache</td><td>Retrieval/tool results</td><td>Query + permissions + freshness</td><td>External component</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Only consecutive common token prefixes can be directly reused<span class="dd-badge math">mechanism</span></h2>
+<div class="dd-agent-response"><p>How much prompt caching can reuse depends on the length of consecutive identical tokens from the first token in two token sequences—that is, the longest common prefix (LCP). Given two token sequences A and B, the LCP output is the length ℓ, indicating the number of consecutive tokens that are identical token by token from the first token. The system compares token by token and stops at the first divergence; the KV after the divergence point cannot be directly reused. This explains why two prompts that contain the same 8000-token document can have a hit rate of zero if the order differs: in causal attention, the representation at position i depends on all previous tokens. When the document is moved to a different position, the input context for every subsequent position changes, and the entire KV chain from the divergence point onward becomes invalid.</p>
+<p>The common prefix must be exact at the token level, not at the semantic level. Semantic equivalence does not mean token equivalence: any difference in JSON field order, whitespace, Unicode normalization, template version, or tool ordering changes the token sequence, shortening or even eliminating the common prefix. Some radix-tree-based systems can search for the longest hit among many stored prefixes, so the cache does not need to match the entire prompt one-to-one, but the search target remains the condition of 'a prefix that is exactly identical from the first token'; the hit rule has not changed.</p>
+<p>This rule directly determines prompt layout: do not put dynamic values at the very front. Once a request ID, current time, or user question appears at the beginning, all stable content that follows—system instructions, tool definitions, knowledge documents—will lose reuse because the prefix is broken. Putting static content first and dynamic content later is the basic way to lengthen the common prefix.</p>
+<p>Note that a long LCP only indicates that computational state can be reused; it does not imply that the two prompts are semantically closer. Two completely different questions can share a very long common prefix (for example, the same system prompt part), while two semantically almost identical questions may have zero cache hits due to a single token difference. Any change affecting tokens, positions, or model state—changing a character, inserting a line, or switching model versions—will terminate the hit at the corresponding position.</p></div>
+<div class="dd-formula"><math display="block" aria-label="两条序列的最长共同前缀"><mi>LCP</mi><mo>(</mo><mi>A</mi><mo>,</mo><mi>B</mi><mo>)</mo><mo>=</mo><munder><mi>max</mi><mi>ℓ</mi></munder><mo>{</mo><msub><mi>A</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>=</mo><msub><mi>B</mi><mrow><mn>1</mn><mo>:</mo><mi>ℓ</mi></mrow></msub><mo>}</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: How Much Is Actually Saved in a 12k Input<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>A typical 12k-token request illustrates the whole process of layout and benefit estimation. Assume the prompt consists of five segments: system rules 2k, tool definitions 3k, shared policy 5k, conversation history 1k, current question 1k. Without any layout, dynamic content may be sandwiched in the middle or placed at the beginning, and the common prefix gets truncated; after sorting by stability, large shared content comes first, dynamic history and questions come later, and the longest common prefix has a chance to reach 10k—so the 12k-token prompt is split into a 10k cache-hit region and a 2k new suffix.</p>
+<p>The core formula for savings is the expected number of input tokens to avoid processing, namely the hit rate h times the hit length L. h is the proportion of requests that can hit the prefix, and L is the length of the hit tokens; multiplying the two gives the average avoided amount. This formula requires first arranging a sufficiently long L by stability, then weighting with the hit rate h—talking about the hit rate without the hit length, or about the longest prefix value without the actual hit proportion, will overestimate or underestimate the benefit.</p>
+<p>Latency benefit can be estimated with the same set of assumptions. Without caching, prefill accounts for 600ms of TTFT; after a hit, the 10k/12k prefill computation is saved, but you pay 60ms for cache lookup and transfer. The rough saving for a single hit request is 600×(10/12)−60=440ms: first convert the saved prefill time according to the ratio of hit length to input, then subtract the fixed overhead of the cache itself. Then, with the hit rate applied, the expected saving across all traffic is about 440×70%=308ms. By the same logic, the average number of saved tokens is 10k×70%=7k.</p>
+<p>The 440ms and 308ms here are estimates under given assumptions: prefill 600ms, hit length 10k, hit rate 70%, lookup and transfer 60ms. Real attention computation cost grows nonlinearly with length, and the actual overhead of lookup, transfer, and invalidation checks varies by implementation, so any pre-deployment conclusion must be based on actual measurement. The purpose of this example is to give the estimation sequence: first determine L by arranging for stability, then use h×L to find the average avoided token count, and finally convert to latency and subtract cache overhead.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 710 260" role="img" aria-label="Twelve-thousand-token prompt sorted by stability forms a ten-thousand-token cache hit and a two-thousand-token new suffix"><rect x="18" y="74" width="112" height="58" rx="7" fill="#4f9d78"/><text x="74" y="99" text-anchor="middle" class="svg-t">System 2k</text><text x="74" y="119" text-anchor="middle" class="svg-t" font-size="11">Stable</text><rect x="130" y="74" width="140" height="58" fill="#4f9d78"/><text x="200" y="99" text-anchor="middle" class="svg-t">Tools 3k</text><text x="200" y="119" text-anchor="middle" class="svg-t" font-size="11">Stable</text><rect x="270" y="74" width="206" height="58" fill="#4f9d78"/><text x="373" y="99" text-anchor="middle" class="svg-t">Shared policy 5k</text><text x="373" y="119" text-anchor="middle" class="svg-t" font-size="11">Version p17</text><rect x="476" y="74" width="100" height="58" fill="#d3a05a"/><text x="526" y="99" text-anchor="middle" class="svg-t">History 1k</text><text x="526" y="119" text-anchor="middle" class="svg-t" font-size="11">Dynamic</text><rect x="576" y="74" width="116" height="58" rx="7" fill="#c77b72"/><text x="634" y="99" text-anchor="middle" class="svg-t">Question 1k</text><text x="634" y="119" text-anchor="middle" class="svg-t" font-size="11">Different each time</text><path d="M18,151 L476,151" stroke="#4f9d78" stroke-width="5"/><text x="247" y="178" text-anchor="middle" class="svg-t" font-size="11">Hit prefix 10k: directly reuse KV</text><path d="M476,151 L692,151" stroke="#d3a05a" stroke-width="5"/><text x="584" y="178" text-anchor="middle" class="svg-t" font-size="11">New suffix 2k: still needs prefill</text><text x="355" y="220" text-anchor="middle" class="svg-t">If hit rate is 70%, average avoided processing is about 0.7×10k=7k input tokens/request</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　Sorted by stability, large shared content goes first, dynamic history and questions go later, and the longest common prefix has a chance to reach 10k.</figcaption></figure>
+<div class="dd-formula"><math display="block" aria-label="期望避免处理的输入 token 数"><mi>E[Nsaved]</mi><mo>≈</mo><mi>h</mi><mo>×</mo><mi>L</mi><mo>=</mo><mn>0.7</mn><mo>×</mo><mn>10000</mn><mo>=</mo><mn>7000</mn></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Prompt Layout and Normalization Determine Hits<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The goal of layout and normalization is not to maximize hit rate, but to make the common prefix as long as possible without breaking semantic and permission boundaries. The basis for ordering is the stability, permission domain, and semantic order of each segment: stable and public content goes first, dynamic and private content goes later.</p>
+<p>The specific order can be organized like this. Put system rules that are stable across model and application versions at the very front; then put tool schemas with a fixed order and shared few-shot examples; after that put versioned public documents or policies. Only after that come conversation history, retrieval evidence, and the current input. Values that change on every request, such as timestamps, random nonces, and trace ids, should either go into metadata that does not participate in model computation or be placed at the very end, to avoid breaking the prefix.</p>
+<p>Serialization must also be deterministic: when serializing objects, fix the field order and tool order, and unify whitespace and Unicode normalization. These differences are semantically invisible, but they can change the token sequence enough to make an otherwise identical context miss. The better the normalization, the greater the chance of exact prefix reuse.</p>
+<p>But layout has a hard boundary that cannot be crossed: to improve hit rate, you must not promote user-specific permissions or secrets into a shared prefix, nor move content that should be private into a public area. Performance optimization is subject to data boundaries; any move that increases reuse must simultaneously preserve the meaning of security rules and tenant isolation. Semantic order is also constrained: moving security rules earlier is good for caching, but once the overall semantics of the template change, you must re-evaluate security effectiveness rather than only looking at how much hit rate has increased. The output of layout is a sequence with stable public content first and dynamic private content later, and its correctness criterion is always that the meaning of security rules and tenant isolation both hold.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>KV capacity grows with layers, tokens, and concurrency<span class="dd-badge math">Memory</span></h2>
+<div class="dd-agent-response"><p>A 10k-token prefix cannot reside on the GPU indefinitely, and the reason can be seen directly from the KV cache size formula. In a rough estimate, the KV byte count MKV is proportional to 2 × number of layers Nlayer × number of KV heads NKVhead × head dimension d × number of tokens Ntoken × bytes per element b. The factor 2 comes from saving K and V each once. Taking 32 layers, 8 KV heads, 128 dimensions, FP16 (2 bytes per element), and 10k tokens as an example: 2×32×8×128×10000×2 = 1,310,720,000 bytes, about 1.31 GB—that is just one prefix segment of a single request. Multiplied by the number of concurrent requests, the footprint competes with model weights and active requests for GPU memory. Different architectures, tensor parallelization methods, and quantization will change the specific numbers, but the magnitude shows that prefix caching is by no means free.</p>
+<p>Therefore, the output of capacity planning is not just the byte count, but also the choice of storage tier; the inputs are number of layers, number of KV heads, head dimension, number of tokens, bytes per element, and concurrency. Several typical strategies each have costs: GPU resident caching has the fastest hits but is expensive and squeezes concurrency; moving to CPU or remote storage has large capacity, but the transfer overhead may exceed the recomputation itself; TTL/LRU is simple to implement but does not understand prefix value and may evict the most valuable long prefixes; value-aware eviction based on 'saved compute divided by occupied bytes' can retain long and hot prefixes, but valuation and implementation are both complex. In engineering practice, common approaches include using block partitioning or PagedAttention to manage memory, prefix trees to organize shared structures, and then layering TTL, LRU, or value-based eviction to trade off hit speed, capacity, and concurrency.</p></div>
+<table class="dd-table"><thead><tr><th>Strategy</th><th>Advantages</th><th>Costs</th></tr></thead><tbody><tr><td>GPU resident</td><td>Fastest hits</td><td>Expensive, squeezes concurrency</td></tr><tr><td>CPU/remote tier</td><td>Large capacity</td><td>Transfer may exceed recomputation</td></tr><tr><td>TTL/LRU</td><td>Simple</td><td>Does not understand prefix value</td></tr><tr><td>Value-aware</td><td>Retains long and hot prefixes</td><td>Valuation and implementation complex</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="KV 缓存字节数估算"><mi>MKV</mi><mo>≈</mo><mn>2</mn><mo>×</mo><mi>Nlayer</mi><mo>×</mo><mi>NKVhead</mi><mo>×</mo><mi>d</mi><mo>×</mo><mi>Ntoken</mi><mo>×</mo><mi>b</mi><mo>≈</mo><mn>1.31</mn><mi>GB</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Cache keys and invalidation must include model semantic version<span class="dd-badge eng">Correctness</span></h2>
+<div class="dd-agent-response"><p>If the text prefix has not changed, that does not mean the KV cache can still be reused. Change a LoRA or adjust the RoPE configuration, and hidden states will shift as a whole; at that point, directly reusing the old cache is equivalent to making the new configuration read old state. Any factor that may affect hidden states—weights and adapters, tokenizer, positional encoding, attention implementation, precision, model template, and various inference configurations—must enter the cache namespace, or directly trigger invalidation, whenever it changes. Prompt, tool, and policy version changes also change the token sequence itself, and likewise need to be reflected in the key through version fields.</p>
+<p>Cache keys are typically composed of model snapshot, adapter identifier, token sequence hash, tenant or security domain, start position, and so on. After a cache hit, you can also sample and recompute some results for comparison, to catch implementation-level errors. During rolling releases, old and new caches must be isolated: v42 must not read state left by v41; isolation relies on version fields entering the key and namespace.</p>
+<p>This design exists because cache pollution propagates silently. If an erroneous state is reused at high frequency, the impact is far greater than a single one-off inference error, and it is difficult to trace. Therefore, in addition to hash and version validation, the system should retain a fast full invalidation switch, so that when signs of pollution appear, it can immediately disable the entire cache.</p>
+<p>The inputs to the invalidation design are model snapshot, adapters, tokenizer, positional configuration, templates, and tenant domain; the outputs are cache namespaces, keys, and invalidation actions. If any one of these changes, the same text may produce different KV caches. When version fields are incomplete, the correct approach is to refuse reuse and recompute as a miss, rather than risk reading old state.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Privacy, Tenant Isolation, and Side Channels<span class="dd-badge eng">Security</span></h2>
+<div class="dd-agent-response"><p>KV looks like just numeric tensors, not readable text, but it is a derived representation of the input and may contain sensitive information, so it must be governed as sensitive data. The risk is not limited to the content itself: when sharing caches across tenants, an attacker can infer from hit latency whether a certain prefix is already present in the cache, creating a side channel; if the cache key lacks permission fields, content that should not be shared may also be reused.</p>
+<p>The default practice is to isolate by tenant, organization, or data classification, and to keep public system prefixes separate from user private history. Caches need retention periods, encryption, access auditing, and deletion propagation; logs record only the hash and length of the prefix, not the original text. When sharing prefixes such as public policies, first confirm that all tenants hold the same version and have the same access rights; the service provider's caching policy itself is part of the data processing agreement and needs to be specified at the agreement level.</p>
+<p>User-controllable prefixes must not be used to directly address shared caches. Such designs must be paired with domain isolation, full hashes, and length or quota limits to prevent hash collisions, prefix probing, and resource exhaustion attacks.</p>
+<p>The inputs to security governance are the prefix's data classification, tenant, retention period, and access rights; the outputs are isolation domains, encryption, audit, and deletion policies. The core conclusion is: KV is derived data of the input; hit timing can leak “whether a certain prefix exists”, so cross-tenant sharing is limited to genuinely public, version-consistent, permission-consistent versioned content.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Evaluation must prove net benefit, not hit rate<span class="dd-badge intuition">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Hit rate rose from 40% to 80% while TTFT did not improve; this is not contradictory. There are three possible explanations: the hits were all just very short prefixes, so the prefill savings were negligible; cache lookup or cross-machine transfer took longer than recomputation itself; requests were routed to cache nodes, and queueing time offset the compute savings. Therefore evaluation cannot look only at hit rate; it must look at request-level hit length distribution, saved prefill tokens and time, lookup and transfer time, GPU KV occupancy, eviction behavior, TTFT p50/p95/p99, throughput, cost, and quality—these are what constitute net benefit.</p>
+<p>The premise of A/B comparison is comparability: the prompt semantics and routing load of the two groups must be consistent; otherwise the change in hits is just an artifact of layout differences. Results must also be sliced by tenant, length, and concurrency to avoid averages masking actual degradation for certain traffic. Failure paths must also be included in testing: version mismatch, cache node loss, cache avalanche, cold start, delete propagation, and cross-tenant access—any one of these failures can reduce online benefits to zero or even become an incident.</p>
+<p>The value metric truly useful for decision-making is the TTFT or computational savings per GB·hour of cache, and the additional serviceable throughput within SLO. These correspond directly to cache occupancy and business capacity, and are closer to decision-making than raw hit rate.</p>
+<p>The inputs to cache evaluation are request-level hit lengths, computation and transfer time, GPU memory usage, latency, throughput, and quality; the output is net benefit sliced by tenant, length, and concurrency. When hit rate rises but TTFT does not drop, it usually means hits are too short, or lookup, transfer, and queueing offset the benefit.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The complete causal chain of prompt caching can be strung into a path from problem to acceptance. The starting point is measurement: first confirm the share of prefill in total latency and how many repeated token prefixes appear in traffic. Only if both are actually present does caching have room for benefit.</p>
+<p>The second step is to reorder context by stability and permissions, placing stable public content first and dynamic private content later, so the longest common prefix has a chance to grow. The third step is to construct the cache key, composed of configuration, tenant, and token prefix, ensuring that identical text under different model versions or different tenants is not incorrectly reused. The fourth step is value-aware storage and hit routing, deciding which prefixes stay resident on GPU, which are demoted to CPU or remote storage, and which are evicted based on "saved computation divided by bytes occupied". The fifth step is atomic invalidation on version changes: if any of weights, adapters, tokenizer, position configuration, or template changes, immediately deactivate the corresponding namespace to prevent old state from being silently reused under the new configuration.</p>
+<p>The final step is joint acceptance: look at hit length, TTFT, GPU memory usage, and quality together, rather than using a single hit rate as a substitute for the conclusion. Each link in the chain is conditional on the previous one—without measurement we would not know what to reorder, without correct keys and invalidation there is no safe reuse, without value-aware storage capacity cannot be maintained, and without joint acceptance net benefit cannot be proven.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes.</b><ul><li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">vLLM: Easy, Fast, and Cheap LLM Serving with PagedAttention</a>: KV cache paging and serving.</li><li><a href="https://arxiv.org/abs/2312.07104" target="_blank" rel="noopener">SGLang</a>: RadixAttention and shared prefix reuse.</li><li><a href="https://arxiv.org/abs/2407.00023" target="_blank" rel="noopener">Preble</a>: prefix-aware distributed scheduling.</li><li><a href="https://arxiv.org/abs/2311.04934" target="_blank" rel="noopener">Prompt Cache</a>: long prompt module reuse.</li></ul><div class="dd-src-date">Access date: 2026-07-22.</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/prompt-caching">Explore connections on the map</a><a href="/zh/concepts/prompt-caching/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

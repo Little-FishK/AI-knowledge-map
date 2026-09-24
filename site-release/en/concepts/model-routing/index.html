@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability? Explained Simply</title>
+<meta name="description" content="From direct routing, small-then-large, and quality-gap prediction, to escalation thresholds, cascade latency, fairness risk, and online recalibration.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/model-routing/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/model-routing/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/model-routing/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability? Explained Simply">
+<meta property="og:description" content="From direct routing, small-then-large, and quality-gap prediction, to escalation thresholds, cascade latency, fairness risk, and online recalibration.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/model-routing/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability? Explained Simply">
+<meta name="twitter:description" content="From direct routing, small-then-large, and quality-gap prediction, to escalation thresholds, cascade latency, fairness risk, and online recalibration.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/model-routing/#page","name":"What Is Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability? Explained Simply","description":"From direct routing, small-then-large, and quality-gap prediction, to escalation thresholds, cascade latency, fairness risk, and online recalibration.","url":"https://ai-knowledge-map.com/en/concepts/model-routing/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability","item":"https://ai-knowledge-map.com/en/concepts/model-routing/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability</span></li></ol></nav><article id="dd-article" data-concept-id="model-routing" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Model Routing and Cascades: Assign Requests of Different Difficulties to Sufficient Capability</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From direct routing, small-then-large, and quality-gap prediction, to escalation thresholds, cascade latency, fairness risk, and online recalibration.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Model routing selects a complete model or service for each request at the application layer, with the goal of reducing expected cost under quality and risk thresholds. The key to saving money is not the proportion of small-model usage, but correctly identifying which requests can be safely offloaded; routing errors disproportionately harm hard, long-tail, and high-risk slices.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>Distinguish model selection, routing, and MoE; derive cascade cost and escalation thresholds; evaluate erroneous offloading and cascade latency; design calibration, drift, and safe rollback.</div>
+<ol class="dd-chain"><li>Establish per-sample quality and cost baselines for candidates.</li><li>Define high-risk mandatory rules.</li><li>Train/calibrate strong-model gain scores.</li><li>Select thresholds that meet slice gates.</li><li>Canary-route and randomly audit offloaded samples.</li><li>Recalibrate/roll back after version or distribution changes.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Routing turns a one-time model selection into a per-request decision<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>In the same refund system, different requests are not equivalent. One user asks “How many days until the refund is credited?” and only needs a simple query against a status table or FAQ library; another user claims the system has already deducted payment but the order status is still unpaid, the amount is abnormal, and the evidence conflicts, which requires reasoning, cross-checking multiple pieces of evidence, and may even involve high-privilege operations. If the entire system pays the same computational cost for these two kinds of requests—sending all of them to the strongest model—then the vast majority of simple queries are subsidizing the pricing of a few difficult cases; conversely, if, to save money, everything is handed to a small model, conflicting cases will fail with higher probability. What model routing aims to solve is precisely to establish a per-request decision between these two extremes: decide who should handle it based on this current request itself, not based on some global constant.</p>
+<p>First clarify several selection methods that are easily confused. Static model selection chooses a model when building a component; afterwards all requests within that component are handled by it, and the decision occurs at deployment time, independent of the content of each request. Dynamic routing is the opposite: the component maintains multiple candidate models. Each time a request arrives, the router reads the request content, risk rules, the capability records of each candidate model, and runtime evidence, and decides in real time whether this request should go to a small model, a strong model, a human, or be directly rejected. The difference between the two lies in when the decision occurs and at what granularity. Mixture of Experts (MoE) is different again: it is a model-internal structure that selects which experts to activate per token, and belongs to the model's own structural design. Users generally cannot directly control “whole-model switching” between requests, so it does not replace dynamic routing; the two operate at different levels.</p>
+<p>The relationship between routing and capability first needs to clarify a boundary: routing does not create capabilities that the underlying models do not have; it only allocates among existing candidates. If all candidate models fail on a certain input slice, the best the router can do is pick one among several failures; it is impossible to expect routing to fill a capability gap. Therefore, the prerequisite for routing is that model selection and evaluation come first—first confirm for each sample slice that at least one sufficiently good candidate exists, establish a per-sample capability baseline, and then discuss allocation optimization on top of that baseline.</p>
+<p>From this we can derive the true goal of routing. It is not “maximizing the small-model invocation rate”: if that were the goal, the system would be induced to incorrectly delegate difficult requests to a small model, trading error rate for cost. The real goal is maximizing safe delegable coverage—under the premise that errors and risks do not cross the red line, send as many requests as possible to lower-cost paths. The meaning of delegating a request is worth emphasizing: it indicates that current evidence shows the small model is sufficient, and absolutely does not mean the request is inherently simple. A request that is delegated today should immediately switch to a strong model or a human when new evidence appears (for example, the amount exceeds a threshold, or the account enters a high-risk list).</p>
+<p>Finally, there are the input and output contracts of routing. Inputs include the current request itself, predefined risk rules, capability records of each candidate model, and runtime evidence; output is the handling path for this request: small model, strong model, human, or reject. In the decision process there is a hard priority: high-risk hard rules must take precedence over probabilistic scores. When a hard rule (such as high-privilege operations must be reviewed by a human) is triggered, no matter what score the probabilistic model gives, the path must be human or reject; the rule cannot be overridden by a score.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Direct Routing, Cascades, and Parallel Selection<span class="dd-badge eng">Architecture</span></h2>
+<div class="dd-agent-response"><p>When putting routing into engineering practice, the first question is: choose the model before the call, or first let a small model provide an answer and then decide whether to upgrade to a stronger model based on answer quality? Different answers to this question form four basic forms, each differing in process, advantages, and costs. They need to be combined according to request characteristics, rather than using only one threshold across the entire site.</p>
+<p>The first is rule-based routing. The router itself is a set of explicit rules: selecting a processing path by domain, by risk level, or by input length. It does not require additional training of any model, and every decision can be directly explained as "because it matched which rule," which is its greatest strength. The cost is that rule boundaries are coarse: overlaps between domains and ambiguous zones in risk judgment require manual rule maintenance; once a request deviates from the preset category divisions, the rules may give an inappropriate path.</p>
+<p>The second is direct routing. Before calling a generative model, the system runs a lightweight classifier that predicts the appropriate tier for the current request (for example, small, medium, or large model), and then calls only the selected one. Its advantage is that difficult requests do not have to waste one call on a small model first—if the classifier judges the difficulty as high, the first step goes directly to the large model. The cost is equally clear: this decision can only rely on the input itself before the call, and the difficulty of many requests cannot be judged from input alone; when subsequent signals such as the answer and verification are missing, the classifier's judgment may be insufficient.</p>
+<p>The third is cascading. The process first lets the small model S provide a complete answer; if its confidence is low, then it calls the strong model L to reprocess. The advantage of cascading is that it can use signals that are only produced in the first-answer stage: the confidence of the first answer, the verifier's judgment, and whether the retrieval results support that answer. These better reflect the true difficulty than input alone. The cost has two layers: upgraded requests take longer overall because they go through S's complete answer and then L's; moreover, S's first answer may "contaminate" subsequent processing—if L's processing references the first answer or the first answer has already triggered side effects, the error is carried into the strong-model stage.</p>
+<p>The fourth is parallel selection. Multiple models run simultaneously on the same request, and after completion a selector chooses which answer to adopt. Its advantage is low wall-clock latency, because all candidates proceed in parallel and multiple candidate answers are obtained simultaneously for easier comparison. The cost is that compute cost grows multiplicatively with the number of candidates, and the selector itself can also make mistakes—the incorrectly chosen answer is not more reliable than a single model answering directly.</p>
+<p>These forms suit different signal types. Signals available before the call suit direct selection; first-answer and verification signals can only be obtained after running one round, so they suit cascading; parallel selection trades cost for wall-clock time. Therefore, architecture selection has an input-output structure: the inputs are the decision time point (when signals are available), available signal types, error cost, and latency SLO; the output is a combination of these four forms for different request slices. High-risk requests should use deterministic rules to force the strong model or human review, not leave them to a probabilistic router to "try its luck"; low-risk long-tail requests can safely use cascading. The whole site should combine forms according to different slices, rather than scheduling uniformly by a single threshold.</p>
+<p>There is also a boundary that must be observed: when the first stage may produce side effects, you must not cascade without review. If the small model's answer can directly trigger charges, send notifications, or modify state, then "run S first and then decide to upgrade" is itself unacceptable—the side effect of the first stage has already occurred, and subsequent upgrading cannot undo it. Paths with side effects can only be used under the premise of having review and oversight.</p></div>
+<table class="dd-table"><thead><tr><th>Form</th><th>Process</th><th>Advantage</th><th>Cost</th></tr></thead><tbody><tr><td>Rule-based routing</td><td>Select by domain/risk/length</td><td>Interpretable, no extra model</td><td>Coarse boundaries, maintain rules</td></tr><tr><td>Direct routing</td><td>Lightweight classifier selects S/M/L first</td><td>Difficult requests don't waste the small model first</td><td>Input alone may be insufficient to judge</td></tr><tr><td>Cascade</td><td>Run S first, then run L if low confidence</td><td>Uses first-answer, verification, and retrieval signals</td><td>Upgraded requests are slower and first answer may contaminate</td></tr><tr><td>Parallel selection</td><td>Run multiple models simultaneously, then select</td><td>Low wall-clock latency, more candidates</td><td>High cost, selector can also err</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>The mathematical objective must include per-slice hard constraints<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>If the objective of routing optimization is only to “minimize average cost”, the router learns a dangerous shortcut: downgrade all requests to the small model. Average cost is indeed minimized, but a few high-risk unauthorized action errors are drowned in the success of many easy requests. This is exactly the structural defect of average constraints—it allows high scores from many easy requests to offset misrouting in a few key slices. Mathematically acceptable, operationally unacceptable.</p>
+<p>Therefore, the correct formulation of the routing objective must include per-slice hard constraints. The overall goal is to minimize expected cost while satisfying each key slice’s quality lower bound and risk upper bound. Written as a constrained optimization problem:</p>
+<p>Minimize E[ c( m(x) ) ], subject to: for every key slice k, quality q(m(x)) ≥ Q₀ and Riskₖ ≤ Rₖ.</p>
+<p>Here x is the request, m(x) is the model the router selects for that request, c is the processing cost, q is the answer quality, Q₀ is the quality lower bound, Riskₖ is the risk exposure of slice k, and Rₖ is the risk upper bound permitted for that slice. A slice refers to a subset along dimensions such as language, domain, risk level, and user group. The constraints are inequalities that hold separately for each slice; if any slice violates its constraint, the entire policy is unacceptable. High quality in one slice cannot be borrowed to fill a gap in another. Slices with small sample sizes require special attention: point estimates are unreliable, so interval estimates should be reported, and a conservative upper bound should be used as the basis for determining whether a constraint is satisfied. It is better to downgrade less than to underestimate risk.</p>
+<p>Alongside the objective function is the specification of the training target. If a router learns to “predict the absolute difficulty of a request”, the information it learns is not aligned with the benefit. The correct training target is to predict the quality gain of the strong model relative to the small model: if both answer correctly, upgrading is wasted; if both answer incorrectly, upgrading has no benefit; only on samples where the strong model answers correctly but the small model answers incorrectly does upgrading truly produce value. Hence the most valuable training signal is the samples where “the strong model is correct and the small model is wrong”. Meanwhile, quality labels must come from independent scorers and human annotation. The strong model’s self-ratings cannot be used as unbiased ground truth—letting the strong model be both player and referee would systematically bias labels toward upgrading, because the model tends to endorse its own answers.</p>
+<p>There is also a data-level pitfall called selection bias. During online operation, the strong model typically runs only on samples that are upgraded, while downgraded samples are never tried by the strong model. As a result, we can never see the counterfactual: “if these samples had been upgraded originally, would the strong model have done better?”. Training only on upgraded samples biases the gain learned by the router. There are two ways to remedy this: random exploration, upgrading requests that should have been downgraded with a certain probability in exchange for counterfactual observations; or offline dual execution, running the same batch of samples through both the small model and the strong model to directly obtain unbiased paired data.</p>
+<p>Putting this all together: routing optimization takes the request x, the selected model m(x), cost c, quality q, quality lower bound Q₀, risk Riskₖ for each key slice, and upper bound Rₖ as inputs, and outputs a minimum expected cost policy that satisfies all per-slice hard constraints. A pretty average-quality number cannot offset misrouting in a few slices; the training target should aim at the strong model’s relative benefit; the missing counterfactual for downgraded samples must be filled through random exploration or offline dual execution. If any of the three is missing, the direction of optimization will deviate from the true goal of “safe to downgrade”.</p></div>
+<div class="dd-formula"><math display="block" aria-label="带逐切片约束的模型路由目标"><munder><mi>min</mi><mi>m</mi></munder><mi>Ecost</mi><mo>[</mo><mi>c</mi><mo>(</mo><mi>m</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo><mo>]</mo><mo>,</mo><mtext>subject to</mtext><mi>Equality</mi><mo>[</mo><mi>q</mi><mo>(</mo><mi>m</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>,</mo><mi>x</mi><mo>)</mo><mo>]</mo><mo>≥</mo><mi>Q0</mi><mo>,</mo><msub><mi>Risk</mi><mi>k</mi></msub><mo>≤</mo><msub><mi>R</mi><mi>k</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How to Calculate the Expected Cost and Latency of Cascades<span class="dd-badge math">Derivation</span></h2>
+<div class="dd-agent-response"><p>The intuition about cascade cost is easy to get wrong. Given a small model at ¥0.02 per call, a strong model at ¥0.10, and an escalation rate of 25%, a common intuition is that “the average cost falls between the two, roughly weighted by the escalation rate.” If all requests first run the small model and only those judged for escalation then run the strong model, and temporarily ignoring other components such as scorers, the expected call cost can be written exactly as:</p>
+<p>ECost = Cₛ + r × Cₗ</p>
+<p>where Cₛ is the small model’s per-call cost, Cₗ is the strong model’s per-call cost, and r is the escalation rate. The meaning is: every request first pays Cₛ, because the first step of the cascade is executed for everyone; the escalated portion of requests (proportion r) then additionally pays Cₗ. Substituting Cₛ = 0.02, Cₗ = 0.10, r = 0.25 gives 0.02 + 0.25 × 0.10 = 0.045 yuan. So under this calling assumption, the average cost is indeed ¥0.045—consistent with intuition, but the premise must be made clear: this is the cascade accounting for “all requests run the small model first,” not a universal answer for arbitrary routing forms.</p>
+<p>Comparing with direct routing makes the differences between the forms clear. If the router, after an upstream classifier, calls only one model, the cost structure becomes Crouter + (1 − r)Cₛ + rCₗ, meaning the classifier cost Crouter is paid first, then requests split into two paths according to the escalation rate: a proportion (1 − r) pays only the small model, and a proportion r pays only the strong model. When the expected costs of the two forms are close, direct routing appears more cost-effective, because the escalated requests in a cascade must bear the serial tail latency of the small model plus the strong model: they first wait for the small model’s full answer, then wait for the strong model’s full answer, and the slowest user experience clearly deteriorates.</p>
+<p>Latency accounting is isomorphic to the cost structure. The expected latency ETime = Tₛ + Tjudge + r × Tₗ, where Tₛ is the small model latency, Tjudge is the latency required to decide whether to escalate, and Tₗ is the strong model latency. Everyone first bears Tₛ and Tjudge; the escalated proportion r additionally bears Tₗ, and these delays are serial accumulations with no parallel overlap.</p>
+<p>The premise under which these two formulas hold must be clear: they only account for the calls themselves. Real total cost also includes scorers, retries, retrieval, human intervention, and failure handling; each of these changes the final number. The result 0.045 yuan does not hold after adding these components; it is only a value under the “given calling assumptions.” Similarly, the latency formula does not include queuing, retries, or failure degradation paths.</p>
+<p>The final structural constraint: the first stage of a cascade should be side-effect-free by default. If the small model’s answer is directly written into the user’s conversation history, or triggers a tool call, then even if it is later escalated to the strong model, the content left by the first answer or the side effects that have already occurred cannot be retracted, constituting contamination. Therefore, the first-stage output of the cascade should only serve as candidate evidence for subsequent stages to reference, not as the source of established facts or external actions.</p></div>
+<div class="dd-formula"><math display="block" aria-label="级联期望成本与延迟"><mi>ECost</mi><mo>=</mo><mi>Cs</mi><mo>+</mo><mi>r</mi><mo>×</mo><mi>Cl</mi><mo>;</mo><mi>ETime</mi><mo>=</mo><mi>Ts</mi><mo>+</mo><mi>Tjudge</mi><mo>+</mo><mi>r</mi><mo>×</mo><mi>Tl</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Worked example: how thresholds change coverage, errors, and cost<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>The effect of the threshold on a routing system is not abstract; it can be seen directly in a set of numbers. Suppose there are 1000 refund requests, each with an escalation score g(x) for "needs the strong model," and the system sorts them by score from high to low: requests whose score reaches threshold τ are escalated to the strong model, and the rest are delegated to the small model. Three candidate thresholds produce the following results (the latency path for escalated requests is the serial process "small model + decision + strong model"):</p>
+<p>At τ = 0.7, 150 requests are escalated, 28 difficult requests are misrouted, the quality pass rate is 91.0%, and the average model cost is 0.02 + 0.15 × 0.10 = ¥0.035. At τ = 0.5, 250 requests are escalated, 12 difficult requests are misrouted, the quality pass rate is 93.1%, and the average model cost is 0.02 + 0.25 × 0.10 = ¥0.045. At τ = 0.3, 420 requests are escalated, 4 difficult requests are misrouted, the quality pass rate is 94.0%, and the average model cost is 0.02 + 0.42 × 0.10 = ¥0.062.</p>
+<p>The pattern in the table is clear: lowering τ means more requests are escalated, average cost rises, misrouted difficult requests decrease, and the quality pass rate increases. Raising τ has the opposite effect: it saves money, but more difficult requests are wrongly delegated, and overall quality declines. So the threshold is not just a number being adjusted; it is a common control point moving along three curves: misrouting, quality, and cost.</p>
+<p>Now add decision constraints: require a quality pass rate ≥ 93% and misrouted difficult requests ≤ 15. Check each candidate: τ = 0.7 has only 91.0% quality, so it fails; τ = 0.5 has 93.1% quality and 12 misrouted requests, satisfying both constraints; τ = 0.3 also satisfies them, but its cost ¥0.062 is higher than τ = 0.5's ¥0.045. Therefore, under the constraints, τ = 0.5 is the lowest-cost feasible point—threshold selection is about finding the lowest-cost point in the feasible region, not blindly choosing the highest quality or lowest cost.</p>
+<p>But passing on global metrics does not mean the decision is complete. Suppose a high-risk slice (such as abnormal amounts or high-privilege refunds) accounts for exactly 5 of the 12 misrouted requests, and this slice has its own independent misrouting cap, say no more than 3. Then τ = 0.5 already exceeds the limit for this slice. In this case, the global average cannot be used to cover it up: the correct approach is to forcibly escalate this high-risk slice separately, even if its escalation score is below the global threshold. The per-slice hard constraint once again overrides the global average.</p>
+<p>The inputs to this analysis are the 1000 requests, their escalation scores g(x), threshold τ, and the corresponding quality and cost results. The output is the lowest-cost threshold that simultaneously satisfies the global quality gate, the misrouting gate, and all critical slice constraints. There is also a premise hidden in the feedback loop shown in the diagram: the escalation score must predict "escalation benefit" rather than some other quantity, and samples of delegated requests must flow back through sampled dual-run or human audit; otherwise the system can never see the requests it misroutes, and the misrouting numbers above cannot be measured.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 260" role="img" aria-label="Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit."><defs><marker id="mr1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="88" width="130" height="68" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="83" y="114" text-anchor="middle" class="svg-t">1000 requests</text><text x="83" y="136" text-anchor="middle" class="svg-t" font-size="11">Risk rules intercept first</text><path d="M148,122 L208,122" stroke="#6b7484" marker-end="url(#mr1)"/><rect x="210" y="88" width="150" height="68" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="285" y="114" text-anchor="middle" class="svg-t">Routing score g(x)</text><text x="285" y="136" text-anchor="middle" class="svg-t" font-size="11">Predicts strong-model gain</text><path d="M360,105 L420,63" stroke="#6b7484" marker-end="url(#mr1)"/><path d="M360,139 L420,184" stroke="#6b7484" marker-end="url(#mr1)"/><rect x="422" y="31" width="140" height="64" rx="9" fill="#21252d" stroke="#c77b72"/><text x="492" y="56" text-anchor="middle" class="svg-t">g≥τ → strong model</text><text x="492" y="77" text-anchor="middle" class="svg-t" font-size="11">Escalation rate and cost rise</text><rect x="422" y="161" width="140" height="64" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="492" y="186" text-anchor="middle" class="svg-t">g&lt;τ → small model</text><text x="492" y="207" text-anchor="middle" class="svg-t" font-size="11">High coverage but may be misrouted</text><path d="M562,193 C650,196 662,104 566,65" fill="none" stroke="#6b7484" stroke-dasharray="5 4" marker-end="url(#mr1)"/><text x="626" y="137" text-anchor="middle" class="svg-t" font-size="11">Random dual-run / human audit</text><text x="626" y="153" text-anchor="middle" class="svg-t" font-size="11">Fill in counterfactual labels and recalibrate</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 Routing score must predict escalation benefit; delegated samples must go through sampled dual-run or human audit, otherwise the system cannot see its misrouted requests.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Threshold</th><th>Escalated count</th><th>Misrouted difficult requests</th><th>Quality pass rate</th><th>Average model cost</th><th>Escalated request latency</th></tr></thead><tbody><tr><td>τ=.7</td><td>150</td><td>28</td><td>91.0%</td><td>.02+.15×.10=¥.035</td><td>S+decision+L</td></tr><tr><td>τ=.5</td><td>250</td><td>12</td><td>93.1%</td><td>¥.045</td><td>S+decision+L</td></tr><tr><td>τ=.3</td><td>420</td><td>4</td><td>94.0%</td><td>¥.062</td><td>S+decision+L</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Routing signals must be available and calibratable at decision time<span class="dd-badge eng">Features</span></h2>
+<div class="dd-agent-response"><p>The router's entire intelligence comes from the signals it uses, so the choice of signals determines the upper bound of routing. The question to answer is not “which features correlate with difficulty,” but the stricter version: which features can actually predict that the strong model is more valuable than the small model. The answer to this question is first constrained by a timing constraint—the signals must already be available at the moment the decision is made.</p>
+<p>By availability timing, signals can be divided into two groups. Available before invocation: the input's domain, input length, language, risk rule matches, retrieval hit status, and degree of evidence conflict. These can be obtained before any generative model has been called, and are suitable for direct routing. The other group can only be obtained after running the first answer: the small model's output probability (logprob), self-consistency disagreement among multiple samples, format validation results, and the judgment of external verifiers. These signals are suitable for cascading, because cascading already runs the small model once. Conversely, when training an offline router, you must never use final human labels, future tool states, or features known only after the strong model has run—if used, the model “sees the future” during training, which is data leakage, and the offline router's evaluation scores will be inflated, but cannot be reproduced after deployment.</p>
+<p>Even when signals are available, each has blind spots. Rules and metadata are available before invocation, but new types of difficult requests often do not fall into categories covered by old rules, and historical group features may carry the risk of proxy discrimination. The small model's logprob is available after the first answer, but it is insensitive to fluent but incorrect content, affected by length bias, and often miscalibrated itself. Multi-sample disagreement is powerless against consistent errors—multiple samples can be wrong consistently, and running more samples is costly. Retrieval and verifiers are only available after tool execution, their reliability is limited by verification coverage, and verifiers themselves can also make mistakes. Historical group features are available before invocation, but they involve fairness, privacy, and distribution shift: group behavior in the training distribution changes over time and with policy, and static use introduces discrimination and outdated judgments.</p>
+<p>After signals are selected, there is one final step: calibration. The router outputs a score, but the score must be interpreted as “the probability that upgrading can fix this error,” not as the model's self-perceived confidence. A model saying “I am 90% confident” cannot directly become a routing threshold of 0.9, because self-reported confidence is uncalibrated, and systematic overconfidence or underconfidence are the norm. The correct approach is to plot reliability diagrams by slicing the score on held-out independent data: divide the score into intervals, compute the true proportion of cases in each interval where “the strong model actually fixed the small model's error,” and compare it with the interval's average score. If a slice has a high score but a low repair rate, the threshold for that slice must be tightened accordingly. In this way, the routing input is the domain, length, language, risk, retrieval, first-answer, or verification signal already available at decision time, and the output is the “upgrade repair probability” calibrated on an independent set. Both error directions must be blocked: leaking future information during training makes the score untrustworthy, and ignoring slice differences during calibration lets global reliability mask local miscalibration.</p></div>
+<table class="dd-table"><thead><tr><th>Signal</th><th>Stage</th><th>Blind spots</th></tr></thead><tbody><tr><td>Rules / metadata</td><td>Before invocation</td><td>Novel difficulties and proxy discrimination</td></tr><tr><td>Small-model logprob</td><td>After first answer</td><td>Fluent errors, length bias, miscalibration</td></tr><tr><td>Multi-sample disagreement</td><td>After first answer</td><td>High cost, may err consistently</td></tr><tr><td>Retrieval / verifier</td><td>After tool use</td><td>Verification coverage and its own errors</td></tr><tr><td>Historical group features</td><td>Before invocation</td><td>Fairness, privacy, and distribution shift</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Where Do Erroneous Downgrades Concentrate?<span class="dd-badge eng">Safety and Fairness</span></h2>
+<div class="dd-agent-response"><p>A routing system can meet global quality thresholds while particular groups consistently receive only the weak model. Average quality pass rates mask distributional issues: erroneous downgrades are not spread evenly across all users but concentrated in a few slices. Routers are usually trained on majority languages and common tasks, so they misjudge short inputs as easy—but short does not mean easy, and a short request that condenses complex background actually needs the strong model the most. They may also ignore low confidence on minority languages as noise because there are too few such samples in training data for the model to learn their difficulty. They may further use historical proxy features such as region or account tier to make decisions, creating unfair gaps in service quality along those dimensions.</p>
+<p>Fairness evaluation reports slice by slice rather than looking at a single overall number. For each language, domain, user group, and risk slice, report the downgrade rate, strong-vs-small error rate (the proportion of samples where the strong model answers correctly and the small model answers incorrectly), misrouting rate, and upgrade benefit, along with their confidence intervals. When a slice has few samples, the confidence interval will be wide; this itself is information—it tells you the estimate for that slice is unreliable and calls for a more conservative strategy, rather than treating a wide interval as “no problem.” The fairness goal needs to be stated clearly: it is not about requiring the same upgrade proportion across all groups, but about ensuring that errors and service quality do not produce unacceptable gaps due to routing policy. Different upgrade proportions are reasonable—different groups inherently have different problem distributions; what is unacceptable is that some groups continuously receive errors because of the router’s systematic blind spots.</p>
+<p>In high-impact domains there is a more direct way out: do not rely on learned routing. Healthcare, financial decisions, permission write operations, and explicitly matched compliance keywords—these scenarios have cost functions that do not allow a probabilistic router to make mistakes, so you can directly use deterministic rules to force a stronger verification or human path. Learned routing is suitable for the long tail where errors are tolerable; deterministic rules handle the head where errors are intolerable. The two divide responsibilities by domain, rather than letting one model decide everything.</p>
+<p>There is also a passive feedback loop that quietly contaminates fairness. Users downgraded to the small model are more likely to churn, and their interactions disappear from future logs. If only the interactions of users who stayed are used to train the next router, the system sees only samples where “the user remained after downgrade,” and thus incorrectly concludes that the downgrade was successful. The router learns to downgrade more and more aggressively, while evidence of churned users never appears in the training set. Breaking this loop requires proactively preserving before-and-after churn comparison information, treating “user leaving” itself as an observable negative feedback rather than as missing data.</p>
+<p>Therefore, the input to fairness evaluation is language, domain, user group, and risk slices; the output is four sets of metrics plus confidence intervals for each slice. Average pass and slice-level pass are two different things: the former can hide the fact that long-tail users continuously receive the weak model, while the latter determines whether this router can go live.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Router rollout also requires exploration, monitoring, and rollback<span class="dd-badge eng">Operations</span></h2>
+<div class="dd-agent-response"><p>A router is not a one-time deliverable component. The boundaries it learns rest on a set of specific conditions: routing labels are essentially relative differences between candidate models—which model is stronger on which requests—rather than a static description of a model's absolute capability. Therefore, when the underlying model changes version, the prompt changes, the price changes, retrieval quality fluctuates, or traffic composition drifts, the original optimal boundary immediately becomes invalid. Thresholds that performed well at launch may, after conditions change, simultaneously exhibit increased misrouting and cost waste, without any error signal.</p>
+<p>The remedy is to make governance a continuous loop. The first layer is logging: each request leaves a routing score, selection reason, candidate model versions, escalation rate, per-slice quality, cost, and cascade latency. Without these logs, no drift can be located. The second layer is the version change process: new models or new routers first run offline in dual-run mode, compared in parallel with the current solution on the same samples; then go live in shadow mode, only recording decisions without affecting real traffic; finally canary rollout. Skipping any step means the impact of the change can only be revealed by a production incident.</p>
+<p>The third layer is active exploration. Selection bias says that downgraded samples have no strong-model counterfactual; the governance loop must create this counterfactual: for a small number of requests that should have been downgraded, randomly run the strong model instead or send them for human audit to estimate the misrouting rate. Exploration has cost and risk, so it must be limited to requests that are safe to run in dual-run mode; irreversible tool calls can only be executed through one approved path, and exploration traffic must not trigger them.</p>
+<p>The fourth layer is monitoring. Continuously observe the score distribution, calibration curve, and escalation benefit by time and slice: an overall shift in a slice's score distribution indicates the traffic composition has changed; calibration curve deviation from the diagonal indicates the score semantics are failing; a decline in escalation benefit indicates the gap between the strong and small models is narrowing or widening. Quality labels are often delayed; before real labels are in place, we can first look at the missing-evidence rate, user correction rate, and human override rate as proxy metrics—when these three signals rise, it usually means the router is making errors.</p>
+<p>The fifth layer is rollback. When unauthorized action errors or the misrouting rate exceed budget, immediately switch to conservative rules: escalate all traffic to the strong model or switch to human, or simply disable the relevant actions. The order here matters: first stop the bleeding with conservative mode, then recollect dual-run data and recalibrate boundaries. Merely shifting thresholds to "suppress" misrouting numbers without recollecting data uses new numbers to cover up the root cause; drift still exists, and thresholds will continue to fail.</p>
+<p>Putting it together, the inputs to online governance are model version, price, traffic, routing score, selection reason, and delayed quality feedback; the outputs are a set of actions: exploration audit, recalibration, canary, or conservative rollback. Random dual-run lets the system continuously see counterfactuals of downgraded samples; drift signals trigger data re-collection rather than threshold fine-tuning; when misrouting exceeds budget, first disable dangerous actions or escalate all. Router quality is not the state at the moment of launch, but whether this loop continues to operate.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Arrange the constraints from the previous steps in causal order. From routing as “a problem” to “a verifiable practice” there are only six steps, and each step provides the premise for the next. If any step is skipped, the later steps lose their foundation.</p>
+<p>Step one: establish a per-sample quality and cost baseline for candidate models. Routing only allocates among existing candidates; if all candidates fail on a slice, the router can at best select a different failure. Therefore, before writing any routing logic, record each candidate model’s performance and cost per sample, and confirm that each slice has at least one adequate candidate. If this step fails, all subsequent optimization allocates on the wrong capability map.</p>
+<p>Step two: define high-risk mandatory rules. For medical, financial decisions, permission-write operations, and explicit compliance keywords, the cost on these slices does not allow a probabilistic router to make mistakes; use deterministic rules to force routing to a strong model or human. Hard rules must take effect before any probability score; they are the system's safety baseline, not soft suggestions that can be overridden by scores.</p>
+<p>Step three: train and calibrate the “gain of the strong model relative to the small model” score. The training objective is not absolute difficulty but the expected benefit of upgrading: upgrading is valuable only for samples where the strong model is right and the small model is wrong; samples where both are right or both are wrong produce no benefit. Labels come from an independent scorer and humans; counterfactuals missing for downgraded samples are filled by random double runs or offline double runs; on an independent set, calibrate the score by slice as “probability that upgrade can fix the error,” and reject uncalibrated self-reported confidence.</p>
+<p>Step four: choose the threshold under constraints that satisfy slice gates. Treat the threshold as a control point moving on the misrouting, quality, and cost curves: a threshold that is too high saves money but causes difficult requests to be misrouted; a threshold that is too low fixes misrouting but pushes up cost and upgrade latency. The feasible region is bounded by the global quality gate, the misrouting gate, and independent upper limits for all key slices; choose the threshold at the point in the feasible region with the lowest cost.</p>
+<p>Step five: launch in gray release and randomly audit downgraded samples. Validate routing decisions on small traffic, and for a small number of downgraded requests randomly run the strong model or human audit, so the system continuously sees whether it misroutes. Exploration traffic covers only requests that are safe to run twice; irreversible actions are allowed to execute only through one approved path.</p>
+<p>Step six: after version or distribution changes, recalibrate or roll back. Routing labels are relative differences among candidates; any change in model version, prompt, price, retrieval quality, or traffic will shift the optimal boundary. A drift signal triggers collecting double-run data again and recalibrating, not fine-tuning thresholds to hide the root cause; when misrouting exceeds budget, first switch to conservative mode—all requests to strong model, transfer to human, or disable actions—then recover calmly.</p>
+<p>The causal direction of this chain is: the baseline determines whether candidates can be allocated; hard rules determine which slices do not participate in probabilistic allocation; the gain score determines whether the basis for allocation is trustworthy; slice gates determine whether the threshold is feasible; random audit determines whether operations can see errors; recalibration and rollback determine whether the system still holds after changes. The output of each step is the input to the next; if any link in the chain breaks, the remaining links merely repeat the same error at a higher level.</p></div>
+</section>
+<div class="dd-src"><b>Source and adaptation notes.</b><ul><li><a href="https://arxiv.org/abs/2305.05176" target="_blank" rel="noopener">FrugalGPT</a>: Model cascades and budget optimization.</li><li><a href="https://arxiv.org/abs/2406.18665" target="_blank" rel="noopener">RouteLLM</a>: Preference-data-driven strong-weak model routing.</li><li><a href="https://arxiv.org/abs/2410.13284" target="_blank" rel="noopener">Learning to Route LLMs with Confidence Tokens</a>: Routing based on confidence signals.</li><li><a href="https://arxiv.org/abs/1705.08500" target="_blank" rel="noopener">Selective Classification for Deep Neural Networks</a>: Risk-coverage and selective decision-making.</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/model-routing">Explore connections on the map</a><a href="/zh/concepts/model-routing/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

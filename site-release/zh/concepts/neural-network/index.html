@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>神经网络 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>神经网络是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从「为什么需要」到「如何通过反向传播学会」">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/neural-network/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/neural-network/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/neural-network/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="神经网络">
+<meta property="og:title" content="神经网络是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从「为什么需要」到「如何通过反向传播学会」">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/neural-network/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="神经网络">
+<meta name="twitter:title" content="神经网络是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从「为什么需要」到「如何通过反向传播学会」">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/neural-network/#page","name":"神经网络","description":"从「为什么需要」到「如何通过反向传播学会」","url":"https://ai-knowledge-map.com/zh/concepts/neural-network/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"神经网络","item":"https://ai-knowledge-map.com/zh/concepts/neural-network/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/neural-network/#page","name":"神经网络是什么？原理通俗讲解 | AI 知识地图","description":"从「为什么需要」到「如何通过反向传播学会」","url":"https://ai-knowledge-map.com/zh/concepts/neural-network/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"神经网络","item":"https://ai-knowledge-map.com/zh/concepts/neural-network/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,8 +60,8 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">神经网络</span></li></ol></nav><article id="dd-article" data-concept-id="neural-network">
-<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">神经网络</h1><aside class="dd-publication-notice" data-review-status="needs-revision" role="note"><strong>持续修订中</strong><span>本页部分内容有待修订，建议结合参考资料阅读。</span></aside>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">神经网络</span></li></ol></nav><article id="dd-article" data-concept-id="neural-network" lang="zh-Hans">
+<header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">神经网络</h1>
 <p class="dd-sub">从「为什么需要」到「如何通过反向传播学会」</p>
 <p class="dd-ali">Neural Network · 人工神经网络 · ANN</p>
 <p class="dd-metabar">建议 45–60 分钟 · 基础 → 中级 · 需要：代数、函数、导数</p>
@@ -389,7 +391,7 @@
 <p>每个输出都在 0 和 1 之间，而且所有输出之和为 1。某个类别分数相对于其他类别越大，它得到的输出就越高。因此，Softmax 常用于类别彼此互斥的多分类任务，例如一张图片只能在“猫、狗、鸟”中选择一个类别。</p>
 <p>Softmax 输出经常被称为类别概率，但需要谨慎理解。它首先是把相对分数规范化为一个分布形式；这些数值是否真的与现实中的正确概率吻合，还取决于训练数据、损失函数以及模型是否经过良好校准。一个模型输出 0.99，并不自动保证它在所有输出 0.99 的样本中都有 99% 的准确率。</p>
 <p>容易混淆的一点是：ReLU、Sigmoid、tanh、GELU 和 Softmax 都可能被统称为激活函数，但它们在网络中的职责并不完全相同。</p>
-<p>隐藏层面对的问题是：“怎样把当前表示变成下一层可以继续组合的新表示？”这里使用 ReLU、GELU 或 tanh，主要目的在于引入非线性。如果所有隐藏层都没有非线性，无论层数多少，网络最终仍会退化成一个仿射变换。</p>
+<p>隐藏层面对的问题是：“怎样把当前表示变成下一层可以继续组合的新表示？”这里使用 ReLU、GELU 或 tanh，主要目的在于引入非线性。如果所有隐藏层都没有非线性，隐藏层到输出变换之前的多层仿射计算就能合并成一个仿射变换。若输出层也不含非线性，整个网络才仍是仿射函数；若输出使用 Sigmoid 或 Softmax，最终概率映射不是仿射函数，但隐藏层仍未获得新的非线性表示能力。</p>
 <p>输出层面对的问题则是：“最终答案应该具有怎样的范围和含义？”回归任务可能采用线性输出，让结果可以取任意实数；二分类可能用 Sigmoid 产生一个 0 到 1 之间的值；互斥多分类可能用 Softmax 产生类别分布。输出层可以采用线性映射，也可以采用 Sigmoid、Softmax 等非线性变换。选择哪一种，首先取决于任务所需的输出范围和含义。</p>
 <table class="dd-table">
     <thead><tr><th>位置</th><th>它要回答的问题</th><th>常见选择</th></tr></thead>
@@ -877,7 +879,7 @@
 <div class="dd-formula">a=φ(z)</div>
 <p>许多节点组成隐藏层，多个隐藏层形成函数复合。前向传播沿这些函数从输入计算到输出，输出层根据任务把内部数值转换成预测，损失函数把预测错误转换成标量。反向传播再利用链式法则计算全部参数梯度，优化器根据梯度更新权重和偏置。</p>
 <p>这一核心层不应被学成八个互不相干的定义。应当能够解释每个概念为什么出现：权重用于组合输入，偏置用于平移响应门槛，多个节点用于并行形成不同响应，激活函数防止多层坍缩成单层，损失给出可优化目标，反向传播高效计算责任，梯度下降根据局部坡度调整参数。</p>
-<p>第三层是训练深化。初始化不仅给参数一个起点，还要打破节点之间的对称，并控制前向信号和反向梯度的尺度。Xavier 和 He 初始化分别针对不同激活与层宽设计合理方差。理解初始化后，才能解释为什么全部权重设为零会让同层节点始终学习相同内容，也能理解过大或过小初值为何导致数值问题。</p>
+<p>第三层是训练深化。初始化不仅给参数一个起点，还要打破节点之间的对称，并控制前向信号和反向梯度的尺度。Xavier 和 He 初始化分别针对不同激活与层宽设计合理方差。理解初始化后，才能解释全零权重可能带来的节点对称或梯度受阻风险：只有相关权重、偏置、下游连接、优化器状态及更新规则都保持节点间的对称性时，这些节点才会持续给出相同响应并接受相同更新。仅凭全部权重为零，不能断言节点永久学习相同内容；过大或过小初值也可能导致数值问题。</p>
 <p>mini-batch 训练是在完整数据梯度与单样本随机梯度之间折中。一次只用一小批样本，可以利用硬件并行，又能频繁更新参数。batch size 会影响梯度噪声、显存占用和训练速度，因此它不仅是数据读取设置，也是优化超参数。</p>
 <p>Adam、动量和学习率调度是在基本梯度下降上的进一步发展。动量累积历史方向，帮助减少狭长谷地中的来回震荡；Adam 根据梯度统计为不同参数调整有效步长；学习率调度则让训练早期迈较大步探索，后期用较小步细化。学习这些方法时，应始终保留共同主线：反向传播提供梯度，优化器决定如何使用梯度。</p>
 <p>归一化、正则化和过拟合构成训练稳定性与泛化的另一组知识。批归一化或层归一化控制中间数值尺度；权重衰减、Dropout、数据增强和早停限制模型过度适应训练细节；训练、验证和测试划分用于区分参数学习、方案选择和最终评价。它们回答的不再只是“损失能否下降”，而是“训练是否稳定，以及下降是否能迁移到未见数据”。</p>
@@ -910,7 +912,7 @@
   <div class="dd-src-date">访问日期：2026-07-20</div>
 </div>
 <!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/neural-network">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/neural-network">在地图中查看概念关系</a><a href="/en/concepts/neural-network/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

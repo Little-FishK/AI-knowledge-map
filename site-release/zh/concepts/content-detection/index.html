@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>AI 内容检测与溯源：区分统计猜测、水印信号和签名来源 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>AIGC 是什么？检测与水印原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/content-detection/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/content-detection/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/content-detection/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="AI 内容检测与溯源：区分统计猜测、水印信号和签名来源">
+<meta property="og:title" content="AIGC 是什么？检测与水印原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/content-detection/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AI 内容检测与溯源：区分统计猜测、水印信号和签名来源">
+<meta name="twitter:title" content="AIGC 是什么？检测与水印原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/content-detection/#page","name":"AI 内容检测与溯源：区分统计猜测、水印信号和签名来源","description":"从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。","url":"https://ai-knowledge-map.com/zh/concepts/content-detection/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"AI 内容检测与溯源：区分统计猜测、水印信号和签名来源","item":"https://ai-knowledge-map.com/zh/concepts/content-detection/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/content-detection/#page","name":"AIGC 是什么？检测与水印原理通俗讲解 | AI 知识地图","description":"从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。","url":"https://ai-knowledge-map.com/zh/concepts/content-detection/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"AI 内容检测与溯源：区分统计猜测、水印信号和签名来源","item":"https://ai-knowledge-map.com/zh/concepts/content-detection/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">AI 内容检测与溯源：区分统计猜测、水印信号和签名来源</span></li></ol></nav><article id="dd-article" data-concept-id="content-detection">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">AI 内容检测与溯源：区分统计猜测、水印信号和签名来源</span></li></ol></nav><article id="dd-article" data-concept-id="content-detection" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">AI 内容检测与溯源：区分统计猜测、水印信号和签名来源</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从基率、ROC和校准，到模型指纹的分布漂移、鲁棒水印、C2PA式签名清单、链式编辑与“无信号不等于真人创作”。</p>
 
@@ -152,7 +154,7 @@
       </tbody></table>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://c2pa.org/specifications/specifications/2.2/index.html" target="_blank" rel="noopener">C2PA Technical Specification</a>：签名内容凭证与编辑清单</li><li><a href="https://arxiv.org/abs/2301.10226" target="_blank" rel="noopener">A Watermark for Large Language Models</a>：文本生成水印与统计检测</li><li><a href="https://arxiv.org/abs/2303.15435" target="_blank" rel="noopener">The Stable Signature</a>：潜扩散图像水印</li><li><a href="https://arxiv.org/abs/2303.11156" target="_blank" rel="noopener">Can AI-Generated Text be Reliably Detected?</a>：检测器释义与对抗边界</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/content-detection">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/content-detection">在地图中查看概念关系</a><a href="/en/concepts/content-detection/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Lost in the Middle: When context fits, why might the model still fail to find it? Explained Simply</title>
+<meta name="description" content="Understand position effects in long contexts, learn to measure them with controlled experiments, and use retrieval, reordering, and structural design to reduce the probability that key evidence is ignored.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/lost-in-middle/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/lost-in-middle/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/lost-in-middle/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Lost in the Middle: When context fits, why might the model still fail to find it? Explained Simply">
+<meta property="og:description" content="Understand position effects in long contexts, learn to measure them with controlled experiments, and use retrieval, reordering, and structural design to reduce the probability that key evidence is ignored.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/lost-in-middle/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Lost in the Middle: When context fits, why might the model still fail to find it? Explained Simply">
+<meta name="twitter:description" content="Understand position effects in long contexts, learn to measure them with controlled experiments, and use retrieval, reordering, and structural design to reduce the probability that key evidence is ignored.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/lost-in-middle/#page","name":"What Is Lost in the Middle: When context fits, why might the model still fail to find it? Explained Simply","description":"Understand position effects in long contexts, learn to measure them with controlled experiments, and use retrieval, reordering, and structural design to reduce the probability that key evidence is ignored.","url":"https://ai-knowledge-map.com/en/concepts/lost-in-middle/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Lost in the Middle: When context fits, why might the model still fail to find it?","item":"https://ai-knowledge-map.com/en/concepts/lost-in-middle/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Lost in the Middle: When context fits, why might the model still fail to find it?</span></li></ol></nav><article id="dd-article" data-concept-id="lost-in-middle" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Lost in the Middle: When context fits, why might the model still fail to find it?</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Understand position effects in long contexts, learn to measure them with controlled experiments, and use retrieval, reordering, and structural design to reduce the probability that key evidence is ignored.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> “Lost in the Middle” is an empirical position effect in long contexts: input capacity does not equal stable utilization ability. It should be confirmed through experiments that hold content fixed and only permute evidence positions, and mitigation should prioritize retrieval, reordering, structured assembly, and continuous regression.</div></header>
+<!-- source-body:start --><div class="dd-goals"><strong>After reading, you should be able to:</strong>Accurately describe the “Lost in the Middle” phenomenon; distinguish between context window capacity and effective utilization; design position permutation experiments; avoid interpreting correlation as causation; implement verifiable mitigation strategies.</div>
+<div class="dd-chain">Establish a position baseline → add length gradients → add similarity interference → apply reordering/structural solutions → compare accuracy and citations → run regressions by model version</div>
+<section class="dd-sec" data-source="content-generation"><h3>1. What exactly does “Lost in the Middle” refer to?</h3>
+<div class="dd-agent-response"><p>The “Lost in the Middle” phenomenon refers to an empirical observation: the same piece of information that is crucial for answering a question, simply because it is placed in the middle of a long context, becomes noticeably harder for the model to find and use, and performance drops accordingly. Intuitively, whatever content is placed in the context should be treated equally by the model; but experimental observations show otherwise—when relevant information is at different positions, the model's output quality changes in a measurable and broadly consistent direction, with the middle often being the weakest region.</p>
+<p>This effect is not a conclusion based on intuition but a position effect that needs to be confirmed experimentally. To confirm it, the experimental inputs should be a set of inputs that differ from each other only in the position of the evidence: the same question, the same key evidence, the same batch of distractor documents, with the only change being where the key evidence is inserted in the context. The experimental outputs are metrics aggregated by position buckets, such as answer accuracy, or the citation hit rate for the correct document when the model generates an answer. The logic for determination is: if merely moving the position of the key evidence is sufficient to cause stable metric changes, then the conclusion that the system is position-sensitive is supported; conversely, if metric fluctuations across positions are non-directional within the margin of error, one cannot claim that Lost in the Middle exists.</p>
+<p>The U-shaped curve frequently mentioned in such experiments also needs to be understood precisely. U-shaped refers to the fact that in a particular experiment, performance at the beginning and end positions of the context is better than at the middle position, so the curve plotted by position is high at both ends and low in the middle. It describes the observational results of that particular experiment and does not mean that every model, every context length, and every type of task will exhibit exactly the same curve shape.</p>
+<p>The classic experimental approach is to place the same key evidence at the beginning, middle, or end of the context, while keeping other conditions as unchanged as possible. Under such controlled experiments, some models exhibit a U-shaped positional curve: content at the beginning and end is utilized better, while content in the middle is relatively weaker. It is worth noting that this is always an empirical phenomenon: it comes from observations of specific models, specific lengths, and specific tasks, and is not a universal law that necessarily holds for all models, all tasks, and all lengths. The fact that a particular model exhibits Lost in the Middle on a particular task does not mean that another model or another task will necessarily do so; conversely, the absence of the effect in some combination does not negate its existence in other combinations.</p>
+<p>To illustrate with a concrete example: suppose there are 30 candidate documents, only one of which contains the answer. When feeding these 30 documents to the model, the position of the document containing the answer can be controlled manually. If merely changing the position of this document causes the answer accuracy to change accordingly, it indicates that the system is position-sensitive, and the Lost in the Middle effect holds for this system. The key in this example is the word “only”: keeping everything else unchanged, position is the only variable, so that the performance difference can be cleanly attributed to position rather than to the content itself.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>2. What is the difference between context window and effective context?</h3>
+<div class="dd-agent-response"><p>Context window and effective context describe two different things. A context window is a capacity concept: it specifies the maximum number of tokens a model can receive in a single request; beyond that, the API typically rejects or truncates directly. It answers the question of “whether it can be put in,” but does not guarantee that every token put in will be used stably and equivalently. Effective context, on the other hand, is a performance concept: it refers to the extent to which and how well the model can actually use the information within it, given that it fits within the window. It answers the question of “whether it can be used after being put in.”</p>
+<p>The difference in how the two are measured stems from the difference between input and output. To measure window capacity, the input is only the token count of the request, and the output is a single binary result: whether the API accepts or rejects. This boundary is determined by the upper limit set on the server side and is an engineering constraint. In contrast, to measure effective utilization, the input is much richer: in addition to the content itself, it includes where the key evidence is located, how many distractors are in the context, and what task is to be completed; the output is no longer just accepted or rejected, but task metrics such as accuracy and citation hit rate for the correct evidence. These metrics cannot be obtained directly from any API; they must be measured through experiments designed for the specific task.</p>
+<p>Therefore, a statement such as “supports 128K” can only be interpreted as “can receive a capacity of 128K,” not as “can reliably retrieve evidence at any position within 128K.” The former is a capacity claim, the latter is task performance, and between them lies the model's actual ability to use the context. Treating a capacity claim directly as a guarantee of evidence-retrieval ability will lead to overestimating the system's reliability in long contexts. This is one of the reasons why many long-context products underperform expectations after launch.</p>
+<p>Effective context is also affected by many factors: the difficulty of the task itself, the number and similarity of distractors, the task's requirements for retrieval ability, the structure of the prompt, and the model version. Under the same window specification, the effective range for a simple task may be much larger than for a difficult task; when distractors are dense, content in the middle positions is more easily submerged; even if different model versions have the same window number, their actual utilization ability can differ significantly. In other words, effective context is not a constant determined by hardware specifications, but the result of the combined effects of model capability, task characteristics, and input structure.</p>
+<p>So, the window numbers provided by vendors cannot replace your own evaluation of position and length on real workloads. To determine whether a system can handle a particular long-context task, the correct approach is to test with your own task, your own distractors, and your own evidence distribution, rather than making inferences based on the window upper limit on the marketing page.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>3. How do you measure the position effect as a curve?</h3>
+<div class="dd-agent-response"><p>To measure the position effect as a curve, there is only one core approach: fix the evidence and the question, change only the relative position of the evidence in the context, and repeat with enough samples. Only position is the variable; keep everything else as constant as possible, so that observed performance differences can be attributed to position itself.</p>
+<p>The inputs to a curve experiment are multiple pairable question instances, along with the corresponding positions, context lengths, and distractor settings; the outputs are accuracy, confidence intervals, and sample size under each condition. All three outputs are essential: accuracy gives a point estimate, confidence intervals give the range of variation, and sample size determines how credible that range is. For each question, generate multiple versions with the evidence at the beginning, middle, and end, and randomize the order of the remaining materials so that the question itself serves as its own control—the performance difference for the same question across three positions is much cleaner than performance differences between different questions, because question difficulty and required knowledge are controlled through pairing. If the differences on the curve are smaller than the statistical fluctuation range, you cannot claim a position effect; a curve that appears lower in the middle and higher at both ends is convincing only when the sample size is sufficient and the confidence intervals do not overlap with adjacent positions.</p>
+<p>The relationship between accuracy and the variables can be written as:</p>
+<p>A = f(p, L, d)</p>
+<p>Here A is the task accuracy measured under the current conditions; p is the normalized relative position of the evidence in the context, with values close to 0 indicating near the beginning and close to 1 indicating near the end; L is the total token length of the context; d is the number or strength of similar distractors. This notation expresses that accuracy may vary jointly with the three variables, rather than presupposing that a fixed algebraic formula exists among them—how p, L, and d affect A is exactly what the experiment is designed to answer, so function notation f is used instead of a concrete expression.</p>
+<p>When measuring, normalize p to the range 0 to 1, so that contexts of different lengths can be compared on the same graph; at the same time, report different lengths L and distractor strengths d separately, because the position effect is likely to change with these two conditions, and mixing them together for averaging would blur the curves for different conditions. In addition, randomize the order of irrelevant documents, control the total token count of the context, and record the model version and decoding parameters: if the order of irrelevant documents is fixed, position differences may be confounded with differences in document content; changes in total token count alter density; different model versions and decoding parameters may make the whole system behave differently.</p>
+<p>Finally, the decision boundary: comparing only one beginning sample and one middle sample cannot rule out sample difficulty and chance fluctuation. A single sample's difference may be caused by differences in difficulty between these two specific questions, unrelated to position. To obtain a credible position curve, one must rely on repeated measurements of paired questions at multiple positions, rather than one or two isolated comparisons.</p></div>
+<div class="dd-formula" data-formula-id="lost-in-middle-position-accuracy"><math display="block" aria-label="准确率 A 是证据位置 p、上下文长度 L 和干扰强度 d 的函数"><mrow><mi>A</mi><mo>(</mo><mi>p</mi><mo>,</mo><mi>L</mi><mo>,</mo><mi>d</mi><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>4. Why does it happen?</h3>
+<div class="dd-agent-response"><p>Lost in the Middle has been repeatedly observed, but “why it happens” does not have a single answer that holds for all models. Research confirms the phenomenon of position bias itself, while its causes may simultaneously arise from three levels—training distribution, model mechanisms, and task design—and the proportions of these three may be completely different across systems.</p>
+<p>When diagnosing causes, the inputs should include three types of material: an already reproduced position curve, attention or retrieval traces, and controlled ablation experiments; the output consists of candidate explanations that still hold up after being tested against this evidence. The basic diagnostic method is to change suspicious factors one by one and observe how the position curve changes: change the distribution of context lengths during training to see whether the training distribution shapes the model's preference for positions; change the similarity of distractors to see whether the drop in the middle segment is mainly caused by competition among similar documents; change the structure of the prompt to see whether the prompt's failure to clearly indicate where the evidence is located amplifies the effect. If the curve changes after a factor is changed, that factor is more likely to be part of the cause; factors that leave the curve unchanged after being changed can be downgraded from the candidate list. This process gradually narrows the range of causes rather than finding the single culprit at once.</p>
+<p>The possible factors proposed so far fall roughly into four categories. First, primacy/recency bias: during training, models more often encounter distributions in which key information appears at the beginning or end, thereby forming a preference for first and last positions. Second, difficulty of long-distance retrieval: information in middle positions is farther from the current generation step, so the model must cross a longer distance to retrieve it. Third, competition from similar distractors: the more material in the context that is similar to the evidence, the more easily the middle evidence is “drowned out” by other documents. Fourth, prompt structure problems: if the prompt itself does not clearly indicate the structure and location of the evidence, the model can only search the entire context on its own, leaving more room for error. In addition, different architectures and training methods themselves will change performance; even if two systems have the same window size, the shape and causes of their position curves may differ.</p>
+<p>The role played by attention weights in such diagnoses needs to be carefully delimited. Attention weights can tell us where in the context the model placed its attention when generating a certain token, and therefore can serve as diagnostic clues; but they are only a correlational observation and cannot alone prove a causal narrative such as “the model forgot the middle because a certain attention head failed.” A lower weight of an attention head on middle positions may be the cause of forgetting, the result of forgetting, or merely an unrelated phenomenon that happens to co-occur. Only by combining ablation experiments that change model structure or input conditions and then observing behavioral changes can we move closer to causal conclusions.</p>
+<p>Therefore, we should guard against over-explanation: reproducing the phenomenon does not mean there is a single mechanistic answer that applies to all models. The same Lost-in-the-middle curve may be caused mainly by training distribution in one model, mainly by distractor competition in another, and by a combination of prompt structure and retrieval mechanism in a third. When facing a specific system, the right question is “which factors are at work in it and how much each contributes,” rather than applying a one-size-fits-all mechanistic explanation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>5. How to reduce the risk of key evidence being drowned out?</h3>
+<div class="dd-agent-response"><p>There are only two core strategies for reducing the risk of key evidence being drowned out: minimize irrelevant context as much as possible, while making the task and key evidence easier to locate relative to each other. The larger the window, the more can be crammed in, but the more crammed in, the more the information in the middle is prone to being diluted and obscured. Therefore, the engineering effort should not be aimed at "putting more things in," but at "making the parts that need to be used among what is put in easier to find."</p>
+<p>A typical mitigation pipeline takes as input the raw candidate documents, the current question, and a token budget, and outputs a compact context that has been deduplicated, reranked, and annotated with source markers. The pipeline first filters to remove content unrelated to the current question, reducing the number of distractors; then reranks to place high-value evidence near the task, avoiding the weakness of the middle position; and at the same time marks the retained content with source labels, so that every conclusion generated by the model can be traced back to a specific passage. The effect after this processing should be interpreted as "evidence is easier to locate," not "the model's window capability has been permanently changed"—the window and the model themselves have not been upgraded by this input organization; the change occurs only in how this particular input is constructed.</p>
+<p>This pipeline has one irrecoverable stage: retrieval. If the retrieval stage misses the correct evidence, then subsequent reranking and position adjustments cannot remedy it—no matter how you arrange things, the correct answer is simply not in the context, and the model cannot fabricate it out of thin air. Therefore, the effectiveness of mitigation measures has an upper limit: they can only make evidence that has already entered the context easier to find, and cannot replace a retrieval stage that can fish out the correct evidence.</p>
+<p>Concretely, first retrieve, rerank, and deduplicate; assemble only the passages truly needed to solve the current question, rather than dumping the entire batch of material as-is; use headings, numbering, source identifiers, and separators to establish a clear structure, avoiding the concatenation of long documents into a "text wall" that prevents the model from distinguishing evidence from noise. In terms of position, you can restate the question after the evidence, bringing the task and the evidence closer together in the context; or place the highest-value evidence directly near the task. As for whether to place it before or after the task, and how close is best, there is no universally applicable answer; the specific position should be determined by experiment—different models and different tasks have different sensitivities to position.</p>
+<p>For complex tasks, they should be decomposed into multiple stages such as retrieval, verification, and synthesis, with each stage retaining intermediate citations, rather than expecting the model to read the entire context once and directly produce a final answer; decomposition makes each step face a small and clear goal, and the chance of intermediate evidence being drowned out decreases accordingly. For very long materials, first generate a traceable index, letting the model use the index to locate the relevant passages before reading them, rather than directly generating an unverifiable summary—a summary compresses information and also severs the connection between the conclusion and the original text.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>6. How can mitigation approaches be validated credibly?</h3>
+<div class="dd-agent-response"><p>Whether a mitigation approach is usable depends on whether it still holds under sufficiently rigorous validation conditions. The easiest mistake is to test only the ideal layout where "the answer happens to be placed at the very beginning"—in that case no approach looks bad, because it avoids the most problematic position. Credible validation must cover combinations of position, length, and distractors, especially scenarios where middle positions, long contexts, and highly similar distractors occur simultaneously.</p>
+<p>The input to validation is the complete results of the baseline and the candidate approach on the same batch of position, length, and distractor combinations; the output is the bucketed quality metrics, citation status, latency, and cost differences. Here "same batch" is critical: the baseline does not use the approach, the candidate uses the approach, and apart from that the questions, data, and evaluation method must be exactly the same; only the mitigation approach itself may vary. At the same time, save the final complete request, and afterwards check whether the evidence set was assembled into the context as expected—if the actual request sent does not match the design, the evaluation results cannot be trusted.</p>
+<p>There is one hard decision rule: even if the average score rises, as long as the performance of any high-risk position bucket drops, the approach still cannot pass. The improvement in the average score may come entirely from the head positions that were not problematic to begin with, while the middle positions—exactly the places the approach is meant to address—instead get worse. For a mitigation approach, the worst bucket's performance is more informative than the average.</p>
+<p>The validation process can proceed in order: first establish a position baseline by measuring the native performance of evidence at different positions without applying any approach; then introduce a length gradient and gradually lengthen the context to see how the effect evolves with length; then add similar distractors to simulate real scenarios where evidence is mixed with noise; then apply a reordering or structuring approach; compare accuracy and citation hit rate before and after application; and finally run regression separately by model version to confirm that the conclusion still holds on new versions, not only on old versions.</p>
+<p>When recording metrics, all four of accuracy, whether the evidence citation hits, latency, and token cost must be kept. If accuracy rises but the citation is wrong, it means the model may not have actually found the evidence but guessed the answer correctly based on prior knowledge—such "correctness" is not trustworthy in validation. If the approach works only on a single prompt template and fails with a different structure, it is likely only overfitting that one prompt format rather than truly mitigating the position effect.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>7. Which failures cannot simply be called “Lost in the Middle”?</h3>
+<div class="dd-agent-response"><p>The Lost-in-the-middle Effect is an attribution conclusion with strict meaning, not a catch-all term for all failures in long contexts. If the evidence was never retrieved, was truncated before entering the context, used the wrong version, or the question itself is too vague to locate an answer, then the root cause of the failure is likely not positional at all—calling a data pipeline failure “Lost in the Middle” only uses a fashionable term to mask the real problem.</p>
+<p>The input to attribution troubleshooting consists of three types of material: the complete request from the failed run, the content finally assembled into the context, and the retrieval and document parsing logs. The output is a judgment of the failure type: either a data pipeline failure or a problem in the model’s use of position. The judgment criterion is strict: only when it is confirmed that the correct evidence is indeed present in the final context and that changing only its position changes the outcome can the failure be interpreted as the Lost-in-the-middle Effect; if the controlled experiment “everything else unchanged, only the evidence position moved” cannot be constructed, then “cause undetermined” should be retained instead of rushing to a conclusion.</p>
+<p>Troubleshooting should proceed in a fixed order, first ruling out pipeline problems and only considering the model at the end. Step one: confirm that the final request actually contains the correct evidence; if the evidence is not there at all, the model is bound to answer incorrectly, and position is irrelevant. Step two: check token truncation; content may be truncated when it is too long, or key passages may fall exactly into the discarded portion. Step three: check permission filtering and document parsing; access control may have filtered out the evidence, and the parser may have lost key passages when converting PDF or web pages. Step four: check retrieval and ranking; did the retrieval stage pull out the correct document, and did ranking place it into the final assembly? Only when all these checks pass—the correct evidence is indeed in the final context, and no truncation, filtering, parsing loss, or retrieval omission occurred—can a position-permutation experiment be used to determine whether this is a model-side utilization problem.</p>
+<p>Such an order can reclassify many failures that “look like Lost in the Middle” into where they truly belong. A common lesson is: users complain that “the model always fails to find the content in the middle of a long document,” but after troubleshooting it turns out that the parser dropped the middle pages, and the model never saw that passage from beginning to end. Calling this kind of problem “Lost in the Middle” both misses the opportunity to fix the pipeline and falsely inflates the model’s position problem.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>8. What regression tests should be set up in the product?</h3>
+<div class="dd-agent-response"><p>Position effects are not something you can test once and be done with. A change in any part—model upgrades, prompt adjustments, retriever updates—can alter the system's effective context, and may even cause a previously inconspicuous Lost-in-the-middle Effect to reappear. Therefore position testing cannot remain a one-time evaluation; it must enter continuous evaluation: treat position sensitivity as a product quality metric tracked over the long term.</p>
+<p>The input to continuous regression is a fixed, permutable set of tasks, plus the new system version for each release; the output is trend curves and alerts bucketed by position, length, task type, and risk level. After each upgrade, rerun everything using exactly the same assembly process and scoring process as the baseline, then compare with the baseline. On judgment, there is one non-negotiable rule: even if the overall average score remains stable or even rises, as long as a key position bucket falls below the minimum threshold, the release must still be blocked. The average score cannot hide local collapses, and position buckets are precisely where local collapses most often occur.</p>
+<p>The test set itself also needs to be updated regularly. If you always use the same batch of questions and the same templates, both the approach and the evaluation will unknowingly overfit to this fixed format; the measured "stability" is only stability to the template, not stability to real inputs. Continuous rotation of the test set is intended to keep the regression always facing fresh and diverse input distributions.</p>
+<p>The test set should retain several types of position-permutable tasks: multi-document question answering (the evidence for the same question can be moved among multiple documents), key-value retrieval (finding the value corresponding to a specified key in a long list), and multi-hop tasks (requiring synthesis of information from multiple places in the context to answer). These task types cover different difficulties from simple localization to cross-span synthesis. After each upgrade, plot the bucketed position curve, not just an overall average score—only the curve can reveal which segment of positions is degrading.</p>
+<p>For high-risk answers, the model should also be required to provide cited evidence as a mandatory output in addition to the answer. When citations are missing, or when the citations and the answer contradict each other, trigger supplemental retrieval or manual review, instead of letting an answer without evidential support flow out directly. This mechanism further transforms the Lost-in-the-middle Effect from an evaluation metric into an online safety net: even if the model fails to find evidence at a certain position, the system can intercept it through citation verification, rather than letting it answer based on prior guesses.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h3>9. Case Walkthrough: How Is a Position Curve Calculated?</h3>
+<div class="dd-agent-response"><p>Let's use a concrete scenario to tie together the earlier measurement methods: suppose there is a customer-service task where only one of 30 equal-length documents contains a refund exception clause, and the answer is hidden in that document. Place this evidence at the beginning, middle, and end of the context respectively, keep the other 29 documents unchanged, and then record the answer accuracy at each position. The question is: is the resulting curve difference a true position effect or random sample fluctuation?</p>
+<p>Figure 1 shows a schematic U-shaped position curve: the horizontal axis is the relative position of the evidence in the context, and the vertical axis is accuracy; the red line represents the results under the original long context, with a clear dip at the middle position; the green dashed line represents the results after retrieval reranking, with the middle dip lifted. It must be emphasized that this figure is schematic: the shape of the real curve must be measured on a specific model, specific length, and specific task, and this figure cannot be treated as a universal constant applicable to any system.</p>
+<p>Figure 1: Schematic U-shaped position curve. The red line is the original long context, and the green dashed line is the result after retrieval reranking; the real shape must be measured on a specific model, length, and task, and this figure cannot be treated as a universal constant.</p>
+<p>The accompanying numerical example can be organized into the table below. Each row is one position condition, and the number correct is based on a total of 60 samples:</p>
+
+<p>The interpretation of the numbers should be done step by step. The original middle section is 34/60 ≈ 56.7%, and after reranking it is 46/60 ≈ 76.7%, an absolute improvement of about 20 percentage points. On the surface the reranking effect looks significant, but there is a trap in attribution: if 8 distractor documents are also deleted at the same time as the reranking, then part of that 20-percentage-point improvement comes from the reduction in interference, and only another part comes from the position shift; the two cannot be separated. At this point you cannot attribute the entire improvement to 'the evidence being placed further back'; you should run an ablation experiment that changes only the position and leaves the document set untouched, to isolate the contribution of the position variable alone.</p>
+<p>A more robust approach is a paired experiment: for the same question instance, generate three versions with the evidence at the beginning, middle, and end, keeping the evidence content, distractors, total length, and answer exactly the same, with the only difference being the position of the evidence. In this way each question serves as its own control, and differences in question difficulty are canceled out by pairing, allowing the position effect to emerge from the question noise. If the task requires combining two pieces of evidence scattered in the context to answer, you should also separately test layouts such as 'both in the middle', 'one at the beginning and one at the end', and 'both adjacent to each other'—failure in multi-hop synthesis is not necessarily equivalent to failure in single-fact retrieval, and the curves for these two types of tasks may have completely different shapes; mixing them together in testing will contaminate each other.</p>
+<p>With a small sample size, fluctuations in percentages are likely to be purely accidental. For example, in 60 samples, getting 2 more or fewer correct causes the accuracy to fluctuate by about 3.3 percentage points; with even smaller samples the fluctuation is larger. Therefore curves based on small samples must be accompanied by confidence intervals and replicated across multiple different question wordings to see whether the effect holds under different formulations.</p>
+<p>Product thresholds should be set according to risk level. Ordinary recommendation scenarios can tolerate slight position sensitivity; but high-risk policy interpretation and compliance answers should meet minimum accuracy and citation hit rates in every position bucket, and any bucket that fails should be considered unqualified. A higher overall average must never mask middle-section failures: if sampling includes many beginning samples and few middle samples, the total score will be biased toward the well-performing beginning, and the most dangerous positions will disappear from the report. Therefore at least bucket by the three dimensions of relative position, context length, and interference intensity, and report sample sizes or confidence intervals for each bucket, rather than reporting only a single overall average.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 650 230" role="img" aria-label="U-shaped accuracy curve when answer evidence is at the beginning, middle, and end"><line x1="70" y1="180" x2="600" y2="180" stroke="#6b7484"/><line x1="70" y1="30" x2="70" y2="180" stroke="#6b7484"/><text x="335" y="214" text-anchor="middle" class="svg-t">Relative position of key evidence</text><text x="26" y="105" text-anchor="middle" class="svg-t" transform="rotate(-90 26 105)">Accuracy</text><polyline points="110,58 205,95 300,140 395,105 550,66" fill="none" stroke="#cf6f6f" stroke-width="3"/><circle cx="110" cy="58" r="5" fill="#cf6f6f"/><circle cx="300" cy="140" r="5" fill="#cf6f6f"/><circle cx="550" cy="66" r="5" fill="#cf6f6f"/><text x="110" y="46" text-anchor="middle" class="svg-t">85%</text><text x="300" y="158" text-anchor="middle" class="svg-t">57%</text><text x="550" y="54" text-anchor="middle" class="svg-t">80%</text><text x="110" y="198" text-anchor="middle" class="svg-t" font-size="10">Beginning</text><text x="300" y="198" text-anchor="middle" class="svg-t" font-size="10">Middle</text><text x="550" y="198" text-anchor="middle" class="svg-t" font-size="10">End</text><polyline points="110,52 205,66 300,74 395,68 550,56" fill="none" stroke="#4f9d78" stroke-width="2" stroke-dasharray="7 4"/><text x="448" y="87" class="svg-t" fill="#4f9d78" font-size="10">After reranking and placing evidence near the task</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  Schematic U-shaped position curve. The red line is the original long context, and the green dashed line is the result after retrieval reranking; the real shape must be measured on a specific model, length, and task, and this figure cannot be treated as a universal constant.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Evidence position</th><th>Correct / 60</th><th>Accuracy</th><th>Beyond the 95% interval, also control:</th></tr></thead><tbody><tr><td>Beginning 0–10%</td><td>51</td><td>85%</td><td>Document order, total tokens, question wording</td></tr><tr><td>Middle 45–55%</td><td>34</td><td>57%</td><td>Same evidence, similar distractors, and decoding parameters</td></tr><tr><td>End 90–100%</td><td>48</td><td>80%</td><td>Model version, random seed, and number of repetitions</td></tr><tr><td>Middle + Reranking</td><td>46</td><td>77%</td><td>Cost, citation accuracy, and whether it only fits a template</td></tr></tbody></table>
+</section>
+<div class="dd-src"><strong>Sources and further reading:</strong><ul><li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., Lost in the Middle</a></li><li><a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">Hsieh et al., RULER: What's the Real Context Size of Your Long-Context Language Models?</a></li><li><a href="https://aclanthology.org/2024.tacl-1.9/" target="_blank" rel="noopener">TACL publication: Lost in the Middle</a></li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/lost-in-middle">Explore connections on the map</a><a href="/zh/concepts/lost-in-middle/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

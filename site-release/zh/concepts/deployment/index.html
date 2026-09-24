@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>部署形态是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/deployment/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/deployment/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/deployment/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务">
+<meta property="og:title" content="部署形态是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/deployment/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务">
+<meta name="twitter:title" content="部署形态是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/deployment/#page","name":"AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务","description":"从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。","url":"https://ai-knowledge-map.com/zh/concepts/deployment/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务","item":"https://ai-knowledge-map.com/zh/concepts/deployment/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/deployment/#page","name":"部署形态是什么？原理通俗讲解 | AI 知识地图","description":"从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。","url":"https://ai-knowledge-map.com/zh/concepts/deployment/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务","item":"https://ai-knowledge-map.com/zh/concepts/deployment/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务</span></li></ol></nav><article id="dd-article" data-concept-id="deployment">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务</span></li></ol></nav><article id="dd-article" data-concept-id="deployment" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">AI 部署：把离线能力变成可容量化、可灰度、可回滚的服务</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从运行位置、排队与批处理，到版本发布、幂等副作用、降级和事故响应。</p>
 
@@ -142,7 +144,7 @@
 <p>第四步进入真实世界：影子部署复制真实流量，验证候选在真实分布下的容量与读行为，同时禁止不可逆副作用。影子补齐了离线评测看不见的排队、缓存和真实输入长度。第五步是金丝雀：按门槛逐级放量，1%→5%→25%→100%，每一级都观察完整的标签窗口，确认任务通过率、越权率、延迟和容量都没有越过门禁，才扩大流量。第六步是运行期的闭环：告警触发时执行降级或回滚——降级按风险分层保护高价值路径，回滚按 release id 原子恢复——并且把失败案例回流，成为下一轮评测集和门禁的一部分。这样，一次事故不只是被扑灭，而是让整个因果链的下一次迭代更严格。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>：ML 系统组合依赖与运维债务</li><li><a href="https://sre.google/sre-book/handling-overload/" target="_blank" rel="noopener">Google SRE Book: Handling Overload</a>：容量、背压、降级与负载保护</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/mlops-checklist/continuous-deployment.html" target="_blank" rel="noopener">AWS MLOps Continuous Deployment</a>：影子、金丝雀、蓝绿与回滚</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>：部署监测、事件响应和变更管理</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/deployment">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/deployment">在地图中查看概念关系</a><a href="/en/concepts/deployment/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

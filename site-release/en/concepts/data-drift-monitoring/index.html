@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System? Explained Simply</title>
+<meta name="description" content="From P(x), P(y), and P(y|x) to PSI, delayed labels, proxy metrics, slice alerts, and safe response.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System? Explained Simply">
+<meta property="og:description" content="From P(x), P(y), and P(y|x) to PSI, delayed labels, proxy metrics, slice alerts, and safe response.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System? Explained Simply">
+<meta name="twitter:description" content="From P(x), P(y), and P(y|x) to PSI, delayed labels, proxy metrics, slice alerts, and safe response.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/#page","name":"What Is Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System? Explained Simply","description":"From P(x), P(y), and P(y|x) to PSI, delayed labels, proxy metrics, slice alerts, and safe response.","url":"https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System","item":"https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System</span></li></ol></nav><article id="dd-article" data-concept-id="data-drift-monitoring" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Data Drift and Continuous Monitoring: When Distribution Change Actually Harms the System</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From P(x), P(y), and P(y|x) to PSI, delayed labels, proxy metrics, slice alerts, and safe response.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Drift detection compares baseline and current data, but &quot;distribution difference&quot; is only a diagnostic signal, not equivalent to quality degradation, nor an automatic retraining command. A reliable closed loop must distinguish between input, label, concept, and true performance changes, use delayed ground truth to confirm impact, and connect alerts to rollback handling.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>Distinguish four types of drift; compute PSI by hand and understand statistical boundaries; design early warnings without labels; turn drift alerts into investigation and release closed loops.</div>
+<ol class="dd-chain"><li>Freeze multiple versioned baselines</li><li>Continuously collect desensitized features and proxies</li><li>Quantify changes by window/slice</li><li>Validate instrumentation and locate contributing sources</li><li>Wait for mature labels to confirm task impact</li><li>Incrementally repair and update evaluation and baselines</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>First Separate the Four Types of Change<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>“User wording changed,” “refund eligibility rules changed,” and “the model is making more errors” all look like system problems, but they occur at entirely different levels and are handled differently. The first step in data drift monitoring is to separate them, because only by knowing which layer the change occurs in can you know which metrics to look at and what to fix. Based on the position in the probability distribution, changes can be divided into four types: covariate drift, label drift, concept drift, and performance drift.</p>
+<p>Covariate drift means the input distribution P(x) has changed. Users' expression habits evolve over time; for example, the word used to describe product issues shifted from “damaged” to the new colloquial “a dud”, so the composition of inputs the model receives is no longer the same as during training. Note that this type of drift only says that the input has changed; it does not directly answer whether the output rule has changed or whether the model will therefore make mistakes.</p>
+<p>Label drift means the label distribution P(y) has changed. For example, just after a holiday promotion ends, the proportion of orders eligible for refunds among refund requests rises significantly, and the proportional structure of the y values the model needs to predict shifts overall. At this point, even if the correct answer rule for each input remains unchanged, the class balance assumption from training has already become invalid.</p>
+<p>Concept drift means the conditional relationship P(y|x) has changed, that is, “the same input should now receive a different answer.” A typical example is a policy adjustment: the quality issue refund window is extended from 30 days after placing an order to 45 days. At this point, the input distribution may appear completely unchanged on the surface—the same order data still comes in—but the decision boundary learned by the old model no longer holds. This is the most critical point: changes in P(y|x) can quietly occur while P(x) appears stable, so monitoring input fields alone is never enough.</p>
+<p>Performance drift directly observes task performance: accuracy, risk metrics, or calibration actually decline. The first three types of drift describe which part of the distribution is moving, while performance drift describes whether the model is still doing the right thing. The two cannot replace each other.</p>
+<p>After separating the four types of change, a natural causal sequence is: first observe “what changed” and determine whether the change is in the input, the label, or the conditional relationship; then verify “whether it truly affects the task,” because not all distribution changes harm the model—for example, if users switch from iOS to Android, as long as the task only depends on the order date, drift in the device field is irrelevant; only then decide “what to fix,” whether to supplement data, change rules, retrain the model, or troubleshoot the pipeline.</p>
+<p>The inputs to drift classification are the past and current x, y, conditional relationship, and task metrics; the output is a diagnosis of covariate, label, concept, or performance drift. A change in P(x) means the input composition has changed; a change in P(y) means the label proportions have changed; a change in P(y|x) means the correct answer rule for the same input has changed; and whether performance has declined must still be directly observed through task metrics. The value of classification lies in locating which layer the change occurs in, not in drawing conclusions: asserting that the model has deteriorated based solely on a change in the input distribution goes beyond the scope of evidence that this step can provide.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>A baseline is not an eternal truth but a versioned reference.<span class="dd-badge eng">Design</span></h2>
+<div class="dd-agent-response"><p>The essence of drift detection is comparison: place the current observed distribution next to a reference distribution and see whether the difference exceeds expectations. So the first question is "compared to what" — should current traffic be compared to the training set, to last week, or to the same period last year? The answer depends on what problem you want to detect; different monitoring goals correspond to different baselines.</p>
+<p>A training set or frozen evaluation set answers the question "Have we already left the range covered by capability evidence?" Model capability has evidence only on the training distribution; once production traffic leaves that distribution, any performance promise is merely extrapolation. But its typical error direction is also clear: the training distribution never equals the production distribution, and treating the normal difference between the two as drift will continuously produce false alarms.</p>
+<p>A recent stable window answers "Did a sudden anomaly occur?" It is best at capturing instant changes such as pipeline failures and attack injection, but if the window is made into a continuously rolling "last N days", the baseline will follow the traffic — chronic drift will be swallowed by the baseline itself and never surface as an anomaly.</p>
+<p>A seasonal same period (such as the same period last year) answers "Is this change a normal cyclical phenomenon?" It suits holidays and cyclical patterns, but when the product and policies themselves have already changed, the difference compared with the same period last year may be a difference between two different systems rather than degradation.</p>
+<p>A control group or old version answers "What incremental impact did this new release bring?" It suits evaluating canary releases, but if the split is not random, or if new and old version traffic contaminate each other, the comparison result is not trustworthy.</p>
+<p>When choosing a baseline, remember one premise: every baseline must be bound to a version — application, model, prompt, index, policy, and instrumentation all count as part of the version. If the model version corresponding to the baseline differs from the current production one, even a normal release will be misreported as drift. Confirm these versions are consistent before comparing; otherwise the detected difference includes the noise of the release itself.</p>
+<p>Window length also affects the conclusion: if the window is too short, noise will drown out the signal; if it is too long, sudden changes will be smoothed and diluted. In practice, a common approach is to maintain two windows at the same time — a fast window responsible for sudden alarms in the short term, and a slow window responsible for observing long-term trends. The fast window detects sudden changes, the slow window identifies trends, and the seasonal same period is used to suppress cyclical false alarms.</p>
+<p>The inputs to baseline design are the monitoring problem itself, application and model versions, seasonality assumptions, and time-window selection; the output is a versioned reference such as the training set, a recent stable period, the same period last year, or a control group. Different baselines are suited to detecting different changes, and each has its own typical misjudgments, so no baseline is an eternally correct reference. Choosing the wrong baseline, or letting the baseline quietly follow current traffic, will make the entire monitoring system blind without noticing.</p></div>
+<table class="dd-table"><thead><tr><th>Reference</th><th>Suited to detect</th><th>Main misjudgment</th></tr></thead><tbody><tr><td>Training/frozen evaluation set</td><td>Capability evidence extrapolation risk</td><td>Does not inherently represent production</td></tr><tr><td>Recent stable window</td><td>Sudden pipeline failures or attacks</td><td>Chronic drift swallowed by the baseline</td></tr><tr><td>Seasonal same period</td><td>Holidays and cyclical patterns</td><td>Product and policy already changed</td></tr><tr><td>Control group/old version</td><td>Incremental impact of a new release</td><td>Nonrandom split or cross-contamination</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>From Category Distribution to PSI<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>After establishing the baseline and current window, the next question is how to measure 'how much they differ.' If the feature is a set of discrete categories—such as the word classes users input, regions, payment methods—the most commonly used compression approach is the Population Stability Index, abbreviated PSI.</p>
+<p>Let the baseline proportion for each bucket be eᵢ, and the current-window proportion for the same bucket be aᵢ. PSI is calculated in three steps: for each bucket i, first compute the difference between the current proportion and the baseline proportion (aᵢ − eᵢ), then multiply by the log ratio ln(aᵢ/eᵢ) of the two, and finally sum over all buckets:</p>
+<p>PSI = Σᵢ (aᵢ − eᵢ) × ln(aᵢ/eᵢ)</p>
+<p>This structure has two noteworthy properties. First, when the two distributions are exactly the same, every bucket's aᵢ equals eᵢ, the difference term is zero, and PSI is also zero; the greater the distribution difference, the higher the value usually is. Second, each bucket's contribution is amplified by two factors simultaneously: how much the bucket proportion actually deviated (aᵢ − eᵢ), and how large that deviation is relative to the baseline scale (log ratio). Therefore, a small-proportion bucket going from 0.1% to 0.5% can also produce a significant contribution and is not drowned out by the size of large buckets. PSI's input is the proportions of the same set of discrete buckets in the baseline period and the current period, and its output is each bucket's contribution and the sum.</p>
+<p>But PSI's value is far less 'objective' than it appears. It depends on the bucketing method: how bucket boundaries are cut and how many buckets there are directly change the result. Some buckets may have zero proportion in the current window, so ln(0/eᵢ) is undefined and smoothing must be applied first. Popular alert thresholds like 0.1 and 0.25 are only rules of thumb, not statistical laws. If the feature is a continuous variable, KS distance can be used to measure the maximum difference between cumulative distributions; if the question is whether categories conform to expected frequencies, a chi-square test can be used; if comparing complete probability distributions rather than sampled proportions, JS divergence or KL divergence can be used; for representations such as high-dimensional embeddings that cannot be directly bucketed, a classifier two-sample test or clustering monitoring can be used. Whichever distance is chosen, it must ultimately be connected to task impact—distance itself does not indicate loss.</p>
+<p>Large-scale traffic also brings a trap: when request volume reaches millions, extremely small distribution differences can be statistically significant, and the alerting system will be drowned in noise. Therefore, alert conditions should not look only at the distance value; they should also require effect size, duration, and business relevance: the difference must not only exist but be large enough, persist long enough, and fall where it affects the task.</p>
+<p>The correct positioning of PSI is as an effect signal that requires investigation. Its value is affected by bucketing, smoothing, and sample size, and can only indicate that 'the category composition of the baseline and current window shows a noteworthy difference'; it cannot directly serve as the conclusion that 'the model has deteriorated and needs automatic retraining.'</p></div>
+<div class="dd-formula"><math display="block" aria-label="总体稳定性指数"><mi>PSI</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mrow><mo>(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>−</mo><msub><mi>e</mi><mi>i</mi></msub><mo>)</mo></mrow><mo>×</mo><mi>ln</mi><mo>(</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><msub><mi>e</mi><mi>i</mi></msub></mfrac><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked example: hand calculation of PSI after a new policy goes live<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>Manually calculating PSI in a concrete scenario makes the formula's meaning clearer. In a refund system, the refund reasons used to be roughly "Unwanted" 50%, "Size" 30%, "Quality" 20%, and after the new policy went live they became 30%/30%/40%. Question: Where does the drift mainly come from?</p>
+<p>Using the formula PSI = Σᵢ (aᵢ − eᵢ) × ln(aᵢ/eᵢ), calculate bucket by bucket, denoting the baseline proportion as e and the current proportion as a:</p>
+<p>"Unwanted" bucket: a − e = 0.30 − 0.50 = −0.20, log ratio is ln(0.30/0.50) = ln(0.6), contribution is (−0.20) × ln(0.6) ≈ 0.102.</p>
+<p>"Size" bucket: a = e = 0.30, the difference term is zero, contribution is 0.</p>
+<p>"Quality" bucket: a − e = 0.40 − 0.20 = 0.20, log ratio is ln(0.40/0.20) = ln(2), contribution is 0.20 × ln(2) ≈ 0.139.</p>
+<p>Summing the three terms, PSI ≈ 0.102 + 0 + 0.139 ≈ 0.241. If the bucketing also includes an "Other" bucket that drops from 0.10 to 0.04, its contribution is approximately (0.04 − 0.10) × ln(0.04/0.10) ≈ 0.055, giving a total value of about 0.296 for the complete bucketing. Every step here emphasizes that PSI is the sum of per-bucket contributions, not an absolute quantity independent of the specific bucketing — the 0.358 given in the figure corresponds to a different smoothing and bucketing method, and the value cannot be reproduced apart from the bucketing scheme. This is one reason PSI can only serve as a signal and not as an absolute conclusion.</p>
+<p>More important than the total is the per-bucket contribution. In the hand-calculated result, the largest contribution comes from the "Quality" bucket: the proportion of quality-related reasons doubled from 20% to 40%. The business question that really needs answering at this point is: the newly launched policy extended the quality issue refund window to 45 days, and the old eligibility logic is likely to miss orders that fall into this new window. This example fully illustrates the flow in Figure 1: the drift alert (PSI tells us the distribution changed) is only the starting point; next we must wait for ground truth labels to mature — whether the refund is actually approved and whether the order truly meets the new policy — before confirming whether this change harmed the system. The statistic only answers "did the distribution change?", while the policy and mature labels answer "does this change harm the system?"</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 255" role="img" aria-label="Refund reason baseline and current proportions, and the flow from drift alert to delayed ground truth confirmation"><rect x="28" y="38" width="258" height="174" rx="10" fill="#21252d" stroke="#6b8cbe"/><text x="157" y="62" text-anchor="middle" class="svg-t">Refund reason distribution</text><text x="78" y="190" text-anchor="middle" class="svg-t" font-size="11">Unwanted</text><rect x="55" y="100" width="22" height="75" fill="#6b8cbe"/><rect x="82" y="130" width="22" height="45" fill="#d3a05a"/><text x="158" y="190" text-anchor="middle" class="svg-t" font-size="11">Size</text><rect x="135" y="130" width="22" height="45" fill="#6b8cbe"/><rect x="162" y="130" width="22" height="45" fill="#d3a05a"/><text x="238" y="190" text-anchor="middle" class="svg-t" font-size="11">Quality</text><rect x="215" y="145" width="22" height="30" fill="#6b8cbe"/><rect x="242" y="115" width="22" height="60" fill="#d3a05a"/><text x="110" y="82" class="svg-t" font-size="11">Blue=baseline 50/30/20　Yellow=current 30/30/40</text><path d="M286,125 L353,125" stroke="#6b7484"/><polygon points="353,125 344,120 344,130" fill="#6b7484"/><rect x="355" y="75" width="144" height="98" rx="9" fill="#21252d" stroke="#c77b72"/><text x="427" y="99" text-anchor="middle" class="svg-t">PSI≈0.358</text><text x="427" y="120" text-anchor="middle" class="svg-t" font-size="11">Quality issue contributes the most</text><text x="427" y="140" text-anchor="middle" class="svg-t" font-size="11">Just an investigation signal</text><text x="427" y="158" text-anchor="middle" class="svg-t" font-size="11">Not a retraining command</text><path d="M499,125 L553,125" stroke="#6b7484"/><polygon points="553,125 544,120 544,130" fill="#6b7484"/><rect x="555" y="75" width="122" height="98" rx="9" fill="#21252d" stroke="#4f9d78"/><text x="616" y="99" text-anchor="middle" class="svg-t">Replay by slice</text><text x="616" y="120" text-anchor="middle" class="svg-t" font-size="11">Policy version verification</text><text x="616" y="140" text-anchor="middle" class="svg-t" font-size="11">14-day label backfill</text><text x="616" y="158" text-anchor="middle" class="svg-t" font-size="11">Confirm performance impact</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　The statistic only tells us the distribution changed; the policy and mature labels determine whether this change harms the system.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Bucket</th><th>e baseline</th><th>a current</th><th>(a−e)ln(a/e)</th></tr></thead><tbody><tr><td>Unwanted</td><td>.50</td><td>.30</td><td>(−.20)ln(.6)=.102</td></tr><tr><td>Size</td><td>.30</td><td>.30</td><td>0</td></tr><tr><td>Quality</td><td>.20</td><td>.40</td><td>.20ln(2)=.139</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>When there is no ground truth, you can only use proxies; do not treat proxies as conclusions.<span class="dd-badge eng">Delayed Labels</span></h2>
+<div class="dd-agent-response"><p>Whether a refund is truly correct is only known after the 14-day label matures—users may later revoke the refund, or manual review may change the decision. But monitoring cannot wait 14 days; how can we alert today? The answer is to handle immediately visible proxy signals and delayed ground truth separately, and never treat proxies as conclusions.</p>
+<p>Immediately visible early signals include: the occurrence rate of new words in inputs, the frequency of empty retrieval results, the proportion of low-confidence or refusal responses, the number of repeated user questions, the number of human handoffs, tool-calling errors, rule conflicts, and version changes. They have no necessary correspondence with final correctness. An increase in the handoff rate may mean the model is deteriorating, or it may mean the new review policy inherently requires more human intervention; a stable confidence distribution also does not mean safety, as the model can confidently make mistakes on the new distribution. Therefore each proxy signal can only pose a hypothesis to be verified, not directly serve as evidence of 'model degradation'.</p>
+<p>At the same time, establish a label maturation queue. For each prediction, save the event time, slice information, and model version; after 14 days, backfill the true outcome—whether the refund was revoked, whether the human review changed the decision—then compute accuracy, risk, calibration, and selective coverage. One mistake must be avoided here: treating 'no failure observed yet' as correct. Samples whose labels have not matured must not be prematurely marked as correct, otherwise accuracy will be inflated and chronic degradation will be hidden.</p>
+<p>Several typical proxies and the ground truths they await can be listed as correspondences. An increase in empty retrieval results may be rooted in an influx of new words, indexing failures, or permission filtering changes, but what needs to be confirmed with ground truth is 'whether the necessary policy evidence actually exists.' An increase in handoff rate may come from difficulty shifts, threshold adjustments, or capacity changes; what truly needs to wait is whether the human ultimately overturns the decision and why. An increase in repeated user questions may be due to unclear answers or interface changes; what truly needs to wait is whether the task is ultimately resolved. A stable confidence distribution may mean everything is normal, or it may mean the model is miscalibrated; you need to review actual accuracy by confidence bucket to tell which.</p>
+<p>The inputs to delayed-label monitoring are therefore of two types: one is immediate proxies such as empty retrieval results, repeated questions, human handoffs, and confidence; the other is real business outcomes backfilled later. The outputs also have two layers: early warnings for the present, and true performance after labels mature. The role of proxies is to pose hypotheses and trigger investigations; only mature labels can turn hypotheses into conclusions.</p></div>
+<table class="dd-table"><thead><tr><th>Early proxy</th><th>Possible root cause</th><th>Ground truth to wait for</th></tr></thead><tbody><tr><td>Empty retrieval results↑</td><td>New words, index failure, permission filtering</td><td>Whether the necessary policy evidence exists</td></tr><tr><td>Human handoff↑</td><td>Difficulty, threshold, or capacity changes</td><td>Whether the human ultimately changes the decision and why</td></tr><tr><td>Repeated user questions↑</td><td>Unclear answer or interface changes</td><td>Whether the task is ultimately resolved</td></tr><tr><td>Stable confidence distribution</td><td>May be unchanged, or may be miscalibrated</td><td>Actual accuracy by confidence bucket</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Average stability can mask local harm<span class="dd-badge math">Slices</span></h2>
+<div class="dd-agent-response"><p>Overall accuracy still shows 90%, and everything looks normal—but the accuracy for users with Chinese quality issues may have dropped from 85% to 55%. How can the average accommodate both facts at the same time? Because overall performance is a weighted sum of slice performances:</p>
+<p>Qoverall = Σₖ wₖ × qₖ</p>
+<p>where wₖ is the traffic weight of slice k, and qₖ is the performance of that slice. If the harmed slice accounts for only 3% of total traffic, and the remaining 97% of traffic inches up from 90.2% to 91.1%, the weighted overall performance barely moves and stays around 90%. The sharp degradation of the minority group is offset in weight by the slight improvement of the majority group. Average stability does not mean there is no harm; it merely dilutes the harm.</p>
+<p>Therefore, slice monitoring cannot look only at the aggregate. It needs to slice by language, region, product, channel, input length, risk level, and policy version, while handling two statistical issues: multiple comparisons—the more slices there are, the more likely pure random fluctuation will produce a “significant” alert in some slice; and small-sample noise—when a slice has only a few cases, the fluctuation itself is large. For small slices, the correct approach is to report numerator/denominator and confidence intervals, use a longer window to accumulate samples, or use hierarchical shrinkage to shrink slice estimates toward the aggregate. We should neither permanently alert just because 2/3 failed, nor ignore high-loss groups just because the sample is small. For high-risk slices, event counts and zero-tolerance thresholds can be used: trigger as soon as a single serious error occurs, rather than waiting for aggregate metrics to become significant.</p>
+<p>Slice analysis must also distinguish two changes that look the same: composition change and within-slice performance change. Composition change means the proportion of difficult cases increases—for example, the share of quality issue orders in total traffic rises; in this case the performance of that group has not changed, but the traffic structure has. Within-slice performance change means that on the same type of task, the model or system does worse. The former is more likely to be resolved by adjusting traffic, rules, or data; the latter points more directly to model degradation. Confusing the two will mistake a traffic structure problem for a model problem and retrain, or vice versa.</p>
+<p>The inputs to slice monitoring are each slice’s traffic weight wₖ, slice performance qₖ, sample size, and risk level; the outputs are overall performance Qoverall and the performance intervals for each slice. The fact that the aggregate is a weighted sum itself means that weight changes can mask degradation of minority groups. Therefore monitoring must compare both composition changes and within-slice changes, and give small slices sufficiently long time windows and interval reporting, rather than dismissing all alerts with the phrase “aggregate is stable”.</p></div>
+<div class="dd-formula"><math display="block" aria-label="总体表现是各切片表现的加权和"><mi>Qoverall</mi><mo>=</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>w</mi><mi>k</mi></msub><mo>×</mo><msub><mi>q</mi><mi>k</mi></msub></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Investigation Tree After a Drift Alert<span class="dd-badge eng">Response</span></h2>
+<div class="dd-agent-response"><p>The first impulse triggered by a drift alert is often to “retrain the model.” This is a dangerous shortcut, because the alert only indicates that something somewhere has changed, not what has changed. Directly pouring new traffic into the training set is equivalent to modifying the system before knowing the cause, and it can inject anomalies or even attacks into the training data. The correct approach is to investigate layer by layer along an investigation tree, eliminating one class of possibility at each layer until you find a verifiable root-cause candidate, then choose a remediation method.</p>
+<p>The first layer is to verify the signal itself. Have the instrumentation points been changed? Have parsing logic, timezone handling, deduplication rules, or sampling strategies changed? Has the baseline version been swapped out? Much “drift” is actually drift in the monitoring signal itself, and checking these can save all subsequent work.</p>
+<p>The second layer is to locate the slice. Break down the alert into specific dimensions: which input patterns, which model version, which regions, and which risk levels contribute the most. This step turns “overall drift” into “who is drifting.”</p>
+<p>The third layer is to examine external causes. Have policies changed, has the product entry been redesigned, has a marketing campaign introduced new traffic, is there an attack, or is an upstream service abnormal? These external events are often the true source of distribution changes, and fixing them does not require touching the model.</p>
+<p>The fourth layer is replay evaluation. Compare the new and old systems on the same batch of evidence, using oracle evidence and frozen tool responses, to determine whether the difference comes from the model, prompts, retrieval, or the pipeline.</p>
+<p>Only after reaching this point can you talk about choosing a remediation: fix instrumentation, update rules or retrieval, change prompts, tighten thresholds—retraining the model comes last. If you finally decide to release, you must also go through progressive rollout—first shadow running, then canary validation, and keep the old version for rollback.</p>
+<p>Poisoning risk is the last link in this investigation tree that must be strictly guarded against. Automatically adding anomalous production input to training is equivalent to opening a path for attackers to rewrite the model through the drift channel: the attacker continuously creates a certain input pattern, the system detects “drift,” automatically retrains, and the model is shaped according to the attacker’s intent. Therefore, any production sample that is to enter training must be de-identified, deduplicated, and have its source and labels reviewed.</p>
+<p>The input to the investigation tree is a drift alert plus version and slice evidence; the output is a verified root-cause candidate and remediation choice. The question it must always answer is the same: after drift is detected, should the model be automatically retrained—and walking through the tree reveals that for most alerts the correct endpoint is not retraining at all.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Alerts should connect error budgets and executable runbooks<span class="dd-badge eng">Operations</span></h2>
+<div class="dd-agent-response"><p>If dozens of red lights light up on the monitoring screen every day and no one handles them, the failure is not the model but the monitoring system itself: alerts are not connected to actions. A valuable alert must answer three questions—how severe is this breach, who handles it, and what is allowed to be done.</p>
+<p>For this reason, every monitoring metric must specify complete parameters in the runbook: what the baseline is, how long the window is, the minimum sample size, the effect threshold, how severity is graded, who is responsible, where the diagnostic entry point is, and which actions are allowed to be executed after triggering. Only when alerts are bound to executable actions do red lights have meaning.</p>
+<p>The escalation strategy for alerts should be tiered. A single breach usually only enters an observation state; continuous breaches across multiple windows, or rapid depletion of the error budget, escalate to calling a human for handling. The error budget plays the role of “how much error allowance is left”: the faster the budget is consumed, the more severe the problem. Safety-related events are an exception: once confirmed, they can be blocked immediately, without waiting for windows to accumulate.</p>
+<p>Response measures are far richer than “retraining the model”: freezing automatic refunds, raising the threshold for human handoff, rolling back indexes, and switching back to the old policy are all legitimate responses. After recovery, update the evaluation set and baseline, but keep the old baseline to identify chronic drift; also record whether this alert was a true positive and what benefit the response brought, and periodically remove noise metrics that have no long-term action value—a metric that never triggers an effective action is just creating noise.</p>
+<p>Finally, we must accept an asymmetric fact: not detecting drift does not mean there is no degradation. Monitoring only covers the features you selected; omitted variables, label errors, and changes inside the model can still cause harm, and they occur precisely outside the monitoring's line of sight. The inputs to the alert runbook are baseline, window, minimum sample size, effect threshold, error budget, responsible person, and allowed actions; the outputs are concrete responses such as observe, call, block, roll back, or hand off to humans. Not detecting drift only means that monitored features have not breached thresholds; it cannot prove that the system is healthy.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connect the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Stringing together the preceding stages, the complete causal chain of data drift monitoring consists of six actions, with the output of each action serving as the input to the next.</p>
+<p>First step, freeze versioned multiple baselines. The training set, recent stable window, seasonal same-period, and control group each answer different questions, and all must be bound to application, model, prompt, index, policy, and instrumentation versions. Without this step, all later comparisons have no reference.</p>
+<p>Second step, continuously collect desensitized features and proxies. Distribution statistics require input features; early warning requires immediate proxies such as new word rate, empty search results, repeated questions, takeover rate, and confidence; label-maturity queues require saving event time, slice, and version. Collection must be desensitized from day one, otherwise samples can never legally enter any subsequent analysis or training.</p>
+<p>Third step, quantify changes by window and slice. Use PSI or other distance measures to compress baseline-versus-current differences into comparable values, while splitting the overall population into slices. Only slices can expose “average stable, local collapse” situations.</p>
+<p>Fourth step, verify instrumentation and locate contribution sources. Instrumentation, parsing, time zones, deduplication, and sampling themselves may be wrong; first rule out signal errors; then locate which slices contribute most by input, version, region, and risk, and check external causes such as policy, product, marketing, and attacks.</p>
+<p>Fifth step, wait for mature labels to confirm task impact. Statistics only answer whether the distribution changed; policy and mature labels answer whether this change actually harms the system. After 14 days of label backfill, the hypotheses raised by proxy signals can become conclusions.</p>
+<p>Sixth step, incrementally remediate and update evaluation and baselines. Remediation may be fixing instrumentation, changing rules, swapping prompts, rolling back indexes, or switching policies, with training last; releases go through shadow and canary validation and retain rollback. After recovery, update evaluation sets and baselines, but retain old baselines to identify chronic drift, and record alert true positives and remediation benefits, so that the monitoring system itself iterates.</p>
+<p>Each link in this chain constrains the conclusion of the previous link: baselines give comparisons a reference, slices give the overall population resolution, instrumentation verification gives signals credibility, and mature labels give proxies evidence. Missing any one link leaves only alerts without causal basis.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1810.11953" target="_blank" rel="noopener">Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift</a>: detecting dataset shift without labels</li><li><a href="https://arxiv.org/abs/2004.05785" target="_blank" rel="noopener">Learning under Concept Drift: A Review</a>: concept drift definitions and methods</li><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>: feedback loops and monitoring debt</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>: deployment monitoring, measurement, and response</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/data-drift-monitoring">Explore connections on the map</a><a href="/zh/concepts/data-drift-monitoring/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

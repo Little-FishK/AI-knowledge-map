@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is CLIP: Using image–text contrast to align two modalities into the same space? Explained Simply</title>
+<meta name="description" content="From dual encoders, a normalized similarity matrix, and symmetric cross-entropy, to zero-shot classification, retrieval, compositional relations, and bias boundaries.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/clip/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/clip/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/clip/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is CLIP: Using image–text contrast to align two modalities into the same space? Explained Simply">
+<meta property="og:description" content="From dual encoders, a normalized similarity matrix, and symmetric cross-entropy, to zero-shot classification, retrieval, compositional relations, and bias boundaries.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/clip/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is CLIP: Using image–text contrast to align two modalities into the same space? Explained Simply">
+<meta name="twitter:description" content="From dual encoders, a normalized similarity matrix, and symmetric cross-entropy, to zero-shot classification, retrieval, compositional relations, and bias boundaries.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/clip/#page","name":"What Is CLIP: Using image–text contrast to align two modalities into the same space? Explained Simply","description":"From dual encoders, a normalized similarity matrix, and symmetric cross-entropy, to zero-shot classification, retrieval, compositional relations, and bias boundaries.","url":"https://ai-knowledge-map.com/en/concepts/clip/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"CLIP: Using image–text contrast to align two modalities into the same space","item":"https://ai-knowledge-map.com/en/concepts/clip/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">CLIP: Using image–text contrast to align two modalities into the same space</span></li></ol></nav><article id="dd-article" data-concept-id="clip" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">CLIP: Using image–text contrast to align two modalities into the same space</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From dual encoders, a normalized similarity matrix, and symmetric cross-entropy, to zero-shot classification, retrieval, compositional relations, and bias boundaries.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> CLIP uses independent image and text encoders to pull matched image–text pairs together and push mismatched combinations apart, learning a retrievable open-vocabulary space. Its scalability comes from large-scale weak pairing and in-batch negative samples; but global similarity mainly proves that “this image and this text are often paired in the data distribution,” and does not automatically prove object relations, counts, negation, truthfulness, or fairness.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Manually compute an image-text similarity matrix; explain the bidirectional contrastive loss; complete a zero-shot classification pipeline; diagnose prompt, compositional relation, and data bias issues.</div>
+<ol class="dd-chain"><li>Collect and govern image-text pairs</li><li>Dual encoders produce normalized vectors</li><li>Construct an in-batch similarity matrix</li><li>Align spaces with bidirectional cross-entropy</li><li>Complete transfer with text prototypes or ANN</li><li>Use minimal contrasts and subgroup slices to constrain use</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Dual encoders first understand separately, then meet in vector space<span class="dd-badge math">Architecture</span></h2>
+<div class="dd-agent-response"><p>Images and text are originally two completely different types of input: images are pixel matrices, text is a token sequence, and the two cannot be directly compared. CLIP uses two independent encoders to map them to a single shared vector space of the same dimension. For the i-th image Iᵢ, first the image encoder f_img obtains features, and then L2 normalization is performed:</p>
+<p>vᵢ = f_img(Iᵢ) / ‖f_img(Iᵢ)‖</p>
+<p>For the j-th text Tⱼ, the text encoder f_txt performs the same process:</p>
+<p>tⱼ = f_txt(Tⱼ) / ‖f_txt(Tⱼ)‖</p>
+<p>where ‖·‖ denotes the vector length. After dividing by its own length, both vᵢ and tⱼ become unit vectors, so the dot product vᵢ·tⱼ equals their cosine similarity. The larger the score, the closer the directions of the image and text in this shared space, that is, the more semantically matched the model considers them.</p>
+<p>For example, a batch contains two pairs of data: I₁ is a cat image, T₁ is “a cat”; I₂ is a dog image, T₂ is “a dog”. After comparing the normalized vectors pairwise, the similarity matrix is [[0.8, 0.2], [0.3, 0.7]]. The first row represents the similarity of the cat image to “a cat” and “a dog”, with 0.8 higher than 0.2; the second row represents the similarity of the dog image to the two texts, with 0.7 higher than 0.3. The two correct pairs therefore lie on the diagonal of the matrix and achieve the higher score in their respective row or column.</p>
+<p>The immediate benefit of the dual-encoder structure is that images and text can be encoded independently and offline in advance. During actual retrieval, there is no need to rerun the joint computation of the two encoders; only the already obtained vectors need to be compared. Its limitation also comes from the same design: before scoring, there is no deep interaction between individual tokens and image regions, so the final judgment depends on whether the two global vectors can retain the information needed for matching.</p></div>
+<div class="dd-formula">vᵢ=f<sub>img</sub>(Iᵢ)/‖f<sub>img</sub>(Iᵢ)‖, tⱼ=f<sub>txt</sub>(Tⱼ)/‖f<sub>txt</sub>(Tⱼ)‖</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>One batch automatically forms N×N image-text combinations<span class="dd-badge math">similarity matrix</span></h2>
+<div class="dd-agent-response"><p>If a batch contains N real image-text pairs, it simultaneously produces N×N candidate combinations. The unit vector vᵢ of the i-th image and the unit vector tⱼ of the j-th text segment are dot-multiplied pairwise, then scaled by temperature τ, yielding the matching score before entering softmax:</p>
+<p>Sᵢⱼ = vᵢᵀtⱼ / τ</p>
+<p>The superscript ᵀ denotes transpose, so vᵢᵀtⱼ is the dot product of two unit vectors. S is an N-row, N-column matrix: each row fixes one image and compares N text segments, and each column fixes one text segment and compares N images. In the collected data, the i-th image and the i-th text segment belong to the same real pair, so the diagonal Sᵢᵢ are positive pairs; off-diagonal combinations are treated as negative pairs in the standard CLIP objective. In this way, by providing only N real pairs, a large number of candidates for comparison naturally form within the batch, without needing to construct negative samples for each sample one by one.</p>
+<p>Taking two groups of data as an example, I₁ is a cat image, T₁ is cat text, I₂ is a dog image, T₂ is dog text. The original similarity matrix is [[0.8, 0.2], [0.3, 0.7]]: 0.8 and 0.7 lie on the diagonal and are the cat–cat and dog–dog positive pairs, respectively; 0.2 and 0.3 lie off the diagonal and are the cat–dog and dog–cat negative pairs. When τ = 0.1, each similarity is divided by 0.1, giving logits [[8, 2], [3, 7]]. Scaling does not change the ranking of candidates, but it widens the numerical differences seen by softmax, making the probability distribution sharper; a larger or smaller τ will correspondingly change this sharpness.</p>
+<p>Increasing the batch size makes each image or text face more candidates, thus providing richer contrastive signals, but off-diagonal entries are not necessarily all true negative examples semantically. If two samples with similar content and actually identical semantics are not collected as the same pair, they will still be treated as negative pairs by the objective, and this is a false negative sample. As the number of candidates grows with the batch, such conflicts are also more likely to increase, so the efficient N×N construction simultaneously brings stronger contrast and a higher risk of false negative samples.</p></div>
+<table class="dd-table"><thead><tr><th></th><th>T₁ cat</th><th>T₂ dog</th></tr></thead><tbody><tr><td>I₁ cat</td><td><b>0.8 positive pair</b></td><td>0.2 negative pair</td></tr><tr><td>I₂ dog</td><td>0.3 negative pair</td><td><b>0.7 positive pair</b></td></tr></tbody></table>
+<div class="dd-formula">Sᵢⱼ=vᵢᵀtⱼ/τ</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>CLIP simultaneously performs image-to-text and text-to-image retrieval<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>The same similarity matrix can support retrieval in both directions, but the two directions correspond to different competition sets. In image-to-text retrieval, one image is the query and all texts in the batch are candidates, so softmax must be applied along each row of the matrix; in text-to-image retrieval, one text is the query and all images in the batch are candidates, so softmax must be applied along each column. CLIP optimizes both directions simultaneously:</p>
+<p>L = (CE_image→text + CE_text→image) / 2</p>
+<p>CE_image→text represents the average cross-entropy for each image to select its paired text among all texts, and CE_text→image represents the average cross-entropy for each text to select its paired image among all images. The final loss L is the arithmetic mean of the two. Cross-entropy takes the negative logarithm of the predicted probability of the correct candidate, so the closer the probability of the correct pairing is to 1, the smaller the corresponding loss; conversely, if the model assigns a higher probability to an incorrect candidate, it incurs a larger penalty.</p>
+<p>Continuing with the logits matrix [[8, 2], [3, 7]], compute the image-to-text probabilities row by row. For I₁, the probability of T₁ is e⁸ / (e⁸ + e²) ≈ 0.9975; for I₂, the probability of T₂ is e⁷ / (e³ + e⁷) ≈ 0.9820. The probabilities of both correct texts are close to 1, so the image-to-text loss is small. When computing column by column, T₁ must retrieve I₁ among I₁ and I₂, and T₂ must retrieve I₂ among I₁ and I₂; the loss in this direction constrains the text vectors to correctly distinguish images as well. The bidirectional averaging prevents training from favoring only one query mode; if only a unidirectional objective is optimized, the retrieval structure formed by the other side may be weaker.</p>
+<p>Temperature affects the intensity of candidate competition in both directions. The lower the temperature, the sharper the softmax distribution, and high-scoring incorrect candidates or hard negative pairs close to the positive pair have a greater impact. This can strengthen learning on hard-to-distinguish candidates, provided the pairing signal is sufficiently reliable; if there are many incorrect pairings in the data, an overly sharp distribution will also force the model to reinforce these erroneous relationships.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Query</th><th>Candidate Competition</th></tr></thead><tbody><tr><td>Image→Text</td><td>One image</td><td>all texts in batch</td></tr><tr><td>Text→Image</td><td>One text</td><td>all images in batch</td></tr></tbody></table>
+<div class="dd-formula">L=(CE<sub>image→text</sub>+CE<sub>text→image</sub>)/2</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Original figure: Positive pairs form a shared space along the diagonal<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>Figure 1 shows the relationship between image–text dual encoders and a 2×2 similarity matrix. Images first pass through the image encoder to obtain image vectors, and texts first pass through the text encoder to obtain text vectors; the two processing paths are independent until these vectors meet when compared pairwise in the similarity matrix. The rows of the matrix correspond to images, and the columns correspond to texts; each cell represents the logit of a pair of image and text vectors after a single temperature scaling. This matrix is denoted S, consistent with the definition in Section 2; the 8, 2, 3, and 7 in the figure are already the values of vᵢᵀtⱼ divided by τ, and should not be divided by τ again.</p>
+<p>The true image–text pairs in the training data lie on the diagonal of the matrix. The training signal targets these diagonal positions and is sent back to both the image encoder and the text encoder, so what is adjusted is not just the vectors on one side, but the way both sides produce vectors. As a result, the image vectors and text vectors of correct pairs gradually move closer in the shared space, making the matches on the diagonal more prominent.</p>
+<p>This figure also reveals a key boundary of the dual-encoder structure: images and texts do not directly exchange information during their respective encoding processes; the two meet only at the final vector comparison. Therefore, the shared space is not an additional joint representation, but a comparable coordinate system jointly shaped by the two encoders through the same training signal.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 735 310" role="img" aria-label="Image–text dual encoders and a two-by-two similarity matrix"><defs><marker id="clpa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="25" y="50" width="120" height="55" rx="8" fill="#21252d" stroke="#65a6d9"/><text x="85" y="82" text-anchor="middle" class="svg-t">Cat image / Dog image</text><rect x="25" y="195" width="120" height="55" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="85" y="227" text-anchor="middle" class="svg-t">“Cat” / “Dog”</text><path d="M145,78 L240,108" stroke="#788293" marker-end="url(#clpa)"/><path d="M145,222 L240,192" stroke="#788293" marker-end="url(#clpa)"/><rect x="245" y="70" width="145" height="72" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="318" y="98" text-anchor="middle" class="svg-t">Image encoder</text><text x="318" y="121" text-anchor="middle" class="svg-t" font-size="11">Normalized v₁,v₂</text><rect x="245" y="168" width="145" height="72" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="318" y="196" text-anchor="middle" class="svg-t">Text encoder</text><text x="318" y="219" text-anchor="middle" class="svg-t" font-size="11">Normalized t₁,t₂</text><path d="M390,106 L475,135" stroke="#788293" marker-end="url(#clpa)"/><path d="M390,204 L475,174" stroke="#788293" marker-end="url(#clpa)"/><rect x="480" y="82" width="210" height="145" rx="10" fill="#21252d" stroke="#8b76bd"/><text x="585" y="108" text-anchor="middle" class="svg-t">Similarity matrix S/τ</text><rect x="525" y="125" width="62" height="38" fill="#315d54"/><rect x="590" y="125" width="62" height="38" fill="#343943"/><rect x="525" y="166" width="62" height="38" fill="#343943"/><rect x="590" y="166" width="62" height="38" fill="#315d54"/><text x="556" y="150" text-anchor="middle" class="svg-t">8</text><text x="621" y="150" text-anchor="middle" class="svg-t">2</text><text x="556" y="191" text-anchor="middle" class="svg-t">3</text><text x="621" y="191" text-anchor="middle" class="svg-t">7</text><text x="585" y="256" text-anchor="middle" class="svg-t">Raise the diagonal, lower the off-diagonal</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  Dual encoders meet only at the similarity matrix; the training signal updates both sides simultaneously, bringing true pairs closer in the shared space.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Zero-shot classification turns categories into text prototypes<span class="dd-badge eng">Transfer</span></h2>
+<div class="dd-agent-response"><p>Zero-shot classification does not require training a new classification head for target categories such as “cat” and “dog”; instead, each category is converted into text, and the text vector serves as the class prototype. For example, when the candidate categories are cat and dog, “a photo of a cat” and “a photo of a dog” can be constructed separately. After these texts pass through the text encoder and are normalized, they become candidate representations that can be directly compared with image vectors; the same category can also use multiple templates, and the corresponding vectors are averaged into the text prototype for that category.</p>
+<p>At prediction time, the image to be tested passes through the image encoder to obtain a normalized vector, and then its similarity to all pre-declared category prototypes is computed. The system can directly select the category with the highest similarity, or apply softmax to these candidate scores to obtain a probability distribution over the current candidate set. Thus, classification is converted into an image-to-category-text retrieval: whichever text prototype the image is closest to is predicted as the category.</p>
+<p>Here, “zero-shot” means that no new classification head is trained for these categories; it does not mean that the model can discover all possible labels out of thin air. Results are valid only within the pre-given closed set of candidates; if the true category is not included in the candidate set, the model will still select one from the existing categories. The wording of category names, the language used, prompt templates, temperature, and the candidate set itself can all change the relative scores of the categories. To prevent test results from being influenced by temporarily selected templates, templates should first be selected on the validation set, frozen, and then used for final testing.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Retrieval Efficiency Comes from Independent Encoding, and Reranking Ability Is Limited as a Result<span class="dd-badge eng">System</span></h2>
+<div class="dd-agent-response"><p>Dual encoders encode retrieval objects and queries independently into global vectors, so image vectors in a large image gallery can be computed in advance and an ANN (approximate nearest neighbor) index can be built. After receiving a text query, the system only needs to encode the text once and then quickly find a small batch of images whose vectors are closest through the index, without having to perform a complete exact scan of the query against every image in the gallery. This division of labor—"gallery processed offline, query encoded once online"—is key to CLIP achieving high throughput in large-scale retrieval.</p>
+<p>The cost of this efficiency is limited interaction depth. During the comparison stage, CLIP faces global vectors compressed separately from images and text, and during scoring it does not let text tokens interact further with specific image regions. For complex queries that depend on detailed relational judgments, the global vector may be insufficient to express the local correspondences that determine whether a match is made, so it is easy for recalled results to be broadly relevant while the details do not match the query.</p>
+<p>Cross-encoder takes the opposite trade-off: it lets text tokens interact with image regions in the same model, enabling finer relational judgments, but every query–candidate combination requires a joint computation, making it difficult to pre-index gallery representations as dual encoders do. Real systems often chain the two: first use CLIP to recall a small batch of candidates from a large gallery with high recall, then have a cross-modal cross-encoder rerank those candidates. In this way, the dual encoder is responsible for narrowing the search space, and the cross-encoder confines the more expensive fine-grained computation to a small number of candidates. CLIP is more suitable for recall and zero-shot matching, while the cross-encoder is more suitable for fine-grained ranking within a small candidate set.</p></div>
+<table class="dd-table"><thead><tr><th>Architecture</th><th>Offline Indexing</th><th>Interaction Depth</th><th>Use</th></tr></thead><tbody><tr><td>Dual-encoder CLIP</td><td>Yes</td><td>Global vectors</td><td>Recall, zero-shot</td></tr><tr><td>Cross-encoder</td><td>Difficult</td><td>token/region interaction</td><td>Small-candidate reranking</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Object co-occurrence is not the same as understanding relations, counting, and negation<span class="dd-badge intuition">compositional boundaries</span></h2>
+<div class="dd-agent-response"><p>“Dog chases person” and “person chases dog” contain the same object and action words, but the subject and object roles are exactly reversed. If the model’s global vector mainly retains the overall topic “dog, person, chasing” without stably encoding who performs the action on whom, the two sentences may be mapped to nearby positions. Web image-text pairs often come from relatively coarse captions, and the global contrastive objective only requires the correct topic’s score to be higher than other candidates in the batch, which does not necessarily force the model to parse the role and order of each word.</p>
+<p>The same issue also appears with quantity, spatial relations, and negation. “No dog,” “two dogs,” and “the dog is under the table” all contain the conspicuous object word “dog”; global similarity may be dominated by object co-occurrence and ignore the key constraints introduced by “no,” “two,” or “under the table.” Therefore, high image-text similarity only indicates that the overall representations are close; it cannot be interpreted as the image entailing the entire sentence, nor can it prove that every predicate in the description is supported by the image.</p>
+<p>When evaluating these abilities, minimal contrasts should be used to isolate the factor that actually needs to be judged. One can swap only the subject and object, change only the quantity, change only the spatial relation, or add only negation, while keeping other words and image statistics as consistent as possible. Then check whether the model can consistently rank the correct description ahead of the incorrect description that differs only in one key relation, and report pairwise accuracy. Overall Recall may be inflated by a large number of samples whose topics are easy to match, whereas pairwise accuracy more directly reveals whether the model truly understands roles, counting, spatial relations, or negation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Weakly paired data brings scale and noise at the same time<span class="dd-badge eng">Data</span></h2>
+<div class="dd-agent-response"><p>Alt-text, titles, and nearby text on web pages can link large numbers of images with natural language, providing the model with large-scale, open-vocabulary supervisory signals. Their value is that rich expressions can be covered without creating precise annotations anew for each image; but this image-text relationship is only weak pairing, and the text may describe the entire web page, advertisement, or context rather than the image itself. Data scale therefore grows together with supervisory noise, and what the model learns may be useful visual-language correspondences or mismatched relationships.</p>
+<p>Noise does not only manifest as inaccurate descriptions. Web text may also contain stereotypes, mislabeled identities, and personal information; near-duplicate content in images or text may cross into training and evaluation sets, causing evaluation results to be affected by data leakage. For mismatches and weak descriptions, manual sampling can be used to understand actual noise, and noise-robust training can reduce the impact of incorrect supervision. For social bias, one should not only look at overall metrics; differences should be checked by slices such as population × occupation × language. For duplication and contamination, near-duplicate deduplication should be performed separately on images and text. For privacy and licensing, the source and authorization status should be recorded, and an executable deletion chain should be retained.</p>
+<p>Data filtering itself also has boundaries. Filtering too weakly retains more mismatches, harmful content, and sensitive information, while filtering too strongly may delete minority languages and specific cultural contexts along with it, further unbalancing data coverage. Therefore, data governance cannot only pursue 'the cleaner the better'; it must simultaneously evaluate the quality of the retained supervision, coverage across different groups and languages, evaluation contamination risk, and the source, licensing, and deletability of content.</p></div>
+<table class="dd-table"><thead><tr><th>Risk</th><th>Check</th></tr></thead><tbody><tr><td>Mismatch/Weak description</td><td>Manual sampling, noise-robust training</td></tr><tr><td>Social bias</td><td>Population × occupation × language slices</td></tr><tr><td>Duplication and contamination</td><td>Image/text near-duplicate deduplication</td></tr><tr><td>Privacy and licensing</td><td>Source, authorization, deletion chain</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>CLIP score is not a universal image quality or safety judge<span class="dd-badge eng">Failure boundary</span></h2>
+<div class="dd-agent-response"><p>CLIP score comes from the global vector similarity between image and text, answering 'how close this image is to this prompt in the shared representation.' Based on the mechanism introduced earlier, this value is suitable for comparing how close the current prompt is to the image representation; it does not itself output independent judgments about anatomy, facts, aesthetics, copyright, or safety. Therefore, a high score only indicates that the model leans more toward this image on this matching axis, and cannot serve as proof that these other attributes have been satisfied.</p>
+<p>When using it, first clarify the decision problem: if the question is which candidate image is closer to the prompt, CLIP similarity can be used as a ranking signal; if the question is whether an image is real, safe, or suitable for a specific population, then metrics and checks need to be designed separately for that attribute. This limited use comes from the input-output boundaries of the score itself, and does not rely on interpreting it as a universal quality score.</p>
+<p>Generative evaluation should measure prompt alignment, visual quality, diversity, relationship and text accuracy, safety, and human preference separately. Each dimension needs evidence matching its meaning, and should be validated with independent models and human sampling. Results across different populations should also be reported in slices; especially in high-impact scenarios affecting people, rights, or safety, one cannot rely solely on a single embedding score as the final decision.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>From raw data to practical applications, CLIP’s mechanism can be connected into an inspectable causal chain:</p>
+<p>Collecting and governing image-text pairs → generating normalized vectors with dual encoders → constructing an image-text similarity matrix within the batch → aligning the shared space with bidirectional cross-entropy → completing task transfer via text prototypes or ANN → constraining usage with minimal contrasts and subgroup slices.</p>
+<p>The starting point of the chain is image-text pair data. After governance is applied to these pairs, images and texts separately enter the dual encoders and output normalized vectors. Normalization allows the representations of the two modalities to be compared on the same scale; combining the image vectors and text vectors in the batch pairwise yields a similarity matrix. Training then simultaneously constrains image-to-text and text-to-image matching through bidirectional cross-entropy, giving true pairs more suitable relative positions in the shared space. The data provides the supervisory relation, the encoders transform inputs into representations, the similarity matrix creates candidate competition, and the loss function feeds the competition results back to the encoders on both sides; together these steps produce a transferable aligned space.</p>
+<p>After obtaining aligned representations, we can write categories as text prototypes to perform transfer based on candidate categories, or organize vectors into an ANN index to support retrieval. Application effectiveness must still return to verifiable tests: minimal contrasts are used to check whether the model can distinguish candidates that change only one key factor, and subgroup slices are used to observe performance differences across different groups. Only by considering these verification results together with specific usage scenarios can we determine what tasks the model is suitable for and within which boundaries it should be used.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Learning Transferable Visual Models From Natural Language Supervision</a>: CLIP dual encoders and zero-shot transfer</li><li><a href="https://arxiv.org/abs/2102.05918" target="_blank" rel="noopener">Scaling Up Visual and Vision-Language Representation Learning With Noisy Text Supervision</a>: ALIGN weak text supervision</li><li><a href="https://arxiv.org/abs/2303.15343" target="_blank" rel="noopener">Sigmoid Loss for Language Image Pre-Training</a>: SigLIP pairwise loss</li><li><a href="https://arxiv.org/abs/2204.03162" target="_blank" rel="noopener">Winoground</a>: compositional relation diagnosis</li><li><a href="https://arxiv.org/abs/1908.04913" target="_blank" rel="noopener">FairFace</a>: visual fairness slice context</li></ul><div class="dd-src-date">Date accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/clip">Explore connections on the map</a><a href="/zh/concepts/clip/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

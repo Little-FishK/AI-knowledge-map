@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Test-time Compute and Verifiers? Explained Simply</title>
+<meta name="description" content="Without changing the weights, use sampling, search, tools, and checking to convert extra computation into more reliable answers.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/test-time-compute/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/test-time-compute/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/test-time-compute/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Test-time Compute and Verifiers? Explained Simply">
+<meta property="og:description" content="Without changing the weights, use sampling, search, tools, and checking to convert extra computation into more reliable answers.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/test-time-compute/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Test-time Compute and Verifiers? Explained Simply">
+<meta name="twitter:description" content="Without changing the weights, use sampling, search, tools, and checking to convert extra computation into more reliable answers.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/test-time-compute/#page","name":"What Is Test-time Compute and Verifiers? Explained Simply","description":"Without changing the weights, use sampling, search, tools, and checking to convert extra computation into more reliable answers.","url":"https://ai-knowledge-map.com/en/concepts/test-time-compute/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Test-time Compute and Verifiers","item":"https://ai-knowledge-map.com/en/concepts/test-time-compute/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Test-time Compute and Verifiers</span></li></ol></nav><article id="dd-article" data-concept-id="test-time-compute" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Test-time Compute and Verifiers</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Without changing the weights, use sampling, search, tools, and checking to convert extra computation into more reliable answers.</p>
+<p class="dd-ali">Test-time Compute · Inference-time Scaling · Verifier</p>
+<p class="dd-metabar">Suggested 25–35 minutes · Advanced · Requires: Sampling, Reasoning Models, Reinforcement Learning</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Test-time Compute moves part of the capability budget from the training phase to the answering phase: the model can generate longer trajectories, propose multiple candidates, search the solution space, and use a verifier to select or correct results. The gains depend on candidate diversity, search strategy, and verification signal, not simply on having the model output more tokens.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer these questions yourself:</div><ul><li>What is the difference between inference-time scaling and scaling up training?</li><li>What tasks are suited to parallel sampling, sequential reasoning, and search, respectively?</li><li>Why does increasing the number of candidates lead to diminishing marginal returns?</li><li>What happens when the verifier is wrong?</li><li>How do you allocate budget across accuracy, latency, and cost?</li></ul></div>
+<ol class="dd-chain"><li>The base model provides a candidate distribution, not a guaranteed correct answer.</li><li>Additional sampling or search expands the explored solution space.</li><li>Diversity determines whether new computation leads to different attempts.</li><li>Verification signals distinguish more reliable branches from worse ones.</li><li>Selection, correction, and early stopping convert signals into quality gains.</li><li>Correlated errors, weak verifiers, and budget caps lead to diminishing returns.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Training-time Scaling and Inference-time Scaling<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Spending the same amount of compute on the training stage versus on every request looks like the same accounting on the surface, but actually they are two different product decisions: one is a fixed cost paid once before deployment, and the other is a marginal cost incurred on every request.</p>
+<p>Training-time scaling invests more compute into weight learning. This cost is paid before the model is deployed and is thereafter shared by all requests. Regardless of whether later problems are hard or easy, the capability improvements brought by weight updates take effect for every user, and the marginal cost per request remains almost unchanged. Training compute directly changes the model parameters themselves, yielding a more capable but already frozen model.</p>
+<p>Inference-time scaling, by contrast, invests this compute on a per-request basis. The model parameters remain unchanged; the extra compute is used to change how the model uses its existing parameters and external tools: generating more candidate answers, performing search, calling tools, and verifying candidates. Its core advantage is that the budget can be dynamically routed according to difficulty—spending more budget on hard problems and less on simple problems. The costs are equally direct: latency, expense, and peak energy consumption for each request all rise accordingly. More importantly, test-time compute can only amplify the knowledge already present in the weights and context; it cannot create facts that are completely absent from them out of thin air.</p>
+<p>When comparing the two together, the inputs include training budget, request difficulty, inference budget, latency cost, and knowledge boundary, and the output is the choice between training-time scaling and inference-time scaling. The causal chain is: training compute changes the weights and is shared by all requests; test-time compute adds candidates, search, tools, and verification on a per-request basis, which can be dynamically routed but directly increases service costs. The common boundary of both is that no matter how much compute is invested, there is no guarantee of creating facts that are completely absent from training and context.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Four Main Computation Methods<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The extra computation from inference-time scaling is not a homogeneous resource: extra tokens, extra candidates, search nodes, and tool calls provide different forms of benefit. Spending budget on the wrong form increases computation while accuracy stays unchanged.</p>
+<p>Longer serial trajectories let the model gradually decompose, compute, check, and correct within a continuous reasoning process. It excels at tasks with strong dependencies—the next step depends on the intermediate result of the previous step, and one wrong step will propagate along the chain. At this point, adding parallel candidates does not help, because branches have already forked at the source; what is really needed is to make the single chain deeper.</p>
+<p>Parallel candidates solve the coverage problem. When a problem has multiple relatively independent solution paths, a single chain may choose the wrong direction from the start; generating multiple candidates simultaneously and then selecting among them can significantly increase the probability of hitting the correct solution. It is suitable for tasks where dependencies between solutions are weak, and each candidate can advance independently.</p>
+<p>Explicit search turns the reasoning process into a stateful process: save expanded nodes, expand candidates according to a policy, and prune using a scoring function. It lies between serial and parallel—preserving multiple paths while using scores to decide which paths are worth continued investment. It is suitable for tasks where the state space is branch-structured and requires systematic exploration rather than luck.</p>
+<p>Tool execution obtains new evidence beyond the model weights by calling a code interpreter, retrieval system, math solver, or interactive environment. Its benefit differs from the previous three: the first three do more processing on the model's existing knowledge, while tool execution introduces external information to make up for facts missing from the model or context.</p>
+<p>Which form to choose depends on the task's verifiability. Math and code often have strong checkers: whether a candidate answer is correct and whether tests pass provide clear, cheap feedback signals, and spending more computation can almost always improve in the right direction. Open-ended writing has only vague preference feedback, with no objective criterion to tell you which candidate is better; extra search can easily optimize the wrong objective—the more computation, the further you may get from the true intent.</p>
+<p>Therefore, diagnose the bottleneck first, then choose the computation form: the inputs are the task's dependency depth, solution coverage, state space, external verifiability, and tool availability; the output is one of the four forms. Use serial for deep dependencies, parallel for diverse solutions, search for stateful branching, and tools when new evidence is missing. Misjudging the bottleneck is the most common source of waste in inference-time scaling.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Number of Candidates and Marginal Returns<span class="dd-badge math">Mathematics</span></h2>
+<div class="dd-agent-response"><p>The benefit of parallel candidates is not linear. With each additional candidate, the improvement in coverage is smaller than the previous candidate; the reason can be derived starting from the most ideal case.</p>
+<p>Assume each candidate is fully independent, and the probability of success on a single attempt is p; then the probability that a single candidate fails is 1 − p. For all k candidates to fail, these k independent attempts must fail simultaneously, with probability (1−p)ᵏ. Taking the complement, the probability that at least one candidate succeeds is:</p>
+<p>P_coverage = 1 − (1−p)ᵏ</p>
+<p>The coverage gain from adding the kth candidate equals the probability that the first k−1 candidates all fail and the kth candidate succeeds:</p>
+<p>P(k) − P(k−1) = (1−p)ᵏ⁻¹ × p</p>
+<p>Since 0 ≤ 1−p &lt; 1, this gain decays exponentially as k increases. The first few candidates cover most of the easily covered success cases, and subsequent candidates can only cover an increasingly small remaining failure space.</p>
+<p>This formula is an ideal upper bound, and in reality it is almost never reached. Real multiple candidates share the same model and the same prompt, and their errors are highly correlated: if the model has a systematic weakness on a certain type of problem, all candidates often fail together in similar places, and the independence assumption breaks down. Second, coverage is only a necessary condition; the system must also identify which candidate is the successful one; if the verifier selects wrong, no matter how high the candidate pool coverage is, the accuracy cannot be realized. Therefore, increasing k does not automatically bring all the theoretical benefits, and actual benefit is usually below the upper bound.</p>
+<p>The inputs of candidate coverage are the single-try success probability p, the number of candidates k, and candidate correlation; the output is the ideal probability P_coverage that at least one candidate succeeds. Under the independence assumption, P_coverage = 1 − (1−p)ᵏ, and the marginal coverage gain of additional candidates decreases as k increases; real candidates share the model and prompt, are usually correlated, and fall below this upper bound. This formula only estimates the candidate pool's own ability to cover the correct answer and does not include whether the verifier can choose correctly.</p></div>
+<div class="dd-formula"><math display="block" aria-label="至少一个成功候选的独立上界"><msub><mi>P</mi><mi>coverage</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><msup><mrow><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow><mi>k</mi></msup></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Verifier determines search direction<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>After candidate generation, search itself cannot tell you which one is correct; it is the verifier that determines where the search goes.</p>
+<p>Verifiers can check only the final answer, or they can score intermediate steps. Outcome verification suits tasks with a well-defined terminal state—where whether an answer is correct can be judged by an objective terminal state, such as whether tests pass or whether an equation holds. Process verification, in contrast, gives feedback on each reasoning step and can prune an erroneous branch before it expands to the endpoint, saving downstream computation. Its cost is that process annotation is much more expensive than terminal-state annotation, and the scorer may mistake a particular problem-solving style for correctness: steps that are neatly written and follow common patterns in the training data do not necessarily mean the reasoning is actually correct.</p>
+<p>The more independent a verifier's signal is, the more trustworthy it is. Compilers and formal provers are usually more independent than model self-evaluation—they execute mechanical rules rather than the same model judging its own output, so they are less likely to make the same mistakes as the generation process. But they still need to check coverage, version, and cross-domain drift: a compiler can only verify the languages and features it supports, and a prover only provides guarantees within its formal system; in uncovered domains, signal strength drops.</p>
+<p>The verifier is also an attack surface. As long as scoring rules have loopholes, search will actively find high-scoring but incorrect outputs—what the scorer rewards, search will concentrate on producing, a phenomenon known as reward hacking. The larger the candidate space and the more ample the search budget, the more lethal a systematically exploited loophole becomes.</p>
+<p>The verifier's inputs are candidate answers or processes, an explicit correctness contract, test rules, version, and domain; its outputs are pass, fail, score, or corrective feedback. Outcome verification checks the terminal state, process verification prunes early, and compilers and formal rules are usually more independent than same-source self-evaluation; but every verifier has coverage gaps. Search actively exploits scoring loopholes, so a high score does not equal true correctness.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Search Is Not Endless Chain-of-Thought Writing<span class="dd-badge intuition">Boundary</span></h2>
+<div class="dd-agent-response"><p>Inference-time scaling is easily mistaken for &quot;letting the model write more thinking text.&quot; Stateful exploration and verbose rewriting of the same error are two different things; distinguishing them depends on whether each expansion changes the search state.</p>
+<p>Effective computation requires four things: state, actions, stopping conditions, and feedback. State records where the search has reached, actions are the legal next steps, stopping conditions determine when to stop investing further, and feedback tells the search whether these actions are good or bad. Under this framework, every expansion should produce a new candidate, fill an evidence slot, or change the verification state. If a token sequence merely repeats the same mistake at greater length—the same erroneous conclusion, the same blocked path—it brings no new information, is not new exploration, and only consumes budget through verbose rewriting.</p>
+<p>Publicly displaying the reasoning trace to users also does not make the internal computation more reliable. There is no causal relationship between display length and computation quality: a long public text may only be low-information repetition, while truly valuable exploration may be reflected only in a few changes to internal state. A system can retain necessary intermediate state, use hidden drafts or structured tool calls to complete exploration, and at the same time provide users with a concise verifiable explanation—explanation is responsible for letting users verify conclusions, exploration is responsible for finding conclusions, and the lengths of the two need not match.</p>
+<p>State search takes as input the current state, legal actions, new evidence, stopping conditions, and feedback, and outputs traceable state changes and candidates. Each expansion should fill in evidence, change verification state, or produce a different candidate; repeatedly generating verbose text with the same error does not count as new exploration. The concise verifiable explanation provided to users and the length of internal computation are inherently two different things.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Budget Allocation and Stopping Policy<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Search does not know by itself when to stop. The question budget allocation must answer is: at what point does the expected benefit of continuing to search fall below the added latency and cost it brings? This requires a stopping policy, rather than unconditionally using up the budget.</p>
+<p>The first step in allocation is estimating difficulty. First use a lightweight model to make a cheap difficulty or uncertainty judgment about the request, then decide on the investment tier: simple requests are answered directly, while difficult requests are escalated to a larger model or more candidates. This step reserves expensive computation for the requests that truly need it.</p>
+<p>Stopping, in turn, depends on verification signals. As soon as strong verification evidence appears—tests pass, a proof is closed, a checker confirms—you can stop early instead of mechanically running through the preset maximum number of steps. Conversely, to guard against worst-case scenarios, you must also set hard upper limits: token count, number of tool calls, wall-clock time, and monetary caps, to prevent a single request from running out of control.</p>
+<p>The quality of a routing policy should be evaluated using curves sliced by task: for each task type, how quality rises with cost and how latency rises with cost. A good routing policy optimizes the quality gain per unit cost, rather than having every request use the maximum budget—the latter only raises average quality while raising average cost to a meaningless level.</p>
+<p>There is also an easily overlooked failure mode here: the router may lower average cost by incorrectly downgrading difficult requests, while the average metrics still look good. Therefore, record the difficult samples that were incorrectly downgraded and examine their performance separately, to prevent the router from learning only &quot;spend less&quot; rather than &quot;spend money correctly&quot;.</p>
+<p>The inputs to a budget policy are difficulty estimates, calibrated uncertainty, verification results, tokens, call counts, wall-clock time and monetary caps, and task value; the outputs are budget tier, early stopping, escalation, or reporting unknown. Simple requests are answered briefly; difficult and verifiable requests get more candidates; stop when strong evidence appears, while recording difficult examples that were incorrectly downgraded. The goal is quality gain per unit cost, not having every request use the maximum budget.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connecting the Causal Chain Together<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>To connect the earlier stages: for test-time compute to be converted into quality gains, a complete causal chain must be traversed; if any one link breaks, the invested computation spins without effect.</p>
+<p>The starting point of the chain is the candidate distribution produced by the base model. The distribution only indicates which answers are more likely, not that a correct answer is necessarily among them—the first step of coverage depends on whether the model has placed the correct solution within the range that can be sampled. Additional sampling or search expands the explored solution space: more candidates, more branches, more paths. But expanding the solution space is meaningful only when diversity holds; if newly generated candidates are highly similar to one another and repeatedly fall into the same kind of error, then the additional compute does not bring different attempts, only repeated sampling of the same failure region.</p>
+<p>Next, the verification signal is responsible for distinguishing more reliable branches from worse ones. Without this layer, search does not know which direction to move; however many candidates there are, they just pile up. Finally, selection, correction, and early stopping convert the verification signal into real quality gains: choose the highest-scoring branch, correct the branch close to correct, and stop investing when strong evidence appears.</p>
+<p>Diminishing returns come from three places: correlated errors among candidates destroy diversity, weak verifiers provide incorrect discriminative signals, and budget limits cut off paths that could have continued to improve. If any of the three takes effect, it lowers the marginal quality of additional compute.</p>
+<p>The inputs to this causal chain are the base candidate distribution, exploration diversity, verification signal, selection and correction, and budget limit; its output is an explanation of &quot;why additional compute did or did not produce quality gains&quot;. Additional compute first expands coverage, then is identified by the verifier, and finally is realized by the stopping strategy. Its purpose is diagnosis: when inference-time scaling does not bring the expected improvement, examine the chain layer by layer to find the broken link. It does not by itself constitute a new correctness guarantee.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How Four Code Candidates Realize Compute Gains<span class="dd-badge math">Worked Example</span></h2>
+<div class="dd-agent-response"><p>A numerical example of code repair can make the preceding chain concrete. Assume the model's single-repair success rate is 35%, and the system generates 4 candidates for each problem. &quot;At least one candidate is correct&quot; and &quot;the system ultimately selects the correct one&quot; are two different events, corresponding to two different probabilities. The whole flow is shown in Figure 1: from difficulty routing into four-candidate generation, then through compilation and test verification, and early stopping when strong evidence appears.</p>
+<p>The extra computation in Figure 1 realizes gains through &quot;expanding the candidate set + independent verification&quot;: parallel sampling only increases the chance that a correct candidate appears; the verifier determines whether the system can find it. Step by step:</p>
+
+<p>First, under the independence assumption, use 1 − (1−0.35)⁴ to get 82.1%; this is an upper bound. Real candidates share the same model, so errors are correlated, and measured coverage is only 68%—the four candidates often get stuck together on the same blind spot, so the independence formula clearly overestimates. Next, the verifier can only make a selection when the candidate pool actually contains a solution, and its selection accuracy is 85%. End-to-end success requires both events to occur simultaneously: a candidate appears and is selected, so it is 0.68 × 0.85 = 57.8%.</p>
+<p>Going from 35% to 57.8% is a valuable improvement, but the cost is approximately 4 times candidate generation plus verification overhead. The gain is extremely sensitive to verifier quality: if selection accuracy is only 55%, end-to-end becomes 0.68 × 0.55 = 37.4%, and the gain is almost entirely eaten away; if candidates are highly homogeneous, increasing k will not approach the upper bound from the independence formula. The direction for improvement is therefore to optimize diversity and verification together, not merely to expand tokens.</p>
+<p>The failure boundary is equally clear: a verifier can only check the contract it encodes. When unit tests miss concurrency isolation, search will more efficiently find patches that &quot;pass the tests but still have vulnerabilities&quot;—search is optimizing the test score, and the test score does not fully represent true correctness. The countermeasure is to retain hidden tests, protect acceptance and permission boundaries, and let the verification contract cover the properties that truly need to be guaranteed. The code case inputs are a single-repair success rate of 35%, k=4 candidates, measured coverage of 68%, and verifier selection accuracy of 85%; outputs are candidate coverage, selection rate, and end-to-end success of 57.8%. First use the independence formula to obtain an 82.1% upper bound, then substitute measured coverage, and finally compute 0.68 × 0.85; candidate appearance and final correct selection are two events.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 235" role="img" aria-label="Test-time Compute flow from difficulty routing to four-candidate generation, compile-test verification, and early stopping"><defs><marker id="tc1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="55" width="110" height="78" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="73" y="79" text-anchor="middle" class="svg-t">Difficulty routing</text><text x="73" y="101" text-anchor="middle" class="svg-t" font-size="10">Easy: k=1</text><text x="73" y="119" text-anchor="middle" class="svg-t" font-size="10">Hard: k=4</text><path d="M128,94 L174,94" stroke="#6b7484" marker-end="url(#tc1)"/><rect x="176" y="34" width="146" height="120" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="249" y="58" text-anchor="middle" class="svg-t">Candidate generation</text><text x="249" y="81" text-anchor="middle" class="svg-t" font-size="10">C1: composite key ✓</text><text x="249" y="100" text-anchor="middle" class="svg-t" font-size="10">C2: disable cache ✗</text><text x="249" y="119" text-anchor="middle" class="svg-t" font-size="10">C3: extend TTL ✗</text><text x="249" y="138" text-anchor="middle" class="svg-t" font-size="10">C4: only clear cache ✗</text><path d="M322,94 L368,94" stroke="#6b7484" marker-end="url(#tc1)"/><rect x="370" y="34" width="142" height="120" rx="8" fill="#21252d" stroke="#c77b72"/><text x="441" y="58" text-anchor="middle" class="svg-t">External verifier</text><text x="441" y="82" text-anchor="middle" class="svg-t" font-size="10">Compile → isolation test</text><text x="441" y="101" text-anchor="middle" class="svg-t" font-size="10">Hit protected tests</text><text x="441" y="120" text-anchor="middle" class="svg-t" font-size="10">Resource/permission check</text><text x="441" y="139" text-anchor="middle" class="svg-t" font-size="10">Stop when unique pass found</text><path d="M512,94 L558,94" stroke="#6b7484" marker-end="url(#tc1)"/><rect x="560" y="55" width="102" height="78" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="611" y="79" text-anchor="middle" class="svg-t">Select C1</text><text x="611" y="101" text-anchor="middle" class="svg-t" font-size="10">Output evidence</text><text x="611" y="119" text-anchor="middle" class="svg-t" font-size="10">No release execution</text><path d="M441,155 C435,215 249,215 249,156" fill="none" stroke="#6b7484" marker-end="url(#tc1)"/><text x="345" y="207" text-anchor="middle" class="svg-t" font-size="10">When all fail, provide only diagnostics to a limited correction round; stop transparently after the budget is exhausted.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 Extra computation realizes gains through &quot;expanding the candidate set + independent verification&quot;; parallel sampling only increases the chance of a correct candidate appearing, while the verifier determines whether it can be found.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Quantity</th><th>Calculation</th><th>Result</th><th>Meaning</th></tr></thead><tbody><tr><td>At least one correct (independence upper bound)</td><td>1−(1−0.35)⁴</td><td>82.1%</td><td>Candidate pool coverage upper bound</td></tr><tr><td>Measured coverage after error correlation</td><td>68 of 100 labeled problems contain a correct candidate</td><td>68%</td><td>Shared blind spots cause the independence formula to overestimate</td></tr><tr><td>Verifier selects correctly from solution-containing set</td><td>85%</td><td>0.85</td><td>Selection is not perfect</td></tr><tr><td>End-to-end success</td><td>0.68×0.85</td><td>57.8%</td><td>Still higher than the single-attempt 35%</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Budget Routing, Misconceptions, and Learning Path<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>If all requests are fixed to use the maximum number of candidates and the longest trajectories, then the vast majority of simple requests are paying for the marginal benefit of a very small number of difficult requests. The value of budget routing lies precisely in treating them differently according to signals:</p>
+
+<p>Tasks with strong external verification and cheap candidates are ideal scenarios for scaling up k, but only if the verifier really covers the properties to be guaranteed; misjudgment in difficulty estimation can cause simple problems to be incorrectly downgraded; open-ended preference tasks, if only using model self-evaluation, easily fall into sycophancy and mode collapse, requiring clear rubric and human evaluation as a backstop; high-risk irreversible actions must first be simulated in a sandbox and obtain approval before execution, and majority voting from sampling does not constitute authorization; when the budget is exhausted, honestly reporting unknown is more honest than forcing an answer.</p>
+<p>The learning path can be layered according to dependencies. Prerequisite concepts are sampling parameters, probability, reasoning models, and code execution. The core of this page is parallel candidates, sequential trajectories, search, verifiers, early stopping, and budget routing. Closely adjacent extension concepts include self-consistency, tree of thoughts, reflection, and post-training. Engineering-level extensions are model routing, evaluation, reward hacking, observability, and human-in-the-loop.</p>
+
+<p>Post-launch evaluation should plot the quality–cost–p95 latency frontier and slice by difficulty, domain, and verifier type. To judge whether a task needs depth or coverage, compare one long trajectory with multiple short candidates under the same total tokens; looking only at overall success rate can mask the router incorrectly downgrading difficult domains or minority domains. The inputs to budget routing are task difficulty, verification strength, candidate cost, risk reversibility, SLO, and historical slice performance; outputs are k, trajectory length, model choice, sandbox approval, or stop and report unknown. Strong-verification low-cost tasks can scale up k, high-risk actions should only be simulated in a sandbox and authorized before execution, and open-ended preference tasks use clear rubric and human evaluation. After launch, report the quality-cost-p95 frontier and incorrect downgrading of difficult slices.</p></div>
+<table class="dd-table"><thead><tr><th>Routing signal</th><th>Budget action</th><th>Risk</th></tr></thead><tbody><tr><td>Strong external verification, low-cost candidates</td><td>Scale up k, early stop after a hit</td><td>Verification coverage gaps</td></tr><tr><td>High-confidence simple problems</td><td>k=1 or a short trajectory</td><td>Difficulty estimation misjudgment</td></tr><tr><td>Open-ended preference tasks</td><td>A few candidates + human evaluation/clear rubric</td><td>Self-evaluation sycophancy and mode collapse</td></tr><tr><td>High-risk irreversible actions</td><td>Simulate in sandbox, approve before execution</td><td>Cannot rely on sampled majority for authorization</td></tr><tr><td>No progress or budget exhausted</td><td>Stop and report unknown</td><td>Forcing an answer causes hallucination</td></tr></tbody></table>
+<table class="dd-table"><thead><tr><th>Level</th><th>Concept dependencies and extensions</th></tr></thead><tbody><tr><td>Prerequisite</td><td>Sampling parameters, probability, reasoning models, code execution</td></tr><tr><td><b>Core of this page</b></td><td>Parallel candidates, sequential trajectories, search, verifiers, early stopping and budget routing</td></tr><tr><td>Adjacent</td><td>Self-consistency, tree of thoughts, reflection, post-training</td></tr><tr><td>Engineering extension</td><td>Model routing, evaluation, reward hacking, observability, and human-in-the-loop</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Self-Consistency Improves Chain of Thought Reasoning</a>: multi-path sampling and consistency selection.</li><li><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noopener">Let's Verify Step by Step</a>: process supervision and verifiers.</li><li><a href="https://arxiv.org/abs/2305.10601" target="_blank" rel="noopener">Tree of Thoughts</a>: explicit search, evaluation, and backtracking.</li></ul><div class="dd-src-date">Date accessed: 2026-07-21</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/test-time-compute">Explore connections on the map</a><a href="/zh/concepts/test-time-compute/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Retrieval and Semantic Search? Explained Simply</title>
+<meta name="description" content="Surface the most relevant snippets from a knowledge base and feed them to the model for answering.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/retrieval/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/retrieval/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/retrieval/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Retrieval and Semantic Search? Explained Simply">
+<meta property="og:description" content="Surface the most relevant snippets from a knowledge base and feed them to the model for answering.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/retrieval/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Retrieval and Semantic Search? Explained Simply">
+<meta name="twitter:description" content="Surface the most relevant snippets from a knowledge base and feed them to the model for answering.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/retrieval/#page","name":"What Is Retrieval and Semantic Search? Explained Simply","description":"Surface the most relevant snippets from a knowledge base and feed them to the model for answering.","url":"https://ai-knowledge-map.com/en/concepts/retrieval/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Retrieval and Semantic Search","item":"https://ai-knowledge-map.com/en/concepts/retrieval/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Retrieval and Semantic Search</span></li></ol></nav><article id="dd-article" data-concept-id="retrieval" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Retrieval and Semantic Search</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Surface the most relevant snippets from a knowledge base and feed them to the model for answering.</p>
+<p class="dd-ali">Retrieval · Semantic Search</p>
+<p class="dd-metabar">Suggested 25–35 minutes · Intermediate · Prerequisites: understand Embeddings and Context Window</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Retrieval is the process of finding the few snippets most relevant to the current question from a large set of documents. It has two paths: keyword retrieval (matching the literal text) and semantic retrieval (matching meaning, using embeddings to find nearest neighbors). Because the context window cannot hold the entire knowledge base, how well the model answers often depends on whether retrieval gets the right content—and this is the true bottleneck for RAG performance.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>Why retrieval</b>—why not give the entire knowledge base directly to the model.</li>
+    <li><b>Two paths</b>—the difference between keyword retrieval and semantic retrieval, and when each is better.</li>
+    <li><b>How it works</b>—what the offline and online stages each do.</li>
+    <li><b>Why it's the bottleneck</b>—why they say “if retrieval gets it wrong, no matter how strong the rest is, it's all for nothing.”</li>
+    <li><b>How to retrieve more accurately</b>—reranking and other improvements.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>The context window can't hold the entire knowledge base, so we need to first retrieve the most relevant small amount of material.<span>(§1)</span></li>
+    <li>Retrieval has two paths: literal keyword retrieval and meaning-based semantic retrieval (finding nearest neighbors via embeddings), often used in combination.<span>(§2)</span></li>
+    <li>The process is divided into offline indexing (chunking → embedding → storing in a vector database) and online querying (query embedding → finding nearest neighbors → Top-K).<span>(§3)</span></li>
+    <li>It's the RAG bottleneck: if retrieval gets it wrong, the model lacks the correct material and can only answer incorrectly or make things up.<span>(§4)</span></li>
+    <li>Use reranking, query rewriting, hybrid retrieval, and chunking adjustments to improve, and evaluate with metrics.<span>(§5)</span></li>
+    <li>Recall@K addresses missed evidence, Precision@K addresses noise, MRR/nDCG addresses ranking; ultimately it must also connect to citations and task success.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why "Retrieval"?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>To have a model answer questions based on a knowledge base, the most direct idea is to stuff the entire knowledge base into the model and let it find answers in it by itself. This approach is not viable in the vast majority of real-world scenarios, for three reasons.</p>
+<p>The first is capacity: the model's context window is finite (see its deep-dive page for details of this mechanism), whereas real knowledge bases often contain tens of thousands of documents, and their total size far exceeds what the window can hold and simply cannot fit. The second is cost and speed: even if it barely fits, taking in massive amounts of text as input makes inference slow and expensive, and token consumption grows rapidly with input length. The third is quality: mixing a large amount of question-irrelevant content into the input dilutes the signal, and the model may be overwhelmed by noise, exhibiting the "lost in the middle" effect—information located in the middle of a long context is more likely to be ignored by the model, so it fails to grasp the truly critical information.</p>
+<p>Therefore the correct approach is the reverse: first pick out a small number of documents most relevant to the question from the vast collection, feed only that small set to the model, and let the model answer within that narrowed, clean scope. This "picking" process is retrieval.</p>
+<p>In a nutshell, retrieval is the "finding a needle in a haystack" step—accurately pulling out a small amount of material relevant to the question from the knowledge base for the model to answer with. Whether it is pulled out accurately directly determines whether the answer is good: if key evidence is not retrieved, no matter how strong the model is, it cannot answer; if everything retrieved is noise, the model will likewise be led astray. Retrieval is therefore the front-line gate of the entire pipeline, and its quality sets an upper limit on the quality of the final answer.</p>
+<p>Abstract retrieval as a component: its inputs are the user query, the accessible knowledge base, and the context budget; its output is a small number of candidate snippets and their sources. What it does is drastically narrow the scope of material before the model's limited window is filled, thereby reducing cost, latency, and noise at the same time. Note that a snippet being recalled only indicates that it is relevant to the query—it is a candidate "worth looking at"; it does not guarantee that it is sufficient to answer the question, nor that its content is correct—these judgments are left for the subsequent model reasoning to complete.</p>
+<p>Retrieval is also not unconditionally necessary. When the knowledge base is small and can be completely and safely loaded into context, feeding it all in directly is a reasonable choice; in that case, the benefit of retrieval is offset by its own overhead. Therefore, whether to introduce retrieval depends on the relationship between knowledge base size and context budget: the closer the size is to the budget limit, the greater the value of retrieval.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Worked Example: Literal vs. Meaning<span class="dd-badge intuition">Intuition</span><span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>The task of “finding relevant documents” can be approached from two fundamentally different angles: keyword retrieval and semantic retrieval.</p>
+<p>Keyword retrieval matches on the literal level: whether the same words appear in the query and the document. Its implementation relies on traditional search techniques such as inverted indexes—maintaining a list of “which documents contain each word” in advance, and then directly looking up documents that contain those words at query time. Semantic retrieval matches on meaning: it embeds both the query and the document into vectors, and then finds the nearest neighbors to the query vector.</p>
+<p>Each approach has its own blind spot. Keyword retrieval excels at exact words, proper nouns, and identifiers: querying an object with a unique literal form such as “Order Number 2026-0715” hits the mark immediately. But as soon as the user rephrases—for example, querying “return” while the document writes “return process,” the two share no common words, and keyword retrieval will simply miss this highly relevant document. Semantic retrieval fills exactly this gap: because “return” and “return process” are similar in meaning, their embedding vectors are close together, so it can recall the document. Conversely, semantic retrieval is not necessarily reliable for identifiers and proper nouns that are unique literally but semantically rare, so it excels at rephrasing, synonyms, and cross-language scenarios, rather than replacing literal matching.</p>
+<p>Semantic retrieval works by turning each document and the query into vectors—similar meanings produce close vectors; see the “Embedding” deep-dive page for the mechanism—and then computing the cosine similarity between the query vector and each document vector, taking the top few with the highest similarity. Cosine similarity measures how close the directions of two vectors are:</p>
+<p>cos(q, d) = q·d / (‖q‖ × ‖d‖)</p>
+<p>That is, the dot product of query vector q and document vector d, divided by the product of their norms.</p>
+<p>A toy two-dimensional vector calculation makes each step clear. Let query q = (1,1), fragment A = (1,0), fragment B = (2,2). For A: dot product q·A = 1×1 + 1×0 = 1, norm ‖q‖ = <math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math>, ‖A‖ = 1, so cos(q, A) = 1/(<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> × 1) = 1/<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> ≈ 0.707. For B: dot product q·B = 1×2 + 1×2 = 4, norm ‖B‖ = <math class="dd-inline-root" aria-label="根号 8"><msqrt><mtext>8</mtext></msqrt></math>, so cos(q, B) = 4/(<math class="dd-inline-root" aria-label="根号 2"><msqrt><mtext>2</mtext></msqrt></math> × <math class="dd-inline-root" aria-label="根号 8"><msqrt><mtext>8</mtext></msqrt></math>) = 1. B's higher score means that in this representation space, B's direction is closer to the query. Real embeddings have hundreds to thousands of dimensions, much higher, but the logic is the same: the score only represents the geometric similarity learned by the model, not factual correctness, nor that it is sufficient to answer the question.</p>
+<p>Since both retrieval methods have their blind spots, practice commonly uses “hybrid retrieval”: fusing the keyword and semantic results together is often more robust than using either alone—neither missing precise identifier terms nor rephrased expressions.</p>
+<p>The following worked example uses the query “refund period” to show the scores from both paths and the fused ranking:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Document</th><th class="dd-align-left">Keyword Score</th><th class="dd-align-left">Semantic Score</th><th class="dd-align-left">Fused Ranking</th></tr></thead><tbody><tr><td class="dd-align-left">A “Refund and Return: 30 Days”</td><td class="dd-align-left">0.90</td><td class="dd-align-left">0.82</td><td class="dd-align-left">1st</td></tr><tr><td class="dd-align-left">B “Product Return Process: 30 Days After Receipt”</td><td class="dd-align-left">0.10</td><td class="dd-align-left">0.94</td><td class="dd-align-left">2nd</td></tr><tr><td class="dd-align-left">C “Refund Crediting Time: 3–5 Days”</td><td class="dd-align-left">0.88</td><td class="dd-align-left">0.70</td><td class="dd-align-left">3rd</td></tr></tbody></table></div>
+<p>This table also illustrates that scores cannot be judged merely by “how high.” Both A and B can answer “how long can one apply”; C, although it overlaps heavily with the query literally (keyword score as high as 0.88), is about how long after approval the refund arrives, answering a different question. If we take Top-2 as A and B, both relevant fragments are recalled, Recall@2 = 2/2 = 100%; if we sort by keyword alone and take A and C, B is pushed out of the top two, Recall@2 = 1/2 = 50%. This comparison points to a more fundamental principle: retrieval evaluation requires first labeling “what counts as relevant,” not staring at similarity scores and feeling satisfied.</p>
+<p>From a component perspective, hybrid retrieval takes as input the query q, document vector d, keyword score, and semantic score, and outputs a fused candidate ranking. Each branch has its applicable boundary: requirements involving precise identifiers should trust keywords first, while rephrased and synonymous expressions should trust semantics first; production environments usually fuse the two branches and then re-rank.</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>Keyword retrieval</th><th>Semantic retrieval</th></tr></thead>
+    <tbody>
+      <tr><td>What it matches</td><td>Whether literal words overlap</td><td>Whether meanings are similar</td></tr>
+      <tr><td>How it works</td><td>Inverted indexes and the like (traditional search)</td><td>Embeds both the query and document<b>into</b>vectors, and finds nearest neighbors</td></tr>
+      <tr><td>“return / return process”</td><td>no common words,<b>misses</b></td><td>meanings similar,<b>can recall</b></td></tr>
+      <tr><td>Excels at</td><td>Exact words, proper nouns, identifiers</td><td>Rephrasing, synonyms, cross-language</td></tr>
+    </tbody>
+  </table>
+<table class="dd-table"><thead><tr><th>Worked example: query “refund period”</th><th>Keyword Score</th><th>Semantic Score</th><th>Fused</th></tr></thead><tbody><tr><td>A “Refund and Return: 30 Days”</td><td>0.90</td><td>0.82</td><td><b>1st</b></td></tr><tr><td>B “Product Return Process: 30 Days After Receipt”</td><td>0.10</td><td>0.94</td><td><b>2nd</b></td></tr><tr><td>C “Refund Crediting Time: 3–5 Days”</td><td>0.88</td><td>0.70</td><td>3rd</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="查询与文档向量的余弦相似度"><mi>CosineSim</mi><mo>(</mo><mi>q</mi><mo>,</mo><mi>d</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>q</mi><mo>·</mo><mi>d</mi></mrow><mrow><mo>‖</mo><mi>q</mi><mo>‖</mo><mo>×</mo><mo>‖</mo><mi>d</mi><mo>‖</mo></mrow></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>How It Works: Offline + Online<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Using semantic search as an example, a single retrieval has two stages behind the scenes: offline index building and online retrieval.</p>
+<p>Figure 1: Two stages of offline index building and online retrieval. The top half is the offline stage: raw documents → split into small chunks → embed each chunk → store in a vector database; the bottom half is the online stage: user query → embed → find the most similar Top-K chunks in the database (approximate nearest neighbor) → return candidates.</p>
+<p>The offline stage is one-time preparation: split documents into small chunks, embed each chunk, and store them in a vector database (see the deep-dive pages “Document Chunking” and “Vector Databases” for details on splitting and storage). It turns “documents” into a “set of vectors that can be compared quickly”. Because this step happens before a query arrives, its cost does not enter the latency of a single Q&A, and the cost is shared across the entire database.</p>
+<p>The online stage must be fast: after a user query arrives, first embed the query into a vector using the same rules, then find and return the Top-K chunks most similar to it in the database. This step uses approximate nearest neighbor (ANN) search—making exact comparisons across massive vectors is too expensive, so approximate algorithms use index structures to make a trade-off between quality and speed, quickly returning neighbors that are good enough.</p>
+<p>There is a hard consistency constraint between the two stages: queries must be encoded with the same representation rules used when building the offline index. In other words, the model and configuration used to embed queries online must be the same as those used to embed documents offline; otherwise the vectors on the two sides lie in different geometric spaces, and the “near/far” comparison between them is meaningless. Therefore, once the embedding model is changed, the old index becomes invalid entirely; changes to chunking or permission scope likewise alter what the index should contain. After any of these three changes occurs, the index must be rebuilt or updated—an index is always just a snapshot under a given configuration.</p>
+<p>Abstract the whole pipeline into components: the inputs are raw documents and online queries, and the output is Top-K candidates, each with a chunk ID, version, permissions, and similarity. The permissions component reminds us that retrieval is not a purely mathematical problem—it must operate within the scope of “what the user is authorized to see”, and retrieval results must not exceed that authorization.</p>
+<p>Finally, a note on interpreting the returned order: the ordering of candidates is the retriever's judgment of “which is more relevant”, placing the most likely evidence first, but this is not the final ranking of facts; chunks ranked later are not necessarily less reliable, and the final choice is still made by the downstream reasoning stage.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 200" role="img" aria-label="Two stages: offline index building and online retrieval">
+      <text x="20" y="24" class="svg-t">Offline (index building, one-time)</text>
+      <rect x="20" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#2c313b"/><text x="60" y="52" text-anchor="middle" class="svg-t" font-size="11">Documents</text>
+      <line x1="100" y1="48" x2="128" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="128" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#2c313b"/><text x="168" y="52" text-anchor="middle" class="svg-t" font-size="11">Chunking</text>
+      <line x1="208" y1="48" x2="236" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="236" y="34" width="80" height="28" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="276" y="52" text-anchor="middle" class="svg-t" font-size="11">Embed</text>
+      <line x1="316" y1="48" x2="344" y2="48" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="344" y="34" width="110" height="28" rx="5" fill="#21252d" stroke="#4f9d78"/><text x="399" y="52" text-anchor="middle" class="svg-t" font-size="11">Store in vector database</text>
+
+      <text x="20" y="112" class="svg-t">Online (per query)</text>
+      <rect x="20" y="122" width="90" height="28" rx="5" fill="#1a1d23" stroke="#6b8cbe"/><text x="65" y="140" text-anchor="middle" class="svg-t" font-size="11">Query: how to return an item</text>
+      <line x1="110" y1="136" x2="138" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="138" y="122" width="70" height="28" rx="5" fill="#21252d" stroke="#6b8cbe"/><text x="173" y="140" text-anchor="middle" class="svg-t" font-size="11">Embed</text>
+      <line x1="208" y1="136" x2="236" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="236" y="122" width="110" height="28" rx="5" fill="#21252d" stroke="#4f9d78"/><text x="291" y="140" text-anchor="middle" class="svg-t" font-size="11">Find nearest neighbors</text>
+      <line x1="346" y1="136" x2="374" y2="136" stroke="#6b7484" stroke-width="1.3" marker-end="url(#k1)"/>
+      <rect x="374" y="122" width="150" height="28" rx="5" fill="#1a1d23" stroke="#d3a05a"/><text x="449" y="140" text-anchor="middle" class="svg-t" font-size="11">Top-K: Product return process…</text>
+      <defs><marker id="k1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1 Offline: split documents into small chunks, embed each chunk, store in a vector database (see “Document Chunking” and “Vector Databases”). Online: embed the query, find the top K most similar chunks in the database (approximate nearest neighbor) and return them.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Why It Is the Real Bottleneck of RAG<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The generative model in RAG is usually very strong and the output is fluent, but in engineering practice people repeatedly emphasize that “the problem is mostly in retrieval.” The reason has to do with the structure of RAG itself.</p>
+<p>The logic of RAG is “retrieve first, then have the model answer based on the retrieved material”; retrieval is a precondition for generation. If the retrieval step does not fetch the correct documents, the model has no correct material at all—it either cannot answer or simply makes things up, i.e., hallucination. What is at work here is “garbage in, garbage out”: if the input material is wrong, no matter how strong the model is, it cannot recover, because the model can only look for evidence in the context it receives and cannot “recall” out of thin air content that never appeared in its input. Therefore, in many RAG systems, the performance ceiling is not the model but retrieval: no matter how high the generation ceiling is, it will be directly cut off by failures in the retrieval step.</p>
+<p>Retrieval failures have several common concrete forms. First, the query and document wording are too far apart: the user uses a completely different expression from the knowledge base, and neither literal matching nor semantic similarity can push the correct document to the top. Second, chunking scatters key information: the evidence for an answer in a document is split across different chunks, no single chunk alone is enough to support an answer, and even if retrieval recalls one of them, it is of no help. Third, relevant documents are pushed out of the Top-K by more irrelevant documents: Top-K has limited capacity; when noisy documents have inflated scores, the truly relevant chunks fall outside K and never enter the context.</p>
+<p>When diagnosing retrieval as the bottleneck, it can be abstracted into a decision component: input the target question, necessary evidence, and recall results, and output one of three states—“evidence recalled”, “pushed out by noise”, or “not in the knowledge base”. This three-way classification separates symptoms from causes: in the first state the bottleneck is not in retrieval, and the problem lies further downstream; the second indicates a problem with ranking or fusion strategy; the third means the knowledge base itself lacks that evidence, and no retrieval algorithm can conjure up content that does not exist.</p>
+<p>Because the generative model can only use material that enters the context, when the necessary evidence is not recalled, no matter how strong the model is, it cannot reliably recover the answer. Conversely, adequate retrieval does not guarantee that assembly and generation are correct—after recalling the correct chunks, the model may still assemble them incorrectly, read them incorrectly, or reason incorrectly. Therefore, when locating a RAG failure, the first step is always to determine at which layer the evidence chain breaks: was it not retrieved, pushed out, or retrieved but not used correctly.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>How to retrieve more accurately<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Building on the previous example: the initial Top-K includes documents such as 'Refund Crediting Time' that are lexically similar but do not answer the question. How can we improve recall without letting noise drown out the answer? There are four common improvement methods, each acting on a different stage of the retrieval pipeline.</p>
+<p>Reranking is the most direct lever. First use fast, coarse retrieval to pull back a batch of candidates (say 50), then use a finer model to precisely compute relevance item by item, reorder them, and take the top few. Its division of labor is 'coarse filtering first, fine ranking later': coarse filtering is responsible for covering a wide range cheaply, and fine ranking is responsible for surfacing what is truly worth reading (see the 'Reranking' deep-dive page for details).</p>
+<p>Query rewriting acts on the input side. User questions are often colloquial and imply context, so using them directly for retrieval is not effective; rewriting or expanding them into a more retrieval-friendly form, or splitting them into multiple subqueries that are retrieved separately and then merged, can significantly improve hit rate (this belongs to 'Advanced RAG' techniques).</p>
+<p>Hybrid search fuses results from two paths—keyword and semantic—so that each branch compensates for the other's blind spots: exact identifiers rely on keywords, and paraphrases rely on semantics.</p>
+<p>Chunk tuning acts during the offline indexing stage. If chunks are too large, irrelevant content gets mixed in as noise; if too small, complete meaning is cut apart. The chunking method directly affects whether queries can hit the correct passages and is a variable that needs repeated tuning depending on document type.</p>
+<p>Each of these methods can improve retrieval, but how do we know whether retrieval is accurate? The answer can only be evaluation: we commonly look at metrics such as recall (whether what should have been retrieved was retrieved). Without evaluation, retrieval quality can only be judged by feel, and optimization has no place to start (see the 'LLM Application Evaluation' deep-dive page for methodology).</p>
+<p>During evaluation, we must also hold to one principle: similarity does not equal answerability. A document may be topically relevant but not contain the object, time, or condition the question requires—just as 'Refund Arrival Time' and 'Refund Period' are highly similar literally, but the former does not answer 'how long one can apply'. Rerankers also make mistakes; they may likewise put topically relevant passages that lack key elements at the top. Therefore production evaluation should look at multiple dimensions simultaneously: relevance, answer coverage, timeliness, permission filtering, and whether the final citation truly supports the conclusion.</p>
+<p>Abstract this whole set of improvements into components: the inputs are initial candidates, query, chunks, permission and timeliness information, and the output is a smaller candidate set after query rewriting, hybrid recall, and reranking. The division of labor at each stage can be summarized as: coarse recall aims to miss nothing, fine ranking aims to put passages that can truly answer the question at the front; the final delivered result must be able to simultaneously explain recall, noise, version, and permission, rather than only giving a ranked list. Two boundaries need to be remembered: an excessively large Top-K may aggravate the model's 'Lost in the Middle' effect—the longer the context, the easier it is for mid-position evidence to be ignored; the reranker itself must also be independently evaluated, and cannot be assumed to be more reliable than coarse ranking by default.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>What Recall@K, MRR, and nDCG Each Measure<span class="dd-badge math">Evaluation</span></h2>
+<div class="dd-agent-response"><p>If both systems retrieve the correct document, why isn’t ranking it 1st as good as ranking it 20th? Because downstream can only consume a limited number of positions: only results within the Top-K can enter the context, and results ranked earlier are more likely to be actually used by the model. So evaluation metrics care not only about “whether it is there”, but also “at which position” and “whether the earlier content is correct”. Common metrics each answer a different question and each has a blind spot:</p>
+
+<p>The formulas for the two core metrics are intuitive. MRR is the mean reciprocal rank: for each query, take the reciprocal of the position of the first relevant result, then average over all queries. Suppose in three test queries, the first relevant passage ranks 1st, 2nd, and 5th, respectively, then</p>
+<p>MRR = (1 + 1/2 + 1/5)/3 ≈ 0.567</p>
+<p>The meaning of each term is: ranking 1st contributes 1, ranking 2nd contributes 1/2, ranking 5th contributes only 1/5—the later the first evidence appears, the closer that query's contribution is to 0.</p>
+<p>Recall@K is the hit rate: Recall@K = Hit@K / Relevant, where Hit@K is the number of relevant items hit in the Top-K results, and Relevant is the total number of relevant items for that query. It only asks “how much of what should be retrieved was retrieved”, completely ignoring where the retrieved items are ranked, and also ignoring how much irrelevant content is mixed into the Top-K.</p>
+<p>The blind spots of these two metrics are complementary; only by looking at them together do we get the full picture. Consider a task where each query actually needs two passages—“general rule + exception”—to answer correctly, but the system always ranks the general rule 1st and misses the exception. In this case MRR still looks good—the first relevant result is 1st every time—but the exception is never recalled, so the answer is necessarily wrong. Therefore, looking only at MRR gives false reassurance; you must also look at Recall@K to discover the missing evidence.</p>
+<p>A more general principle is: the metric is determined by the task's needs. Tasks that must not miss evidence prioritize Recall@K; tasks with tight context budgets and a need to control noise prioritize Precision@K; tasks where “finding the first answer entry point is enough” are suited to MRR; tasks with complete graded relevance annotations are suited to nDCG@K. Conversely, automatically treating a single nDCG on a leaderboard as product quality is a common misuse—it measures ranking quality, not task completion quality.</p>
+<p>Offline relevance is not the final success either. During evaluation, you should also slice by document version, permissions, language, query length, and hard examples to see performance differences under different conditions; after launch, observe online behavioral signals such as citation support rate, handling of no-answer cases, user re-asking, and task completion. Pay special attention to click-through rate: it may favor clickbait and cannot be directly used as a correctness label.</p>
+<p>Assemble these metrics into an evaluation component: input N queries, the annotated relevant set for each query, the ranking position rankᵢ of each relevant result, and truncation K; output Recall@K, Precision@K, MRR, and nDCG. Here MRR is the average over queries of the reciprocal rank of the first relevant result, and Recall@K equals Hit@K divided by Relevant. When interpreting results, keep one boundary in mind: a high MRR only means the first piece of evidence is near the top; it does not mean that both the general rule and the exception have been recalled. Metrics must be chosen according to the task's evidence needs, not by habit.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Metric</th><th>Question it answers</th><th>Suitable for</th><th>Blind spot</th></tr></thead>
+    <tbody>
+      <tr><td>Recall@K</td><td>How much of the needed relevant material makes it into the top K?</td><td>RAG candidate recall, avoiding missed evidence</td><td>Does not care about the order within the top K or about noise</td></tr>
+      <tr><td>Precision@K</td><td>How many in the top K are truly relevant?</td><td>Controlling context noise and cost</td><td>May reward taking only a small amount of material and missing exceptions</td></tr>
+      <tr><td>MRR</td><td>How early does the first relevant result appear?</td><td>Each query only needs one answer entry point</td><td>Ignores other relevant material after the first</td></tr>
+      <tr><td>nDCG@K</td><td>Are multiple relevance grades correctly ranked to the front?</td><td>When there are graded labels such as “fully/partially/irrelevant”</td><td>Depends on stable relevance grades and truncation K</td></tr>
+    </tbody>
+  </table>
+<div class="dd-formula"><math display="block" aria-label="平均倒数排名和前 K 召回率"><mi>MRR</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mn>1</mn><mi>ranki</mi></mfrac><mo>;</mo><mi>RecallK</mi><mo>=</mo><mfrac><mi>HitK</mi><mi>Relevant</mi></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connecting the entire causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>By stringing together the previous sections, you can see that every step in the entire design chain is derived from the previous constraint, with everything interlocking.</p>
+<p>The starting point of the chain is a hard constraint: the context window cannot fit the entire knowledge base (§1). Since you cannot feed everything in, you must first retrieve the most relevant small amount of material and then hand it to the model. This constraint also determines the goal of retrieval—to use the smallest possible amount of material while covering the evidence necessary to answer.</p>
+<p>Once you have the need to 'select', the next step is 'how to select'. Retrieval has two fundamentally different paths: keyword retrieval on the literal text and semantic retrieval on meaning—the latter relies on embeddings to turn queries and documents into vectors and then find nearest neighbors (§2). Each path has its own blind spots, so in practice they are often mixed: keyword retrieval preserves exact identifiers, while semantic retrieval preserves expressions that use different wording.</p>
+<p>Then comes the engineering implementation. The entire pipeline is divided into two stages: offline index building (chunking → embedding → storing in the vector database) and online querying (query embedding → nearest neighbor search → Top-K) (§3). The offline stage amortizes costs, the online stage pursues low latency, and querying and index building must use the same representation rules—any configuration change requires rebuilding the index.</p>
+<p>Why is it worth being rigorous about these steps? Because retrieval is the bottleneck of RAG (§4): if retrieval picks the wrong material, the model has no correct material in hand and can only answer incorrectly or fabricate. Retrieval quality sets a ceiling on the overall system's performance—no matter how strong the later model is, it cannot exceed it.</p>
+<p>To address this bottleneck, improvement measures fall into four parts: reranking refines the coarse candidates, query rewriting makes colloquial questions more suitable for retrieval, hybrid retrieval fuses the two signal paths, and adjusting chunking changes the granularity of matches; whether all of these measures are effective can only be measured through evaluation (§5).</p>
+<p>Evaluation metrics themselves are also divided along the causal chain (§6): Recall@K handles missed evidence—whether the evidence that should be in the Top-K is included; Precision@K handles noise—how much irrelevant content is mixed into the Top-K; MRR and nDCG handle ranking—whether the first relevant item comes early and whether multi-level relevance is ordered correctly. But offline metrics are not the endpoint: ultimately you still need to connect retrieval results to whether citations support conclusions and whether user tasks succeed. If retrieval metrics look great, but citations do not support the answer, or users keep re-asking, it means the chain broke at a step after retrieval.</p>
+<p>The entire chain can be self-checked with one question: why can semantic retrieval recall documents that share no common keywords? Because documents and queries are embedded into the same geometric space—when meanings are close, vectors are close—so nearest neighbor search can cross the gap of literal wording. And why is retrieval the ceiling of RAG effectiveness? Because the model can only make use of material that enters the context; evidence that was not retrieved cannot be restored out of thin air. If you can clearly explain these two 'whys', you have grasped the core of retrieval.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Retrieval is not an island; it sits in the middle of a clear chain of conceptual dependencies. Before understanding this page, you need several prerequisite concepts; after mastering this page, there are several immediate extensions and further directions to continue exploring.</p>
+
+<p>The prerequisite layer lays the two foundations of this page. Embeddings are the mathematical basis of semantic search—without the step of turning text into vectors, there is no comparison where similar meanings have similar vectors; Context Window and Tokens and Tokenization explain why retrieval must exist: the window is limited and billing is by token, so you need to narrow the material scope first.</p>
+<p>The five core concepts on this page form a complete mechanism chain: keyword and semantic search are two complementary matching routes; nearest neighbor is how the semantic route searches in vector space; offline/online is the engineering division into two stages; retrieval as bottleneck explains why it is worth investing in; and reranking is the refinement step after coarse recall.</p>
+<p>Immediate extensions unfold outward along this chain: Retrieval-Augmented Generation (RAG) is the most direct scenario served by retrieval; Vector Databases are the storage substrate for offline index construction; document splitting determines the hit granularity of the offline stage; reranking deserves a separate page for in-depth reading; Advanced RAG covers more complex orchestration such as Query Rewriting; and evaluation is the only way to verify whether all of this is truly effective.</p>
+<p>Further directions widen the perspective: Knowledge Graphs and GraphRAG extend retrieval from vector similarity to structured relationships; Lost in the Middle explains why retrieving more is not necessarily better; and Context Engineering treats “what material to give the model” itself as a system problem to design. Learning along this dependency chain allows each layer to directly answer the questions left by the previous layer.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Embeddings, Context Window, Tokens and Tokenization</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Keyword vs semantic search, nearest neighbor, offline/online, retrieval as bottleneck, reranking</td></tr>
+      <tr><td>Immediate Extensions</td><td>Retrieval-Augmented Generation (RAG), Vector Databases, Document Chunking, Reranking, Advanced RAG, Evaluation</td></tr>
+      <tr><td>Further</td><td>Knowledge Graphs and GraphRAG, Lost in the Middle, Context Engineering</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and Adaptation Notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">Karpukhin et al., Dense Passage Retrieval</a>: dual encoding of questions and passages, inner product retrieval.</li>
+    <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>: sentence vectors that can be used for semantic similarity search.</li>
+    <li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">Khattab &amp; Zaharia, ColBERT</a>: late interaction retrieval and precision—cost tradeoff.</li>
+    <li><a href="https://arxiv.org/abs/2104.08663" target="_blank" rel="noopener">Thakur et al., BEIR</a>: cross-domain retrieval benchmark and comparison of sparse, dense, and reranking methods.</li>
+  </ul>
+  <div class="dd-src-date">Accessed: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/retrieval">Explore connections on the map</a><a href="/zh/concepts/retrieval/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

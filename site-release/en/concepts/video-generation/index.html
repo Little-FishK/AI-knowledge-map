@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State? Explained Simply</title>
+<meta name="description" content="From video latent variables, spatiotemporal attention, and diffusion, to image-to-video, cascaded super-resolution, identity consistency, physics failures, long video planning, and temporal evaluation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/video-generation/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/video-generation/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/video-generation/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State? Explained Simply">
+<meta property="og:description" content="From video latent variables, spatiotemporal attention, and diffusion, to image-to-video, cascaded super-resolution, identity consistency, physics failures, long video planning, and temporal evaluation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/video-generation/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State? Explained Simply">
+<meta name="twitter:description" content="From video latent variables, spatiotemporal attention, and diffusion, to image-to-video, cascaded super-resolution, identity consistency, physics failures, long video planning, and temporal evaluation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/video-generation/#page","name":"What Is Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State? Explained Simply","description":"From video latent variables, spatiotemporal attention, and diffusion, to image-to-video, cascaded super-resolution, identity consistency, physics failures, long video planning, and temporal evaluation.","url":"https://ai-knowledge-map.com/en/concepts/video-generation/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State","item":"https://ai-knowledge-map.com/en/concepts/video-generation/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State</span></li></ol></nav><article id="dd-article" data-concept-id="video-generation" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From video latent variables, spatiotemporal attention, and diffusion, to image-to-video, cascaded super-resolution, identity consistency, physics failures, long video planning, and temporal evaluation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Video is not a frame-by-frame collection of images: each frame must look good, and it must also keep object identity, occlusion relationships, camera, action causality, and world state continuous over time. The temporal dimension turns local errors in image generation into flicker, drift, and accumulated distortion.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>calculate video tensor and latent space costs; explain how spatiotemporal modules share information; distinguish text-to-video and image-to-video constraints; diagnose identity/motion/physics consistency; design hierarchical long video and multi-axis evaluation.</div>
+<ol class="dd-chain"><li>Break the prompt into subject, scene, event, and shot.</li><li>Choose text-to-video, image-to-video, or trajectory control conditions.</li><li>Generate a complete low-resolution motion skeleton in latent space.</li><li>Use temporal modules to maintain identity, occlusion, and state.</li><li>Temporal super-resolution interpolates frames; spatial super-resolution shares details.</li><li>Track objects and verify event and physical order.</li><li>Evaluate multiple axes: frame quality, temporal aspects, semantics, and preference.</li><li>Record sources, restrict identity abuse, and release with versioning.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Video has an additional time axis, amplifying computation and consistency issues together.<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The most intuitive first reaction to video generation is: since an image model can draw one frame, wouldn't stitching together 24 individual frames make one second of video? This path doesn't work. If each frame is independently resampled from text or noise, then there is no shared random state between the previous frame and the next frame. Pedestrians' face shapes, clothing colors, background signs, and the number of objects in the scene would randomly jump from frame to frame, producing not motion but a flickering slideshow.</p>
+<p>Motion itself must rely on cross-frame information. Where an object is at this moment and which direction it should move in the next instant can only be determined by observing the states of several frames before and after at the same time; no single frame viewed in isolation is sufficient to constrain the direction and speed of motion. Therefore, video cannot be understood as 'a collection of several images,' but as a whole unfolding along the time axis.</p>
+<p>Technically, the model no longer faces a single H×W image, but a T×H×W spatiotemporal volume: T is the number of frames along the time dimension, and H and W are the height and width of each frame. The network must simultaneously accomplish two things—learn spatial features such as texture, edges, and object appearance within each frame, while keeping feature correspondence for the same object and same identity across adjacent frames. The former corresponds to existing image generation capabilities, and the latter is a video-specific challenge; both must be trained simultaneously in the same parameter set.</p>
+<p>This extra time axis also changes the cost structure of errors. In a still image, an erroneous pixel only affects that single image; in video, an isolated pixel noise often only flashes for one or two frames and is almost visually negligible. What is truly fatal is structural error: once a person's identity, an object's geometric shape, or background layout shifts in a frame, subsequent frames treat this error as an established fact and continue to extrapolate from it, and the error accumulates and amplifies along the time axis, becoming increasingly difficult to recover from. This means video quality is not determined by the average level of all frames, but by the worst time segment and the transitions between shots—viewers tend to remember the moment of a continuity error, not the average performance of other normal frames.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Raw video tensors are huge; generation typically occurs first in spatial or spatiotemporal latent variables.<span class="dd-badge math">Cost hand calculation</span></h2>
+<div class="dd-agent-response"><p>The raw representation of video is astonishingly large. Take a 4-second, 24 fps, 512×512 RGB video as an example: the number of frames T = 4×24 = 96, each frame is 512×512×3 scalars, and the entire video has 96×512×512×3 ≈ 75,497,472 values, about 75.5 million. Performing diffusion sampling directly on a tensor of this magnitude requires reading, writing, and processing nearly 100 million scalars at each step, and the memory and computational costs will quickly overwhelm any single GPU.</p>
+<p>Image generation has already shown a way out: first generate in a compressed latent space, and finally decode back to pixels. Video follows the same idea, but compression can act on the spatial dimension and can further act on the temporal dimension. If a VAE is used to downsample the spatial dimension by 8 times and map the color channels to 4 latent channels, then the original 512×512 space is compressed to 64×64, and the entire video becomes 96×64×64×4 ≈ 1,572,864 scalars, about 1.57 million. Compared with 75.5 million, this is a reduction of about 48 times, and the cost of two-stage diffusion in latent space drops by orders of magnitude accordingly.</p>
+<p>The temporal axis can also be compressed as well: let several adjacent frames share the same set of latent features, so the tensor becomes further shorter in the T dimension. This can push the cost of a single sampling step even lower and allow the same memory budget to cover longer videos, but at the cost of losing fast motion more easily. Temporal compression essentially assumes that adjacent frames are highly similar; once there is rapid waving, high-speed crossing of objects, or violent deformation in the picture, the merged-away intermediate states cannot be recovered at the decoding end, and details become blurry or show trailing artifacts.</p>
+<p>Therefore, the degree of latent compression and the spatiotemporal scope of the attention mechanism are two sides of the same coin: the smaller the latent space and the shorter the spatiotemporal window covered by the attention mechanism, the cheaper each step is and the longer the duration that can be accommodated; conversely, more spatiotemporal details are retained. Together, they determine memory usage, generation speed, and how long a video a model can coherently model. This trade-off runs through every design of video generation systems.</p></div>
+<div class="dd-formula" data-formula-id="video-generation-formula-1" data-display="mathml"><math display="block" aria-label="raw = 96×512×512×3 ≈ 75.5M；latent = 96×64×64×4 ≈ 1.57M"><mrow><mi>raw</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>96</mn><mo>×</mo><mn>512</mn><mo>×</mo><mn>512</mn><mo>×</mo><mn>3</mn><mspace width="0.35em"/><mo>≈</mo><mspace width="0.35em"/><mn>75.5</mn><mi>M</mi><mtext>；</mtext><mi>latent</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>96</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>4</mn><mspace width="0.35em"/><mo>≈</mo><mspace width="0.35em"/><mn>1.57</mn><mi>M</mi></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Video diffusion predicts a cross-frame-consistent denoising direction on a noisy spatiotemporal volume.<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>The sampling object of video diffusion is no longer a single image, but an entire segment of noisy latent video. A natural question is: if the same noise is fed to all frames, wouldn't denoising automatically yield consistent motion? The answer is no. Consistency does not mean replicating the same noise; it requires objects to maintain continuity of identity, geometry, and appearance throughout the motion, and this information must be explicitly established at every denoising step through cross-frame interactions, rather than being maintained by the crude coincidence of identical noise.</p>
+<p>Specifically, the model works on noisy spatiotemporal latents, and the network can be structured as 3D convolutions, temporal attention, or a decomposed structure that processes spatial and temporal layers separately. Regardless of the structure, the core is to let features from different frames communicate with each other: 3D convolutions directly mix information within a spatiotemporal neighborhood, temporal attention lets a frame reference previous and subsequent frames at arbitrary distances, and a decomposed structure first computes the spatial features of each frame and then exchanges them along the temporal axis. Conditioning signals can be text, the first frame, motion trajectories, or camera parameters; they tell the model “which motion the denoising direction should point to.” Shared network parameters and these cross-frame interactions create correlations between the appearances of the same object across different frames, which is precisely the basis for coherent motion.</p>
+<p>But the strength of sharing must lie in an intermediate zone. If sharing is too strong, the features of all frames are compressed into almost the same thing, motion is frozen, and the picture becomes a static image; if sharing is too weak, each frame is denoised independently, falling back into the flicker of independently generated single frames. The entire art of the model lies in tuning the interval between these two failures so that adjacent frames are similar enough to maintain continuity while retaining enough difference to carry real motion.</p>
+<p>When sequences become longer, the computational cost of having each frame attend to all other frames grows quadratically with the number of frames and quickly becomes prohibitive. Therefore, long-sequence generation usually switches to local temporal windows, sparse attention, or hierarchical keyframe structures: fine-grained cross-frame interactions are performed within short windows, while long-range consistency is passed through sparse connections or a number of keyframes. These approaches sacrifice part of the global connectivity in exchange for acceptable computational cost, which is another trade-off between long-video consistency and computational cost.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Complete example: Generating a 6-second shot of “a pedestrian with a red umbrella crossing a waterlogged street”<span class="dd-badge eng">Case walkthrough</span></h2>
+<div class="dd-agent-response"><p>Take a specific task as an example: generate a 6-second shot of “a pedestrian with a red umbrella crossing a waterlogged street.” If you simply feed that sentence to the model, the results are often hard to verify, because the word “crossing” does not specify any verifiable intermediate states. A more useful approach is to break the prompt down into an event sequence that can be verified.</p>
+<p>First, lock down the subject: a pedestrian holding a red umbrella and wearing a dark coat; the scene is a wet street after rain. These are identity and appearance constraints that run through the entire video and must remain consistent frame by frame. Second, define temporal events by expanding the abstract “crossing” into a clear causal sequence: the pedestrian enters the frame from the left → one foot steps into a puddle → splashes water → continues walking to the right, with the camera slowly following. This event chain provides checkpoints that can be checked segment by segment, rather than a vague stylistic description.</p>
+<p>If image-to-video generation is used, the first frame can lock in the initial identity and layout, giving subsequent generation a definite starting point; trajectory or depth information further constrains the direction of motion and camera movement, preventing the subject from drifting arbitrarily or the camera from shaking erratically. Generation is usually performed in two stages: first generate the complete, coherent motion at low resolution with a base model, then perform temporal and spatial super-resolution separately. This allows the motion skeleton to stabilize first, rather than sharpening each frame independently—independent sharpening destroys inter-frame continuity and introduces flicker.</p>
+<p>During the verification stage, focus on the three most error-prone objects: the pedestrian, the umbrella, and the puddle. Track them frame by frame to check whether there is identity switching, whether an object reappearing after occlusion is still the same object, and whether the number of objects in the frame changes midway. Quantitatively, optical flow and flicker metrics can be used to detect jumps; qualitatively, a human must inspect several causal details frame by frame: whether the splash is really triggered by a foot stepping into the puddle, whether the contact between foot and ground is solid, and whether the camera movement is continuous.</p>
+<p>Before publishing, there is also a high-risk check: if real people appear in the footage, their identity authorization must be confirmed; the source of any copyrighted material must be clear; and the finished video must carry a provenance marker. In summary, a time-expanded event graph constrains the video far better than piling up a large number of stylistic adjectives, because style words only affect appearance, while the event chain determines what actually happens on the timeline.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Original figure: Appearance, motion, and state jointly constrain generation along a multi-scale temporal axis<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>The entire generation pipeline can be summarized in one figure: Why is generating motion at low resolution first and then performing spatiotemporal super-resolution more stable than upscaling frame by frame? Figure 1 provides the answer and also shows the causal order among the stages.</p>
+<p>The starting point of the figure is two conditional inputs: a text event graph that specifies “what state changes happen at what time”; and a first-frame condition that locks in the initial identity and layout. Together they enter a low-resolution video model; the output of this step is not final image quality but a temporal skeleton—a complete, cross-frame coherent motion sequence, just at low resolution and with few details.</p>
+<p>Afterward there are two stages of super-resolution. Temporal super-resolution first fills in intermediate frames along the time axis to make motion smoother; spatial super-resolution then raises resolution and adds details frame by frame. The key is that these two steps are performed jointly on the already stable motion skeleton—frame interpolation and detail addition reference each other, rather than operating on each frame independently. Finally, object tracking and physical evaluation use the previously established identity constraints and causal events to inspect the final video.</p>
+<p>The logic of the whole figure is “skeleton first, details later”: first solve the hardest temporal consistency in a low-resolution space, then use super-resolution to restore image quality. If you do the opposite and enlarge and sharpen each frame separately, each frame will drift a little toward its own optimum, and inter-frame continuity will be destroyed. What Figure 1 expresses is precisely that appearance, motion, and state are jointly constrained on a multi-scale time axis, rather than each operating independently at the pixel level.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 350" role="img" aria-label="Text event graph and first-frame condition enter the low-resolution video model, then go through temporal super-resolution and spatial super-resolution, and finally undergo object tracking and physical evaluation."><defs><marker id="vg31" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="22" y="55" width="125" height="62" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="84" y="91" text-anchor="middle" class="svg-t">Text event graph</text><rect x="22" y="165" width="125" height="62" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="84" y="201" text-anchor="middle" class="svg-t">First frame/trajectory</text><path d="M147 86L195 133M147 196L195 163" stroke="#7f8b9d" marker-end="url(#vg31)"/><rect x="200" y="90" width="135" height="126" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="267" y="120" text-anchor="middle" class="svg-t">Base video</text><text x="267" y="147" text-anchor="middle" class="svg-t" font-size="11">Low-resolution complete motion</text><text x="267" y="177" text-anchor="middle" class="svg-t">Identity/state</text><path d="M335 153H375" stroke="#7f8b9d" marker-end="url(#vg31)"/><rect x="380" y="90" width="115" height="126" rx="9" fill="#21252d" stroke="#72b293"/><text x="437" y="120" text-anchor="middle" class="svg-t">Temporal super-resolution</text><text x="437" y="147" text-anchor="middle" class="svg-t" font-size="11">Frame interpolation</text><text x="437" y="177" text-anchor="middle" class="svg-t">Motion continuity</text><path d="M495 153H535" stroke="#7f8b9d" marker-end="url(#vg31)"/><rect x="540" y="90" width="115" height="126" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="597" y="120" text-anchor="middle" class="svg-t">Spatial super-resolution</text><text x="597" y="147" text-anchor="middle" class="svg-t" font-size="11">Cross-frame shared details</text><text x="597" y="177" text-anchor="middle" class="svg-t">Avoid flicker</text><path d="M655 153H705" stroke="#7f8b9d" marker-end="url(#vg31)"/><text x="730" y="149" text-anchor="middle" class="svg-t">Final video</text><path d="M705 205V276H267V216" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#vg31)"/><text x="486" y="303" text-anchor="middle" class="svg-t">Object tracking, optical flow, event order, and manual physical review return to base model</text><text x="486" y="328" text-anchor="middle" class="svg-t" font-size="11">Later cascade stages cannot repair identity and causality errors from earlier stages.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　First establish a temporal skeleton, then jointly fill in frames and details to reduce per-frame independent drift.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Text-to-video generation, image-to-video generation, and video editing have different constraint strengths<span class="dd-badge eng">Task Type</span></h2>
+<div class="dd-agent-response"><p>Video generation is not a single task, but a family of tasks with different constraint strengths. The more known conditions there are, the fewer degrees of freedom the model needs to sample on its own, and the difficulty shifts accordingly. A common misconception is that providing the first frame to the model both improves identity consistency and may conversely restrict reasonable motion. Because the first frame locks in the initial appearance and layout, identity drift is suppressed, but the model also loses the freedom to sample motion from scratch—it must strike a balance between 'respecting the first frame' and 'producing reasonable motion', especially regarding motion magnitude and the content that reappears after an object is occluded.</p>
+<p>Viewed by task type, the differences become clearer. Text-to-video generation has only high-level semantics as conditions; layout, identity, and motion all require the model to sample on its own, giving it the greatest degrees of freedom and making it the most prone to losing control. Image-to-video generation provides the initial appearance and layout, greatly reducing the burden of identity consistency, and the difficulty shifts to motion magnitude and content after occlusion. Trajectory or pose control provides a geometric path, imposing hard constraints on motion, but the new contradiction is the conflict between control and naturalness: strictly adhering to the path may make movement stiff. Video editing has the strongest conditions; the original video's motion and most pixels are known, requiring modification only of the target region and ensuring that modifications remain consistent across frames without affecting unrelated parts.</p>
+<p>These differences mean that evaluation must align with task conditions. Comparing the stability of image-to-video generation directly with pure text-to-video generation is unfair—the former inherits a large amount of information from the first frame and is inherently more likely to maintain consistency. Reasonable comparisons should only occur between the same type of task and under equivalent conditions; otherwise, 'stronger conditions' can be misread as 'smarter model'.</p></div>
+<table class="dd-table"><thead><tr><th>Task</th><th>Known Conditions</th><th>Main Difficulty</th></tr></thead><tbody><tr><td>Text-to-video generation</td><td>High-level semantics</td><td>Layout, identity, and motion all need to be sampled</td></tr><tr><td>Image-to-video generation</td><td>Initial appearance/layout</td><td>Motion magnitude and content after occlusion</td></tr><tr><td>Trajectory/pose control</td><td>Geometric path</td><td>Conflict between control and naturalness</td></tr><tr><td>Video editing</td><td>Original motion and partial pixels</td><td>Only modify the target and ensure cross-frame consistency</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Temporal consistency includes multiple layers of identity, geometry, lighting, and causality.<span class="dd-badge eng">Consistency</span></h2>
+<div class="dd-agent-response"><p>Temporal consistency is not a property that a single metric can cover. A typical problem is: even when optical flow looks smooth, a cup in the frame can still suddenly turn into a phone out of nowhere. The reason is that optical flow only measures low-level consistency—whether pixels and features move smoothly with motion; it does not care what objects those pixels represent. An object changing identity while optical flow remains smooth is exactly the mechanism by which this discontinuity occurs.</p>
+<p>Breaking consistency down, at least four layers can be distinguished. Low-level consistency looks at the smoothness of pixels and features with motion, answering the question “does the picture jump?”. Object consistency looks at whether identity, number, and texture are preserved, answering “is it still the same object?”. Scene consistency looks at whether the camera, lighting, occlusion, and spatial relationships among objects are self-consistent, answering “does this world still hold?”. Causal consistency looks at whether actions produce correct consequences, answering “does stepping into a puddle produce a splash?”. The reason a cup turning into a phone can fool optical flow is that it only breaks the object layer, while the low-level layer remains continuous.</p>
+<p>Precisely because any single metric can only cover part of this, diagnosis requires combining multiple approaches: object tracking to confirm identity remains unbroken, re-identification to handle objects that reappear after being occluded or leaving the frame, depth to check spatial relationships, optical flow to measure low-level smoothness, event detection to verify causal chains, plus human review of temporal issues. Several types of stress tests are especially revealing: reappearance after occlusion, re-entry from outside the frame, and rapid rotation of objects. These are the moments when models are most likely to lose identity, swap objects, and disrupt spatial relationships, and they are high-value scenarios for verifying consistency.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Long videos require planning shots, state, and narrative rather than infinitely extending the window<span class="dd-badge eng">Long-range structure</span></h2>
+<div class="dd-agent-response"><p>Directly stitching short videos into a long video inevitably causes drift: each time you extend by 4 seconds, characters and props eventually slowly become distorted. The root cause is that the sliding-window mechanism only keeps the most recent frames as context, while character identity and overall world state need a summary to be passed along. This summary is lossy at each continuation—it cannot fully remember all previous details, and the error caused by the discarded information becomes the condition for the next generation segment. Errors accumulate segment by segment like compound interest, and after tens of seconds the character's facial features, clothing color, and number of props may look like a different person from the beginning.</p>
+<p>The solution is not to infinitely extend the attention window, because that would again hit the wall of computational cost, but to switch to a layered planning-generation-editing workflow. The system first writes a scene table, shot table, and state table, specifying which characters are in each shot, what they wear, what they hold, and what space they stand in; then generates short shots segment by segment, and at each transition explicitly verifies whether the characters, clothing, props, and spatial layout match the state table. If they do not match, it corrects them before moving to the next segment. Composition happens after generation, rather than letting the model sample all at once.</p>
+<p>Certain content also requires specialized conditioning signals to be done well: lip synchronization for dialogue, causality between actions and consequences, and the cinematic language itself (shot size, camera position, pacing). These are difficult to automatically emerge from a vague text prompt. Therefore, long-form video production is more like a production process that alternates among planning, generation, and editing, rather than one-shot sampling by a single model. Planning handles macro consistency, generation handles local motion, and editing intercepts errors at transitions.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Cascaded super-resolution can increase frame rate and clarity, but cannot correct base motion<span class="dd-badge eng">cascade boundary</span></h2>
+<div class="dd-agent-response"><p>Cascaded super-resolution has a capability boundary that is easy to overestimate. Suppose that in the base video a pedestrian's finger count has already drifted—from five fingers to six—the later-stage super-resolution model will not fix it back; instead, it will render the texture of the six fingers more and more clearly. The reason is that each stage of super-resolution only does “enhancement,” not “re-planning”: temporal super-resolution inserts intermediate frames between already generated keyframes, and spatial super-resolution adds texture to existing content, both of which are constrained by the trajectories set by the base stage. They inherit the already existing object identity, motion direction, and event order; if these are already wrong, later stages usually only preserve them, or even sharpen the errors more conspicuously.</p>
+<p>To prevent super-resolution from introducing new artifacts, the conditions and noise at each stage must be shared across frames. If each frame is super-resolved independently, adjacent frames will each refine in slightly different directions, producing flicker. The correct approach is to have both frame interpolation and detail addition refer to the same cross-frame shared information, maintaining inter-frame continuity.</p>
+<p>This naturally leads to a staged evaluation method: first check whether the base motion is correct, then check the consistency of the frame interpolation, and finally check whether the spatial details are clear. Each stage only verifies the responsibility of its own layer. Once a problem is found, do not expect later stages to fix it; instead, go back to the earliest stage that produced the fault to resolve it—if the base motion is wrong, fix it in the base model; if the frame interpolation jumps, fix the temporal super-resolution; only when the texture is blurry should spatial super-resolution be fixed. Attributing the fault to the correct layer is the key to repair efficiency.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Physical common-sense failures come from data correlations, not from simulating world equations.<span class="dd-badge eng">Failure boundary</span></h2>
+<div class="dd-agent-response"><p>A model can generate realistic splashes, yet the foot may not actually touch the water at all; this contradiction reveals the fundamental difference between video generators and the physical world. The generator learns statistical regularities in video data: it knows what splash appearance typically accompanies a frame of "foot stepping in water," so it can reproduce that appearance. But internally it has no hard physical constraints—no conservation of mass, no rigid-body rules, no contact detection, and no persistent identity constraints. It draws pixels that "look the part," not a world state driven by conservation laws. Correct appearance but wrong contact is exactly the typical failure of this "correlation learning."</p>
+<p>Certain scenarios are especially fragile. Rare interactions (such as multiple objects colliding simultaneously), complex hands, mirror reflections, text in the frame, and precise counting are corners that are statistically hard to cover: in training data, samples of these situations are sparse or their patterns complex, so the model can only guess from weak correlations, and its error rate is far higher than for common actions.</p>
+<p>Introducing world-model-style state representations or geometric conditions can improve this situation—for example, explicitly tracking objects' positions, velocities, and contact relationships so that generation is constrained by those states—but this still does not eliminate the need for verification. As long as the model remains fundamentally a statistical generator, there is a risk of using plausible appearance to mask incorrect physics. Therefore, in any context involving safety, scientific research, or use as training data, visual realism must not be treated as physical correctness; task simulators or real data must be used to verify that the motion and consequences actually hold.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Video evaluation must simultaneously consider frame quality, temporal consistency, semantics, and human preferences.<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>The most insidious misconception in video evaluation is treating a single metric as a comprehensive conclusion. For example, a decrease in distribution metrics like FVD only indicates that the generated samples are overall closer to the distribution of real videos; it does not directly answer fine-grained questions such as "whether characters are more consistent in long takes." Distribution metrics measure differences at the sample-set level, not identity stability across frames within a single video.</p>
+<p>Correct evaluation requires covering multiple perspectives simultaneously. Text-video similarity checks semantics, answering "whether the generated content matches the prompt"; frame-level image metrics assess the clarity of individual frames; optical flow or feature differences measure short-term stability; object tracking checks whether identity is maintained in long takes; event question answering verifies whether the temporal order of actions and consequences is correct. Each of these metrics covers one layer; none can replace the others.</p>
+<p>But machine metrics cannot replace human judgment. Human blind testing needs to holistically evaluate naturalness, adherence to the prompt, whether motion is plausible, and ultimately whether the video is usable. Human preference can catch flaws beyond metric scores, such as a certain indescribable stiffness.</p>
+<p>To make evaluation conclusions truly informative, you also need to slice the samples: group them by duration, motion speed, number of objects, camera cuts, on-screen text, and occlusion, and separately report the failure rate and worst time segments under each slice. Finally, there is another layer of risk from the evaluation tools themselves: the encoder used for scoring may also have its own preferences, for example favoring still frames or familiar content seen during training, thus giving inflated scores. Only by recognizing this can you avoid misinterpreting the encoder's tendencies as the actual quality of the video.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Safety and provenance issues are amplified by video's persuasiveness and identity simulation<span class="dd-badge eng">Governance</span></h2>
+<div class="dd-agent-response"><p>Adding watermarks to generated videos does not by itself solve the risk of deepfakes. Watermarks are one link in the verification chain, not the endpoint. What really needs to be controlled is the use itself: likenesses of real people, minors, impersonation in political or financial scenarios, unauthorized portraits, and copyrighted material. Even if these things carry watermarks, the harm does not disappear because of the watermark.</p>
+<p>The value of provenance credentials, watermarks, and edit histories lies in supporting post-hoc verification—enabling people to trace who generated a video, when, and with what tool. But this verification chain is fragile: watermarks can be cropped out, diluted by re-encoding, or even erased by filming the screen again; detectors themselves also have false positives and false negatives, and they will experience distribution drift as generation technology evolves. A detector trained today may become ineffective tomorrow.</p>
+<p>Therefore, practical protection requires a set of coordinated measures: restrict high-risk combinations of identity and action, for example, disallow generating certain sensitive behaviors of specific real people; record the authorized sources of all input materials to ensure that materials used in training and generation are legal; clearly label outputs so viewers know the content is synthetic; and provide impersonated individuals with appeal and takedown channels so victims can quickly stop the spread. It is also necessary to distinguish two things—the model's own capabilities and the release policies built around the model; they need to be evaluated separately. A highly capable model paired with strict release policies can be used safely, while a model with limited capabilities but missing policies can still cause harm. Safety is a policy issue, not just a technical issue.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>Deployment focuses on spatiotemporal slicing, deterministic reproducibility, and resource limits<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>High-resolution long videos have a typical failure mode during deployment: everything works fine at first, and the last few seconds suddenly crash and exhaust resources. The root cause is that GPU memory and computation grow rapidly with spatial resolution, frame count, and attention connections—the higher the resolution, the larger each frame; the more frames, the longer the tensor; attention connections scale quadratically with sequence length. When these factors stack up, resource demands may exceed hardware limits in the final stage, while users only see an unexplained failure.</p>
+<p>Therefore, deployment must proactively set limits and make failures explainable. The system should set maximum frame count, resolution, sampling steps, and concurrency limits, keeping tasks within hardware capacity; at the same time, support cancellation at any time, and write checkpoints at each stage so that after a long task fails, it can resume from an intermediate stage rather than starting over. For long tasks, return clear progress and failure stage—users need to know whether it is stuck at base motion, frame interpolation, or super-resolution, not a vague "failure".</p>
+<p>When generation must be split into segments, the segments should overlap with each other, and state should be passed from the previous segment to the next. Overlap provides room for continuity, and state passing ensures identity and layout continuity, thus avoiding seams and identity jumps across segments.</p>
+<p>Reproducibility is the other half of deployment. Keeping only the final compressed video is insufficient; once auditing, repair, or re-export is needed, there is no starting point. The complete generation recipe must be saved: model version, VAE, prompt, control signals, random seed, and the versions of each stage of the cascaded super-resolution. Before release, it should be regenerated from these original conditions and verified, ensuring it does not rely solely on a final file that may have been damaged by compression. The complete recipe and the limited runtime together constitute a deployable, recoverable, reproducible video generation service.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">15</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>By stringing together all the previous links, you can see a complete causal chain that leads directly from the problem to verifiable practice.</p>
+<p>The starting point is to break down the prompt into subject, scene, event, and shot. A vague description is not enough to constrain the time axis; only by breaking it down into verifiable state changes does each subsequent step have something to check against. Then choose the task type based on the conditions at hand: if you have only text, take text-to-video; if you have a first frame, take image-to-video; if you have a geometric path, take trajectory control. The strength of the conditions determines the degrees of freedom the model must sample on its own, and also determines the baseline for subsequent verification.</p>
+<p>The generation itself is first completed in latent space: use a compressed low-resolution tensor to generate a complete motion skeleton, let the most difficult temporal consistency stabilize first, and then let temporal modules maintain identity, occlusion, and state on top of the skeleton. After that, enter cascaded post-processing—temporal super-resolution fills in intermediate frames, spatial super-resolution adds details, and the two share cross-frame information to avoid the flicker caused by frame-by-frame independent processing. At the verification stage, track the objects in the picture, check whether the order of events and the physical consequences hold; at the same time, evaluate on multiple axes—frame quality, temporal consistency, semantics, and human preference—since any single metric covers only one of those layers. At final delivery, record provenance, restrict identity misuse, and perform versioned release to ensure reproducibility.</p>
+<p>This chain also gives a method for verifying it. Between fixing and observing, each layer must simultaneously answer two questions: what is fixed, and what evidence is observed. The input layer fixes the same batch of samples, the same preprocessing pipeline, and permission boundaries, and observes input hashes, slice labels, and rejection reasons. The mechanism layer changes only one core variable while locking all other configurations, and observes key intermediate states and where the first deviation from expectation occurs. The output layer uses the same acceptance rules and resource budget, and observes differences in quality, cost, latency, and failure rate across layers. The falsification layer keeps a control group that does not enable the target mechanism, to see whether the benefit can be stably reproduced across different samples and random seeds. Only when a causal chain is self-consistent in the three directions of fixing, observing, and falsification is it not just a derivation in principle, but a practice that can be repeatedly tested.</p></div>
+<table class="dd-table"><thead><tr><th>Validation layer</th><th>What to fix in "Video Generation: Jointly Modeling Spatial Appearance, Temporal Motion, and Cross-Shot State"</th><th>What evidence to observe</th></tr></thead><tbody>
+      <tr><td>Input</td><td>The same batch of samples, preprocessing, and permission boundaries</td><td>Input hashes, slice labels, and rejection reasons</td></tr>
+      <tr><td>Mechanism</td><td>Change only one core variable, lock all other configurations</td><td>Key intermediate states and the location of the first deviation from expectation</td></tr>
+      <tr><td>Output</td><td>The same acceptance rules and resource budget</td><td>Hierarchical differences in quality, cost, latency, and failure rate</td></tr>
+      <tr><td>Falsification</td><td>Keep a control group that does not enable the target mechanism</td><td>Whether the benefit is stably reproducible across samples and random seeds</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/2204.03458" target="_blank" rel="noopener">Video Diffusion Models</a>: the spatiotemporal architecture and video generation of diffusion models.</li><li><a href="https://arxiv.org/abs/2210.02303" target="_blank" rel="noopener">Imagen Video</a>: base video and spatiotemporal super-resolution cascades.</li><li><a href="https://arxiv.org/abs/2401.12945" target="_blank" rel="noopener">Lumiere</a>: space-time U-Net and full frame rate generation.</li><li><a href="https://arxiv.org/abs/2311.15127" target="_blank" rel="noopener">Stable Video Diffusion</a>: latent video diffusion training and data curation.</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/video-generation">Explore connections on the map</a><a href="/zh/concepts/video-generation/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

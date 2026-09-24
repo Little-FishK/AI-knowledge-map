@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>强化学习：从延迟反馈中学习决策策略 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>强化学习是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/reinforcement-learning/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="强化学习：从延迟反馈中学习决策策略">
+<meta property="og:title" content="强化学习是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="强化学习：从延迟反馈中学习决策策略">
+<meta name="twitter:title" content="强化学习是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/#page","name":"强化学习：从延迟反馈中学习决策策略","description":"用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。","url":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"强化学习：从延迟反馈中学习决策策略","item":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/#page","name":"强化学习是什么？原理通俗讲解 | AI 知识地图","description":"用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。","url":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"强化学习：从延迟反馈中学习决策策略","item":"https://ai-knowledge-map.com/zh/concepts/reinforcement-learning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">强化学习：从延迟反馈中学习决策策略</span></li></ol></nav><article id="dd-article" data-concept-id="reinforcement-learning">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">强化学习：从延迟反馈中学习决策策略</span></li></ol></nav><article id="dd-article" data-concept-id="reinforcement-learning" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">强化学习：从延迟反馈中学习决策策略</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">用 MDP、回报、价值函数、Bellman 方程、探索与策略梯度理解 Agent 如何在交互中优化长期结果。</p>
 
@@ -79,7 +81,7 @@
         <section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">10</span>把因果链连起来<span class="dd-badge intuition">综合</span></h2><p class="dd-lead">这个概念怎样从问题一路连接到可验证的实践？</p><ol class="dd-chain"><li>策略选择动作</li><li>环境返回状态与奖励</li><li>多步奖励形成回报</li><li>价值估计承担信用分配</li><li>探索产生新经验</li><li>独立评测检查奖励是否代表真实目标</li></ol></section>
         <section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">11</span>误区与自测<span class="dd-badge intuition">自测</span></h2><p class="dd-lead">你能否不用背术语，解释它的机制、边界与验证方法？</p><div class="dd-quiz"><ol><li>强化学习的一步交互包含哪些对象？策略的输入和输出分别是什么？</li><li>现在奖励为 −1、下一步奖励为 +8，γ=0.9。计算两步回报，并解释为什么它可能优于即时奖励为 +4、下一步为 −12 的动作。</li><li>Vπ(s) 与 Qπ(s,a) 的输入和含义有什么区别？为什么一次幸运轨迹不能证明价值高？</li><li>用白话解释 Bellman 递推解决了什么问题，γ 和 s′ 在式中分别表示什么。</li><li>策略梯度中的优势 A(s,a) 为正或为负时分别怎样更新？它为什么不是一种新奖励？</li><li>为什么探索不等于随机乱试？退款助手面对未知高风险动作时应怎样获得证据？</li><li>PPO 的裁剪能保证哪些事情，又不能保证哪些事情？</li><li>训练回报和离线成功率都上升后，设计三个验收切片，并说明不可被平均值抵消的失败边界。</li><li>假设“强化学习：从延迟反馈中学习决策策略”在离线示例上表现正常、上线后核心结果却下降，你会怎样按输入、内部变换、输出反馈和适用边界定位问题？</li></ol></div><details class="dd-answers"><summary>参考答案</summary><ol><li>环境给出状态 s，策略 π(a|s) 以状态为输入并输出动作或动作概率；智能体执行动作 a 后，环境返回奖励 r 和下一状态 s′。学习结果是一套状态到动作的决策规则，而不是某一道题的固定答案。</li><li>前者 G=−1+0.9×8=6.2；后者 G=4+0.9×(−12)=−6.8。只看即时奖励会选择 +4，但折扣回报把延迟后果也计入，因此应选择先付出一点核验成本、长期结果更好的动作。</li><li>V 输入状态，估计从该状态遵循 π 的期望回报；Q 还固定当前动作，估计先做该动作、之后遵循 π 的期望回报。两者都对策略选择和环境随机性求平均，一次轨迹只是一个带噪样本。</li><li>它把很长的未来拆成“眼前一步奖励 + 下一状态剩余价值”，因而不必每次等整条轨迹结束。s′ 是执行当前动作后的下一状态，γ 是折扣因子，用来降低更远奖励在当前估计中的权重。</li><li>A 为正时提高已选动作在该状态下的概率，为负时降低。优势由动作回报减去状态基线得到，表示这个动作相对该状态通常水平好多少；它重新中心化已有回报信号，并未定义新的现实目标。</li><li>探索的目的应是减少影响决策的关键不确定性，重复已知坏动作只有风险没有信息价值。高风险动作应先在模拟器、历史日志或受限沙箱中验证，并受权限、审批和可回滚约束，不能直接对真实用户随机试错。</li><li>裁剪限制一次更新中新旧策略概率比的变化，降低单个批次导致行为突变的风险；它不能保证奖励代表真实目标、状态信息充分、权限正确或长期安全，许多小步累积也会远离参考策略。</li><li>可按权限风险切片，越权动作率必须为零或低于硬上限；按订单年龄与证据完整度切片，分别报告正确处理率和人工接管率；按时间或用户群切片，检查环境变化后的回报和真实解决率。越权、不可逆伤害等红线不能由普通案例的高平均分抵消。</li><li>先保存同一失败样本及环境，确认输入、权限和前置条件没有漂移；再记录关键中间状态，检查机制是否按本页描述完成变换；随后把原始输出与独立指标、人工终验对照；最后用边界样例和对照实验复测。只有定位到首次偏离预期的环节，才能判断应修改数据、机制、评测还是使用边界。</li></ol></details></section>
         <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Reinforcement Learning: An Introduction</a>：MDP、价值与策略基础</li><li><a href="https://arxiv.org/abs/1312.5602" target="_blank" rel="noopener">Playing Atari with Deep Reinforcement Learning</a>：DQN</li><li><a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener">Proximal Policy Optimization Algorithms</a>：PPO</li><li><a href="https://arxiv.org/abs/2006.04779" target="_blank" rel="noopener">Conservative Q-Learning for Offline Reinforcement Learning</a>：离线分布外动作的保守价值估计</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/reinforcement-learning">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/reinforcement-learning">在地图中查看概念关系</a><a href="/en/concepts/reinforcement-learning/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

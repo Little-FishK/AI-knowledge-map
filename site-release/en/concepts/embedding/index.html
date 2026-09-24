@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Embedding? Explained Simply</title>
+<meta name="description" content="Turn text into vectors, making “similar meaning” become “close in distance”">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/embedding/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/embedding/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/embedding/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Embedding? Explained Simply">
+<meta property="og:description" content="Turn text into vectors, making “similar meaning” become “close in distance”">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/embedding/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Embedding? Explained Simply">
+<meta name="twitter:description" content="Turn text into vectors, making “similar meaning” become “close in distance”">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/embedding/#page","name":"What Is Embedding? Explained Simply","description":"Turn text into vectors, making “similar meaning” become “close in distance”","url":"https://ai-knowledge-map.com/en/concepts/embedding/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Embedding","item":"https://ai-knowledge-map.com/en/concepts/embedding/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Embedding</span></li></ol></nav><article id="dd-article" data-concept-id="embedding" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Embedding</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Turn text into vectors, making “similar meaning” become “close in distance”</p>
+<p class="dd-ali">Embedding · Vector representation · Word vector</p>
+<p class="dd-metabar">Suggested 25–35 min · Basic → Intermediate · Requires: basic concepts of vectors, distance/angle</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> An embedding is a representational coordinate shaped by the training objective: it maps tokens, sentences, images, and other objects into continuous vectors, enabling similarities important for the current task to be approximated by distance or angle. It is not a naturally complete “semantic truth”; training pairs, pooling, similarity, and negative samples together determine what the space preserves and what it ignores.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>What it is</b>— turning text into vectors, and why it means “making similar meanings close together.”</li>
+    <li><b>Why</b>— why vector distance should correspond exactly to semantic nearness—is it a coincidence?</li>
+    <li><b>What it can do</b>— after making semantics computable, what previously impossible things are unlocked?</li>
+    <li><b>Two “embeddings”</b>— why it is sometimes a layer in a model and sometimes a standalone model.</li>
+    <li><b>Two pitfalls</b>— why changing models requires rebuilding the index, and why it is insensitive to “negation”—what each is about.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>For a machine to compare “meaning”, it must first turn text into numbers, and make “similar meaning” show up as “similar numbers”—that is embedding.<span>(§1)</span></li>
+    <li>“Distance = semantics” is not by design; it is forced out by training that pulls similar items together and pushes unrelated items apart.<span>(§2)</span></li>
+    <li>Then, to judge whether two passages are synonymous, one only needs to compute the angle between their vectors; semantics becomes a computable quantity for the first time.<span>(§3)</span></li>
+    <li>Cosine similarity turns the directional relationship between vectors into a sortable number, but the threshold can only be calibrated on real tasks.<span>(§4)</span></li>
+    <li>Be careful to distinguish two “embeddings”: Transformer's input embedding layer (per token) vs. a standalone embedding model (whole text).<span>(§5)</span></li>
+    <li>Its most typical use is semantic search: finding nearest neighbors by meaning rather than literal wording—this is the heart of Retrieval-Augmented Generation (RAG).<span>(§6)</span></li>
+    <li>Two must-know pitfalls: changing models requires rebuilding the index, and it is insensitive to negation.<span>(§7)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Is an Embedding?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>To determine whether two pieces of text are “similar in meaning,” a machine must first convert text into a numerical representation that can be computed and compared. Embedding is the method that completes this conversion: the input is a piece of text, the model first encodes the text, and outputs a continuous vector composed of hundreds to thousands of numbers. This vector is not arbitrary numbering, but the coordinates of the text in the semantic space learned by the model.</p>
+<p>The key constraint of embedding is to make semantic relationships manifest as spatial relationships: texts with more similar meanings usually have closer vector distances; texts with greater meaning differences usually have vectors farther apart. Thus, the originally non-computable question of “whether meanings are similar” can be transformed into the computable question of “whether two vectors are close.” In the semantic map shown in Figure 1, similar content naturally clusters into groups. Although “how to return an item” and “product return process” have no common keywords, they fall in nearby positions because they express the same need—this is exactly the value of embedding relative to literal matching.</p>
+<p>This semantic map is not a unified coordinate system shared by all models. Each embedding model forms its own representation space; the same text will get different coordinates when using another model. Therefore, only vectors in the same model's coordinate system are suitable for direct comparison; you cannot mix vectors generated by different embedding models and interpret distances.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 230" role="img" aria-label="In the semantic space, content with similar meanings clusters together.">
+      <rect x="20" y="20" width="520" height="195" rx="8" fill="none" stroke="#2c313b"/>
+      <g font-size="12">
+        <circle cx="110" cy="70" r="5" fill="#6b8cbe"/><text x="120" y="74" class="svg-t">Cat</text>
+        <circle cx="140" cy="95" r="5" fill="#6b8cbe"/><text x="150" y="99" class="svg-t">Dog</text>
+        <circle cx="105" cy="120" r="5" fill="#6b8cbe"/><text x="115" y="124" class="svg-t">Pet</text>
+        <text x="120" y="52" class="svg-t" fill="#6b8cbe">Animal cluster</text>
+
+        <circle cx="410" cy="65" r="5" fill="#d3a05a"/><text x="420" y="69" class="svg-t">Car</text>
+        <circle cx="440" cy="90" r="5" fill="#d3a05a"/><text x="450" y="94" class="svg-t">Train</text>
+        <text x="410" y="47" class="svg-t" fill="#d3a05a">Transportation cluster</text>
+
+        <circle cx="240" cy="165" r="5" fill="#4f9d78"/><text x="252" y="160" class="svg-t">How to return an item</text>
+        <circle cx="300" cy="180" r="5" fill="#4f9d78"/><text x="312" y="184" class="svg-t">Product return process</text>
+        <text class="svg-t" fill="#4f9d78" text-anchor="middle" x="280" y="205" style="font-size:12px"><tspan x="280" y="205">No common words, but similar meaning → close together</tspan></text>
+      </g>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1　Place content into a “semantic map”: things with similar meanings automatically cluster together. Note “how to return an item” and “product return process”—they have no common keywords, yet they are close together because of similar meaning. This is exactly the value of embedding.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Why can “distance equal semantics”?<span class="dd-badge math">Math</span><span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>That vector distances reflect semantic distance is not a coincidence; it is a geometric property continuously shaped by the training objective. The training data contains a large number of text sample pairs, some with similar meanings and some unrelated to each other. The model first encodes each piece of text into a vector, and then adjusts its parameters based on the known relationships between samples: vectors of similar samples are pulled closer together, while vectors of unrelated samples are pushed farther apart. As this process is repeated, semantic relationships are encoded into the structure of the entire vector space.</p>
+<p>Therefore, “being close” is not a fixed coordinate artificially assigned to a particular word; it is the result of associations the model has learned under a large number of pairwise constraints. Two similar samples are repeatedly required to shorten their distance and eventually fall into neighboring regions; unrelated samples are separated from each other under training pressure. After the vector space is formed, distance can serve as a numerical signal for the degree of semantic relatedness.</p>
+<p>Earlier word vectors embodied a simpler version of the same idea: words with similar contexts tend to have similar meanings. For example, around “cat” and “dog” one may see words such as “feed, raise, cute, pet store”; their contexts overlap heavily, so training causes the vectors of the two words to gradually move closer. Whether using sample pairs to directly pull together or push apart, or learning associations from shared contexts, “distance corresponds to semantics” is not an extra hard-coded rule but a result produced by the training process. This correspondence is also constrained by the training material and training objective: what the model can express is the semantic structure it has learned under these constraints.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>It turns “semantics” into something computable<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>Once text is represented as embedding vectors, the question “whether two passages are about the same thing” can be turned into a numerical comparison. A common metric is cosine similarity: it does not require the two texts to share the same vocabulary but instead compares the directions of two vectors. The smaller the angle, the more aligned the two vectors are, and the higher the similarity; the larger the angle, the more pronounced the difference in direction, and the lower the similarity.</p>
+<p>Similarity = cos(θ) = (A·B) / (‖A‖ ‖B‖)</p>
+<p>Here, A and B are the two embedding vectors to compare, θ is the angle between them, A·B denotes the dot product, and ‖A‖ and ‖B‖ are the lengths of the two vectors respectively. In computation, first the dot product measures the degree to which they agree in direction, then divide by the product of their lengths. The denominator removes the effect of vector length, so cosine similarity focuses on direction rather than how long the vectors themselves are.</p>
+<p>The result lies between −1 and 1: the closer to 1, the more aligned the directions; near 0, the two vectors are nearly perpendicular; near −1, the directions are opposite. This number only describes similarity within the same embedding model space; vectors generated by different models cannot be compared across spaces, nor can the similarity be directly interpreted as the probability that an answer is correct.</p>
+<p>“king − man + woman ≈ queen” is the classic demonstration of vector semantics. Here it is not just the position of a single point that matters; directions in the vector space also carry relationships: the direction of change “from man to woman” can be applied to “king,” bringing the result close to “queen.” This shows that semantics is not only placed into coordinates but also encoded into the geometric structure of the space.</p>
+<p>Once semantics can be computed with vectors and similarity, retrieval and semantic search, vector databases, Retrieval-Augmented Generation (RAG), and clustering share a common foundation: either find the nearest neighbors to the current vector, or group vectors that are close to each other. They face different specific tasks, but all are built on the ability to “turn semantics into computable vectors.”</p></div>
+<div class="dd-formula">Similarity = cos(θ) = (A·B) / (‖A‖ ‖B‖)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Manually calculate a cosine similarity<span class="dd-badge math">Numerical Example</span></h2>
+<div class="dd-agent-response"><p>Using two-dimensional toy vectors, we can fully recalculate how cosine similarity turns "more aligned" into sortable scores. Let the query vector q = [1, 0]. The vector for the candidate "return goods" is a = [0.8, 0.6], and the vector for the candidate "train schedule" is b = [−0.6, 0.8]. These three vectors all have length 1, so the length products in the cosine similarity formula are all 1.</p>
+<p>For candidate a, first compute the dot product:</p>
+<p>q·a = 1×0.8 + 0×0.6 = 0.8</p>
+<p>Then divide by the length product 1 to obtain cos(q, a) = 0.8. This relatively high positive value indicates that a is more aligned with the query direction, so "return goods" is more relevant among these two candidates.</p>
+<p>For candidate b, compute similarly:</p>
+<p>q·b = 1×(−0.6) + 0×0.8 = −0.6</p>
+<p>After length normalization, we obtain cos(q, b) = −0.6. The negative value indicates that b is opposite to the query direction, so "train schedule" is less relevant in the model space. When sorting scores from high to low, a will appear before b. The angular relationships in the figure express the same thing as the calculation results: a has a smaller angle with the query, and b has a larger angle with the query.</p>
+<p>Real embeddings usually have hundreds of dimensions, but the computation process remains the same: input one query vector and several candidate vectors, compute dot products separately, then normalize by their respective lengths, output each candidate's similarity and rank them accordingly. Cosine only compares direction, not length; in practical retrieval, vectors are often normalized to unit length first, in which case the dot product directly equals the cosine similarity.</p>
+<p>High similarity only indicates that two objects are close in that model's vector space; it does not guarantee that a candidate is necessarily correct for a specific business task. The threshold used to filter results needs to be calibrated based on real queries, hard negatives, and labels; different models shape different spaces, so a 0.8 in one model and a 0.8 in another model do not have a unified meaning, and thresholds cannot be directly copied across models.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 650 270" role="img" aria-label="Comparison of angles between the query vector and two candidate vectors"><defs><marker id="emb-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><line x1="120" y1="215" x2="560" y2="215" stroke="currentColor" opacity=".3"/><line x1="300" y1="245" x2="300" y2="25" stroke="currentColor" opacity=".3"/><g stroke-width="5" fill="none" marker-end="url(#emb-a)"><path d="M300 215L510 215" stroke="#8b5cf6"/><path d="M300 215L468 89" stroke="#10b981"/><path d="M300 215L174 47" stroke="#ef4444"/></g><path d="M380 215A80 80 0 0 0 364 167" fill="none" stroke="#10b981" stroke-width="3"/><g class="svg-t"><text x="520" y="218">q=[1,0]</text><text x="475" y="82">a, cos=0.8</text><text x="80" y="42">b, cos=−0.6</text><text x="382" y="174">small angle</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Cosine only compares direction, not length. In real retrieval, vectors are often normalized first so that the dot product equals the cosine similarity directly.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Dot product</th><th>Cosine and conclusion</th></tr></thead><tbody><tr><td>a</td><td><code>0.8</code></td><td><code>0.8</code>, more relevant</td></tr><tr><td>b</td><td><code>−0.6</code></td><td><code>−0.6</code>, less relevant</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Two Easily Confused “Embeddings”<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>“Embedding” often refers to two different things: the input embedding layer inside a Transformer, and the embedding model used in retrieval scenarios such as RAG. They both take text and produce vectors, but they differ in where they sit, output granularity, and purpose; they cannot be substituted for one another just because they share the name.</p>
+<p>The input embedding layer of a Transformer is part of the model architecture. After text is split into tokens, this layer generates a vector for each token, and then passes this set of vectors to the subsequent network for processing. Its output is not a single representation of the whole text, but a series of vectors corresponding to each token; its responsibility is to convert discrete tokens into input that the model can process internally.</p>
+<p>By contrast, the embedding model in a retrieval context is an independently trained model. It takes an entire text, summarizes the information within it into one vector, and makes the overall semantics of different texts comparable and retrievable. What is needed here is a representation for each text that can be used for similarity computation, not just the internal vector of each token as it first enters the Transformer.</p>
+<p>The difference between the two can be understood along the processing chain: the input embedding layer performs “token → vector for each token → subsequent network,” while the embedding model performs “entire text → one whole-text representation vector.” The former serves computation inside the Transformer; the latter serves comparison of whole-text semantics. When selecting a model, first confirm whether the task needs a per-token model input representation or a whole-text representation for retrieval; confusing the two concepts will directly lead to errors in model selection and implementation.</p></div>
+<table class="dd-table">
+    <thead><tr><th></th><th>Input embedding layer inside a Transformer</th><th>The “Embedding Model” in RAG</th></tr></thead>
+    <tbody>
+      <tr><td>What it is</td><td>Part of the model architecture</td><td>An independently trained model</td></tr>
+      <tr><td>Whose vector it outputs</td><td>each <b>token</b>'s vector</td><td>the whole <b>text</b>'s vector</td></tr>
+      <tr><td>Goal</td><td>Feeds input to the Transformer (see its deep-read page)</td><td>Makes the semantics of the whole passage comparable and retrievable</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>The Most Typical Use Case: Semantic Search<span class="dd-badge intuition">Intuition</span><span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Keyword search relies on literal matching: the words in the query need to match the words in the document. When a user searches for “how to return an item,” a document that only says “product return process” is semantically related but may not be retrieved because there are no common keywords. Semantic search aims to solve exactly this kind of missed retrieval; it finds nearest neighbors by meaning rather than by literal form.</p>
+<p>The input to semantic search includes a query and a document collection. The system first uses the same embedding model to convert the query and each document into vectors, then compares the distances between the query vector and document vectors, and outputs the document closest to the query. In this way, “return goods” and “return process” may be retrieved because their vectors are close in the semantic space even though the wording differs. Retrieving a document means the model judges that it is close in meaning to the query, not that it necessarily contains the original query terms.</p>
+<p>This mechanism is also a key part of Retrieval-Augmented Generation (RAG). A common vector-retrieval RAG, before answering a question, uses embeddings to perform semantic search to find materials related to the question from a knowledge base, then passes these materials to a large language model to generate the answer; RAG can also adopt keyword, hybrid, or structured retrieval mechanisms and does not always rely on embeddings. The causal chain is: embeddings represent query and document → similarity retrieval selects materials → large language model answers based on materials. Embedding quality directly affects whether retrieval picks the right content, and retrieval results in turn determine what basis the answering stage can obtain, so retrieval quality often becomes the bottleneck of RAG effectiveness.</p>
+<p>Semantic similarity is only a judgment in model space and does not necessarily mean correctness in a business sense. Retrieval quality depends on whether the embedding can accurately represent the semantic relationships in the current domain; even if the overall average retrieval performance is good, it cannot guarantee that every result is correct. Retrieval, vector databases, and RAG will continue to handle storage, nearest-neighbor search, and generation issues on this basis.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Two pitfalls in practice<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>When embeddings are deployed, two types of problems are especially likely to distort results: mixing vectors from different models, and mistaking surface similarity for semantic consistency.</p>
+<p>After changing the embedding model, you must rebuild the entire vector index. The same batch of texts processed by different models gets mapped into different vector spaces; even if the "cat" produced by model A and the "cat" produced by model B come from the same text, their coordinates are not directly comparable. If the query uses the new model while the document index still retains vectors from the old model, similarity computation faces two different coordinate systems, and the results become nothing but noise. Therefore, changing models means all documents must be re-embedded, the index rebuilt with the new vectors, and validation performed again on the same evaluation data.</p>
+<p>Negative expressions expose the limits of similarity itself. "Suitable for children" and "not suitable for children" differ only by one negative word, and most of the literal content is the same, so their vectors may be very close, but the actual meanings are opposite. In such cases, high similarity reflects proximity in surface and topic, but cannot guarantee that the key judgment direction is consistent. For these hard negatives, where a small amount of text can reverse the entire meaning, you cannot rely only on vector similarity; you need to add rules, structured filtering, or reranking as a fallback.</p>
+<p>Embedding vectors are usually high-dimensional. "High-dimensional" only means that a vector contains many coordinates; for example, a 768-dimensional vector describes a piece of text with 768 numbers together. As dimensionality increases, distances between samples may become closer and closer, making them harder to distinguish; this phenomenon is often summarized as the "curse of dimensionality." Trained embeddings are not random scattered points; they form structures related to the training task, so high-dimensional distances may still be meaningful. However, this effectiveness is not naturally guaranteed; it must be tested with real retrieval samples.</p>
+<p>To let people observe the distribution of vectors with hundreds of dimensions, you can temporarily map them to two or three dimensions through dimensionality reduction. A dimensionality-reduction plot is a lossy projection; it is suitable for helping discover suspicious clusters and outliers, but it cannot prove the retrieval quality in the original high-dimensional space. "Clustering together" on a two-dimensional plot does not mean retrieval is necessarily reliable, nor can it replace task-oriented metrics.</p>
+<p>Reliable validation should first build a small golden set of query–document pairs with relevance grades, then report Recall@k, nDCG, or MRR, and slice by negative expressions, numbers, proper nouns, language, and text length separately. If average recall is good but "not suitable for children" still retrieves "suitable for children", the problem should be located in hard negatives and ranking boundaries rather than being masked by the overall average. At this point, you should add structured filtering or reranking; after changing models, you should retest on the same golden set while regenerating all vectors and rebuilding the index.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Embedding ties together "how objects become vectors" and "how vectors produce retrieval results" into one complete causal chain. The starting point is that machines cannot directly compute text meaning, so text must be encoded into numeric vectors and semantic closeness made to manifest as spatial closeness. This mapping is not arbitrary numbering: training continually pulls samples with similar meanings closer together and pushes unrelated samples apart, ultimately making semantic relationships become the geometric structure of the vector space.</p>
+<p>With this structure, the semantic relationship between two pieces of text can be turned into a numeric result through vector comparison. Cosine similarity converts the directional relationship between two vectors into a sortable score: the more aligned the directions, the higher the score, which usually indicates the model considers the semantics more similar. This score is only meaningful within the same model space; the threshold used for business filtering is also not a fixed constant, but must be calibrated against real task data.</p>
+<p>From here to semantic search is only one step away. After queries and documents are converted into vectors by the same embedding model, the system can find the query's nearest neighbors by similarity. Matching is based on closeness in semantic space, not on whether they share common keywords, so "how to return an item" can retrieve "product return process." RAG first uses this step to retrieve relevant material from a knowledge base, then hands that material to a large language model to answer.</p>
+<p>The choices in this chain together define "similarity": the training objective determines what relationships the vector space learns, the embedding model determines which coordinate system text lands in, the similarity calculation determines how directions are compared, and the task data determines how thresholds are calibrated. In implementation, you must also distinguish between the per-token input embedding layer inside a Transformer and the standalone embedding model that produces a single vector for a whole piece of text; semantic retrieval requires the latter.</p>
+<p>A mismatch in any link of the chain will ruin the final result. Replacing the model while continuing to use the old index is equivalent to mixing two incomparable coordinate systems, so you must re-embed all documents and rebuild the index. When encountering negative expressions such as "suitable for children" and "not suitable for children," apparently high similarity may hide a meaning reversal, requiring rules, filtering, or reranking to cover the limits of raw vector similarity. Ultimately, the reason vector distance can carry semantics is that training shapes this geometric relationship; the reason documents without common keywords can be retrieved is that retrieval compares this relationship, not literal overlap.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>Understanding embeddings requires a few foundational concepts. Vectors provide the numerical representation of text; dot product and angle explain how the directions of two vectors are compared; tokens and tokenization explain how text is split into units that a model can accept; neural networks are the basis for the model learning mapping relationships. With these prerequisites, semantic coordinates, cosine similarity, and the process by which training shapes the vector space can be connected into a coherent whole.</p>
+<p>The core knowledge of embeddings centers on four relationships: how text is placed into semantic coordinates, how cosine similarity compares vector directions, why the Transformer's input embedding layer and standalone embedding models should not be conflated, and how semantic search uses vector nearest neighbors to recall content by meaning. These relationships together explain the complete path from text input to similarity scores and then to retrieval results.</p>
+<p>Extension topics closely adjacent to embeddings include retrieval and semantic search, vector databases, RAG, clustering, the curse of dimensionality, and dimensionality reduction. Retrieval and semantic search focus on how to find similar content; vector databases handle the storage and lookup of vectors; RAG connects recalled material into the generation process; clustering groups similar vectors. The curse of dimensionality and dimensionality reduction help understand the difficulties of high-dimensional spaces and how to project high-dimensional structure in a lossy manner for observation.</p>
+<p>Further outward, multimodal research studies how to bring different modalities into a shared embedding space, CLIP is an adjacent specific learning topic, and knowledge graphs provide another path for organizing and connecting knowledge. Learning along the hierarchy “prerequisite foundations → embedding core → nearest-neighbor applications and high-dimensional issues → cross-modality and knowledge organization” can keep the dependency relationships between concepts clear.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Covered</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Vector, dot product and angle, tokens and tokenization, neural network</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Semantic coordinates, cosine similarity, embedding layer vs embedding model, semantic search</td></tr>
+      <tr><td>Adjacent Extensions</td><td>Retrieval and semantic search, vector databases, RAG, clustering, curse of dimensionality, dimensionality reduction</td></tr>
+      <tr><td>Further</td><td>Multimodal (cross-modal shared embedding space), CLIP, knowledge graphs</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al., Efficient Estimation of Word Representations in Vector Space</a>: distributed word vectors and their training objective.</li>
+    <li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers &amp; Gurevych, Sentence-BERT</a>: sentence vectors, cosine similarity, and semantic retrieval.</li>
+    <li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., Learning Transferable Visual Models From Natural Language Supervision</a>: cross-modal image-text embeddings and contrastive learning.</li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-21</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/embedding">Explore connections on the map</a><a href="/zh/concepts/embedding/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Multimodal Models? Explained Simply</title>
+<meta name="description" content="One model that understands images, sounds, and text all at once.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/multimodal/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/multimodal/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/multimodal/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Multimodal Models? Explained Simply">
+<meta property="og:description" content="One model that understands images, sounds, and text all at once.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/multimodal/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Multimodal Models? Explained Simply">
+<meta name="twitter:description" content="One model that understands images, sounds, and text all at once.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/multimodal/#page","name":"What Is Multimodal Models? Explained Simply","description":"One model that understands images, sounds, and text all at once.","url":"https://ai-knowledge-map.com/en/concepts/multimodal/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Multimodal Models","item":"https://ai-knowledge-map.com/en/concepts/multimodal/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Multimodal Models</span></li></ol></nav><article id="dd-article" data-concept-id="multimodal" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Multimodal Models</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">One model that understands images, sounds, and text all at once.</p>
+<p class="dd-ali">Multimodal · Large Multimodal Models</p>
+<p class="dd-metabar">Suggested 25–35 min · Intermediate · Requires: basic understanding of Transformer and embeddings.</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Multimodal refers to a single model concurrently processing information from different modalities such as text, images, audio, and video. It rests on two cornerstones: Transformer is modality-agnostic (anything can be cut into tokens), and aligning different modalities into the same semantic space (so the image of a cat and the word “cat” are close together). Only when modalities are connected do visual question answering, text-to-image generation, and operating interfaces by looking at screens become possible.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>Why</b>—Why use a single model to handle images, text, and audio together instead of using separate models?</li>
+    <li><b>How is it possible</b>—Why can an architecture designed for language handle images and audio?</li>
+    <li><b>Where is the soul</b>—Image tokens and text tokens: how does the model know they refer to the same thing?</li>
+    <li><b>How to connect it</b>—How does a model that can speak grow "eyes"?</li>
+    <li><b>What has been unlocked</b>—After modalities are connected, what previously impossible things become possible?</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Real-world tasks are cross-modal, and a single model handling them uniformly allows different modalities to corroborate each other—so we need multimodal models.<span>(§1)</span></li>
+    <li>The first cornerstone: Transformer is modality-agnostic; anything can be cut into tokens and computed together.<span>(§2)</span></li>
+    <li>But "being able to compute them together" does not equal "understanding they are the same thing", so a second cornerstone is needed.<span>(§2→3)</span></li>
+    <li>The second cornerstone: establish cross-modal alignment; it can be CLIP-style shared representation, or a projector or cross-attention connection.<span>(§3)</span></li>
+    <li>In engineering terms, use a visual encoder to turn images into visual tokens, project them into the word embedding space, and feed them together with text tokens to the large model.<span>(§4)</span></li>
+    <li>Once modalities are connected, this unlocks image-text QA, text-to-image generation, screen-based operation, accessibility, and more.<span>(§5)</span></li>
+    <li>But alignment quality determines the ceiling, information density varies widely, and there can be hallucinations on images too.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why “Multimodal”<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The problem that multimodal models aim to solve can be summarized in one sentence: let the same model process multiple forms of information such as images, text, and sound at the same time, rather than training a dedicated model for each form. This goal is not driven by engineering curiosity, but by two practical reasons.</p>
+<p>The first reason is that real-world tasks themselves are often cross-modal. Image captioning requires converting visual content into language; identifying objects by sound requires linking sound signals to categorical knowledge about objects; reading illustrated documents requires understanding both text and images and clarifying their correspondence. If these modalities are completely separated and each is processed by an independent model, the “connection” that the task depends on is lost: a text-only model cannot exploit structural information in illustrations, and a sound-only model cannot use text to name what it hears. The value of multimodal models lies precisely in keeping this connection within the same computational process.</p>
+<p>The second reason is at the capability level: after connecting different modalities into the same model system, the model can achieve joint conditioning and cross-modal reasoning. Joint conditioning means that generation or judgment is based on inputs from multiple modalities at the same time—for example, when answering “where is this cat lying,” the model uses both the cat’s location in the image and the reference “cat” in the question. Cross-modal reasoning means that something observed in one modality can trigger inference or correction of content in another modality. This capability emerges only after information channels between modalities are established.</p>
+<p>It is important to note that “the same system” is not a fixed architecture. It can be an end-to-end unified model in which all modalities share one set of parameters from the start; it can also be a system composed of specialized encoders, projectors, adapters, and a language model, among other modules. The key point is that, regardless of internal organization, from the outside the input of a multimodal system is data in one or more modalities plus a task instruction, and the output is text, images, sound, actions, or some cross-modal judgment. Its processing flow can be decomposed into two steps: first encode each modality into a computable representation, then establish cross-modal information channels between these representations so that information can flow across modalities.</p>
+<p>Interpretation of the output must return to the specific task. For example, a visual question answering result of “the cat is lying on the keyboard” only shows that the model correctly associated the image evidence with the question on this task, and does not mean that all of the model’s visual capabilities are reliable in any scenario. Conversely, if a task does not require cross-modal connections—such as classifying a piece of plain text or single-modal recognition of an image—a dedicated model is usually simpler, cheaper to train, and easier to debug. Multimodal is not unconditionally better; it shows irreplaceable value only when the task genuinely spans modalities.</p>
+<p>Therefore, the essence of multimodal models is not “putting several models together,” but enabling one model to simultaneously accommodate and relate different modalities in a unified representation. Only when information is genuinely connected in a unified representation space can it produce an effect of 1 + 1 &gt; 2; if the outputs of several models are merely mechanically concatenated, cross-modal connections will not appear automatically.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>First Cornerstone: Transformer Is Modality-Agnostic<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Transformer was originally designed for language modeling, but it can be used directly to process images and sound because it has a strong “agnostic” characteristic with respect to its input: it does not care what the input actually is, only whether the input can be cut into a sequence of tokens, that is, a sequence of vectors. As long as this condition is met, data from any source can go through the same computational pipeline.</p>
+<p>The specific approach is to force different modalities into the same shape. An image is cut into small squares, and each small square is encoded as if it were a “word”; an audio clip is cut into frames, and each frame is likewise encoded into a vector; text is already made up of tokens. Thus, information from completely different sensory channels is unified into a single data structure, “a sequence of tokens,” and the same Transformer can process them all.</p>
+<p>This solves the first hurdle of multimodality—whether they can be computed together. At this layer, the input is a sequence of vectors obtained after encoding image patches, audio frames, or text, and the output is the updated token representation from the Transformer. The update is effective because of the self-attention mechanism: every token in the sequence can exchange information with every other token, and the output at each position integrates context from the entire sequence. Precisely because this mechanism depends only on the abstract relationship of “pairwise interactions between positions” and not on the specific physical meaning of the input, the same computational backbone can process sequences from different sources without modification.</p>
+<p>But we must be clear about the boundary of this layer: the output representation only indicates that the model has completed a numerical transformation. Without paired training or other alignment signals, tokens that are close in position across the two modalities cannot be interpreted as the same concept. In other words, “can be computed together” does not mean “understands that they are the same thing.”</p>
+<p>After you cut an image of a cat into tokens and turn the word “cat” into a token, put them into the same model, at this moment they are just two strings of numbers speaking different languages. The language of image tokens comes from pixel patches, and the language of text tokens comes from the vocabulary; there is no natural correspondence between the two. How is the model supposed to know that this sequence of image tokens and that word refer to the same thing? Transformer itself cannot answer this question. It is only responsible for continuing the computation over the sequence, while knowledge like “this string of numbers and that string of numbers have the same semantics” must be injected by an additional alignment mechanism. This is exactly the problem the next cornerstone will solve.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>The second cornerstone: understanding cross-modal alignment through numerical examples<span class="dd-badge math">Math</span><span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The previous cornerstone left an unresolved question: although image tokens and text tokens can enter the same Transformer and be computed together, the model does not know which string of numbers and which word refer to the same thing. Cross-modal alignment aims to solve this problem—making the “image of a cat” and the word “cat” correspond in the model's view.</p>
+<p>One important and direct approach is to learn comparable cross-modal representations: pull paired image-text vectors closer and push unpaired ones apart. This is the CLIP route. It uses massive paired data of “image + corresponding text caption” to train two encoders simultaneously—one for images, one for text—and then applies contrastive training: paired image and text vectors move toward each other, unpaired ones push apart. This objective is exactly the contrastive learning from the “embedding” concept, except the objects of comparison cross modalities. After training, images and texts share the same semantic space: different modalities have their own encoders, but all are mapped into the same space, so that the “image of a cat” and the word “cat” land close to each other. With alignment, image tokens and text tokens truly “speak the same language”; this shared space is also the foundation for text-to-image generation to “find corresponding pictures from text.”</p>
+<p>It should be noted, however, that multimodal systems do not necessarily permanently compress all tokens into a single shared space. Another approach is to keep visual features unchanged and connect them to a language model through projection layers or cross-attention. Whichever route is taken, the common goal is the same: to establish learnable modality alignment and information channels.</p>
+<p>The effect of alignment can be seen clearly through a numerical example. Let the cat image vector v = (0.8, 0.6), the text vector for “cat” t₁ = (1, 0), and the text vector for “keyboard” t₂ = (0.6, 0.8), all three with length 1. After length normalization, cosine similarity equals the dot product. Computing one by one: v · t₁ = 0.8 × 1 + 0.6 × 0 = 0.8, whereas v · t₂ = 0.8 × 0.6 + 0.6 × 0.8 = 0.48 + 0.48 = 0.96. So the similarity of this cat image vector to “keyboard” is 0.96, which is actually higher than its similarity of 0.8 to “cat.” This result is not contradictory: if the image shows a scene of “a cat lying on a keyboard,” the keyboard pixels occupy a considerable portion of its visual representation, so the local representation matching “keyboard” more closely is completely reasonable. It precisely illustrates that similarity scores must be interpreted in the context of a specific task.</p>
+<p>The input to alignment training is paired or corresponding image-text samples; the output is comparable representations or features that can be queried across modalities. The training objective is clear: increase the similarity of correct image-text pairs and decrease the similarity of incorrect pairs. In retrieval scenarios, the model ranks by relative scores, where a higher score means “a better match within the current candidate set,” but it is not a factual probability. A single similarity value cannot guarantee that the model can count keycaps or understand spatial relations; if the paired data itself is biased, the candidate set changes, or the task requires counting and spatial reasoning, global alignment alone is not enough.</p>
+<p>Looking at the two cornerstones together: Transformer enables different modalities to be computed together, and alignment enables them to speak the same language. Without alignment, multimodality is just several strings of unrelated tokens forced together; alignment is the soul that truly connects modalities in a multimodal system.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 220" role="img" aria-label="Images and texts are mapped into the same semantic space and aligned">
+      <rect x="20" y="40" width="110" height="40" rx="6" fill="#21252d" stroke="#a86fa8"/><text x="75" y="65" text-anchor="middle" class="svg-t" font-size="12">Image: cat</text>
+      <rect x="20" y="140" width="110" height="40" rx="6" fill="#21252d" stroke="#6b8cbe"/><text x="75" y="165" text-anchor="middle" class="svg-t" font-size="12">Text: “cat”</text>
+      <line x1="130" y1="60" x2="300" y2="95" stroke="#6b7484" stroke-width="1.4" marker-end="url(#f1)"/>
+      <line x1="130" y1="160" x2="300" y2="110" stroke="#6b7484" stroke-width="1.4" marker-end="url(#f1)"/>
+      <rect x="300" y="30" width="240" height="160" rx="8" fill="none" stroke="#2c313b"/>
+      <text x="420" y="24" text-anchor="middle" class="svg-t" font-size="11">Shared semantic space</text>
+      <circle cx="360" cy="100" r="6" fill="#a86fa8"/><circle cx="378" cy="108" r="6" fill="#6b8cbe"/>
+      <text x="360" y="135" text-anchor="middle" class="svg-t" font-size="11" fill="#4f9d78">Cat image and “cat” → close together</text>
+      <circle cx="480" cy="60" r="6" fill="#a86fa8"/><circle cx="498" cy="68" r="6" fill="#6b8cbe"/>
+      <text x="490" y="48" text-anchor="middle" class="svg-t" font-size="11">Car image and “car”</text>
+      <defs><marker id="f1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1  Alignment: different modalities each have their own encoders, but are all mapped into<b>the same</b>semantic space, so that the “image of a cat” and the word “cat” land close to each other. With alignment, image tokens and text tokens truly “speak the same language.”</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How to connect “seeing” to “speaking”<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The previous two sections discussed “can they be calculated together” and “how to align them”; now we arrive at a more concrete scenario: we already have a very articulate large language model, how do we give it “eyes” so that it can look at images while answering questions.</p>
+<p>A mainstream approach is very direct and can be viewed as a three-stage connection chain. The first stage is the visual encoder: it turns the input image into a sequence of visual tokens, that is, a vector sequence of image features; this step completes the conversion from pixels to a computable representation. The second stage is the projection layer: it aligns these visual tokens into the large model's word embedding space, making them look like “words” the large model recognizes. The third stage is concatenation and generation: treat the projected visual tokens as some special “words”, place them before the text tokens, and feed them together into the large model. Thus the large model can “read” the image just as it “reads” text, and then generate an answer autoregressively as usual—when it predicts the next token at each step, it can see both the image content and the question text, and the two interact within the same sequence.</p>
+<p>The input to this connection chain is an image and a text question, and the output is the answer generated by the language model. The division of labor among the parts is clear: the visual encoder is responsible for extracting image features, the projection layer is responsible for turning the features into visual tokens that the language model can accept, and the language model then combines the text tokens to gradually generate the answer. The whole process is feasible precisely because the first two cornerstones are already in place: visual tokens and text tokens are the same data structure, so they can enter the same sequence; the alignment completed by the projection layer lets the model know that these visual tokens express image semantics rather than a string of unrelated numbers.</p>
+<p>When interpreting the output, we need to stay clear-headed: the words in the answer are the result of conditional generation, not direct readings from a visual sensor. What the model “sees” is actually the encoded and compressed image representation; fine text, spatial localization relationships, and details in ultra-high-resolution images may be lost during this compression process. Therefore, for any task that involves reading small text in an image, judging precise positions, or relying on high-resolution details, you should separately verify the model's answer using the corresponding image crop or enlarged region, rather than assuming it has “seen clearly” the whole image.</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 560 120" role="img" aria-label="Visual encoder turns the image into visual tokens and, together with text tokens, feeds them to the large model.">
+      <rect x="20" y="45" width="70" height="34" rx="6" fill="#21252d" stroke="#a86fa8"/><text x="55" y="66" text-anchor="middle" class="svg-t" font-size="12">Image</text>
+      <line x1="90" y1="62" x2="120" y2="62" stroke="#6b7484" stroke-width="1.4" marker-end="url(#g1)"/>
+      <rect x="120" y="45" width="90" height="34" rx="6" fill="#1a1d23" stroke="#6b8cbe"/><text x="165" y="66" text-anchor="middle" class="svg-t" font-size="11">Visual encoder</text>
+      <line x1="210" y1="62" x2="240" y2="62" stroke="#6b7484" stroke-width="1.4" marker-end="url(#g1)"/>
+      <rect x="240" y="45" width="90" height="34" rx="6" fill="#21252d" stroke="#4f9d78"/><text x="285" y="66" text-anchor="middle" class="svg-t" font-size="11">visual token</text>
+      <text x="285" y="98" text-anchor="middle" class="svg-t" font-size="11" fill="#6b7484">+ text token</text>
+      <line x1="330" y1="62" x2="360" y2="62" stroke="#6b7484" stroke-width="1.4" marker-end="url(#g1)"/>
+      <rect x="360" y="40" width="90" height="44" rx="8" fill="#1a1d23" stroke="#6b8cbe" stroke-width="2"/><text x="405" y="66" text-anchor="middle" class="svg-tn" font-size="12">Large model</text>
+      <line x1="450" y1="62" x2="480" y2="62" stroke="#6b7484" stroke-width="1.4" marker-end="url(#g1)"/>
+      <text x="518" y="66" text-anchor="middle" class="svg-t" font-size="11">Answer</text>
+      <defs><marker id="g1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 2  A common approach to giving a large model eyes: image → visual encoder → visual token (projected into word embedding space) → concatenated with text tokens → fed to the large model. The model can then “look at images while answering questions”.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>What Unlocks When Modalities Are Connected<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Once text, images, and sound are connected into the same model, things that were previously impossible or done poorly begin to become possible. These new capabilities do not appear out of thin air; each one corresponds to the mechanisms established earlier:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Capability</th><th class="dd-align-left">How it is achieved</th></tr></thead><tbody><tr><td class="dd-align-left">Image-text question answering, understanding charts in documents</td><td class="dd-align-left">Image-text alignment and joint reasoning within the same model</td></tr><tr><td class="dd-align-left">Text-to-image, text-to-video</td><td class="dd-align-left">Text and images are aligned in a shared space, enabling “finding the image by the text”</td></tr><tr><td class="dd-align-left">Agent viewing screens and operating interfaces</td><td class="dd-align-left">Understanding interface screenshots as visual input</td></tr><tr><td class="dd-align-left">Accessibility applications: reading images for the visually impaired, voice interaction</td><td class="dd-align-left">Cross-modal conversion, such as image → text, text → speech</td></tr></tbody></table></div>
+<p>The input to this capability table is a specific cross-modal business task, and the output is the conversion direction to adopt and the acceptance result: image-text question answering outputs an answer, text-to-image outputs an image, and a screen Agent outputs controlled actions. The thinking order when selecting a capability should be: first determine which modalities provide conditions for the task and which modality carries the final result, then verify segment by segment along the “alignment–generation” chain whether the model truly possesses the required capability for that segment. When interpreting results, also limit the scope: a single successful image-text question answering only shows that the model is qualified on that task slice; “supports image input” does not imply that OCR, chart reasoning, spatial localization, and video understanding all meet the standard.</p>
+<p>From a more macroscopic perspective, multimodal large models can be understood as adding input interfaces and alignment layers for processing other modalities to a large language model, while the core “understanding and generation” still follows the same mechanism as the language model. It is not a completely new system built from scratch, but a natural extension of language model capabilities. This also explains why today’s mainstream models are almost all natively multimodal: since the cost of alignment and interfaces has been continuously driven down, while the benefits cover the entire table above, incorporating multiple modalities into the same system becomes a natural choice.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Capability</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Image-text question answering, understanding charts in documents</td><td>Image-text alignment and joint reasoning within the same model</td></tr>
+      <tr><td>Text-to-image / text-to-video</td><td>Text and images are aligned in a shared space, enabling ‘finding the image by the text’ (see ‘Image Generation’)</td></tr>
+      <tr><td>Agent viewing screens and operating interfaces</td><td>Understanding interface screenshots as visual input (see ‘Computer Use’ and ‘AI Agent’)</td></tr>
+      <tr><td>Accessibility: reading images for the visually impaired, voice interaction</td><td>Cross-modal conversion (image→text, text→speech)</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Costs and Challenges<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Multimodal systems introduce new failure sources that text-only models do not have, which can be grouped into three categories: alignment, computation, and generation. To diagnose a failure, you cannot look only at the final answer—looking at the answer alone cannot distinguish whether the model failed to see clearly, failed to align, or whether the language model itself made up the content. The correct approach is to put the failure sample, the original modality source, and the intermediate representation together, and inspect layer by layer along a causal chain: whether the original input is clear; whether the encoding preserved key information; whether the cross-modal correspondence is correct; whether the generation is faithful to the evidence. Every layer can be the first place where an error occurs, and the location of the first error determines the remediation to take.</p>
+<p>The first type of cost lies in alignment. Alignment quality sets the upper limit: if image-text alignment is trained poorly, the model will "see wrong"—recognize things in the image as something else, or establish incorrect correspondences between image and text. The success or failure of multimodal systems depends to a large extent on the volume and quality of alignment training data, and flaws in this step will be amplified across all downstream tasks.</p>
+<p>The second type of cost lies in computation. The information density of different modalities varies greatly: a high-resolution image carries far more information than a sentence, and after being split into tokens, the sequence is both long and expensive; processing long videos is especially compute-hungry. Multimodal models have to pay encoding and attention costs far exceeding those of text-only models for an input that has "few words but a lot of information".</p>
+<p>The third type of cost lies in generation. Hallucination still exists under image input: the model may describe things that are not in the image at all in vivid detail, for example asserting "there is a dog in the image" when there is actually none. The root cause is that what it describes is still the "most likely statement" rather than the "observed fact"—the image merely adds a condition and changes the probability distribution, but does not turn the generation process into an objective transcription of the image.</p>
+<p>Therefore, do not treat multimodal models as "objective eyes". The essence of "image captioning" is still generating the most likely text, just with an image as an additional condition. It will see wrong and will make things up; in critical scenarios, its descriptions still need to be checked against the original image, and you cannot assume by default that its output is a faithful reading of the image. Only by understanding this can you make good use of the capabilities brought by multimodality while not pushing it into a position it cannot bear.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Taken together with the previous sections, the whole causal chain of multimodal models is interlocking. The starting point is reality: many tasks are inherently cross-modal—image captioning, reading documents with illustrations, identifying objects by sound. Separating modalities loses the very connections the tasks depend on; when a single model handles them in a unified way, different modalities can corroborate each other—for example, image evidence correcting linguistic ambiguity. Therefore, multimodal models are needed; this is the first link in the whole chain.</p>
+<p>The first cornerstone then appears: Transformer is agnostic to modality. It does not care whether the input is pixel patches, audio frames, or text; as long as they can be cut into tokens, they can be computed together. This solves the problem of 'whether they can be computed together'—but only that half: being computed together does not mean understanding they are the same thing. The image token of a cat and the word token 'cat' are still two strings of numbers each speaking its own language; semantic identity does not automatically appear just because they enter the same sequence. It is precisely this gap that pushes the reasoning to the second cornerstone.</p>
+<p>The second cornerstone is cross-modal alignment. Its form can be CLIP-style learning of shared representations, pulling paired vectors closer together, or it can preserve visual features and connect to the language model through a projector or cross-attention, but the goal is the same: to establish learnable modal alignment and information channels. With alignment, image tokens and word tokens can speak the same language, and cross-modal queries such as 'find the image from text' become possible.</p>
+<p>The engineering implementation puts this chain into practice: a visual encoder converts images into visual tokens, which are then projected into the word-embedding space, concatenated with text tokens, and fed into the large model. The model can then generate answers autoregressively while looking at the image. Once modalities are connected, capabilities such as image-text question answering, text-to-image generation, screen AI Agents, and accessibility applications are unlocked in succession, each corresponding to the mechanisms accumulated earlier.</p>
+<p>But at the end of the causal chain is cost: alignment quality determines the ceiling; poor alignment leads to 'seeing wrong.' Information density varies greatly across modalities, and high-resolution images and long videos mean long and expensive token sequences. Moreover, image conditioning cannot eliminate hallucination—the model may still be describing the most likely statement rather than the fact it sees. So the whole chain ultimately returns to a passing standard: being able to clearly explain that multimodal models are built on the two cornerstones of 'Transformer is modality-agnostic' and 'cross-modal alignment', especially explaining why 'aligning to the same semantic space' is the soul—being able to compute together is only an admission ticket; speaking the same language is where multimodal models truly begin.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Concept dependencies and extended learning<span class="dd-badge eng">path</span></h2>
+<div class="dd-agent-response"><p>The knowledge points on this page can be divided into four levels according to their dependencies; proceeding level by level will make learning smoother:</p>
+
+<p>The prerequisite layer provides the foundation for all mechanisms on this page: Transformer explains why the same computational skeleton can process arbitrary token sequences; embeddings explain vector representations and contrastive training; Token and Tokenization explains the text-side version of “cutting different modalities into unified units”; large language models are the most commonly integrated generation core in multimodal systems. If the prerequisites are not solid, every later building block will be left hanging.</p>
+<p>The four core concepts on this page happen to form a causal chain: modality-agnostic processing allows sequences from different sources to enter the same model; shared semantic space and modality alignment let these sequences “recognize” each other; and visual encoder integration turns this chain into a concrete engineering solution. These four concepts are the basis for judging whether “a system counts as truly multimodal”.</p>
+<p>Immediate extensions unfold in two directions: first, CLIP, which makes the alignment idea into a benchmark model, and image generation premised on “finding the picture from text”; second, using multimodality for action—Computer Use and AI Agent, where an agent understands interface screenshots and operates them. A further layer moves toward the temporal dimension and generation capabilities: video generation requires alignment to further cover dynamic sequences, speech recognition and synthesis brings the auditory modality into the same chain, and world models try to give models the ability to predict the world on top of multimodal perception. Each layer is not isolated; instead, it is a natural extension of the preceding causal chain.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning level</th><th>Related concepts</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisite</td><td>Transformer, embeddings, Token and Tokenization, large language models</td></tr>
+      <tr><td><b>Core on this page</b></td><td>Modality-agnostic processing, shared semantic space, modality alignment, visual encoder integration</td></tr>
+      <tr><td>Immediate extensions</td><td>CLIP, Image Generation, Computer Use, AI Agent</td></tr>
+      <tr><td>Further</td><td>Video Generation, Speech Recognition and Synthesis, World Model</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and Adaptation Notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., CLIP</a>: Image-text contrastive learning and shared representation space.</li>
+    <li><a href="https://arxiv.org/abs/2204.14198" target="_blank" rel="noopener">Alayrac et al., Flamingo</a>: A modular combination of a visual encoder, cross-attention, and a language model.</li>
+    <li><a href="https://arxiv.org/abs/2304.08485" target="_blank" rel="noopener">Liu et al., LLaVA</a>: Visual instruction tuning and a visual projection connector.</li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/multimodal">Explore connections on the map</a><a href="/zh/concepts/multimodal/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

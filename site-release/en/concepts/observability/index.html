@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result? Explained Simply</title>
+<meta name="description" content="Use traces, spans, versions, quality signals, and minimized data to turn “occasional wrong answers” into locatable, replayable, regression-testable problems.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/observability/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/observability/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/observability/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result? Explained Simply">
+<meta property="og:description" content="Use traces, spans, versions, quality signals, and minimized data to turn “occasional wrong answers” into locatable, replayable, regression-testable problems.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/observability/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result? Explained Simply">
+<meta name="twitter:description" content="Use traces, spans, versions, quality signals, and minimized data to turn “occasional wrong answers” into locatable, replayable, regression-testable problems.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/observability/#page","name":"What Is LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result? Explained Simply","description":"Use traces, spans, versions, quality signals, and minimized data to turn “occasional wrong answers” into locatable, replayable, regression-testable problems.","url":"https://ai-knowledge-map.com/en/concepts/observability/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result","item":"https://ai-knowledge-map.com/en/concepts/observability/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result</span></li></ol></nav><article id="dd-article" data-concept-id="observability" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">LLM Observability and Tracing: Reconstructing Why an AI Request Got This Result</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Use traces, spans, versions, quality signals, and minimized data to turn “occasional wrong answers” into locatable, replayable, regression-testable problems.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> AI observability is not about permanently storing every prompt; it is about enabling teams to formulate and test failure hypotheses based solely on the evidence the system generates: the input summary, retrieval, model, tools, retries, version, and final result for a single user task must be connected into a causal timeline while satisfying privacy minimization, sampling representativeness, and actionable response.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>Design AI trace/span structures; distinguish logs, metrics, and tracing; locate failures from latency and quality signals; establish a closed loop of data masking, sampling, alerting, and rollback.</div>
+<ol class="dd-chain"><li>Generate and propagate trace context for user tasks</li><li>Component spans record version/evidence/action</li><li>Aggregate quality and system metrics by slice</li><li>Drill down from anomalies to controlled traces to propose hypotheses</li><li>Rollback/ablation verification and stop-loss</li><li>Audit failed samples and feed them back into evaluation</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why HTTP 200 Can Still Be a Serious Failure<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>A refund assistant receives a user's refund request. The interface returns HTTP 200, there is no exception stack in the logs, and all calls appear to have succeeded. This can still be a serious failure: the assistant may have retrieved a version of the return policy that has been deprecated and answered accordingly; it may have passed the wrong parameter when passing the order number to the refund tool; it may have automatically retried after the first call timed out, when in fact the first call had already created the refund and the retry created another one; or it may have smoothly promised the user an action it had no permission to perform. In these scenarios, all metrics at the transport layer are green, but the user got the wrong result or the wrong promise.</p>
+<p>The root of the problem lies in the semantic boundary of HTTP 200. A 200 only confirms that the request was received and got a response at the transport level; it does not promise that the response is semantically correct, that the evidence is reliable, that the permission is valid, or that the business action succeeded. For an AI system composed of retrieval, generation, tool calls, and policy decisions, failures often occur precisely outside the transport layer: the model received the wrong input, retrieval returned outdated evidence, the tool was passed the wrong parameter, a retry introduced duplicate side effects, or the generated content did not match the permissions. These failures do not produce exception stacks, and traditional log-centric observability approaches are almost powerless against them.</p>
+<p>Traditional logs are good at recording machine anomalies: process crashes, null pointers, and connection timeouts all leave traces. But LLM-driven systems also need to record three categories of things that traditional logs do not cover: semantic failures (answers that are fluent but factually wrong), evidence paths (which retrieved result and which version a conclusion is based on), and action outcomes (what actually happened in external systems after a tool call). Without these records, engineers can only guess after an incident occurs.</p>
+<p>Observability has a boundary here that needs to be clarified: it is not “seeing the real thinking inside the model.” The activations and intermediate states inside a model cannot be reliably read out, and any claim of directly observing model thought exceeds what the tools can actually do. What observability reconstructs is the causal chain outside the model: what versioned input the model actually received, what calls were actually made, what observations external systems gave for those calls, and what side effects were ultimately produced. With this chain, engineers can attribute a wrong result to a specific link: was the input itself wrong, or was the retrieved evidence wrong; did the generation stage deviate from the evidence, or were the tool call parameters wrong; were the policy rules poorly designed, or did the environment data change between two requests.</p>
+<p>Whether this set of records is sufficient can be tested with one core test: can on-call personnel, without reproducing the user's sensitive original text, answer four questions based solely on the trace—which step the failure occurred at, which version that step used, what evidence the conclusion at the time was based on, and what state changes this operation produced. If they can answer, then this causal chain is locatable, replayable, and verifiable; if they cannot, then the system is invisible at key links, no matter how frequent its 200 responses are.</p>
+<p>From this, we can give the inputs and outputs of the AI observability layer. The inputs are the event stream collected along the request chain: versioned requests, retrieval results, model inputs and outputs, tool calls, policy decisions, and the side effects of each step. The output is a causal timeline that can be located, replayed, and verified, which decomposes “the user got this result” into “which step, with which version, based on what evidence, and what state was changed.” The trace records the actual inputs, actions, and state changes that occurred; it never claims to read model thought. At the same time, the sensitive original text is not something that must be saved by default—which fields to record and to what extent to redact are decided by privacy policy, not an inevitable cost of observability.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Logs, metrics, and traces answer different questions<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>Many teams fall into the same predicament after an incident: the logging system clearly stores massive numbers of records, yet when it comes to actually locating the problem they still can only guess. The reason is not that there are too few logs, but that logs are only one of four observability signals, and each answers a different question; no single one can cover the complete diagnostic chain.</p>
+<p>Logs record discrete events and answer the question “what happened at a particular step.” For example, if the refund tool returns permission_denied, this event will leave a clear record in the log, and the on-call engineer can confirm from it that the permission was indeed denied. The value of logs is that they faithfully preserve the specific result of a step at a given moment, but logs alone cannot tell you whether this is a large-scale occurrence or an isolated incident.</p>
+<p>Metrics aggregate discrete events into time series and answer the question “whether scale and trends are abnormal.” p95 latency and unauthorized interception rate are typical metrics: they do not care about the details of individual requests, but expose the overall direction of the system. When “rising error commitment rate” appears on the dashboard, engineers know that some kind of error is spreading, but this curve alone cannot tell which requests or which version is at fault.</p>
+<p>Tracing records spans with parent-child structure and answers the question “how a single request flows across components.” A refund request is passed along a chain such as retrieval, model, tool, retry, and the trace strings this entire path into an ordered, hierarchical relationship, allowing you to see where the request branches, where it waits, and where it fails. Only after metrics find the abnormal scale can traces then find the affected requests and versions.</p>
+<p>Evaluation labels judge quality at the sample level and answer the question “whether the result is good or bad, and what type of failure it is.” They annotate semantic judgments such as eligibility errors and unsupported citations, and are the only signal that can confirm “wrong answer content” rather than just “execution errors.”</p>
+<p>The four play relay roles in a single diagnosis: metrics detect “rising error commitment rate,” traces find the affected requests and versions, logs explain exactly what was returned, and evaluation labels confirm that this is a semantic failure rather than an execution failure. Missing any one layer leaves a blind spot—with only traces, you do not know whether the problem is widespread; with only metrics, you do not know how to reproduce it. Conversely, understand the inputs and outputs of these four types of signals: the inputs are discrete events, aggregated trends, cross-component paths, and sample quality judgments, and the outputs are logs, metrics, traces, and evaluation labels. Logs explain what happened at a step, metrics detect scale and trends, traces connect a single request, and labels judge whether the result is good or bad; the four are linked together through trace ID and version so that they can corroborate one another. Keeping only one type of signal limits diagnostic ability to the one question it is good at, and during an incident you can naturally only guess.</p></div>
+<table class="dd-table"><thead><tr><th>Signal</th><th>Structure</th><th>Best at answering</th><th>Refund assistant example</th></tr></thead><tbody><tr><td>Logs</td><td>Discrete events</td><td>What happened at a particular step</td><td>Tool returns permission_denied</td></tr><tr><td>Metrics</td><td>Aggregated time series</td><td>Whether scale and trends are abnormal</td><td>p95 latency, unauthorized interception rate</td></tr><tr><td>Traces</td><td>Spans with parent-child structure</td><td>How a single request flows across components</td><td>Retrieval → model → tool → retry</td></tr><tr><td>Evaluation labels</td><td>Sample-level judgment</td><td>Result quality and failure type</td><td>Eligibility errors, unsupported citations</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>How trace and span express a task<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>A single user query often triggers ten model and tool calls in the background, across different services, processes, and even different machines. The core problem trace solves is: when these calls are scattered, how to keep them in the same causal chain and later reconstruct the order and attribution relationships between calls.</p>
+<p>The smallest structural unit of tracing is the span. Each span corresponds to an operation with clear boundaries: a retrieval, a model inference, a tool call, a retry. The root of the whole tree is called the trace; it corresponds to the user's overall task. Relationships between spans are expressed using a parent-child structure: under the root span are the retrieval span and the model span, under the model span is the tool span, and the retry span after a tool timeout has the tool span as its parent. Figure 1 shows the parent-child relationships among these types of spans—retrieval, model, tool, and retry—in the refund assistant trace.</p>
+<p>Just drawing the hierarchy is not enough; diagnosis requires three kinds of information on spans: parent-child relationships indicate call ownership, event times indicate the sequence, and idempotency keys are used to identify duplicates. The reason why incidents like duplicate refund creation can be diagnosed is precisely time and idempotency keys: the first tool call and the retry call have the same idempotency key. When two side-effect records appear in the business database but there is only one expected operation, the time difference between the two and the idempotency key directly expose the duplication. Without the idempotency key, side effects from retries cannot be determined to be two records of one operation or two independent operations.</p>
+<p>To fully reconstruct the trace, span data requires each span to record start and end times, a reference to the parent span, status, and attributes. But the structure itself does not automatically cross processes: trace context must be explicitly propagated across HTTP, queues, and background tasks. A request enters a service via HTTP, is placed into a message queue, and is then consumed by a background worker—if context is lost at any hop, subsequent spans will break off the tree and become orphan points without a parent, and the entire causal chain will be disconnected.</p>
+<p>There is also an easily overlooked evidence rule: when the model-generated text claims "I called a tool," that statement itself is not evidence. The model's output may describe a call that never happened, or omit a call that did happen. What truly constitutes evidence of a call is the tool span and the state change in the business database. From this we can summarize the input and output of the tracing structure: the input is the user task and calls across HTTP, queues, and background tasks; the output is a span tree with the root trace as the vertex and connected by parent-child relationships; each span records time, parent, version, status, and actual side effects, and context is responsible for cross-boundary propagation. The tool span and business state constitute the evidence that a call occurred; the model's after-the-fact claim of what it did cannot replace system records.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 720 270" role="img" aria-label="Parent-child relationships of retrieval, model, tool, and retry spans in the refund assistant trace"><defs><marker id="ob1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="24" width="684" height="52" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="36" y="48" class="svg-t">trace 9f2: user task (total 1.42 s)</text><text x="36" y="66" class="svg-t" font-size="11">hash of session=u_7 · app=v42 · policy=2026-07-18</text><rect x="62" y="106" width="130" height="54" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="127" y="129" text-anchor="middle" class="svg-t">retrieval 180 ms</text><text x="127" y="148" text-anchor="middle" class="svg-t" font-size="11">index=p17 · top5</text><rect x="226" y="106" width="130" height="54" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="291" y="129" text-anchor="middle" class="svg-t">model 620 ms</text><text x="291" y="148" text-anchor="middle" class="svg-t" font-size="11">prompt=h83 · 418 tok</text><rect x="390" y="106" width="130" height="54" rx="8" fill="#21252d" stroke="#c77b72"/><text x="455" y="129" text-anchor="middle" class="svg-t">refund tool 90 ms</text><text x="455" y="148" text-anchor="middle" class="svg-t" font-size="11">attempt=1 · timeout</text><rect x="554" y="106" width="130" height="54" rx="8" fill="#21252d" stroke="#c77b72"/><text x="619" y="129" text-anchor="middle" class="svg-t">retry 310 ms</text><text x="619" y="148" text-anchor="middle" class="svg-t" font-size="11">same idempotency key</text><path d="M127,76 L127,104" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M291,76 L291,104" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M455,76 L455,104" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M619,76 L619,104" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M192,133 L224,133" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M356,133 L388,133" stroke="#6b7484" marker-end="url(#ob1)"/><path d="M520,133 L552,133" stroke="#6b7484" marker-end="url(#ob1)"/><rect x="226" y="195" width="294" height="48" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="373" y="216" text-anchor="middle" class="svg-t">Final state: created_once · judge=policy_pass</text><text x="373" y="234" text-anchor="middle" class="svg-t" font-size="11">Actual trace proves the retry, not relying on the model's post-hoc explanation</text><path d="M619,160 C617,215 544,219 522,219" fill="none" stroke="#6b7484" marker-end="url(#ob1)"/></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　Root trace corresponds to the user task, span corresponds to a bounded operation; parent-child relationships, event times, and idempotency keys make duplicates and side effects diagnosable.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Record versions sufficient for reproduction, not a blob of text<span class="dd-badge eng">fields</span></h2>
+<div class="dd-agent-response"><p>The same input succeeding yesterday and failing today is the most common form of AI system incident. To answer “what changed,” what needs to be compared is not the text of the two outputs, but a set of reproducible version evidence. The goal of logging is not to save as much content as possible, but to save a minimal set of fields sufficient to compare yesterday's and today's differences item by item after an incident.</p>
+<p>These fields can be grouped into several families by diagnostic purpose:</p>
+
+<p>Correlation fields allow all records for the same request to be linked across components, and also allow duplicate records to be deduplicated. Version fields support comparing differences before and after a release, and also determine which version to roll back to. Input evidence fields are used to reconstruct the information actually visible to the model at the time—the model received the masked intent, the selected candidate document IDs, and their spans within the documents. Behavior fields record tool names, parameter summaries, and idempotency keys, for auditing external side effects. Result fields connect quality evaluation to specific requests, rather than just staring at status codes.</p>
+<p>In addition, you need to record sampling parameters, retrieval queries, index/embedding/reranking versions, tool schema and response status, policy rules, token counts, costs, and final acceptance results. Each category of fields serves the comparison question of “which item differs between yesterday and today”: a different release number means the deployment changed, a different prompt hash means the instructions changed, a different index version means the evidence base changed, different retrieval queries and candidate document IDs mean the information the model saw changed, and different tool parameters and idempotency keys mean the side-effect path changed.</p>
+<p>There is an important trade-off in how to record: save content hashes or controlled references, rather than copying raw sensitive text into every logging system. Hashes and stable IDs can also support locating differences—identical hashes mean the content has not changed, different hashes point to the specific change—while avoiding the spread of original text across multiple systems. Record too little and the incident cannot be reproduced; record all original text and the privacy surface expands. The balance between the two is: store version evidence and references, not unnecessary original text.</p>
+<p>There is also a clear exclusion: do not record free-form chain of thought as factual truth. The model's free-form chain of thought may not faithfully reflect what it actually did, may contain sensitive data, and storing it token by token is costly. What needs to be retained is only a concise decision summary and actually observable action records. In summary, the inputs to reproduction fields are the respective versions of the application, model, prompt, parameters, index, candidates, tools, policy, and acceptance; the output is minimal comparable version evidence plus controlled content references. Hashes and stable IDs support locating differences while avoiding copying original text into every logging system; free-form chain of thought is not treated as factual evidence.</p></div>
+<table class="dd-table"><thead><tr><th>Field family</th><th>Example</th><th>Diagnostic value</th></tr></thead><tbody><tr><td>Correlation</td><td>trace/span/session/request id</td><td>Cross-component linking and deduplication</td></tr><tr><td>Version</td><td>app v42, prompt h83, index p17</td><td>Compare before/after release and rollback</td></tr><tr><td>Input evidence</td><td>Masked intent, document ID/span</td><td>Reconstruct model-visible information</td></tr><tr><td>Behavior</td><td>Tool name, parameter summary, idempotency key</td><td>Audit side effects</td></tr><tr><td>Result</td><td>Acceptance, human override, maturity label</td><td>Connect quality rather than just looking at status codes</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Worked Example: Where Exactly Is the Slowness in 1.42 s?<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>A refund request took 1.42 s end-to-end, exceeding its SLO. To locate where the slowness is, first answer a question that is easy to get wrong: Does the duration of the root trace equal the sum of all span durations? Not necessarily.</p>
+<p>In the example trace, retrieval took 180ms, model invocation took 620ms, tool invocation took 90ms, backoff and retry took 310ms, and orchestration itself took 220ms. If all these stages execute serially, the total is exactly 180 + 620 + 90 + 310 + 220 = 1420ms. But spans are not always serial: if retrieval and safety classification execute in parallel, the two spans' times overlap, and the duration of the root trace is determined only by the critical path—that is, the longest dependency chain that determines the final completion time—not by the sum of all child span durations. The number obtained by adding all spans is work, not end-to-end time. Therefore the key formula for latency analysis is:</p>
+<p>Tcritical = sum of durations of serial stages + duration of the longest dependency path in parallel stages</p>
+<p>where Tcritical is the end-to-end wall-clock latency. Serial stages are added directly; for parallel stages, take the longest path that determines the completion time; the sum of the two is the actual duration of the root trace.</p>
+<p>With this decomposition, you can compare the duration of each stage this time with the historical p95 one by one:</p>
+
+<p>Retrieval is below the historical level, full model generation is also below p95, and only the first token is slightly slow. The real anomaly is in tools and retries: the tool call itself at 90ms plus backoff and retry at 310ms totals 400ms, while the historical p95 is only 110ms. The total duration of 1420ms exceeds the SLO, mainly due to tool retries, not model generation.</p>
+<p>This is exactly where looking only at average total latency goes wrong: average total latency attributes 1420ms to "this request was slow"; if you then assume without further thought that the slowness is in the model, you will blame the model for a tool timeout. To avoid this misjudgment, latency must be broken down to the granularity of TTFT (time to first token), per-token time, retrieval, tools, queueing, and retries, and you must observe p50, p95, and p99 rather than only the average—the experience of long-tail users will not be represented by the average, and only p99 can expose the slowest batch of requests.</p>
+<p>Summarize the inputs and outputs of the latency case: the inputs are each span's start and end times, dependency relationships, and the durations of queueing, compute, network, and retries; the output is the critical path wall-clock latency Tcritical. Serial stages are added; for parallel stages, take the longest dependency path that determines completion; the sum of all span durations is work, not equal to end-to-end time. The main cause of the 1.42 s is tool retries, not average model generation.</p></div>
+<table class="dd-table"><thead><tr><th>Stage</th><th>This run</th><th>Past p95</th><th>Assessment</th></tr></thead><tbody><tr><td>Retrieval</td><td>180ms</td><td>210ms</td><td>Normal</td></tr><tr><td>Model first token</td><td>410ms</td><td>390ms</td><td>Slightly slow</td></tr><tr><td>Full generation</td><td>620ms</td><td>760ms</td><td>Normal</td></tr><tr><td>Tools + retries</td><td>400ms</td><td>110ms</td><td>Primary cause of anomaly</td></tr><tr><td>Total duration</td><td>1420ms</td><td>1180ms</td><td>Exceeds SLO</td></tr></tbody></table>
+<div class="dd-formula"><math display="block" aria-label="关键路径端到端延迟"><mi>Tcritical</mi><mo>=</mo><mi>CriticalPath</mi><mo>(</mo><mi>Tqueue</mi><mo>,</mo><mi>Tcompute</mi><mo>,</mo><mi>Tnetwork</mi><mo>,</mo><mi>Tretry</mi><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Quality metrics must connect to specific traces and slices<span class="dd-badge eng">Semantic Monitoring</span></h2>
+<div class="dd-agent-response"><p>After the like rate drops, the real problem is not "quality got worse," but how to know which tasks, which versions, and which types of failures the deterioration occurs in. A lone satisfaction curve cannot answer this question; quality metrics must be able to expand in two directions: downward to specific traces, and sideways into meaningful slices.</p>
+<p>The way to connect them is to asynchronously write quality judgments back onto traces. Offline scorers or delayed human labels can attach semantic labels such as eligibility correct, citation supported, unauthorized access, tool completed, and human overridden to each request. Because these labels are attached to specific requests, aggregation can then slice by task, language, risk, model, prompt, index, and customer group, and every point on the dashboard can drill down to desensitized samples and actual execution paths. Metrics therefore are no longer a lump of averages but a clue that can be traced to evidence.</p>
+<p>Online agent metrics are also valuable, but you need to be clear about their nature: signals such as refusal rate, transfer-to-human rate, user re-asking, tool undo, and citation click respond quickly but are not ground truth. Satisfaction may favor responses that confidently over-promise; a drop in transfer-to-human rate could also be because the escalation rule itself is broken, and users cannot even click the human entry point. Therefore every agent metric needs to come with possible alternative explanations and be validated by sampled human review or final business status; otherwise the green on the dashboard only masks real problems.</p>
+<p>The full path from metrics to root cause can unfold like this: monitoring finds that "the citation failure rate rose from 2% to 7%"—this is only a signal and proves nothing. Drill down from this point to specific traces and find that the failed requests all come from index version index p17, and that the corresponding retrieval span retrieved no documents; only then does a testable root-cause candidate form: the new index lost documents during retrieval. Signal, slices, and trace evidence together make the hypothesis hold.</p>
+<p>From this we can summarize the inputs and outputs of semantic monitoring: the inputs are asynchronously written-back labels for eligibility, citation, unauthorized access, tool completion, and human override; the outputs are quality trends sliced by task, language, risk, model, prompt, index, and group. Agent metrics only provide root-cause clues; likes, transfer-to-human, and re-asking can all have alternative explanations; you must drill down to desensitized traces and validate with human review or final business status before a quality conclusion can be considered established.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Sampling, Cardinality, and Cost: How Not to Destroy Evidence<span class="dd-badge math">Sampling</span></h2>
+<div class="dd-agent-response"><p>Ten million traffic traces per day cannot all be stored; the storage budget of an observability system forces us to sample. But if sampling is done carelessly, it causes two kinds of damage at the same time: either missing incidents, or making the saved samples unable to be used to estimate the true proportion.</p>
+<p>A common question is: if we randomly retain only 1%, won't we happen to miss the incident? The answer is that purely uniform sampling can indeed miss rare events, so we cannot treat all traffic equally. A reasonable approach is stratification: use low-rate head sampling for regular successful traces, and increase tail sampling rates for error, high-risk, very slow, and new-version traffic. The tail rule has a temporal constraint—whether a trace belongs to “error or very slow” can only be determined after it completes, so the tail sampling decision must be made after trace completion, not intercepted in advance. More importantly, the probability that each trace is included must be recorded: when estimating the overall failure rate, we need to weight by this probability; otherwise, the proportion of errors in the sample cannot be used directly as the overall proportion. If only failed requests are saved, the failure proportion in the sample is always 100%, and we cannot estimate the real failure rate in production from it.</p>
+<p>The weighted rate estimate based on inclusion probability can be expressed as follows. Let the outcome of each retained trace i be yᵢ (1 for failure, 0 for success), and its retention probability be pᵢ; then the weighted overall rate estimate is:</p>
+<p>RateWeighted = Σ(yᵢ / pᵢ) ÷ Σ(1 / pᵢ)</p>
+<p>The numerator Σ(yᵢ / pᵢ) means: a failed trace retained with probability pᵢ represents 1/pᵢ traces of the same type in the population; including it in the numerator is equivalent to scaling each observed failure back to the size of the population. Likewise, the denominator Σ(1 / pᵢ) scales all retained samples back to the total number of requests. Dividing the two gives the estimate of the overall failure rate. This Horvitz–Thompson-style weighting makes tail sampling legitimate—as long as the inclusion probability of each trace is recorded truthfully, even severe sampling bias can be corrected in estimation.</p>
+<p>The cardinality problem threatens another direction: metric labels. Time-series systems require a limited number of label combinations. Directly using user ID, full prompt, or document ID as metric labels makes the time-series cardinality explode, while also spreading sensitive information to every monitoring system. The correct approach is to keep high-cardinality fields in controlled trace storage, and use only finite enumerations such as task type, language, and risk level as metric slice labels. Additionally, extremely low-frequency catastrophic events cannot rely on ordinary sampling. No matter how high the sampling ratio is, a failure that occurs once a year may fall outside the sample, so such events need a dedicated security event channel for separate reporting.</p>
+<p>There is another hidden source of sampling bias: sampling only requests where users clicked “dislike” for quality analysis will miss errors that users are completely unaware of, especially fluent hallucinations—users think the answer is good, but the evidence is actually fabricated. Therefore, in addition to complaint-driven sampling, random audit samples must be retained. Summarizing the inputs and outputs of sampling-based estimation: inputs are each trace’s outcome yᵢ and retention probability pᵢ, output is the Horvitz–Thompson-style weighted rate RateWeighted; tail sampling can retain more error and high-risk traffic, but the inclusion probability must be recorded; saving only failure samples cannot directly estimate production failure rate, and extremely low-frequency disasters go through a separate security event channel.</p></div>
+<div class="dd-formula"><math display="block" aria-label="按采样纳入概率加权的率估计"><mi>RateWeighted</mi><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mi>yi</mi><mi>pii</mi></mfrac></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mn>1</mn><mi>pii</mi></mfrac></mrow></mfrac></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How Privacy Minimization and Debugging Capability Can Coexist<span class="dd-badge eng">Governance</span></h2>
+<div class="dd-agent-response"><p>From a debugging perspective, saving prompts and attachments in full is certainly the most convenient, but this cannot become the default acceptable approach. Prompts, attachments, and tool parameters may contain PII, health information, trade secrets, and credentials; copying them into the logging system simultaneously expands the range of accessors, data residency, retention period, and leakage surface: how many people can see the logs, which jurisdiction they fall under, how long they are retained, and from which entry points they might leak—all expand accordingly.</p>
+<p>The correct approach to privacy governance is field-by-field decision-making, not all-or-nothing. First define necessary fields according to diagnostic purpose: if an order hash and error code are sufficient to reproduce an incident, then there is no need to save names and original text; if content review is truly required, place the encrypted original text in a separate controlled store with short-term authorized access, rather than piling it into general logs. Each observability field must go through a decision—masking, hashing, encrypted isolation, or simply not collecting—and the inputs to that decision include the field's diagnostic purpose, sensitivity level, accessors, region, and retention period.</p>
+<p>Discipline at the collection stage is more reliable than after-the-fact cleaning: fields must be classified before collection, and original text and keys are off by default; masking should be performed in a structured manner at the entry point, because later regex cleaning can easily miss sensitive values nested deep within tool parameter structures. Access should be restricted by role, and every view must be recorded, with production and development environments isolated. For lifecycle, define retention periods, deletion processes, region requirements, and handling of user deletion requests; deletion must cover derived indexes—deleting only the original records but not the copies in the index is as good as not deleting.</p>
+<p>There is also an engineering test that is easy to overlook: the trace pipeline itself must undergo failure-path testing to confirm that when the pipeline errors, it does not write unmasked payloads into fallback logs. During failures, the most dangerous is often the fallback log, because fallback logic often abandons masking in order to "not lose data".</p>
+<p>Over-masking can also damage evidence. If all numbers are erased indiscriminately, failures such as amount errors can no longer be diagnosed. The correct granularity is to preserve type, range, or stable identifiers: do not save the specific amount, but save the type and value range of the amount field; do not save names, but save stable user identifiers. This way, diagnostic needs and privacy risks can be weighed separately for each field.</p>
+<p>To summarize the inputs and outputs of privacy governance: inputs are each observability field's diagnostic purpose, sensitivity level, accessors, region, and retention period; outputs are the specific decision to mask, hash, isolate encrypted original text, or not collect. If diagnosis can be accomplished with type, range, and stable identifiers, do not copy names and credentials; if content review is needed, use short-term authorized controlled storage; deletion must cover derived indexes and fallback logs, so that privacy minimization and debugging capability can both be achieved.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Alerting, Rollback, and Failure Feedback Complete the Loop<span class="dd-badge intuition">Operations</span></h2>
+<div class="dd-agent-response"><p>A dashboard turning red without anyone taking action is not observability; it is only monitoring display. The observability loop must turn signals into action, and then feed the results of action back as new evidence.</p>
+<p>The first link in the loop is the completeness of the alerts themselves. Every alert should be bound to a clear set of elements: the SLO target it serves, trigger threshold, duration window, owner, diagnostic query, remediation steps, and rollback version. An alert with no owner and no remediation path only trains people to ignore it. When it comes to how alerts are triggered, burn-rate alerts deserve a separate explanation: they measure the rate at which the error budget is being consumed, and can distinguish incidental noise from ongoing deterioration that is rapidly exhausting the budget. At the same time, every release marker must appear on the timeline; otherwise, it is impossible to determine which deployment a failure started from.</p>
+<p>For example, when the refund over-authorization rate crosses the threshold, the response should proceed along two tracks. First, stop the bleeding: freeze the automated refund tool or switch back to the old policy, returning the service to a safe state. Then investigate the cause: check whether affected traces are concentrated in a particular prompt version (prompt h83), a particular policy version, or a particular language. Restoring service and fixing the model are two separate steps; do not delay stopping the bleeding in order to study the root cause — stop the bleeding first, then dissect. After confirming the root cause, construct the failure as a minimal regression sample, add it to the evaluation candidate pool, and after review admit it to the next version's frozen evaluation set, so that this failure will be re-examined in every future release.</p>
+<p>Observability also has a clear failure boundary: it can only discover problems that are recorded, defined, and viewed. Problems without instrumentation it cannot see; problems without defined metrics it cannot measure; problems whose dashboards nobody watches it cannot alert on. It cannot replace permission isolation, idempotency design, evaluation systems, or incident response drills — these are the responsibility of the system design itself; observability is only responsible for making their failures visible.</p>
+<p>To summarize the inputs and outputs of the response loop: inputs are SLO, error budget, alert window, owner, diagnostic query, and rollback version; outputs are stopping the bleeding, rollback, root-cause experiments, and reviewed regression samples. After an alert triggers, first restore safe service, then study long-term fixes; release markers and affected traces are used to verify hypotheses; and defenses such as permissions, idempotency, and incident drills cannot be replaced by observability — they can only be complemented.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String together the previous links: LLM observability goes from a user question to a verifiable fix, traversing a complete causal chain. Each step provides input to the next step; any break in a step leaves the chain stuck where it is.</p>
+<p>The chain starts at the request entry point: generate a trace context for the user task and propagate it across HTTP, queues, and background tasks. This step determines whether the ten calls triggered by a single question still belong to the same causal chain. Then, each component records version, evidence, and actions in its own span—which application release was used, which prompt hash, which index version, which candidate document IDs were retrieved, what parameters the tool was called with, and what the idempotency key was. At this point the data is still scattered, so quality labels and system metrics are aggregated by task, language, risk, model, prompt, index, and cohort slices, and anomalies surface as trends.</p>
+<p>Trends are only signals. When an anomaly appears, drill down into controlled, sanitized traces to turn signals into testable hypotheses: whether a particular version, a type of evidence path, or a tool call is affected. The hypothesis must then be verified back in production—roll back a version, ablate a parameter, observe whether metrics recover accordingly, while also stopping the loss. Finally, the verified failure samples go through human review and flow back into the evaluation set, becoming regression cases that the next release must pass.</p>
+<p>Each link in this chain has clear inputs and outputs: the input to context propagation is the user task, and its output is a span tree that crosses boundaries; the input to span recording is the component's actual execution, and its output is fields for version, evidence, and actions; the input to aggregation is labels, and its output is slice trends; the input to drill-down is anomaly signals, and its output is root-cause hypotheses; the input to rollback and ablation is a hypothesis, and its output is the recovered service; the input to failure feedback is verified failure samples, and its output is regression cases that enter a frozen evaluation set. A question that starts from “where is it slow, where is it wrong” and finally lands on “how to ensure it won’t happen again” is the complete closed loop of LLM observability.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://opentelemetry.io/docs/specs/otel/" target="_blank" rel="noopener">OpenTelemetry Specification</a>: trace, metric, log, and context semantics</li><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>: ML system dependencies, feedback, and monitoring debt</li><li><a href="https://sre.google/workbook/alerting-on-slos/" target="_blank" rel="noopener">Google SRE Workbook: Alerting on SLOs</a>: error budget and multiwindow alerting</li><li><a href="https://www.nist.gov/privacy-framework" target="_blank" rel="noopener">NIST Privacy Framework</a>: data processing and privacy risk governance</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/observability">Explore connections on the map</a><a href="/zh/concepts/observability/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

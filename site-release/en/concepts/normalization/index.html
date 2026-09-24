@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Normalization: Controlling Representation Scale, Stabilizing Deep Optimization? Explained Simply</title>
+<meta name="description" content="From LayerNorm&#39;s centering and RMSNorm&#39;s root-mean-square scaling, to Pre-Norm/Post-Norm and implementation acceptance, understand exactly which axis normalization computes statistics along, what it retains, and what it discards.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/normalization/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/normalization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/normalization/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Normalization: Controlling Representation Scale, Stabilizing Deep Optimization? Explained Simply">
+<meta property="og:description" content="From LayerNorm&#39;s centering and RMSNorm&#39;s root-mean-square scaling, to Pre-Norm/Post-Norm and implementation acceptance, understand exactly which axis normalization computes statistics along, what it retains, and what it discards.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/normalization/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Normalization: Controlling Representation Scale, Stabilizing Deep Optimization? Explained Simply">
+<meta name="twitter:description" content="From LayerNorm&#39;s centering and RMSNorm&#39;s root-mean-square scaling, to Pre-Norm/Post-Norm and implementation acceptance, understand exactly which axis normalization computes statistics along, what it retains, and what it discards.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/normalization/#page","name":"What Is Normalization: Controlling Representation Scale, Stabilizing Deep Optimization? Explained Simply","description":"From LayerNorm's centering and RMSNorm's root-mean-square scaling, to Pre-Norm/Post-Norm and implementation acceptance, understand exactly which axis normalization computes statistics along, what it retains, and what it discards.","url":"https://ai-knowledge-map.com/en/concepts/normalization/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Normalization: Controlling Representation Scale, Stabilizing Deep Optimization","item":"https://ai-knowledge-map.com/en/concepts/normalization/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Normalization: Controlling Representation Scale, Stabilizing Deep Optimization</span></li></ol></nav><article id="dd-article" data-concept-id="normalization" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Normalization: Controlling Representation Scale, Stabilizing Deep Optimization</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From LayerNorm&#39;s centering and RMSNorm&#39;s root-mean-square scaling, to Pre-Norm/Post-Norm and implementation acceptance, understand exactly which axis normalization computes statistics along, what it retains, and what it discards.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The core of normalization is not to make all data conform to the same distribution, but to reparameterize representations along a specified axis, making subsequent layers less sensitive to overall translation or scale changes. LayerNorm and RMSNorm both operate along the feature dimension of a single token and do not depend on the batch; they improve numerical and gradient paths, but they are not universal stabilizers. Statistical axis, ε, affine parameters, and residual position are all part of the model definition.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer:</div><ul><li>What exactly does LayerNorm subtract from a vector, and what does it divide by?</li><li>How do the statistical axes of RMSNorm, LayerNorm, and BatchNorm differ?</li><li>What information does normalization preserve and remove?</li><li>Why is Pre-Norm usually easier for training deep Transformers?</li><li>How do ε, the statistical axis, and affine parameter broadcasting cause numerical failures without errors?</li></ul></div>
+<ol class="dd-chain"><li>Deep residual and sublayer transformations cause representation scale to vary across layers and samples.</li><li>LayerNorm or RMSNorm computes statistics of the current token along the specified hidden dimension.</li><li>Centering / root-mean-square scaling reduces sensitivity to overall offset or scale.</li><li>γ/β restores a learnable scale and offset for each feature.</li><li>The position of Norm before or after the residual branch changes the identity gradient path.</li><li>ε controls the upper bound on gain for small-variance inputs.</li><li>Attention logits, residual accumulation, and loss still require independent stabilization measures.</li><li>Axes, formulas, and affine broadcasting serve as weight contracts and are safeguarded by layer-wise equivalence tests.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What kind of conditioning problem does normalization solve?<span class="dd-badge intuition">Motivation</span></h2>
+<div class="dd-agent-response"><p>The optimization of deep networks depends not only on what functions the model can express, but also on the range in which intermediate values fall. Even if two parameterizations have the same function expressiveness, the activation scales they produce differ, and the optimization difficulty may also differ significantly.</p>
+<p>Suppose a layer receives an activation vector x. If the overall magnitude of x is too large, after being passed to subsequent linear layers it will be further amplified, and may make the attention logits too large, or push nonlinear units into the saturation region; in severe cases, numerical overflow may also occur. If the magnitude of x is too small, effective signals and gradients may be rounded away in finite-precision computation, or may become too weak relative to the residual branch and be drowned out. The problem is not just that a particular value is too large or too small at one time, but that the scales across different samples, tokens, and network layers drift continuously during training.</p>
+<p>This scale drift changes the local conditioning that the optimizer actually faces. At the current position, the loss surface may have some directions that are very steep and some that are very flat; for a fixed learning rate, the same step size may be too large in steep directions and too small in flat directions. When the scale of intermediate representations keeps changing, this difference in local curvature also changes, making it harder for the optimizer to advance training with a stable set of step sizes.</p>
+<p>The input to normalization is some activation or representation to be processed, and the output is a representation with more controlled scale. It first limits the numerical range through deterministic statistics and scaling rules, and then uses a learnable parameter γ to restore the magnitude required by the task; some forms of normalization also use a learnable parameter β to restore the required offset. The causal chain is: activation scale drift → unstable workspace and local curvature for subsequent operators → fixed learning rate finds it hard to accommodate all directions → normalization controls the scale → γ and β preserve the ability of the task to reselect magnitude and offset.</p>
+<p>Therefore, normalization is more accurately a reparameterization and conditioning improvement technique. It makes parameter updates occur in a coordinate system where numerical values are more controllable, but it does not guarantee that every layer's output always follows a standard normal distribution, nor can it alone eliminate all saturation, overflow, or gradient problems. It solves the optimization conditioning problem caused by representation scale, rather than making a permanent probabilistic distribution commitment about the output distribution.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>LayerNorm: Center first, then scale by standard deviation<span class="dd-badge math">Formula</span></h2>
+<div class="dd-agent-response"><p>LayerNorm computes statistics independently for each token's hidden vector. Given a d-dimensional vector x, where xᵢ is the i-th coordinate, first compute the mean of all coordinates of the vector:</p>
+<p>μ = (1/d)Σxᵢ</p>
+<p>Here Σ means summing all d coordinates, and μ describes the overall magnitude around which this token's hidden representation is centered. Next compute the variance:</p>
+<p>σ² = (1/d)Σ(xᵢ − μ)²</p>
+<p>Each coordinate first subtracts the mean, then is squared, and the average is taken over all d coordinates. σ² measures the dispersion of the coordinates around the mean. LayerNorm then transforms the i-th coordinate as:</p>
+<p>LN(x)ᵢ = γᵢ(xᵢ − μ)/<math class="dd-inline-root" aria-label="根号 σ² + ε"><msqrt><mtext>σ² + ε</mtext></msqrt></math> + βᵢ</p>
+<p>Subtracting μ performs centering, expressing each coordinate relative to the current token's own mean level; dividing by <math class="dd-inline-root" aria-label="根号 σ² + ε"><msqrt><mtext>σ² + ε</mtext></msqrt></math> scales by the standard deviation, keeping the representation's dispersion under control. ε is a small positive number used to prevent the division from becoming unstable when the variance is very small. Finally, the per-dimension learnable parameters γᵢ adjust the magnitude of the i-th dimension, and βᵢ adjust the offset of the i-th dimension, so normalization does not permanently lock down the scale and center position the model can express.</p>
+<p>μ and σ² are both computed from all hidden dimensions of the current token, and each token row independently obtains its own statistics. γᵢ and βᵢ are not quantities temporarily computed for each token; instead, they are parameters shared across samples and learned per hidden dimension. Therefore the input and output are still the same d-dimensional vector, but each output coordinate simultaneously depends on all coordinates of the input vector.</p>
+<p>The variance formula uses denominator d, not the d − 1 common for unbiased sample variance in statistics. This is not estimating an unknown population variance from a sample; rather, it defines a deterministic vector transformation, so the population variance form is exactly part of the algorithm.</p>
+<p>The statistical axis determines the semantics of the transformation. For a representation whose shape can be understood as “token × hidden”, LayerNorm computes statistics row by row along the hidden dimension; each token uses only its own hidden coordinates. If it is mistakenly computed along the sequence dimension, the tensor shape may still be correct and the program may run normally, but different tokens will participate in each other's statistics, and what is executed is no longer the LayerNorm defined here.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 740 260" role="img" aria-label="LayerNorm computes statistics independently along the hidden dimension of each token."><g stroke="currentColor" stroke-width="2"><rect x="50" y="55" width="250" height="150" rx="10" fill="#0ea5e9" opacity=".12"/><g fill="#8b5cf6" opacity=".55"><rect x="75" y="85" width="45" height="34"/><rect x="125" y="85" width="45" height="34"/><rect x="175" y="85" width="45" height="34"/><rect x="225" y="85" width="45" height="34"/></g><g fill="#10b981" opacity=".55"><rect x="75" y="135" width="45" height="34"/><rect x="125" y="135" width="45" height="34"/><rect x="175" y="135" width="45" height="34"/><rect x="225" y="135" width="45" height="34"/></g><path d="M320 102H430M320 152H430"/><rect x="450" y="75" width="230" height="110" rx="12" fill="#f59e0b" opacity=".15"/></g><g class="svg-t"><text x="80" y="42">Two tokens of shape [B,S,H]</text><text x="88" y="108">h₁</text><text x="138" y="108">h₂</text><text x="188" y="108">h₃</text><text x="238" y="108">h₄</text><text x="325" y="90">Respective μ,σ</text><text x="465" y="110">Center/scale along H dimension</text><text x="465" y="145">Does not mix other tokens or batch</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Each row computes statistics independently. If the implementation mistakenly computes statistics along the sequence dimension, the tensor shape may still be legal, but the semantics are completely different.</figcaption></figure>
+<div class="dd-formula">μ=(1/d)Σxᵢ　　σ²=(1/d)Σ(xᵢ−μ)²　　LN(x)ᵢ=γᵢ(xᵢ−μ)/<span class="dd-radical" role="math" aria-label="square root of σ²+ε"><span class="dd-radicand">σ²+ε</span></span>+βᵢ</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Hand calculation of LayerNorm: What does the vector [1,2,3] become?<span class="dd-badge math">Numerical example</span></h2>
+<div class="dd-agent-response"><p>Take the input vector x = [1, 2, 3], first ignore ε, and set the learnable scale γ = 1 and offset β = 0. This allows us to observe only the centering and standard-deviation scaling themselves.</p>
+<p>First step: calculate the mean of the three coordinates:</p>
+<p>μ = (1 + 2 + 3)/3 = 2</p>
+<p>Second step: subtract the mean from each coordinate to get the deviations from the mean:</p>
+<p>x − μ = [1 − 2, 2 − 2, 3 − 2] = [−1, 0, 1]</p>
+<p>This step shifts the center of the vector to 0 while preserving the relative high-low relationship among the three coordinates. Third step: calculate the population variance:</p>
+<p>σ² = (1² + 0² + 1²)/3 = 2/3 ≈ 0.667</p>
+<p>The standard deviation is the square root of the variance:</p>
+<p>σ = <math class="dd-inline-root" aria-label="根号 2/3"><msqrt><mtext>2/3</mtext></msqrt></math> ≈ 0.816</p>
+<p>Finally, divide each deviation by the standard deviation:</p>
+<p>(x − μ)/σ = [−1, 0, 1]/0.816 ≈ [−1.225, 0, 1.225]</p>
+<p>Therefore, under these simplified conditions, LayerNorm transforms [1, 2, 3] into approximately [−1.225, 0, 1.225]. The output has mean 0, and the three coordinates have a mean square of about 1; this corresponds to first removing the overall offset and then adjusting the dispersion scale to a uniform level.</p>
+<p>This example also reveals what the transformation preserves and removes. If we add 10 to all inputs, the vector becomes [11, 12, 13]; the new mean also increases by 10, and after centering we still get [−1, 0, 1], so the normalization result is unchanged. If we multiply the input by a positive number 5, both the deviations from the mean and the standard deviation are multiplied by 5, and after division the result is also approximately unchanged. The "approximate" here reminds us that the actual implementation also includes ε, which causes the strict scale cancellation to change in the low-variance region.</p>
+<p>The choices γ = 1 and β = 0 are only for convenience in hand calculation. In actual LayerNorm, after standardization, it also uses per-dimension affine parameters to relearn suitable scales and offsets for different hidden dimensions, so while obtaining a controlled numerical scale, it still retains the per-dimension adjustment capability required by the task.</p></div>
+<table class="dd-table"><thead><tr><th>Step</th><th>Calculation</th><th>Result</th></tr></thead><tbody><tr><td>Mean</td><td><code>(1+2+3)/3</code></td><td>2</td></tr><tr><td>Deviation from mean</td><td><code>[1−2,2−2,3−2]</code></td><td><code>[−1,0,1]</code></td></tr><tr><td>Variance</td><td><code>(1²+0²+1²)/3</code></td><td><code>2/3≈0.667</code></td></tr><tr><td>Standard deviation</td><td><code><span class="dd-radical" role="math" aria-label="2/3 的平方根"><span class="dd-radicand">2/3</span></span></code></td><td><code>≈0.816</code></td></tr><tr><td>Normalization</td><td><code>[−1,0,1]/0.816</code></td><td><code>[−1.225,0,1.225]</code></td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>RMSNorm: Preserves the mean, controls only the root mean square<span class="dd-badge math">Numerical comparison</span></h2>
+<div class="dd-agent-response"><p>RMSNorm does not perform centering; instead, it directly controls the root-mean-square scale of the original vector. Given a d-dimensional vector x, its root mean square is:</p>
+<p>RMS(x) = <math class="dd-inline-root" aria-label="根号 (1/d)Σxᵢ² + ε"><msqrt><mtext>(1/d)Σxᵢ² + ε</mtext></msqrt></math></p>
+<p>where xᵢ is the i-th coordinate, Σ sums the squares of all coordinates, dividing by d gives the mean square, and taking the square root yields an overall scale of the same order of magnitude as the original coordinates. ε is used for numerical stability when the scale is very small. The output of the i-th dimension is:</p>
+<p>RMSNorm(x)ᵢ = γᵢxᵢ/RMS(x)</p>
+<p>γᵢ is a scaling parameter learned per hidden dimension. Compared with LayerNorm, this formula has no xᵢ − μ, so it does not first subtract the vector mean; it usually has only γ and no β for restoring the offset. Omitting centering means it only constrains the overall root mean square and does not force the output mean to 0, so the mean information in the original representation is preserved.</p>
+<p>Taking x = [1, 2, 3] as an example, set γ = 1 and ignore ε. The sum of squares of the three coordinates is 1 + 4 + 9 = 14, so:</p>
+<p>RMS(x) = <math class="dd-inline-root" aria-label="根号 14/3"><msqrt><mtext>14/3</mtext></msqrt></math> ≈ 2.160</p>
+<p>After dividing coordinate-wise by this scale, the output is approximately:</p>
+<p>[1, 2, 3]/2.160 ≈ [0.463, 0.926, 1.389]</p>
+<p>The mean square of the three output coordinates is 1, but the mean is not 0. This is exactly the core difference between RMSNorm and LayerNorm: LayerNorm controls the variance after centering, while RMSNorm controls the root mean square of the original vector without centering.</p>
+<p>Both are approximately insensitive to overall positive proportional scaling. If x is multiplied by a positive number, the numerator and the corresponding scale will increase together, and roughly cancel after division; whether they cancel exactly is also affected by ε. Overall translation is different: LayerNorm's centering removes the offset added uniformly to all coordinates, while RMSNorm does not subtract the mean, so translation changes the vector's root mean square, direction, and final output.</p>
+<p>Therefore, the input and output shapes of RMSNorm are the same as the original hidden vector, but the structure it preserves differs from LayerNorm. Choosing it means you only need to control the overall energy scale of the original representation, while accepting that common offsets still affect the result; it does not provide the property of zero output mean.</p></div>
+<table class="dd-table"><thead><tr><th>Property</th><th>LayerNorm</th><th>RMSNorm</th></tr></thead><tbody><tr><td>Subtract mean</td><td>Yes</td><td>No</td></tr><tr><td>Controlled quantity</td><td>Variance after centering</td><td>Root mean square of the original vector</td></tr><tr><td>Under overall positive proportional scaling</td><td>Approximately insensitive</td><td>Approximately insensitive</td></tr><tr><td>Under overall translation</td><td>Centering removes</td><td>Changes direction and output</td></tr><tr><td>Common parameters</td><td>γ, β</td><td>Usually γ, no β</td></tr></tbody></table>
+<div class="dd-formula">RMS(x)=<span class="dd-radical" role="math" aria-label="square root of (1/d)Σxᵢ²+ε"><span class="dd-radicand">(1/d)Σxᵢ²+ε</span></span>　　RMSNorm(x)ᵢ=γᵢxᵢ/RMS(x)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>The statistical axis determines whether it is LayerNorm or another algorithm<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>The names of normalization methods are similar, but what actually determines the algorithm's semantics is "along which axes the statistics are computed." The statistical axis determines which input positions an output position depends on, and also determines whether external statistical information is needed during training and inference.</p>
+<p>In BatchNorm for convolutional scenarios, statistics are usually computed for each channel, jointly along the batch dimension and spatial dimensions. A sample in the same channel therefore depends on other samples in the same batch. Training uses the current batch statistics, while inference commonly uses moving statistics accumulated during training, so the rules differ between the two stages.</p>
+<p>LayerNorm computes statistics along the hidden dimension of a single sample or a single token. A token's mean and variance are determined only by its own hidden coordinates and do not depend on other samples in the same batch. Both training and inference can compute them from the current input using the same rules. RMSNorm has a similar dependency scope and also computes along the hidden dimension of a single token, but the statistic is the root mean square of the original vector. GroupNorm, within a single sample, computes statistics along pre-partitioned channel groups and corresponding spatial positions, likewise not depending on other samples, with consistent training and inference rules.</p>
+<p>These dependency differences explain why LayerNorm is suitable for variable-length sequences and small batches: not because it is necessarily "better" on all tasks, but because each token's statistics do not change with the number, length, or content of samples in the same batch. Conversely, as long as the statistical axis includes the batch, a sample's normalization result may be affected by other samples in the same batch.</p>
+<p>During implementation, you cannot judge an algorithm as correct merely by the "Norm" name or by a legally shaped tensor. If the model definition requires joint normalization over multiple dimensions, normalized_shape must precisely cover those dimensions; if you habitually select only the last dimension, you may get a computation with a completely correct shape but wrong dependency relationships. When validating a normalization implementation, first clarify the semantics of each axis of the input tensor, then confirm that the statistical axes, parameter shapes, and training and inference rules match the algorithm definition.</p></div>
+<table class="dd-table"><thead><tr><th>Method</th><th>Typical statistical axis</th><th>Depends on other samples</th><th>Training/inference rules</th></tr></thead><tbody><tr><td>BatchNorm (convolutional)</td><td>batch and spatial, per-channel statistics</td><td>Yes</td><td>Training batch statistics; inference commonly uses moving statistics</td></tr><tr><td>LayerNorm</td><td>Hidden dimension of a single sample / single token</td><td>No</td><td>Same rules in both stages</td></tr><tr><td>RMSNorm</td><td>Root mean square of a single token's hidden dimension</td><td>No</td><td>Same rules in both stages</td></tr><tr><td>GroupNorm</td><td>Channel groups and spatial positions within a single sample</td><td>No</td><td>Same rules in both stages</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>What Normalization Preserves and What It Erases<span class="dd-badge math">Invariance</span></h2>
+<div class="dd-agent-response"><p>Normalization gains scale stability by removing certain global changes, but those removed changes may also be exactly the information the task needs. The key to understanding its boundary is distinguishing between “relative patterns across dimensions” and “the absolute mean or magnitude of the current sample.”</p>
+<p>Ignoring ε and the affine parameters, for any positive number a, and for a shift b·1 added to all dimensions, LayerNorm satisfies:</p>
+<p>LN(ax + b·1) = LN(x)</p>
+<p>Here 1 denotes the vector whose coordinates are all 1. The common shift b enters both the input and the mean and cancels during centering; the proportional scaling a enlarges both the deviations from the mean and the standard deviation, and also cancels when divided. Therefore, LayerNorm preserves the relative high/low structure of each dimension compared with this token’s mean, but no longer preserves the token’s original overall mean or proportional scale.</p>
+<p>Under the same simplified conditions, RMSNorm satisfies for proportional scaling:</p>
+<p>RMSNorm(ax) = RMSNorm(x)</p>
+<p>The numerator and the root mean square are both multiplied by a, so the proportion cancels. But RMSNorm does not subtract the mean, so if a constant is added to all coordinates, both the vector direction and the root mean square change, and the output changes accordingly. It removes the overall proportional magnitude, but remains sensitive to a common shift.</p>
+<p>The learnable γ and β can set a fixed scale and shift shared across samples for each channel after normalization. They can reshape the typical magnitude and center of each hidden dimension, but cannot recover information that has been completely removed by the current sample statistics: if two inputs differ only by the overall mean or scale that LayerNorm removes, they already yield the same result before entering the affine transform, and afterward the shared γ and β cannot tell which original input was which.</p>
+<p>Thus, scale insensitivity is both an optimization advantage and an information choice. If the absolute magnitude in a task itself represents confidence, energy, or counts, direct normalization may weaken or delete this signal. In that case you must confirm whether the architecture has a bypass that does not go through this normalization to preserve it; otherwise subsequent layers cannot reconstruct the vanished sample-level overall scale or mean from the normalization output alone.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Pre-Norm and Post-Norm change the residual gradient path<span class="dd-badge eng">Architecture</span></h2>
+<div class="dd-agent-response"><p>Pre-Norm and Post-Norm use the same residual branch and normalization operator, but they are placed in different orders, so gradients take different paths when passing through deep networks. Let F denote a residual sublayer; Pre-Norm can be written as:</p>
+<p>y = x + F(Norm(x))</p>
+<p>Normalization occurs before the residual sublayer. The input x has an identity path that is directly added to the output y; during backpropagation, the gradient can travel along this backbone across the current layer without first passing through the derivative transformation of Norm. The F branch still depends on the normalized input, but the residual backbone preserves a more direct gradient channel.</p>
+<p>Post-Norm can be written as:</p>
+<p>y = Norm(x + F(x))</p>
+<p>The input and the residual branch are added first, and the result is then normalized. This way, every layer's output must pass through Norm, and the backward gradient depends more on Norm's Jacobian. The Jacobian is a matrix composed of derivatives of the output with respect to each input coordinate; it describes how a local perturbation or gradient is scaled, mixed, and rotated as it passes through this transformation. The deeper the network, the more important the joint influence of consecutive layers' Jacobians on gradient propagation becomes.</p>
+<p>This causal chain explains why even just moving the position of Norm can significantly change training difficulty: Pre-Norm provides a more direct identity residual path, generally makes deep Transformers easier to optimize, and reduces how sensitive training is to learning-rate warmup and initialization; Post-Norm immediately normalizes the result after each residual addition, but deep gradients must repeatedly pass through the normalization transformation.</p>
+<p>This difference is not just a training trick. The position of normalization also affects the scale of the final representation and how the network uses depth, so the two structures define different computational processes. A trained Post-Norm model cannot become Pre-Norm losslessly merely by moving Norm before the residual branch; the original parameters were learned under the original gradient path and representation scale, and moving the position changes each layer's input, output, and overall function.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 300" role="img" aria-label="Comparison of Pre-Norm and Post-Norm residual structures"><defs><marker id="norm-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g stroke="currentColor" stroke-width="2" fill="none" marker-end="url(#norm-a)"><path d="M55 95H125H205H285"/><path d="M55 95V165H270V118"/><path d="M450 95H530H610H690"/><path d="M450 95V165H595V118"/></g><g stroke="currentColor" stroke-width="2"><rect x="125" y="68" width="80" height="54" rx="9" fill="#8b5cf6" opacity=".2"/><rect x="205" y="68" width="80" height="54" rx="9" fill="#0ea5e9" opacity=".2"/><circle cx="285" cy="95" r="23" fill="#10b981" opacity=".25"/><rect x="450" y="68" width="80" height="54" rx="9" fill="#0ea5e9" opacity=".2"/><circle cx="610" cy="95" r="23" fill="#10b981" opacity=".25"/><rect x="635" y="68" width="80" height="54" rx="9" fill="#8b5cf6" opacity=".2"/></g><g class="svg-t" text-anchor="middle"><text x="165" y="100">Norm</text><text x="245" y="100">F</text><text x="285" y="102">+</text><text x="170" y="220">Pre-Norm: x + F(Norm(x))</text><text x="490" y="100">F</text><text x="610" y="102">+</text><text x="675" y="100">Norm</text><text x="585" y="220">Post-Norm: Norm(x + F(x))</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Pre-Norm's residual backbone has a more direct identity path; in Post-Norm, after each layer's addition the result passes through Norm, and deep gradients depend more on its Jacobian.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>ε Is Not Decorative: It Determines the Gain Ceiling in Low-Variance Regions<span class="dd-badge math">Numerical</span></h2>
+<div class="dd-agent-response"><p>Normalization requires dividing by the scale of the representation. When a vector has almost identical values in all dimensions, the variance becomes very small, and the denominator also approaches 0. At this point, differences that were originally just rounding errors or tiny perturbations may be amplified by the division into noticeable changes.</p>
+<p>For example, if the variance is 10⁻¹², the corresponding standard deviation is only <math class="dd-inline-root" aria-label="根号 10⁻¹²"><msqrt><mtext>10⁻¹²</mtext></msqrt></math> = 10⁻⁶. Dividing directly by this number is equivalent to applying a gain of about one million. Even if there is only extremely small rounding noise among the input coordinates, the normalized output may fluctuate wildly. If the formula adds ε = 10⁻⁵ to the variance, the denominator is approximately:</p>
+<p><math class="dd-inline-root" aria-label="根号 10⁻¹² + 10⁻⁵"><msqrt><mtext>10⁻¹² + 10⁻⁵</mtext></msqrt></math> ≈ <math class="dd-inline-root" aria-label="根号 10⁻⁵"><msqrt><mtext>10⁻⁵</mtext></msqrt></math> ≈ 0.00316</p>
+<p>In this case, the maximum gain is controlled by ε and is no longer arbitrarily determined by the near-zero input variance. Therefore, ε is not only used to avoid exact division by zero; it essentially sets the scaling upper bound and numerical sensitivity in low-variance regions.</p>
+<p>The choice of ε involves a trade-off. A larger ε makes the lower bound of the denominator larger and the computation more stable, but the output variance will also deviate more noticeably from the ideal unit variance. When the variance is much larger than ε, the effect of ε is small; when the variance is of the same order as ε or smaller, the output scale is mainly determined by ε.</p>
+<p>The exact position of the formula is also important.<math class="dd-inline-root" aria-label="根号 variance + ε"><msqrt><mtext>variance + ε</mtext></msqrt></math> and <math class="dd-inline-root" aria-label="根号 variance"><msqrt><mtext>variance</mtext></msqrt></math> + ε are not the same transformation in low-variance regions: the former adds ε to the variance before taking the square root, while the latter adds ε after obtaining the standard deviation, resulting in different denominators and gain upper bounds. Therefore, when migrating weights, performing quantization, or replacing the normalization operator, you cannot only check the layer name. The original formula form, the specific value of ε, and the statistical axis must all match; otherwise, an implementation that seems close on ordinary inputs may show noticeable differences on low-variance inputs.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Valid shapes can still be computed incorrectly: guard the statistical axis and affine broadcasting.<span class="dd-badge eng">Implementation</span></h2>
+<div class="dd-agent-response"><p>The most insidious errors in normalization implementations often do not break tensor shapes. For a representation of shape [B,S,H], both LayerNorm and RMSNorm should have each token compute statistics only along its own H dimension; the output still remains [B,S,H]. If S or B is mistakenly included in the statistics, the program may run as usual, but one token's result will incorrectly depend on other positions.</p>
+<p>Affine parameters also have clear semantics. LayerNorm's γ and β and RMSNorm's γ are learned along hidden coordinates, so the parameters should correspond element-wise to the normalized feature dimension and then be reused across batch and sequence positions. The same γᵢ should act on the i-th hidden coordinate of all tokens, and should not change with the token, nor be misaligned to the sequence axis.</p>
+<p>Dependency experiments can identify statistical-axis errors: fix the target token's hidden vector and change only other samples in the same batch or neighboring tokens. If the target token's LayerNorm or RMSNorm output changes accordingly, the implementation has mixed in input positions that should not participate. Then, set mutually distinguishable γ values for different hidden dimensions to directly observe whether the affine parameters broadcast correctly along the H dimension.</p>
+<p>Therefore, “no NaN” or “output shape is correct” are only minimum conditions. Whether implementations are equivalent also depends on the statistical axis, the position of ε in the formula, and the parameter shapes and broadcasting directions of γ and β; these details collectively determine which inputs and parameters each output coordinate depends on.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>After normalization, explosions can still occur: the fault may be elsewhere<span class="dd-badge eng">Diagnosis</span></h2>
+<div class="dd-agent-response"><p>The presence of normalization layers in a Transformer does not mean that numerical values at all positions will automatically remain stable. Norm only constrains the representations it actually receives and outputs; other links such as learning rate, initialization, loss scaling, residual accumulation over time, and attention softmax can still become uncontrolled. Therefore, when a loss spike appears, you cannot rule out numerical issues merely because the model “has Norm,” nor can you assume by default that the fault must come from the normalization layer.</p>
+<p>If the input RMS to Norm is observed to increase continuously with network depth while the Norm output remains controlled, the likely link is residual branches accumulating in the same direction over time. Each layer’s normalization can only handle the input at its current position; it cannot prevent the residual backbone from continuously accumulating magnitude after many layers of addition. In this case, you should compare the residual backbone RMS with the branch update RMS to determine how large each update is relative to the backbone and whether it keeps pushing the representation higher in the same direction.</p>
+<p>If the Norm output is normal but NaN appears in the attention stage, the fault is more likely to lie in the QK logits, the mask, or the softmax. You should record the maximum logits per attention head and check whether any row is entirely masked. Finite normalized inputs do not guarantee that subsequent dot products, mask processing, and exponential operations are all within safe ranges.</p>
+<p>If spikes appear suddenly only in specific batches, you should correlate the numerical trajectory with the data. Abnormal sequence lengths, unusual sample content, or loss scaling can all trigger the problem; you need to record sample IDs, token counts, and gradient norms to determine whether the spike begins in the forward representations or only appears at the loss and backpropagation stage.</p>
+<p>If quality degrades after switching to a different inference backend after training, rather than producing NaN directly, you should first check whether ε, the normalization axis, the formula form, and fused operators match the original implementation. Such differences often produce finite values but accumulate layer by layer into a shift in model behavior. Comparing the maximum output error between the two backends layer by layer can locate where the deviation first becomes noticeable.</p>
+<p>A reliable diagnostic sequence is to measure segment by segment along the computation chain: data → layer input → Norm output → sublayer output → residual sum → loss. This can distinguish scale drift before normalization, differences in normalization implementations, internal overflow in sublayers, residual accumulation, and anomalies at the loss end, rather than attributing all explosion phenomena to Norm.</p></div>
+<table class="dd-table"><thead><tr><th>Symptom</th><th>Possible Link</th><th>What to Observe</th></tr></thead><tbody><tr><td>Norm input RMS increases layer by layer</td><td>Residual branches accumulate in the same direction over time</td><td>RMS ratio of residual backbone to branch update</td></tr><tr><td>Norm output normal but attention NaN</td><td>QK logits, mask, or softmax overflow</td><td>Maximum logits per head and fully masked rows</td></tr><tr><td>Sudden spikes in specific batches</td><td>Abnormal length, data, or loss scaling</td><td>Sample ID, token count, gradient norm</td></tr><tr><td>Quality degradation after switching inference backend</td><td>Inconsistency in ε, precision, axis, or fused operators</td><td>Maximum layer-by-layer output error</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>How to Validate a Normalization Implementation<span class="dd-badge eng">Experiment</span></h2>
+<div class="dd-agent-response"><p>When validating a normalization implementation, first prove that it computes the intended formula, not merely that it outputs finite values with the correct shape. The most direct starting point is to use a small vector [1, 2, 3] that can be computed by hand: check the mean, variance, standard deviation, and final output of LayerNorm respectively, as well as the root mean square and final output of RMSNorm. A small example can quickly reveal whether it incorrectly subtracts the mean, omits the square root, uses the wrong denominator, or places ε incorrectly.</p>
+<p>Next, check the algorithm's semantics using transformation invariance. When the input is multiplied by a positive number, the outputs of LayerNorm and RMSNorm should exhibit approximate scale insensitivity according to their respective definitions; when the same constant is added to all coordinates, LayerNorm's centering should eliminate this translation, while RMSNorm's output should change. If observed results contradict these properties, even if the error on ordinary random inputs is small, it indicates that the implemented formula or statistical axis may be wrong.</p>
+<p>Degenerate and extreme inputs are used to check numerical boundaries. An all-identical vector and a zero vector will make the variance or root mean square close to its minimum, which can verify whether ε participates in the computation correctly; inputs with very small variance can test whether the gain is controlled; inputs with very large values can expose overflow or precision issues in squaring, accumulation, and reciprocal square root. Testing should not only judge whether NaN appears but also compare the output scale with reference results.</p>
+<p>Statistical axes can be verified through dependency experiments. Fix one token's hidden vector and change only other samples in the same batch or adjacent tokens; a LayerNorm that computes statistics independently over the hidden dimension should not change with these irrelevant positions. If the result changes, the implementation may incorrectly aggregate along the batch or sequence dimension. At the same time, confirm how γ and β are broadcast: they must act element-wise along the intended hidden dimension, not accidentally align across tokens, batch, or other axes.</p>
+<p>Finally, compare forward and backward passes with a trusted reference. Compare outputs and input gradients across various tensor shapes, sequence lengths, and ε settings to simultaneously check the formula, statistical axis, and affine broadcasting. If using a fused operator or an alternative backend, also compare errors layer by layer starting from the first normalization layer, and check the final metrics: layer-by-layer errors locate where deviations begin, and final metrics confirm whether the local differences have already changed model behavior.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Connecting the whole causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Representations in deep networks undergo residual addition and sublayer transformations, so their scale can continually change across network layers, samples, and tokens. Scale drift pushes subsequent computations into different numerical regions and also changes the local conditions faced by the optimizer. Normalization, in this chain, takes the current representation, computes statistics for the current token along the model-specified hidden dimension, and outputs a representation with more controlled scale.</p>
+<p>LayerNorm first subtracts the mean and then scales by the standard deviation after centering, thereby reducing the representation's sensitivity to common translation across dimensions and to overall proportional scaling. RMSNorm does not perform centering; it scales only by the root mean square of the original vector, thus controlling overall magnitude while preserving the response to common translation. Both preserve the relative patterns among dimensions, but they weaken certain absolute scale information.</p>
+<p>Normalization is not the end of the computation. Per-feature γ can relearn the output magnitude, and β in forms such as LayerNorm can also relearn the offset. They allow the model to continue choosing the typical scale and center position of each feature in a controlled coordinate system, but they cannot restore sample-level mean or magnitude that has already been completely removed by the current sample statistics.</p>
+<p>Whether Norm is placed before or after the residual branch also changes the path of backpropagation. When placed before the branch, the residual backbone has a more direct identity gradient path; when placed after the addition, each layer's gradient depends more on the Jacobian of the normalization transform. Therefore, the effect of normalization is determined not only by the formula but also by its position in the residual structure.</p>
+<p>Numerical stability forms another layer of conditions. ε sets a lower bound on the denominator for small-variance inputs, limiting the extent to which tiny noise is amplified; whether it is inside or outside the square root also changes the actual gain in the small-variance region. The statistical axis, ε, formula form, and affine broadcasting are all part of the implementation semantics, not merely details that can be replaced arbitrarily.</p>
+<p>Even if Norm itself is correct, attention logits, softmax, long-term residual accumulation, and loss computation can still go out of control independently. Normalization only constrains where it is located; it cannot substitute for stability measures across the whole model chain. Therefore, the actual contract of model weights includes the normalization axis, the exact formula, ε, the broadcasting method of affine parameters, and the residual position; when migrating or replacing operators, this contract must be preserved through layer-by-layer forward and gradient equivalence tests.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Route</span></h2>
+<div class="dd-agent-response"><p>To continue understanding normalization, you can proceed along five dependency threads: statistical axis, residual backbone, overall architecture, training stability, and low-precision deployment.</p>
+<p>Batch normalization illustrates another choice of statistical axis. It includes the batch in the statistical scope, so one sample's output depends on other samples in the same batch; the training phase uses batch statistics, and the inference phase often switches to moving statistics. Comparing it with LayerNorm, which computes statistics along the hidden dimension of a single token, clarifies why the statistical axis changes dependency relationships and the training and inference rules.</p>
+<p>Residual Connection is the direct prerequisite concept for understanding Pre-Norm. The identity path lets the input bypass the residual branch and reach the output, and whether Norm is placed before or after the branch determines whether this path must pass through the Jacobian of normalization. Only by combining the residual structure with the normalization position can you explain why deep gradients differ depending on the choice of Pre-Norm and Post-Norm.</p>
+<p>Transformer provides the overall architectural context in which normalization operates. Attention layers and feed-forward layers are both inside residual structures, and the placement of Norm around these sublayers determines what scale of input each sublayer receives and whether the representation after the residual addition is immediately normalized. After understanding the formula for a single Norm, you also need to trace its connections with attention, feed-forward layers, and the residual backbone across the full network.</p>
+<p>Training spikes need to be connected with gradient clipping. Norm controls the representation scale at a specific position; it cannot directly guarantee that parameter updates are always controlled. Gradient clipping limits risk from the perspective of abnormal updates. Distinguishing the two helps avoid conflating representation stability with update stability.</p>
+<p>Low-precision deployment also depends on quantization concepts. Normalization involves scale estimation, ε, formula form, and affine parameters; fused operators or quantization backends must preserve the semantic equivalence of these computations. Deployment acceptance cannot just check whether the final program runs; it must confirm that scale handling and per-layer results before and after fusion remain consistent with the original implementation.</p>
+<p>After mastering these dependencies, you should be able to given any tensor, clearly identify the normalization axis, compute by hand the statistics and outputs of LayerNorm and RMSNorm, explain how the identity residual path in Pre-Norm propagates gradients, and design an implementation acceptance plan covering degenerate inputs, statistical axis, forward-backward comparison, and per-layer alignment.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Next Read</th><th>Key Questions</th></tr></thead><tbody><tr><td>Another Statistical Axis</td><td><a href="#" data-node="batch-norm">Batch Normalization</a></td><td>Why do batch statistics produce training/inference differences?</td></tr><tr><td>Deep Backbone</td><td><a href="#" data-node="residual-connection">Residual Connection</a></td><td>How does the identity path work with Pre-Norm?</td></tr><tr><td>Overall Architecture</td><td><a href="#" data-node="transformer">Transformer</a></td><td>How is Norm placed around attention and feed-forward layers?</td></tr><tr><td>Training Spikes</td><td><a href="#" data-node="gradient-clipping">Gradient Clipping</a></td><td>How can abnormal updates be limited beyond Norm?</td></tr><tr><td>Low-precision Deployment</td><td><a href="#" data-node="quantization">Quantization</a></td><td>How do scale estimation and fused operators maintain equivalence?</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Layer Normalization</a>: LayerNorm definition and motivation.</li><li><a href="https://arxiv.org/abs/1910.07467" target="_blank" rel="noopener">Root Mean Square Layer Normalization</a>: RMSNorm.</li><li><a href="https://arxiv.org/abs/2002.04745" target="_blank" rel="noopener">On Layer Normalization in the Transformer Architecture</a>: gradient analysis of Pre-LN/Post-LN.</li><li><a href="https://proceedings.mlr.press/v37/ioffe15.html" target="_blank" rel="noopener">Batch Normalization</a>: statistical dependencies and running statistics compared with BatchNorm.</li></ul><p>The hand-calculation examples, axis diagrams, residual structure diagrams, fault chains, and acceptance workflow are all originally organized by this project.</p><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/normalization">Explore connections on the map</a><a href="/zh/concepts/normalization/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

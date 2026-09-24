@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness? Explained Simply</title>
+<meta name="description" content="Understand when logprob is useful from token log probabilities, sequence likelihood, calibration, and selective prediction, and how tokenization and semantic equivalence mislead thresholds.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/logprobs/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/logprobs/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/logprobs/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness? Explained Simply">
+<meta property="og:description" content="Understand when logprob is useful from token log probabilities, sequence likelihood, calibration, and selective prediction, and how tokenization and semantic equivalence mislead thresholds.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/logprobs/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness? Explained Simply">
+<meta name="twitter:description" content="Understand when logprob is useful from token log probabilities, sequence likelihood, calibration, and selective prediction, and how tokenization and semantic equivalence mislead thresholds.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/logprobs/#page","name":"What Is Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness? Explained Simply","description":"Understand when logprob is useful from token log probabilities, sequence likelihood, calibration, and selective prediction, and how tokenization and semantic equivalence mislead thresholds.","url":"https://ai-knowledge-map.com/en/concepts/logprobs/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness","item":"https://ai-knowledge-map.com/en/concepts/logprobs/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness</span></li></ol></nav><article id="dd-article" data-concept-id="logprobs" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Logprobs and Confidence: Model Preference Does Not Equal Answer Trustworthiness</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Understand when logprob is useful from token log probabilities, sequence likelihood, calibration, and selective prediction, and how tokenization and semantic equivalence mislead thresholds.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> logprob is the log probability the model assigns to a token in the current context; it can be used for ranking and diagnosis. It measures the model&#39;s internal relative preference, not factual accuracy, and must undergo task-level calibration before it can serve as a confidence signal.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Explain why logarithms are used; compute sequence logprob; identify length and tokenization biases; design calibration and abstention thresholds.</div>
+<ol class="dd-chain"><li>Model outputs token probability</li><li>Logarithms make sequence scores additive.</li><li>Length and tokenization affect aggregation.</li><li>Independent data maps to correct frequency.</li><li>Thresholds trade off coverage and risk.</li><li>Continuously recalibrate after distribution changes.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why Take the Logarithm of Probability?<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>At each position, a language model outputs not a single token but a complete probability distribution: given the preceding token sequence, every candidate token in the vocabulary has a conditional probability. To assess the likelihood of an entire candidate sequence x₁…xₙ, the most natural approach is to multiply the conditional probabilities at each position together:</p>
+<p>P(x₁…xₙ) = P(x₁) × P(x₂ | x₁) × … × P(xₙ | x₁…xₙ₋₁)</p>
+<p>This expression is formally correct, but computing it directly causes problems. Each factor is a number less than 1; once the sequence is even slightly long, the product shrinks so quickly that it reaches a magnitude that computer floating-point numbers cannot represent, underflows, and the score becomes 0, making different candidate sequences incomparable from then on. The multiplicative form is also inconvenient for incremental accumulation: any change requires recomputing the entire chain.</p>
+<p>Taking the natural logarithm solves both problems at once. The logarithm turns multiplication into addition:</p>
+<p>log P(x₁…xₙ) = Σₜ₌₁ⁿ log P(xₜ | x&lt;t)</p>
+<p>Here P is the probability the model assigns to an event, log is the natural logarithm, xₜ is the token at position t, x&lt;t is the prefix before it, n is the total number of tokens in the sequence, and t is the summation position index. Thus the input to the sequence logprob is the token probability at each position under the established prefix, and the output is a log score for the entire candidate sequence that can be added and compared. Probability always lies between 0 and 1, so each term log P(xₜ | x&lt;t) is no greater than 0: the closer the total logprob is to 0, the higher the generation probabilities of the tokens in the sequence overall, and the stronger the model's relative preference for the entire sequence; the more negative the logprob, the lower the model considers the probability of tokens at certain positions.</p>
+<p>The value of the logarithm ends there: it stably turns the product of many small probabilities into additive, comparable scores, mitigates floating-point underflow, and lets different candidates be ranked on the same scale. It is not responsible for judging whether content is true or false. A high logprob only means the model prefers this token sequence more; it does not imply that it is more factually correct—preference and correctness are two different questions: the former is answered by score ranking, and the latter requires factual evidence outside the model.</p></div>
+<div class="dd-formula" data-formula-id="logprobs-sequence"><math display="block" aria-label="序列 x 一到 x n 的对数概率等于各位置 t 的条件对数概率之和"><mrow><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>…</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>t</mi></munder><mi>log</mi><mi>P</mi><mo>(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>x</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Token scores do not equal answer scores<span class="dd-badge intuition">Granularity</span></h2>
+<div class="dd-agent-response"><p>A multi-token answer does not have a single probability in the model; there are only conditional logprobs for the token at each position. To turn these into “the confidence of this answer,” you must aggregate: the input to answer aggregation is the logprobs of multiple tokens, and the output can be a sum, an average, the weakest position, or a task-specific score. Different aggregation methods imply different assumptions, and each has its own shortcomings.</p>
+<p>The sum simply adds all token scores. Since each term is no greater than 0, the more tokens there are, the more the sum is penalized, and the score decreases monotonically with length; this means the sum naturally favors short sequences, and a long correct answer may lose to a short incorrect answer. The average divides the total score by the number of tokens, canceling out the length effect, but it may obscure a critical token: what really determines correctness in a sentence is often just one low-probability token, such as the word in the answer that carries the core fact or a negation, while the other tokens all have high probabilities; after averaging, that danger signal is diluted and the entire sentence still looks trustworthy. The weakest position takes the minimum token logprob in the entire sentence, zeroes in on this danger point, but it is insensitive to the overall probability of the rest of the sentence.</p>
+<p>No aggregation method is inherently correct. The right approach is to first define the task unit and candidate specification: determine whether the smallest unit to score is a token, a label, or a whole sentence, and determine whether the candidate set is controlled labels or free text; then use a validation set to measure the actual performance of different aggregation methods on that task before choosing one. For classification tasks, controlled labels have only a few fixed options, so it is better to compare the complete token-sequence score of each label rather than only the score of a single token; for free-text generation, the same meaning has multiple semantically equivalent expressions, and texts such as “the answer is sunny” and “sunny” are written differently but mean the same thing, yet their scores may differ greatly. At this point, the limits of a single string score become especially obvious—using the score of a specific string to represent “answer confidence” is itself untenable.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>High probability can also be confidently wrong<span class="dd-badge intuition">Boundary</span></h2>
+<div class="dd-agent-response"><p>The goal of a language model is to reproduce the statistical regularities of its training data, not to verify facts. It is entirely possible for it to fluently say something false with a very high logprob. Therefore, the input for factual diagnosis should include both the model's high-scoring answer and independent evidence, and the output should separate the two judgments—"language preference" and "factual correctness"—rather than using a single score to represent both at once.</p>
+<p>At least three mechanisms independently push logprob higher, even when the proposition itself is false. The first is training frequency: common statements that appear repeatedly in training data—including widely circulated false claims—naturally have high probability. The second is prompt suggestion: the wording of the question and clues given in the context can steer the model toward a certain answer; even if that answer contradicts the facts, the model will follow the suggestion and give high-scoring output. The third is fluency patterns: sentences that conform to grammatical habits and connect smoothly with the surrounding text naturally have high probability, and "smooth-sounding" and "correct" are two different things.</p>
+<p>Conversely, rare but correct answers can receive low scores: a correct but obscure name, or an accurate but uncommon phrasing, can have low logprob because they appear less often in training data. So logprob measures the model's language preference, not the truth value of a proposition, and cannot be used as a fact verifier. To use logprob for factual judgment, you must introduce evidence from outside the model: retrieve external materials, call tools to verify, or have a person verify the facts about the world. When independent evidence disagrees with the model score, facts should follow the evidence, not the score.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Calibration maps scores to frequencies<span class="dd-badge math">Calibration</span></h2>
+<div class="dd-agent-response"><p>For “confidence 0.8” to be a statement with empirical meaning, one must answer a question: among all predictions labeled 0.8, in the long run are about 80% actually correct? Calibration solves exactly this. The input to calibration is the model’s raw scores and true labels on independent data, and the output is a mapping from scores to empirical accuracy.</p>
+<p>The approach is to put predictions with similar scores into the same bucket and compute the true accuracy in each bucket. If the average score of the samples in a bucket is 0.8, then in the long run about eight out of ten predictions in that bucket should be correct; a bucket with an average score of 0.6 should be about six out of ten correct. If a bucket is actually only half correct, it means the model is overconfident in this range, and its scores need to be mapped back to a lower empirical frequency rather than being used literally.</p>
+<p>The mapping can be fit on an independent calibration set using methods such as temperature scaling and isotonic regression. One boundary to remember here is: the fitted mapping holds only for the target task and that data distribution. If any of the model version, prompt wording, or input distribution changes, the original mapping may become invalid and must be recalibrated with new data. Calibration translates “the number given by the model” into “the frequency that actually occurs,” but it does not change the model’s knowledge, nor does it verify any fact—it only ensures that, when the distribution is unchanged, the statistical meaning of the score is consistent with the true accuracy.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Selective Prediction<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>After calibration, the system must still do something when facing low-confidence samples: answering anyway may be wrong, while refusing to answer across the board wastes its capability. Selective prediction addresses exactly this decision. Its inputs are calibrated scores, error costs, and coverage requirements; its output is a specific action: answer automatically, supplement retrieval, escalate, clarify, or refuse to answer.</p>
+<p>The core mechanism is the threshold. Set a bar on the score: samples above the threshold are answered directly by the model; samples below it are sent down a safer fallback path, such as answering after supplemental retrieval, escalating to a stronger model, asking the user for clarification, or routing to human handling. The higher the threshold, the more low-score samples are sent to safe fallback, so overall system risk is usually lower, but coverage declines accordingly—fewer samples can be handled automatically, and product usability suffers.</p>
+<p>Therefore, the threshold cannot be chosen by accuracy alone. Whether it is worth refusing to answer must consider both error cost and coverage: for high-cost tasks it is worth setting the threshold high, preferring more refusals and more human handoffs; for low-cost tasks you can relax the threshold to preserve the share handled automatically. The coverage–risk curve and business cost are the basis for choosing the threshold; looking only at “accuracy goes up after refusal” will miss the cost brought by a collapse in coverage.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Tokenization and API Pitfalls<span class="dd-badge eng">Implementation</span></h2>
+<div class="dd-agent-response"><p>“Yes” and “No” may look like just two tokens, but in practice you cannot assume you can read the score at a single position. The inputs for API verification must be the tokenizer actually used, the complete text of the candidate labels, and the position information returned by the API; the output is the complete sequence score for each canonical label. Skipping this step means the comparison is built on the wrong comparability basis.</p>
+<p>Three situations break the single-token assumption. The first is tokenization: a label may be split into multiple tokens, for example a label containing a space or a string not present in the vocabulary. “No” may be a single token, while “is not” may be split into two. The second is shared prefixes: when multiple candidates share the same prefix, the score for the prefix part is the same for all candidates; what actually distinguishes them is the token after the prefix. Comparing only the score at the starting position mistakes the shared part for a difference. The third is whitespace and formatting: the token text returned by the API may have a leading space. The same word at different positions may correspond to different tokens, directly affecting which score belongs to which label.</p>
+<p>The API return values themselves also have two pitfalls. If a token is absent from the top-k list, it only means it did not make the top k; this does not mean its probability is zero. To obtain its score, you must explicitly request it or recompute it. Raw logprobs across models also have no common scale: different vocabularies, different tokenization methods, and different training distributions mean that a −1.2 from model A and a −1.2 from model B do not represent the same thing and cannot be directly compared. The correct approach is always: use the actual tokenizer to fully tokenize the candidate label, aggregate the scores across the entire sequence, and confirm that the API returns the required positions and candidate set.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Complete worked calculation: how to convert between probability, logprob, and sequence score<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>For an answer consisting of two tokens, if the conditional probabilities of the two tokens are 0.8 and 0.25 respectively, what is the joint probability of the entire answer? The inputs of the manual calculation are these two conditional probabilities, and the outputs are four numbers: the joint probability, total logprob, average logprob, and geometric mean probability. They describe the preference for the same sequence but serve different purposes.</p>
+<p>First, multiply the conditional probabilities autoregressively: P = 0.8 × 0.25 = 0.20. Second, take the natural logarithm of each probability: log 0.8 ≈ −0.223, log 0.25 ≈ −1.386, and add them to get total logprob ≈ −1.609. Third, verify the interchange: take exp of the total logprob, exp(−1.609) ≈ 0.20, recovering the original joint probability. Then divide the total logprob by the token count 2 to get average logprob −0.805; take exp of that, exp(−0.805) ≈ 0.447, which is the geometric mean probability—an equal-weight representative value of the two tokens' individual probabilities.</p>
+<p>For the same sequence, different aggregation methods yield different numbers and also represent different preferences. Total logprob −1.609 measures the preference for the entire sequence, but since each term is non-positive, it favors short sequences. Average logprob −0.805 measures average fluency, but may mask some critical low-probability token. Minimum token logprob −1.386 corresponds exactly to that 0.25 token, directly exposing the weakest position, but it is noisy and easily affected by fluctuations of a single token.</p>
+<p>These numbers all describe “how much the model prefers this sequence,” not “how correct the answer is,” and cannot be conflated with accuracy. Before comparing candidates, you must first define the task unit: label classification and free text should not share an unvalidated aggregation formula; otherwise, no matter how accurate the manual calculation is, the ruler used for comparison is wrong.</p></div>
+<table class="dd-table"><thead><tr><th>Aggregation</th><th>Value</th><th>Preference</th></tr></thead><tbody><tr><td>Total logprob</td><td>−1.609</td><td>Short sequences</td></tr><tr><td>Average logprob</td><td>−0.805</td><td>Average fluency, but can mask key low points</td></tr><tr><td>Minimum token logprob</td><td>−1.386</td><td>Exposes the weakest position, noisy</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Original figure: token signal must go through task calibration to trigger action<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>API returns only local probabilities at each position; it is several layers away from “what the system should do.” The decision chain turns token logprob into auditable actions: inputs include token logprobs, task units, calibration data, and business cost, and outputs are automatic answering or fallback actions.</p>
+<p>The chain is divided into three stages. The first stage is sequence or semantic aggregation: scattered token logprobs are aggregated by task unit into scores for candidate answers; classification tasks aggregate the full label sequence, and free text aggregates by semantic unit. The second stage is independent calibration: independent calibration data is used to map aggregated scores to empirical accuracy, making 0.8 really mean about eight out of ten correct. The third stage is risk threshold decision-making: error cost and coverage are combined to decide between automatic answering and supplementary retrieval, escalation, clarification, or handoff to a human.</p>
+<p>From left to right, the entire chain is: token logprob → sequence aggregation → task calibration → risk threshold → system action. Logprob is only a raw signal; aggregation, calibration, and cost thresholds together determine executable actions. Therefore, if any layer in the chain changes—changing model, prompt, aggregation method, or threshold—the entire chain must be replayed, revalidating the output of every layer. Never present raw local probabilities directly as confidence: unaggregated and uncalibrated token scores are neither the accuracy of the answer nor a decision basis on which the system can act.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 735 285" role="img" aria-label="token logprob through sequence aggregation, task calibration, and risk threshold forms system action"><defs><marker id="lpa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="82" y="122" text-anchor="middle" class="svg-t">token logprobs</text><text x="82" y="147" text-anchor="middle" class="svg-t" font-size="11">tokenization/context conditioning</text><path d="M145,131 L195,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="200" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="262" y="122" text-anchor="middle" class="svg-t">task aggregation</text><text x="262" y="147" text-anchor="middle" class="svg-t" font-size="11">label sequence/semantic cluster</text><path d="M325,131 L375,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="380" y="95" width="125" height="72" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="442" y="122" text-anchor="middle" class="svg-t">independent calibration</text><text x="442" y="147" text-anchor="middle" class="svg-t" font-size="11">score→empirical accuracy</text><path d="M505,131 L555,131" stroke="#788293" marker-end="url(#lpa)"/><rect x="560" y="65" width="150" height="132" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="635" y="94" text-anchor="middle" class="svg-t">risk policy</text><text x="635" y="122" text-anchor="middle" class="svg-t" font-size="11">automatic answer</text><text x="635" y="147" text-anchor="middle" class="svg-t" font-size="11">retrieval/escalation</text><text x="635" y="172" text-anchor="middle" class="svg-t" font-size="11">refuse/handoff</text><text x="367" y="245" text-anchor="middle" class="svg-t">model or distribution shift → recalibrate the entire chain</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 logprob is only a raw signal; aggregation, calibration, and cost thresholds together determine executable actions.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Candidate Labels Must Be Compared Using Full Sequence Probability<span class="dd-badge math">Tokenization Pitfall</span></h2>
+<div class="dd-agent-response"><p>“Yes” is one token, “No answer” is two tokens, directly comparing the first-token scores of the two is obviously unfair. The input for candidate comparison is a shared prompt and multiple complete labels; the output is the conditional logprob of each label's entire sequence. The method is: fix the prompt shared by all candidates, then use teacher forcing to accumulate token by token—feed the candidate label token by token, record the log probability of each token conditioned on “shared prompt + already provided prefix”, and accumulate until the end of the label. You cannot only read the first token, because candidates may share a prefix; nor can you treat candidates that do not appear in the API top-k as probability 0.</p>
+<p>Written out as a formula:</p>
+<p>score(c) = Σₜ₌₁..|c| log p(cₜ | prompt, c&lt;t)</p>
+<p>Where c is a complete candidate label, |c| is its number of tokens, cₜ is the t-th candidate token, c&lt;t is the prefix of the candidate that has already been provided, prompt is the prompt shared by all candidates, p is the token probability under the current condition, and score(c) is the total logprob of the entire candidate. Each candidate is calculated in this way, so comparisons are based on the same prompt and the same accumulation method.</p>
+<p>Length is still a problem: if the task allows expressions of different lengths, the sum will favor shorter labels. In that case either prescribe canonical labels in advance so all candidates have the same length, or use length normalization and confirm on a validation set that the correction is effective. Once the tokenizer changes, segmentation, sequence length, and normalization space all change, and all scores must be recomputed. Across models it is even more thoroughgoing: different tokenizers leave raw scores without a common scale, so when doing model routing, you should calibrate each model separately and then compare calibrated expected risk, rather than directly comparing average logprob.</p></div>
+<div class="dd-formula" data-formula-id="logprobs-candidate-score"><math display="block" aria-label="候选 c 的分数等于从 t 等于一到候选长度的每个 token 条件对数概率之和"><mrow><mi>score</mi><mo>(</mo><mi>c</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mrow><mo>|</mo><mi>c</mi><mo>|</mo></mrow></munderover><mi>log</mi><mi>p</mi><mo>(</mo><msub><mi>c</mi><mi>t</mi></msub><mo>∣</mo><mi>prompt</mi><mo>,</mo><msub><mi>c</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Semantic uncertainty first requires merging equivalent expressions<span class="dd-badge eng">Free text</span></h2>
+<div class="dd-agent-response"><p>In free-form generation, the same meaning can be written as many different strings: “the French capital,” “Paris,” and “Paris, the capital of France” appear to be three answers but are actually one meaning. If we do not merge them, when the model samples multiple times, the probability will be spread across many synonymous expressions; each string individually has a very low score, and the signal that “the model thinks the answer is Paris” is diluted. Semantic aggregation aims to solve this problem: its input is the strings from multiple generations and a task equivalence judge, and its output is meaning clusters and the cumulative probability of each cluster.</p>
+<p>The approach is to first use an equivalence judge to cluster the strings into meaning clusters, then sum the probabilities of all expressions within each cluster to obtain a distribution over clusters—this distribution is closer to the true uncertainty of the task. Different tasks require different judges:</p>
+<p>For math problems, parse the candidates and perform algebraic simplification to recognize equivalent forms; for code problems, merge by test behavior, so two implementations that pass the same set of tests count as the same cluster; for factual question answering, perform entity normalization and entailment judgment, grouping aliases and abbreviations into the same entity; for open-ended advice, we can only rely on semantic clustering, and cluster boundaries are inherently subjective.</p>
+<p>The judge itself can make mistakes: erroneous merging combines different meanings into one cluster, erroneous splitting separates synonymous expressions into two clusters, alias normalization can also lose details, and incomplete tests likewise lead to merging errors. Therefore, clustering results must be validated with human annotations; only after confirming that the merge and split boundaries align with the task semantics do cluster probabilities become meaningful.</p></div>
+<table class="dd-table"><thead><tr><th>Task</th><th>Equivalence judgment</th><th>Risk</th></tr></thead><tbody><tr><td>Math</td><td>Parsing and algebraic simplification</td><td>Format / units</td></tr><tr><td>Code</td><td>Test behavior</td><td>Incomplete tests</td></tr><tr><td>Factual question answering</td><td>Entity normalization / entailment</td><td>Alias and detail loss</td></tr><tr><td>Open-ended advice</td><td>Semantic clustering</td><td>Subjective boundaries</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>From scores to action: the coverage-risk curve matters more than a single threshold<span class="dd-badge eng">Selective Prediction</span></h2>
+<div class="dd-agent-response"><p>Raising the threshold from −1.2 to −0.5 does not necessarily make the system safer; it may simply answer less. To judge the effect of a threshold change, you need coverage-risk analysis: input the calibrated scores, true labels, and action costs on a validation set, and output the coverage, accepted error rate, and expected cost at each threshold.</p>
+<p>The way to draw the curve is sorted expansion. On the validation set, sort samples by calibrated score from high to low, then gradually expand the automatically answered set starting from the highest-scoring samples; at each coverage point calculate the error rate among the answered samples, and connect them to obtain the coverage-risk curve. The curve directly answers the threshold question: raising the threshold usually lowers coverage, but risk does not necessarily decrease monotonically; if templated hallucinations happen to be mixed into the high-score region, the curve will rise there, exposing a calibration failure on that slice—score ordering has not pushed risk to the low-score end. Conversely, if raising the threshold only lowers coverage without lowering risk, this indicates that score ordering or calibration has failed on that slice.</p>
+<p>Product decisions cannot pursue accuracy alone; they must compare expected cost. The expected cost at threshold τ is:</p>
+<p>E[cost(τ)] = Cerr × P(incorrect and accepted) + Cabstain × P(abstain) + Cverify × P(escalation verification)</p>
+<p>Here E[cost(τ)] is the average business cost at threshold τ, and τ is the automatic acceptance threshold; Cerr, Cabstain, and Cverify are the costs of one incorrect acceptance, one abstention, and one escalation verification, respectively; P is the empirical probability of the corresponding action event on the validation set. All terms must be computed over the same evaluation period and task slice; costs across slices are not comparable.</p>
+<p>Different slices must be plotted separately because the risk structures differ: for short answers and long answers, aggregated scores are affected by length, so they should be normalized and calibrated separately; for common domains and new domains, there is distribution shift, and the model tends to be overconfident in new domains, so it should first retrieve or hand off to humans; for low-loss and high-loss errors, even if the error rate is the same, the business costs are completely different, so different thresholds should be adopted; when the model or prompt version changes, the score scale may shift as a whole, requiring version-level replay and recalibration.</p>
+<p>Post-launch monitoring likewise cannot look only at a single average: you need to record scores, actions, final labels, and slices; monitoring only the average logprob cannot detect localized miscalibration on a particular language, task, or answer length. True labels often arrive with delay, so you can first monitor drift in the score distribution and abstention rate, but these signals can only trigger investigation, not replace accuracy feedback.</p></div>
+<table class="dd-table"><thead><tr><th>Slice</th><th>Why plot curves separately</th><th>Recommended action</th></tr></thead><tbody><tr><td>Short answer / Long answer</td><td>Length changes aggregated score</td><td>Normalize and calibrate separately</td></tr><tr><td>Common domain / New domain</td><td>Distribution shift leads to overconfidence</td><td>For new domains, retrieve first or hand off to humans</td></tr><tr><td>Low-loss / High-loss errors</td><td>Business costs differ for the same error rate</td><td>Use different thresholds</td></tr><tr><td>Model or prompt version</td><td>Score scale may shift as a whole</td><td>Version-level replay and recalibration</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="logprobs-expected-cost"><math display="block" aria-label="阈值 tau 下的期望成本等于错误接收成本乘错误且接收概率，加拒答成本乘拒答概率，加升级验证成本乘升级验证概率"><mrow><mi>E</mi><mo>[</mo><mi>cost</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>]</mo><mo>=</mo><msub><mi>C</mi><mi>err</mi></msub><mi>P</mi><mo>(</mo><mtext>incorrect and accepted</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>abstain</mi></msub><mi>P</mi><mo>(</mo><mtext>abstain</mtext><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>verify</mi></msub><mi>P</mi><mo>(</mo><mtext>escalated verification</mtext><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>From raw output to verifiable practice, the entire causal chain can be connected link by link.</p>
+<p>At each position, the model outputs only token probabilities. These probabilities need to be combined into a score across the entire sequence; taking logarithms turns products into sums, so the sequence score becomes additive and comparable. But length and tokenization directly affect this score: the longer the sequence and the more fragmented the tokenization, the lower the sum; the choice of aggregation is therefore not a detail but part of what determines the meaning of the score.</p>
+<p>The aggregated score still expresses only language preference, not correctness. Calibration on independent data is needed to map the score to the actual frequency of correctness, before 0.8 acquires the empirical meaning of “about eight out of ten correct.” With calibrated scores, threshold decisions begin to make sense: raising the threshold trades coverage for risk; lowering the threshold trades risk for coverage.</p>
+<p>Finally, the entire chain is built on a specific distribution. Once the model, prompt, or input distribution changes, the assumptions in each link may fail; the chain must be continuously recalibrated with new data so it does not silently break at some link.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1706.04599" target="_blank" rel="noopener">On Calibration of Modern Neural Networks</a>: temperature scaling and calibration</li><li><a href="https://arxiv.org/abs/1705.08500" target="_blank" rel="noopener">Selective Classification for Deep Neural Networks</a>: coverage-risk trade-off</li><li><a href="https://arxiv.org/abs/2302.09664" target="_blank" rel="noopener">Semantic Uncertainty</a>: uncertainty under semantically equivalent answers</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/logprobs">Explore connections on the map</a><a href="/zh/concepts/logprobs/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

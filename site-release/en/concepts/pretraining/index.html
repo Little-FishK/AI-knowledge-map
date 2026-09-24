@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Pre-training? Explained Simply</title>
+<meta name="description" content="Self-supervised learning on massive unlabeled text, instilling “general capabilities” into the model in one go">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/pretraining/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/pretraining/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/pretraining/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Pre-training? Explained Simply">
+<meta property="og:description" content="Self-supervised learning on massive unlabeled text, instilling “general capabilities” into the model in one go">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/pretraining/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Pre-training? Explained Simply">
+<meta name="twitter:description" content="Self-supervised learning on massive unlabeled text, instilling “general capabilities” into the model in one go">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/pretraining/#page","name":"What Is Pre-training? Explained Simply","description":"Self-supervised learning on massive unlabeled text, instilling “general capabilities” into the model in one go","url":"https://ai-knowledge-map.com/en/concepts/pretraining/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Pre-training","item":"https://ai-knowledge-map.com/en/concepts/pretraining/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Pre-training</span></li></ol></nav><article id="dd-article" data-concept-id="pretraining" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Pre-training</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Self-supervised learning on massive unlabeled text, instilling “general capabilities” into the model in one go</p>
+<p class="dd-ali">Pre-training · Pretraining</p>
+<p class="dd-metabar">Suggested 20–30 minutes · Intermediate · Requires: familiarity with self-supervised/supervised learning and large language models</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Pre-training enables models to learn transferable representations and generative patterns from large-scale data, and is an important source of foundation-model capabilities. Autoregressive models often perform next-token prediction, encoders can also use masked prediction, and multimodal models additionally mix contrastive, reconstruction, and other objectives. Data filtering, deduplication, mixture ratios, and training compute are equally critical; post-training further shapes instruction following, preferences, and safety behavior.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer these yourself:</div>
+  <ul>
+    <li><b>Why “pre”</b>—why not train directly on the task, but first take a step of “pre-training”.</li>
+    <li><b>How to train</b>—how exactly this “general foundation” is learned.</li>
+    <li><b>Why it works</b>—just predicting the next token, how does it manage to instill language, common sense, and reasoning?</li>
+    <li><b>What it produces</b>—after pre-training, do you get a directly usable assistant?</li>
+    <li><b>Why it's expensive</b>—why only a few organizations can afford pre-training.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Training directly on a task is both expensive and narrow, so learning a general foundation first and then adapting to the task—that is “pre-training.”<span>(§1)</span></li>
+    <li>It constructs supervisory signals from the data itself: autoregressive models predict the next token, and other architectures can use masking, contrastive, or reconstruction objectives, thereby making use of large-scale unlabeled data.<span>(§2)</span></li>
+    <li>Each position contributes loss as −ln p, and an entire text automatically produces dense supervision; gradients make the relative probability of the correct token rise.<span>(§3)</span></li>
+    <li>The prediction objective forces the model to compress many reusable structures, but capability is jointly determined by data, scale, and task distribution.<span>(§4)</span></li>
+    <li>What emerges is a knowledgeable but not-yet-obedient base model, which still requires fine-tuning + alignment to become an assistant.<span>(§5)</span></li>
+    <li>Pre-training simultaneously consumes data, compute, communication, and engineering time, so most teams reuse a base model and then adapt it.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why 'pre-' training?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Directly training a model for a specific task looks like the shortest path on the surface, but in reality it incurs two high costs. The first is data: task-specific training requires manually labeled data, which is expensive to annotate and limited in quantity. The second is capability narrowing: parameters trained this way learn only the patterns of that small task, and switching to another task requires starting nearly from scratch. Pre-training is a two-stage approach designed to bypass these two costs: first train a 'general foundation' on massive general-purpose data—letting the model first learn how language is used and roughly what the world is like; then make small task-specific adjustments. That is exactly the meaning of the word 'pre': before formally facing a specific task, first build a solid general foundation.</p>
+<p>To state the whole task completely: Pre-training takes two inputs—large-scale general-purpose data and a model that has not yet learned the patterns of any task; the output is a parameter checkpoint, which can be used directly for subsequent fine-tuning or directly for representation extraction. The mechanism loop during training is straightforward: the model repeatedly constructs a prediction target from the data itself, computes the loss, and then updates parameters based on the loss. What deserves attention here is the step of 'constructing the target from the data itself'—general-purpose data itself carries no human-labeled task answers; the target is automatically generated from the raw data. This is also the key that allows pre-training to use massive amounts of unlabeled data.</p>
+<p>At the other end of the causal chain is the evaluation criterion. A decrease in training loss only shows that the model has memorized the training data; it cannot prove that the 'general foundation' has formed. What really matters is the loss on held-out data that the model never saw during training, as well as performance on multiple capability evaluations. Only when the model can also make stable predictions on unseen data and shows improvement across multiple capabilities can we say that this general foundation has been established.</p>
+<p>This route has clear applicability boundaries. When the target task heavily overlaps with the patterns contained in the pre-training data, the broad patterns accumulated during pre-training can be directly reused, yielding the greatest benefit. But if the target domain differs greatly from the pre-training data, the general foundation does not apply directly. In that case, domain adaptation is needed, and one should even consider switching to a domain-specific model for that field rather than forcing general parameters onto it.</p>
+<p>To summarize this causal chain in one sentence: first become a generalist, then become a specialist. Just as a person first receives many years of general education and then undergoes job-specific pre-employment training—the general education step is the most expensive and time-consuming, but as long as it is done well once, all kinds of specialization can be picked up quickly afterwards. Pre-training's role in the entire process is exactly the same: it is the most costly and longest-running stage, and it is also the prerequisite that allows all subsequent specialized capabilities to be acquired cheaply.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How It Is Specifically Trained<span class="dd-badge math">Math</span></h2>
+<div class="dd-agent-response"><p>This “general foundation” is not instilled through human explanations; rather, supervisory signals are constructed from the data itself, allowing the model to learn on its own. This is the most essential difference between pre-training and task-specific training: no per-sample human labels are needed; the raw data itself is the problem, and part of the content carried by the data itself is the answer.</p>
+<p>There are three mainstream ways to construct signals, each corresponding to different input construction methods, model output forms, and applicable directions. Autoregressive models perform next-token prediction: given the already-appeared left-side text as a prefix, the model outputs a probability distribution over the entire vocabulary for the next token; this type of objective is suitable for training autoregressive generative models. BERT-type encoders perform masked prediction: some tokens in the sequence are masked, and the model outputs vocabulary probabilities corresponding to these masked positions; this type of objective is suitable for training bidirectional encoding representations. Multimodal systems commonly use contrastive or reconstruction objectives: the input is paired views (such as image-text pairs) or corrupted samples, and the model outputs matching scores or reconstructed samples; this type of objective is suitable for training visual and multimodal representations. All three objectives answer the same question—how to let raw data provide the learning target on its own—but they are different algorithms and cannot be interchanged arbitrarily: the objective determines what the model can see and output at each step, and also determines whether the final model is better at generation, encoding, or cross-modal matching.</p>
+<p>Take autoregressive training as an example to see one complete parameter update loop: the model performs computation on the prefix and obtains a predictive distribution for the next token; cross-entropy measures the gap between this predictive distribution and the actual next token—the larger the gap, the higher the loss; then gradient descent is performed on this loss to update the parameters in the direction that makes the prediction closer to the actual token. Repeating this loop over massive amounts of text, the model gradually learns the statistical regularities of text sequences.</p>
+<p>The freedom brought by “reducing human labels” is not unlimited; its ceiling is constrained by data quality. High-quality data itself is a scarce resource: acquisition licenses, cleaning, deduplication, and the balance of languages and domains—each link directly affects the final model's capability distribution, bias tendencies, and memorization risk. If the data is poorly selected, no matter how many self-supervised signals there are, a good general foundation cannot be learned.</p>
+<p>The validation stage must likewise respect consistency between objectives and data. You must use held-out data that matches the training objective to evaluate loss and performance, not use training loss as a substitute; at the same time, you should additionally check for data leakage, duplicate samples, and whether there is a mismatch between training objectives and downstream tasks—if the objective trains for generation but the downstream task requires encoding, this mismatch will directly weaken the validity of the evaluation conclusions.</p>
+<p>Compress the whole matter into one sentence: pre-training means repeatedly performing the single self-supervised task of “predicting the next token” on as much text as possible. Simple to the point of being counterintuitive, yet it is the foundation of the entire edifice.</p></div>
+<table class="dd-table"><thead><tr><th>Pre-training Objective</th><th>How Input Is Constructed</th><th>What the Model Outputs</th><th>Applicable Focus</th></tr></thead><tbody><tr><td>Next-token Prediction</td><td>Given the Left Prefix</td><td>Vocabulary Probabilities for the Next Token</td><td>Autoregressive Generative Model</td></tr><tr><td>Masked Prediction</td><td>Mask Some Tokens in the Sequence</td><td>Vocabulary Probabilities at the Masked Positions</td><td>Bidirectional Encoding Representations</td></tr><tr><td>Contrastive or Reconstruction</td><td>Paired Views, or Corrupted Samples</td><td>Matching Scores, or Reconstructed Samples</td><td>Visual and Multimodal Representations</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Hand-calculating a next-token training signal<span class="dd-badge math">Numerical example</span></h2>
+<div class="dd-agent-response"><p>The loop from the previous section can be worked through by hand on a single sentence. Take the text “猫 喜欢 鱼 &lt;EOS&gt;” (&lt;EOS&gt; is the end-of-sequence token). A training sample is not this sentence as a whole; instead, the sequence is shifted one token to the right, offset position by position: each prefix becomes an independent sample, and the sample’s correct answer is the token immediately after it. Thus this sentence produces three training positions: seeing the prefix “猫” requires predicting “喜欢”, seeing the prefix “猫 喜欢” requires predicting “鱼”, and seeing the prefix “猫 喜欢 鱼” requires predicting &lt;EOS&gt;.</p>
+<p>Suppose the model assigns the correct token probabilities 0.50, 0.25, and 0.80 at the three positions, respectively. The loss at each position is expressed as the negative log probability: −ln p. The first position is −ln 0.50 ≈ 0.693, the second is −ln 0.25 ≈ 1.386, and the third is −ln 0.80 ≈ 0.223. The intuition here is that the lower the probability, the larger the negative log and the heavier the loss; the position where the model is least certain contributes the largest loss.</p>
+<p>Averaging the losses at the three positions gives the average cross-entropy of the whole sentence: L̄ = (0.693 + 1.386 + 0.223) ÷ 3 ≈ 0.767. In notation, L̄ represents the average cross-entropy over the three prediction positions, t is the position index, pₜ is the probability the model assigns to the correct token at position t, and ln is the natural logarithm. Then applying the exponential transform to the average cross-entropy: PPL = exp(L̄) = e^0.767 ≈ 2.15. Here exp is the exponential function with the natural constant e as its base; it converts the average negative log loss back to a probability scale—2.15 can be understood as follows: on the evaluation data, when the model predicts the next token at each step on average, it feels as if it is choosing among about 2.15 equally likely candidates. On the same tokenizer and the same data, a smaller PPL usually means the model is better at predicting subsequent tokens.</p>
+<p>After the loss is computed, how do the parameters change? Backpropagation simultaneously adjusts all shared parameters in the model so that, under similar contexts, the logit of the correct token rises relative to the others. Returning to the second position: if after one update the model’s probability for “鱼” rises from 0.25 to 0.50, the loss at that position drops directly from −ln 0.25 = 1.386 to −ln 0.50 = 0.693. An improvement at one position immediately shows up as a decrease in the whole-sentence average loss; this is the smallest unit at which gradient descent operates on text sequences.</p>
+<p>The real value of this example is that it reveals the density of the training signal. Training does not provide just one label per passage of text; rather, a sequence of length L usually contributes about L next-token supervision positions. A ten-token sentence can be cut into about ten training samples. Massive raw text multiplied by this density automatically produces a training signal so dense that it needs no manual annotation—this is the arithmetic foundation that makes pre-training viable at the data level.</p>
+<p>Finally, the boundaries of this metric must be made clear. Low perplexity does not mean the facts are more true, nor does it mean the assistant is more useful. It only means the model is better at predicting tokens on the evaluation-text distribution. Data contamination, rote memorization, learning only stylistic shortcuts, or a mismatch between the training objective and the real task can all cause PPL to diverge from real capability—the metric declines, but capability does not necessarily improve in step.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 250" role="img" aria-label="Shifting the same text right produces three next-token training targets"><defs><marker id="pre-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g class="svg-t"><text x="55" y="60">猫</text><text x="170" y="60">喜欢</text><text x="300" y="60">鱼</text><text x="405" y="60">&lt;EOS&gt;</text><text x="55" y="125">The input prefix grows step by step</text><text x="55" y="190">Each position has a supervision target</text></g><g stroke-width="3" fill="none" marker-end="url(#pre-a)"><path d="M75 70C105 100 140 100 165 70" stroke="#8b5cf6"/><path d="M195 70C220 100 270 100 295 70" stroke="#0ea5e9"/><path d="M320 70C340 100 380 100 400 70" stroke="#10b981"/></g><g class="svg-t"><text x="105" y="145">Predict “喜欢”</text><text x="255" y="145">Predict “鱼”</text><text x="420" y="145">Predict the end</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Training does not provide just one label per passage of text; a sequence of length L usually contributes about L next-token supervision positions, so large-scale raw text can automatically produce a dense training signal.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Prefix</th><th>Correct next token</th><th>Correct probability p</th><th>Loss −ln p</th></tr></thead><tbody><tr><td>猫</td><td>喜欢</td><td>0.50</td><td>0.693</td></tr><tr><td>猫 喜欢</td><td>鱼</td><td>0.25</td><td>1.386</td></tr><tr><td>猫 喜欢 鱼</td><td>&lt;EOS&gt;</td><td>0.80</td><td>0.223</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="pretraining-cross-entropy-perplexity" data-display="mathml"><math display="block" aria-label="平均交叉熵等于三个位置负对数概率的平均，约为零点七六七；困惑度等于平均交叉熵的指数，约为二点一五"><mtable><mtr><mtd><mover><mi>L</mi><mo>¯</mo></mover><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mn>3</mn></munderover><mi>ln</mi><mo> </mo><msub><mi>p</mi><mi>t</mi></msub><mo>=</mo><mfrac><mrow><mn>0.693</mn><mo>+</mo><mn>1.386</mn><mo>+</mo><mn>0.223</mn></mrow><mn>3</mn></mfrac><mo>≈</mo><mn>0.767</mn></mtd></mtr><mtr><mtd><mi>PPL</mi><mo>=</mo><mi>exp</mi><mo>(</mo><mover><mi>L</mi><mo>¯</mo></mover><mo>)</mo><mo>=</mo><mi>exp</mi><mo>(</mo><mn>0.767</mn><mo>)</mo><mo>≈</mo><mn>2.15</mn></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Why can this step instill so many capabilities?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The most critical question is: by merely predicting the next token, how does it learn grammar, common sense, and even reasoning? The answer lies in the strength of the constraints that the prediction task imposes on representations. The model faces a massive number of samples across topics, with infinitely many prefixes and infinitely many combinations. To reduce prediction error simultaneously across large amounts of different text, the model cannot rely only on rote memorization—memorizing just one sentence cannot explain why infinitely many new, never-seen prefixes can also be predicted accurately. The only way to keep the loss decreasing is to form reusable internal structures: grammatical regularities, semantic associations, code structure, and co-occurrence patterns among facts. Thus the direct output of training is lower loss and an updated set of internal representations; translation, code, or reasoning performance are external manifestations that emerge when these representations are invoked by prompts and evaluation tasks.</p>
+<p>Here it is necessary to separate 'being able to continue reasoning text' from 'reliable reasoning'. The model may actually reuse abstract regularities, or it may only memorize templates and exploit surface cues. The criterion depends on the strength of generalization evidence: if it still answers correctly and stably on newly composed problems, counterfactual problems, and out-of-distribution samples, then it has mastered transferable regularities; if it succeeds only on familiar formats, one cannot claim it has learned a general algorithm.</p>
+<p>The position of scale in this causal chain is equally worth clarifying. Increasing the number of parameters, the amount of data, and compute usually smoothly reduces prediction loss, and may allow certain capabilities to cross the threshold of 'usable'—such empirical relationships are called scaling laws. But scaling laws describe trends, not guarantees. Scale is not a sufficient condition: data quality, the design of the training objective, model architecture, and evaluation criteria—any change in any link will alter the final result. 'Bigger' does not automatically mean facts are more reliable, nor does it automatically mean fairer for everyone. Scale provides an upper bound on potential; turning potential into capabilities still depends on every earlier design choice.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>What It Produces Is a “Base Model”<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Once pre-training is finished, do you have an assistant you can use directly? Not yet. What you get at the end of this stage is a base model checkpoint: knowledgeable, but not obedient. Ask it a question, and it may follow the inertia of “how text usually continues” and continue generating more questions instead of giving an answer. The reason lies in the training objective itself—it has only learned the probabilistic patterns of text sequences, and has never learned the behavioral norm of “when asked a question, you should answer.”</p>
+<p>To turn the base model into an assistant that can converse, two more training steps are needed: instruction fine-tuning teaches it to “answer when asked,” and preference alignment teaches it to answer both usefully and safely (see the deep-dive pages on “Fine-tuning” and “Alignment”). So the boundary of this stage becomes clear: the input is the pre-training data stream, and the output is the base model checkpoint and its training records; “being able to continue text and having low held-out loss” shows that the language modeling objective has made progress, but it does not show that the model already follows instructions.</p>
+<p>From massive amounts of text to a base model and then to an assistant, the division of labor along this chain can be summarized in two sentences. Pre-training is responsible for pouring in “knowledge and abilities,” producing a knowledgeable but not obedient base model; fine-tuning and alignment are responsible for calibrating “behavior,” turning the base model into an everyday assistant. All three steps are indispensable. To compress it one step further: pre-training determines “what it can do,” while fine-tuning and alignment determine “how it behaves”—most of the model’s knowledge and abilities are poured in during the pre-training step.</p>
+<p>One more boundary must be maintained: subsequent training can change the model’s answering habits and preferences, but it cannot guarantee factual correctness. No matter how much knowledge the base model has, it is still probabilistic statistical knowledge, not a verified fact base. High-risk uses must rely on independent evaluation, retrieval, or tool verification, and cannot skip checking just because “this model was pre-trained on a lot of data.”</p></div>
+<figure class="dd-fig">
+    <div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 924 180" style="min-width:924px" role="img" aria-label="From massive text to base model to assistant">
+      <rect x="33" y="40" width="198" height="40" rx="8" fill="#21252d" stroke="#6b7484"/><text x="132" y="58" text-anchor="middle" class="svg-t" font-size="11">Massive unlabeled text</text><text x="132" y="73" text-anchor="middle" class="svg-t" font-size="10">Nearly infinite</text>
+      <line x1="231" y1="60" x2="288.75" y2="60" stroke="#6b7484" stroke-width="2.3099999999999996" marker-end="url(#j1)"/>
+      <text x="330" y="47" text-anchor="middle" class="svg-t" font-size="10">Pre-training</text><text x="330" y="76" text-anchor="middle" class="svg-t" font-size="10">Self-supervised</text>
+      <rect x="379.5" y="40" width="198" height="40" rx="8" fill="#21252d" stroke="#6b8cbe" stroke-width="3.3"/><text x="478.5" y="58" text-anchor="middle" class="svg-tn" font-size="11">Base model</text><text x="478.5" y="73" text-anchor="middle" class="svg-t" font-size="10">Knowledgeable · Not obedient</text>
+      <line x1="577.5" y1="60" x2="635.25" y2="60" stroke="#6b7484" stroke-width="2.3099999999999996" marker-end="url(#j1)"/>
+      <text x="676.5" y="47" text-anchor="middle" class="svg-t" font-size="10">Fine-tuning</text><text x="676.5" y="76" text-anchor="middle" class="svg-t" font-size="10">+ Alignment</text>
+      <rect x="726" y="40" width="181.5" height="40" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="816.75" y="58" text-anchor="middle" class="svg-tn" font-size="11">Conversational assistant</text><text x="816.75" y="73" text-anchor="middle" class="svg-t" font-size="10">Obedient · Safe</text>
+      <defs><marker id="j1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs>
+    </svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p>
+    <figcaption>Figure 1 Pre-training is responsible for pouring in “knowledge and abilities,” producing a knowledgeable but not obedient base model; fine-tuning and alignment are responsible for calibrating “behavior,” turning the base model into the assistant you use every day. All three steps are indispensable.</figcaption>
+  </figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Why is it so expensive?<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Pre-training is critical because it is the primary source of capability; it is expensive because instilling that capability requires simultaneously burning through four types of resources. Pre-training frontier general-purpose models from scratch consumes large-scale data, accelerator clusters, and long-term engineering effort, and the cost is usually affordable only by a few organizations—but note that 'small-model pre-training' is not absolutely infeasible; what is expensive is the frontier-scale tier, not pre-training itself.</p>
+<p>The four cost sources have different growth logics. Compute and memory: the more parameters and tokens there are, the more forward and backward computation is required, which directly determines training duration and accelerator cluster size. Communication: multiple devices must continuously synchronize gradients, parameters, or activations; once the network becomes a bottleneck, cluster utilization is dragged down, and machines are waiting for data instead of computing. Data engineering: collection, licensing, filtering, deduplication, and mixing ratios require repeated iteration; it does not directly show up on the compute bill but determines the model's contamination level, bias tendencies, and long-tail coverage quality. Failures and validation: hardware faults, numerical anomalies, and bad batches can interrupt training runs that often last months, so checkpoints, monitoring, and recovery systems must be in place; otherwise a single interruption can lose a large amount of completed training progress.</p>
+<p>When doing budget planning, the inputs are target model size, number of training tokens, hardware efficiency, and data plan, and the outputs are estimated compute, time, cost, and a recoverable checkpoint plan. One budget line is most easily overlooked: the total training budget must be allocated rationally between parameter count and token count. Work such as Chinchilla shows that increasing parameters alone while training data is insufficient is not compute-optimal—a model that is large enough but has not seen enough data amounts to spending compute on capacity that is not fed enough.</p>
+<p>Reading the state of the training process also requires distinguishing cause and effect. Actual throughput below theoretical peak does not necessarily indicate a model design error; it may be a bottleneck in communication or the data pipeline. Conversely, training running very fast does not mean data and capability quality meet the bar. Speed only reflects engineering efficiency, not that the model is learning well.</p>
+<p>Since pre-training from scratch is this expensive, most people will not redo it themselves; instead they fine-tune on top of someone else's pre-trained model—this is transfer learning: at very small cost, you borrow that extremely expensive general-purpose foundation (see the 'Fine-tuning' deep-dive page). Pre-training and fine-tuning therefore form a division of labor: one expensive generalist development, paired with countless cheap specialist adaptations. In a specific scenario, which path to choose must be weighed by data volume, task difference, and budget: with little data and the task close to the pre-training domain, direct fine-tuning is most cost-effective; with a lot of data and a specialized domain, a small-scale domain model or continued pre-training is worth considering.</p></div>
+<table class="dd-table"><thead><tr><th>Cost source</th><th>Why it grows</th><th>Engineering result</th></tr></thead><tbody><tr><td>Compute and memory</td><td>More parameters and tokens require more forward and backward computation</td><td>Determines training duration and accelerator scale</td></tr><tr><td>Communication</td><td>Multiple devices must synchronize gradients, parameters, or activations</td><td>Cluster utilization may be dragged down by the network</td></tr><tr><td>Data engineering</td><td>Collection, licensing, filtering, deduplication, and mixing ratios require repeated iteration</td><td>Determines contamination, bias, and long-tail coverage</td></tr><tr><td>Failures and validation</td><td>Hardware faults, numerical anomalies, and bad batches can interrupt long training runs</td><td>Requires checkpoints, monitoring, and recovery systems</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String together the previous links, and the entire causal chain of pre-training is coherent. The starting point is an economic judgment: training directly for a task is both expensive and narrow, so instead learn a general foundation first and then adapt to the task—this is how the two-stage "pre"-training arrangement comes into being.</p>
+<p>How is a general foundation learned? By having the data itself construct supervision signals. Autoregressive models predict the next token, and other architectures can use masked, contrastive, or reconstruction objectives; in any case, learning signals are obtained from large-scale unlabeled data without relying on manual annotation. The signal falls on every position: each position contributes loss as −ln p, and shifting a text one position to the right automatically produces dense supervision positions; gradient descent then makes the relative probability of the correct token rise step by step. The micro-level arithmetic accumulates at the macro level into a constraint: the prediction objective forces the model to compress out a large amount of reusable structure—syntax, semantics, code structure, and factual co-occurrence. But this step does not promise that results automatically improve; final capability is jointly determined by data, scale, and task distribution.</p>
+<p>What the end of the chain produces is a base model: knowledgeable but not obedient, because the language modeling objective never taught it to "answer when asked." To become an assistant, two further steps are needed: fine-tuning and alignment. The cost structure of the whole chain—the multiple drains of data, compute, communication, and engineering time—explains why most teams do not train from scratch but instead reuse an existing base model and then adapt it.</p>
+<p>To grasp the core, you can self-check with two questions: Can you explain clearly why pre-training can learn so much without annotations? Can you say which two steps separate a base model from a conversational assistant? Only when you can answer both questions have you truly got this chain in your hands.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Concept dependencies and extended learning<span class="dd-badge eng">Route</span></h2>
+<div class="dd-agent-response"><p>Before entering pre-training, there are four prerequisite foundations that need to be established first: supervised learning—it provides the basic loop of 'constructing a loss from data and updating parameters with gradients'; self-supervised learning—it explains how to create supervision signals from the data itself, which is the core mechanism of pre-training; large language models and Transformer—they determine the model's structure, capacity, and sequence modeling approach. With these, the four core concepts on the pre-training page can take root: the overall two-stage (pre-training → fine-tuning) route, the specific objective of self-supervised next-word prediction, the intermediate product known as the base model, and the division of capabilities between generalists and specialists.</p>
+<p>The immediately adjacent extension concepts unfold along both sides of the chain. Going toward 'after training' leads to fine-tuning, instruction fine-tuning, and alignment: it is here that the base model is shaped into an obedient, useful assistant. Going toward 'training scale' leads to scaling laws: they describe the empirical relationship between parameters, data, compute, and loss, and are the key to understanding why pre-training requires such large-scale investment. Further extensions touch on large-scale application and engineering realities: synthetic data supplements the scarcity of high-quality data, distillation compresses the capabilities of large models into smaller models, and quantization and deployment determine at what cost the trained model ultimately reaches users.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning level</th><th>Concepts involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisites</td><td>Supervised learning, self-supervised learning, large language models, Transformer</td></tr>
+      <tr><td><b>Core concepts</b></td><td>Two-stage (pre-training → fine-tuning), self-supervised prediction of the next word, base model, generalist vs specialist</td></tr>
+      <tr><td>Adjacent extensions</td><td>Scaling laws, fine-tuning, alignment, instruction fine-tuning</td></tr>
+      <tr><td>Further</td><td>Synthetic data, distillation, quantization, and deployment</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Source and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., Language Models are Few-Shot Learners</a>: autoregressive pre-training and in-context learning.</li>
+    <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">Devlin et al., BERT</a>: masked language modeling shows that pre-training objectives are not limited to next-token prediction.</li>
+    <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., Training Compute-Optimal Large Language Models</a>: the compute-optimal trade-off between model size and the number of training tokens.</li>
+  </ul>
+  <div class="dd-src-date">Date accessed: 2026-07-21</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/pretraining">Explore connections on the map</a><a href="/zh/concepts/pretraining/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

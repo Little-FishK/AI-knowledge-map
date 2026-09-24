@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control? Explained Simply</title>
+<meta name="description" content="From DAGs, state machines, and durable execution, to idempotency, retries, compensation, version migration, and human tasks, build recoverable, auditable AI processes.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/workflow-orchestration/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/workflow-orchestration/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/workflow-orchestration/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control? Explained Simply">
+<meta property="og:description" content="From DAGs, state machines, and durable execution, to idempotency, retries, compensation, version migration, and human tasks, build recoverable, auditable AI processes.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/workflow-orchestration/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control? Explained Simply">
+<meta name="twitter:description" content="From DAGs, state machines, and durable execution, to idempotency, retries, compensation, version migration, and human tasks, build recoverable, auditable AI processes.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/workflow-orchestration/#page","name":"What Is Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control? Explained Simply","description":"From DAGs, state machines, and durable execution, to idempotency, retries, compensation, version migration, and human tasks, build recoverable, auditable AI processes.","url":"https://ai-knowledge-map.com/en/concepts/workflow-orchestration/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control","item":"https://ai-knowledge-map.com/en/concepts/workflow-orchestration/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control</span></li></ol></nav><article id="dd-article" data-concept-id="workflow-orchestration" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Workflow Orchestration: Carrying Probabilistic Models with Persistent State and Deterministic Control</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From DAGs, state machines, and durable execution, to idempotency, retries, compensation, version migration, and human tasks, build recoverable, auditable AI processes.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> When steps and branches can be described in advance, control flow should be handed to a deterministic orchestrator; the Large Language Model (LLM) is one of the probabilistic activities. Reliability comes from persistent state, idempotency, timeouts, and compensation, not from having the model remember &quot;where it got to&quot;.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Distinguish DAGs, state machines, and autonomous Agents; derive idempotency requirements under at-least-once execution; design compensation and human pauses; use fault injection to verify recovery and version migration.</div>
+<ol class="dd-chain"><li>Draw tasks as dependencies and state transitions</li><li>Define versioned input/output schema</li><li>Annotate side effects, idempotency keys, and compensation</li><li>Have decisions durably recorded by the orchestrator</li><li>Workers execute LLM or business activities</li><li>Retry or escalate by error type</li><li>Wait durably for human/external events</li><li>Fault recovery, history replay, and version migration</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Deterministic skeleton confines probabilistic errors to observable nodes<span class="dd-badge intuition">Localize</span></h2>
+<div class="dd-agent-response"><p>The most direct impulse when organizing a group of model calls into a reliable process is to have the Agent itself remember which step it has reached. This approach does not work. Agent sessions can be truncated or have their context compressed at any time, or deviate from the original plan because the model replans. Session memory is not transactional state; it can neither guarantee that "what is the next step" is always traceable, nor guarantee that after a failure we can return exactly to the step that went wrong. Putting process state into model context is like betting reliability on a carrier that is neither reproducible nor auditable.</p>
+<p>What Workflow Orchestration solves is exactly this misalignment: the model is responsible for producing results, but the model is not responsible for remembering the process. The orchestrator is a piece of deterministic control logic that persistently records each node's input, current state, attempt count, and output, and based on this handles dependencies, timeouts, and recovery. The "persistent" here is key—node state resides in stable storage, not in the memory of some session. In this way, after a process crashes and restarts, the orchestrator reads back the facts committed last time, not a conversation that may already be lost.</p>
+<p>Probabilistic activities are compressed into clearly defined nodes. Large Language Model (LLM) nodes only perform local tasks such as classification, extraction, generation, or judgment, and when delivering results use a versioned schema to constrain the model's free-text output into structured, validatable results. The orchestrator keeps complete records of each node's input and output, so when the model makes an error, which node the error occurred in, what the input was, and what output was produced are all observable, replayable, and localizable. Probabilistic errors are no longer scattered throughout the entire process but are confined into bounded nodes one by one.</p>
+<p>Inputs, outputs, and the overall causal chain can be understood as follows: the input is a set of describable steps, dependencies between steps, the schema for each step, and timeout and recovery rules; the orchestrator compiles these into a deterministic execution skeleton, invokes a probabilistic activity once at each node, and writes the result back into the history. The output is a restartable, auditable process instance—it records not only the final answer but also the facts of what happened at every step.</p>
+<p>From this we get a usage boundary: fixed paths use workflows, and autonomous search is placed only in genuinely unknown local parts. When process steps are clear and dependencies are well-defined, use the deterministic skeleton for scheduling; only when a certain step faces a truly open search space that cannot be enumerated in advance do we embed a constrained Agent in that local part. The orchestrator preserves facts and decisions, and the LLM only handles local judgments; model context can carry a single inference, but it cannot carry the transactional state of the entire process. Separating these two layers is the starting point for orchestration reliability.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>DAG and state machines express different control structures<span class="dd-badge eng">Model</span></h2>
+<div class="dd-agent-response"><p>The orchestration skeleton is not a single graph; rather, it selects different representations based on the control structure of the process. A review process with a conditional loop—for example, 'if the document fails, send it back to supplement materials until the conditions are met before continuing'—if forcibly drawn as a directed acyclic graph (DAG), immediately becomes awkward: DAG edges can only go in one direction and cannot return to ancestor nodes, while 'return for re-review' is naturally a back edge, requiring nodes to be expanded into several copies to barely represent it. Choosing the wrong control model turns a clear process into a pile of copy-pasted pseudo-nodes.</p>
+<p>The inputs for choosing the control model are whether the process itself has cycles, whether it has waits, whether it receives asynchronous events, and whether there are paths unknown in advance. The output is one or a combination of the four types of structures: DAG, state machine, event-driven, or Agent subprocess.</p>
+<p>DAG excels at expressing acyclic dependencies, batch processing, and parallel fan-out: a batch of steps first runs independently to completion, then converges, making dependencies clear at a glance and naturally suited to parallel scheduling. Its limitation is that loops and waiting are cumbersome to express—any process that needs to 'go back to the previous step' or 'get stuck waiting for external conditions' will be forcibly flattened.</p>
+<p>State machines treat 'which state you are currently in and what event triggers what transition' as first-class concepts, so conditional branches, loops, timeouts, and human pauses can all be modeled directly; review returns, approval timeout escalations, and orders awaiting payment are all state transitions. The cost is that when the number of states and transitions grows large, the state diagram itself becomes complex and hard to read.</p>
+<p>Event-driven structures excel at cross-system asynchronous reactions: when an external system sends callbacks, messages, or webhooks, the corresponding handling is triggered. Their weakness is that order and duplication are harder to track—the order in which events arrive is not necessarily deterministic, and the same event may be delivered multiple times, requiring additional idempotency and deduplication mechanisms as a safety net.</p>
+<p>Agent subprocesses are suitable for local tasks whose paths are unknown in advance, letting the model decide on its own what to do next within a constrained scope. Their cost and termination are both uncertain: the model may explore for a long time, or may never converge, so they can only be placed in a clearly bounded local area and must have timeout and termination conditions.</p>
+<p>These four types of structures can be combined rather than mutually exclusive. In the same system, DAGs can be used to organize dependencies between large phases, state machines can be used to manage long-lived state flows such as orders, event-driven can be used to trigger external callbacks, and inside a certain node a constrained Agent can be called to handle local unknown judgments. The key to composition is to let each structure carry only the part of control it is best at, rather than squeezing all requirements into the same kind of graph. Forcing a conditional loop into a DAG loses exactly the clear expression of states—this is exactly the mistake to avoid first when selecting a model.</p></div>
+<table class="dd-table"><thead><tr><th>Model</th><th>Suitable for</th><th>Limitations</th></tr></thead><tbody><tr><td>DAG</td><td>Acyclic dependencies, batch processing, parallel fan-out</td><td>Loops/waits are cumbersome to express</td></tr><tr><td>State machine</td><td>Conditions, loops, timeouts, human pauses</td><td>Complex with many branches</td></tr><tr><td>Event-driven</td><td>Cross-system asynchronous reactions</td><td>Order and duplication are harder to track</td></tr><tr><td>Agent subprocess</td><td>Paths unknown in advance</td><td>Cost and termination are uncertain</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Complete example: invoice extraction—validation—approval—posting<span class="dd-badge eng">Case walkthrough</span></h2>
+<div class="dd-agent-response"><p>Putting the previously discussed principles into a real pipeline, the most intuitive example is invoice processing: from receiving a file to final posting, with probabilistic extraction, deterministic validation, potentially lengthy human approval, and a posting call that interacts with the external financial system in between. Each type of risk in this pipeline is assigned to the corresponding structure.</p>
+<p>The receiving stage uses the file hash as the workflow ID. When the same file is uploaded again with the same hash, it matches the existing workflow instance instead of opening a new one. Deduplication thus becomes deterministic key matching, and duplicate submissions do not create duplicate workflows.</p>
+<p>The extraction stage calls an LLM, asking it to output a versioned invoice schema—fields such as supplier, amount, tax amount, and date are constrained within a structured contract. When parsing fails, only the “extraction” activity is retried: the preceding receiving step has already settled, and the subsequent validation has not yet occurred, so the cost of retrying is limited to a single node. The free text output by the model is first converged here into a verifiable structure.</p>
+<p>The validation stage is completely deterministic code that checks whether the total amount adds up, whether the supplier is valid, and whether it forms a duplicate invoice with existing records. It does not rely on any probabilistic judgment, so any validation result can be recomputed at any time and yield the same answer.</p>
+<p>The approval stage routes high-amount invoices into a persistent human task. The approver may not respond for days, but this workflow instance does not occupy a worker process—it is saved in a waiting state and only wakes up when a human action or a timeout triggers it. The long wait is decoupled from the process lifecycle; it is a state machine, not an online call, that carries this part of the control.</p>
+<p>The posting stage calls the financial API and carries an idempotency key, invoice_id. Multiple calls with the same invoice_id produce only one posting effect on the financial system side. Thus, even if a call times out or a response is lost, retrying will not cause duplicate posting.</p>
+<p>The notification stage is sent only after the posting number is confirmed. If the notification itself fails, it can be retried independently, because the posting fact is already established and the notification is merely a replayable side effect.</p>
+<p>The key property of the entire pipeline is reflected in recovery: after a workflow restart, the persistent history is read and confirmed activities are not repeated. If the posting result is unknown—for example, the request was sent but no response was received—the correct approach is not to retry blindly, but first to query the financial system to confirm whether this invoice was actually posted, and then decide whether to retry or escalate to human investigation. Recovery means continuing from confirmed nodes, not directly re-executing unknown side effects.</p>
+<p>The inputs of this pipeline are the invoice file, the versioned schema, validation rules, and the approval and financial APIs; the outputs are a posting number or a paused state with a clear reason. Hash-based deduplication blocks duplicate submissions, extraction failure retries only that node, human approval waits persistently, and posting timeout first checks the status; each step's failure is confined within observable, recoverable boundaries.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>At-least-once execution means activities may be repeated<span class="dd-badge math">Execution semantics</span></h2>
+<div class="dd-agent-response"><p>Any “at-least-once execution” semantics implies a corollary: the same activity may be executed multiple times. To understand this, first see how the one-shot success rate of a long chain decreases with the number of steps.</p>
+<p>If three independent steps each have a one-shot success rate of 0.99, the one-shot success rate of the entire chain without retries is 0.99³ ≈ 97.03%; if the chain has ten steps, it drops to 0.99¹⁰ ≈ 90.44%. Each additional independent step makes the chain's success probability without retries the product of all step success rates. The more steps there are, the higher the probability that the chain as a whole fails. This is not because some step is not good enough; it is the inevitable result of multiplying probabilities.</p>
+<p>Retries are a direct way to improve the final success rate: if a step fails and you retry, the final probability of success is significantly higher than a single attempt. But the cost of retries is that the same activity may be executed multiple times—you may never know whether the first call actually took effect. Thus, while availability improves, the risk of duplicate execution is also created. To retry safely, side effects must be idempotent: executing the same business intent repeatedly produces only one business effect.</p>
+<p>The idempotency key K consists of three parts: workflow identifier, activity type, and logical attempt identifier, that is, K = workflowId ∥ activityType ∥ logicalAttempt. workflowId identifies a specific workflow instance, activityType identifies the kind of activity (for example, "posting to ledger" rather than "sending a notification"), and logicalAttempt identifies the same business intent — it remains the same when retrying the same intent and changes only when a new intent is attempted. The symbol ∥ denotes unambiguous concatenation encoding, not numeric addition. The key obtained by concatenating the three is stable and unique, and the business system uses it for deduplication.</p>
+<p>This clarifies the true meaning of "exactly once". It is usually a business effect, not a network transmission guarantee: the network layer may still deliver the same request multiple times, but as long as the receiver uses a unique key, a deduplication table, and state checks so that duplicate requests produce only one payment or one write, the business effect is exactly once.</p>
+<p>The input to this logic is the workflow ID, activity type, and logical attempt identifier; the output is a stable idempotency key and the guarantee that "duplicate requests produce only one business effect". Its boundaries must be clear: idempotency applies only to defined business keys; it does not mean the network transmits only once, nor can it fix incorrect business parameters — if the request itself carries the wrong amount or supplier, no matter how many retries or how thorough the deduplication, it will only cement the error. Idempotency solves the problem of "repeated execution of the same intent", not the problem of "the intent itself being wrong".</p></div>
+<div class="dd-formula" data-formula-id="workflow-idempotency-key" data-display="mathml"><math display="block" aria-label="幂等键 K 由流程标识、活动类型和逻辑尝试标识组成"><mi>K</mi><mo>=</mo><mi>workflowId</mi><mo>∥</mo><mi>activityType</mi><mo>∥</mo><mi>logicalAttempt</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Original diagram: Persistent history turns restarts into replaying decisions, not redoing side effects<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>After a process crashes, how does the orchestrator know which steps have completed, which are halfway, and which haven't started? The answer is that it does not rely on memory but on persistent history. What the history records is not what was said in the session, but every scheduling, start, completion, failure, timer, and approval event—these are facts and decisions, not intermediate artifacts of reasoning.</p>
+<p>The core role of persistent history is to turn “restart” into “replaying decisions,” rather than “redoing side effects.” During recovery, the orchestrator replays the control logic: it reads from history the state that has already occurred at each node, determines which edge to take next, which wait to wake, and which failure to retry or compensate. Activities that are already confirmed complete will not execute again, because their results have been written into history as facts. Activities that produce external side effects rely on idempotency keys and status queries to avoid redoing—retrying the same idempotency key causes the external system to recognize the effect only once; when the result is unknown, query first rather than blindly sending again.</p>
+<p>This mechanism can be understood as a causal chain. The input is the events accumulated in persistent history: when an activity was scheduled, started, completed, failed, and when a human approval arrived or timed out. During recovery, the orchestrator reads these recorded results, reconstructs control decisions, and outputs replayable control flow. Business activities themselves carry idempotency keys and initiate status queries for uncertain external results, thereby ensuring that “replaying decisions” does not degenerate into “redoing side effects.”</p>
+<p>This structure has a boundary that must be clearly drawn: history proves that the system recorded an event, but it does not automatically prove that the facts in external systems are true. The history may say “the posting call has been sent,” but that does not mean the finance system actually posted successfully; if the result is unknown, you still need to query the external system or escalate to human handling. Persistent history provides a reliable local sequence of facts and decisions, building recovery determinism on “what was recorded,” while the truth of the outside world must still be confirmed separately through idempotency and querying.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 735 325" role="img" aria-label="Workflow orchestrator writes decisions to persistent history and schedules idempotent activities; failure retries, compensation, and human waits all recover from history."><defs><marker id="wf28" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="105" width="140" height="100" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="90" y="134" text-anchor="middle" class="svg-t">Orchestrator</text><text x="90" y="159" text-anchor="middle" class="svg-t" font-size="11">Dependencies · Branches · Timeouts</text><text x="90" y="182" text-anchor="middle" class="svg-t" font-size="11">Makes only deterministic decisions</text><path d="M160,155 L210,155" stroke="#788293" marker-end="url(#wf28)"/><rect x="215" y="75" width="160" height="160" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="295" y="105" text-anchor="middle" class="svg-t">Persistent event history</text><text x="295" y="132" text-anchor="middle" class="svg-t" font-size="11">Scheduled / Started</text><text x="295" y="155" text-anchor="middle" class="svg-t" font-size="11">Completed / Failed</text><text x="295" y="178" text-anchor="middle" class="svg-t" font-size="11">Timer / Approval</text><text x="295" y="207" text-anchor="middle" class="svg-t">Replay decisions after restart</text><path d="M375,125 L430,70" stroke="#788293" marker-end="url(#wf28)"/><path d="M375,155 L430,155" stroke="#788293" marker-end="url(#wf28)"/><path d="M375,185 L430,240" stroke="#788293" marker-end="url(#wf28)"/><rect x="435" y="35" width="140" height="70" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="505" y="62" text-anchor="middle" class="svg-t">LLM activity</text><text x="505" y="84" text-anchor="middle" class="svg-t" font-size="11">schema output · retryable</text><rect x="435" y="120" width="140" height="70" rx="9" fill="#21252d" stroke="#72b293"/><text x="505" y="147" text-anchor="middle" class="svg-t">Business side effect</text><text x="505" y="169" text-anchor="middle" class="svg-t" font-size="11">Idempotency key · status query</text><rect x="435" y="205" width="140" height="70" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="505" y="232" text-anchor="middle" class="svg-t">Human / external events</text><text x="505" y="254" text-anchor="middle" class="svg-t" font-size="11">Persistent wait · SLA</text><path d="M575,70 L625,70" stroke="#788293" marker-end="url(#wf28)"/><path d="M575,155 L625,155" stroke="#788293" marker-end="url(#wf28)"/><path d="M575,240 L625,240" stroke="#788293" marker-end="url(#wf28)"/><rect x="630" y="72" width="87" height="166" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="673" y="105" text-anchor="middle" class="svg-t">Result</text><text x="673" y="132" text-anchor="middle" class="svg-t" font-size="11">Completed</text><text x="673" y="155" text-anchor="middle" class="svg-t" font-size="11">Retry</text><text x="673" y="178" text-anchor="middle" class="svg-t" font-size="11">Compensation</text><text x="673" y="201" text-anchor="middle" class="svg-t" font-size="11">Escalation</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　History records facts and decisions; recovery replays control logic, and external side effects are avoided through idempotency and querying.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Retries are only suitable for transient failures, and must have boundaries<span class="dd-badge eng">Error Handling</span></h2>
+<div class="dd-agent-response"><p>Retries are a means to improve availability, but they are effective for only one class of failure: transient failures. When a Large Language Model (LLM) continuously outputs invalid fields, exponential backoff cannot solve the problem—that is not network jitter, but rather the output itself not matching the schema. Applying retries to the wrong failure type only causes the same bad result to be repeatedly produced and discarded.</p>
+<p>The boundary between transient and permanent failures is drawn by error type. Network timeouts, rate limiting, and brief unavailability are transient errors that can be retried: the problem usually disappears on its own within a short time, and retries have a genuine chance of success. Schema incompatibility, permission denial, and business validation failures are permanent errors; retries will not make them better. What is needed is to fix data, perform a migration, or transfer to manual handling. The criterion is whether this failure might disappear automatically on the next attempt. Only failures that can disappear are worth retrying.</p>
+<p>Even when the failure type is suitable for retries, boundaries must be set. The maximum number of attempts, exponential backoff, and jitter together form a bounded policy: after each failure, the wait time grows exponentially, and random jitter is added to prevent many clients from retrying at the same moment; once the attempt count reaches the limit, the task enters a dead-letter queue or a manual queue rather than retrying indefinitely. The purpose of this boundary is to prevent retry storms from amplifying downstream failures—when the downstream is already overloaded, unrestrained retries only push more requests into it, turning a local failure into a full-scale avalanche.</p>
+<p>Each retry must also keep the same logical activity ID and a different physical attempt number. The logical activity ID represents the same business intent and is used for deduplication; the physical attempt number distinguishes which specific physical execution it is and is used for diagnostics. Only by separating the two can you ensure that duplicate requests take effect only once in the business sense while precisely tracking which physical execution had a problem.</p>
+<p>The inputs to a retry policy are the error type, the number of attempts already made, the backoff parameters, and the maximum time limit; the output is one of four dispositions: retry, enter dead-letter, transfer to manual handling, or stop. Network timeouts and rate limiting can have bounded retries; schema, permission, and business rule errors must be fixed. Exponential backoff cannot turn permanent errors into transient errors, nor can it allow retry storms to run unchecked—it only gives transient failures a finite and polite waiting rhythm.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Cross-system transactions rely on compensation, not pretending to be atomic commits<span class="dd-badge eng">Saga</span></h2>
+<div class="dd-agent-response"><p>A process spanning multiple external systems cannot be like a single-database transaction: 'either all succeed or all roll back.' If a hotel has already been booked but the subsequent payment fails, the workflow cannot pretend nothing happened—there is already a real booking in the hotel system. Long-running processes cannot lock multiple external systems for a long time waiting for an atomic commit, so cross-system consistency must be restored through compensation rather than database-style rollback.</p>
+<p>The mechanism of compensation is: for each successful side effect that has already occurred, predefine a corresponding inverse action. The inverse of booking is canceling the booking; the inverse of occupying inventory is returning the inventory; the inverse of creating a draft is revoking the draft. When a later step fails, the workflow executes these inverse actions in order, using new business actions to pull the system back to a consistent state. Compensation itself is also an ordinary external call, so it can also fail—therefore compensation also needs idempotency, retries, and human escalation as a fallback. If a request to cancel a booking times out, you cannot assume the cancellation definitely succeeded; you must be able to resend it safely, and if necessary transfer to manual processing.</p>
+<p>Here there is an unavoidable boundary: not all actions are reversible. An email that has already been sent cannot be taken back; you can only append a correction notice. Therefore, during design, you should first minimize irreversible steps and, as much as possible, place them later in the process—the later an irreversible action is executed, the fewer things actually need to be reversed when an earlier failure occurs, and the shorter and more reliable the compensation chain becomes.</p>
+<p>This leads to a point that beginners most easily confuse: a workflow 'final completion' is not equivalent to database-style all-or-nothing. A process may stop in a state of partial completion, unknown side-effect outcome, or compensation failure; these states must be explicitly defined and included in a recoverable model, rather than pretending they do not exist.</p>
+<p>The inputs of the compensation mechanism are completed side effects, subsequent failures, and the inverse actions predefined for each side effect; the output is one of three states: partial recovery, compensation failure, or requiring human escalation. It uses new business actions to restore cross-system consistency, not database atomic rollback; compensation itself can fail, and some actions are irreversible, so irreversible steps should be minimized and placed later. Only by thinking through these constraints can you maintain truly usable consistency in real-world cross-system processes.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Version migration must protect running old instances<span class="dd-badge eng">Evolution</span></h2>
+<div class="dd-agent-response"><p>The most insidious damage from deploying new code occurs in those old instances that were started long ago and are still running. Suppose the new version deletes a state in the workflow definition, and a workflow instance started yesterday is still waiting in that state. When it resumes or replays, the new code cannot find that state, so replay fails or takes the wrong branch. The core problem that version migration must solve is to allow running old instances to continue safely under the new code.</p>
+<p>The approach has two layers. First, version both the workflow definition and activity schemas. Old instances either continue using compatible branches or undergo explicit migration to convert old states into new states—migration is an explicit, auditable state transition, not an implicit assumption in the new code that “the old state does not exist.” Second, deterministic replay requires that the same history produce the same control decisions. This means current time, random numbers, and results of external queries cannot directly participate in orchestration logic: if replay re-fetches the current time, yesterday’s and today’s decisions will differ; if replay re-calls an external query, returning a different value will lead the workflow down another path. These non-deterministic values should be written into history as activity results, so that replay reads the values that were fixed at the time rather than values generated on the spot.</p>
+<p>Combining these two points makes replay truly reproducible: given the same persistent history, the orchestration logic produces the same set of control decisions whenever it replays. Sources of nondeterminism are isolated into the history record, while the orchestration logic itself remains purely deterministic.</p>
+<p>Before release, also replay the new code against snapshots of production history: run the new version over histories that actually ran, observe whether control decisions match the old version, and catch incompatibilities during the canary phase instead of discovering only when production instances resume that the migration does not hold.</p>
+<p>The inputs to version migration are the history of running instances, the workflow code, and the activity schema versions; the outputs are compatible branches or states after explicit migration. Historical snapshot replay can significantly reduce the risk of incompatibility, but it has a clear boundary: it cannot prove that all future external responses are compatible. Snapshots can only cover histories that have already occurred and cannot enumerate every result external systems may return in the future. Deterministic replay guarantees “consistent decisions for recorded history,” while responses from the future external world must still be handled at runtime through idempotency, queries, and compensation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Human tasks are persistent state that can time out and be escalated<span class="dd-badge eng">Human-in-the-loop</span></h2>
+<div class="dd-agent-response"><p>Human approval may wait three days or even longer. This wait cannot be implemented by "leaving the process hanging"; otherwise a deployment, a restart, or a scale-out will drop the waiting tasks. It also cannot hang indefinitely, otherwise the workflow will be permanently stuck. Human tasks must be modeled as persistent state that can time out and be escalated.</p>
+<p>An approval node stores not just a "to-do" marker, but a complete set of fields: owner, qualification, evidence, SLA, reminders, and escalation path. Owner and qualification determine who the task should be assigned to and who is authorized to process it; evidence is the material the approver needs to make a judgment; SLA and reminders define when the task should be chased; the escalation path specifies who it is handed to after timeout and what process to follow. All of this information is persisted together, so the worker process can release resources after issuing the human request—it does not need to retain any memory or thread for this wait.</p>
+<p>When an external approval event arrives, it carries a task token. The orchestrator uses this token to wake the corresponding workflow instance from persistent state and continue executing subsequent nodes. The wait is thus completely decoupled from the process lifecycle: the process can crash, restart, or scale out, and as long as the persistent state and task token remain, the workflow will not be lost.</p>
+<p>Timeout is a path that must be explicitly handled in this design. Timeout can be escalated to a higher-level owner, can be rejected, can be canceled, but must never silently auto-approve—auto-approval amounts to secretly bypassing the intent of the human gate. Review results and reasons must enter history, ensuring that afterwards it is possible to audit "who made what decision, when, and on what grounds." Sensitive feedback is handled according to retention policy; just because it entered history does not mean all of its content is retained forever.</p>
+<p>The inputs to a human task are owner, qualification, evidence, SLA, reminders, and escalation path; the output is one of four events: approve, reject, escalate on timeout, or cancel. Its two boundaries must both be maintained: persisting the wait does not mean the approval can hang indefinitely; timeout cannot silently auto-approve; sensitive reasons remain subject to retention policy. Persistence solves "not losing" the task; timeout and escalation solve "not getting stuck"; both are indispensable.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Evaluation must inject crashes, duplicates, and non-deterministic results<span class="dd-badge eng">Verification</span></h2>
+<div class="dd-agent-response"><p>A single ideal path that runs from start to finish does not mean the system can go live. An ideal path only verifies that “it works when there is no failure,” but the value of an orchestration system emerges precisely when failures occur: can it recover after a crash, will duplicate delivery produce duplicate side effects, and what to do when compensation fails. Evaluation must actively inject these anomalies to prove that reliability is not luck.</p>
+<p>The metrics in an evaluation report should be end-to-end success, node failures and retries, duplicate side effects, compensation success, unknown states, queue backlog, wait and execution times, cost per successful task, and human SLA. Together these metrics answer not just “can the process complete,” but also “where are failures contained, where does recovery continue from, and whether resources are out of control.”</p>
+<p>The fault injection checklist corresponds to the mechanisms discussed in each preceding chapter: response loss after an activity completes, verifying whether external calls such as posting validation correctly query rather than blindly redo when the result is unknown; orchestrator restart, verifying whether persistent history allows recovery to continue from the correct node; duplicate external callbacks, verifying whether idempotent deduplication actually blocks duplicate side effects; old schema, verifying the compatibility of version migration for in-flight instances; compensation failure, verifying whether the human escalation path can handle it; queue full, verifying whether backpressure and boundaries stop a retry storm.</p>
+<p>The means of verification is to inspect the event history. By comparing event sequences, confirm that recovery indeed continues from the correct node, rather than redoing activities that have already completed. Event history is the most direct source of evidence in this evaluation; it records what the system actually did, not what the design intent claims it would do.</p>
+<p>Evaluation can also be used to compare architectural choices: place the “deterministic backbone plus LLM node” approach and the all-Agent approach under the same set of faults and compare quality, cost, and diagnosability. The advantage of a deterministic backbone is that it is replayable and locatable, while an all-Agent approach, under failures, is often harder to explain where it stopped and why it did not continue.</p>
+<p>The inputs to a recovery evaluation are an ideal task and a set of faults—crash, packet loss, duplicate callbacks, old schema, compensation failure, and queue full; the outputs are observed values such as end-to-end success, duplicate side effects, compensation result, backlog, SLA, and recovery node. Be clear about its boundaries: passing one ideal path does not mean it is ready for production, and fault injection can only cover scenarios that have already been designed. It proves the system's resilience to known fault categories; it cannot guarantee that the same holds for new faults never imagined.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>The results of probabilistic activities must be recorded in history, not regenerated during replay.<span class="dd-badge eng">Deterministic replay</span></h2>
+<div class="dd-agent-response"><p>When restoring a workflow, calling the same model again may lead to a different branch. The reason is that the model call itself is nondeterministic: model version, temperature parameter, server-side version, and sampling randomness can all cause the same input to produce different outputs. If, during replay, it is regenerated once, the new output may differ from the output recorded in history, so the workflow will proceed along a path different from the previous one. Deterministic replay therefore fails at a Large Language Model (LLM) node—not because the orchestration logic is nondeterministic, but because the probabilistic result it depends on has been resampled.</p>
+<p>The solution is to have the results of probabilistic activities go into history, rather than regenerating them during replay. After the first call completes, the orchestrator writes the input version, model version, output, and validation result together into persistent history. When replaying the control logic, it reads these recorded results and does not call the model again. Thus, “which branch was taken last time” is determined by history, not by a new round of random sampling; the same history necessarily yields the same control branch.</p>
+<p>Only explicitly initiated new attempts produce new activity events. By an explicit new attempt, we mean that the workflow explicitly decides to “try again with new parameters or new inputs,” rather than unintentionally regenerating during replay. A new attempt produces a new result, while the old result remains for audit comparison—history shows what each attempt took as input and what it obtained.</p>
+<p>For cacheable read-only activities, content hashing can be used to avoid repeated computation. But the cache key must include four types of elements: prompt, model, tool, and data version. If any one is missing, the cache will disguise stale answers as determinism: when the prompt changes, the model is upgraded, tool behavior changes, or data has been updated, the old cached answer still hits, and the workflow proceeds on an old fact that no longer holds. The value of caching is to save repeated read-only computation, not to erase the impact of input changes.</p>
+<p>The inputs for replaying a probabilistic activity are the recorded model input version, model version, output, and validation result; the output is the same control branch under the same history. During recovery, read the old result rather than generating it again; only explicit new attempts create new events. Content-hash caching must also include prompt, model, tool, and data version in the key. By settling probabilistic results into historical facts, the deterministic skeleton can still hold in workflows that include model calls.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>String the previously scattered mechanisms into a causal chain, and you can see how this concept starts from an original problem and ends up as verifiable engineering practice.</p>
+<p>The starting point is to model tasks as dependencies and state transitions. This step determines whether the workflow is a DAG, a state machine, event-driven, or local Agent subprocesses, and also determines which component carries loops, waiting, and unknown paths. With a clear control structure in place, next define versioned input and output schemas for each node, so that the model's free-form text is converted into verifiable, migratable structures.</p>
+<p>After the structure is fixed, annotate every side effect and equip it with an idempotency key and compensating action. Posting has an idempotency key, reservations have a cancellation action, and irreversible steps like email are minimized and deferred. This way, repeated execution produces only one business effect, and cross-system failures can be brought back to consistency with new business actions rather than pretending to be atomic rollback.</p>
+<p>During execution, the orchestrator durably records every decision—scheduling, start, completion, failure, timing, and approval events are all recorded in history. Workers are responsible for executing specific LLM or business activities: the results of probabilistic activities are written back to history, and during replay old results are read rather than regenerated. On failure, handle based on error type: transient errors get bounded retries, permanent errors are fixed or escalated, and those exceeding thresholds go to a dead-letter or manual queue. Human and external events are modeled as durable waits, resumed with task tokens after events arrive, not occupying worker processes nor hanging indefinitely.</p>
+<p>Finally, there is the verification stage: fault recovery, history replay, and version migration. By injecting crashes, packet loss, duplicate callbacks, old schemas, compensation failures, and queue saturation, inspect the event history and confirm that recovery indeed continues from the correct node, and that new code replaying old history yields consistent decisions. The entire chain is thus closed—from the graphical representation of tasks, to schemas and idempotency, to durable history and replay, to repeatable failure evaluation, each link builds on the previous one, and together they answer the same question: how to reliably support probabilistic models with durable state and deterministic control.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://www.omg.org/spec/BPMN/2.0/" target="_blank" rel="noopener">BPMN 2.0</a>: Business process modeling standard</li><li><a href="https://docs.temporal.io/temporal" target="_blank" rel="noopener">Temporal Durable Execution</a>: Event history and durable execution concepts</li><li><a href="https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf" target="_blank" rel="noopener">Saga Pattern</a>: Long-lived transactions and compensation</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/workflow-orchestration">Explore connections on the map</a><a href="/zh/concepts/workflow-orchestration/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

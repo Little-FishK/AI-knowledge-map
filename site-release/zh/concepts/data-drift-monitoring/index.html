@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>数据漂移与持续监控：分布变化何时真的伤害系统 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>数据漂移与持续监控是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/data-drift-monitoring/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="数据漂移与持续监控：分布变化何时真的伤害系统">
+<meta property="og:title" content="数据漂移与持续监控是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="数据漂移与持续监控：分布变化何时真的伤害系统">
+<meta name="twitter:title" content="数据漂移与持续监控是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/#page","name":"数据漂移与持续监控：分布变化何时真的伤害系统","description":"从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。","url":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"数据漂移与持续监控：分布变化何时真的伤害系统","item":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/#page","name":"数据漂移与持续监控是什么？原理通俗讲解 | AI 知识地图","description":"从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。","url":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"数据漂移与持续监控：分布变化何时真的伤害系统","item":"https://ai-knowledge-map.com/zh/concepts/data-drift-monitoring/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">数据漂移与持续监控：分布变化何时真的伤害系统</span></li></ol></nav><article id="dd-article" data-concept-id="data-drift-monitoring">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">数据漂移与持续监控：分布变化何时真的伤害系统</span></li></ol></nav><article id="dd-article" data-concept-id="data-drift-monitoring" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">数据漂移与持续监控：分布变化何时真的伤害系统</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从 P(x)、P(y) 与 P(y|x)，到 PSI、延迟标签、代理指标、切片告警和安全响应。</p>
 
@@ -152,7 +154,7 @@
 <p>这条链的每一环都在约束上一环的结论：基线给比较以参照，切片给总体以分辨率，埋点验证给信号以可信度，成熟标签给代理以证据。缺任何一环，剩下的都只是没有因果依据的告警。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1810.11953" target="_blank" rel="noopener">Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift</a>：无标签数据集漂移检测</li><li><a href="https://arxiv.org/abs/2004.05785" target="_blank" rel="noopener">Learning under Concept Drift: A Review</a>：概念漂移定义与方法</li><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>：反馈环与监控债务</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>：部署监测、测量与响应</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/data-drift-monitoring">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/data-drift-monitoring">在地图中查看概念关系</a><a href="/en/concepts/data-drift-monitoring/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

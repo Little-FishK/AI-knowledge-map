@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Quantization: Compressing Continuous Parameters onto a Finite Lattice? Explained Simply</title>
+<meta name="description" content="From scale, zero-point, and rounding error, to granularity, outliers, PTQ/QAT, weights/activations/KV, and hardware kernels.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/quantization/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/quantization/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/quantization/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Quantization: Compressing Continuous Parameters onto a Finite Lattice? Explained Simply">
+<meta property="og:description" content="From scale, zero-point, and rounding error, to granularity, outliers, PTQ/QAT, weights/activations/KV, and hardware kernels.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/quantization/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Quantization: Compressing Continuous Parameters onto a Finite Lattice? Explained Simply">
+<meta name="twitter:description" content="From scale, zero-point, and rounding error, to granularity, outliers, PTQ/QAT, weights/activations/KV, and hardware kernels.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/quantization/#page","name":"What Is Quantization: Compressing Continuous Parameters onto a Finite Lattice? Explained Simply","description":"From scale, zero-point, and rounding error, to granularity, outliers, PTQ/QAT, weights/activations/KV, and hardware kernels.","url":"https://ai-knowledge-map.com/en/concepts/quantization/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Quantization: Compressing Continuous Parameters onto a Finite Lattice","item":"https://ai-knowledge-map.com/en/concepts/quantization/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Quantization: Compressing Continuous Parameters onto a Finite Lattice</span></li></ol></nav><article id="dd-article" data-concept-id="quantization" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Quantization: Compressing Continuous Parameters onto a Finite Lattice</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From scale, zero-point, and rounding error, to granularity, outliers, PTQ/QAT, weights/activations/KV, and hardware kernels.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Quantization maps floating-point numbers to a finite integer lattice, exchanging approximation error for storage, bandwidth, and compute gains. Bit width is only a label; the real outcome is jointly determined by range selection, quantization granularity, outliers, calibration data, compute precision, and hardware kernels.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Manually calculate linear quantization and error; distinguish symmetric/asymmetric and quantization granularity; understand PTQ/QAT and outlier handling; jointly evaluate quality, GPU memory, and latency.</div>
+<ol class="dd-chain"><li>Determine what to quantize and the target hardware.</li><li>Use representative data to select range/granularity.</li><li>Generate candidates with PTQ or QAT.</li><li>Check errors and key logit flips.</li><li>Measure GPU memory, latency, and throughput under the target workload.</li><li>Jointly gate on quality risk and cost per successful task.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why finite bit width loses information<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The problem that quantization aims to solve is straightforward: weights, activations, and KV cache in models are all stored as floating-point numbers, each number often taking up as many as 32 bits or even 16 bits, and there are a great many such numbers, so bandwidth and memory are fully occupied by them during inference. What quantization does is to map values that can originally take a large number of continuous decimals onto a finite number of discrete grid points, replacing floating-point numbers with shorter integer encodings.</p>
+<p>Information loss first comes from the number of grid points itself. Taking INT4 as an example, each encoding uses only 4 bits, so there are only 2⁴ = 16 encodings in total. Which 16 integers these 16 encodings correspond to—whether −8 to 7, −7 to 7, or some other range—depends on the signedness convention and whether special values are reserved; you cannot infer the value range just by seeing the three characters &quot;INT4&quot;. But no matter how it is agreed, using 16 grid points to carry an originally continuous interval inevitably produces two types of errors: continuous values that fall near the same grid point within the interval become indistinguishable from each other, which is rounding error; values outside the interval are truncated to the boundary grid point, which is saturation error.</p>
+<p>Here you can see the causal chain between bit width and error: lower bit width reduces the number of bytes the model reads each time, thereby saving bandwidth and memory; the cost is fewer grid points and coarser spacing, so rounding or saturation error increases accordingly. The input to the entire process is weights, activations, or KV cache in floating-point form, and the output contains three things: the integer encodings themselves, the scale metadata used to recover the values, and the approximated values recovered during computation—what the model actually uses in computation is the approximated values, not the original floating-point numbers.</p>
+<p>Therefore quantization is not &quot;lossless decompression after compressing a file.&quot; Throughout inference, approximate weights or approximate activations are used, and errors propagate layer by layer through the network. Fortunately, neural networks have redundancy, and with appropriate scales, many tasks can tolerate these errors; but the errors do not distribute evenly, and values on critical decision boundaries may still be pushed to the wrong grid points, causing some individual outputs to flip.</p>
+<p>Finally, it is necessary to ask clearly what is being quantized, because the consequences of loss are completely different for different objects: weight quantization saves model bandwidth, activation quantization affects the numerical flow of intermediate operators, and KV quantization determines the capacity limit for long contexts. Each of the three has its own trade-offs, and they cannot be generalized with the single word &quot;INT4&quot;.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Scale and Zero-Point in Linear Quantization<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>Mapping floating-point values to integers must answer a specific question: How is a continuous floating-point range put into one-to-one correspondence with a finite set of integer grid points? The correspondence given by linear quantization is completely determined by two parameters: the scale s and the zero-point z. Given the integer bit width, the available integers are restricted to between q_min and q_max; for example, an 8-bit signed integer corresponds to −128 through 127. Quantization first performs a linear transform, then rounds, and finally clips:</p>
+<p>q = clip(round(x ÷ s) + z, q_min, q_max)</p>
+<p>Dequantization uses the same set of parameters to convert integers back to floating-point approximations:</p>
+<p>x̂ = s × (q − z)</p>
+<p>In the formula, each symbol has a clear responsibility. x is the original floating-point value; s is the floating-point step size between adjacent integer grid points, meaning that whenever the quantization code changes by 1, the dequantized result changes by s; round takes x ÷ s to the nearest integer; z is the zero-point, specifying which integer grid point corresponds exactly to floating-point zero, and its role is to shift the integer axis to a position aligned with the floating-point distribution; clip limits out-of-range intermediate results to between q_min and q_max. The final code is q, and the dequantized x̂ is usually no longer exactly equal to x; the difference between the two is the quantization error introduced in this step.</p>
+<p>The division of labor between the two parameters can be understood as follows: s determines the grid-point spacing, that is, the resolution; z determines the shifted position of the grid-point axis, that is, which integer the floating-point zero falls on. Together they determine how many grid points a floating-point range is cut into and how large a floating-point interval each grid point represents. Therefore, the output error should be explained as the result of jointly choosing the range and the step size, not solely determined by the bit width: with the same bit width, if the range is chosen narrow and the step size fine, the error for the bulk of the data is small; if the range is chosen wide and the step size coarse, more values can be covered, but the error for each value becomes correspondingly larger.</p>
+<p>Depending on whether z is zero, linear quantization is divided into symmetric and asymmetric types.</p>
+<p>Symmetric quantization sets z = 0; the integer range is symmetric around zero, and floating-point zero is encoded as zero. The advantage is that the zero-point is simple and multiply-add operations are efficient, and dequantization does not require an additional zero-point correction. The cost is that when the data distribution as a whole deviates from zero, grid points on one side are barely used, the effective range is wasted, and at the same bit width the step size is forced to become larger.</p>
+<p>Asymmetric quantization places q_min and q_max according to the data's actual min and max; z is usually nonzero, so it can completely cover a shifted distribution. The advantage is that it fits arbitrary min/max and has high range utilization. The cost is that zero-point correction is more complex, and operations must additionally handle the shift introduced by z.</p>
+<p>There is another fork in range selection: when the data has extreme values far from the main body, whether to let the quantization range cover them.</p>
+<p>Truncate extremes: q_min and q_max only cover the main body of the data, and a small number of outliers that exceed them are clipped to the boundary and become saturated. The advantage is that the main grid points are finer and the step size is smaller, so the error for most data is lower. The cost is that outliers are forcibly saturated, and the information they carry is lost.</p>
+<p>Cover all extremes: the range extends from the minimum value all the way to the maximum value. The advantage is that nothing is truncated, and every value has a corresponding code. The cost is that the extremes enlarge the range and coarsen the step size, making quantization of the main data rough.</p>
+<p>These two choices together determine a set of s and z parameters. With a fixed bit width, the larger the range, the coarser the step size and the greater the main-body error; the smaller the range, the finer the step size and the more values that fall into the saturation region. Whether the zero-point is zero determines the complexity of the kernel. Looking at a quantization table is essentially looking at which range and step size it has chosen, and using that to anticipate how the error will be distributed.</p></div>
+<table class="dd-table"><thead><tr><th>Choice</th><th>Advantage</th><th>Cost</th></tr></thead><tbody><tr><td>Symmetric</td><td>Simple zero-point, efficient multiply-add</td><td>Shifted distribution wastes range</td></tr><tr><td>Asymmetric</td><td>Fits arbitrary min/max</td><td>Zero-point correction is more complex</td></tr><tr><td>Truncate extremes</td><td>Finer main grid points</td><td>Outliers saturate</td></tr><tr><td>Cover all extremes</td><td>No truncation</td><td>Coarse main quantization</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="quantization-linear-map" data-display="mathml"><math display="block" aria-label="整数编码 q 等于浮点值 x 除以尺度 s 后舍入，加零点 z，再截断到整数上下限；反量化值 x hat 等于 s 乘 q 减 z"><mtable><mtr><mtd><mi>q</mi><mo>=</mo><mi>clip</mi><mo>(</mo><mi>round</mi><mo>(</mo><mfrac><mi>x</mi><mi>s</mi></mfrac><mo>)</mo><mo>+</mo><mi>z</mi><mo>,</mo><msub><mi>q</mi><mtext>min</mtext></msub><mo>,</mo><msub><mi>q</mi><mtext>max</mtext></msub><mo>)</mo></mtd></mtr><mtr><mtd><mover><mi>x</mi><mo>^</mo></mover><mo>=</mo><mi>s</mi><mo>(</mo><mi>q</mi><mo>−</mo><mi>z</mi><mo>)</mo></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Worked example: how four numbers land on INT3 grid points<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>To see how much error symmetric INT3 quantization actually introduces, it is most intuitive to go through a specific set of numbers. Assume the integer grid points are 3-bit signed values in the range −4…3, and the maximum absolute value of the floating-point weights is 1.2. To make the grid cover 1.2, use the largest positive grid point 3 to represent it, so the scale is s = 1.2 ÷ 3 = 0.4, meaning adjacent integers differ by 0.4 in floating-point value. Now quantize and then dequantize the four weights in turn:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">x</th><th class="dd-align-left">round(x ÷ 0.4)</th><th class="dd-align-left">q</th><th class="dd-align-left">x̂ = 0.4 × q</th><th class="dd-align-left">|error|</th></tr></thead><tbody><tr><td class="dd-align-left">−1.10</td><td class="dd-align-left">−3</td><td class="dd-align-left">−3</td><td class="dd-align-left">−1.20</td><td class="dd-align-left">0.10</td></tr><tr><td class="dd-align-left">−0.35</td><td class="dd-align-left">−1</td><td class="dd-align-left">−1</td><td class="dd-align-left">−0.40</td><td class="dd-align-left">0.05</td></tr><tr><td class="dd-align-left">0.31</td><td class="dd-align-left">1</td><td class="dd-align-left">1</td><td class="dd-align-left">0.40</td><td class="dd-align-left">0.09</td></tr><tr><td class="dd-align-left">1.25</td><td class="dd-align-left">3</td><td class="dd-align-left">3</td><td class="dd-align-left">1.20</td><td class="dd-align-left">0.05 (clipped)</td></tr></tbody></table></div>
+<p>Each column's operation corresponds to one step in the formula. Take −1.10 as an example: first divide by the scale, −1.10 ÷ 0.4 = −2.75; round to the nearest integer gives −3, which is the quantized code q; dequantization multiplies back by the scale, x̂ = 0.4 × (−3) = −1.20; the absolute error from the original value is 0.10. −0.35 and 0.31 likewise are just small rounding errors, at 0.05 and 0.09 respectively. As long as values are within the grid-point coverage range, the error is at most half a step size, i.e. 0.2.</p>
+<p>1.25 is the exception. 1.25 ÷ 0.4 = 3.125, rounding would give 3, and 3 is already the largest grid point in the positive direction: x̂ = 1.20, which is 0.05 smaller than the original value. This 0.05 may look smaller than the error for −1.10, but it comes from clipping—1.25 exceeds the upper bound 1.2 and is saturated to the boundary, so the excess information is lost; no matter how large it is, it will be squeezed onto the same grid point.</p>
+<p>If you do not want to clip and want 3 to represent exactly 1.25, the scale must be adjusted to s = 1.25 ÷ 3 ≈ 0.4167. The cost is that all grid points become coarser: −1.10 dequantizes to about −1.25, and its error rises from 0.10 to 0.15; 0.31 dequantizes to about 0.4167, and its error rises from 0.09 to about 0.11. The loss of main-body precision from covering the extreme value is greater than the cost of clipping a single outlier.</p>
+<p>This four-number example shows the essence of real calibration: the range and scale are a choice between bulk error and extreme-value clipping. If you clip the extreme value, the main-body grid points are fine and most errors are small, at the cost of saturating outliers; if you cover the extreme value, the outlier is preserved, at the cost of making every grid point coarser and raising the overall main-body error. The magnitude of the error is ultimately determined by this set of choices, not by “how many bits are used” alone.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 250" role="img" aria-label="Four floating-point weights mapped to the symmetric INT3 grid and dequantized"><line x1="60" y1="125" x2="650" y2="125" stroke="#6b7484" stroke-width="2"/><g fill="#6b8cbe" class="svg-t" font-size="10"><circle cx="80" cy="125" r="5"/><text x="80" y="150" text-anchor="middle">−1.6</text><circle cx="160" cy="125" r="5"/><text x="160" y="150" text-anchor="middle">−1.2</text><circle cx="240" cy="125" r="5"/><text x="240" y="150" text-anchor="middle">−0.8</text><circle cx="320" cy="125" r="5"/><text x="320" y="150" text-anchor="middle">−0.4</text><circle cx="400" cy="125" r="5"/><text x="400" y="150" text-anchor="middle">0</text><circle cx="480" cy="125" r="5"/><text x="480" y="150" text-anchor="middle">0.4</text><circle cx="560" cy="125" r="5"/><text x="560" y="150" text-anchor="middle">0.8</text><circle cx="640" cy="125" r="5"/><text x="640" y="150" text-anchor="middle">1.2</text></g><circle cx="180" cy="90" r="7" fill="#d3a05a"/><text x="180" y="75" text-anchor="middle" class="svg-t" font-size="11">x=−1.1→q=−3→−1.2</text><path d="M180,96 L160,119" stroke="#d3a05a"/><circle cx="310" cy="62" r="7" fill="#4f9d78"/><text x="310" y="47" text-anchor="middle" class="svg-t" font-size="11">x=−.35→q=−1→−.4</text><path d="M310,68 L320,119" stroke="#4f9d78"/><circle cx="462" cy="90" r="7" fill="#4f9d78"/><text x="462" y="75" text-anchor="middle" class="svg-t" font-size="11">x=.31→q=1→.4</text><path d="M462,96 L480,119" stroke="#4f9d78"/><circle cx="665" cy="62" r="7" fill="#c77b72"/><text x="595" y="47" text-anchor="middle" class="svg-t" font-size="11">x=1.25→clip q=3→1.2</text><path d="M665,68 L640,119" stroke="#c77b72"/></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　s=1.2/3=0.4; rounding causes small errors, and 1.25 outside the range is clipped.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>x</th><th>round(x/.4)</th><th>q</th><th>x̂=.4q</th><th>|error|</th></tr></thead><tbody><tr><td>−1.10</td><td>−3</td><td>−3</td><td>−1.20</td><td>.10</td></tr><tr><td>−.35</td><td>−1</td><td>−1</td><td>−.40</td><td>.05</td></tr><tr><td>.31</td><td>1</td><td>1</td><td>.40</td><td>.09</td></tr><tr><td>1.25</td><td>3</td><td>3</td><td>1.20</td><td>.05 (clipped)</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Finer granularity lowers error but complicates metadata and kernels<span class="dd-badge eng">granularity</span></h2>
+<div class="dd-agent-response"><p>The value distribution within a matrix is often not uniform. A few channels may be shifted significantly as a whole or contain large outlier values, while most channels' values are crowded near zero. If the entire tensor uses only one scale, that scale must cover the widest channel range, so most channels can only use a small segment of the sparse grid points, and quantization error is indirectly increased by a few anomalous channels. This is exactly why a single scale for the whole matrix is often dominated by a few anomalous channels: the range is determined by extremes, but the cost is borne by everyone.</p>
+<p>The solution is to subdivide the quantization range so that each group of data uses its own suitable scale. By granularity from coarse to fine, there are three choices: per-tensor uses one scale for the entire tensor; per-channel sets a separate scale for each output channel; group-wise divides a number of consecutive weights into one group, one scale per group. The finer the granularity, the narrower the range within each group, the smaller the step size can be, and quantization error usually decreases accordingly. The cost is equally straightforward: more scales need to be stored, indexing is more complex, and computation requires specialized kernels that support this grouped layout.</p>
+<p>The growth in the amount of metadata can be estimated with a 4096 × 4096 weight matrix. It has a total of 4096 × 4096 = 16777216 weights. Per-tensor quantization requires only 1 scale; per-channel divides by output channel and requires 4096; if every 128 consecutive weights form a group, then 16777216 ÷ 128 = 131072 scales are needed. The choice of granularity is essentially a trade-off between error and metadata: the number of scales can span six orders of magnitude.</p>
+<p>From a process perspective, the input to this step is the weight matrix, the grouping axis, and the group size, and the output is the integer encoding and scale metadata for each group. The volume of scale metadata relative to the weights is usually still very small — even if there are 130,000 scales, compared with over 16 million weights, they account for less than 1% — so the main conflict for precision is not storage but computation: during dequantization, each group must read its own scale and convert according to the layout, and actual speed is determined jointly by dequantization overhead and layout.</p>
+<p>Fine-grained quantization has another boundary to note: different libraries make different choices for group size, grouping axis, and packing format. Model files that are also labeled “4-bit” may internally be per-channel, or group-wise with different group sizes, or have different weight packing order, so you cannot directly compare two model files solely based on the bit width.</p>
+<p>Finally, finer granularity and lower error do not necessarily mean faster execution on the target hardware. If the inference kernel does not support a particular grouping layout, the additional overhead of metadata reads and dequantization may completely offset the benefits from precision. When choosing granularity, you must consider hardware support for the layout together, rather than only looking at error metrics.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Outliers determine the range, and may also determine capability<span class="dd-badge eng">failure boundary</span></h2>
+<div class="dd-agent-response"><p>If an entire layer uses only one scale, the scale must accommodate the activation with the largest magnitude. A few unusually large activations stretch the range, coarsening the step size, and the vast majority of normal values can only crowd onto a few grid points near zero, indistinguishable from one another. A small number of large activations cause ordinary values to lose discriminative ability; this is what "outliers determine the range" means.</p>
+<p>Several mainstream methods address different aspects of this problem, and their optimization objectives differ.</p>
+<p>LLM.int8 directly separates out the outlier dimensions: it detects outlier feature dimensions in the hidden states, that is, columns of the activation matrix with unusually large magnitudes, corresponding to rows on the input side of the weight matrix, rather than the weight output channels referred to by per-channel quantization; the multiply-accumulate operations involving these dimensions are kept in FP16 high precision, while the remaining parts undergo INT8 quantization as usual. The inputs are the layer to be quantized and representative calibration activations, and the outputs are a high-precision decomposition of the outlier feature dimensions and the quantization ranges for the remaining parts.</p>
+<p>The idea behind SmoothQuant is to move part of the scale onto the weights. If the outlier scales in activations are borne entirely by the activations, the activation-side step size becomes coarse; by migrating part of the scale to the weight side, the weights are amplified accordingly, and the quantization difficulty on both sides becomes more balanced.</p>
+<p>GPTQ starts from the impact of weight errors on the output, using approximate curvature to measure how errors introduced by different weights propagate to the layer output, and prioritizes correcting weights with large influence at low cost. AWQ uses real activations to identify which weights are more important and compensates those important weights. GPTQ is concerned with the global impact of weight errors, while AWQ is concerned with the importance of weights for real inputs; both operate at a different stage than LLM.int8, which handles outlier feature dimensions, and SmoothQuant, which balances activations and weights.</p>
+<p>These methods share a common premise: calibration data must represent the true distribution. Blindly clipping outliers may harm the performance on rare tokens, long contexts, or specific languages, because the so-called "outlier" values may actually carry important features—a rare but critical grammatical structure, positional information in long sequences—all of which may be expressed by those outlier activations. The calibration set must therefore cover real lengths, domains, and hard examples, and cannot rely solely on short English encyclopedia corpora.</p>
+<p>The last boundary belongs to evaluation rather than quantization itself: a small average error does not mean the behavior is safe. The model outputs logits for each token, and final behavior is determined by their ranking. A ranking flip among a few critical logits is enough to change tool-calling actions or refusal behavior. Quantization evaluation must focus on this kind of behavior-level degradation, not just average error.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>PTQ, QAT, and Quantized Base Training<span class="dd-badge eng">Method</span></h2>
+<div class="dd-agent-response"><p>Quantization can be performed after training, during training, or even without touching the original model at all. These three routes correspond to different costs and applicable scenarios: PTQ (post-training quantization), QAT (quantization-aware training), and QLoRA-style quantized base training. Their outputs are a quantized model, a new model adapted to quantization error, and a mountable adapter, respectively—these three are not the same thing.</p>
+<p>PTQ is performed after model training is complete: the weights are no longer changed, and only a small batch of representative data is used to estimate the scale of each layer, with weight compensation applied when necessary. It is low-cost and serves as the starting point for compressing weights to 8-bit or 4-bit. However, PTQ does not mean zero data—scale estimation still relies on calibration data, or on layer-wise optimization to correct errors; when there is no representative data at all, the estimated scales are not trustworthy.</p>
+<p>QAT moves quantization into training: rounding and truncation are simulated in the forward pass, and backpropagation uses straight-through estimation to let gradients pass through the quantization nodes, allowing the weights to gradually adapt to quantization error during training. It is high-cost and suitable for low-bit-width or activation-error-sensitive models. The trade-off is that it reintroduces dependence on training data and overfitting risk, and the performance after quantization is affected by the training data.</p>
+<p>QLoRA takes a different path: it keeps the low-bit base model frozen and trains only high-precision low-rank adapters (LoRA). During fine-tuning, the main GPU memory consumption comes from the base model, so keeping the base model at low bit width can significantly save fine-tuning GPU memory; the adapters have few parameters and high precision, and are responsible for absorbing domain knowledge. Note that during QLoRA training, the base model must first be dequantized to high precision to participate in forward computation, so training and final deployment are not the same graph: at deployment, whether to merge the adapters into the base model and whether to requantize after merging need separate evaluation and cannot be taken for granted.</p>
+<p>The applicable conditions of the three can be summarized as follows: PTQ is low-cost and suitable as the starting point for 8/4-bit weight quantization; QAT is high-cost and used for low-bit-width or activation-sensitive scenarios; QLoRA is moderate-cost and used to save fine-tuning GPU memory. In practice, one should start with a low-cost PTQ baseline, and only when critical slices cannot meet the target should one take on the training cost of QAT or introduce other compensation methods.</p></div>
+<table class="dd-table"><thead><tr><th>Method</th><th>Approach</th><th>Cost</th><th>Suitable For</th></tr></thead><tbody><tr><td>PTQ</td><td>Post-training scale estimation / compensation</td><td>Low</td><td>8/4-bit weight starting point</td></tr><tr><td>QAT</td><td>Simulated quantization during training</td><td>High</td><td>Low-bit-width / activation-sensitive</td></tr><tr><td>QLoRA</td><td>Low-bit frozen base + high-precision LoRA</td><td>Medium</td><td>Saving fine-tuning GPU memory</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Saving GPU memory does not guarantee faster performance<span class="dd-badge eng">Hardware</span></h2>
+<div class="dd-agent-response"><p>Between a smaller file and faster execution lies an execution chain. An INT4 weight file is only one quarter the size of FP16, so transfer and storage pressure does drop, but end-to-end throughput may not improve. The reason is that at compute time weights must return to a usable form to participate in multiply-add: quantization must have matching packed formats, low-bit matrix multiplication, and fused kernels on the target GPU or CPU in order to perform low-bit multiply-add directly. Otherwise each step would first dequantize, do format conversion, and additionally issue a kernel launch—starting a compute kernel itself has fixed overhead—these overheads offset the bandwidth benefits from low bit width; this is especially obvious at small batch sizes, because the amortizable fixed overhead is spread over fewer computations.</p>
+<p>It is also necessary to distinguish between "weights becoming smaller" and "the entire memory becoming smaller." A reduction in weights does not equal a reduction in KV cache, activations, and framework overhead: the KV for long context, intermediate activations, and runtime overhead remain unchanged, and the savings from weights may be drowned out.</p>
+<p>The bottlenecks for throughput and latency are not the same in the two stages of inference. Prefill processes the entire input prompt at once, has a large amount of computation, and is usually more compute-bound, so low-bit weights provide limited help; decode generates token by token, and every generated token must read the weights once, so it is usually more weight-read bandwidth-bound, and the smaller the weights, the more direct the benefit. The bottlenecks of the two stages differ, and therefore the optimization targets also differ.</p>
+<p>Therefore, the inputs for evaluating quantization are not only the quantized artifact itself, but also the target hardware, batch, prompt and output length; the outputs should cover first-token latency, per-token latency, throughput, peak GPU memory, power consumption, and load time. Looking at a single number cannot determine the benefit.</p>
+<p>Finally, there are service-level boundaries. SLO is a service-committed target for latency, availability, etc. "Being able to fit into GPU memory" only passes the capacity gate, does not equal latency meeting the SLO: the model may fit in GPU memory, but each token may be too slow to interact. CPU offload moves part of the state to host memory, allowing the model to run, but the round-trip latency of PCIe transfers may still make interaction unusable. Capacity, throughput, and latency are three independent gates, and quantization is considered compliant only when it passes all of them simultaneously.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Quantization error stacks with subsequent optimizations<span class="dd-badge eng">Combination</span></h2>
+<div class="dd-agent-response"><p>Quantized models are rarely isolated when deployed: they often still have optimizations such as speculative decoding, LoRA merging, and KV compression stacked on top. Each of these optimizations has its own test conclusions, but adding up individual test results does not yield the combined conclusion, because quantization error stacks with subsequent optimizations and they amplify each other.</p>
+<p>Take speculative decoding as an example: it relies on output consistency between the draft model and the target model to achieve acceleration. The quantization schemes for the draft and target change how well their outputs match, which in turn changes the acceptance rate; once the acceptance rate changes, the speedup ratio changes, and the original acceleration conclusion no longer holds.</p>
+<p>LoRA merging is a more direct coupling. After merging, the weight range changes, but the scale was estimated based on the weight distribution before merging, so the old scale may no longer match the new distribution, and quantization error is amplified again.</p>
+<p>KV quantization is coupled with attention error. Attention over long contexts is inherently sensitive to KV precision; KV quantization error stacks with long-context attention error, and conclusions from testing KV compression alone or long context alone cannot be directly extrapolated to the scenario where both are enabled simultaneously.</p>
+<p>Under tensor parallelism there is also a layout problem: the quantization layout affects communication, and the partitioning scheme and quantization granularity must be considered together.</p>
+<p>The correct approach is to re-quantize or recalibrate based on the actual final artifact, and to perform end-to-end ablation on the complete system after stacking optimizations, rather than adding up results from separate isolated tests.</p>
+<p>This leads to an engineering requirement: the quantization recipe must be fully preserved. The base model hash, weight/activation/KV bit widths, symmetry, granularity, group size, calibration set, algorithm, compute dtype, kernel, and hardware each change the final error. If any one of these is missing, results cannot be reproduced even if both models are labeled 'INT4'.</p>
+<p>The final boundary is at the evaluation level: do not hide compression loss with more retries. Giving the model more retry opportunities may indeed improve the final success rate, but this is achieved at the expense of cost, latency, and selection bias—selecting good results from multiple samples is itself a form of selection bias, and it masks the degradation of single-shot behavior. When evaluating quantization loss, look at single-shot behavior, not the best result after retries.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Evaluation must capture ranking flips and long-tail degradation<span class="dd-badge intuition">Evaluation</span></h2>
+<div class="dd-agent-response"><p>A perplexity increase of only 0.2% and degraded tool calling can occur simultaneously, because the model's final behavior is determined not by average error but by local logit ordering. At each generation step, probabilities of candidate tokens are compared; a small quantization error falling on a token near the decision boundary is enough to swap two probabilities that should be adjacent. One flip changes one word: if it falls on a tool name or parameter, it changes the action; if it falls on a safety boundary, it changes whether to refuse. Average perplexity measures the overall closeness of token predictions, and it is insensitive to these few critical flips.</p>
+<p>Therefore evaluation cannot look only at a single overall score; it must compare per-sample differences by slice: general capability, target task, rare tokens, language, long context, structured output, calibration, refusal, and adversarial slices. Each slice answers a question: whether this type of behavior changed before and after quantization.</p>
+<p>System metrics and quality metrics also need to be precise. TTFT is the time from request to first token; TPOT is the average time per subsequent token during generation; p50, p95, and p99 are latency percentiles, respectively indicating that 50%, 95%, and 99% of requests do not exceed that latency. These metrics are comparable only when inputs are identical: same prompt, same sampling, same kernel, same load. Output should include quality difference before and after quantization, latency interval, throughput, GPU memory, energy consumption, and cost per successful task—quality difference answers "did it change?", while cost-type metrics answer "is it worth it?".</p>
+<p>A small change in average perplexity only indicates that overall token predictions are close; it cannot rule out ranking flips in a few critical actions. To distinguish random fluctuation from systematic long-tail damage, per-sample failures must be saved and examined to see which slices are degrading: if failures concentrate in rare language or long-context slices, it is systematic damage; if they are scattered everywhere, it may be random fluctuation.</p>
+<p>The release threshold is therefore two hard conditions: hard-risk slices do not degrade, and the system benefit holds on the target hardware. Only when both are satisfied is the quantization configuration a viable solution.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connect the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>From "why quantize" to "can this quantization go live", there is a complete causal chain in between, and each step takes the output of the previous step as input.</p>
+<p>The first step is to determine the quantization target and target hardware. The target determines whether to quantize weights, activations, or KV; the hardware determines which packing formats and low-bit kernels are available, and also determines the environment in which all subsequent system metrics are measured.</p>
+<p>The second step is to use representative data to select range and granularity. Calibration data provides the real numerical distribution; the choice of range and granularity (per-tensor, per-channel, or group-wise; symmetric or asymmetric) is settled in this step, and the trade-off between main error and outlier clipping is also completed here.</p>
+<p>The third step is to generate candidates using PTQ or QAT. In low-cost scenarios, start with PTQ; only consider the training cost of QAT if critical slices cannot meet the target. The output of this step is a candidate quantized model with a complete recipe.</p>
+<p>The fourth step is to inspect errors and critical logits flips. Average error only reflects the overall level; behavior depends on local ordering; check by slice whether hard-risk slices such as rare tokens, languages, long context, structured output, and refusal exhibit ranking flips.</p>
+<p>The fifth step is to measure system metrics under target load. With the same prompts, sampling, kernels, and load, measure GPU memory, TTFT, TPOT, latency percentiles, and throughput. Saving GPU memory does not guarantee it is faster; capacity, latency, and throughput are three independent gates.</p>
+<p>The sixth step is joint gating: release only when both quality risk and cost per successful task meet the bar. Quality risk answers "will it make mistakes"; cost per successful task answers "whether speed and savings really hold." If either one does not meet the bar, the candidate should be rolled back or abandoned rather than launched with risk.</p>
+<p>Each link in this chain may roll back to the previous link when a problem is found: if error is large, reselect the range or granularity; if latency is poor, change hardware or kernels; if risk slices degrade, return to candidate generation. Quantization is not a one-time compression action but a gating loop around error, behavior, and cost.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2208.07339" target="_blank" rel="noopener">LLM.int8()</a>: Outliers and mixed precision in large models</li><li><a href="https://arxiv.org/abs/2210.17323" target="_blank" rel="noopener">GPTQ</a>: Post-training weight quantization via second-order approximation</li><li><a href="https://arxiv.org/abs/2211.10438" target="_blank" rel="noopener">SmoothQuant</a>: Weight–activation scale migration</li><li><a href="https://arxiv.org/abs/2306.00978" target="_blank" rel="noopener">AWQ</a>: Activation-aware weight quantization</li></ul><div class="dd-src-date">Accessed on: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/quantization">Explore connections on the map</a><a href="/zh/concepts/quantization/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

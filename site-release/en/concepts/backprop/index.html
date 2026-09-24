@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters? Explained Simply</title>
+<meta name="description" content="Starting from computational graphs, local derivatives, and upstream gradients, work through one complete backward traversal by hand, and understand branch accumulation, vector–Jacobian products, activation caching, and gradient checking.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/backprop/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/backprop/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/backprop/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters? Explained Simply">
+<meta property="og:description" content="Starting from computational graphs, local derivatives, and upstream gradients, work through one complete backward traversal by hand, and understand branch accumulation, vector–Jacobian products, activation caching, and gradient checking.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/backprop/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters? Explained Simply">
+<meta name="twitter:description" content="Starting from computational graphs, local derivatives, and upstream gradients, work through one complete backward traversal by hand, and understand branch accumulation, vector–Jacobian products, activation caching, and gradient checking.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/backprop/#page","name":"What Is Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters? Explained Simply","description":"Starting from computational graphs, local derivatives, and upstream gradients, work through one complete backward traversal by hand, and understand branch accumulation, vector–Jacobian products, activation caching, and gradient checking.","url":"https://ai-knowledge-map.com/en/concepts/backprop/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters","item":"https://ai-knowledge-map.com/en/concepts/backprop/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters</span></li></ol></nav><article id="dd-article" data-concept-id="backprop" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Backpropagation: Efficiently Assigning the Responsibility of One Result Back to All Parameters</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Starting from computational graphs, local derivatives, and upstream gradients, work through one complete backward traversal by hand, and understand branch accumulation, vector–Jacobian products, activation caching, and gradient checking.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Backpropagation is not another optimizer; it is reverse-mode automatic differentiation on a scalar output: the forward pass saves the necessary intermediate values, the backward pass starts from 1 at the loss, multiplies the upstream gradient by the local derivative; contributions from shared paths are added together, thereby obtaining gradients for a large number of parameters at a cost close to a few forward computations.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer:</div><ul><li>Why is the finite-difference approach of perturbing parameters one by one unsuitable for training large models?</li><li>How does a computational graph decompose a complex function into reusable local derivative problems?</li><li>What is the relationship among upstream gradient, local derivative, and parameter gradient?</li><li>When a variable is used by multiple paths, why must gradients be summed?</li><li>How do you manually calculate the complete forward and backward passes, and check the implementation with finite differences?</li></ul></div>
+<ol class="dd-chain"><li>The forward pass follows the computational graph to produce predictions and a scalar loss, and saves necessary intermediate values.</li><li>The loss node uses <code>∂L/∂L=1</code> as the backpropagation seed.</li><li>Reverse topological traversal lets each node receive the upstream gradient.</li><li>Nodes use local derivatives to compute vector-Jacobian products.</li><li>Contributions from multiple downstream paths are summed at shared variables.</li><li>After the traversal, each trainable parameter receives <code>∂L/∂θ</code>.</li><li>Finite differences and local tests spot-check the gradient implementation.</li><li>The optimizer then reads the gradients and updates the parameters; whether the objective is correct remains the responsibility of the loss and evaluation.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why can't we give each parameter a light nudge to try it out?<span class="dd-badge intuition">Motivation</span></h2>
+<div class="dd-agent-response"><p>This section addresses a core question: since finite differences can approximate derivatives, why is backpropagation still needed for training neural networks?</p>
+<p>Finite differences use a purely numerical method. For a parameter <span class="dd-inline-math" role="math" aria-label="θ_(i)">θ<sub>i</sub></span>, keep the other parameters fixed, move it in the positive and negative directions by a very small step <span class="dd-inline-math" role="math" aria-label="ε">ε</span>, then compare the two losses:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ θ_(i) ≈ (L(θ_(i)+ε)-L(θ_(i)-ε))/2ε"><span>∂ L/∂ θ<sub>i</sub> ≈ (L(θ<sub>i</sub>+ε)-L(θ<sub>i</sub>-ε))/2ε</span></div>
+<p>This formula is called the central difference. Its inputs are the current parameter value and a manually chosen perturbation step size <span class="dd-inline-math" role="math" aria-label="ε">ε</span>, and its output is the approximate slope of the loss along the <span class="dd-inline-math" role="math" aria-label="i">i</span>-th parameter direction.</p>
+<p>Its calculation process can be divided into three steps:</p>
+<ol><li>Change <span class="dd-inline-math" role="math" aria-label="θ_(i)">θ<sub>i</sub></span> to <span class="dd-inline-math" role="math" aria-label="θ_(i)+ε">θ<sub>i</sub>+ε</span>, perform a complete forward computation to obtain the loss <span class="dd-inline-math" role="math" aria-label="L(θ_(i)+ε)">L(θ<sub>i</sub>+ε)</span>.</li><li>Change <span class="dd-inline-math" role="math" aria-label="θ_(i)">θ<sub>i</sub></span> to <span class="dd-inline-math" role="math" aria-label="θ_(i)-ε">θ<sub>i</sub>-ε</span>, perform the complete forward computation again to obtain the loss <span class="dd-inline-math" role="math" aria-label="L(θ_(i)-ε)">L(θ<sub>i</sub>-ε)</span>.</li><li>Divide the difference between the two losses by the distance between the two parameter values <span class="dd-inline-math" role="math" aria-label="2ε">2ε</span>, to estimate the change in loss caused by a unit change in the parameter.</li></ol>
+<p>The central difference uses information from both sides of the perturbation point and is usually more accurate than the forward difference computed from only one side. However, it is still an approximate method rather than an analytical gradient obtained directly from the computation process.</p>
+<p>Finite differences first face a computational cost problem. Suppose the model has <span class="dd-inline-math" role="math" aria-label="P">P</span> parameters, checking the central difference for each parameter requires approximately <span class="dd-inline-math" role="math" aria-label="2P">2P</span> complete forward computations. One million parameters means about two million forward computations, and one billion parameters means about two billion forward computations. Each time only one parameter is changed, but the entire model must be rerun; most shared computation is repeatedly redone, making it unaffordable for everyday training.</p>
+<p>Second, the step size <span class="dd-inline-math" role="math" aria-label="ε">ε</span> has a numerical dilemma.</p>
+<p>When <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is too large, the loss function may already be significantly curved in this range. The difference quotient measures the average slope over an interval, not the instantaneous slope at the current point, hence producing truncation error.</p>
+<p>When <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is too small, the two loss values become extremely close. In finite-precision floating-point arithmetic, subtracting two nearly equal numbers can easily lose significant digits; the resulting tiny error is then divided by a very small <span class="dd-inline-math" role="math" aria-label="2ε">2ε</span>, and may be further amplified. This is rounding error or cancellation error.</p>
+<p>Therefore, <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is not the smaller the better. In practical checks, one often tries step sizes across multiple orders of magnitude and observes whether the numerical gradient remains stable within a certain interval. Usually, as <span class="dd-inline-math" role="math" aria-label="ε">ε</span> decreases, the truncation error first decreases; when <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is too small, the floating-point error rises again.</p>
+<p>These limitations determine the appropriate use of finite differences: they are suitable for gradient checking and not for directly training models. One can randomly select a small number of parameters and compare the finite-difference results with the gradients obtained by automatic differentiation to detect errors in the backward formula, path accumulation, or broadcast handling.</p>
+<p>The efficiency of backpropagation comes from a different approach. All parameters of a neural network ultimately affect the same scalar loss, and they share a large amount of intermediate computation on the way to the loss. Finite differences treat each parameter as an independent experiment, thus repeatedly redoing these computations; backpropagation saves the structure of the forward computation and the necessary intermediate values, then starts from the loss and traverses the computation graph once in reverse according to the chain rule.</p>
+<p>In a single backward traversal, the sensitivity of a shared node to the loss only needs to be computed once and can then be reused for all upstream parameters. Therefore, backpropagation can obtain the gradients of all parameters at a cost comparable to a few forward computations.</p>
+<p>The difference between the two methods can be summarized as:</p>
+<ul><li>Finite differences ask one by one: “If I nudge this parameter alone, how will the loss change?”</li><li>Backpropagation computes uniformly: “How is the loss sensitivity propagated back to all parameters along shared computation paths?”</li></ul>
+<p>So the problem with finite differences is not that they cannot compute gradients, but that they cannot efficiently and stably compute gradients repeatedly for a massive number of parameters. Backpropagation truly leverages the shared structure in the computation graph, turning the trial-and-error that originally needed to be repeated parameter by parameter into a single systematic propagation of sensitivity.</p></div>
+<div class="dd-formula">∂L/∂θᵢ ≈ [L(θᵢ+ε)−L(θᵢ−ε)]/(2ε)</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How does the computational graph break a complex function into local problems?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>This section explains the organizational basis of backpropagation: how the computational graph breaks a complex function into many simple, reusable local differentiation problems.</p>
+<p>Take</p>
+<div class="dd-equation" role="math" aria-label="ŷ=wx, L=1/2(ŷ-y)^(2)"><span>ŷ=wx, L=1/2(ŷ-y)<sup>2</sup></span></div>
+<p>as an example. Although the loss can be written directly as:</p>
+<div class="dd-equation" role="math" aria-label="L=1/2(wx-y)^(2)"><span>L=1/2(wx-y)<sup>2</sup></span></div>
+<p>and differentiate the entire composite formula, but real neural networks contain numerous matrix multiplications, biases, normalizations, and nonlinear functions. If the entire model is expanded into a single enormous formula, derivation, implementation, and maintenance all become difficult.</p>
+<p>The computational graph adopts a different representation: it breaks the composite function into a sequence of elementary operations. For example:</p>
+<div class="dd-equation" role="math" aria-label="u=wx"><span>u=wx</span></div>
+<div class="dd-equation" role="math" aria-label="e=u-y"><span>e=u-y</span></div>
+<div class="dd-equation" role="math" aria-label="L=1/2e^(2)"><span>L=1/2e<sup>2</sup></span></div>
+<p>Here, <span class="dd-inline-math" role="math" aria-label="u">u</span> is the predicted value <span class="dd-inline-math" role="math" aria-label="ŷ">ŷ</span>,<span class="dd-inline-math" role="math" aria-label="e">e</span> is the prediction error. Multiplication, subtraction, and the half-square each constitute a local operation node, and edges between nodes represent data dependencies. Since an operation must wait for its inputs to be produced, ordinary forward computation forms a directed acyclic graph.</p>
+<p>Forward propagation computes values along the dependency direction:</p>
+<div class="dd-equation" role="math" aria-label="w,x→ u→ e→ L"><span>w,x→ u→ e→ L</span></div>
+<p>Backpropagation propagates sensitivity in the opposite direction:</p>
+<div class="dd-equation" role="math" aria-label="L→ e→ u→ w,x"><span>L→ e→ u→ w,x</span></div>
+<p>What is passed here is not the forward values, but the gradient of the final loss with respect to the output of the current node, that is, "how will the loss change if the current variable changes slightly?"</p>
+<p>Backpropagation starts from:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ L=1"><span>∂ L/∂ L=1</span></div>
+<p>Then, each node only needs to combine the received upstream gradient with its own local derivative.</p>
+<p>For the half-square node:</p>
+<div class="dd-equation" role="math" aria-label="L=1/2e^(2)"><span>L=1/2e<sup>2</sup></span></div>
+<p>The local derivative is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ e=e"><span>∂ L/∂ e=e</span></div>
+<p>For the subtraction node:</p>
+<div class="dd-equation" role="math" aria-label="e=u-y"><span>e=u-y</span></div>
+<p>The local derivative is:</p>
+<div class="dd-equation" role="math" aria-label="∂ e/∂ u=1, ∂ e/∂ y=-1"><span>∂ e/∂ u=1, ∂ e/∂ y=-1</span></div>
+<p>For the multiplication node:</p>
+<div class="dd-equation" role="math" aria-label="u=wx"><span>u=wx</span></div>
+<p>The local derivative is:</p>
+<div class="dd-equation" role="math" aria-label="∂ u/∂ w=x, ∂ u/∂ x=w"><span>∂ u/∂ w=x, ∂ u/∂ x=w</span></div>
+<p>After assembling them according to the chain rule, we obtain:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = ∂ L/∂ e ∂ e/∂ u ∂ u/∂ w = e·1· x = (wx-y)x"><span>∂ L/∂ w = ∂ L/∂ e ∂ e/∂ u ∂ u/∂ w = e·1· x = (wx-y)x</span></div>
+<p>and:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = e·1· w = (wx-y)w"><span>∂ L/∂ x = e·1· w = (wx-y)w</span></div>
+<p>Throughout the entire process, no node needs to know the complete model. The multiplication node is only responsible for the backward rule of multiplication, the subtraction node only for the backward rule of subtraction, and the square node only for the backward rule of the square. The gradients of a complex network are the result of combining these local rules according to the graph structure.</p>
+<p>Therefore, the computational graph is not just a visualization of formulas; it is also an executable differentiation plan. It needs to record at least two types of information.</p>
+<p>The first type is the connection relationships between operations. For example, <span class="dd-inline-math" role="math" aria-label="u">u</span> is produced by <span class="dd-inline-math" role="math" aria-label="w">w</span> and <span class="dd-inline-math" role="math" aria-label="x">x</span> by multiplication, <span class="dd-inline-math" role="math" aria-label="e">e</span> in turn depends on <span class="dd-inline-math" role="math" aria-label="u">u</span> and <span class="dd-inline-math" role="math" aria-label="y">y</span>. These relationships determine in what order backpropagation should traverse which nodes.</p>
+<p>The second type is the forward values needed by the local backward formulas. For example:</p>
+<ul><li>Computing the gradient of <span class="dd-inline-math" role="math" aria-label="w">w</span> in the multiplication node requires the forward value <span class="dd-inline-math" role="math" aria-label="x">x</span>;</li><li>Computing the gradient of <span class="dd-inline-math" role="math" aria-label="x">x</span> requires the forward value <span class="dd-inline-math" role="math" aria-label="w">w</span>;</li><li>Computing the backward pass of the half-square loss requires the error <span class="dd-inline-math" role="math" aria-label="e=ŷ-y">e=ŷ-y</span>;</li><li>the activation function may need to know which region the forward input falls into.</li></ul>
+<p>This shows that "the graph structure still exists" does not equal "backpropagation can definitely be executed." If the framework still knows that a node performed multiplication, but has already lost or overwritten the input value required for the backward pass of the multiplication, it cannot correctly compute the local gradient.</p>
+<p>The relationship between the computational graph and intermediate states also explains why training memory usage is higher than inference memory usage. After inference completes a layer, if its activations no longer participate in subsequent forward computations, they can usually be freed; training, however, must retain intermediate values needed for the backward pass until the corresponding node completes its backward computation.</p>
+<p>It also explains why in-place modification is dangerous. If a tensor is directly overwritten after the forward pass, while the backward formula needs the original value, what the backward pass reads is no longer the state that produced the current loss. Even if the forward result looks normal, the gradient may error out or be distorted.</p>
+<p>When the computational graph has branches, the same variable may affect the loss along multiple paths. Each path will pass back its gradient contribution, and they are summed at shared nodes. This is the manifestation of the multivariate chain rule in the graph structure, and it is also the basis for the computational graph's ability to handle residual connections, weight sharing, and recurrent structures.</p>
+<p>So, the way the computational graph solves complex differentiation problems is not by deriving an even larger overall formula, but by establishing a clear local collaboration mechanism:</p>
+<div class="dd-equation" role="math" aria-label="Record forward operations → Save necessary states → Call local backward rules in reverse order → Combine gradients according to the chain rule"><span>Record forward operations → Save necessary states → Call local backward rules in reverse order → Combine gradients according to the chain rule</span></div>
+<p>It transforms global differentiation into many small local problems, while also establishing a hard boundary: the correctness of backpropagation depends on ensuring that both the forward computational graph and the necessary intermediate values remain intact.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 720 260" role="img" aria-label="Computational graph and backward gradients of ŷ=wx and the half-square loss"><defs><marker id="bpa" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="context-stroke"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2"><rect x="35" y="45" width="76" height="42" rx="10"/><rect x="35" y="150" width="76" height="42" rx="10"/><rect x="180" y="92" width="92" height="50" rx="12"/><rect x="342" y="92" width="92" height="50" rx="12"/><rect x="505" y="92" width="120" height="50" rx="12"/><path d="M111 66 L180 105" marker-end="url(#bpa)"/><path d="M111 171 L180 130" marker-end="url(#bpa)"/><path d="M272 117 L342 117" marker-end="url(#bpa)"/><path d="M434 117 L505 117" marker-end="url(#bpa)"/></g><g class="svg-t"><text x="65" y="72">w=2</text><text x="65" y="177">x=2</text><text x="205" y="122">multiplication</text><text x="365" y="122">ŷ=4</text><text x="526" y="122">L=½(ŷ−6)²=2</text></g><g fill="#ef4444" class="svg-tn"><text x="518" y="78">Start: ∂L/∂L=1</text><text x="345" y="174">∂L/∂ŷ=−2</text><text x="175" y="174">∂L/∂w=−2×x=−4</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Forward computation goes from left to right; backward propagation goes from right to left, passing "how sensitive the loss is to this point." In the figure, each box represents only one local operation; nowhere is there a need to differentiate the entire formula at once.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>What Does Multiplying the Upstream Gradient by the Local Derivative Mean?<span class="dd-badge math">Chain Rule</span></h2>
+<div class="dd-agent-response"><p>This section zooms into a single operation node in backpropagation and explains exactly how gradients are passed between nodes.</p>
+<p>Suppose a node performs:</p>
+<div class="dd-equation" role="math" aria-label="z=f(u)"><span>z=f(u)</span></div>
+<p>The final loss <span class="dd-inline-math" role="math" aria-label="L">L</span> in turn depends on <span class="dd-inline-math" role="math" aria-label="z">z</span>. When backpropagation passes through this node, it uses the chain rule:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u"><span>∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u</span></div>
+<p>These three quantities each have a clear meaning:</p>
+<ul><li><span class="dd-inline-math" role="math" aria-label="∂ L/∂ z">∂ L/∂ z</span> is the upstream gradient received by the node, indicating that <span class="dd-inline-math" role="math" aria-label="z">z</span> when it changes slightly, how the final loss changes;</li><li><span class="dd-inline-math" role="math" aria-label="∂ z/∂ u">∂ z/∂ u</span> is the local derivative of the node, indicating that <span class="dd-inline-math" role="math" aria-label="u">u</span> when it changes slightly, the node output <span class="dd-inline-math" role="math" aria-label="z">z</span> how it changes;</li><li><span class="dd-inline-math" role="math" aria-label="∂ L/∂ u">∂ L/∂ u</span> is the gradient passed to the input <span class="dd-inline-math" role="math" aria-label="u">u</span>, indicating that <span class="dd-inline-math" role="math" aria-label="u">u</span> how a small change in it ultimately affects the loss.</li></ul>
+<p>The reason these two sensitivities are multiplied can be understood from small changes:</p>
+<div class="dd-equation" role="math" aria-label="Δ z≈∂ z/∂ uΔ u"><span>Δ z≈∂ z/∂ uΔ u</span></div>
+<div class="dd-equation" role="math" aria-label="Δ L≈∂ L/∂ zΔ z"><span>Δ L≈∂ L/∂ zΔ z</span></div>
+<p>Substituting the first expression into the second:</p>
+<div class="dd-equation" role="math" aria-label="Δ L ≈ ∂ L/∂ z ∂ z/∂ u Δ u"><span>Δ L ≈ ∂ L/∂ z ∂ z/∂ u Δ u</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u"><span>∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u</span></div>
+<p>The first term describes the influence from <span class="dd-inline-math" role="math" aria-label="z">z</span> to the loss, and the second term describes the influence from <span class="dd-inline-math" role="math" aria-label="u">u</span> to <span class="dd-inline-math" role="math" aria-label="z">z</span> influence. After connecting the two segments end to end, we get the complete local influence from <span class="dd-inline-math" role="math" aria-label="u">u</span> to the loss.</p>
+<p>The common overbar notation can make the formula more compact:</p>
+<div class="dd-equation" role="math" aria-label="z̄=∂ L/∂ z, ū=∂ L/∂ u"><span>z̄=∂ L/∂ z, ū=∂ L/∂ u</span></div>
+<p>Thus the backward rule for a single node can be written as:</p>
+<div class="dd-equation" role="math" aria-label="ū=z̄∂ z/∂ u"><span>ū=z̄∂ z/∂ u</span></div>
+<p>In other words: first receive the upstream gradient, then transform it using the local derivative of this node, and finally pass the result to the input.</p>
+<p>For addition:</p>
+<div class="dd-equation" role="math" aria-label="z=a+b"><span>z=a+b</span></div>
+<p>The local derivatives are:</p>
+<div class="dd-equation" role="math" aria-label="∂ z/∂ a=1, ∂ z/∂ b=1"><span>∂ z/∂ a=1, ∂ z/∂ b=1</span></div>
+<p>So:</p>
+<div class="dd-equation" role="math" aria-label="ā=z̄, b̄=z̄"><span>ā=z̄, b̄=z̄</span></div>
+<p>Both inputs receive the full upstream gradient. This is not averaging the gradient across the two inputs; rather, if either input increases a little, the output increases by the same amount.</p>
+<p>For multiplication:</p>
+<div class="dd-equation" role="math" aria-label="z=ab"><span>z=ab</span></div>
+<p>The local derivatives are:</p>
+<div class="dd-equation" role="math" aria-label="∂ z/∂ a=b, ∂ z/∂ b=a"><span>∂ z/∂ a=b, ∂ z/∂ b=a</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="ā=z̄ b, b̄=z̄ a"><span>ā=z̄ b, b̄=z̄ a</span></div>
+<p>Computing <span class="dd-inline-math" role="math" aria-label="a">a</span> gradient requires the forward-time <span class="dd-inline-math" role="math" aria-label="b">b</span>, and computing <span class="dd-inline-math" role="math" aria-label="b">b</span> gradient requires the forward-time <span class="dd-inline-math" role="math" aria-label="a">a</span>. This explains why backpropagation must save certain forward intermediate values.</p>
+<p>For the square:</p>
+<div class="dd-equation" role="math" aria-label="z=u^(2)"><span>z=u<sup>2</sup></span></div>
+<p>The local derivative is:</p>
+<div class="dd-equation" role="math" aria-label="∂ z/∂ u=2u"><span>∂ z/∂ u=2u</span></div>
+<p>So:</p>
+<div class="dd-equation" role="math" aria-label="ū=z̄·2u"><span>ū=z̄·2u</span></div>
+<p>When the upstream gradient passes through the square node, it is scaled according to the current input <span class="dd-inline-math" role="math" aria-label="u">u</span> value and sign.</p>
+<p>For ReLU:</p>
+<div class="dd-equation" role="math" aria-label="z=max(0,u)"><span>z=max(0,u)</span></div>
+<p>When <span class="dd-inline-math" role="math" aria-label="u&gt;0">u&gt;0</span> , the local derivative is 1; when <span class="dd-inline-math" role="math" aria-label="u&lt;0">u&lt;0</span> , the local derivative is 0. Therefore:</p>
+<div class="dd-equation" role="math" aria-label="ū= { z̄, u&gt;0; 0, u&lt;0 }"><span>ū= { z̄, u&gt;0; 0, u&lt;0 }</span></div>
+<p>ReLU can be understood as a gradient gate: the positive region lets the upstream gradient pass through unchanged, while the negative region blocks it.</p>
+<p>At <span class="dd-inline-math" role="math" aria-label="u=0">u=0</span> , the left and right derivatives of ReLU differ, and the classical derivative does not exist. Autodiff frameworks must define a value, typically choosing some subgradient. This value is not uniquely determined by the ordinary chain rule but is an implementation convention of the operator.</p>
+<p>For matrix multiplication:</p>
+<div class="dd-equation" role="math" aria-label="Z=WX"><span>Z=WX</span></div>
+<p>Let the upstream gradient be:</p>
+<div class="dd-equation" role="math" aria-label="Z̄=∂ L/∂ Z"><span>Z̄=∂ L/∂ Z</span></div>
+<p>Then the input gradients are:</p>
+<div class="dd-equation" role="math" aria-label="W̄=Z̄ X^(T)"><span>W̄=Z̄ X<sup>T</sup></span></div>
+<div class="dd-equation" role="math" aria-label="X̄=W^(T)Z̄"><span>X̄=W<sup>T</sup>Z̄</span></div>
+<p>Assume:</p>
+<div class="dd-equation" role="math" aria-label="W∈ℝ^(m× n), X∈ℝ^(n× p), Z∈ℝ^(m× p)"><span>W∈ℝ<sup>m× n</sup>, X∈ℝ<sup>n× p</sup>, Z∈ℝ<sup>m× p</sup></span></div>
+<p>Then:</p>
+<div class="dd-equation" role="math" aria-label="W̄∈ℝ^(m× n), X̄∈ℝ^(n× p)"><span>W̄∈ℝ<sup>m× n</sup>, X̄∈ℝ<sup>n× p</sup></span></div>
+<p>The resulting gradients respectively have the same shape as <span class="dd-inline-math" role="math" aria-label="W">W</span> and <span class="dd-inline-math" role="math" aria-label="X">X</span> . Checking gradient shapes is a basic method for determining whether the transpose positions in matrix backward formulas are correct.</p>
+<p>In scalar examples, “multiplying the upstream gradient by the local derivative” looks like ordinary multiplication; in vector and tensor cases, the local derivative may be a Jacobian matrix. Strictly speaking, the node performs the product of the upstream gradient and the local Jacobian. Frameworks usually do not explicitly construct the full Jacobian but instead directly implement this product.</p>
+<p>If a node has multiple inputs, it needs to compute gradients for each input separately. If the same input affects the loss through multiple paths, the contributions returned by each path must also be added. For example, <span class="dd-inline-math" role="math" aria-label="u">u</span> simultaneously affects <span class="dd-inline-math" role="math" aria-label="z_(1)">z<sub>1</sub></span> and <span class="dd-inline-math" role="math" aria-label="z_(2)">z<sub>2</sub></span>, then:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ u = ∂ L/∂ z_(1) ∂ z_(1)/∂ u + ∂ L/∂ z_(2) ∂ z_(2)/∂ u"><span>∂ L/∂ u = ∂ L/∂ z<sub>1</sub> ∂ z<sub>1</sub>/∂ u + ∂ L/∂ z<sub>2</sub> ∂ z<sub>2</sub>/∂ u</span></div>
+<p>Therefore, a single path follows “upstream gradient times local derivative,” while multiple paths at a shared node must also perform “summing the contributions from each path.”</p>
+<p>Backpropagation does not create new calculus rules. It merely organizes the chain rule into an efficient execution process: each node implements only its own local backward rule, and the framework combines these rules in reverse order of the computation graph.</p>
+<p>This mechanism also has clear prerequisites: local derivatives must exist or have clear conventions, and the backward rules must be correctly implemented. If a custom operator's forward computation is correct but its backward formula is wrong, the model can still produce normal forward values, but incorrect gradients will continue to propagate from that node to all upstream variables, contaminating the entire training chain.</p></div>
+<table class="dd-table"><thead><tr><th>Local operation</th><th>Forward</th><th>Backward to input</th></tr></thead><tbody><tr><td>Addition</td><td><code>z=a+b</code></td><td>Both sides receive the upstream gradient</td></tr><tr><td>Multiplication</td><td><code>z=ab</code></td><td><code>ā=ż·b, b̄=ż·a</code></td></tr><tr><td>Square</td><td><code>z=u²</code></td><td><code>ū=ż·2u</code></td></tr><tr><td>ReLU</td><td><code>z=max(0,u)</code></td><td><code>u&gt;0</code> pass, otherwise 0</td></tr><tr><td>Matrix multiplication</td><td><code>Z=WX</code></td><td>Obtain via transpose multiplication <code>W̄</code> and <code>X̄</code></td></tr></tbody></table>
+<div class="dd-formula">∂L/∂u = ∂L/∂z · ∂z/∂u</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Complete manual calculation: how −4 appears step by step<span class="dd-badge math">Numerical example</span></h2>
+<div class="dd-agent-response"><p>This section uses a complete manual calculation to show: the gradient <span class="dd-inline-math" role="math" aria-label="-4">-4</span> is not something that appears suddenly, but is the result of the seed gradient from the loss end being gradually scaled through multiple local nodes.</p>
+<p>Given:</p>
+<div class="dd-equation" role="math" aria-label="x=2, y=6, w=2"><span>x=2, y=6, w=2</span></div>
+<p>The model and loss are:</p>
+<div class="dd-equation" role="math" aria-label="u=wx, e=u-y, L=1/2e^(2)"><span>u=wx, e=u-y, L=1/2e<sup>2</sup></span></div>
+<p>Together they represent the composite function:</p>
+<div class="dd-equation" role="math" aria-label="L=1/2(wx-y)^(2)"><span>L=1/2(wx-y)<sup>2</sup></span></div>
+<p>The calculation does not directly differentiate the entire composite formula; instead, it first completes the forward propagation, saves the intermediate values, and then performs backpropagation in reverse order.</p>
+<p>First, compute the forward pass.</p>
+<p>Multiplication node:</p>
+<div class="dd-equation" role="math" aria-label="u=wx=2×2=4"><span>u=wx=2×2=4</span></div>
+<p>Here <span class="dd-inline-math" role="math" aria-label="u">u</span> is the model prediction.</p>
+<p>Subtraction node:</p>
+<div class="dd-equation" role="math" aria-label="e=u-y=4-6=-2"><span>e=u-y=4-6=-2</span></div>
+<p>Here <span class="dd-inline-math" role="math" aria-label="e=-2">e=-2</span> means the prediction is 2 lower than the target.</p>
+<p>Half-squared loss node:</p>
+<div class="dd-equation" role="math" aria-label="L=1/2e^(2) =1/2(-2)^(2) =1/2×4 =2"><span>L=1/2e<sup>2</sup> =1/2(-2)<sup>2</sup> =1/2×4 =2</span></div>
+<p>The forward propagation finally yields:</p>
+<div class="dd-equation" role="math" aria-label="u=4, e=-2, L=2"><span>u=4, e=-2, L=2</span></div>
+<p>Here <span class="dd-inline-math" role="math" aria-label="u">u</span> and <span class="dd-inline-math" role="math" aria-label="e">e</span> are not just temporary calculation results; they are also the raw materials needed for backpropagation. The local derivative of the square node depends on <span class="dd-inline-math" role="math" aria-label="e">e</span>, and the local derivative of the multiplication node depends on <span class="dd-inline-math" role="math" aria-label="w">w</span> and <span class="dd-inline-math" role="math" aria-label="x">x</span>.</p>
+<p>Backpropagation starts from the final loss. Its seed gradient is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ L=1"><span>∂ L/∂ L=1</span></div>
+<p>This is because the derivative of any variable with respect to itself equals 1. This 1 is not a learning rate, nor a guessed gradient magnitude, but a one-unit sensitivity that starts backpropagation.</p>
+<p>Next, pass through the half-squared node:</p>
+<div class="dd-equation" role="math" aria-label="L=1/2e^(2)"><span>L=1/2e<sup>2</sup></span></div>
+<p>For input <span class="dd-inline-math" role="math" aria-label="e">e</span> the local derivative of the node is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ e=e"><span>∂ L/∂ e=e</span></div>
+<p>Substitute the forward-saved <span class="dd-inline-math" role="math" aria-label="e=-2">e=-2</span> and multiply by the upstream gradient 1:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ e = 1× e = 1×(-2) = -2"><span>∂ L/∂ e = 1× e = 1×(-2) = -2</span></div>
+<p>The negative sign in this step comes from the forward error <span class="dd-inline-math" role="math" aria-label="e=-2">e=-2</span>. Although the square operation makes the final loss positive, its derivative still retains the directional information of the error.</p>
+<p>Then pass through the subtraction node:</p>
+<div class="dd-equation" role="math" aria-label="e=u-y"><span>e=u-y</span></div>
+<p>The local derivative of the node with respect to <span class="dd-inline-math" role="math" aria-label="u">u</span> is:</p>
+<div class="dd-equation" role="math" aria-label="∂ e/∂ u=1"><span>∂ e/∂ u=1</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ u = ∂ L/∂ e ∂ e/∂ u = (-2)×1 = -2"><span>∂ L/∂ u = ∂ L/∂ e ∂ e/∂ u = (-2)×1 = -2</span></div>
+<p>The gradient, when passing through the subtraction path to <span class="dd-inline-math" role="math" aria-label="u">u</span> does not change in magnitude or sign.</p>
+<p>Finally, pass through the multiplication node:</p>
+<div class="dd-equation" role="math" aria-label="u=wx"><span>u=wx</span></div>
+<p>The local derivative with respect to the parameter <span class="dd-inline-math" role="math" aria-label="w">w</span> is:</p>
+<div class="dd-equation" role="math" aria-label="∂ u/∂ w=x"><span>∂ u/∂ w=x</span></div>
+<p>Since in the forward pass <span class="dd-inline-math" role="math" aria-label="x=2">x=2</span>, so:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = ∂ L/∂ u ∂ u/∂ w = (-2)×2 = -4"><span>∂ L/∂ w = ∂ L/∂ u ∂ u/∂ w = (-2)×2 = -4</span></div>
+<p>Therefore,<span class="dd-inline-math" role="math" aria-label="-4">-4</span> the complete source can be written as:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = 1 (loss seed) × (-2) (local derivative of the square node with respect to e) × 1 (local derivative of the subtraction node with respect to u) × 2 (local derivative of the multiplication node with respect to w, i.e., x) = -4"><span>∂ L/∂ w = 1 (loss seed) × (-2) (local derivative of the square node with respect to e) × 1 (local derivative of the subtraction node with respect to u) × 2 (local derivative of the multiplication node with respect to w, i.e., x) = -4</span></div>
+<p>The same multiplication node can also pass the gradient to the input <span class="dd-inline-math" role="math" aria-label="x">x</span>. Since:</p>
+<div class="dd-equation" role="math" aria-label="∂ u/∂ x=w"><span>∂ u/∂ x=w</span></div>
+<p>and <span class="dd-inline-math" role="math" aria-label="w=2">w=2</span>, so:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = ∂ L/∂ u ∂ u/∂ x = (-2)×2 = -4"><span>∂ L/∂ x = ∂ L/∂ u ∂ u/∂ x = (-2)×2 = -4</span></div>
+<p>If we also treat the target value <span class="dd-inline-math" role="math" aria-label="y">y</span> as a variable that requires differentiation, then the subtraction node on the path to <span class="dd-inline-math" role="math" aria-label="y">y</span> has local derivative:</p>
+<div class="dd-equation" role="math" aria-label="∂ e/∂ y=-1"><span>∂ e/∂ y=-1</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ y = ∂ L/∂ e ∂ e/∂ y = (-2)×(-1) = 2"><span>∂ L/∂ y = ∂ L/∂ e ∂ e/∂ y = (-2)×(-1) = 2</span></div>
+<p>However, in ordinary supervised learning,<span class="dd-inline-math" role="math" aria-label="x">x</span> and <span class="dd-inline-math" role="math" aria-label="y">y</span> are usually data, and the optimizer only updates the trainable parameter <span class="dd-inline-math" role="math" aria-label="w">w</span>.</p>
+<p>The gradient:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w=-4"><span>∂ L/∂ w=-4</span></div>
+<p>means that near the current point <span class="dd-inline-math" role="math" aria-label="w=2">w=2</span>, if we let <span class="dd-inline-math" role="math" aria-label="w">w</span> increase by a very small amount <span class="dd-inline-math" role="math" aria-label="Δ w">Δ w</span>, the change in loss is approximately:</p>
+<div class="dd-equation" role="math" aria-label="Δ L≈-4Δ w"><span>Δ L≈-4Δ w</span></div>
+<p>Therefore, slightly increasing <span class="dd-inline-math" role="math" aria-label="w">w</span> will decrease the loss. This is consistent with the current prediction being too low: since <span class="dd-inline-math" role="math" aria-label="x=2&gt;0">x=2&gt;0</span>, increasing <span class="dd-inline-math" role="math" aria-label="w">w</span> will increase the prediction <span class="dd-inline-math" role="math" aria-label="u=wx">u=wx</span>, moving it from 4 toward the target value 6.</p>
+<p>But <span class="dd-inline-math" role="math" aria-label="-4">-4</span> does not mean that we should directly let <span class="dd-inline-math" role="math" aria-label="w">w</span> increase by 4. If using the simplest gradient descent, the update formula is:</p>
+<div class="dd-equation" role="math" aria-label="w_(new) = w-η∂ L/∂ w"><span>w<sub>new</sub> = w-η∂ L/∂ w</span></div>
+<p>Substitute the current gradient:</p>
+<div class="dd-equation" role="math" aria-label="w_(new) = 2-η(-4) = 2+4η"><span>w<sub>new</sub> = 2-η(-4) = 2+4η</span></div>
+<p>The actual update magnitude is determined by the learning rate <span class="dd-inline-math" role="math" aria-label="η">η</span> and the optimizer rule. Backpropagation only provides the direction and rate of change near the current point; it does not determine the actual step size.</p>
+<p>Finally, these forward values and gradients only hold for:</p>
+<div class="dd-equation" role="math" aria-label="x=2, y=6, w=2"><span>x=2, y=6, w=2</span></div>
+<p>this set of values. After the parameter update, the prediction <span class="dd-inline-math" role="math" aria-label="u">u</span>, the error <span class="dd-inline-math" role="math" aria-label="e">e</span>, the loss <span class="dd-inline-math" role="math" aria-label="L">L</span> and the various local gradients will change. Therefore, after each parameter update, you need to re-run the forward pass and then perform backpropagation based on the new intermediate state.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Node</th><th>Calculation</th><th>Value</th></tr></thead><tbody><tr><td>Forward</td><td><code>u=wx</code></td><td><code>2×2</code></td><td>4</td></tr><tr><td>Forward</td><td><code>e=u−y</code></td><td><code>4−6</code></td><td>−2</td></tr><tr><td>Forward</td><td><code>L=½e²</code></td><td><code>½×4</code></td><td>2</td></tr><tr><td>Backward</td><td>Loss seed</td><td><code>∂L/∂L</code></td><td>1</td></tr><tr><td>Backward</td><td>Through square</td><td><code>∂L/∂e=1×e</code></td><td>−2</td></tr><tr><td>Backward</td><td>Through subtraction</td><td><code>∂L/∂u=−2×1</code></td><td>−2</td></tr><tr><td>Backward</td><td>Through multiplication to w</td><td><code>∂L/∂w=−2×x</code></td><td>−4</td></tr><tr><td>Backward</td><td>Through multiplication to x</td><td><code>∂L/∂x=−2×w</code></td><td>−4</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Why do forked paths require gradient accumulation?<span class="dd-badge math">Multiple paths</span></h2>
+<div class="dd-agent-response"><p>This section explains a key rule in the multivariable chain rule: when the same variable affects the final result through multiple computation paths, its total gradient equals the sum of all path contributions.</p>
+<p>Take:</p>
+<div class="dd-equation" role="math" aria-label="u=w^(2)+w"><span>u=w<sup>2</sup>+w</span></div>
+<p> as an example. The parameter <span class="dd-inline-math" role="math" aria-label="w">w</span> has two paths in the computation graph leading to <span class="dd-inline-math" role="math" aria-label="u">u</span>:</p>
+<div class="dd-equation" role="math" aria-label="w→ w^(2)→ u"><span>w→ w<sup>2</sup>→ u</span></div>
+<p>and:</p>
+<div class="dd-equation" role="math" aria-label="w→ u"><span>w→ u</span></div>
+<p>The first path goes through the squaring operation, and the second path goes directly into the addition. As long as <span class="dd-inline-math" role="math" aria-label="w">w</span> changes by a small amount, the outputs of these two paths will change simultaneously, so <span class="dd-inline-math" role="math" aria-label="u">u</span>'s total change must include both parts.</p>
+<p>The derivative contribution of the squaring path is:</p>
+<div class="dd-equation" role="math" aria-label="d(w^(2))/dw=2w"><span>d(w<sup>2</sup>)/dw=2w</span></div>
+<p>The derivative contribution of the direct path is:</p>
+<div class="dd-equation" role="math" aria-label="dw/dw=1"><span>dw/dw=1</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="du/dw=2w+1"><span>du/dw=2w+1</span></div>
+<p>The plus sign here is not an incidental result of algebraic expansion, but the general rule for backpropagating through forked paths in a computation graph: if a variable affects the output through multiple downstream paths, the gradient contributions returned by all paths must be summed at that variable.</p>
+<p>If there is also a loss <span class="dd-inline-math" role="math" aria-label="L">L</span> that depends on <span class="dd-inline-math" role="math" aria-label="u">u</span>, let the upstream gradient passed from downstream to <span class="dd-inline-math" role="math" aria-label="u">u</span> be:</p>
+<div class="dd-equation" role="math" aria-label="ū=∂ L/∂ u"><span>ū=∂ L/∂ u</span></div>
+<p>The contribution returned by the squaring path to <span class="dd-inline-math" role="math" aria-label="w">w</span> is:</p>
+<div class="dd-equation" role="math" aria-label="w̄_(squared) = ū·2w"><span>w̄<sub>squared</sub> = ū·2w</span></div>
+<p>The contribution returned by the direct path to <span class="dd-inline-math" role="math" aria-label="w">w</span> is:</p>
+<div class="dd-equation" role="math" aria-label="w̄_(direct) = ū·1"><span>w̄<sub>direct</sub> = ū·1</span></div>
+<p>Therefore,<span class="dd-inline-math" role="math" aria-label="w">w</span>'s complete gradient is:</p>
+<div class="dd-equation" role="math" aria-label="w̄ = w̄_(squared) + w̄_(direct)"><span>w̄ = w̄<sub>squared</sub> + w̄<sub>direct</sub></span></div>
+<p>That is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = ∂ L/∂ u(2w+1)"><span>∂ L/∂ w = ∂ L/∂ u(2w+1)</span></div>
+<p>This is the path-summation form of the multivariable chain rule in a computation graph.</p>
+<p>The same conclusion can also be reached from the perspective of small changes. Suppose <span class="dd-inline-math" role="math" aria-label="w">w</span> changes by a very small amount <span class="dd-inline-math" role="math" aria-label="Δ w">Δ w</span>. The change in the squared branch is approximately:</p>
+<div class="dd-equation" role="math" aria-label="Δ(w^(2))≈2wΔ w"><span>Δ(w<sup>2</sup>)≈2wΔ w</span></div>
+<p>The change in the direct branch is:</p>
+<div class="dd-equation" role="math" aria-label="Δ w=1·Δ w"><span>Δ w=1·Δ w</span></div>
+<p>Because the addition node adds the results of the two branches,<span class="dd-inline-math" role="math" aria-label="u">u</span>'s total change is:</p>
+<div class="dd-equation" role="math" aria-label="Δ u ≈ 2wΔ w+Δ w = (2w+1)Δ w"><span>Δ u ≈ 2wΔ w+Δ w = (2w+1)Δ w</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="du/dw=2w+1"><span>du/dw=2w+1</span></div>
+<p>If we backpropagate only along the squaring path, we would incorrectly get:</p>
+<div class="dd-equation" role="math" aria-label="du/dw=2w"><span>du/dw=2w</span></div>
+<p>This misses the contribution of 1 from the direct path. The incorrect result may still have the correct shape and finite values, appearing to be a reasonable gradient, and is therefore more insidious than an outright error.</p>
+<p>Missing a path does not necessarily always make the gradient smaller. Contributions from different paths may have the same sign or opposite signs. For example, if one path contributes 5 and another path contributes <span class="dd-inline-math" role="math" aria-label="-3">-3</span>, the correct total gradient is 2. If one of the paths is missed, the result may become 5 or <span class="dd-inline-math" role="math" aria-label="-3">-3</span>, not only changing the magnitude but possibly also flipping the sign. Therefore, missing a path may slow down training or cause parameters to update in the wrong direction.</p>
+<p>In automatic differentiation implementations, the gradient buffer for a variable must not be directly overwritten each time a new contribution arrives:</p>
+<div class="dd-equation" role="math" aria-label="w̄←new contribution"><span>w̄←new contribution</span></div>
+<p>Instead, accumulation should be performed:</p>
+<div class="dd-equation" role="math" aria-label="w̄←w̄+new contribution"><span>w̄←w̄+new contribution</span></div>
+<p>If overwrite by assignment is used, the path that arrives later will erase the path that arrived earlier, and in the end only part of the derivative will be retained. Correct backward traversal must wait for or aggregate the contributions from all downstream paths to obtain the complete total gradient.</p>
+<p>This kind of path accumulation is very common in neural networks.</p>
+<p>A residual connection is usually written as:</p>
+<div class="dd-equation" role="math" aria-label="y=F(x)+x"><span>y=F(x)+x</span></div>
+<p>The input <span class="dd-inline-math" role="math" aria-label="x">x</span> takes one path through the transformation <span class="dd-inline-math" role="math" aria-label="F">F</span>, and the other path reaches the addition node directly through the identity connection. Therefore:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = ∂ L/∂ y ( ∂ F(x)/∂ x+I )"><span>∂ L/∂ x = ∂ L/∂ y ( ∂ F(x)/∂ x+I )</span></div>
+<p>where <span class="dd-inline-math" role="math" aria-label="I">I</span> is the local derivative of the identity path. Backpropagation must preserve the contributions of both the transformation branch and the shortcut branch.</p>
+<p>Weight sharing also produces path accumulation. If the same parameter <span class="dd-inline-math" role="math" aria-label="w">w</span> is used multiple times during the forward pass, for example:</p>
+<div class="dd-equation" role="math" aria-label="u=f(w,x_(1))+g(w,x_(2))"><span>u=f(w,x<sub>1</sub>)+g(w,x<sub>2</sub>)</span></div>
+<p>Then:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = ∂ L/∂ u ( ∂ f/∂ w + ∂ g/∂ w )"><span>∂ L/∂ w = ∂ L/∂ u ( ∂ f/∂ w + ∂ g/∂ w )</span></div>
+<p>Although they refer to the same parameter object, each use forms an independent downstream path. The gradient contributions generated at all usage positions must be accumulated into the same parameter.</p>
+<p>In recurrent neural networks, the same set of weights is used repeatedly across multiple time steps. After unfolding the recurrence over time, each time step forms a path that uses the shared weights, so the final gradient for those weights is the sum of contributions from all time steps. This is a fundamental mechanism in backpropagation through time.</p>
+<p>It is also necessary to distinguish between in-graph path summation and cross-mini-batch gradient accumulation.</p>
+<p>In-graph path summation occurs within the same forward and backward pass. It comes from the dependency structure of the function itself and is an indispensable part of computing the correct total derivative. Whenever the computation graph contains branching, sharing, or repeated use, the automatic differentiation system must perform this accumulation.</p>
+<p>Cross-mini-batch gradient accumulation, on the other hand, is a training strategy. After multiple independent forward-backward passes, it temporarily does not clear the parameter gradient buffers, thereby adding the gradients from multiple batches to simulate a larger effective batch size. For example, after continuously accumulating <span class="dd-inline-math" role="math" aria-label="K">K</span> micro-batches, the parameters are then updated.</p>
+<p>These two types of accumulation both use addition, but for different reasons:</p>
+<ul><li>In-graph fork summation is a requirement of the chain rule and cannot be omitted;</li><li>Cross-batch gradient accumulation is a training configuration and can be chosen whether to use;</li><li>In-graph summation is completed automatically by the computation graph;</li><li>Cross-batch accumulation requires the training code to explicitly decide when to retain gradients, when to update, and when to zero them.</li></ul>
+<p>Therefore, the key to understanding forked paths is that a variable's gradient is not a local result obtained from arbitrarily choosing one path, but the total effect of that variable on the final loss through all downstream paths. Only by completely adding up the contributions from every path can the resulting gradient be the true total derivative.</p></div>
+<div class="dd-formula">du/dw = 2w + 1</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Why not explicitly construct the huge Jacobian when there are many tensors?<span class="dd-badge math">Vectorization</span></h2>
+<div class="dd-agent-response"><p>This section explains why reverse-mode automatic differentiation can handle high-dimensional tensors: it usually does not construct the full Jacobian matrix, but directly computes vector–Jacobian products.</p>
+<p>Suppose a layer is:</p>
+<div class="dd-equation" role="math" aria-label="y=f(x)"><span>y=f(x)</span></div>
+<p>where:</p>
+<div class="dd-equation" role="math" aria-label="x∈ℝ^(n), y∈ℝ^(m)"><span>x∈ℝ<sup>n</sup>, y∈ℝ<sup>m</sup></span></div>
+<p>The full Jacobian matrix of this function is:</p>
+<div class="dd-equation" role="math" aria-label="J=∂ y/∂ x ∈ℝ^(m× n)"><span>J=∂ y/∂ x ∈ℝ<sup>m× n</sup></span></div>
+<p>The elements of the matrix are:</p>
+<div class="dd-equation" role="math" aria-label="J_(ij)=∂ y_(i)/∂ x_(j)"><span>J<sub>ij</sub>=∂ y<sub>i</sub>/∂ x<sub>j</sub></span></div>
+<p>It records the local influence of each input component on each output component. If both the input and output are large, explicitly storing <span class="dd-inline-math" role="math" aria-label="J">J</span> would be very expensive. For example <span class="dd-inline-math" role="math" aria-label="m=n=10 000">m=n=10 000</span> the Jacobian contains one hundred million elements; larger tensors would produce even more unacceptable storage and computational costs.</p>
+<p>But what neural network training really needs is usually not <span class="dd-inline-math" role="math" aria-label="J">J</span> itself. The final goal is a scalar loss:</p>
+<div class="dd-equation" role="math" aria-label="L=L(y)"><span>L=L(y)</span></div>
+<p>When backpropagation reaches the current layer, the downstream has already given the gradient of the loss with respect to the layer output:</p>
+<div class="dd-equation" role="math" aria-label="v^(T) = ∂ L/∂ y"><span>v<sup>T</sup> = ∂ L/∂ y</span></div>
+<p>According to the chain rule, the gradient of the loss with respect to the layer input is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = ∂ L/∂ y ∂ y/∂ x = v^(T)J"><span>∂ L/∂ x = ∂ L/∂ y ∂ y/∂ x = v<sup>T</sup>J</span></div>
+<p>This operation is called the vector–Jacobian product, or VJP.</p>
+<p>If gradients are uniformly represented as column vectors, the same relationship can also be written as:</p>
+<div class="dd-equation" role="math" aria-label="∇_(x)L=J^(T)∇_(y)L"><span>∇<sub>x</sub>L=J<sup>T</sup>∇<sub>y</sub>L</span></div>
+<p>The two forms merely adopt different row/column vector conventions and have exactly the same meaning.</p>
+<p>The key point is that the final result is only a vector of the same shape as the input <span class="dd-inline-math" role="math" aria-label="x">x</span>, containing <span class="dd-inline-math" role="math" aria-label="n">n</span> elements. Since only <span class="dd-inline-math" role="math" aria-label="v^(T)J">v<sup>T</sup>J</span>, there is no need to first create the <span class="dd-inline-math" role="math" aria-label="mn">mn</span> elements' complete Jacobian, then perform the multiplication. The framework can leverage the structure of each operation to directly compute the input gradient from the upstream gradient.</p>
+<p>Take the linear transformation as an example:</p>
+<div class="dd-equation" role="math" aria-label="y=Wx"><span>y=Wx</span></div>
+<p>The gradient of the loss with respect to the output is:</p>
+<div class="dd-equation" role="math" aria-label="∇_(y)L"><span>∇<sub>y</sub>L</span></div>
+<p>Then the input gradient can be directly computed as:</p>
+<div class="dd-equation" role="math" aria-label="∇_(x)L=W^(T)∇_(y)L"><span>∇<sub>x</sub>L=W<sup>T</sup>∇<sub>y</sub>L</span></div>
+<p>If the gradient of parameter <span class="dd-inline-math" role="math" aria-label="W">W</span> is also needed, then:</p>
+<div class="dd-equation" role="math" aria-label="∇_(W)L=(∇_(y)L)x^(T)"><span>∇<sub>W</sub>L=(∇<sub>y</sub>L)x<sup>T</sup></span></div>
+<p>Both results can be obtained directly through matrix multiplication, without creating the complete array of partial derivatives of the output with respect to each element of <span class="dd-inline-math" role="math" aria-label="x">x</span> or <span class="dd-inline-math" role="math" aria-label="W">W</span>.</p>
+<p>For an element-wise activation function:</p>
+<div class="dd-equation" role="math" aria-label="y_(i)=f(x_(i))"><span>y<sub>i</sub>=f(x<sub>i</sub>)</span></div>
+<p>Its Jacobian is theoretically a diagonal matrix:</p>
+<div class="dd-equation" role="math" aria-label="J= diag ( f&#39;(x_(1)),…,f&#39;(x_(n)) )"><span>J= diag ( f&#39;(x<sub>1</sub>),…,f&#39;(x<sub>n</sub>) )</span></div>
+<p>Explicitly creating this diagonal matrix would store a large number of useless zeros. Backpropagation only needs to compute:</p>
+<div class="dd-equation" role="math" aria-label="∇_(x)L = ∇_(y)L⊙ f&#39;(x)"><span>∇<sub>x</sub>L = ∇<sub>y</sub>L⊙ f&#39;(x)</span></div>
+<p>where <span class="dd-inline-math" role="math" aria-label="⊙">⊙</span> denotes element-wise multiplication. The whole process only handles tensors of the same scale as the input.</p>
+<p>Convolution also does not need to be expanded into a huge matrix. The backward pass of convolution can directly obtain the gradients of the input and the convolution kernel using convolution or correlation operations. Attention, normalization, and other complex operators likewise implement specialized backward rules to directly complete the required VJP.</p>
+<p>Therefore, the interface that an automatic differentiation framework implements for operators can be understood as:</p>
+<div class="dd-equation" role="math" aria-label="Input: upstream gradient with the same shape as the node output"><span>Input: upstream gradient with the same shape as the node output</span></div>
+<div class="dd-equation" role="math" aria-label="Output: gradients with the same shape as each node input"><span>Output: gradients with the same shape as each node input</span></div>
+<p>The full Jacobian exists only in the mathematical description and does not need to appear as a real tensor in GPU memory. This approach simultaneously saves storage, the time to construct the Jacobian, and the cost of subsequently performing large-scale multiplication.</p>
+<p>Reverse mode is particularly suited to neural network training because training problems usually have many inputs and few outputs. If the model has <span class="dd-inline-math" role="math" aria-label="P">P</span> parameters:</p>
+<div class="dd-equation" role="math" aria-label="θ=(θ_(1),…,θ_(P))"><span>θ=(θ<sub>1</sub>,…,θ<sub>P</sub>)</span></div>
+<p>And the final loss is only one scalar:</p>
+<div class="dd-equation" role="math" aria-label="L=L(θ)"><span>L=L(θ)</span></div>
+<p>Then the full derivative is a gradient containing <span class="dd-inline-math" role="math" aria-label="P">P</span> elements:</p>
+<div class="dd-equation" role="math" aria-label="∇_(θ) L = ( ∂ L/∂θ_(1), …, ∂ L/∂θ_(P) )"><span>∇<sub>θ</sub> L = ( ∂ L/∂θ<sub>1</sub>, …, ∂ L/∂θ<sub>P</sub> )</span></div>
+<p>Reverse mode starts from:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ L=1"><span>∂ L/∂ L=1</span></div>
+<p>Starting from there, one backward traversal yields the gradient of the loss with respect to all parameters. Its cost grows mainly with the size of the computation graph, rather than performing one derivation separately for each parameter.</p>
+<p>Forward-mode automatic differentiation propagates another kind of product. Given an input direction <span class="dd-inline-math" role="math" aria-label="r">r</span>, forward mode computes:</p>
+<div class="dd-equation" role="math" aria-label="Jr"><span>Jr</span></div>
+<p>This is called the Jacobian–vector product, or JVP. It answers: if the input changes slightly along direction <span class="dd-inline-math" role="math" aria-label="r">r</span> changes slightly, how will all outputs change.</p>
+<p>The difference between the two modes can be summarized as:</p>
+<ul><li>Reverse mode computes VJP and is suitable for many inputs and few outputs;</li><li>Forward mode computes JVP and is suitable for few inputs and many outputs.</li></ul>
+<p>If a function has only a few inputs but many outputs, forward mode can obtain the changes of all outputs at once for one input direction. If reverse mode is used to obtain the full Jacobian, it usually needs to perform backward repeatedly for multiple output directions.</p>
+<p>Conversely, neural network training has millions or even billions of parameters, but usually only one scalar loss. If forward mode were used to compute the derivative for each parameter direction, many propagations would be needed; reverse mode only needs to propagate backward one time from the scalar loss, so it is more suitable.</p>
+<p>When the output being differentiated is not a scalar, reverse mode must provide a seed vector with the same shape as the output <span class="dd-inline-math" role="math" aria-label="v">v</span>. At this point what is computed is:</p>
+<div class="dd-equation" role="math" aria-label="v^(T)J"><span>v<sup>T</sup>J</span></div>
+<p>rather than the entire <span class="dd-inline-math" role="math" aria-label="J">J</span>. It is equivalent to first weighting the vector output according to <span class="dd-inline-math" role="math" aria-label="v">v</span> into a scalar, and then computing the gradient of this scalar with respect to the input. In standard training, the loss is already a scalar, so the initial seed is naturally 1.</p>
+<p>The full Jacobian is not absolutely impossible to obtain. Some automatic differentiation frameworks provide an explicit Jacobian interface, and its implementation usually combines results from different directions into a full matrix through multiple VJP or JVP calls. But when both input and output dimensions are large, the time and space cost of this computation is still high, so it is not suitable as the default method for ordinary training.</p>
+<p>Therefore, the efficiency of backpropagation lies not only in applying the chain rule, but also in computing only what training really needs: along the direction given by the scalar loss, directly transform the upstream gradient into the input gradient without explicitly storing all partial derivatives of each output with respect to each input.</p></div>
+<table class="dd-table"><thead><tr><th>Mode</th><th>Suitable output/input relationship</th><th>Intuition</th></tr></thead><tbody><tr><td>Reverse mode</td><td>Many input parameters → few scalar outputs</td><td>One backward pass yields the gradient of the loss with respect to all parameters</td></tr><tr><td>Forward mode</td><td>Few inputs → many outputs</td><td>Propagate derivatives forward along a given input direction</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Why Backpropagation Uses More Memory Than Pure Inference<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>This section explains the fundamental reason why training memory usage is higher than pure forward inference: backpropagation needs the intermediate states from the forward phase, so many tensors that can be released immediately during inference must be retained during training.</p>
+<p>Although the number of model parameters does not change, training and inference have different requirements for the lifetime of intermediate results.</p>
+<p>In pure forward inference, after a layer's output is passed to the next layer, if the previous layer's activations no longer participate in subsequent computation, their memory can usually be freed or reused. The system mainly needs to keep the tensors still in use on the forward path, so intermediate states can be produced and discarded incrementally, like a pipeline.</p>
+<p>In addition to the forward computation, training must run backpropagation in reverse order along the computation graph. Many local backward formulas depend on the forward-time inputs, outputs, or statistics, and cannot be computed from the operator name and the upstream gradient alone.</p>
+<p>For example, for ReLU:</p>
+<div class="dd-equation" role="math" aria-label="y=max(0,x)"><span>y=max(0,x)</span></div>
+<p>The backward rule is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = ∂ L/∂ y · 𝟙_(x&gt;0)"><span>∂ L/∂ x = ∂ L/∂ y · 𝟙<sub>x&gt;0</sub></span></div>
+<p>Therefore, the backward phase must know which positions of the forward input were greater than 0. The framework can save the input, the output, or a compressed mask, but it must always retain enough information to recover this decision.</p>
+<p>For a matrix layer:</p>
+<div class="dd-equation" role="math" aria-label="Y=WX"><span>Y=WX</span></div>
+<p>Its backward formulas are:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ W = ∂ L/∂ YX^(T)"><span>∂ L/∂ W = ∂ L/∂ YX<sup>T</sup></span></div>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ X = W^(T)∂ L/∂ Y"><span>∂ L/∂ X = W<sup>T</sup>∂ L/∂ Y</span></div>
+<p>Computing the weight gradient requires the forward input activation <span class="dd-inline-math" role="math" aria-label="X">X</span>, and computing the input gradient requires the parameter <span class="dd-inline-math" role="math" aria-label="W">W</span>. Therefore, the input activation cannot be discarded immediately after the forward pass completes.</p>
+<p>The backward pass of a normalization layer may require the input, mean, variance, or normalized result from the forward computation. Other activation functions, attention, and convolution operators also have their own intermediate states that must be saved.</p>
+<p>The training forward pass therefore has two tasks:</p>
+<ul><li>Compute predictions and loss;</li><li>Save the necessary materials for future backpropagation.</li></ul>
+<p>These activations waiting to be used by the backward pass are the first major category of additional memory usage in training compared with inference.</p>
+<p>The main memory items during training typically include:</p>
+<ul><li>Model parameters;</li><li>Forward activations and intermediate states needed for local backward passes;</li><li>Parameter gradients;</li><li>Optimizer states;</li><li>Temporary workspace used during operator execution.</li></ul>
+<p>Among these, parameters are a basic memory cost required by both inference and training. The additional costs in training are mainly activations, gradients, and optimizer states.</p>
+<p>Parameter gradients typically have the same shape as the corresponding parameters. For each trainable parameter <span class="dd-inline-math" role="math" aria-label="θ">θ</span>, backpropagation needs to save:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂θ"><span>∂ L/∂θ</span></div>
+<p>Therefore, parameters and gradients alone may require two equally sized storage areas, with exact sizes depending on their respective data types.</p>
+<p>Optimizers may also maintain, for each parameter, state that persists across training steps. For example, momentum-based optimizers save historical gradient statistics. These states are not temporary data that can be released after a single backward pass; they are training state that must continue to be used in the next update.</p>
+<p>Activation memory is typically affected by the following factors:</p>
+<ul><li>Batch size;</li><li>Sequence length;</li><li>Feature dimension;</li><li>Network depth;</li><li>Types of intermediate states that operators need to save.</li></ul>
+<p>The larger the batch, the more samples each layer's activations contain. The longer the sequence, the larger the intermediate tensors in attention and sequence models typically are. The deeper the network, the more layers are simultaneously waiting for use by the backward pass. Therefore, even if the model parameters are completely unchanged, increasing the batch size or context length can significantly increase training memory usage.</p>
+<p>The activation lifecycle in a single training iteration is roughly:</p>
+<div class="dd-equation" role="math" aria-label="Forward pass produces activations → save states needed for backward → obtain loss → backward reads states layer by layer → release states of completed nodes"><span>Forward pass produces activations → save states needed for backward → obtain loss → backward reads states layer by layer → release states of completed nodes</span></div>
+<p>At the very beginning of the backward pass, activations from many layers are still simultaneously held in GPU memory, so peak memory usage is usually much higher than forward-only inference.</p>
+<p>Gradient checkpointing changes the strategy of 'saving all necessary activations'. It divides the network into several computation segments and, during the forward pass, saves only the activations at a few boundary positions, called checkpoints. Other intermediate values within a segment can be released after they are used in the forward pass.</p>
+<p>When backpropagation reaches a segment, the system starts from the nearest checkpoint, re-runs the forward pass for that segment, temporarily restores the intermediate values needed for the backward pass, and then completes the backward pass for that segment.</p>
+<p>The core trade-off of this method is:</p>
+<div class="dd-equation" role="math" aria-label="reduce activation storage ↔ increase forward recomputation"><span>reduce activation storage ↔ increase forward recomputation</span></div>
+<p>The fewer checkpoints saved, the more activations can usually be released, but the more content must be recomputed during the backward pass. Therefore, gradient checkpointing trades extra computation time for lower memory usage.</p>
+<p>Under ideal conditions, gradient checkpointing does not change the mathematical gradients. If the first forward pass and the recomputed forward pass produce exactly the same intermediate values, the subsequent execution still uses the same set of local derivatives and the chain rule.</p>
+<p>But this requires the recomputation process to reproduce the original forward results.</p>
+<p>For example, dropout generates a random mask during the forward pass. If the first forward pass uses mask <span class="dd-inline-math" role="math" aria-label="M_(1)">M<sub>1</sub></span>, but the recomputation uses a different mask <span class="dd-inline-math" role="math" aria-label="M_(2)">M<sub>2</sub></span>, then the restored intermediate values do not belong to the computation that produced the current loss. The gradients subsequently computed by backpropagation also no longer correspond to the original loss. Therefore, checkpointing mechanisms usually need to save or restore the random number state so that the recomputation gets the same mask.</p>
+<p>In-place modification is equally dangerous. If the input saved by a checkpoint or a tensor that recomputation depends on is later overwritten directly, then the recomputation no longer reproduces the original forward process.</p>
+<p>Operators with side effects can also break reproducibility. For example, an operator might modify external state, update counters, read mutable data that is changing, or depend on unrecoverable random behavior. Even if the inputs look the same, a second execution may produce different results.</p>
+<p>Therefore, when using gradient checkpointing, pay particular attention to:</p>
+<ul><li>Whether random layers can restore the same random state;</li><li>Whether in-place operations overwrite the inputs needed for recomputation;</li><li>Whether operators modify external state;</li><li>Whether the two forward passes read the same data and model state;</li><li>Whether the implementation contains non-deterministic behavior that cannot be reproduced.</li></ul>
+<p>Also distinguish between 'evaluation mode' and 'disabling gradient recording'. Switching the model to evaluation mode usually only changes the behavior of layers such as dropout and normalization; it does not necessarily stop the construction of the computation graph. If the program still requests gradients, the framework may still save intermediate states. To obtain the low-memory characteristics of pure inference, it is usually necessary to explicitly disable gradient recording.</p>
+<p>Therefore, high training memory usage is not because model parameters suddenly become more numerous, but because the system simultaneously takes on more responsibilities: saving forward history, storing backward gradients, and maintaining optimizer states. Gradient checkpointing rearranges the trade-off between computation and storage through selective forgetting and on-demand recomputation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Which code operations silently sever or contaminate the computation graph<span class="dd-badge eng">Failure modes</span></h2>
+<div class="dd-agent-response"><p>This section discusses the engineering boundaries of automatic differentiation: even when the mathematical formulas are perfectly correct, the tensor operations actually executed by the program can still sever or contaminate the computation graph, causing gradients to become <code>None</code>, all zeros, <code>NaN</code>, <code>Inf</code>, or produce results with correct shape but incorrect values.</p>
+<p>When troubleshooting these problems, first distinguish the meanings that different symptoms may express:</p>
+<ul><li>A gradient of <code>None</code>, usually indicates that there is no trackable computation path between the parameter and the loss, or the parameter did not participate in this forward computation;</li><li>A constant zero gradient may come from a true zero derivative, or from gradient blocking, activation saturation, non-differentiable operations, or low-precision underflow;</li><li>A gradient containing <code>NaN</code> or <code>Inf</code>, is usually related to numerical overflow, illegal operations, or unstable computation;</li><li>Gradient direction seems plausible but magnitude is abnormal; this may come from missing paths, incorrect broadcasting, stale gradient accumulation, or scaling errors;</li><li>Gradient increases continuously with training steps; this may be due to forgetting to zero the gradient, or the model itself may be experiencing exploding gradients.</li></ul>
+<p>Symptoms can only narrow the scope of troubleshooting, not determine the root cause alone. Reliable diagnosis must return to the tensor operations actually executed by the code and independent gradient checking results.</p>
+<p>The first type of failure is a severed computation graph.</p>
+<p>Let:</p>
+<div class="dd-equation" role="math" aria-label="a=f(w)"><span>a=f(w)</span></div>
+<p>If a detach operation is subsequently performed:</p>
+<div class="dd-equation" role="math" aria-label="b=detach(a)"><span>b=detach(a)</span></div>
+<p>Then compute:</p>
+<div class="dd-equation" role="math" aria-label="L=g(b)"><span>L=g(b)</span></div>
+<p>Although <span class="dd-inline-math" role="math" aria-label="b">b</span> has the same numerical value as <span class="dd-inline-math" role="math" aria-label="a">a</span>, <span class="dd-inline-math" role="math" aria-label="b">b</span> no longer retains <span class="dd-inline-math" role="math" aria-label="a">a</span> 's computation history. The loss <span class="dd-inline-math" role="math" aria-label="L">L</span> cannot trace back along:</p>
+<div class="dd-equation" role="math" aria-label="L→ b→ a→ w"><span>L→ b→ a→ w</span></div>
+<p>this path to the parameter <span class="dd-inline-math" role="math" aria-label="w">w</span>, therefore <span class="dd-inline-math" role="math" aria-label="w">w</span> 's gradient may be <code>None</code>.</p>
+<p>Converting a tensor to a plain array, a plain numeric value, or passing it to an external program not tracked by the automatic differentiation system can also produce the same effect. Even if the result is later converted back to a tensor, the new tensor is usually just an independent object without the original computation history; the original dependency relationships are not automatically restored.</p>
+<p>When troubleshooting, check:</p>
+<ul><li>whether the parameter has gradient tracking enabled;</li><li>whether the loss actually depends on that parameter;</li><li>whether <code>detach</code> or an equivalent operation was used;</li><li>whether the tensor was converted to a plain array or scalar and then reconstructed back into a tensor;</li><li>whether the relevant computation occurred inside a scope where gradient recording is disabled;</li><li>whether the parameter exists only in a conditional branch that was not actually executed;</li><li>whether the model contains parameters that were not used by this sample.</li></ul>
+<p>Note that a gradient of <code>None</code> is not the same as a zero gradient.<code>None</code> usually indicates that no differentiable path was formed; a zero gradient indicates that the path may exist, but the current local derivative or total path contribution is zero.</p>
+<p>The second type of failure is in-place modification of saved activations.</p>
+<p>Backpropagation often needs to read tensors saved during the forward phase. If the code directly modifies that tensor in the original memory, what the backward phase sees may no longer be the value that produced the current loss.</p>
+<p>For example, the backward formula for a node may require the original input <span class="dd-inline-math" role="math" aria-label="u">u</span>, but after the forward pass the code executes:</p>
+<div class="dd-equation" role="math" aria-label="u← h(u)"><span>u← h(u)</span></div>
+<p>If this is an in-place overwrite, then the <span class="dd-inline-math" role="math" aria-label="u">u</span> has already changed. The local derivative may not be computable, or may be computed based on an incorrect state.</p>
+<p>Mature frameworks usually detect some dangerous modifications through tensor version information and report an error, but the absence of an error does not guarantee that all cases are safe. Shared storage, views, custom operators, and operations that bypass framework checks can still cause hidden contamination.</p>
+<p>Troubleshooting methods include:</p>
+<ul><li>temporarily change in-place operations to non-in-place forms that produce new tensors;</li><li>enable automatic differentiation anomaly detection;</li><li>check whether multiple tensors share underlying storage;</li><li>look at the forward node pointed to by the error, not just the location where the error occurred during backward;</li><li>check whether a custom operator saved and then modified the same tensor.</li></ul>
+<p>The third type of failure is forgetting to zero the parameter gradients.</p>
+<p>Many automatic differentiation frameworks by default accumulate new gradients into the parameter's existing gradient buffer:</p>
+<div class="dd-equation" role="math" aria-label="g_(buffer) ← g_(buffer)+g_(new)"><span>g<sub>buffer</sub> ← g<sub>buffer</sub>+g<sub>new</sub></span></div>
+<p>This is to support path accumulation in the same computation graph and gradient accumulation across mini-batches. However, if the training code expects each batch to be updated independently but does not zero the gradients at the correct time, then subsequent steps will see not the current batch's gradient, but the sum of contributions from multiple batches.</p>
+<p>A typical training sequence is:</p>
+<div class="dd-equation" role="math" aria-label="zero gradients → forward → compute loss → backward → parameter update"><span>zero gradients → forward → compute loss → backward → parameter update</span></div>
+<p>If gradient accumulation is intentional, you should specify:</p>
+<ul><li>how many micro-batches to accumulate;</li><li>whether the loss or gradient should be scaled by the number of accumulation steps;</li><li>when to perform the parameter update;</li><li>when to zero the gradients after the update.</li></ul>
+<p>When troubleshooting, you can record the gradient value or gradient norm after each backward step. If the gradient persistently contains historical contributions without a mathematical reason, check the timing of zeroing.</p>
+<p>The fourth type of failure comes from underflow and overflow in mixed precision.</p>
+<p>Low-precision floating-point formats have limited representable range and significant digits. Very small gradients may underflow to 0, and very large activations or gradients may overflow to <code>Inf</code>, and subsequent operations may produce <code>NaN</code>.</p>
+<p>The basic approach of loss scaling is to first multiply the loss by a scale factor <span class="dd-inline-math" role="math" aria-label="s">s</span>:</p>
+<div class="dd-equation" role="math" aria-label="L&#39;=sL"><span>L&#39;=sL</span></div>
+<p>Then:</p>
+<div class="dd-equation" role="math" aria-label="∇_(θ) L&#39; = s∇_(θ) L"><span>∇<sub>θ</sub> L&#39; = s∇<sub>θ</sub> L</span></div>
+<p>Gradients that were originally too small are amplified, reducing underflow risk. Before the parameter update, divide the gradients by <span class="dd-inline-math" role="math" aria-label="s">s</span>, restoring the original scale.</p>
+<p>When diagnosing, check:</p>
+<ul><li>the proportion of finite values among gradients and activations;</li><li>the number of zero values, <code>NaN</code> and <code>Inf</code>;</li><li>whether the problem appears only in low-precision training;</li><li>whether the problem disappears after temporarily switching to higher precision;</li><li>whether the order of loss scaling and unscaling is correct;</li><li>whether gradient clipping or threshold judgment was incorrectly performed before unscaling.</li></ul>
+<p>If dynamic loss scaling detects non-finite gradients, it usually skips the current parameter update and adjusts the scaling factor. This skipping itself may be normal protective behavior, but if it occurs frequently, it indicates that the numerical range still has problems.</p>
+<p>The fifth type of problem is non-differentiable discrete operations.</p>
+<p>Rounding, hard thresholding, discrete sampling, taking category indices, and certain selection operations may cause the output to remain unchanged over a large region of the input. In this case the local derivative is usually zero; at jump positions, the classical derivative may not exist.</p>
+<p>This is not damage to the computation graph, but rather the chosen operation itself lacks a continuous derivative suitable for ordinary gradient descent. Solutions depend on the task and may include:</p>
+<ul><li>smooth approximation;</li><li>differentiable relaxation;</li><li>surrogate gradient;</li><li>specialized gradient estimator;</li><li>redesigning the loss or model objective.</li></ul>
+<p>What these methods obtain may be approximate gradients, surrogate gradients, or stochastic estimators, and should not be mistaken for the exact ordinary derivative of the original discrete function.</p>
+<p>The sixth type of problem is incorrect broadcasting.</p>
+<p>Broadcasting allows tensors of different shapes to perform legal operations, but the fact that the forward pass runs does not mean the axis semantics are correct.</p>
+<p>For example:</p>
+<div class="dd-equation" role="math" aria-label="Y=X+b"><span>Y=X+b</span></div>
+<p>If <span class="dd-inline-math" role="math" aria-label="b">b</span> is reused along the batch dimension, then when backpropagation computes the gradient of <span class="dd-inline-math" role="math" aria-label="b">b</span> when computing its gradient, it must sum the contributions from all batch positions back to <span class="dd-inline-math" role="math" aria-label="b">b</span> 's original shape:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ b = Σ_(broadcast dimensions) ∂ L/∂ Y"><span>∂ L/∂ b = Σ<sub>broadcast dimensions</sub> ∂ L/∂ Y</span></div>
+<p>If the tensor axes are arranged incorrectly, the program may still broadcast successfully but duplicate the parameter along the wrong dimension. Backpropagation will then also sum along the wrong dimension. The final gradient shape may even still be correct, but the actual meaning of each value will be misaligned.</p>
+<p>Therefore, check:</p>
+<ul><li>the complete shape of each tensor;</li><li>whether each axis represents batch, time, channel, or feature;</li><li>on which axes broadcasting actually occurs;</li><li>whether the backward reduction corresponds to the expanded axes;</li><li>whether it can be verified by hand after changing to a small example with dimensions 1, 2, 3.</li></ul>
+<p>A practical troubleshooting order is:</p>
+<ol><li>Confirm whether a complete computation graph path exists between the parameters and the loss.</li><li>Check whether detach operations, plain array conversions, or no-gradient scopes were used.</li><li>Check whether the activations needed for backward were modified in place.</li><li>Clarify the timing for zeroing parameter gradients and intentional accumulation.</li><li>Check for zero, <code>NaN</code>, <code>Inf</code> and other abnormal values.</li><li>Use higher precision for comparison to determine whether a mixed-precision problem exists.</li><li>Check for discrete or non-differentiable nodes.</li><li>Check broadcasting, reduction, and tensor axis semantics.</li><li>In a small deterministic example, compare automatic gradients with hand calculations or finite differences.</li></ol>
+<p>When performing gradient checks, you should minimize randomness, fix data and model states, use double precision, and check only a small number of parameters at a time. If numerical gradients are stable but automatic gradients clearly disagree, prioritize suspecting local backward rules, graph paths, branch accumulation, and broadcast reductions.</p>
+<p>The same symptom may be caused by multiple failures together. For example, forgetting to zero gradients may coexist with low-precision underflow; after fixing the zeroing problem, zero-gradient phenomena may still continue. Incorrect broadcasting may also appear together with a detached branch.</p>
+<p>Therefore, after each fix, rerun the minimal forward-backward test and gradient check. The disappearance of errors, gradients no longer being zero, or the loss starting to decrease can only prove that some symptom has changed; they cannot individually prove that the entire computation graph and all gradients are correct.</p></div>
+<table class="dd-table"><thead><tr><th>Failure</th><th>Mechanism</th><th>Inspection Method</th></tr></thead><tbody><tr><td><code>detach</code> / converting to plain array</td><td>Explicitly stops recording subsequent dependencies</td><td>Check requires-grad and graph boundaries</td></tr><tr><td>In-place modification of saved activations</td><td>Forward values needed for backward have been overwritten</td><td>Enable anomaly detection, avoid dangerous in-place operations</td></tr><tr><td>Forgetting to zero gradients</td><td>Most frameworks accumulate to old values by default</td><td>Record gradients per step and clarify zero-grad timing</td></tr><tr><td>Mixed-precision underflow/overflow</td><td>Small gradients become 0 or large values become Inf</td><td>Loss scaling, check finite ratio</td></tr><tr><td>Non-differentiable discrete operations</td><td>No usable continuous derivative locally</td><td>Use surrogate, estimator, or rewrite objective</td></tr><tr><td>Incorrect broadcasting</td><td>Shape is legal but gradients are summed along the wrong dimension</td><td>Check tensor shapes and hand-calculate with small examples</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Worked Example: Checking Automatic Gradients with Finite Differences<span class="dd-badge eng">Verification</span></h2>
+<div class="dd-agent-response"><p>This section shows how to use finite differences to check automatic differentiation: backpropagation efficiently computes the gradients of all parameters, while finite differences serve as a relatively independent numerical route for spot-checking a small number of parameters.</p>
+<p>Still using the running example:</p>
+<div class="dd-equation" role="math" aria-label="x=2, y=6"><span>x=2, y=6</span></div>
+<p>The model and loss are:</p>
+<div class="dd-equation" role="math" aria-label="ŷ=wx"><span>ŷ=wx</span></div>
+<div class="dd-equation" role="math" aria-label="L(w)=1/2(ŷ-y)^(2) =1/2(wx-y)^(2)"><span>L(w)=1/2(ŷ-y)<sup>2</sup> =1/2(wx-y)<sup>2</sup></span></div>
+<p>The analytical gradient given by backpropagation is:</p>
+<div class="dd-equation" role="math" aria-label="g=∂ L/∂ w =(wx-y)x"><span>g=∂ L/∂ w =(wx-y)x</span></div>
+<p>At <span class="dd-inline-math" role="math" aria-label="w=2">w=2</span>:</p>
+<div class="dd-equation" role="math" aria-label="g=(2×2-6)×2 =(-2)×2 =-4"><span>g=(2×2-6)×2 =(-2)×2 =-4</span></div>
+<p>Now instead of using this backward formula, we will run only the forward loss and estimate the numerical gradient from both sides of the parameter. The central difference is:</p>
+<div class="dd-equation" role="math" aria-label="g_(num) = (L(w+ε)-L(w-ε))/2ε"><span>g<sub>num</sub> = (L(w+ε)-L(w-ε))/2ε</span></div>
+<p>Take:</p>
+<div class="dd-equation" role="math" aria-label="w=2, ε=10^(-4)"><span>w=2, ε=10<sup>-4</sup></span></div>
+<p>Perturb in the positive direction:</p>
+<div class="dd-equation" role="math" aria-label="w+ε=2.0001"><span>w+ε=2.0001</span></div>
+<p>The corresponding prediction is:</p>
+<div class="dd-equation" role="math" aria-label="ŷ_(+)=2.0001×2=4.0002"><span>ŷ<sub>+</sub>=2.0001×2=4.0002</span></div>
+<p>The loss is:</p>
+<div class="dd-equation" role="math" aria-label="L(2.0001) = 1/2(4.0002-6)^(2) = 1/2(-1.9998)^(2) = 1.99960002"><span>L(2.0001) = 1/2(4.0002-6)<sup>2</sup> = 1/2(-1.9998)<sup>2</sup> = 1.99960002</span></div>
+<p>Perturb in the negative direction:</p>
+<div class="dd-equation" role="math" aria-label="w-ε=1.9999"><span>w-ε=1.9999</span></div>
+<p>The corresponding prediction is:</p>
+<div class="dd-equation" role="math" aria-label="ŷ_(-)=1.9999×2=3.9998"><span>ŷ<sub>-</sub>=1.9999×2=3.9998</span></div>
+<p>The loss is:</p>
+<div class="dd-equation" role="math" aria-label="L(1.9999) = 1/2(3.9998-6)^(2) = 1/2(-2.0002)^(2) = 2.00040002"><span>L(1.9999) = 1/2(3.9998-6)<sup>2</sup> = 1/2(-2.0002)<sup>2</sup> = 2.00040002</span></div>
+<p>Substitute into the central difference:</p>
+<div class="dd-equation" role="math" aria-label="g_(num) = (1.99960002-2.00040002)/(2×10^(-4))"><span>g<sub>num</sub> = (1.99960002-2.00040002)/(2×10<sup>-4</sup>)</span></div>
+<div class="dd-equation" role="math" aria-label="g_(num) = (-0.0008)/0.0002 = -4"><span>g<sub>num</sub> = (-0.0008)/0.0002 = -4</span></div>
+<p>Therefore:</p>
+<div class="dd-equation" role="math" aria-label="g_(num)≈ g=-4"><span>g<sub>num</sub>≈ g=-4</span></div>
+<p>In this example, the loss with respect to <span class="dd-inline-math" role="math" aria-label="w">w</span> is quadratic. Under ideal arithmetic, central difference cancels the first-order approximation error caused by the quadratic term, so the result is particularly accurate; in actual programs, finite floating-point errors still exist.</p>
+<p>Numerical gradients can serve as an independent reference for automatic gradients because they depend only on:</p>
+<div class="dd-equation" role="math" aria-label="L(w+ε) and L(w-ε)"><span>L(w+ε) and L(w-ε)</span></div>
+<p>the loss values from these two forward computations. It does not use the backward formula of the node being checked. If a custom backward rule is written incorrectly while the forward computation is correct, automatic gradients and numerical gradients will usually differ.</p>
+<p>When comparing the two, you can use the relative error:</p>
+<div class="dd-equation" role="math" aria-label="E_(rel) = (|g-g_(num)|)/(|g|+|g_(num)|+δ)"><span>E<sub>rel</sub> = (|g-g<sub>num</sub>|)/(|g|+|g<sub>num</sub>|+δ)</span></div>
+<p>where <span class="dd-inline-math" role="math" aria-label="δ">δ</span> is a small positive number used to prevent division by zero.</p>
+<p>Relative error takes into account the scale of the gradient itself. For example, when the gradient magnitude is <span class="dd-inline-math" role="math" aria-label="10^(3)">10<sup>3</sup></span>, <span class="dd-inline-math" role="math" aria-label="10^(-5)">10<sup>-5</sup></span> an absolute difference can usually be ignored; when the gradient magnitude is <span class="dd-inline-math" role="math" aria-label="10^(-6)">10<sup>-6</sup></span>, the same absolute difference may be serious.</p>
+<p>However, when both gradients are close to zero, the relative error may appear large because the denominator is small. Therefore, during actual checking, you should also observe the absolute error:</p>
+<div class="dd-equation" role="math" aria-label="E_(abs) = |g-g_(num)|"><span>E<sub>abs</sub> = |g-g<sub>num</sub>|</span></div>
+<p>Only by combining absolute error, relative error, and gradient scale can you judge the result reasonably.</p>
+<p>Finite difference checks need to satisfy several conditions; otherwise, even if the backward implementation is correct, inconsistencies may occur.</p>
+<p>First, avoid non-differentiable points as much as possible. Take ReLU as an example:</p>
+<div class="dd-equation" role="math" aria-label="f(u)=max(0,u)"><span>f(u)=max(0,u)</span></div>
+<p>At <span class="dd-inline-math" role="math" aria-label="u=0">u=0</span> the left and right derivatives differ. The central difference observes both sides of the kink, while the automatic differentiation framework returns a subgradient according to a predefined convention. The two may differ, but this does not necessarily mean the backward implementation is wrong.</p>
+<p>For piecewise functions, select test points within each differentiable region separately, and handle non-differentiable boundaries according to the operator's convention.</p>
+<p>Second, the forward computation must be deterministic. If the two finite-difference forward passes use different dropout masks, then:</p>
+<div class="dd-equation" role="math" aria-label="L(w+ε)-L(w-ε)"><span>L(w+ε)-L(w-ε)</span></div>
+<p>contains both parameter perturbation and random noise, so the difference quotient cannot reliably represent the derivative in the parameter direction.</p>
+<p>Therefore, you need to:</p>
+<ul><li>Turn off random behavior such as dropout, or strictly restore the same random state;</li><li>Fix the input data;</li><li>Fix the model state;</li><li>Avoid updating running statistics between the two forward passes;</li><li>Avoid operators with uncontrollable side effects.</li></ul>
+<p>Third, <span class="dd-inline-math" role="math" aria-label="ε">ε</span> must be in an appropriate range.</p>
+<p>When <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is too large, the difference quotient measures the average slope over a relatively wide interval and cannot adequately represent the local derivative at the current point, producing truncation error.</p>
+<p>When <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is too small, the two loss values are very close and significant digits are easily lost during subtraction. The resulting rounding error, when divided by the very small <span class="dd-inline-math" role="math" aria-label="2ε">2ε</span>, may be further amplified.</p>
+<p>Therefore, you should not try only a single <span class="dd-inline-math" role="math" aria-label="ε">ε</span>, but should test multiple orders of magnitude. The typical phenomenon is:</p>
+<ul><li>a larger <span class="dd-inline-math" role="math" aria-label="ε">ε</span> is affected by truncation error;</li><li>in some middle range, the numerical gradient is relatively stable;</li><li>an extremely small <span class="dd-inline-math" role="math" aria-label="ε">ε</span> starts to be affected by floating-point rounding error.</li></ul>
+<p>Checks should preferentially use results from this stable range.</p>
+<p>Fourth, gradient checks are best done in double precision. Central difference requires subtracting two very close loss values, and single precision more easily loses significant digits. The goal of a gradient check is to verify the differentiation logic, so you need not stick to the low-precision setting used in actual training.</p>
+<p>Fifth, you should reduce the network and parameter scale. Finite differences require an additional forward computation for each parameter element checked. Checking a complete large model is both expensive and not conducive to locating problems.</p>
+<p>For tensor parameters, you can randomly select a small number of indices. Each time, perturb only one of the elements while keeping the others unchanged, then compare the numerical gradient with the automatic gradient at the same position.</p>
+<p>Sixth, check in an order from local to global:</p>
+<ol><li>First check the input gradients of a single custom operator;</li><li>Then check a layer or a combination of a few operators;</li><li>Finally check a small end-to-end network;</li><li>Repeat spot checks for different parameter positions and different input regions.</li></ol>
+<p>If you directly check the complete network and find an inconsistency, the problem could come from any node, broadcast dimension, or branching path, making it hard to locate. Local testing can more quickly identify which backward rule is wrong.</p>
+<p>Test cases should also cover different branches of operators. For example, when checking ReLU, choose positive and negative inputs separately; when checking broadcasting, use small tensors that expose the reduction axes; when checking shared parameters, ensure that the same parameter actually participates in the loss along multiple paths.</p>
+<p>If a gradient check fails, further localization can be based on the observed behavior:</p>
+<ul><li>At multiple <span class="dd-inline-math" role="math" aria-label="ε">ε</span> values the numerical gradient is stable but inconsistent with the automatic gradient: first check the backward formula, path accumulation, and broadcast reduction;</li><li>The numerical gradient varies drastically with <span class="dd-inline-math" role="math" aria-label="ε">ε</span>: check floating-point precision, randomness, non-differentiable points, and loss scale;</li><li>The automatic gradient is <code>None</code>: check whether the parameter participates in the loss and whether the computation graph has been cut;</li><li>The automatic gradient is zero while the numerical gradient is nonzero: check detach operations, wrong local derivatives, non-differentiable operations, and low-precision underflow;</li><li>Single-layer checks pass but end-to-end checks fail: check layer combinations, shared variables, branch summation, and state changes.</li></ul>
+<p>Even if all spot checks pass, it cannot prove that the entire backward implementation is correct for all inputs and all parameters. It only shows that, at the selected parameter elements, input data, and evaluation points, the automatic gradient and the finite-difference gradient give similar results.</p>
+<p>Therefore, gradient checking is a targeted sampling verification. It should cover representative parameters, numerical ranges, and computational branches, and combine small models, double precision, deterministic forward, central difference, and multiple step sizes to make this independent evidence as reliable as possible.</p></div>
+<div class="dd-formula">g<sub>num</sub>=[L(2+ε)−L(2−ε)]/(2ε) ≈ −4</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the entire causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>This section connects the complete causal chain in one training iteration and clarifies the boundaries of responsibility among backpropagation, the loss function, the optimizer, and evaluation.</p>
+<p>The entire process can be summarized as:</p>
+<div class="dd-equation" role="math" aria-label="Current parameters → forward prediction → scalar loss → backward gradient → optimizer update → new parameters"><span>Current parameters → forward prediction → scalar loss → backward gradient → optimizer update → new parameters</span></div>
+<p>Backpropagation sits between loss computation and parameter updates. It is responsible for answering “how sensitive the current loss is to each parameter,” but it does not define the training objective, nor does it decide how much parameters are actually updated.</p>
+<p>The first step is to perform forward propagation using the current parameters.</p>
+<p>Given input <span class="dd-inline-math" role="math" aria-label="x">x</span>, target <span class="dd-inline-math" role="math" aria-label="y">y</span> and model parameters <span class="dd-inline-math" role="math" aria-label="θ">θ</span>, the model produces a prediction:</p>
+<div class="dd-equation" role="math" aria-label="ŷ=f(x;θ)"><span>ŷ=f(x;θ)</span></div>
+<p>The loss function then computes:</p>
+<div class="dd-equation" role="math" aria-label="L=ℓ(ŷ,y)"><span>L=ℓ(ŷ,y)</span></div>
+<p>In training, the loss is usually reduced to a scalar. Forward propagation also records the dependencies of the computation graph and saves intermediate values needed by the backward formulas, such as input activations, errors, activation masks, and normalization statistics.</p>
+<p>What we get at this point is only the prediction and loss of the current parameters on the current data; the parameters themselves have not changed yet.</p>
+<p>The second step is to start backpropagation from the scalar loss.</p>
+<p>The final node is the loss itself, so the backward seed is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ L=1"><span>∂ L/∂ L=1</span></div>
+<p>This 1 represents one unit of sensitivity of the loss to itself. It is not a learning rate, nor is it an artificially set optimization signal, but rather the mathematical starting point of backpropagation.</p>
+<p>If the output with respect to which we differentiate is not a scalar, an additional seed gradient with the same shape as the output must be provided. Standard training usually already reduces the output error to a scalar loss, so the initial seed is naturally 1.</p>
+<p>The third step is to traverse the computation graph in reverse topological order.</p>
+<p>Forward propagation must first obtain node inputs before it can compute node outputs. Backpropagation must first know the gradient of the loss with respect to the node output before it can compute the gradient of the loss with respect to the node input. Therefore, the reverse traversal order is opposite to the forward computation order.</p>
+<p>Suppose a node performs:</p>
+<div class="dd-equation" role="math" aria-label="z=f(u)"><span>z=f(u)</span></div>
+<p>The node receives the upstream gradient from downstream:</p>
+<div class="dd-equation" role="math" aria-label="z̄=∂ L/∂ z"><span>z̄=∂ L/∂ z</span></div>
+<p>Then, combined with its own local derivative, it computes the gradient passed to the input:</p>
+<div class="dd-equation" role="math" aria-label="ū = ∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u"><span>ū = ∂ L/∂ u = ∂ L/∂ z ∂ z/∂ u</span></div>
+<p>Each operator is only responsible for its own local rule. A multiplication node handles the derivative of multiplication, an activation node handles the derivative of the activation function, and a matrix multiplication node handles the corresponding transposed multiplication. They do not need to know the structure of the complete model.</p>
+<p>The fourth step is to directly compute the vector–Jacobian product.</p>
+<p>For a tensor node:</p>
+<div class="dd-equation" role="math" aria-label="y=f(x)"><span>y=f(x)</span></div>
+<p>The complete local derivative is the Jacobian matrix:</p>
+<div class="dd-equation" role="math" aria-label="J=∂ y/∂ x"><span>J=∂ y/∂ x</span></div>
+<p>But backpropagation does not need to explicitly construct <span class="dd-inline-math" role="math" aria-label="J">J</span>. If the downstream gradient is:</p>
+<div class="dd-equation" role="math" aria-label="v^(T)=∂ L/∂ y"><span>v<sup>T</sup>=∂ L/∂ y</span></div>
+<p>The current node only needs to compute:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = v^(T)J"><span>∂ L/∂ x = v<sup>T</sup>J</span></div>
+<p>This is the vector–Jacobian product. The operator uses its own structure to directly complete this computation, avoiding the generation of a huge full Jacobian matrix.</p>
+<p>The fifth step is to accumulate gradient contributions at forks and shared variables.</p>
+<p>If the same variable affects the loss through multiple paths, each path returns a gradient. The total gradient of that variable must be the sum of all path contributions:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ u = Σ_(k) ( ∂ L/∂ u )_(k)"><span>∂ L/∂ u = Σ<sub>k</sub> ( ∂ L/∂ u )<sub>k</sub></span></div>
+<p>Residual connections, weight sharing, and parameter reuse in recurrent networks all rely on this rule. Keeping only one path, or letting a later-arriving contribution overwrite an earlier one, will miss part of the total derivative.</p>
+<p>The sixth step is to obtain the gradients of all trainable parameters.</p>
+<p>After the reverse topological traversal is complete, every parameter that participated in computing the current loss and requires gradients <span class="dd-inline-math" role="math" aria-label="θ">θ</span> will receive:</p>
+<div class="dd-equation" role="math" aria-label="∇_(θ) L = ∂ L/∂θ"><span>∇<sub>θ</sub> L = ∂ L/∂θ</span></div>
+<p>This gradient describes the first-order change in the loss when parameters undergo small changes near the current parameter point:</p>
+<div class="dd-equation" role="math" aria-label="L(θ+Δθ) ≈ L(θ) + ∇_(θ) L^(T)Δθ"><span>L(θ+Δθ) ≈ L(θ) + ∇<sub>θ</sub> L<sup>T</sup>Δθ</span></div>
+<p>At this point, the main responsibility of backpropagation has been completed. It delivers gradients, not new parameters.</p>
+<p>The seventh step is to verify the gradient implementation using finite differences and local tests.</p>
+<p>Finite differences estimate the numerical gradient using the forward loss on both sides of a parameter:</p>
+<div class="dd-equation" role="math" aria-label="g_(num) = (L(θ_(i)+ε)-L(θ_(i)-ε))/2ε"><span>g<sub>num</sub> = (L(θ<sub>i</sub>+ε)-L(θ<sub>i</sub>-ε))/2ε</span></div>
+<p>Compare it with the gradient obtained from backpropagation:</p>
+<div class="dd-equation" role="math" aria-label="g=∂ L/∂θ_(i)"><span>g=∂ L/∂θ<sub>i</sub></span></div>
+<p>By comparison, you can check whether local backward rules, broadcast reductions, path accumulation, or custom operators are correct.</p>
+<p>Such checks are not a necessary part of every training iteration, and they cannot prove that all parameters are correct for all possible values. They are a development and diagnostic tool.</p>
+<p>The eighth step is when the optimizer updates the parameters.</p>
+<p>The simplest gradient descent rule is:</p>
+<div class="dd-equation" role="math" aria-label="θ_(new) = θ-η∇_(θ) L"><span>θ<sub>new</sub> = θ-η∇<sub>θ</sub> L</span></div>
+<p>where <span class="dd-inline-math" role="math" aria-label="η">η</span> is the learning rate. More complex optimizers may also combine momentum, historical squared gradients, weight decay, or other state to process the current gradient.</p>
+<p>Therefore, the division of labor between backpropagation and the optimizer is:</p>
+<ul><li>Backpropagation computes gradients;</li><li>The optimizer reads and transforms gradients;</li><li>The optimizer decides the update magnitude and modifies the parameters.</li></ul>
+<p>Backpropagation does not automatically modify parameters, nor does it decide the learning rate, momentum, gradient clipping, or weight decay.</p>
+<p>Even if the gradient direction is correct, a single actual update does not guarantee a decrease in loss. The negative gradient gives the local descent direction in an infinitesimal neighborhood:</p>
+<div class="dd-equation" role="math" aria-label="-∇_(θ) L"><span>-∇<sub>θ</sub> L</span></div>
+<p>If the learning rate is too large, the actual update may exceed the region where the local linear approximation holds, causing the loss to oscillate or even increase. The gradient provides the local direction and rate of change, while the concrete step size remains the optimizer's responsibility.</p>
+<p>Backpropagation is also not responsible for judging whether the training objective is correct. It only faithfully computes the derivatives of the given loss function. If the loss function does not express the true objective, the gradient may still be mathematically completely correct, but the model will optimize the wrong or incomplete objective.</p>
+<p>For example, if training loss keeps decreasing while validation metrics do not improve, possible causes include:</p>
+<ul><li>The loss is only a proxy for the actual evaluation objective;</li><li>The model is overfitting;</li><li>The training data distribution differs from actual usage data;</li><li>There are issues with labels or sample weights;</li><li>The evaluation metric includes constraints not reflected by the loss;</li><li>The model exploits incorrect shortcuts in the data.</li></ul>
+<p>These problems need to be solved by data, loss design, and independent evaluation; they cannot be discovered by backpropagation alone.</p>
+<p>Backpropagation also does not guarantee finding the global optimum. It computes the local derivative at the current point, and long-term training results also depend on model structure, initialization, data order, optimizer, learning rate, and randomness.</p>
+<p>A complete training iteration can be organized as:</p>
+<ol><li>Zero out or retain old gradients according to the training strategy;</li><li>Perform forward propagation using current parameters;</li><li>Compute the scalar loss and save necessary intermediate state;</li><li>From <span class="dd-inline-math" role="math" aria-label="∂ L/∂ L=1">∂ L/∂ L=1</span> start the backward pass;</li><li>Execute the local vector–Jacobian product for each node in reverse order;</li><li>Accumulate all path contributions at shared variables;</li><li>Obtain the gradients of all trainable parameters;</li><li>If necessary, perform unscale, non-finite value checks, or gradient clipping;</li><li>The optimizer reads the gradients and updates the parameters;</li><li>Use the loss and independent evaluation to judge whether training actually improves the objective.</li></ol>
+<p>The responsibilities of the three parties can be summarized as:</p>
+<div class="dd-equation" role="math" aria-label="[Loss function defines the optimization objective]"><span>[Loss function defines the optimization objective]</span></div>
+<div class="dd-equation" role="math" aria-label="[Backpropagation computes gradients of the objective with respect to parameters]"><span>[Backpropagation computes gradients of the objective with respect to parameters]</span></div>
+<div class="dd-equation" role="math" aria-label="[Optimizer updates parameters based on gradients]"><span>[Optimizer updates parameters based on gradients]</span></div>
+<p>Evaluation is responsible for judging whether the model improves on the criteria we truly care about.</p>
+<p>Therefore, the precise responsibility of backpropagation is: given the current forward computation graph, the necessary intermediate state, and the final scalar loss, efficiently compute the gradients of that loss with respect to all variables that require gradients. It connects “the loss has already been computed” with “the optimizer can act,” but it does not replace objective design, parameter update strategy, or effectiveness evaluation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Pathway</span></h2>
+<div class="dd-agent-response"><p>This section presents the conceptual dependencies and subsequent learning pathway for backpropagation. After understanding backpropagation, you still need to answer five types of questions: from what objective to start differentiation, how gradients become updates, why deep paths weaken gradients, how network structure improves propagation, and how large-scale training balances computation, communication, and memory.</p>
+<p>The first dependency is the loss function. Backpropagation must start from a clear output, typically a scalar loss during training:</p>
+<div class="dd-equation" role="math" aria-label="L=ℓ(ŷ,y)"><span>L=ℓ(ŷ,y)</span></div>
+<p>Backpropagation computes:</p>
+<div class="dd-equation" role="math" aria-label="∇_(θ) L = ∂ L/∂θ"><span>∇<sub>θ</sub> L = ∂ L/∂θ</span></div>
+<p>Therefore, before discussing gradients, one must first answer: what scalar are we actually differentiating?</p>
+<p>The loss function defines the optimization objective of the model. Different loss functions produce different gradients; even if the model, parameters, and data are identical, changing the loss can change the training signal received by parameters.</p>
+<p>The relationship between the loss function and backpropagation is:</p>
+<div class="dd-equation" role="math" aria-label="What result the loss defines as better → How backpropagation computes how changing parameters affects this objective"><span>What result the loss defines as better → How backpropagation computes how changing parameters affects this objective</span></div>
+<p>If the loss does not accurately express the true task objective, backpropagation can still produce mathematically correct gradients, but the model will efficiently optimize a wrong or incomplete objective. Therefore, a correct gradient does not mean a correct objective.</p>
+<p>The second dependency is gradient descent. Backpropagation yields:</p>
+<div class="dd-equation" role="math" aria-label="g_(t)=∇_(θ) L_(t)"><span>g<sub>t</sub>=∇<sub>θ</sub> L<sub>t</sub></span></div>
+<p>After this, the parameters have not changed yet. The optimizer needs to convert the gradient into a concrete update. The simplest gradient descent rule is:</p>
+<div class="dd-equation" role="math" aria-label="θ_(t+1) = θ_(t)-η g_(t)"><span>θ<sub>t+1</sub> = θ<sub>t</sub>-η g<sub>t</sub></span></div>
+<p>where <span class="dd-inline-math" role="math" aria-label="η">η</span> is the learning rate.</p>
+<p>The gradient provides the direction and rate of change near the current parameter point; the learning rate determines the actual step size. If the step is too small, training may progress slowly; if too large, parameters may overshoot the local descending region, causing the loss to oscillate or diverge.</p>
+<p>In mini-batch training, the current gradient is usually only a stochastic estimate of the gradient of the overall objective:</p>
+<div class="dd-equation" role="math" aria-label="g_(t) ≈ ∇_(θ) 𝔼_((x,y))[ℓ(f(x;θ),y)]"><span>g<sub>t</sub> ≈ ∇<sub>θ</sub> 𝔼<sub>(x,y)</sub>[ℓ(f(x;θ),y)]</span></div>
+<p>Different batches produce different gradients, so updates contain sampling noise. When later studying gradient descent, you need to continue to understand:</p>
+<ul><li>how the learning rate controls stability and convergence speed;</li><li>how batch size affects gradient noise;</li><li>how momentum integrates gradient directions across multiple steps;</li><li>how gradient clipping limits abnormal updates;</li><li>how weight decay changes the actual optimization objective or update rule.</li></ul>
+<p>Backpropagation is responsible for computing the direction, and the optimizer is responsible for deciding how to use that direction.</p>
+<p>The third extension is vanishing and exploding gradients. Gradients in deep networks are formed by successively multiplying many local Jacobians.</p>
+<p>Let the layers of the network be:</p>
+<div class="dd-equation" role="math" aria-label="h_(k)=f_(k)(h_(k-1))"><span>h<sub>k</sub>=f<sub>k</sub>(h<sub>k-1</sub>)</span></div>
+<p>Then the gradient of the loss with respect to the early state <span class="dd-inline-math" role="math" aria-label="h_(0)">h<sub>0</sub></span> contains:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ h_(0) = ∂ L/∂ h_(n) ∂ h_(n)/(∂ h_(n-1)) … ∂ h_(1)/∂ h_(0)"><span>∂ L/∂ h<sub>0</sub> = ∂ L/∂ h<sub>n</sub> ∂ h<sub>n</sub>/(∂ h<sub>n-1</sub>) … ∂ h<sub>1</sub>/∂ h<sub>0</sub></span></div>
+<p>If each local derivative shrinks the gradient in the relevant direction, for example each layer multiplies by about <span class="dd-inline-math" role="math" aria-label="0.5">0.5</span>, after <span class="dd-inline-math" role="math" aria-label="n">n</span> layers, the gradient scale becomes approximately:</p>
+<div class="dd-equation" role="math" aria-label="0.5^(n)"><span>0.5<sup>n</sup></span></div>
+<p>This value decreases exponentially with depth, causing early layers to receive almost no effective training signal. This is one intuitive source of vanishing gradients.</p>
+<p>Conversely, if the scaling factor of successive Jacobians in the relevant direction is consistently greater than 1, for example each layer multiplies by about <span class="dd-inline-math" role="math" aria-label="1.5">1.5</span>, the gradient scale may grow to:</p>
+<div class="dd-equation" role="math" aria-label="1.5^(n)"><span>1.5<sup>n</sup></span></div>
+<p>thus producing exploding gradients.</p>
+<p>In the tensor case, you cannot only look at a single element of the Jacobian; you must also pay attention to how the Jacobian scales different vector directions. Some directions may be compressed, while others may be amplified.</p>
+<p>Vanishing gradients do not mean that backpropagation missed a path. It may be exactly the result correctly computed by the chain rule, just that successive local transformations make the signal extremely small. Understanding this problem requires further study of activation functions, initialization, normalization, Jacobian spectra, and numerical stability in deep networks.</p>
+<p>The fourth extension is residual connections. A plain deep path requires the gradient to pass through all nonlinear transformations consecutively, while a residual block adds an identity shortcut:</p>
+<div class="dd-equation" role="math" aria-label="y=F(x)+x"><span>y=F(x)+x</span></div>
+<p>Its derivative with respect to the input is:</p>
+<div class="dd-equation" role="math" aria-label="∂ y/∂ x = ∂ F(x)/∂ x+I"><span>∂ y/∂ x = ∂ F(x)/∂ x+I</span></div>
+<p>Therefore, the backward gradient is:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ x = ∂ L/∂ y ( ∂ F(x)/∂ x+I )"><span>∂ L/∂ x = ∂ L/∂ y ( ∂ F(x)/∂ x+I )</span></div>
+<p>Here, <span class="dd-inline-math" role="math" aria-label="I">I</span> comes from the identity path. The gradient can pass not only through the transformation branch <span class="dd-inline-math" role="math" aria-label="F">F</span>, but it can also propagate directly back to the input along the shortcut.</p>
+<p>From the computational graph perspective, a residual connection is exactly the summation of forked paths:</p>
+<div class="dd-equation" role="math" aria-label="Input gradient = Transformation branch contribution + Identity branch contribution"><span>Input gradient = Transformation branch contribution + Identity branch contribution</span></div>
+<p>Even if the local Jacobian in the transformation branch significantly shrinks the gradient, the identity branch can still provide a shorter, more direct propagation path.</p>
+<p>Residual connections do not bypass the chain rule, nor can they guarantee that gradients never vanish. By changing the structure of the computational graph, they add a path whose derivative is the identity mapping, thereby improving information and gradient propagation in deep networks.</p>
+<p>The fifth extension is the memory trade-off in distributed training. Training memory typically includes:</p>
+<ul><li>model parameters;</li><li>forward activations;</li><li>parameter gradients;</li><li>optimizer states;</li><li>temporary computation space.</li></ul>
+<p>When these cannot fit on a single device, you can apply sharding, recomputation, or cross-device scheduling to different objects.</p>
+<p>Parameters can be fully replicated on every device or stored in shards. Full replication allows each device to directly access all parameters, but every device bears the full model memory; parameter sharding reduces per-device occupancy, but requires additional communication during computation.</p>
+<p>Gradients can also be synchronized, summed, averaged, or sharded across devices. In data parallelism, different devices compute local gradients using different data, then aggregate them into gradients consistent with the overall batch. The aggregation rule must be consistent with whether the loss is summed or averaged.</p>
+<p>Optimizer state is usually proportional to the parameter size, and a single parameter may correspond to multiple historical statistics. Sharding optimizer state across multiple devices can avoid each device keeping a full copy.</p>
+<p>Activations mainly grow with batch size, sequence length, network depth, and feature width. Methods to reduce activation memory include:</p>
+<ul><li>using gradient checkpointing to recompute part of the forward pass during the backward pass;</li><li>adjusting micro-batch size to reduce peak memory per step;</li><li>performing pipeline partitioning so that different devices handle different network layers;</li><li>splitting computation and activations along tensor or sequence dimensions;</li><li>arranging more complex schedules between computation, communication, and storage.</li></ul>
+<p>These methods all face a fundamental trade-off:</p>
+<div class="dd-equation" role="math" aria-label="Lower per-device memory ↔ More recomputation, communication, or scheduling complexity"><span>Lower per-device memory ↔ More recomputation, communication, or scheduling complexity</span></div>
+<p>Distributed training does not change the mathematical rules of backpropagation. Each node still performs local vector-Jacobian products, and shared variables still accumulate contributions from all paths. What changes is where parameters, activations, gradients, and optimizer states are stored, and when they are computed and how they are aggregated across devices.</p>
+<p>The pass criterion for this section can be verified with a small computational graph. Let:</p>
+<div class="dd-equation" role="math" aria-label="a=w^(2)"><span>a=w<sup>2</sup></span></div>
+<div class="dd-equation" role="math" aria-label="b=w"><span>b=w</span></div>
+<div class="dd-equation" role="math" aria-label="s=a+b"><span>s=a+b</span></div>
+<div class="dd-equation" role="math" aria-label="e=s-y"><span>e=s-y</span></div>
+<div class="dd-equation" role="math" aria-label="L=1/2e^(2)"><span>L=1/2e<sup>2</sup></span></div>
+<p>Forward propagation computes in order: <span class="dd-inline-math" role="math" aria-label="a">a</span>, <span class="dd-inline-math" role="math" aria-label="b">b</span>, <span class="dd-inline-math" role="math" aria-label="s">s</span>, <span class="dd-inline-math" role="math" aria-label="e">e</span> and <span class="dd-inline-math" role="math" aria-label="L">L</span>, and saves the intermediate values needed for the backward pass.</p>
+<p>Backward pass starts from:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ L=1"><span>∂ L/∂ L=1</span></div>
+<p>Start. After the half-square node:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ e=e"><span>∂ L/∂ e=e</span></div>
+<p>After the subtraction node:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ s=e"><span>∂ L/∂ s=e</span></div>
+<p>The addition node sends the upstream gradient separately to <span class="dd-inline-math" role="math" aria-label="a">a</span> and <span class="dd-inline-math" role="math" aria-label="b">b</span>:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ a=e"><span>∂ L/∂ a=e</span></div>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ b=e"><span>∂ L/∂ b=e</span></div>
+<p>The square path returns to <span class="dd-inline-math" role="math" aria-label="w">w</span> with a contribution of:</p>
+<div class="dd-equation" role="math" aria-label="( ∂ L/∂ w )_(square) = e·2w"><span>( ∂ L/∂ w )<sub>square</sub> = e·2w</span></div>
+<p>The direct path returns to <span class="dd-inline-math" role="math" aria-label="w">w</span> with a contribution of:</p>
+<div class="dd-equation" role="math" aria-label="( ∂ L/∂ w )_(direct) = e·1"><span>( ∂ L/∂ w )<sub>direct</sub> = e·1</span></div>
+<p>The two paths add together at the shared parameter <span class="dd-inline-math" role="math" aria-label="w">w</span>:</p>
+<div class="dd-equation" role="math" aria-label="∂ L/∂ w = 2we+e = e(2w+1)"><span>∂ L/∂ w = 2we+e = e(2w+1)</span></div>
+<p>This example simultaneously checks three core abilities:</p>
+<ul><li>being able to decompose a composite function into a local computational graph;</li><li>being able to backpropagate node by node starting from the loss seed 1;</li><li>being able to correctly accumulate gradients from forked paths at shared variables.</li></ul>
+<p>Finally, you also need to clearly explain the three-way division of labor in training:</p>
+<div class="dd-equation" role="math" aria-label="[Loss function defines the optimization objective]"><span>[Loss function defines the optimization objective]</span></div>
+<div class="dd-equation" role="math" aria-label="[Backpropagation computes the gradient of the objective with respect to parameters]"><span>[Backpropagation computes the gradient of the objective with respect to parameters]</span></div>
+<div class="dd-equation" role="math" aria-label="[Optimizer updates parameters based on the gradient and its own state]"><span>[Optimizer updates parameters based on the gradient and its own state]</span></div>
+<p>The loss function answers "what result is better," backpropagation answers "how current parameters affect this objective," and the optimizer answers "how large a step to actually take based on these gradients."</p>
+<p>Truly understanding backpropagation is not just being able to write the chain rule; you also need to know what objective it starts from, how it handles deep paths and forked structures, how the result is handed to the optimizer, and how large-scale training systems arrange computation, communication, and memory for the same mathematical rules.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Next read</th><th>Key question</th></tr></thead><tbody><tr><td>Starting point of backward pass</td><td><a href="#" data-node="loss-function">Loss function</a></td><td>What scalar are we actually differentiating with respect to?</td></tr><tr><td>How gradients are used</td><td><a href="#" data-node="gradient-descent">Gradient descent</a></td><td>After the direction is computed correctly, how do step size and noise affect updates?</td></tr><tr><td>Why deep paths become weak</td><td><a href="#" data-node="vanishing-gradient">Vanishing gradient problem</a></td><td>Why does multiplying successive Jacobians lead to exponential scaling?</td></tr><tr><td>How structure helps backpropagation</td><td><a href="#" data-node="residual-connection">Residual connection</a></td><td>How does the identity shortcut provide a shorter gradient path?</td></tr><tr><td>How memory is traded off</td><td><a href="#" data-node="distributed-training">Distributed training</a></td><td>How are activations, gradients, and optimizer states sharded or recomputed?</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1502.05767" target="_blank" rel="noopener">Automatic Differentiation in Machine Learning: a Survey</a>: forward/reverse-mode automatic differentiation and complexity.</li><li><a href="https://www.deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">Deep Learning — Deep Feedforward Networks</a>: computational graphs and backpropagation.</li><li><a href="https://pytorch.org/docs/stable/notes/autograd.html" target="_blank" rel="noopener">PyTorch Autograd Mechanics</a>: actual automatic differentiation graph, saved tensors, and gradient semantics.</li><li><a href="https://arxiv.org/abs/1604.06174" target="_blank" rel="noopener">Training Deep Nets with Sublinear Memory Cost</a>: the memory-computation trade-off of activation recomputation.</li></ul><p>The computational graphs, hand calculations, tables, and debugging workflow are all original to this project.</p><div class="dd-src-date">Date accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/backprop">Explore connections on the map</a><a href="/zh/concepts/backprop/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

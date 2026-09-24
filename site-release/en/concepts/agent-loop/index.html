@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Agent Loop? Explained Simply</title>
+<meta name="description" content="Turn a single answer into an observable, verifiable, and stoppable state machine">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/agent-loop/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/agent-loop/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/agent-loop/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Agent Loop? Explained Simply">
+<meta property="og:description" content="Turn a single answer into an observable, verifiable, and stoppable state machine">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/agent-loop/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Agent Loop? Explained Simply">
+<meta name="twitter:description" content="Turn a single answer into an observable, verifiable, and stoppable state machine">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/agent-loop/#page","name":"What Is Agent Loop? Explained Simply","description":"Turn a single answer into an observable, verifiable, and stoppable state machine","url":"https://ai-knowledge-map.com/en/concepts/agent-loop/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Agent Loop","item":"https://ai-knowledge-map.com/en/concepts/agent-loop/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Agent Loop</span></li></ol></nav><article id="dd-article" data-concept-id="agent-loop" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Agent Loop</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Turn a single answer into an observable, verifiable, and stoppable state machine</p>
+<p class="dd-ali">Agent Loop · Observe–Decide–Act · Perceive–Act Loop</p>
+<p class="dd-metabar">Recommended 30–40 minutes · Intermediate · Requires: Large Language Model (LLM), tool calling, AI Agent</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The Agent Loop is not about making the model &#39;think a few more times&#39;; instead, a controller repeatedly executes read protected state → have the model propose an action → validate and execute → receive real observations → verify progress or terminate. The model handles uncertain judgment, and the host handles state, permissions, budget, and completion criteria; only when the two are separated can the loop both adapt to feedback and avoid spiraling out of control.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer on your own:</div><ul><li>What extra machine state does a loop have compared with ordinary multi-turn chat?</li><li>What are the respective responsibilities of the model, controller, tools, and verifier?</li><li>How does an observation change the next action?</li><li>How do you determine whether a loop is making progress, stuck, or already complete?</li><li>Why must termination, permissions, and budget be enforced by code outside the model?</li></ul></div>
+<ol class="dd-chain"><li>A single generation can only guess the environment state based on the context before the action.<span>(§1)</span></li><li>Only by separating the model, controller, tools, and verifier do you get enforceable responsibility boundaries.<span>(§2)</span></li><li>Actions produce observations, observations update facts and plans, but do not overwrite protected goals and authorizations.<span>(§3)</span></li><li>Round-by-round new evidence reduces unmet conditions, which is why a loop is more valuable than repeated generation.<span>(§4)</span></li><li>The plan maintains direction, the loop adapts to change, and the verifier decides completion.<span>(§5)</span></li><li>Success, budget, no progress, dependency failure, and pending authorization are all legitimate exits.<span>(§6)</span></li><li>Therefore, a reliable Agent Loop is essentially a constrained, observable, and terminable state machine.<span>(§7)</span></li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why a single generation is not enough<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>A model is fully capable of writing a patch that looks complete in a single response, which is exactly where the question &quot;if it can be written in one pass, why go back and forth in a loop&quot; comes from. But between &quot;looking complete&quot; and &quot;actually usable&quot; lies an entire layer of facts that the model cannot see at generation time. Before generation, the model does not know the repository's actual directory structure, the exact function signatures, or what the tests will output at that moment; after generation, it also does not know whether the patch can actually be applied, or whether the tests actually pass. A single long answer can only put these unknowns into the text as guesses: no matter how detailed the text is, a guess is still a guess.</p>
+<p>What the loop changes is the way information is acquired. It no longer asks the model to &quot;think up&quot; all the facts at once before acting; instead, it first takes a small action, has the environment return new facts, and then chooses the next step based on those facts. Thus, &quot;maybe the file is here&quot; becomes the real list returned by a directory command, and &quot;maybe it's fixed&quot; becomes the real exit code of a test process. Assumptions in the text are replaced one by one by observations from the environment—this is exactly what single-shot generation cannot do: a single generation cannot see the real result after an action, while a loop obtains new facts round by round through small actions, gradually reducing uncertainty.</p>
+<p>The criterion for judging whether a loop is making progress is information gain. Every round should ask: Did it obtain new observations? Did it narrow the range of candidate causes? Did it change the verifiable state? If none of the three happened, running one more round is just repeated sampling—the output text may differ, but certainty has not increased. That is not progress; it is just an expensive redraw. Conversely, as long as some round brings new observations, reduces candidates, or changes the verifiable state, the loop has done work that single-shot generation cannot replace.</p>
+<p>Laid out, the loop's interface is: inputs are the goal, the unknown environment state, the available set of actions, and the acceptance criteria; outputs are the round-by-round observations, actions, and verification states. The goal and acceptance criteria run throughout; the environment state is continuously updated with each round's observations; and actions are re-selected each round based on what is currently known. This structure explains the fundamental difference between a loop and single-shot generation: single-shot generation treats environment state as assumptions in text, while a loop treats environment state as something that can be queried round by round.</p>
+<p>The applicable boundaries are equally clear. A loop promises neither faster nor cheaper. When all the key facts of a task are already determined before generation and the results of actions are completely predictable, a loop provides no information gain, and single-shot generation is sufficient; the value of a loop lies precisely in scenarios where the environment state is unknown and action results are unpredictable. Conversely, in such scenarios, relying on repeated calls without information gain to &quot;try a few more times&quot; does not get you closer to the answer than single-shot generation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Four roles, not one all-purpose brain<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>In a single loop, who exactly is thinking, who is acting, and who finally says &quot;passed&quot;? Imagining the AI Agent as an all-powerful brain hides the answer: inside the loop are actually four roles each holding their own state and respecting their own boundaries in a relay; each role can do one kind of thing and is explicitly forbidden from another kind.</p>
+<p>The model holds the goal summary, historical observations, and the list of available tools; its responsibility is to propose candidate actions and their parameters; its boundary is that it cannot directly write files or grant itself permissions. The controller holds the turn count, budget, protected constraints, and action history; it is responsible for parsing actions, scheduling execution, pausing, and terminating the entire loop; its boundary is that it cannot treat model text as authorization evidence. The tool executor holds the actual file and API state; it executes actions according to the schema and permissions; its boundary is that it cannot accept unvalidated free-text commands. The verifier holds tests, policies, and acceptance rules; it provides reproducible pass/fail evidence; its boundary is that it cannot be arbitrarily weakened by the candidate solution.</p>
+
+<p>The causal chain of this division of labor points to the same conclusion: the model saying &quot;done&quot; is only a prediction. The completed state is not announced by any single role; it is only truly entered after the controller observes that protected tests pass, the working tree diff matches the expected range, and there are no pending side effects. Why must this be the case? Because the model holds only the goal summary, observations, and tool list, not the actual file and API state, and it has no write permission; its judgment of its own output and the conclusion drawn by the verifier based on protected standards are two different things; prediction needs evidence to adjudicate. The controller holds the budget and constraints, and is the only role that simultaneously has the action history and validation results; the executor provides the real state; the verifier provides evidence using standards that cannot be weakened by the candidate. The respective &quot;cannot&quot; of the four roles is precisely to separate the four things: proposal, authorization, execution, and adjudication.</p>
+<p>From the interface perspective, the inputs of this role architecture are the protected goal, candidate actions, actual resource state, and acceptance rules; the outputs are the model proposal, control decision, tool result, and validation conclusion. The model does not directly write resources, the controller manages budget and authorization, the executor operates according to the schema, and the verifier adjudicates using standards that cannot be weakened by the candidate. The four types of outputs are connected end to end: the model proposal is only executed by the executor after being adjudicated by the controller, the execution result becomes the input of the verifier, and the validation conclusion returns to the controller, which decides the next action or terminates the loop.</p></div>
+<table class="dd-table"><thead><tr><th>Role</th><th>State held</th><th>What it can do</th><th>Boundary it cannot cross</th></tr></thead><tbody><tr><td><b>Model</b></td><td>Goal summary, observations, available tools</td><td>Propose candidate actions and parameters</td><td>Cannot directly write files or grant itself permissions</td></tr><tr><td><b>Controller</b></td><td>Turns, budget, protected constraints, action history</td><td>Parse actions, schedule, pause, and terminate</td><td>Cannot treat model text as authorization evidence</td></tr><tr><td><b>Tool executor</b></td><td>Actual file/API state</td><td>Execute actions according to schema and permissions</td><td>Cannot accept unvalidated free-text commands</td></tr><tr><td><b>Verifier</b></td><td>Tests, policies, and acceptance rules</td><td>Provide reproducible pass/fail evidence</td><td>Cannot be arbitrarily weakened by the candidate solution</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Write the Loop as a State Transition<span class="dd-badge math">Formalized</span></h2>
+<div class="dd-agent-response"><p>The pitfall of natural-language Agent is that if the model is left to improvise in each round, constraints such as goals, budgets, and authorizations can drift or even be lost as the conversation proceeds. Turning it into a state machine gives the loop an explicit state definition and a deterministic transition rule.</p>
+<p>The state consists of five components: the protected goal and acceptance criteria G, the latest observation O, the compressed action/result history H, the remaining step count and cost budget B, and the current authorization A. The state at round t is written as</p>
+<p>Sₜ = (G, Oₜ, Hₜ, Bₜ, Aₜ)</p>
+<p>Each component has its own owner: once G and the acceptance criteria are set, they are no longer modified by any action within the loop; Oₜ is the fact most recently returned by the environment; Hₜ is the compressed record of actions and results; Bₜ is the steps and cost not yet consumed; and Aₜ is the authorization currently in effect.</p>
+<p>The transition has three steps. The first is proposal: the policy proposes an action only from the current state, that is, aₜ = policy(Sₜ). Here the model only produces a candidate action and cannot directly send aₜ to execution; before execute, the candidate must also undergo a permission check to confirm that it falls within the authorization scope of Aₜ. The second is execution and observation: the tool executor executes the action according to the schema, and the environment returns the result rₜ. The third is update: update uses aₜ and rₜ to refresh the observation and history and obtains the next state</p>
+<p>S₍ₜ₊₁₎ = update(Sₜ, aₜ, rₜ)</p>
+<p>The content returned by tools can never overwrite G, B, or A. This is the key to the state machine not losing constraints: no matter what the model says or what a tool returns, the protected goal, budget, and authorization can only be modified by the controller according to its own rules.</p>
+<p>Figure 1 shows this path of state, decision, execution, and verification: the model is inside the control loop but is not the controller itself. External observations can update facts and plans but cannot rewrite goals, budgets, or authorizations. That is, environment information can change &quot;what to do next&quot; but cannot change &quot;why do it&quot; or &quot;how far it can go&quot;.</p>
+<p>The final engineering requirement: states must be versioned. Only if each Sₜ carries a traceable version can we return to a particular round in history and reproduce the basis for that decision at the time. A state machine without versioning can only run forward; when something goes wrong, it cannot locate the round from which the deviation began.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 620 210" role="img" aria-label="Agent Loop state, decision, execution, and verification path"><defs><marker id="al1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="22" y="70" width="130" height="60" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="87" y="94" text-anchor="middle" class="svg-t">Protected state Sₜ</text><text x="87" y="114" text-anchor="middle" class="svg-t" font-size="10">Goal · Budget · Authorization</text><path d="M152,100 L216,100" stroke="#6b7484" marker-end="url(#al1)"/><rect x="218" y="70" width="106" height="60" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="271" y="96" text-anchor="middle" class="svg-t">Model</text><text x="271" y="114" text-anchor="middle" class="svg-t" font-size="10">Candidate action aₜ</text><path d="M324,100 L380,100" stroke="#6b7484" marker-end="url(#al1)"/><rect x="382" y="60" width="104" height="80" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="434" y="88" text-anchor="middle" class="svg-t">Executor</text><text x="434" y="108" text-anchor="middle" class="svg-t" font-size="10">schema · Permission</text><text x="434" y="124" text-anchor="middle" class="svg-t" font-size="10">Real tool result</text><path d="M486,100 L542,100" stroke="#6b7484" marker-end="url(#al1)"/><rect x="544" y="70" width="64" height="60" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="576" y="95" text-anchor="middle" class="svg-t">Verification</text><text x="576" y="114" text-anchor="middle" class="svg-t" font-size="10">Stop / Continue</text><path d="M576,140 C565,190 90,190 87,132" fill="none" stroke="#6b7484" marker-end="url(#al1)"/><text x="330" y="185" text-anchor="middle" class="svg-t" font-size="10">Observations flow back and update the state; the protected goal is not overwritten by observations</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 The model is inside the control loop but is not the controller itself. External observations can update facts and plans but cannot rewrite the goal, budget, or authorization.</figcaption></figure>
+<div class="dd-formula"><math display="block" aria-label="Agent 状态、候选动作与下一状态"><msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><mo>(</mo><mi>G</mi><mo>,</mo><msub><mi>O</mi><mi>t</mi></msub><mo>,</mo><msub><mi>H</mi><mi>t</mi></msub><mo>,</mo><msub><mi>B</mi><mi>t</mi></msub><mo>,</mo><msub><mi>A</mi><mi>t</mi></msub><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>policy</mi><mo>(</mo><msub><mi>S</mi><mi>t</mi></msub><mo>)</mo><mo>;</mo><mspace width="1em"/><msub><mi>S</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>update</mi><mo>(</mo><msub><mi>S</mi><mi>t</mi></msub><mo>,</mo><mi>execute</mi><mo>(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo><mo>)</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: How Four Rounds of Repair Advance<span class="dd-badge eng">Case Walkthrough</span></h2>
+<div class="dd-agent-response"><p>Faced with the same test failure, blindly changing code only creates new noise; the difference with four-round repair is that each round uses new evidence to narrow uncertainty. The following set of run logs shows how the state updates round by round.</p>
+
+<p>In round 0, the model has only the goal G, one failure signature 100 ≠ 90, and a 6-round budget. It does not modify code directly; instead it first searches for the location of the discount calculation and related tests, obtaining two new facts: the suspicious formula is price * (1-discount), and the test input is discount=10.</p>
+<p>Round 1 pieces these two facts together: discount=10 and 90 in the failure signature appear together, so 10 probably means &quot;ten percent&quot;, but the code treats it as a decimal between 0 and 1 — substituting price=100 into price*(1-discount) yields 100*(1-10)=-900. This illegal negative result is caught by the code's guard and the price is returned unchanged; the actual output 100 that the test sees is exactly this fallback path, while the expected value 90 corresponds to a ten percent discount on price=100. Based on this, the model proposes changing the formula to 1-discount/100, making 100*(1-10/100)=90 match the expectation. The patch is applied successfully; at the same time, authorization only allows modifying source files, which sets the scope for later verification — test files must not be touched.</p>
+<p>Round 2 sees that the working tree contains only one source-code difference, so it runs the target test. The exit code is 0, and the target test passes 1/1. But this only proves that the fixed assertion now holds; it does not prove there are no regressions elsewhere, so the uncertainty is merely reduced, not eliminated.</p>
+<p>Under the conditions that the target test passes and 3 rounds of budget remain, round 3 runs the full test suite and checks the diff: 48/48 all pass, the test files have not been changed, then it generates a patch summary, and the loop stops at &quot;waiting for release confirmation&quot;.</p>
+<p>To quantify progress, count the number of unsatisfied conditions Uₜ: initially 3 — target test fails, full test suite fails, and diff scope is unconfirmed; after round 2 it drops from 3 to 2; after round 3 it drops to 0. Only a decrease in Uₜ, or obtaining new evidence that can change the diagnosis, counts as measurable progress; release authorization is not among these three technical conditions, and cannot be automatically derived from &quot;all tests green&quot;. This is clear in the example: after 48/48 pass, the loop still stops at &quot;waiting for release confirmation&quot; instead of declaring it released.</p>
+<p>The complete interface for this case is: inputs are the failure signature 100 ≠ 90, a six-round budget, prohibition on modifying tests, and release requires separate confirmation; outputs are the localization conclusion, minimal patch, target test passing, full regression passing, and pending-release status. Each round relies on new facts to lower Uₜ, from 3 all the way down to 0; all technical acceptance checks turn green, yet release authorization still cannot be derived. Conversely, if a round neither reduces Uₜ nor produces new evidence that can change the diagnosis, then that round has made no progress.</p></div>
+<table class="dd-table"><thead><tr><th>Round</th><th>Key state entering the model</th><th>Candidate action</th><th>Actual observation and state change</th></tr></thead><tbody><tr><td>0</td><td>Goal G; failure <code>100 ≠ 90</code>; budget 6 rounds</td><td>Search for the discount calculation and related tests</td><td>Locate <code>price * (1-discount)</code>, test input discount=10</td></tr><tr><td>1</td><td>Discover that the unit may be “percent” rather than 0–1</td><td>Change the formula to <code>1-discount/100</code></td><td>Patch applied successfully; authorization only allows modifying source files</td></tr><tr><td>2</td><td>Working tree has one source-code difference</td><td>Run the target test</td><td>Exit code 0, target test 1/1 passed; but no regressions proven yet</td></tr><tr><td>3</td><td>Target test passed, 3 rounds remaining</td><td>Run the full tests and check the diff</td><td>48/48 pass; tests unchanged; patch summary generated, and the loop stops at “waiting for release confirmation”.</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Division of Labor Between Plan, Loop, and Verifier<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>Three questions distinguish the three mechanisms: Plan answers &quot;What are the dependencies, and roughly what order should we do them in?&quot;, Loop answers &quot;Does a new observation require changing the next step?&quot;, and Verifier answers &quot;Does the result satisfy externally checkable conditions?&quot;. Each fills a gap, and each has a typical symptom when missing.</p>
+
+<p>First, why do we still need a Loop when we have a Plan? A Plan provides direction and a rough order; it is born at a moment when environmental information is incomplete. As soon as the real environment returns an observation that doesn't match expectations, rigidly carrying out the original plan only leads further and further astray. The Loop's job is to absorb this feedback and make subsequent actions respond to the environment: when a new observation appears, change the next step; only when the observation matches expectations do we continue in the original direction. Therefore, Plan and Loop are not substitutes; rather, &quot;Plan provides direction, Loop absorbs feedback&quot;.</p>
+<p>Next, why do we still need independent verification when we have a Loop? A Loop can make actions increasingly fit the environment, but it cannot answer &quot;Does the result really satisfy the contract?&quot; — the model may perfectly well give a fluent explanation instead of actually passing. The Verifier's role is to make an externally checkable judgment on the result, rather than trusting the model's self-report.</p>
+<p>When any one of the three is missing, the symptoms are distinct: without a Plan, the Agent only makes local reactions, easily taking detours and missing steps; without a Loop, the plan is still rigidly executed when the real environment changes; without a Verifier, the model substitutes a fluent explanation for actually passing. The robust pattern is to chain the three together: Plan provides direction, Loop absorbs feedback, Verifier adjudicates.</p>
+<p>The Verifier must also be protected. If an Agent can delete failing tests or change the passing threshold from 100% to 50%, it can pass by modifying the referee rather than completing the task — the evaluation is contaminated and the verdict is meaningless. Therefore, the verification criteria must be placed outside the loop; the Agent can only accept the verdict, not rewrite the criteria.</p>
+<p>To consolidate the interfaces of this division of labor: inputs are task dependencies, new observations, and external acceptance; outputs are Plan direction, Loop adjustment, and Verifier verdict. Plan describes the rough order, Loop makes subsequent actions respond to the environment, and Verifier judges whether the result satisfies the contract; missing any component respectively leads to detours, rigidity, or false completion.</p></div>
+<table class="dd-table"><thead><tr><th>Mechanism</th><th>Question Answered</th><th>What Happens When Missing</th></tr></thead><tbody><tr><td>Plan</td><td>What are the dependencies, and roughly what order should we do them in?</td><td>Only makes local reactions, easily taking detours and missing steps</td></tr><tr><td>Loop</td><td>Does a new observation require changing the next step?</td><td>The plan is still rigidly executed when the real environment changes</td></tr><tr><td>Verifier</td><td>Does the result satisfy externally checkable conditions?</td><td>Model uses a fluent explanation instead of actually passing</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Five Types of Termination, Not Just “Success”<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>The loop cannot consist of only two states, &quot;success&quot; and &quot;keep running&quot;. There are five categories of reasons for stopping, each triggered by explicit conditions and decided by the controller, not by the model itself.</p>
+<p>Success termination: all machine-checkable acceptance conditions are satisfied. This is the only exit caused by goal achievement; the decision is based on reproducible evidence supplied by the verifier.</p>
+<p>Budget termination: steps, time, tokens, or cost reach a hard limit. Budget is non-negotiable by design—it is not a recommended value but a hard boundary enforced by the controller; the model cannot ignore it on its own.</p>
+<p>No-progress termination: state summaries and actions are equivalent for k consecutive rounds, or progress indicators no longer improve. This corresponds to the information gain criterion mentioned earlier: if there are no new observations, no candidate reduction, and no verifiable state changes, the loop should not continue consuming resources.</p>
+<p>Dependency failure: tools are unavailable, the test environment is damaged, and retries cannot produce new information. At this point the problem is not in the Agent's strategy but in the environment itself; continuing the loop yields no incremental progress, so it can only exit and report the dependency status.</p>
+<p>Authorization suspension: publishing, deleting, paying, or expanding privileges requires a new decision by the user. Such actions are beyond the scope of the current round of authorization; the loop must stop and wait for the user, rather than trying to replace the authorization decision with a technical conclusion such as &quot;all tests green&quot;.</p>
+<p>Putting the five exits side by side reveals a common principle: &quot;try again&quot; is not by itself a termination strategy. Retrying is worthwhile only when it carries new parameters, backoff, alternative tools, or new evidence; otherwise it merely replicates the same failure into the next round. Accordingly, hard budgets and authorization gates must be counted and enforced by the controller—the controller's action history records rounds and budget, and it is also responsible for detecting equivalent action loops, triggering no-progress termination when there is no substantial change for k consecutive rounds.</p>
+<p>The interface of the termination strategy is: inputs are acceptance conditions, steps/time/tokens/cost, progress history, dependency status, and authorization requirements; output is one of five exits—success, budget exhausted, no progress, dependency failure, or authorization suspension. The model can suggest &quot;should stop&quot; in the status summary, but it cannot ignore these exits on its own; whether to leave the loop and in what way to leave is always the controller's decision.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Failure Modes and Diagnostic Signals<span class="dd-badge eng">Failure Boundary</span></h2>
+<div class="dd-agent-response"><p>When the loop gets stuck, the fault may hide in any link of decision, tools, state, or verification. The way to distinguish them is to look at observable signals in the trajectory, then apply targeted repairs to each failure.</p>
+
+<p>The signal of action oscillation is the most intuitive: A→B→A oscillation in the trajectory, files repeatedly changed back to their original state. This is because the decision layer continues sampling even when there is no new information; the repair is state deduplication and prohibiting repeated unproductive actions—the controller identifies equivalent actions accordingly and blocks replay.</p>
+<p>Error observation pollution is more hidden: a tool timeout is summarized as &quot;no result&quot;, and the next round treats &quot;no result&quot; as a fact to continue reasoning. The key to repair is to preserve structured raw information before it enters the model: status code, source, time, and the original error text—rather than allowing a failure to be compressed into a harmless description.</p>
+<p>Goal drift manifests as later summaries quietly omitting key constraints, such as &quot;do not modify tests&quot; disappearing from the summary. The repair is to put goals and constraints into non-compressible state—they do not participate in history compression, so no matter how the summary is simplified, constraints will not be lost.</p>
+<p>The signal of pseudo-completion is natural language claiming success, but with no test record. The repair is to bind the termination condition to verifier evidence and artifact hash: without reproducible passing evidence, it is not considered complete; self-report cannot replace adjudication.</p>
+<p>Privilege escalation manifests as a sudden change in the operation sequence: after a series of read operations, it suddenly requests to publish credentials. The repair is per-action authorization: any authorization escalation triggers a pause, waiting for user decision.</p>
+<p>From these five groups of correspondences, we can derive the records needed for debugging the loop: state version—candidate action—validation decision—tool result—verification conclusion. This chain is sufficient to reproduce each round of decisions and locate which link has the fault; there is no need to save or display the complete private chain of thought. Observability serves reproduction and attribution, not collecting as much natural language as possible.</p>
+<p>The diagnostic interface is: input state version, candidate action, validation decision, tool status code, result source, and verification evidence; output attributes the fault to one of action oscillation, observation pollution, goal drift, pseudo-completion, or privilege escalation. After attribution, the repairs correspond one-to-one: state deduplication, preserve original errors, non-compressible goals, evidence-bound termination, and per-action authorization. The entire process does not require the complete private chain of thought.</p></div>
+<table class="dd-table"><thead><tr><th>Failure</th><th>Observable Signal</th><th>Targeted Repair</th></tr></thead><tbody><tr><td>Action Oscillation</td><td>A→B→A, files repeatedly changed back</td><td>State deduplication; prohibit repeated unproductive actions</td></tr><tr><td>Error Observation Pollution</td><td>Timeout summarized as “no result”</td><td>Preserve status code, source, time, and original error</td></tr><tr><td>Goal Drift</td><td>Later summary omits “do not modify tests”</td><td>Put goals and constraints into non-compressible state</td></tr><tr><td>Pseudo-completion</td><td>Natural language claims success but no test record</td><td>Termination bound to verifier evidence and artifact hash</td></tr><tr><td>Privilege Escalation</td><td>After read operations, suddenly requests to publish credentials</td><td>Per-action authorization; pause on escalation</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Connecting the causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Starting from &quot;a single generation cannot see the real result&quot; we can step by step derive why a reliable Agent Loop must be a constrained, observable, and terminable state machine.</p>
+<p>The starting point is the blind spot of single-shot generation: the model can only guess the environment state based on the context before the action; no matter how long the text is, the guess cannot become fact. To break this blind spot, someone must actually execute and observe, so four roles emerge: the model, the controller, the tool executor, and the verifier. Separating them enforces responsibility boundaries—who proposes, who authorizes, who executes, who adjudicates, each in its place.</p>
+<p>After the roles are separated, the loop's operating rules are established: actions produce observations, observations update facts and plans, but cannot overwrite protected goals and authorizations. Environmental feedback can change what to do next, but cannot change why it is done or how far it can go. This invariant is the foundation that keeps the loop from drifting across iterations.</p>
+<p>With rules in place, the loop's value truly exceeds repeated generation: round-by-round new evidence reduces unmet conditions—goal tests, full test suite, and diff scope turn green one by one, and uncertainty is narrowed round by round; repeated generation is just an expensive resampling of the same set of unknowns.</p>
+<p>To keep this process running stably, three things must each perform their own function: the plan maintains direction, the loop adapts to change, and the verifier adjudicates completion. Direction, feedback, and adjudication are all indispensable; otherwise they lead respectively to detours, rigidity, and false completion.</p>
+<p>The loop must also have exits, and exits are not limited to &quot;success&quot;: success, budget exhausted, no progress, dependency failure, and awaiting authorization are all legitimate exits. Exits are enforced by the controller based on budget count, progress history, and authorization status; the model cannot ignore them on its own, nor can it use &quot;try again&quot; to delay indefinitely.</p>
+<p>Stringing this chain together, the conclusion naturally emerges: a reliable Agent Loop is essentially a constrained, observable, and terminable state machine. Constrained means that goals, budget, and authorization are not overwritten by actions within the loop; observable means that state versions, candidate actions, validation decisions, tool results, and verification conclusions are all traceable; terminable means that the five types of exits are forcibly enforced by the controller. Only when all three hold can the Agent be considered reliable, rather than just a model that continuously outputs.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>: a classic framework that interleaves reasoning, action, and observation.</li><li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., Toolformer</a>: language models learn when to call external tools.</li><li><a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">Wang et al., LLM-based Autonomous Agents Survey</a>: planning, memory, action, and evaluation components.</li><li><a href="https://arxiv.org/abs/2309.15817" target="_blank" rel="noopener">Ruan et al., ToolEmu</a>: evaluation of risks and failure trajectories of tool-using agents.</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/agent-loop">Explore connections on the map</a><a href="/zh/concepts/agent-loop/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms? Explained Simply</title>
+<meta name="description" content="Put speech recognition, speech synthesis, and voice cloning into the same pipeline, understanding acoustic features, alignment, vocoders, streaming latency, WER, and identity authorization.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/speech/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/speech/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/speech/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms? Explained Simply">
+<meta property="og:description" content="Put speech recognition, speech synthesis, and voice cloning into the same pipeline, understanding acoustic features, alignment, vocoders, streaming latency, WER, and identity authorization.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/speech/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms? Explained Simply">
+<meta name="twitter:description" content="Put speech recognition, speech synthesis, and voice cloning into the same pipeline, understanding acoustic features, alignment, vocoders, streaming latency, WER, and identity authorization.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/speech/#page","name":"What Is Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms? Explained Simply","description":"Put speech recognition, speech synthesis, and voice cloning into the same pipeline, understanding acoustic features, alignment, vocoders, streaming latency, WER, and identity authorization.","url":"https://ai-knowledge-map.com/en/concepts/speech/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms","item":"https://ai-knowledge-map.com/en/concepts/speech/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms</span></li></ol></nav><article id="dd-article" data-concept-id="speech" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Speech systems: converting between text, linguistic content, speaker identity, and acoustic waveforms</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Put speech recognition, speech synthesis, and voice cloning into the same pipeline, understanding acoustic features, alignment, vocoders, streaming latency, WER, and identity authorization.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Speech is not just a label on ordinary audio: it simultaneously carries word meaning, pronunciation, prosody, speaker, and environment. ASR must recover text from waveforms, and TTS must generate multiple valid waveforms from text; the error metrics and safety boundaries of the two are completely different.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading, you should be able to:</b>Distinguish ASR, TTS, and voice cloning; compute WER by hand and explain its blind spots; understand acoustic encoding, alignment, and vocoder; design streaming chunking and endpoint detection; verify identity authorization and high-risk use.</div>
+<ol class="dd-chain"><li>Define recognition, synthesis, or cloning tasks and their consequences</li><li>Choose waveform preprocessing and acoustic representation</li><li>ASR processes time alignment and outputs confidence and timestamps</li><li>Business parsing only forms confirmable intents</li><li>TTS normalizes text, predicts duration/acoustic representation, and decodes</li><li>Evaluate content, naturalness, identity, and latency separately</li><li>Ask back about key entities and have the backend authorize actions</li><li>Govern original audio, transcripts, embeddings, and generation provenance</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The same speech contains three layers of signal: content, time, and identity<span class="dd-badge intuition">Problem definition</span></h2>
+<div class="dd-agent-response"><p>A single speech signal simultaneously carries three interwoven but separable layers of information: linguistic content, temporal structure, and speaker identity. Linguistic content is the text itself to be conveyed; temporal structure is reflected in phoneme duration, speaking rate, pauses, and rhythm; identity is reflected in vocal tract shape, timbre, and accent—features that belong to a particular speaker. These three layers are superimposed in the waveform, and the waveform is essentially the result of the combined effects of phonemes, speaking rate, pauses, emotion, vocal tract characteristics, and environmental noise.</p>
+<p>Precisely because they are superimposed in the same waveform, wanting to &quot;recognize only the text&quot; cannot completely bypass the other two layers. Accent and timbre determine that the same phoneme sounds different when spoken by different people, and noise adds an extra layer of interference on top of the raw signal. The goal of automatic speech recognition (ASR) is to preserve as much linguistic content as possible while being insensitive to speaker identity and noise; what it must do is separate content from the entanglement of identity and environment.</p>
+<p>The direction of text-to-speech (TTS) is exactly the opposite. Given a piece of text, TTS needs to fill in the missing information—how long each phoneme lasts, how speaking rate and pauses are arranged, how the prosody rises and falls, and what timbre to use—because the text itself contains none of this. TTS therefore actually reconstructs the temporal and identity layers in reverse, then combines them with the linguistic content to synthesize an audible waveform.</p>
+<p>Voice cloning goes a step further by explicitly extracting the identity layer: it uses the identity embedding (a vector representation of speaker characteristics) from reference audio as a generation condition, so that the synthesized speech carries the timbre of a particular speaker. This practice increases realism, but it also amplifies risk, because identity can now be separately extracted, stored, and reused, detached from the natural vocalization process that occurs when the subject is present.</p>
+<p>Clarifying the task type is a prerequisite for choosing representation, latency, and error tolerance criteria. Verbatim transcription pursues faithful restoration of every word; keyword recognition only cares whether a small number of key pieces of information are detected; subtitles require good temporal alignment; reading aloud emphasizes naturalness and intelligibility; dialogue requires low latency; identity imitation puts timbre similarity first. When the task differs, which layer of signal the system needs to extract, how much latency is allowed, and which errors are tolerated all change accordingly. Therefore, the design of any speech system should start from the question &quot;which layer of signal do I want to process, and which do I discard?&quot; rather than defaulting to the simplistic assumption that &quot;recognition is just transcribing text.&quot;</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>ASR typically consists of acoustic encoding, sequence alignment, and decoding.<span class="dd-badge eng">Recognition mechanism</span></h2>
+<div class="dd-agent-response"><p>The fundamental difficulty of speech recognition is that there is no one-to-one correspondence between each frame of the waveform and the text token. A phoneme may last dozens of frames, a word may span hundreds of frames, and different people may take completely different amounts of time to read the same word. The model cannot expect &quot;which frame corresponds to which character&quot;; it must learn by itself to map a variable-length audio segment to variable-length text, which is exactly the problem that sequence alignment solves.</p>
+<p>The recognition pipeline usually begins with preprocessing: cut the waveform into short frames, convert each frame into a more semantically stable representation, such as log-Mel spectrogram, or pass it directly to an encoder that learns features from the raw waveform. Mel spectrogram mimics the human ear's nonlinear perception of frequency, making features that concentrate energy and are less sensitive to speaker differences easier to model. The encoder then compresses the time axis and models context—summarizing the local information of hundreds of frames into fewer, more representative vectors, while allowing each position to perceive pronunciation information from neighboring frames before and after.</p>
+<p>There are three mainstream approaches to the alignment problem. CTC (Connectionist Temporal Classification) introduces a blank symbol (blank) to &quot;expand&quot; the audio frame sequence into multiple possible text paths, and then sums over all paths that can be mapped to the same sentence. The blank symbol means &quot;this frame outputs no character&quot;, allowing a character to span multiple frames and separating adjacent identical characters by blank symbols. During training, the objective is not a single specific path, but the sum of probabilities of all paths, so the model can learn the correct mapping without manual frame-level alignment.</p>
+<p>Transducer is a variant oriented toward streaming scenarios: at each time step, it jointly considers the current acoustic state and the historical tokens already produced, and gradually decides whether to output the next character or continue waiting for more audio. Because it depends only on the past and present, not on future audio, it is suitable for low-latency recognition while speaking.</p>
+<p>The autoregressive encoder-decoder structure first uses an encoder to compress the entire audio into a sequence of representations, and then uses attention to let the decoder choose which positions of the encoder to attend to when generating each text token. Attention replaces manual alignment, allowing the decoder to establish flexible soft correspondence between &quot;listening&quot; and &quot;writing&quot;, but the entire audio must be seen first, so it naturally leans toward offline scenarios or those that allow greater latency.</p>
+<p>Regardless of the structure, a language model or decoder leverages word-order priors. This prior is a double-edged sword: it can correct obvious errors caused by noise and make the output more fluent, but it may also &quot;change&quot; rare names and proper nouns into more common words—because the language model tends to favor high-probability common strings. This is exactly a typical failure mode in recognition: &quot;fluent but incorrect.&quot;</p>
+<p>Timestamps, speaker separation, and punctuation are additional tasks, not by-products that come with transcription. The model may produce these outputs at the same time, but their accuracy should not be taken for granted: timestamps require additional frame-level localization ability, speaker separation requires clustering segments of different voice timbres, and punctuation requires understanding syntactic boundaries. Treating them as &quot;free add-ons&quot; overestimates the system's true capabilities.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>WER normalizes substitutions, deletions, and insertions by the number of reference words<span class="dd-badge math">Manual calculation</span></h2>
+<div class="dd-agent-response"><p>Word error rate (WER) measures how many edit operations are needed to make the recognition result match the reference text, and is the most common single metric in speech recognition. It attributes the differences between the two texts to three types of operations: substitution (S, replacing one word in the reference with another), deletion (D, omitting a word from the reference), and insertion (I, adding a word that is not in the reference). WER is the total number of these three types of operations divided by the number of words N in the reference text:</p>
+<p>WER = (S + D + I) / N</p>
+<p>Take &quot;Please transfer three hundred yuan&quot; as an example. The reference tokenization is [please, transfer, three hundred, yuan], for a total of N = 4 words. Suppose the system recognizes it as &quot;Please earn three hundred kuai-qian&quot;, and after aligning with the reference it becomes [please, earn, three hundred, kuai-qian]: please→please correct, transfer→earn is a substitution, three hundred→three hundred correct, yuan→kuai-qian is a substitution. Thus S = 2, D = 0, I = 0, WER = (2 + 0 + 0) / 4 = 0.50, i.e. 50%.</p>
+<p>This number is extremely sensitive to the segmentation method. Chinese has no natural space-based word segmentation; whether &quot;yuan&quot; is a single word or part of &quot;kuai-qian&quot; directly changes the alignment result and the value of N. Character-level and word-level segmentation will yield different WER values, so when reporting WER you must also state whether character-level or word-level granularity is used; otherwise comparisons between two systems are meaningless.</p>
+<p>More importantly, WER treats all errors equally and hides differences in business severity. Among the two substitutions above, &quot;transfer&quot; becoming &quot;earn&quot; may completely change the user's intent—whether it is a transfer or some other action—whereas &quot;yuan&quot; becoming &quot;kuai-qian&quot; is semantically almost equivalent and almost harmless downstream. The two count as one substitution each in WER, with exactly the same weight. Therefore, for high-risk scenarios (transfer amounts, account numbers, dates, etc.), WER alone is not enough; you also need to separately compute error rates for entities, numbers, and intent to truly reflect the system's reliability on key information. WER is suitable as an overall, comparable baseline, but it can never replace fine-grained evaluation oriented toward specific business consequences.</p></div>
+<div class="dd-formula" data-formula-id="speech-formula-1" data-display="mathml"><math display="block" aria-label="WER = (S + D + I) / N = (2 + 0 + 0) / 4 = 0.50"><mrow><mi>WER</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mo>(</mo><mi>S</mi><mspace width="0.35em"/><mo>+</mo><mspace width="0.35em"/><mi>D</mi><mspace width="0.35em"/><mo>+</mo><mspace width="0.35em"/><mi>I</mi><mo>)</mo><mspace width="0.35em"/><mo>/</mo><mspace width="0.35em"/><mi>N</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mo>(</mo><mn>2</mn><mspace width="0.35em"/><mo>+</mo><mspace width="0.35em"/><mn>0</mn><mspace width="0.35em"/><mo>+</mo><mspace width="0.35em"/><mn>0</mn><mo>)</mo><mspace width="0.35em"/><mo>/</mo><mspace width="0.35em"/><mn>4</mn><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>0.50</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>TTS first turns text into an acoustic plan, and then a vocoder synthesizes the waveform.<span class="dd-badge eng">Synthesis Mechanism</span></h2>
+<div class="dd-agent-response"><p>The core challenge facing text-to-speech is that the same sentence has countless valid readings. The text gives only the content; it does not specify how long each phoneme should last, where to place pauses, or which word should be stressed. The model must choose a plausible acoustic plan for this sentence and then turn it into an audible waveform.</p>
+<p>This pipeline has roughly several stages. The first step is text normalization, which handles the parts of the text that &quot;cannot be read aloud&quot;—numbers need to be expanded into readings (&quot;三百&quot; or &quot;3-0-0&quot; depending on context), abbreviations need to be resolved (&quot;3元&quot; read as &quot;三元&quot;), and polyphonic characters need the correct pronunciation selected based on context (the 行 in &quot;银行&quot; and &quot;行走&quot;). Normalization errors inject errors into all later stages at the very front.</p>
+<p>Next, a phoneme or text encoder converts the normalized text into a linguistic representation, capturing sentence-level semantics and structure. A duration module or attention mechanism handles the alignment between characters and acoustic frames, deciding how many frames each pronunciation unit occupies and where to pause. This step is where the choice among &quot;countless valid readings&quot; is made—the same sentence can be read quickly, slowly, or with breaks at different positions, and the model needs to make a natural choice based on context. The acoustic model then predicts the Mel spectrum or some latent representation, mapping linguistic information onto specific acoustic parameters; finally, the vocoder reconstructs the waveform from this acoustic representation.</p>
+<p>Another end-to-end route is the codec language model: first compress the speech into discrete acoustic tokens, then directly predict these discrete token sequences in the same way a language model predicts text, bypassing the explicit Mel spectrum intermediate representation. Such systems frame TTS as a purely sequence-generation problem.</p>
+<p>Errors can occur at any link in this chain: text normalization misreads numbers or polyphonic characters, the pronunciation dictionary selects the wrong pronunciation, alignment produces unnatural durations or pauses, prosody modeling misplaces stress, and the vocoder introduces distortion or artifacts. Because the stages are distinct, when locating problems you should not rely only on the black-box judgment of &quot;whether the final audio sounds good&quot;. Instead, use stage-by-stage probes—checking the normalized text, the intermediate linguistic representation, the predicted alignment and prosody, and the waveform reconstructed by the vocoder—and troubleshoot step by step. This makes it easier to find the true source of errors than repeatedly listening to the final synthesized result.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Complete Example: Bank Phone Calls from Streaming Recognition to Controlled Read-Aloud<span class="dd-badge eng">Case Walkthrough</span></h2>
+<div class="dd-agent-response"><p>Imagine a bank phone voice system. A user says &quot;transfer five thousand,&quot; and the system must not allow a single recognition error to directly transfer the money out. This example strings the mechanisms from the previous sections into a complete causal chain, and also shows how defense in depth provides fallback layer by layer.</p>
+<p>First is voice activity detection (VAD), which marks which intervals are actual speech, which are silence or background, and avoids sending the entire recording indiscriminately into the recognizer. Streaming ASR then produces incremental text and attaches a stability marker to each segment—already stable parts no longer change, while not-yet-stable parts may still be revised by subsequent audio. This marker is critical: the business system should make decisions only based on stable text; otherwise, before the user has finished speaking, the text is still changing and may lead to misjudgment.</p>
+<p>For numbers and account entities such as &quot;five thousand,&quot; the system uses specialized decoding and separately calculates candidate confidence. When confidence is below a threshold, the system does not force a guess; instead it asks the user for confirmation, handing the uncertainty to a person to resolve. The business parsing layer here produces only a &quot;transfer proposal&quot; rather than directly calling the payment interface—a semantic parsing and confirmation gate sits between the recognition result and the funds action.</p>
+<p>The confirmation step deliberately uses an independent data source: the system uses another set of data to read back the payee name and the &quot;five thousand yuan&quot; amount, and explicitly asks the user to repeat or press a key to confirm. This way, even if the transcription layer makes an error, the readback and confirmation will expose the inconsistency. The user's confirmation action is then bound to the current session, the amount, and a short-lived token, and the backend verifies permissions and balance—the token prevents replay, and the permission and balance checks ensure the action is legitimate and executable.</p>
+<p>The system's outward voice output is likewise constrained: TTS output must not clone the identity of any customer service personnel and must explicitly tell the other party &quot;this is an automated voice&quot;. Identity is a trust signal in a conversation; cloning a customer service voice would mislead users into thinking they are dealing with a real person.</p>
+<p>On the logging side, only necessary events and model versions are saved, and sensitive raw audio is processed according to the shortest necessary retention period, avoiding unnecessary retention of high-risk data. Ultimately, ASR accuracy, confirmation at the dialogue layer, and backend authorization and balance checks stack up to form defense in depth: if any layer fails, subsequent layers still have a chance to intercept. This is the fundamental reason why voice systems can operate safely in real business, rather than relying on a single &quot;accurate enough&quot; model.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Original figure: Speech content and identity flow along different channels<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>Figure 1 shows the flow of two different channels in a speech system to clarify a commonly confused issue: why recognizing text and verifying the speaker cannot be evaluated with the same score.</p>
+<p>The starting point of the figure is the speech waveform. The waveform first passes through acoustic encoding and is decomposed into several parallel representations—language content representation, speaker representation, and environment representation. Although these three types of information are superimposed in the original waveform, the encoder separates them. The language content representation enters ASR, with the goal of producing text, that is, extracting &quot;what was said&quot; from the waveform; the speaker representation answers &quot;who is speaking&quot;, which belongs to a completely different task; the environment representation carries noise, reverberation, and other information, and ASR should suppress it as much as possible rather than use it.</p>
+<p>The other side of the figure is TTS. Here the input is text, and an authorized voice timbre can be injected as a generation condition; the two merge into the TTS vocoder and are synthesized into a new speech waveform. Note that here the timbre is explicitly passed in as an authorized condition, not secretly extracted from an arbitrary source.</p>
+<p>The core judgment of this figure is that language content and voice identity are related, but they are not the same task. A single person's voice contains both content and identity; the same person can say completely different sentences, and different people can say the same sentence—content and identity are statistically related but separable as tasks. Therefore, the metric for measuring &quot;whether the transcription is correct&quot; and the metric for measuring &quot;whether the speaker is who they claim to be&quot; cannot be shared: the former cares whether the words match, while the latter cares whether the timbre features match; the two have different optimal thresholds, error consequences, and evaluation methods. Mixing the two into a single score simultaneously obscures the true performance of both tasks.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 340" role="img" aria-label="Speech waveform goes through acoustic encoding and is split into language content, speaker, and environment representations; content enters ASR text; text and authorized timbre enter the TTS vocoder."><defs><marker id="spch31" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="25" y="112" width="110" height="86" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="80" y="145" text-anchor="middle" class="svg-t">Input waveform</text><text x="80" y="171" text-anchor="middle" class="svg-t" font-size="11">Content + identity + noise</text><path d="M135 155H175" stroke="#7f8b9d" marker-end="url(#spch31)"/><rect x="180" y="92" width="125" height="126" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="242" y="124" text-anchor="middle" class="svg-t">Acoustic encoder</text><text x="242" y="151" text-anchor="middle" class="svg-t" font-size="11">Time compression/context</text><text x="242" y="180" text-anchor="middle" class="svg-t">Separation is not perfect</text><path d="M305 125H350" stroke="#7f8b9d" marker-end="url(#spch31)"/><path d="M305 185H350" stroke="#7f8b9d" marker-end="url(#spch31)"/><rect x="355" y="55" width="130" height="92" rx="9" fill="#21252d" stroke="#72b293"/><text x="420" y="88" text-anchor="middle" class="svg-t">Language content</text><text x="420" y="116" text-anchor="middle" class="svg-t">ASR → text</text><rect x="355" y="177" width="130" height="92" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="420" y="210" text-anchor="middle" class="svg-t">Speaker/prosody</text><text x="420" y="238" text-anchor="middle" class="svg-t">Condition requiring authorization</text><path d="M485 101L545 145M485 223L545 175" stroke="#7f8b9d" marker-end="url(#spch31)"/><rect x="550" y="105" width="170" height="110" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="635" y="136" text-anchor="middle" class="svg-t">TTS + vocoder</text><text x="635" y="163" text-anchor="middle" class="svg-t" font-size="11">Pronunciation/duration/timbre</text><text x="635" y="190" text-anchor="middle" class="svg-t">Output and source marking</text><path d="M635 215V292H242V218" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#spch31)"/><text x="438" y="317" text-anchor="middle" class="svg-t">Recognition, identity verification, and synthesis must be evaluated and authorized separately.</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　Language content and voice identity are related but not the same task.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Streaming Recognition Trades Off Between Low Latency and Future Context<span class="dd-badge eng">Streaming</span></h2>
+<div class="dd-agent-response"><p>The essential difference between streaming recognition and offline recognition lies in how much future the model can see. Before outputting any token, an offline model has already &quot;seen&quot; the entire audio, so it can revise earlier text based on later context—for example, using the intonation at the end of a sentence to determine the pronunciation of an earlier word. In real-time captioning scenarios, the model cannot do this: it can only see limited right context, that is, a very short segment of audio after the current moment, because the user is still speaking.</p>
+<p>This limitation directly causes the phenomenon of real-time captioning &quot;repeatedly jumping characters&quot;. To reduce latency while improving stability, the system uses chunking, overlap, and caching, cutting the audio into small segments for the model, making adjacent chunks overlap to avoid boundary information loss, and caching the incremental results already produced. It also sets a stability threshold: when a segment's text has been confirmed by enough subsequent audio, it is marked as stable and no longer modified; unstable parts may still be overturned by future audio. If committed too early, captions will be frequently revised and continuously jump characters; if committed too late, although stable, real-time performance is sacrificed. This threshold is the knob that balances latency and accuracy.</p>
+<p>&quot;Whether a sentence has ended&quot; is determined by VAD and endpoint detection. Endpoint detection must determine whether the user has truly finished speaking or is just making a brief pause; this is likewise a trade-off between latency and accuracy: judging the end too early truncates speech that has not yet been finished, while judging too late makes the system wait idly.</p>
+<p>When evaluating a streaming system, reporting only overall WER is insufficient. You should separately report first-character latency (the time from when the user starts speaking to when the first character appears), stable-text latency (the latency until the text is finalized), and end-of-sentence latency, and record the revision rate (how many already displayed characters are later changed) and the truncation rate (how many utterances are cut off before they are finished). These metrics capture &quot;the experience as perceived by the user&quot;, not just &quot;whether the final text is correct&quot;.</p>
+<p>For systems that drive tool actions, the constraints are stricter: consume only final or explicitly stable structured intent, and never use temporary captions to execute actions. Because temporary captions can be revised at any time, using them to trigger operations is equivalent to making an irreversible decision on a still-changing basis. Streaming recognition outputs a gradually converging text stream, and the key to safety lies in strictly separating the temporary text &quot;shown to people&quot; from the final intent &quot;executed by machines&quot;.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Accents, noise, overlapping speech, and domain words determine real robustness<span class="dd-badge eng">failure boundaries</span></h2>
+<div class="dd-agent-response"><p>A low WER measured in a quiet recording studio cannot represent real call-center performance, because real environments shift the data distribution. Studio conditions—close-talking microphone, no reverberation, a single speaker, full frequency band—are only an extremely narrow slice of the speech distribution. In real deployments, speakers far from the microphone cause far-field reverberation, telephone lines compress the bandwidth, background contains other voices, users may switch between two languages (code-switching), and speakers may include children or older adults, as well as many proper nouns. These factors cause significant drift between the training distribution and the test distribution, raising real error rates.</p>
+<p>Noise-targeted augmentation training can improve robustness in part—for example, exposing the model to more noisy and reverberant samples. But such augmentation can also harm performance on clean speech or specific accents: if the distribution of augmented data is skewed, the model pays for &quot;noise robustness&quot; with degraded performance on clean or rare accents. Robustness is therefore not a single switch, but a set of trade-offs that must be weighed.</p>
+<p>Speaker separation errors are especially dangerous. When multiple voices overlap, the system must determine who said each utterance; once an utterance is attributed to the wrong speaker, the harm can be far greater than a single word substitution—because the meaning of the entire utterance is incorrectly bound to another person, which can cause serious consequences in conversation logs, compliance, or liability determinations.</p>
+<p>Evaluation must be done by slices, not just reporting a single overall WER. It should be reported separately by device, environment, language, accent, gender/age, and degree of speech overlap, and validated with real users under real conditions. Overall WER hides high error rates for certain groups behind an average: if mainstream accents perform well but a minority accent performs poorly, the overall number may look acceptable while concealing that the system is effectively unusable for that subset of users. Hiding group differences in overall WER is equivalent to packaging an unfair result as a neutral number. True robustness must be revealed by slice-by-slice and group-by-group evaluation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>TTS naturalness, intelligibility, and speaker similarity are three different axes<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>If a voice sounds very much like the target speaker but reads numbers incorrectly, can it be considered high quality? The answer depends on which axis you ask about. TTS quality is not a single numerical value, but at least three mutually independent axes: naturalness, intelligibility, and speaker similarity.</p>
+<p>Naturalness measures how much synthesized speech sounds like a real person speaking, usually evaluated with blind listening MOS (mean opinion score) or preference tests, where listeners do not know whether samples come from a real person or a system, to avoid preconceptions. Intelligibility measures whether listeners can accurately hear the content; it can be cross-validated with an independent ASR system or human transcription—if another recognition system cannot clearly hear the synthesized speech, then however &quot;natural&quot; it is, it is useless. Pronunciation accuracy must be measured separately for phonemes and entities, especially numbers and proper nouns, where a misread changes meaning. Speaker similarity measures how close the synthesized speech is to the target speaker's voice timbre, judged by speaker embedding similarity plus human listening tests. Prosody quality also needs separate measurement of duration, stress, and emotion against the context.</p>
+<p>There is no necessary positive correlation among these three axes; they may even conflict with one another. A system can sound very natural and have high intelligibility but low speaker similarity; it can also have extremely high speaker similarity yet misread numbers. Speaker similarity is particularly special: it is not unconditionally better when higher, because high speaker similarity also means greater risk of abuse—the more it resembles the person, the easier it is to use for impersonation. Therefore, &quot;similarity&quot; itself is not an unbounded goal to pursue; it must be weighed under the constraints of authorization and use.</p>
+<p>Evaluation should fix the text, speaker, and generation budget to ensure comparability; and slice by the dimensions the downstream task cares about—long sentences, numbers, polyphonic characters, foreign languages, emotion—to look at performance separately, rather than only at a single average score. Automated metrics (MOS prediction, embedding similarity, etc.) can be used for quick screening, but they can never replace human listening tests and semantic verification, because what ultimately determines &quot;whether this sentence was read correctly&quot; is human understanding, not some score.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Voice Cloning Requires Subject Consent, Purpose Binding, and Revocation Capability<span class="dd-badge eng">Identity Security</span></h2>
+<div class="dd-agent-response"><p>A public speech recording does not mean that anyone can legally clone this voice. &quot;Accessibility&quot; answers &quot;I can obtain this audio,&quot; while &quot;consent&quot; answers &quot;whether the voice subject allows me to use it for synthesis.&quot; These are completely different questions. For a publicly released speech, the subject consented to it being played and distributed, but did not consent to having their voice characteristics extracted, copied, and used to synthesize arbitrary text. Therefore, lawful voice cloning must be built on explicit consent and purpose binding.</p>
+<p>Achieving this requires a set of recording and control mechanisms. The system must record who the voice subject is, the basis on which this voice was collected, the permitted uses, how long the authorization lasts, and how it can be revoked. Models or voice embeddings should be stored according to the principle of least privilege—only the processes that need them can access them, and at access time the caller’s identity and the specific use must be verified to be within the authorized scope. Once the authorization is revoked, the corresponding embedding and generation capability should become invalid.</p>
+<p>High-risk scenarios require additional restrictions. Generating arbitrary text in real time (letting the cloned voice &quot;say whatever comes to mind&quot;) is much riskier than generating pre-approved fixed text; impersonation in financial or government scenarios may directly cause harm to property or trust; unlabeled synthetic output (not telling the other party that this is synthetic speech) can mislead listeners. These scenarios require stricter authorization thresholds or outright prohibition.</p>
+<p>Source metadata, digital watermarks, challenge-response, and outbound call prompts can all increase traceability: source metadata records the origin of the speech, watermarks embed imperceptible markers in the waveform, challenge-response requires a &quot;live person&quot; to respond to random questions in real time, and outbound call prompts announce at the beginning of a call that this is an automated voice. But all of these measures can be weakened by editing or re-recording—metadata can be stripped, watermarks may be lost during transcoding, and challenge-response recordings can also be spliced and played back. Therefore, they can only increase the cost of impersonation and traceability, not provide an absolute guarantee. In particular, remember: financial identity verification cannot rely solely on &quot;sounding like someone&quot;; voice similarity can never replace multi-factor verification using passwords, tokens, or biometrics, because the voice characteristics themselves are replicable.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>ASR confidence must be calibrated for words, entities, and business outcomes<span class="dd-badge eng">Uncertainty</span></h2>
+<div class="dd-agent-response"><p>A whole-sentence confidence of 0.95 does not mean that the amount &quot;150,000&quot; is reliable. The problem lies in the masking effect of averaging: the overall confidence of a sequence is usually the average of each token's confidence, and the low confidence of a critical token gets diluted by the surrounding high-confidence ordinary words. The whole sentence appears to be very confident, but the word that needs the most caution is exactly the one with the least confidence. In addition, the acoustic model and language prior can make common words overconfident—the language model has a strong preference for a common word and will push it to high confidence even when the acoustic evidence is actually weak. Thus, high confidence does not necessarily mean that it &quot;heard correctly&quot;.</p>
+<p>Therefore, confidence must be handled in layers, rather than looking only at a sentence-level number. The system should keep the n-best candidate list, word-level timestamps, and word-level confidence, exposing &quot;which word is uncertain&quot;. For tokens such as names, numbers, and negation words, where an error changes the outcome, they must be specially calibrated and have an independent rejection mechanism: below the threshold, ask the user again instead of guessing. Negation words are especially dangerous; omitting a single &quot;not&quot; can completely reverse the meaning of the whole sentence.</p>
+<p>Business-level success also depends on intent parsing and confirmation, not just word-level transcription. Even if the transcription is correct, if the intent parsing is wrong (e.g., interpreting &quot;check balance&quot; as &quot;transfer money&quot;), or if the system does not confirm the key action with the user, the business outcome is still a failure. Therefore, the ultimate target of confidence calibration is &quot;whether the business result is correct&quot;, which lies downstream of transcription confidence.</p>
+<p>When choosing the ask-back threshold, use reliability diagrams and coverage-error curves to make decisions: Reliability diagrams show &quot;among samples where the system says 90% confidence, is the actual accuracy really close to 90%?&quot;, and coverage-error curves show how many samples can be processed automatically and how many errors are let through at a given confidence threshold. By combining the two, you can find a balance between &quot;automatic pass-through&quot; and &quot;manual/ask-back confirmation&quot;. Also note that confidence calibration is not a one-time task: after model version updates, changes in noise conditions, or shifts in language distribution, the original thresholds may no longer hold and must be recalibrated.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Privacy and logging policies must cover original audio, transcripts, and voice embeddings<span class="dd-badge eng">Data governance</span></h2>
+<div class="dd-agent-response"><p>After deleting a recording, if the transcript and speaker vector are still retained, deletion is not complete. The reason is that the original audio, transcript, and speaker embedding are three data forms with different sensitivity, different uses, and each can potentially leak information; they must be managed separately, not treated as &quot;the same data&quot; all together.</p>
+<p>Original audio is the highest-risk layer: it may contain bystanders' voices, environmental information in the background, and the speaker's biometric characteristics (timbre, vocal tract characteristics that can be linked to a specific individual). Transcripts, although stripped of acoustic information, may still contain sensitive content—account numbers, amounts, medical conditions, addresses, and the like—and the text form also requires protection. Speaker embeddings are a minimal representation of identity; on their own they may not contain semantic content, but they are sufficient to link different sessions to the same person, enabling identity tracking. Therefore, &quot;deleting the recording&quot; only clears the first layer; transcripts and embeddings may still be privacy carriers.</p>
+<p>For each data form, you must separately define its purpose, access permissions, retention period, encryption method, and deletion lineage. Deletion lineage means tracking the entire process of a piece of data from entering the system to complete removal, including whether it has been copied, and whether it has entered caches or backups. Debug samples must first be minimized—remove identity and irrelevant content, keeping only the segments needed to locate the problem; human annotators must only see the necessary minimal segments, not the complete recording.</p>
+<p>When using cloud ASR/TTS services, you must also check the data flow: in which region data is stored and processed, whether the provider will use this data for training, and whether there are sub-processors (third parties to which data is handed over for processing). In particular, note that streaming and caching may silently create long-term copies—for low latency, audio is chunked, buffered, and temporarily stored on multiple nodes; if these temporary copies are not cleaned up, they become long-term storage that exceeds the retention period. If a privacy policy only says &quot;we will delete recordings&quot; but does not cover transcripts, embeddings, caches, and third parties, it leaves behind a chain of untracked data copies.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The entire causal chain of a speech system starts from &quot;what problem to solve&quot; and extends all the way to &quot;how to verify that the problem has been solved.&quot; The starting point of the chain is task definition: first clarify whether this is recognition, synthesis, or cloning, and what consequences will result if this task goes wrong. The task and its consequences determine the trade-offs at every subsequent step — verbatim transcription and keyword recognition have different error tolerance standards, and the risks of synthesizing customer-service prompts versus cloning a celebrity's voice are also different.</p>
+<p>Only after selecting the task can we talk about choosing waveform preprocessing and acoustic representations. For recognition tasks, this step converts the raw waveform into log Mel spectrograms or learned features, paving the way for subsequent modeling. ASR handles time alignment on top of the acoustic representation and outputs word-level confidence scores and timestamps — confidence is the basis for downstream judgments of &quot;whether to trust it,&quot; and timestamps align the transcription with the timeline. After the business parsing layer receives these outputs, it only forms confirmable intents and never directly triggers irreversible actions: the recognized &quot;transfer five thousand&quot; is only a proposal until it passes semantic parsing and user confirmation.</p>
+<p>The TTS direction takes text as input: first perform text normalization to handle numbers, abbreviations, and polyphonic characters, then predict duration and acoustic representations, and finally decode into a waveform with a vocoder. The two directions converge again at evaluation: content accuracy, naturalness, speaker similarity, and latency must be measured separately because they do not improve together and may even conflict. Before actually executing an action, key entities must be confirmed with the user, and the backend performs permission and balance checks for the action. Finally, all data generated along the entire chain — original audio, transcriptions, speaker embeddings, generation provenance — must be governed in terms of usage, retention, and deletion; otherwise privacy risks will backfire on the entire system from the very end of the chain.</p>
+<p>Turning this chain into verifiable practice requires a verification layer whose core is the division of labor between &quot;fixing and observing.&quot; For the overall problem of &quot;converting between text, linguistic content, speaker identity, and acoustic waveforms,&quot; what to fix and what evidence to observe must be specified in advance. On the input side, fix the same batch of samples, the same preprocessing, and permission boundaries, and observe input hashes, slice labels, and rejection reasons to ensure each experiment is fed the same data and the same constraints. On the mechanism side, change only one core variable while locking all other configurations, and observe key intermediate states and the first position where expectations deviate — for example, when modifying the vocoder, first check whether the Mel spectrogram has already changed to determine whether the error occurs before or after decoding. On the output side, use the same acceptance rules and resource budget, and observe stratified differences in quality, cost, latency, and failure rate across different slices. Finally, retain a control group that does not enable the target mechanism to answer disconfirmation questions: whether the observed benefits reproduce stably across samples and random seeds, rather than being better only in one particular run. Only when each link of the causal chain can be located to a specific observation object is the chain not merely a description but a verifiable system.</p></div>
+<table class="dd-table"><thead><tr><th>Verification layer</th><th>What to fix in “Speech Systems: Converting Between Text, Linguistic Content, Speaker Identity, and Acoustic Waveforms”</th><th>What evidence to observe</th></tr></thead><tbody>
+      <tr><td>Input</td><td>Same batch of samples, preprocessing, and permission boundaries</td><td>Input hashes, slice labels, and rejection reasons</td></tr>
+      <tr><td>Mechanism</td><td>Change only one core variable; lock all other configurations</td><td>Key intermediate states and the first position where expectations deviate</td></tr>
+      <tr><td>Output</td><td>Same acceptance rules and resource budget</td><td>Stratified differences in quality, cost, latency, and failure rate</td></tr>
+      <tr><td>Disconfirmation</td><td>Retain a control group that does not enable the target mechanism</td><td>Whether benefits reproduce stably across samples and random seeds</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/2212.04356" target="_blank" rel="noopener">Whisper</a>: Large-scale weakly supervised multilingual speech recognition</li><li><a href="https://www.cs.toronto.edu/~graves/icml_2006.pdf" target="_blank" rel="noopener">Connectionist Temporal Classification</a>: Sequence learning without explicit frame-level alignment</li><li><a href="https://arxiv.org/abs/2106.06103" target="_blank" rel="noopener">VITS</a>: End-to-end text-to-speech synthesis</li><li><a href="https://arxiv.org/abs/2112.02418" target="_blank" rel="noopener">YourTTS</a>: Multilingual zero-shot voice cloning</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/speech">Explore connections on the map</a><a href="/zh/concepts/speech/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

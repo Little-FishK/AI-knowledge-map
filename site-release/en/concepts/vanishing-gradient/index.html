@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects? Explained Simply</title>
+<meta name="description" content="From scalar products to matrix Jacobians, from sigmoid saturation to RNN unrolling over time; use numerical examples to understand how initialization, gating, residuals, normalization, and gradient clipping each change which segment of the path.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/vanishing-gradient/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/vanishing-gradient/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/vanishing-gradient/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects? Explained Simply">
+<meta property="og:description" content="From scalar products to matrix Jacobians, from sigmoid saturation to RNN unrolling over time; use numerical examples to understand how initialization, gating, residuals, normalization, and gradient clipping each change which segment of the path.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/vanishing-gradient/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects? Explained Simply">
+<meta name="twitter:description" content="From scalar products to matrix Jacobians, from sigmoid saturation to RNN unrolling over time; use numerical examples to understand how initialization, gating, residuals, normalization, and gradient clipping each change which segment of the path.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/vanishing-gradient/#page","name":"What Is Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects? Explained Simply","description":"From scalar products to matrix Jacobians, from sigmoid saturation to RNN unrolling over time; use numerical examples to understand how initialization, gating, residuals, normalization, and gradient clipping each change which segment of the path.","url":"https://ai-knowledge-map.com/en/concepts/vanishing-gradient/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects","item":"https://ai-knowledge-map.com/en/concepts/vanishing-gradient/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects</span></li></ol></nav><article id="dd-article" data-concept-id="vanishing-gradient" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Vanishing and Exploding Gradients: How Depth Turns Local Derivatives into Exponential Effects</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From scalar products to matrix Jacobians, from sigmoid saturation to RNN unrolling over time; use numerical examples to understand how initialization, gating, residuals, normalization, and gradient clipping each change which segment of the path.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> When backpropagation traverses deep layers or long temporal dependencies, it must repeatedly multiply local Jacobians; if the effective scale in relevant directions remains below 1 or above 1 for a long time, the credit signal decays or amplifies exponentially. The core problem is not the &#39;network being too deep&#39; itself, but rather the signal propagation jointly shaped by depth × local derivative spectrum × path structure.</div></header>
+<!-- source-body:start --><div class="dd-goals"><div class="dd-goals-h">After reading this page, you should be able to answer:</div><ul><li>Why do dozens of seemingly mild 0.9 or 1.1 factors produce huge differences when multiplied together?</li><li>How do sigmoid saturation, weight matrices, and sequence length jointly enter the Jacobian chain multiplication?</li><li>How do vanishing gradients, exploding gradients, and “no gradient at all” differ?</li><li>What do Xavier/He initialization, LSTM gating, residuals, normalization, and clipping each solve?</li><li>How can per-layer activations, gradient norms, and update ratios prove the root cause, rather than guessing from slow training?</li></ul></div>
+<ol class="dd-chain"><li>The loss produces an initial gradient at the output.</li><li>Backpropagation multiplies by a local Jacobian at each layer.</li><li>Activation saturation, weight spectrum, and path direction jointly determine scaling.</li><li>Depth or temporal distance makes these scalings accumulate exponentially.</li><li>Early layers therefore receive almost no updates, or the global gradient explodes out of control.</li><li>Proper initialization first stabilizes the starting scale.</li><li>Gating, residuals, and normalization change long-term paths and local conditions.</li><li>Clipping and precision management handle extreme updates and numerical representation.</li><li>Layer-wise monitoring and ablation prove the root cause, rather than inferring the mechanism backward from a technique's effectiveness.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The output layer knows it made a mistake; why don't the early layers get the message?<span class="dd-badge intuition">Motivation</span></h2>
+<div class="dd-agent-response"><p>The core of this passage is the distinction between “the existence of a backpropagation path” and “an effective gradient being able to arrive.” A connected computational graph only shows that the derivative of the loss with respect to early parameters can be calculated through the chain rule; it does not guarantee that this derivative still has a large enough numerical value to produce appreciable parameter updates.</p>
+<p>Each time the gradient passes through a node, it is multiplied by that node's local derivative. Early layers are farther from the loss function, so they experience more multiplications along the way; therefore depth accumulates local scale effects. If most multipliers in the relevant direction are less than 1, the product decays rapidly with path length, causing vanishing gradients; if most are greater than 1, the product grows rapidly, causing exploding gradients. The key is not just whether individual derivatives are “large or small,” but the overall scale after many local derivatives are multiplied together.</p>
+<p>Numerical systems and the optimization process amplify this effect. Extremely small gradients may be close to the lower limit of floating-point representation or of effective updates; even if formally nonzero, they are not enough to change the parameters. Extremely large gradients may make the update step uncontrolled and cause weights, activations, or the loss to overflow to Inf/NaN. The optimizer receives the gradient after it has already been scaled by this chain, so it cannot automatically recover the useful signal lost along the way.</p>
+<p>This yields an important inter-layer diagnostic feature: gradient problems are usually not a case of “the whole network slows down together.” With vanishing gradients, layers near the output can still learn normally because their backward path is short, while layers near the input are almost frozen and early features remain unchanged for a long time; with exploding gradients, numerical control may suddenly be lost at some step. Observing the gradient and parameter update magnitudes at different depths reveals the problem better than only looking at the overall rate of loss decrease.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How the chain rule turns depth into a product<span class="dd-badge math">Mathematics</span></h2>
+<div class="dd-agent-response"><p>This section uses the chain rule to turn "the network is very deep" into an analyzable mathematical object: a product of Jacobian matrices. Let the loss be <span class="dd-inline-math" role="math">L</span>, and the early state be <span class="dd-inline-math" role="math">h_0</span>, the <span class="dd-inline-math" role="math">k</span> layer state be <span class="dd-inline-math" role="math">h_k</span>, then the gradient of the loss with respect to the early state must pass through the local Jacobians of the subsequent layers in sequence <span class="dd-inline-math" role="math">J_k=∂ h_k/∂ h_{k-1}</span>. Therefore, the scale and direction of the backward signal are jointly determined by the entire chain of Jacobian products, and the network depth <span class="dd-inline-math" role="math">K</span> directly appears as the number of factors in the product.</p>
+<p>In the scalar case, each Jacobian degenerates into an ordinary derivative. If the typical scaling factor of each layer along some direction is approximated as <span class="dd-inline-math" role="math">c</span>, then after <span class="dd-inline-math" role="math">K</span> layers the total scale is approximately <span class="dd-inline-math" role="math">c^K</span>. This reveals the exponential effect of depth: when <span class="dd-inline-math" role="math">c=0.5</span> , after 10 layers it is about <span class="dd-inline-math" role="math">9.77×10^{-4}</span>, after 50 layers it is about <span class="dd-inline-math" role="math">8.88×10^{-16}</span>; even if <span class="dd-inline-math" role="math">c=0.9</span> looks only slightly smaller than 1, after 50 layers only about 0.00515 remains. Conversely, <span class="dd-inline-math" role="math">c=1.1</span> after 50 layers can grow to about 117.4, <span class="dd-inline-math" role="math">c=1.5</span> would reach about <span class="dd-inline-math" role="math">6.38×10^8</span>. So even a mild deviation of the local scale from 1 is accumulated by depth into a huge overall difference.</p>
+<p><span class="dd-inline-math" role="math">c=1</span> represents the idealized case where the scale stays unchanged, but a real vector network cannot be fully described by an average scale. In this case the Jacobian is a matrix, and different input directions are stretched or shrunk to different degrees; matrix multiplication also changes direction. It is more accurate to understand this through singular directions: some directions of the same network may keep shrinking during the product, while other directions are simultaneously amplified, so vanishing and exploding gradients can coexist.</p>
+<p>The diagnostic value of this formula is that it locates the problem in the spectrum and directional behavior of the entire backward propagation chain, rather than in the individual derivative of a single layer. The scalar approximation <span class="dd-inline-math" role="math">c^K</span> provides the first intuition about exponential accumulation; further analysis needs to pay attention to how the Jacobians of each layer stretch along different directions and how these directions combine across layers.</p></div>
+<table class="dd-table"><thead><tr><th>Per-layer scale c</th><th>10 layers</th><th>50 layers</th><th>Meaning</th></tr></thead><tbody><tr><td>0.5</td><td>9.77×10⁻⁴</td><td>8.88×10⁻¹⁶</td><td>vanishes rapidly</td></tr><tr><td>0.9</td><td>0.349</td><td>0.00515</td><td>even mild shrinkage accumulates</td></tr><tr><td>1.0</td><td>1</td><td>1</td><td>idealized preservation</td></tr><tr><td>1.1</td><td>2.59</td><td>117.4</td><td>gradually explodes</td></tr><tr><td>1.5</td><td>57.7</td><td>6.38×10⁸</td><td>extremely rapid loss of control</td></tr></tbody></table>
+<div class="dd-formula">∂L/∂h₀ = ∂L/∂h<sub>K</sub> · J<sub>K</sub>J<sub>K−1</sub>…J₁，　Jₖ=∂hₖ/∂h<sub>k−1</sub></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Why activation functions directly enter the backward scale<span class="dd-badge math">saturation</span></h2>
+<div class="dd-agent-response"><p>This section explains that activation functions do not merely determine the shape of the forward representation; their derivatives are also direct multipliers in the backpropagation chain. <span class="dd-inline-math" role="math">k</span> layer forward computation is <span class="dd-inline-math" role="math">z_k=W_kh_{k-1}</span>, <span class="dd-inline-math" role="math">h_k=φ(z_k)</span>. When backpropagation reaches here, the upstream gradient <span class="dd-inline-math" role="math">∂ L/∂ h_k</span> is multiplied element-wise by the slope at the current pre-activation:</p>
+<div class="dd-equation" role="math" aria-label="∂L/∂zₖ = (∂L/∂hₖ) ⊙ φ′(zₖ)."><span>∂L/∂zₖ = (∂L/∂hₖ) ⊙ φ′(zₖ).</span></div>
+<p>Therefore, the inputs are the pre-activation <span class="dd-inline-math" role="math">z_k</span> and the upstream gradient; the output is a gradient with unchanged shape but reweighted by each unit's local slope. When the slope is close to zero, the credit signal carried by that unit is suppressed; when the slope is 1, the activation itself does not change the backward scale at that location.</p>
+<p>Sigmoid best demonstrates this mechanism. Its derivative is <span class="dd-inline-math" role="math">σ&#39;(z)=σ(z)(1-σ(z))</span>. When the output is close to 0 or 1, the derivative approaches zero, corresponding to the saturation regions at the two ends of the function; even at the most favorable <span class="dd-inline-math" role="math">z=0</span> point, the derivative is only 0.25. If ten layers all contain this activation factor, the product of the activation derivatives alone would produce <span class="dd-inline-math" role="math">0.25^{10}≈9.5×10^{-7}</span> contraction. The weights would need to provide roughly fourfold amplification in the corresponding direction at every layer to offset this term, but that would introduce the risk of runaway growth in other directions.</p>
+<p>Different activation functions change the activation part of the local Jacobian. tanh can have derivative up to 1 at the center, but it still saturates when the state moves away from the center. ReLU has derivative 1 in the positive region, so it does not continuously compress the positive-region gradient downward as sigmoid does; however, its derivative is 0 in the negative region, and if a unit stays in the negative region for a long time, the gradient is completely cut off, forming a “dead” unit. GELU and SiLU have smoother curves and retain a small derivative in the negative region, alleviating the hard cutoff, but the small derivative still shortens the signal.</p>
+<p>The full local Jacobian can be understood as <span class="dd-inline-math" role="math">J=D_φ W</span>:<span class="dd-inline-math" role="math">D_φ</span> consists of the activation derivatives of each unit, <span class="dd-inline-math" role="math">W</span> provides the linear transformation. Changing the activation function only alters the former part, so it can significantly improve deep trainability but cannot by itself guarantee overall stability. Even if the activation derivatives are ideal, the weight matrix may still strongly contract or amplify in certain directions.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 280" role="img" aria-label="Sigmoid function and its derivative, which approaches zero away from zero"><line x1="65" y1="225" x2="650" y2="225" stroke="currentColor" opacity=".28"/><line x1="350" y1="30" x2="350" y2="235" stroke="currentColor" opacity=".28"/><path d="M80 210 C220 205 275 180 315 125 C355 70 420 45 630 42" fill="none" stroke="#8b5cf6" stroke-width="5"/><path d="M80 220 C240 218 285 190 350 170 C415 190 460 218 630 220" fill="none" stroke="#ef4444" stroke-width="5"/><text x="540" y="36" class="svg-t">σ(x)</text><text x="455" y="178" class="svg-t">σ′(x), with a maximum of only 0.25</text><text x="80" y="250" class="svg-tn">Negative saturation region: derivative ≈ 0</text><text x="485" y="250" class="svg-tn">Positive saturation region: derivative ≈ 0</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>The sigmoid output is bounded, but the saturation regions at both ends barely transmit gradient; multiplying by factors no larger than 0.25 layer after layer leads to rapid decay.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Activation</th><th>Local derivative characteristics</th><th>New risk</th></tr></thead><tbody><tr><td>sigmoid</td><td>Maximum 0.25, near 0 in saturation regions</td><td>Prone to vanishing in deep networks and long sequences</td></tr><tr><td>tanh</td><td>Can reach 1 at the center, still saturates at the ends</td><td>Decays after the state leaves the center</td></tr><tr><td>ReLU</td><td>1 in the positive region, 0 in the negative region</td><td>“Dead” units from staying zero in the negative region</td></tr><tr><td>GELU/SiLU</td><td>Smooth, small derivative in the negative region</td><td>Cannot ensure overall Jacobian stability alone</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Why Weight Matrices Let the Same Layer Have Both Shrinking and Expanding Directions<span class="dd-badge math">Matrix</span></h2>
+<div class="dd-agent-response"><p>This section extends the "size" of the gradient from a single scalar to direction-dependent matrix behavior. When a linear layer is followed by an activation function, the local Jacobian can be written as <span class="dd-inline-math" role="math">J=D_\phi W</span>. Here, the weight matrix <span class="dd-inline-math" role="math">W</span> first applies a linear transformation to the signal, and the activation derivative matrix <span class="dd-inline-math" role="math">D_\phi</span> then weights the backward signal according to the current position of each unit. The change in the gradient after passing through this layer depends not only on an overall norm, but also on the specific direction in which it lies.</p>
+<p>The singular values of the weight matrix characterize the degree of stretching in different directions. Larger singular values correspond to directions that are amplified, and smaller singular values correspond to directions that are compressed. If during backpropagation the relevant direction repeatedly encounters a maximum singular value greater than 1, the gradient may be continuously amplified and eventually explode; if the direction carrying task information corresponds to a very small singular value, the gradient in that direction will rapidly decay. Because the same matrix can have both very large and very small singular values, the same layer can perfectly well amplify some directions while erasing others.</p>
+<p>The activation derivative further changes this directional structure.<span class="dd-inline-math" role="math">D_\phi</span> assigns different slopes to different units; some coordinates may be preserved, some may be significantly compressed or even set to zero. When combined with <span class="dd-inline-math" role="math">W</span> after being combined, the final effective direction may not necessarily align with the original coordinate axes or <span class="dd-inline-math" role="math">W</span> 's individual singular directions. Therefore, relying solely on either the weight norm or the activation derivative cannot fully determine whether the local Jacobian is stable.</p>
+<p>This also explains why a “normal average gradient norm” can be misleading. A few especially large gradients can push the overall norm into a seemingly healthy range, while the gradients of most layers, channels, or parameters are already close to zero. A single aggregated scalar flattens direction imbalance and sparse anomalies, possibly masking vanishing gradients as well as local explosions.</p>
+<p>More effective diagnostics should preserve structure: record gradient distributions separately by network layer, module, parameter type, and time step in sequence models, and examine the median, multiple quantiles, extreme values, and the proportion near zero; at the same time, compare the ratio of parameter updates to the scale of the parameters themselves. Only then can you determine which positions are still learning, which directions have frozen, and whether the overall norm is merely supported by a small number of outliers.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>How RNN Turns “Depth” into Time Distance<span class="dd-badge intuition">Sequence</span></h2>
+<div class="dd-agent-response"><p>This section explains that although a recurrent neural network has only a few parameter layers in its structure diagram, unrolling it over time creates a very deep computational chain. The state update of a plain RNN is</p>
+<div class="dd-equation" role="math" aria-label="h_t=\phi(W_hh_{t-1}+W_xx_t)."><span>h_t=\phi(W_hh_{t-1}+W_xx_t).</span></div>
+<p>The same set of state transition parameters is reused at every time step. If at step <span class="dd-inline-math" role="math">T</span> the loss needs to send the credit signal back to step <span class="dd-inline-math" role="math">t</span> step, the gradient must pass through <span class="dd-inline-math" role="math">T-t</span> state-transition Jacobians. Therefore, the time distance in the sequence plays the role of the number of layers in a feedforward network: the farther apart they are, the greater the effective depth.</p>
+<p>The local Jacobian at each time step contains the recurrent weight <span class="dd-inline-math" role="math">W_h</span> and the current activation derivative. Backpropagation multiplies these Jacobians together one after another. Even if the scaling at a single step is only slightly less than or slightly greater than 1, repeating it dozens of times can produce exponential decay or amplification. Parameter sharing only means that each step uses the same matrix; it does not shorten the computation path from the loss to the earlier state. On the contrary, repeatedly multiplying the same matrix continues to accumulate its directional scaling effect.</p>
+<p>Long-distance dependencies face two related but different difficulties. During the forward pass, state information left by earlier inputs may be continuously overwritten by later state updates, so that <span class="dd-inline-math" role="math">h_T</span> no longer retains enough clues; during the backward pass, even if early information once influenced the state, the gradient from later losses may decay along the long path and fail to send back “how the early processing should be modified.” The former is a problem of preserving memory content; the latter is a problem of passing credit assignment signals.</p>
+<p>Therefore, RNNs have difficulty learning information from dozens of steps earlier, not because there are many kinds of trainable parameters, but because both information and gradients must travel through a very long temporal chain. When analyzing such problems, you should treat sequence length as network depth and observe state sensitivity and backward gradients according to time distance, rather than judging depth only by the number of layers explicitly declared in model code.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 720 220" role="img" aria-label="RNN unrolled over time and long-distance backward gradient path"><defs><marker id="vga" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="context-stroke"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="2"><rect x="60" y="80" width="90" height="52" rx="12"/><rect x="220" y="80" width="90" height="52" rx="12"/><rect x="380" y="80" width="90" height="52" rx="12"/><rect x="540" y="80" width="90" height="52" rx="12"/><path d="M150 106L220 106M310 106L380 106M470 106L540 106" marker-end="url(#vga)"/><path d="M585 155 C470 205 215 205 105 155" stroke="#ef4444" stroke-width="4" stroke-dasharray="7 6" marker-end="url(#vga)"/></g><g class="svg-t"><text x="88" y="112">hₜ</text><text x="245" y="112">hₜ₊₁</text><text x="405" y="112">…</text><text x="565" y="112">hT</text><text x="230" y="205">Credit assignment across many time steps: consecutive Jacobian products</text></g></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Parameter sharing does not shorten the backward path; repeatedly multiplying the same matrix also produces exponential effects.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>How LSTM/GRU Gating Builds a More Stable State Channel<span class="dd-badge intuition">Gating</span></h2>
+<div class="dd-agent-response"><p>The core point of this section is: LSTM and GRU use gating to construct a state path close to “identity propagation”, so that long-term information and gradients do not have to pass through the full product of recurrent weights and saturated activations at every time step.</p>
+<p>In addition to the hidden state, LSTM also maintains a cell state <span class="dd-inline-math" role="math">c_t</span>:</p>
+<div class="dd-equation" role="math" aria-label="c_t=f_t\odot c_{t-1}+i_t\odot \tilde c_t."><span>c_t=f_t\odot c_{t-1}+i_t\odot \tilde c_t.</span></div>
+<p>forget gate <span class="dd-inline-math" role="math">f_t</span> determines how much of the old state to keep, and the input gate <span class="dd-inline-math" role="math">i_t</span> determines how much of the candidate content <span class="dd-inline-math" role="math">\tilde c_t</span> is written. This update has an approximately additive structure. When backpropagating along the cell state channel, the main local multiplier between adjacent time steps is <span class="dd-inline-math" role="math">f_t</span>, rather than the “recurrent weight spectrum times nonlinear derivative” that appears repeatedly in ordinary RNNs. The model can therefore learn to make the dimensions that need long-term retention have their corresponding <span class="dd-inline-math" role="math">f_t</span> close to 1.</p>
+<p>Gate values close to 1 are crucial for long paths. Across 100 steps, if the effective multiplier per step is 0.99, the product is <span class="dd-inline-math" role="math">0.99^{100}\approx0.366</span>, which still retains a usable scale; if it is 0.9, then <span class="dd-inline-math" role="math">0.9^{100}\approx2.66\times10^{-5}</span>, the signal still almost disappears. This shows that the advantage of gating is not to eliminate the product, but to allow the multiplicative factor to be driven close to 1 by the data.</p>
+<p>GRU does not have an independent cell state, but instead uses</p>
+<div class="dd-equation" role="math" aria-label="h_t=(1-z_t)\odot h_{t-1}+z_t\odot \tilde h_t."><span>h_t=(1-z_t)\odot h_{t-1}+z_t\odot \tilde h_t.</span></div>
+<p>When the update gate <span class="dd-inline-math" role="math">z_t</span> is close to 0, the old state is almost copied unchanged, and the effective retention multiplier <span class="dd-inline-math" role="math">1-z_t</span> is close to 1, which can also form a relatively stable long-range channel. Compared with LSTM, GRU uses a single gate to bind retaining old information and writing new information into a convex combination; LSTM’s forget gate and input gate are relatively independent, so the control over “how much to retain” and “how much to write” is more separated.</p>
+<p>The common mechanism of both structures is to convert the difficult-to-control “weight matrix scaling × activation derivative” in ordinary RNNs into learnable gate values, allowing the model to build paths close to identity mapping for important state dimensions. But this does not guarantee infinite memory: gate values that deviate from 1 over long periods still decay exponentially, and finite state capacity, optimization difficulty, and sequence noise also impair information retention. Gating provides a long-term channel that is easier to learn, not automatic permanent memory.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>How Initialization Keeps the Signal Scale from Immediately Going Out of Control at the First Step<span class="dd-badge math">Starting Point</span></h2>
+<div class="dd-agent-response"><p>This section explains that the goal of initialization is not simply to make weights "as small as possible," but rather to keep the scales of forward activations and backward gradients as stable as possible when signals pass through multiple layers from the network's starting point. If each layer slightly reduces variance, depth will accumulate this contraction into vanishing; if each layer amplifies variance, it may cause explosion, and may also push activations such as sigmoid or tanh into saturation regions, making derivatives even closer to zero. Therefore, neither too small nor too large is a safe choice.</p>
+<p>Xavier/Glorot initialization sets the weight variance based on input width and output width, with a typical scale of approximately <span class="dd-inline-math" role="math">2/(\mathrm{fan\_in}+\mathrm{fan\_out})</span>. It compromises between preserving variance in the forward and backward passes, suitable for activations that are near linear or approximately symmetric, such as tanh. He/Kaiming initialization has a typical variance of approximately <span class="dd-inline-math" role="math">2/\mathrm{fan\_in}</span>, targeting the fact that ReLU-type activations cause about half of the units to output zero, using a larger initial variance to compensate for the energy loss.</p>
+<p>These two types of methods mainly constrain the average variance in a statistical sense. Orthogonal initialization, on the other hand, addresses the problem from the directional perspective: the columns of an orthogonal matrix are perpendicular to each other and have length 1, and all singular values are 1, so it only rotates vectors and does not amplify or compress any direction. When used as the weight starting point, the local Jacobian <span class="dd-inline-math" role="math">J=D_\phi W</span> in <span class="dd-inline-math" role="math">W</span> initially has a scaling factor close to 1 in all directions, so the norm of deep linear paths is more stable. This corresponds more directly to the singular value perspective than merely guaranteeing average variance.</p>
+<p>Orthogonal weights are usually also multiplied by a gain <span class="dd-inline-math" role="math">gain</span>, to pre-compensate for the energy changes brought by subsequent activations. ReLU on average truncates about half of the energy, so it is often paired with <span class="dd-inline-math" role="math">\sqrt{2}\approx1.414</span> gain; tanh can use an empirical gain slightly greater than 1. If the gain does not match the activation, the activation derivative will still destroy the original scale-preserving property.</p>
+<p>Initialization addresses the conditions at the beginning of training, rather than permanent stability throughout the entire training process. Parameter updates gradually change the weight spectrum, and changes in data and parameters also change the activation distribution; a Jacobian that is healthy at initialization may deviate from the stable region after training. Therefore, sensible initialization needs to be used together with residual paths, normalization, learning rate scheduling, and continuous monitoring of gradients and activations.</p></div>
+<table class="dd-table"><thead><tr><th>Method</th><th>Typical Variance Scale</th><th>Main Assumptions</th></tr></thead><tbody><tr><td>Xavier/Glorot</td><td>approximately <code>2/(fan_in+fan_out)</code></td><td>forward-backward variance compromise, near tanh/linear</td></tr><tr><td>He/Kaiming</td><td>approximately <code>2/fan_in</code></td><td>gating ratio of ReLU-type activations</td></tr><tr><td>Orthogonal initialization</td><td>Directional norm initially more stable</td><td>Shape permitting and gain chosen appropriately</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Why Residual Connections, Normalization, and Clipping Cannot Replace Each Other<span class="dd-badge eng">Mechanism Mapping</span></h2>
+<div class="dd-agent-response"><p>This section puts multiple "stabilized training" techniques back into the Jacobian product chain for comparison; the key conclusion is that they operate at different locations and solve different problems, so they cannot be treated as interchangeable just because they all reduce training collapse.</p>
+<p>Residual connections write the module as <span class="dd-inline-math" role="math">y=x+F(x)</span>, whose Jacobian is</p>
+<div class="dd-equation" role="math" aria-label="∂y/∂x = I + ∂F/∂x."><span>∂y/∂x = I + ∂F/∂x.</span></div>
+<p>The identity matrix <span class="dd-inline-math" role="math">I</span> corresponds to an identity path that does not need to go through the branch transformation. Even if the branch <span class="dd-inline-math" role="math">F</span> has small derivatives in some directions, gradients can still pass through the identity term, thereby improving deep credit assignment. But residuals do not automatically limit the branch scale; if <span class="dd-inline-math" role="math">∂F/∂x</span> is large, the overall Jacobian <span class="dd-inline-math" role="math">I+∂F/∂x</span> can still amplify the gradient.</p>
+<p>Normalization here is used to adjust the numerical scale of intermediate activations; the normalized values can also be rescaled and shifted via learnable parameters <span class="dd-inline-math" role="math">γ,β</span> rescaled and shifted. Keeping intermediate values in a relatively stable range reduces the chance of pre-activations drifting into the sigmoid/tanh saturation regions and improves local optimization conditions. However, normalizing the overall scale does not equate to making every singular value of the weight matrix equal to 1; the original strength differences between different directions may still be preserved.</p>
+<p>Gradient clipping occurs after complete backpropagation. If the global gradient norm <span class="dd-inline-math" role="math">‖g‖</span> exceeds the threshold <span class="dd-inline-math" role="math">τ</span>, the gradient is globally multiplied by <span class="dd-inline-math" role="math">τ/‖g‖</span>, preserving the direction while limiting the length. It is suitable for handling spikes caused by gradient explosion or anomalous batches, but cannot fix vanishing gradients, because when the gradient is originally only <span class="dd-inline-math" role="math">10^{-8}</span> clipping will not be triggered at all.</p>
+<p>Loss scaling is numerical protection in low-precision training. Before the FP16 backward pass, the loss is first multiplied by a larger coefficient <span class="dd-inline-math" role="math">S</span>, so that tiny gradients fall into the representable range, and before the parameter update it is divided back by <span class="dd-inline-math" role="math">S</span>. It can prevent originally nonzero gradients from being rounded to zero due to floating-point underflow, but it cannot change the fact that the mathematically true gradient is already very small.</p>
+<p>Gating, on the other hand, establishes long-term state pathways through learnable retention and write coefficients, mainly targeting credit propagation along the time dimension, and it does not equal unlimited memory. This shows that: residual connections change the Jacobian structure, normalization adjusts activation scales and local conditions, gating controls state transmission, clipping limits the final large gradient, and loss scaling protects numerical representation. Stable systems often need to combine these mechanisms and choose tools based on the specific diagnosed failure locations.</p></div>
+<table class="dd-table"><thead><tr><th>Method</th><th>Directly changes</th><th>Mainly helps</th><th>Cannot solve alone</th></tr></thead><tbody><tr><td>Residual Connection</td><td>Adds identity shortcut path to the Jacobian</td><td>Deep credit propagation, degradation problem</td><td>Uncontrolled branch scale, wrong objective</td></tr><tr><td>Normalization</td><td>Activation scale and local condition</td><td>Numerical range, optimizability</td><td>Keeping the spectrum at 1 in all directions</td></tr><tr><td>Gating</td><td>Learns state retention/write coefficients</td><td>Long-term dependencies</td><td>Infinite sequence memory</td></tr><tr><td>Gradient Clipping</td><td>Final norm of overly large gradients</td><td>Explosion and anomalous batches</td><td>Vanishing gradients</td></tr><tr><td>Loss Scaling</td><td>Numerical range of low-precision backward pass</td><td>Prevents floating-point underflow</td><td>True mathematical gradient too small</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Worked Example: How to Prove It Is Vanishing Gradients Rather Than Vague “Slow Training”<span class="dd-badge eng">Diagnosis</span></h2>
+<div class="dd-agent-response"><p>This section presents a diagnostic method in the style of an “evidence chain”: loss stagnation is only a surface phenomenon. Only by connecting task learnability, forward states, backward gradients, parameter updates, and path length can the root cause be localized to vanishing gradients.</p>
+<p>The first step is to establish a learnability baseline. Have a small or shallow model overfit on a small batch of data. If even this minimal experiment fails, you should first check the data, labels, loss function, and implementation; if a shallow model can learn while a deep model on the same task cannot, then the depth-related backward path becomes the primary suspect.</p>
+<p>The second step is to record per-layer activations and per-layer gradients simultaneously. On the activation side, observe the mean, variance, saturation proportion, and the zero proportion for ReLU to determine whether the signal shrinks with depth or enters a saturation region. On the gradient side, do not record only a single global norm; instead record per-layer norms, medians, maxima, and finite proportion, and compare layers near the input and output. If the gradients of layers near the input are systematically much smaller than those near the output, this is consistent with multiplicative decay along a long path.</p>
+<p>The third step is to connect gradients to actual updates. Record the ratio of “parameter update amount / parameter count” to determine whether small gradients still produce visible updates after passing through the optimizer. If gradients look normal but parameters do not change at all, check the learning rate, optimizer parameter groups, parameter freezing, or scaling settings instead of directly attributing it to vanishing gradients.</p>
+<p>Depth ablation can provide stronger causal evidence: while keeping the task and main settings unchanged, reduce 50 layers to 5 layers. If the shallow version recovers learning, it indicates that path length is highly correlated with failure. Then replace only one mechanism at a time, such as initialization, activation function, or Residual Connection, and observe whether the per-layer gradient profile recovers; single-variable intervention can determine the cause more reliably than stacking multiple tricks at once.</p>
+<p>Different observations correspond to different faults: if all layer gradients are None or zero, it looks more like the computation graph is cut off, parameters are frozen, or the loss does not depend on these parameters; occasional huge spikes and NaN point to explosion, abnormal batches, or precision overflow; if gradients are normal but parameters do not change, it points to optimizer configuration. Zero gradients in FP16 may also be floating-point underflow, which must be distinguished from mathematical multiplicative decay through numerical precision checks. Ultimately, only when “depth-dependent gradient profile + learnability baseline + single-variable intervention recovery” all hold together can you more convincingly prove that the problem actually comes from vanishing gradients.</p></div>
+<table class="dd-table"><thead><tr><th>Observation</th><th>More Likely Problem</th></tr></thead><tbody><tr><td>Shallow-layer gradients are systematically much smaller than deep-layer gradients.</td><td>Long-path vanishing</td></tr><tr><td>All layer gradients are None/zero</td><td>Computation graph cut off, frozen, or loss has no dependence</td></tr><tr><td>Occasional huge spikes and NaN</td><td>Explosion, abnormal batches, or precision overflow</td></tr><tr><td>Gradients normal but parameters unchanged</td><td>Learning rate, optimizer parameter groups, or scaling issues</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Tying the Whole Causal Chain Together<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>This section organizes vanishing and exploding gradients into a complete causal chain. The starting point is that the scalar loss at the output produces the gradient; afterward, as backpropagation passes through each layer, it must multiply by that layer's local Jacobian. The local Jacobian is jointly determined by the current activation derivative, the directional scaling of the weight matrix, and the path the gradient actually takes, so each step may compress, amplify, or rotate the signal.</p>
+<p>A slight scale deviation in a single layer does not necessarily cause an obvious anomaly immediately, but depth or temporal distance makes it recur. After successive Jacobians are multiplied together, effective scales less than 1 decay exponentially, and effective scales greater than 1 amplify exponentially. An activation entering its saturation region makes the local derivative approach zero; the weight spectrum can cause different directions to shrink and amplify simultaneously. The final result appears as almost no effective update in early layers near the input, or as the global gradient suddenly losing control and producing extreme updates and numerical anomalies.</p>
+<p>Various stabilization techniques should be understood according to where they act in the causal chain. Appropriate initialization first prevents the forward and backward scales at the start of training from drifting too early. Gating establishes a learnable state-preserving channel for long-term dependencies; residual connections add an identity shortcut path; normalization controls activation scale and improves local conditioning. These mechanisms directly alter the long-term propagation path or the environment of the local Jacobian. Gradient clipping, in contrast, limits overly large final updates after the backward computation is complete, and precision management is used to avoid underflow or overflow in low-precision representations; they address extreme values and numerical representation problems at the back end of the chain.</p>
+<p>The causal chain also determines the diagnostic approach. You cannot conclude in reverse that the original problem must be the mechanism that a technique usually targets just because training recovers after adding that technique; multiple changes may affect the result simultaneously. A more reliable method is to monitor activation, gradient, and update magnitudes layer by layer, and then use depth ablation and univariate intervention to observe whether anomalies appear with path length and whether they recover at specific locations.</p>
+<p>Therefore, training success or failure is not determined by an isolated local derivative, but by the entire chain formed jointly by “initial gradient—local Jacobian—path length—parameter update—numerical representation.” Understanding where each mechanism is inserted into the chain enables you to choose targeted fixes and verify the true root cause with observational evidence.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>Concept Dependencies and Extended Learning<span class="dd-badge eng">Route</span></h2>
+<div class="dd-agent-response"><p>This section presents a concept dependency graph centered on the gradient propagation problem. The main thread continues to deepen from four aspects: mathematical origins, structural modifications, numerical conditions, and optimization safeguards.</p>
+<p>"Backpropagation" is the foundation for understanding Jacobian multiplication. Each node in the computation graph provides only a local derivative; backpropagation reuses these local Jacobians through the chain rule, ultimately forming a long product from the loss to early states or parameters. Once this layer is understood, vanishing and exploding gradients are no longer merely empirical phenomena, but can be located in specific paths, specific local transformations, and specific scaling directions.</p>
+<p>"Residual Connection" corresponds to shortening the effective backward path. The identity branch directly preserves the input in the forward pass and, in the backward pass, causes the module Jacobian to include an identity matrix term, so that deep signals do not have to rely entirely on the complex branch being passed layer by layer. This explains how structural design directly changes the Jacobian chain, rather than merely adjusting the initial numerical values of parameters.</p>
+<p>"Normalization" and "Batch Normalization" correspond to stabilizing the activation scale and local conditions. They reduce the drift of activation distributions across layers and during training, preventing pre-activations from frequently entering unfavorable regions. However, stabilizing the activation scale and stabilizing the gradient spectrum are different problems: unifying the overall statistical scale does not mean that the singular values in each direction are close to 1. This distinction connects the statistical perspective with the matrix-direction perspective.</p>
+<p>"Recurrent Neural Network" extends the problem to sequences. Gating constructs a relatively stable temporal state channel through learnable retention coefficients, while the more general structural goal is to reduce or bypass backward paths that span very long time distances. This allows the long-term dependency problem to be understood as an effective depth problem in the time dimension.</p>
+<p>"Optimizers and Learning Rate Schedules" belong to the optimization-level safeguards. Gradient clipping limits abnormally large updates, warm-up controls the step-size shock in early training, and precision management prevents underflow and overflow in low-precision representations. These mechanisms need to work together, but they do not replace structural improvements to the Jacobian chain itself.</p>
+<p>The entire dependency graph ultimately forms a unified mapping: backpropagation explains the origin of the multiplication; initialization controls the starting-point scale; gating and residual connections change long paths; Normalization improves activation scale and local conditions; clipping, scheduling, and precision management protect the final update and numerical representation. Only by placing these concepts on the same causal chain can we distinguish which link each method actually changes.</p></div>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Next Read</th><th>Key Question</th></tr></thead><tbody><tr><td>Where the chain multiplication comes from</td><td><a href="#" data-node="backprop">Backpropagation</a></td><td>How are local Jacobians reused on the computation graph?</td></tr><tr><td>How to establish short paths</td><td><a href="#" data-node="residual-connection">Residual Connection</a></td><td>How does the identity term enter the forward and backward passes?</td></tr><tr><td>How to stabilize the activation scale</td><td><a href="#" data-node="normalization">Normalization</a>, <a href="#" data-node="batch-norm">Batch Normalization</a></td><td>What is the difference between scale stability and the gradient spectrum?</td></tr><tr><td>Gating in sequences</td><td><a href="#" data-node="rnn">Recurrent Neural Network</a></td><td>How do LSTM/GRU control state retention?</td></tr><tr><td>Optimization-level safeguards</td><td><a href="#" data-node="optimizer-schedule">Optimizers and Learning Rate Schedules</a></td><td>How do clipping, warm-up, and precision management work together?</td></tr></tbody></table>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://proceedings.mlr.press/v9/glorot10a.html" target="_blank" rel="noopener">Understanding the difficulty of training deep feedforward neural networks</a>: saturation, signal variance, and Xavier initialization.</li><li><a href="https://arxiv.org/abs/1502.01852" target="_blank" rel="noopener">Delving Deep into Rectifiers</a>: ReLU networks and He initialization.</li><li><a href="https://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">Long Short-Term Memory</a>: gated state and long-term dependencies.</li><li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">Deep Residual Learning for Image Recognition</a>: residual learning and optimization of very deep networks.</li></ul><p>The chain product tables, activation and time-unrolled diagrams, and diagnostic workflow are all original organization by this project.</p><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/vanishing-gradient">Explore connections on the map</a><a href="/zh/concepts/vanishing-gradient/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

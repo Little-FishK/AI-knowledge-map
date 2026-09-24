@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction? Explained Simply</title>
+<meta name="description" content="From business cost to a differentiable proxy, from single-sample error to empirical risk; using the same numerical example, see how the loss, gradient, and parameter update connect into a closed loop.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/loss-function/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/loss-function/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/loss-function/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction? Explained Simply">
+<meta property="og:description" content="From business cost to a differentiable proxy, from single-sample error to empirical risk; using the same numerical example, see how the loss, gradient, and parameter update connect into a closed loop.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/loss-function/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction? Explained Simply">
+<meta name="twitter:description" content="From business cost to a differentiable proxy, from single-sample error to empirical risk; using the same numerical example, see how the loss, gradient, and parameter update connect into a closed loop.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/loss-function/#page","name":"What Is Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction? Explained Simply","description":"From business cost to a differentiable proxy, from single-sample error to empirical risk; using the same numerical example, see how the loss, gradient, and parameter update connect into a closed loop.","url":"https://ai-knowledge-map.com/en/concepts/loss-function/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction","item":"https://ai-knowledge-map.com/en/concepts/loss-function/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction</span></li></ol></nav><article id="dd-article" data-concept-id="loss-function" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Loss Function: Turning ‘Where It Went Wrong’ into a Learnable Direction</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From business cost to a differentiable proxy, from single-sample error to empirical risk; using the same numerical example, see how the loss, gradient, and parameter update connect into a closed loop.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The loss function is not another name for model performance; it is the optimizable proxy objective chosen by the training system: it compresses prediction errors into a scalar, and the local slope then tells the parameters how to change. The model will faithfully chase this number, so the shape, weights, and omissions of the loss together define what it learns to care about.</div></header>
+<!-- source-body:start -->
+<div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer for yourself:</div>
+  <ul><li>Why does training need a scalar loss, rather than just saying “the answer is bad”?</li><li>What error assumptions do MSE, MAE, Huber, and cross-entropy respectively imply?</li><li>Why can't true objectives such as accuracy and user satisfaction usually be directly backpropagated?</li><li>How do you manually compute the loss, gradient, and one parameter update from a single sample?</li><li>Why can decreasing training loss still make the product worse, and how should you detect this?</li></ul>
+</div>
+<div class="dd-note key"><b>Running example</b>　We use the minimal regression model <code>ŷ=wx</code> to learn the relationship <code>y=3x</code>. Here <code>w</code> is the “multiplier” parameter that the model needs to learn: the correct relationship requires <code>w=3</code>, but training starts from a deliberately wrong initial value <code>w=2</code> starts. Take the sample <code>x=2,y=6</code> , the model only predicts <code>ŷ=4</code>; this “difference of 2” will run through the three pages on loss, Gradient Descent, and Backpropagation.</div>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">1</span>Why “being wrong” must first become a number<span class="dd-badge intuition">Intuition</span></h2>
+<p class="dd-lead">A model has thousands of parameters; how does a phrase like “this answer wasn’t good” determine which way each parameter should move?</p>
+<p>Ordinary gradient training ultimately needs a total objective that can be compared and differentiated. Loss function <code>L(ŷ,y)</code> receives the prediction and the target and outputs a number: the smaller it is, the better it usually is according to the rules we have written. The slope of this number connects “how good the result is” to parameter changes, solving the problem that natural-language evaluations cannot directly guide updates to many parameters; without it, the optimizer neither knows which of two versions is better nor knows the impact of a small modification.</p>
+<p>During computation, details need not be discarded too early: the system can first keep the loss for each sample, group, or task separately, and finally form a scalar for updating through averaging, weighting, or multi-objective rules. The optimizer adjusts parameters based on the local changes of this aggregated scalar, and how these per-item losses are combined is itself part of the training design.</p>
+<p>But compressing into a single number also loses information. Counting a missed diagnosis and a false alarm both as “one mistake” is equivalent to declaring that they have the same cost; averaging a long answer over tokens is equivalent to choosing a length weight. Loss is not a neutral thermometer; it is a value trade-off written into the training loop, so we still need to return to per-sample, per-group, and real task metrics to interpret the results.</p>
+<div class="dd-note warn"><b>You may wonder: isn’t a model obviously better when the loss is lower?</b> Only under “same data, same loss definition, same normalization” can the values be directly compared. Once sample weights, masks, or regularization terms change, 0.2 and 0.3 may not be on the same scale at all; even if the definition remains unchanged, a lower loss alone cannot prove that the model is more accurate, fairer, or more useful.</div></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">2</span>How a Single Error Becomes a Training Objective<span class="dd-badge math">Math</span></h2>
+<p class="dd-lead">A single sample has a loss; what should the whole training set optimize?</p>
+<p>First look at the <code>i</code>-th sample:<code>xᵢ</code> is the input,<code>yᵢ</code> is the target; model parameters are collectively called <code>θ</code>, so the model prediction is written as <code>f<sub>θ</sub>(xᵢ)</code>. Passing the prediction and target to the loss function gives this sample's loss.</p>
+<div class="dd-formula">Sample i: Lᵢ=L(f<sub>θ</sub>(xᵢ),yᵢ)</div>
+<p>The training set has <code>n</code> samples, the most direct approach is to sum all per-sample losses and divide by <code>n</code>. This step combines the cost of many predictions into a single optimizable objective:</p>
+<div class="dd-formula">J<sub>data</sub>(θ)=1/n · ΣᵢLᵢ</div>
+<p><code>J<sub>data</sub></code> is the average loss on the training data, also called<b>empirical risk</b>. The letter <code>J</code> is used to remind us: it is no longer the loss of a single sample, but the objective that the training procedure needs to lower overall.<code>J<sub>data</sub></code> decreasing only means that the average cost under the current training set and current loss criterion is reduced.</p>
+<p>Sometimes we also want the parameters not to be too large or the model not to be too complex, so we add a regularization term:</p>
+<div class="dd-formula">J<sub>total</sub>(θ)=J<sub>data</sub>(θ)+λR(θ)</div>
+<p><code>R(θ)</code> measures parameter characteristics that are undesirable,<code>λ</code> determines how much weight this constraint has:<code>λ=0</code> means no such constraint is added; the larger λ is, the more importance it is given. The procedure first averages per-sample loss over a batch or the training set, and only then adds the regularization term. Regularization will be formally introduced in a later node; on this page you only need to know that the training objective may include more than prediction error.</p>
+<p>The training procedure tries to reduce <code>J</code>; what we really care about is the average loss when the model encounters future samples. There can be a gap between the two; sample bias, incorrect labels, and improper regularization weights can all distort empirical risk; this is the problem to be studied later under "overfitting and generalization".</p>
+<table class="dd-table"><thead><tr><th>Level</th><th>What it is</th><th>Common misreading</th></tr></thead><tbody><tr><td>Per-sample loss</td><td>How much one prediction is wrong under the current rule</td><td>Treating an outlier sample as overall performance</td></tr><tr><td>Batch loss</td><td>The average objective over the current mini-batch of samples; only after taking its gradient do you get an estimate of the overall gradient.</td><td>Mistaking batch fluctuations for training collapse</td></tr><tr><td>Training empirical risk</td><td>Average loss over the entire training set</td><td>Equating with future performance</td></tr><tr><td>Validation/production metric</td><td>Checking whether unseen data and real-world scenarios improve</td><td>Using it directly to compute gradients without processing</td></tr></tbody></table></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">3</span>Why Regression Losses Have Different Shapes<span class="dd-badge math">Math</span></h2>
+<p class="dd-lead">They are all “prediction minus true value”; why do squared, absolute, and Huber learn different models?</p>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 940 250" style="min-width:940px" role="img" aria-label="Diagram of MSE, MAE, and Huber loss varying with error"><line x1="55" y1="205" x2="625" y2="205" stroke="currentColor" opacity=".35"/><line x1="330" y1="28" x2="330" y2="220" stroke="currentColor" opacity=".35"/><path d="M80 45 Q205 205 330 205 Q455 205 580 45" fill="none" stroke="#8b5cf6" stroke-width="4"/><path d="M80 70 L330 205 L580 70" fill="none" stroke="#0ea5e9" stroke-width="4"/><path d="M80 75 L240 165 Q330 215 420 165 L580 75" fill="none" stroke="#10b981" stroke-width="4"/><text class="svg-t" x="650" y="38" style="font-size:12px"><tspan x="650" y="38">MSE: grows fast far away</tspan></text><text class="svg-t" x="650" y="92" style="font-size:12px"><tspan x="650" y="92">MAE: constant slope</tspan></text><text class="svg-t" x="650" y="132" style="font-size:12px"><tspan x="650" y="132">Huber: quadratic near, linear far</tspan></text><text x="615" y="225" class="svg-tn">error e</text><text x="340" y="24" class="svg-tn">loss</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>The shape of the loss curve determines how much gradient different errors can produce; this is not just swapping a scoring formula.</figcaption></figure>
+<p>Let error <code>e=ŷ−y</code>. MSE, MAE, and Huber convert the difference between the prediction and a continuous target into a non-negative per-sample cost; the difference among the three losses is not their names, but “how quickly the cost grows as the error increases,” that is, how strong a training pressure different-sized errors receive.</p>
+<table class="dd-table"><thead><tr><th>Loss</th><th>single-sample form</th><th>where it pushes the model</th><th>fitting intuition</th></tr></thead><tbody><tr><td>MSE / squared loss</td><td><code>e²</code></td><td>when expected squared loss is minimized, it predicts the conditional mean</td><td>large errors should be corrected more strongly; can also be derived from the negative log-likelihood of fixed-variance Gaussian noise</td></tr><tr><td>MAE / absolute loss</td><td><code>|e|</code></td><td>when expected absolute loss is minimized, it predicts the conditional median</td><td>error is priced linearly by size, more robust to outliers; also corresponds to a Laplace noise model</td></tr><tr><td>Huber</td><td>quadratic for small errors, linear for large errors</td><td>a compromise between mean sensitivity and median robustness</td><td>hopes that ordinary errors are optimized smoothly, while not allowing extreme errors to be infinitely amplified</td></tr></tbody></table>
+<p>Huber requires a transition threshold <code>δ</code>:</p>
+<div class="dd-formula">L<sub>δ</sub>(e)=½e²（|e|≤δ）；　δ(|e|−½δ)（|e|&gt;δ）</div>
+<p>For example, take <code>δ=1</code>: error <code>e=0.5</code> uses the quadratic part, and the loss is <code>0.125</code>; error <code>e=4</code> uses the linear part, and the loss is <code>3.5</code>, while half squared loss would reach <code>8</code>. Therefore Huber will correct large errors, but limit how much they dominate training. After computing per-sample costs separately by squared, absolute, or this piecewise rule, aggregate the per-sample costs into the training objective; only under the same data and the same formula does a lower value indicate a better fit.</p>
+<div class="dd-note key"><b>“Noise assumption” and “prediction location” are two complementary interpretations.</b> Here the<b>likelihood</b>represents how plausible a noise model makes the observed error, and is used to compare how well different parameters explain the data;<b>log-likelihood</b>turns multiplication of many sample probabilities into addition, and after negating it can be used as the loss to minimize. Gaussian/Laplace explain how these losses arise from probabilistic models; mean/median explain what predictions minimizing the corresponding loss over many samples will favor. When choosing, also consider the business error cost: the formula cannot judge whether outliers are real, whether the business treats overestimation and underestimation equally, and cannot automatically determine the Huber threshold.</div></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">4</span>Why Cross-Entropy Fits Probabilistic Classification<span class="dd-badge math">Math</span></h2>
+<p class="dd-lead">When a classification model outputs a set of probabilities, why is it not enough to just look at whether it "guessed correctly"?</p>
+<p>A classification model does not just report one class; instead, it first assigns a probability to each class. Denote <code>p<sub>θ</sub>(y|x)</code> as: the parameter is <code>θ</code> model, upon seeing input <code>x</code> , assigns to the true class <code>y</code> probability. Cross-entropy takes this set of class probabilities and the true class as input and outputs a nonnegative single-sample loss:</p>
+<div class="dd-formula">L<sub>CE</sub>(x,y)=−ln p<sub>θ</sub>(y|x)</div>
+<p>At computation time, read the probability corresponding to the true class, take the negative logarithm, and finally average across samples. Here we explicitly use the natural logarithm <code>ln</code>, so the unit is nat; if instead you use <code>log₂</code>, the numerical unit is bit. The logarithm base only uniformly scales the loss and does not change which model probability is better.</p>
+<table class="dd-table"><thead><tr><th>Probability assigned by model to true class</th><th>Binary classification result</th><th>Cross-entropy −ln(p)</th><th>Description</th></tr></thead><tbody><tr><td>0.90</td><td>Correct</td><td>about 0.105</td><td>The model assigned a relatively high probability to the true class</td></tr><tr><td>0.49</td><td>Wrong</td><td>about 0.713</td><td>just slightly short of crossing the 0.5 decision boundary</td></tr><tr><td>0.01</td><td>Wrong</td><td>about 4.605</td><td>The model very confidently excluded the true class</td></tr></tbody></table>
+<p>Accuracy only looks at the final class: the last two rows are both recorded as one error. Cross-entropy also looks at the probability, so it lightly penalizes "hesitant mistakes" and heavily penalizes "confident mistakes," solving the problem that judging only correct or incorrect cannot distinguish the two. Summing the cross-entropy over all training samples gives the negative log-likelihood; minimizing it is equivalent to increasing the joint probability the model assigns to the training data. The smaller the value, the more probability the model on average places on the true class.</p>
+<p>Language models predict the true next token at each position and likewise use cross-entropy. The formal definition of token is in 2.8; here, temporarily understand it as the text unit that the model predicts step by step. The exponential of the average cross-entropy is perplexity; it describes how well the predicted distribution fits the text, and does not directly guarantee calibrated probabilities, minority-class recall, factual correctness, instruction following, or better actual decision cost. Label noise, class weights, and distribution shift can also change the meaning of the reading.</p>
+<div class="dd-note math"><b>Numerical implementation note</b>　In practice, softmax is usually combined with cross-entropy into a stable computation based on logits, to avoid underflow from first calculating extremely small probabilities and then taking the logarithm.</div></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">5</span>Why Training Loss and Real Objectives Need a Division of Labor<span class="dd-badge intuition">Disambiguation</span></h2>
+<p class="dd-lead">Ultimately, we care about accuracy, conversion rate, or satisfaction; why not directly let the optimizer maximize it?</p>
+<p>First, distinguish the two roles.<b>Real objective</b>is the result the product ultimately cares about, for example, a diagnostic system reducing missed diagnoses, shopping recommendations helping users complete an appropriate purchase, or an assistant receiving high satisfaction ratings after a task. “Conversion rate” is the proportion of users who complete a purchase after seeing a recommendation, and “satisfaction” may come from ratings, complaints, or follow-ups; they are only examples of product objectives, and not all models need to pursue these metrics. During validation, independent samples, user feedback, and safety records serve as inputs, and the resulting real metrics such as missed diagnosis rate, conversion rate, satisfaction, or accident rate are outputs.</p>
+<p><b>Proxy</b>is a quantity that temporarily replaces the real objective and is directly optimized by the training procedure. The so-called<b>differentiable</b>, means that when the parameters change by a very small amount, this quantity usually changes smoothly as well, allowing a useful local slope to be computed. Therefore, a “differentiable proxy” is a training signal that is not necessarily equal to the final objective, but can be computed frequently, differentiated smoothly, and is expected to remain consistent with the final objective, such as cross-entropy. During training, samples and supervised targets serve as inputs, and proxy losses such as cross-entropy serve as outputs; the training procedure first updates parameters along the proxy's local slope, then uses validation and launch metrics to check whether this update serves the real objective.</p>
+<p>Why do we need proxies? Accuracy often does not move at all when parameters change slightly; it jumps only when predictions cross a classification boundary, so there is almost nowhere a useful gradient. Conversion rate and satisfaction may also appear only hours or days later, and a single result is affected by factors outside the model such as price, interface, and inventory. A differentiable proxy provides a timely, continuous training signal; if cross-entropy decreases while missed diagnosis rate, conversion rate, or satisfaction does not improve, it indicates that the proxy has become misaligned with the real objective. Delayed feedback, these confounding factors, and changes in user behavior can all invalidate an originally relevant proxy, so a decrease in the proxy cannot be directly interpreted as the product improving.</p>
+<table class="dd-table"><thead><tr><th>Role</th><th>Required properties</th><th>Examples</th></tr></thead><tbody><tr><td>Training loss</td><td>Differentiable, frequent, numerically stable</td><td>Cross-entropy, MSE, ranking proxy</td></tr><tr><td>Offline metric</td><td>Interpretable, close to the task</td><td>F1, recall, calibration error</td></tr><tr><td>Product objective</td><td>Reflects real benefits and harms</td><td>Success rate, human takeover, accident rate</td></tr><tr><td>Release threshold</td><td>Must not be masked by averages</td><td>Minimum recall for critical slices, safety red lines</td></tr></tbody></table></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">6</span>Weights, masks, and regularization terms: how they rewrite “what the model cares about”<span class="dd-badge eng">Engineering</span></h2>
+<p class="dd-lead">How do class imbalance, different tokens, or high-cost errors enter the same scalar?</p>
+<p>Weights, masks, and regularization terms are control quantities that reshape the relative importance of each training signal. They take the per-sample loss and corresponding control values, and incorporate class imbalance, invalid positions, and complexity constraints into the same training objective: first remove positions marked invalid by the mask, then weight the retained items and normalize them according to the agreed convention, and finally add the regularization term. Sample weights amplify gradients for certain cases; class weights keep minority classes from being drowned out by majority classes; regularization terms add “parameters should not be too complex” to the objective. Focal loss further reduces the contribution of easy samples, making training focus on hard examples.</p>
+<p>These choices also change probability calibration and the effective training distribution. A decrease in the recombined loss only means that the cost computed under this set of importance definitions has become smaller; it does not mean that the risk under natural frequencies has decreased simultaneously. Increasing minority-class recall may increase false positives; weighted probabilities may no longer equal the incidence rate under the natural distribution. Excessive weights, changes in the normalization convention, or mistaken mask deletions can also let a small number of samples dominate training, so you must inspect each component at the same time and re-measure on the unweighted validation distribution and key business slices.</p></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">7</span>Complete Worked Calculation: How One Error Drives Parameters<span class="dd-badge math">Numerical Example</span></h2>
+<p class="dd-lead">Now turn “the loss provides the training signal” into a sequence of numbers that can be checked item by item.</p>
+<p>We use the simplest straight-line model <code>ŷ=wx</code>.<code>x</code> is the input,<code>ŷ</code> is the model prediction,<code>w</code> is the parameter to adjust during training, which can be understood as the slope of the line. The data pattern is <code>y=3x</code>, so ideally we should learn <code>w=3</code>.</p>
+<p>At the beginning of training the model does not know the answer yet. We deliberately set the initial parameter to <code>w=2</code>, meaning it currently only predicts “the output is about 2 times the input.” Now give it a sample <code>x=2,y=6</code>, it will predict <code>ŷ=2×2=4</code>. To keep the derivative clean, take the half-squared loss <code>L=½(ŷ−y)²</code>, and use a learning rate of 0.1 to make one update step; these inputs will eventually produce a new parameter and a new loss.</p>
+<table class="dd-table"><thead><tr><th>Step</th><th>Calculation</th><th>Result</th></tr></thead><tbody><tr><td>Forward Prediction</td><td><code>ŷ=2×2</code></td><td>4</td></tr><tr><td>Error</td><td><code>e=4−6</code></td><td>−2</td></tr><tr><td>Loss</td><td><code>L=½×(−2)²</code></td><td>2</td></tr><tr><td>Slope with respect to prediction</td><td><code>∂L/∂ŷ=e</code></td><td>−2</td></tr><tr><td>Gradient with respect to parameter</td><td><code>∂L/∂w=e·x</code></td><td>−4</td></tr><tr><td>Update with learning rate 0.1</td><td><code>w←2−0.1×(−4)</code></td><td>2.4</td></tr><tr><td>Loss after update</td><td><code>½(2.4×2−6)²</code></td><td>0.72</td></tr></tbody></table>
+<p>The gradients in the table serve first as a preview of the next page: a single-step parameter update converts the local slope of the loss with respect to the parameter into a single parameter move. The slope of the half-squared loss with respect to the prediction is exactly the error <code>e</code>; and <code>w</code> increases a little, the prediction changes by the input <code>x</code> times, so the total slope with respect to w is <code>e×x</code>. The calculation goes through prediction, error, loss, and gradient in order, and then uses the learning rate to obtain <code>w=2.4</code>. The formal derivative, step size, and update direction will be expanded in 1.3 “Gradient Descent”.</p>
+<div class="dd-note key"><b>Observe the Loop</b>　The loss decreased from 2 to 0.72, which means this step moved along the local descent direction of the current sample, not because the model already “understood the 3 times relationship.” The current sample only pushes <code>w</code> from 2 to 2.4, closer to 3; a single update with one sample and one parameter cannot prove that multi-step training is stable, nor can it prove that the model has learned the complete pattern or can generalize.</div></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">8</span>How Loss Curves Can Deceive You<span class="dd-badge eng">Failure Modes</span></h2>
+<p class="dd-lead">If the training curve keeps falling, what serious problems are completely invisible?</p>
+<p>A loss curve plots the loss at each step or epoch during training as a diagnostic view over time; placing validation metrics, group slices, and sub-objective statistics alongside it gives you a better chance of detecting overfitting, long-tail degradation, objective conflict, or proxy misalignment. It takes in a set of process records with clear definitions, and gives only troubleshooting clues, not an automatically issued quality certificate.</p>
+<table class="dd-table"><thead><tr><th>Phenomenon</th><th>Hidden Problem</th><th>Additional Checks</th></tr></thead><tbody><tr><td>Average loss decreases</td><td>Minority groups or long-tail tasks worsen</td><td>Slice by group, difficulty, and scenario</td></tr><tr><td>Training loss is very low</td><td>Memorizes the training set, validation set worsens</td><td>Independent validation and out-of-time testing</td></tr><tr><td>Proxy metric improves</td><td>True objective misaligned or gamed</td><td>Human review and online guardrail metrics</td></tr><tr><td>Different experiments show smaller numbers</td><td>Normalization or weight definitions differ</td><td>Lock down definitions and report breakdowns</td></tr><tr><td>Total loss is normal</td><td>Some sub-loss has collapsed</td><td>Record each objective and gradient contribution</td></tr></tbody></table>
+<p>When reading curves, the first step is not to look for the minimum point, but to confirm that data splits, normalization, weights, and the x-axis definitions are consistent; then compare training and validation trends, and then drill down to groups and sub-objectives. If the average decreases while a key slice worsens, the correct interpretation is that the overall result is still not acceptable; you need to locate the failure hidden by the average, rather than letting training continue to chase the same total.</p>
+<div class="dd-note warn"><b>What a curve can signal also depends on what you record.</b>　Random noise will create short-term jitter; data leakage will make the validation line look unusually good; misaligned metrics may decline steadily yet diverge from the true objective. Even if a line is smooth and continuously decreasing, it alone cannot prove that generalization, key group performance, or product benefit has improved.</div></section>
+
+<section class="dd-sec" data-section-role="core"><h2><span class="dd-n">9</span>How to choose and validate a loss for a task<span class="dd-badge eng">Engineering</span></h2>
+<p class="dd-lead">When facing a new task, should selecting a loss start from a list of formulas, or from the cost of errors?</p>
+<p>What we need to produce here is not a “formula that is always correct”, but a training and validation plan that can be reviewed from real decision-making all the way to online monitoring. It uses decision cost, output semantics, data distribution, and deployment constraints to answer two connected questions: what differentiable proxy to choose, and why we should believe this proxy still serves the true objective; finally, it leaves behind a clear loss definition, weight specification, and acceptance metrics.</p>
+<ol class="dd-steps"><li><b>First, write the real decision:</b>What action the model output will trigger, and which type of error does the most harm.</li><li><b>Define the output semantics:</b>Is it a numeric value, a probability, a ranking, a sequence, or a multi-objective combination?</li><li><b>Choose a differentiable proxy:</b>Specify the noise assumptions, weights, mask, and normalization.</li><li><b>Do a mini hand calculation:</b>Check the correct direction, extreme inputs, and zero-gradient regions.</li><li><b>Run a baseline experiment:</b>Confirm that it can overfit on small data, and that the training signal is actually connected.</li><li><b>Independent validation:</b>Report proxy loss, task metrics, calibration, and key slices at the same time.</li><li><b>Monitor misalignment:</b>After deployment, observe real benefits, harm, and distribution drift, and do not let the training objective replace the product objective.</li></ol>
+<p>The execution sequence starts with clarifying the cost and output semantics, goes through proxy selection, hand calculation, and mini overfitting, and finally enters independent validation and online monitoring. Only when the proxy and the true metric improve together on key slices is the plan considered temporarily effective; once the task, users, or distribution changes, the original loss and acceptance relationship cannot be applied directly and must be revalidated.</p></section>
+
+<section class="dd-sec" data-section-role="synthesis"><h2><span class="dd-n">10</span>Connecting the entire causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<p class="dd-lead">From a real problem to a single parameter update, why is every step in between indispensable?</p>
+<ol class="dd-chain"><li>Real tasks contain errors of different types and costs.</li><li>The loss function encodes the selected error costs into comparable scalars.</li><li>Averaging over finite data yields a computable empirical risk.</li><li>A differentiable proxy provides local slopes for predictions and parameters.</li><li>Backpropagation efficiently distributes the slopes to all parameters.</li><li>The optimizer uses gradients to update parameters, decreasing the training proxy.</li><li>Validation sets, slices, and product metrics check whether the proxy still serves the real objective.</li><li>When misalignment is found, change the data, loss, weights, or decision process instead of continuing to blindly push down the same number.</li></ol></section>
+
+<section class="dd-sec" data-section-role="reference"><h2><span class="dd-n">11</span>Common Misconceptions<span class="dd-badge intuition">Disambiguation</span></h2>
+<table class="dd-table"><thead><tr><th>Misconception</th><th>More accurate statement</th></tr></thead><tbody><tr><td>Loss is the evaluation metric</td><td>The loss serves differentiation; the metric serves judgment, and the two should be related but have different responsibilities.</td></tr><tr><td>Zero loss means the model is perfect</td><td>It only means the proxy is zero under the current data and definition; there may still be leakage, overfitting, or omitted objectives.</td></tr><tr><td>MSE is always smoother than MAE, so it is better</td><td>MSE's strong gradient can also let outliers dominate training; the choice depends on noise and cost.</td></tr><tr><td>Class weighting only affects training speed</td><td>It changes the optimal solution and probabilistic semantics; recalibration and evaluation are necessary.</td></tr><tr><td>Multi-objective losses can simply be added directly</td><td>Different scales can let one term dominate the gradient; normalization, weighting, and conflict diagnosis are needed.</td></tr></tbody></table></section>
+
+<section class="dd-sec" data-section-role="assessment"><h2><span class="dd-n">12</span>Check whether you really understand<span class="dd-badge intuition">Self-test</span></h2>
+<p class="dd-lead">Check step by step from symbols and values to goal misalignment; answers should explain the reasoning, not just give terminology.</p>
+<ol class="dd-quiz"><li>Why does ordinary gradient training ultimately need a scalar objective, yet we should still retain per-sample, per-group, or per-task losses?</li><li>In <code>J<sub>total</sub>=J<sub>data</sub>+λR</code>, λ=0 and a very large λ respectively mean what?</li><li>A regression dataset has mostly small errors but contains a few extreme outliers. How will MSE, MAE, and Huber handle them differently?</li><li>In binary classification, two samples are both predicted incorrectly, and their true-class probabilities are 0.49 and 0.01. Why is accuracy the same but cross-entropy different?</li><li>What is a differentiable proxy? Why can't product satisfaction be used directly as the per-step training loss without processing?</li><li>In the running example, if you change the learning rate from 0.1 to 1, the updated <code>w</code> and loss are what? What does this show?</li><li>After increasing class weights, why do we still need to check calibration on the natural distribution?</li><li>If both training loss and validation loss decrease, does that already prove the product objective has improved? What evidence is still missing?</li></ol>
+<details class="dd-answers"><summary>Reference answers</summary><ol><li>The update rule ultimately needs a clear direction for comparison and differentiation; but if you keep only the average too early, you will miss minority groups, difficult samples, and task conflicts. You should first keep the components, then specify how to aggregate them.</li><li>λ=0 means the training objective does not include that regularization penalty; a large λ means the model attaches more importance to satisfying the constraint expressed by R, possibly even sacrificing data fitting. The appropriate scale of λ depends on the magnitudes of the loss and R.</li><li>MSE squares and amplifies extreme errors, so outliers can dominate training; MAE charges linearly, is more robust but not smooth at zero; Huber uses squared within the threshold and switches to linear beyond it, striking a balance between smoothness and robustness.</li><li>If the threshold is 0.5, both are counted as errors by accuracy; the natural-log cross-entropies are approximately <code>−ln0.49=0.713</code> and <code>−ln0.01=4.605</code>, so it will more heavily penalize predictions that confidently exclude the true class.</li><li>A differentiable proxy is a training quantity that can be computed frequently and provides smooth local slopes, used to temporarily stand in for the true objective. Satisfaction is usually delayed, sparse, and affected by external factors such as interface, price, or task environment, so it cannot stably provide gradients with clear attribution for each small parameter update.</li><li>The current gradient is −4, so <code>w=2−1×(−4)=6</code>; the new prediction is 12, the half-squared loss is 18, which is actually worse. This shows that a correct local direction does not mean any step size is safe.</li><li>Reweighting changes the effective class frequency and optimal probability during training, so the output may no longer represent the true occurrence rate under the natural distribution.</li><li>No. You also need key slices, calibration, human or online task results, and safety and harm metrics; proxy loss and limited validation data may both be misaligned with the true objective.</li></ol></details></section>
+
+<section class="dd-sec" data-section-role="reference"><h2><span class="dd-n">13</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Path</span></h2>
+<table class="dd-table"><thead><tr><th>Direction</th><th>Next Read</th><th>Questions to Take Away</th></tr></thead><tbody><tr><td>How gradients become a one-step update</td><td><a href="#" data-node="gradient-descent">Gradient Descent</a></td><td>When the direction is correct, why can the step size still fail?</td></tr><tr><td>How to compute gradients for all parameters</td><td><a href="#" data-node="backprop">Backpropagation</a></td><td>How does the chain rule reuse intermediate results?</td></tr><tr><td>How to limit memorization of the training set</td><td><a href="#" data-node="regularization">Regularization</a>, <a href="#" data-node="overfitting">Overfitting</a></td><td>Why do the training proxy and unknown risk separate?</td></tr><tr><td>Proxy objective being gamed</td><td><a href="#" data-node="reward-hacking">Reward Hacking</a></td><td>How do metrics become distorted when they become targets?</td></tr><tr><td>How to ultimately evaluate a model</td><td><a href="#" data-node="model-evaluation">Model Evaluation</a></td><td>Which slices and thresholds cannot be replaced by averages?</td></tr></tbody></table>
+<div class="dd-note key"><b>Passing Criteria</b> You can not only write MSE or cross-entropy, but also explain from real error cost all the way to proxy, gradient, validation, and go-live guard metrics, and point out where in this chain misalignment may occur.</div></section>
+
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://www.deeplearningbook.org/contents/ml.html" target="_blank" rel="noopener">Deep Learning — Machine Learning Basics</a>: maximum likelihood, empirical risk, and generalization.</li><li><a href="https://www.deeplearningbook.org/contents/optimization.html" target="_blank" rel="noopener">Deep Learning — Optimization for Training Deep Models</a>: surrogate loss and optimization.</li><li><a href="https://developers.google.com/machine-learning/crash-course/linear-regression/loss" target="_blank" rel="noopener">Google ML Crash Course — Loss</a>: a teaching reference on MSE, MAE, and outlier sensitivity.</li><li><a href="https://doi.org/10.1214/aoms/1177703732" target="_blank" rel="noopener">Robust Estimation of a Location Parameter</a>: Huber piecewise loss and robust estimation.</li><li><a href="https://arxiv.org/abs/1708.02002" target="_blank" rel="noopener">Focal Loss for Dense Object Detection</a>: class imbalance and loss reweighting.</li></ul><p>The main text, figures, and numerical calculations are original organization by this project; sources are used to verify definitions, assumptions, and boundaries.</p><div class="dd-src-date">Access date: 2026-07-25</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/loss-function">Explore connections on the map</a><a href="/zh/concepts/loss-function/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

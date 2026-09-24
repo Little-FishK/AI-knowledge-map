@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Mixture of Experts (MoE): Have each token activate only a few feed-forward networks? Explained Simply</title>
+<meta name="description" content="From top-k routing and weighted outputs, to load balancing, capacity overflow, all-to-all, expert specialization, and inference batching.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/moe/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/moe/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/moe/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Mixture of Experts (MoE): Have each token activate only a few feed-forward networks? Explained Simply">
+<meta property="og:description" content="From top-k routing and weighted outputs, to load balancing, capacity overflow, all-to-all, expert specialization, and inference batching.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/moe/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Mixture of Experts (MoE): Have each token activate only a few feed-forward networks? Explained Simply">
+<meta name="twitter:description" content="From top-k routing and weighted outputs, to load balancing, capacity overflow, all-to-all, expert specialization, and inference batching.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/moe/#page","name":"What Is Mixture of Experts (MoE): Have each token activate only a few feed-forward networks? Explained Simply","description":"From top-k routing and weighted outputs, to load balancing, capacity overflow, all-to-all, expert specialization, and inference batching.","url":"https://ai-knowledge-map.com/en/concepts/moe/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Mixture of Experts (MoE): Have each token activate only a few feed-forward networks","item":"https://ai-knowledge-map.com/en/concepts/moe/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Mixture of Experts (MoE): Have each token activate only a few feed-forward networks</span></li></ol></nav><article id="dd-article" data-concept-id="moe" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Mixture of Experts (MoE): Have each token activate only a few feed-forward networks</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From top-k routing and weighted outputs, to load balancing, capacity overflow, all-to-all, expert specialization, and inference batching.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> MoE uses a router to select a few experts for each token, so total parameter capacity grows while per-token activated parameters grow more slowly. It does not scale for free: shared layers remain dense, and routing quality, load balancing, expert capacity, and cross-device communication determine actual quality and throughput.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>Hand-calculate top-k routing and expert load; distinguish total parameters from active parameters; explain capacity factor and auxiliary loss; diagnose all-to-all and expert hotspots.</div>
+<ol class="dd-chain"><li>Token representation enters the router</li><li>Select top-k and allocate capacity</li><li>All-to-all send to experts</li><li>Experts compute in parallel and return weighted results</li><li>Balancing/overflow control hotspots</li><li>Joint acceptance of quality, communication, capacity, and slicing</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Large total parameters does not mean every token performs the full computation<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>The direct problem that Mixture of Experts (MoE) aims to solve is the tension between computational cost and model capacity of the feedforward network (FFN) in the Transformer. In a dense Transformer, every token fully passes through the same FFN: the number of tokens multiplied by the number of FFN parameters is the amount of computation that must be performed in every forward pass. To make the model more capable, it is common to widen the FFN, but widening the FFN slows down every token at every layer. The entry point of MoE is exactly to break the default assumption that 'every token invokes the full FFN capacity'.</p>
+<p>The structural replacement of MoE: replace the single FFN that every token must pass through with multiple parallel, selectable FFNs, each called an 'expert'. In each layer, a router reads the current token's contextual representation (that is, the hidden vector when the token arrives at this layer), scores each expert, and selects only the top-scoring one or two experts to actually perform computation—this is top-1 or top-2 selection. In a model with 8 experts, the token 'refund' may pass through only 2 of them; the other 6 experts are not computed at all this time. The unselected experts do not participate this time, but attention, word embeddings, layer normalization, and all other shared layers are still densely executed for every token—savings occur only in the feed-forward expert part.</p>
+<p>From the perspective of inputs and outputs, the interface does not change. The input is still the contextual representation of each token; the output is still an updated representation with the same dimensions as the original FFN. That is, MoE is an implementation replacement inside the FFN: the tensor shapes passed between layers, residual connections, and normalization positions do not need to change because of it. This is exactly why it can be treated as 'directly replacing the FFN'.</p>
+<p>The key to understanding the cost and benefit of MoE is to distinguish three numbers that are often conflated. Total parameters is the sum of all parameters stored in the model; it determines the overhead of storage, loading, and training state, and also determines the upper bound of capacity available for conditional selection. Active parameters per token is the sum of the shared-layer parameters and expert parameters that the token actually passes through; it is closer to the real computation amount for a single token, but it still does not include routing scoring and communication overhead. FLOPs is the actual number of floating-point operations performed, which best reflects the real arithmetic workload. A model can have an extremely large total parameter count while each token activates only a very small portion of them.</p>
+<p>From this, three causal judgments follow. First, a large total parameter count only means there is more capacity for conditional selection; it does not mean each token invokes all capabilities: having 8 experts coexist and 'each token computes all 8 experts' are two completely different things. Second, a large total parameter count does not guarantee faster wall-clock time: more parameters mean greater burdens for storage, loading, and training state, and beyond active parameters there are routing and communication overheads; the real speed is determined jointly by FLOPs and the system implementation. Third, the essence of MoE is an exchange—using greater parameter capacity and higher communication complexity in exchange for conditional computation: only some experts work for a token. It does not turn one trillion parameters 'for free' into dense one-trillion capability; a dense model calls on 100% of its capability for every token, while MoE calls on only a small portion of it for each token. The trade-off between per-token capability and total capacity is completely different. Evaluating a MoE model must look at the three metrics—total parameters, active parameters, and FLOPs—at the same time; any one alone will be misleading.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How the Router Selects and Combines Experts<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>The router's work can be broken down into four steps: scoring, selection, renormalization, and weighted combination, each with clearly defined inputs and outputs.</p>
+<p>First, scoring. Let x be the context vector of the current token arriving at this layer, and Wᵣ the router's weight matrix. The router first applies a linear transformation Wᵣ·x to obtain a score for each expert; a higher score means the router considers that expert more suitable for handling this token. Second, softmax. Passing these scores through softmax gives the probability vector g over experts:</p>
+<p>g = softmax(Wᵣ·x)</p>
+<p>The e-th component gₑ satisfies gₑ = exp((Wᵣ·x)ₑ) / Σⱼ exp((Wᵣ·x)ⱼ). softmax compresses arbitrary real-valued scores into a probability distribution that sums to 1: each expert receives a probability between 0 and 1, and the probabilities of all experts add up to exactly 1. gₑ is the router's relative confidence that "this token should be handled by expert e". Third, top-k hard selection. k is the number of experts activated per token, and S is the set of indices of the k experts with the highest probabilities; experts outside the set do not participate in this computation. Fourth, renormalize and combine. The sum of the original probabilities of the selected k experts is usually less than 1, so renormalize within the set S: ĝₑ = gₑ / Σ_{e&#39;∈S} g_{e&#39;}, so that the weights of the selected experts sum to 1 again. The final output y is the weighted sum of the selected experts' respective FFN outputs:</p>
+<p>y = Σ_{e∈S} ĝₑ · Eₑ(x)</p>
+<p>Here Eₑ(x) is the output of expert e's feed-forward network for this token, and ĝₑ is the renormalized weight. Thus the updated representation of a token is a convex combination of the outputs of two (or one) experts, rather than a simple concatenation or average.</p>
+<p>The choice between top-1 and top-2 is a trade-off between fault tolerance and cost. top-1 activates only one expert per token, minimizing computation and communication; but the entire path is staked on a single expert, and if that expert performs poorly on the current input, there is no second path to compensate, making the single path more fragile. top-2 activates two experts simultaneously, introducing redundancy and stronger expressive combination ability: when one expert fails, the other can still contribute output. The cost is that the computational cost of the expert branches approximately doubles, and communication rises correspondingly. This "approximately doubles" comes from the hard selection itself: every selected expert must execute a full FFN.</p>
+<p>Hard top-k also has a key consequence for training. The selection is discrete: an expert is either selected or not selected, and experts that are not selected receive no task gradient for the current token at all this time. Relying only on this hard selection makes the router difficult to train effectively—because the selection action itself is non-differentiable, and many experts may go without gradients for a long time. Therefore training also requires two things: a differentiable routing score (the softmax probability itself is differentiable everywhere, allowing gradients to flow back to the router via the weights g), and a balancing objective (encouraging the selection frequency of experts to be roughly balanced, so that a few experts do not monopolize). The former solves "how to learn", and the latter solves "learn uniformly".</p>
+<p>Different implementations also add structural components. Some architectures have a shared expert in addition to routed experts: every token passes through it unconditionally, and routed experts only add on top of it. In this way, common patterns always have a shared path as a fallback, and routing is only responsible for selecting incremental capabilities. These details vary by implementation; whether a shared expert exists, what k is, and the specific way of renormalization may all differ, and one cannot assume the internal structure just from the "MoE" label.</p></div>
+<div class="dd-formula" data-formula-id="moe-topk-routing"><math display="block" aria-label="路由概率 g 等于 softmax 对路由权重 W r 乘 token 向量 x；集合 S 是概率最高的 k 个专家；输出 y 等于集合 S 内各专家输出按重新归一化权重加权求和"><mtable><mtr><mtd><mi>g</mi><mo>=</mo><mi>softmax</mi><mo>(</mo><msub><mi>W</mi><mi>r</mi></msub><mi>x</mi><mo>)</mo><mo>,</mo><mspace width="0.6em"/><mi>S</mi><mo>=</mo><msub><mi>TopK</mi><mi>k</mi></msub><mo>(</mo><mi>g</mi><mo>)</mo></mtd></mtr><mtr><mtd><mi>y</mi><mo>=</mo><munder><mo>∑</mo><mrow><mi>e</mi><mo>∈</mo><mi>S</mi></mrow></munder><msub><mover><mi>g</mi><mo>^</mo></mover><mi>e</mi></msub><mo>·</mo><msub><mi>E</mi><mi>e</mi></msub><mo>(</mo><mi>x</mi><mo>)</mo></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Running Example: Top-2 Dispatch for 6 Tokens<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>Use a concrete mini-batch to calculate the routing load clearly: 4 experts E1 to E4, a batch of 6 tokens, each token uses top-2 routing, meaning each token simultaneously sends computation requests to two experts.</p>
+<p>First calculate the total volume. Each of the 6 tokens produces 2 expert requests, so the batch has a total of 6×2 = 12 routing requests. Averaged over 4 experts, each expert should receive 12/4 = 3 requests. This is what capacity factor c = 1.0 means: with no safety margin, each expert's capacity is exactly equal to the average load. The capacity formula generalizes this process:</p>
+<p>C = ceil(c × N × k / E)</p>
+<p>Where C is the maximum number of routing requests a single expert can receive in this batch, ceil means round up (ceiling), c is the capacity factor, N is the number of tokens, k is the number of experts selected per token, and E is the total number of experts. Substituting into this example: ceil(1.0 × 6 × 2 / 4) = ceil(3) = 3. Rounding up ensures that capacity is at least not less than the average load, so it will not be pushed below the average because of indivisibility.</p>
+<p>But the average is not the actual value for each expert. The router chooses freely based on token content, so the distribution will not be uniform. In the diagram, E1 receives 5 routing requests, but its capacity is only 3: 2 of the 5 routes must be handled as overflow. This reveals the essence of the capacity mechanism—capacity is allocated by multiplying the average number of routes by a safety factor, so hot experts may still overflow; capacity only limits 'how many a single expert can accept at most' and does not smooth out the load.</p>
+<p>Faced with 2 overflowed routes from E1, there are three common responses, each trading off quality and resources. The first is drop: directly discard these 2 requests, so the corresponding token's expert output misses this route. The loss is that it may hurt the token's representation—the discarded one is exactly one of the experts with the highest router scores; the benefit is that resources are fixed, and the total computation and communication for this batch will not expand. The second is second/backup re-routing: transfer the overflowed requests to other experts that still have spare capacity. The token's representation can be fully restored, but the one taking over is an expert the router originally did not choose, so the semantics will change—the expert receiving the re-routed request may not be suitable for this token; at the same time, an additional scheduling step is introduced, and communication volume increases. The third is to increase the capacity factor, for example CF=2: capacity becomes ceil(2 × 6 × 2 / 4) = 6, each expert can accept up to 6 routes, in this example all 5 of E1's routes fit, and dropping almost never occurs. The cost is equally clear: buffers are reserved according to capacity, and worst-case computation and communication budgets both rise with the capacity limit, even though the actual average load is still 3.</p>
+<p>So the capacity factor is an explicit engineering knob: turn it up, and overflow and dropping decrease and quality is more stable, but the reserved buffer and worst-case cost increase; turn it down, and resources are saved, but hot experts will overflow more, shifting the cost to the completeness of token representations or the semantic shift caused by re-routing. This trade-off appears in both training and inference, but the constraints on each side are different.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 710 270" role="img" aria-label="Six tokens are dispatched to four experts via top-2 routing, showing Expert One overloaded."><defs><marker id="mo1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="18" y="86" width="120" height="96" rx="9" fill="#21252d" stroke="#6b8cbe"/><text x="78" y="111" text-anchor="middle" class="svg-t">6 tokens</text><text x="78" y="134" text-anchor="middle" class="svg-t" font-size="11">Refund/Quality/Order</text><text x="78" y="154" text-anchor="middle" class="svg-t" font-size="11">top-2, 12 routes total</text><path d="M138,134 L225,134" stroke="#6b7484" marker-end="url(#mo1)"/><rect x="227" y="86" width="130" height="96" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="292" y="111" text-anchor="middle" class="svg-t">Router</text><text x="292" y="134" text-anchor="middle" class="svg-t" font-size="11">E1:5 E2:3</text><text x="292" y="154" text-anchor="middle" class="svg-t" font-size="11">E3:2 E4:2</text><path d="M357,134 L425,134" stroke="#6b7484" marker-end="url(#mo1)"/><rect x="427" y="35" width="112" height="48" rx="7" fill="#21252d" stroke="#c77b72"/><text x="483" y="64" text-anchor="middle" class="svg-t">E1: 5 / cap 3</text><rect x="427" y="96" width="112" height="48" rx="7" fill="#21252d" stroke="#4f9d78"/><text x="483" y="125" text-anchor="middle" class="svg-t">E2: 3 / cap 3</text><rect x="427" y="157" width="112" height="48" rx="7" fill="#21252d" stroke="#4f9d78"/><text x="483" y="186" text-anchor="middle" class="svg-t">E3: 2 / cap 3</text><rect x="427" y="218" width="112" height="38" rx="7" fill="#21252d" stroke="#4f9d78"/><text x="483" y="242" text-anchor="middle" class="svg-t">E4: 2 / cap 3</text><path d="M539,60 L606,60" stroke="#c77b72" marker-end="url(#mo1)"/><rect x="608" y="35" width="86" height="70" rx="8" fill="#21252d" stroke="#c77b72"/><text x="651" y="59" text-anchor="middle" class="svg-t">2 routes overflow</text><text x="651" y="80" text-anchor="middle" class="svg-t" font-size="11">Drop/Re-route</text><text x="651" y="96" text-anchor="middle" class="svg-t" font-size="11">or increase capacity</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1: The average load is 12/4=3, so the capacity with CF=1 is 3; 2 of E1's 5 routes must be handled as overflow.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Strategy</th><th>E1 overflow handling</th><th>Quality</th><th>Resources</th></tr></thead><tbody><tr><td>drop</td><td>drop 2 routes</td><td>may hurt token representation</td><td>Fixed</td></tr><tr><td>second/backup</td><td>transfer to other experts</td><td>Recoverable but semantics change</td><td>Communication increases</td></tr><tr><td>CF=2</td><td>Capacity 6</td><td>Less dropping</td><td>Buffer and worst-case computation increase</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="moe-expert-capacity"><math display="block" aria-label="每个专家容量等于向上取整容量因子 c 乘 token 数 N 乘每 token 专家数 k，再除以专家总数 E；示例结果为三"><mrow><mi>C</mi><mo>=</mo><mi>ceil</mi><mo>(</mo><mfrac><mrow><mi>c</mi><mo>·</mo><mi>N</mi><mo>·</mo><mi>k</mi></mrow><mi>E</mi></mfrac><mo>)</mo><mo>=</mo><mi>ceil</mi><mo>(</mo><mfrac><mrow><mn>1</mn><mo>·</mo><mn>6</mn><mo>·</mo><mn>2</mn></mrow><mn>4</mn></mfrac><mo>)</mo><mo>=</mo><mn>3</mn></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Why routing collapses to a few experts<span class="dd-badge eng">balance</span></h2>
+<div class="dd-agent-response"><p>Routing collapse is a self-reinforcing positive feedback process. Suppose that early in training, expert E1, because of random initialization or data order, is slightly stronger than the other experts. The router assigns more tokens to E1; E1 therefore receives more task gradients, gets more training signal, and becomes stronger; the stronger E1 then makes the router favor it even more. Once this loop starts, the other experts receive almost no samples and gradients, their training opportunities approach zero, and they become increasingly “starved”—this is expert starvation. The model nominally has E experts, but only a few actually perform computation, and the remaining parameters merely take up storage and loading cost.</p>
+<p>To understand why this loop occurs naturally, you need to see its inputs and outputs clearly. The router’s input is the probability it assigns to each expert, and its output is the actual assignment; the optimization objective has two parts that pull against each other: both high task quality (assigning tokens to the most suitable expert) and balanced expert load (giving every expert a chance to learn). When training with only the task loss, the second objective has no force to constrain it, so the positive feedback proceeds unhindered.</p>
+<p>The methods for counteracting collapse target different stages. Auxiliary loss directly punishes the situation where “a few experts have excessively high probabilities or an excessively high actual token share,” turning the balancing objective into part of the gradient and acting on the learning process of the router and experts. Routing noise adds random perturbations to routing scores during training, forcing the router to occasionally explore experts it would not otherwise select and creating opportunities for starved experts to be tried. z-loss constrains routing logits from growing without bound: larger logits mean a sharper softmax, with the router becoming increasingly confident in a few experts, while large logits also bring numerical instability; z-loss is like stepping on the brakes for this divergence. Expert capacity limits the maximum routing load a single expert can receive, providing a backstop at the allocation level: even if the router wants to dump tokens onto E1 all at once, capacity will block the overflow or redirect it to other experts.</p>
+<p>But none of these methods can be strengthened without limit. When balancing is too strong, tokens that should go to specialized experts are forcibly spread across unrelated experts, semantic routing is disrupted, and task quality suffers. The right position is not to pursue absolute uniformity, but to observe multiple signals at the same time: task loss, expert entropy (the dispersion of the assignment probability distribution), per-expert token count, overflow rate, and overall quality. Load uniformity itself is only an efficiency signal for computational allocation, indicating that compute is not being wasted; it cannot prove that tokens from different languages or different groups receive equal representation quality—a model with balanced expert load may still be highly uneven in quality. Treating “uniform allocation” as “quality fairness” is one of the most common misreadings of MoE.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>all-to-all makes communication a first-class cost<span class="dd-badge eng">System</span></h2>
+<div class="dd-agent-response"><p>When experts are distributed across multiple GPUs, a token's journey includes two additional communication segments. The input token first completes attention and routing scoring on the local device, then is packed according to destination expert: all tokens going to E1 are grouped together, those going to E2 into another group, and so on. Next, an all-to-all exchange is performed—each GPU sends the packed tokens to the devices holding the corresponding experts, while receiving tokens from other GPUs that need to be processed by local experts. After the device holding the expert completes the FFN computation, it performs a reverse all-to-all to send each token's result back to its originating GPU in the original order. Thus each MoE layer contains two all-to-all communication phases; communication is no longer a hidden detail but a first-class cost alongside expert computation.</p>
+<p>This pattern is fast under ideal conditions, but under real-world conditions it can easily make the network neither idle nor fully saturated, creating multiple bottlenecks.</p>
+<p>Expert hotspots are the first. A few experts are selected by a large number of tokens; the GPUs holding them accumulate a backlog of requests, while other GPUs finish early and can only wait, or trigger capacity overflow. Mitigation measures are load balancing, and replicating particularly popular experts so that copies of the same expert are spread across multiple devices to share the traffic.</p>
+<p>Cross-node bandwidth is the second. The total data volume of all-to-all is proportional to the batch and expert distribution; when experts are distributed across machines, the share of network exchange in per-step time rises sharply, and GPU compute ends up waiting for data. Topology-aware placement and grouped routing can reduce cross-node communication: place devices that frequently exchange messages within the same node, or restrict routing scope to within a group.</p>
+<p>Small messages are the third. Communication latency is composed of waiting time and transmission time; the smaller the message and the shorter the transmission time, the higher the proportion of waiting time, and latency dominates the entire communication. Increasing the token batch size and fusing multiple small messages into larger transmission units can make the network truly busy.</p>
+<p>Long-tail sequences are the fourth. In dynamic batching, sequence lengths are uneven; short sequences finish early, long sequences drag their tails, and the workload across devices fluctuates, leading to uneven load between batches. This requires coordination of capacity policies and scheduling policies, rather than only adjusting the load-balancing loss.</p>
+<p>These bottlenecks together point to one conclusion: a decrease in per-token FLOPs does not guarantee a decrease in wall-clock latency. The computation saved arithmetically by MoE may be eaten up by communication latency and waiting; it depends more on high-speed interconnect and sufficient batch size than dense models. Judging MoE's “speed” using FLOPs ignores communication as this first-class cost.</p></div>
+<table class="dd-table"><thead><tr><th>Bottleneck</th><th>Symptom</th><th>Mitigation</th></tr></thead><tbody><tr><td>Expert hotspot</td><td>Some GPU waiting / overflow</td><td>Load balancing, replicating hot experts</td></tr><tr><td>Cross-node bandwidth</td><td>High all-to-all share</td><td>Topology-aware placement / grouped routing</td></tr><tr><td>Small messages</td><td>Latency dominance</td><td>Increase token batch / fusion</td></tr><tr><td>Long-tail sequences</td><td>Dynamic batch imbalance</td><td>Capacity and scheduling policies</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Training and inference hotspot distributions may differ<span class="dd-badge eng">Deployment</span></h2>
+<div class="dd-agent-response"><p>Load balancing is done well during training, but at inference time a particular expert may still be instantly saturated, because the traffic structure on the two sides is fundamentally different. Training corpora are large batches of data mixing languages and domains; the router sees a thoroughly mixed input, so hotspots are naturally diluted, and the balancing objective also operates on this distribution. Production traffic is not like this: at certain times users suddenly focus on the same topic (for example, a breaking news event), large numbers of semantically similar requests surge to the same expert, batches are small and generation is token by token, so the routing distribution is much sharper than during training. The “evenness” measured during training is evenness on the training distribution and cannot automatically transfer to the inference distribution.</p>
+<p>Therefore inference needs its own monitoring dimensions rather than trusting training metrics: actual load per layer and per expert, routing entropy (whether allocation is overly concentrated), overflow rate, all-to-all latency, and batch and slice quality. Stress testing for possible peak topics is more valuable than discovering afterwards that some GPU is queuing. These monitoring targets are system behavior, not model quality itself.</p>
+<p>Parallel strategies also need to leave combination space for inference spikes. Expert parallel places different experts on different devices; combined with tensor parallel or data parallel, it can simultaneously utilize intra-device and inter-device compute; but the more complex the combination, the more complex the network topology design and fault recovery—when a node fails, its expert replicas or recomputation paths must be able to take over.</p>
+<p>A final boundary is easily overlooked: sparse computation does not equal sparse storage. Inactive experts are not computed for that pass, but their weights usually still need to reside in GPU memory, or in tiered storage that can be accessed quickly. Total parameter count therefore directly affects GPU memory usage and startup time: a MoE model with a trillion total parameters, even if each token activates only ten billion parameters, still needs to find a place for all weights at startup. Sparsity saves per-token arithmetic, not storage.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Expert “specialty labels” require causal evidence<span class="dd-badge eng">Explanation</span></h2>
+<div class="dd-agent-response"><p>If an expert frequently handles code-related tokens, can we call it a “code expert”? Mere statistical frequency is far from sufficient to support that label.</p>
+<p>First, the basis for routing specialization is not necessarily semantic. Experts may specialize along surface features such as word frequency, position, punctuation, or language, or may simply be artifacts of a load-balancing objective—the auxiliary loss spreads tokens across experts, and some experts are merely “assigned” code samples. Using a few high-frequency token examples to tell stories makes it especially easy to anthropomorphize random specialization.</p>
+<p>Mutual information here measures: given that a token belongs to a certain slice (such as a particular language or topic), to what extent can we predict which expert it will be routed to? It can reveal stable statistical associations, such as “German tokens go to E3 more often,” but association does not equal causation. Routing may follow some feature that co-occurs with German, rather than because the expert “understands German.”</p>
+<p>To test the claim that “an expert performs a certain function,” causal intervention is needed rather than observational statistics. The validation input is routing logs and capability slices, and the output includes not only association statistics but also capability changes after swapping or masking experts. If removing or swapping an expert causes a selective decline in code-related capability, while other confounders (such as reduced total parameters or other capabilities being impaired simultaneously) are controlled, then there is stronger evidence that the expert is related to code functionality. Moreover, experts with the same index may mean different things in different layers: E2 in layer 3 and E2 in layer 21 are two different parameter blocks, and their specializations can be completely unrelated.</p>
+<p>A deeper limitation comes from the MoE architecture itself. Experts are not independent modules: the shared attention layers first mix the context, and by the time a token reaches an expert it already carries information from the entire sentence or even the whole passage; a behavior arises from the combined effect of routing and shared layers across multiple layers. Therefore, one cannot infer from the label of an expert in a single layer why the entire answer was generated, nor treat expert boundaries as permission boundaries—for example, the claim that “the content expert was not activated, so the model cannot output incorrect facts” does not hold. Routing logs record “who was used,” but they cannot prove “that it was used for a particular semantic reason.”</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>MoE differs from application model routing and multi-agent systems<span class="dd-badge intuition">Disambiguation</span></h2>
+<div class="dd-agent-response"><p>The word “routing” is used in MoE, application model routing, and multi-agent systems, but the decision granularity and goals of the three are completely different. Confusing them with one another makes problem localization difficult.</p>
+<p>MoE's unit of selection is each layer and each token. In each layer, a router chooses for the current token among multiple FFN experts inside the model; the candidates are parameter blocks within the same model. The main goal is parameter capacity and sparse computation: use larger total capacity to carry more capability while having a single token activate only part of the parameters. This routing is part of the model parameters, learned through training, and is opaque to users.</p>
+<p>Application model routing's unit of selection is each request or a stage within a request. Candidates are complete large models or different services—for example, simple requests go to a small model, complex requests are escalated to a large model, or requests are sent to different model endpoints based on modality or function. The main goal is to control cost under quality constraints: for the same request volume, use a small model to handle most traffic and save call overhead. This routing is explicitly controlled by product rules; logs are observable and rules can be modified. It is fundamentally different from MoE's internally learned parameter routing.</p>
+<p>Multi-agent systems' unit of selection is the subtask. After a task is broken down, a scheduler assigns subtasks to different roles, tools, or agents in contextual environments. The main goals are division of labor, parallelism, and isolation: different agents perform their own roles, tasks can proceed concurrently, and errors and permissions are also isolated in their respective contexts.</p>
+<p>The three can be used together: an application can do model routing at the outer layer to select a service, the selected model can then use MoE routing internally for sparse computation, and after the request enters the model, it can also be orchestrated by multi-agent systems. Therefore, when evaluating, it is necessary to distinguish which layer an error or delay occurs in: whether product rules selected the wrong model, a MoE expert was poorly assigned, or the division of labor among agents went wrong. If the wrong layer is identified, remediation measures will be applied in the wrong place.</p></div>
+<table class="dd-table"><thead><tr><th>Mechanism</th><th>Unit of selection</th><th>Candidates</th><th>Primary objective</th></tr></thead><tbody><tr><td>MoE</td><td>Per layer per token</td><td>FFN experts within the model</td><td>Parameter capacity / sparse computation</td></tr><tr><td>Model routing</td><td>Per request / stage</td><td>Complete models or services</td><td>Cost under quality constraints</td></tr><tr><td>Multi-agent</td><td>Subtasks</td><td>Roles / tools / contexts</td><td>Division of labor, parallelism, isolation</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Evaluation must look at capacity, quality, and system efficiency simultaneously<span class="dd-badge intuition">Evaluation</span></h2>
+<div class="dd-agent-response"><p>With total parameters increased 8-fold and activated FLOPs roughly unchanged, whether such scaling is worthwhile cannot be answered by parameter numbers alone; it requires a controlled comparison. The input to the evaluation is a pair of models: an MoE model and a dense baseline with the same activated FLOPs, both run on the same task, same hardware, same network, and same batch. Only by aligning activated compute is the comparison fair—otherwise it is impossible to tell whether the advantage comes from the sparsity mechanism or simply from doing more computation.</p>
+<p>The quality side and the system side each have a set of metrics. The quality side looks at validation loss, task-specific performance, per-language slices, safety behavior, calibration, and stability. The system side looks at tokens/s throughput, TTFT (time to first token), TPOT (time per output token), GPU memory usage, all-to-all communication share, overflow rate, power consumption, and failure recovery time. The benefits of MoE are often eaten up by communication on the system side; scoring only on the quality side would misjudge a model that is “fast in computation but slow in wall-clock time” as a success.</p>
+<p>Load balancing requires a clear metric. Expert load CV is the standard deviation of the loads across experts divided by the mean: CV = 0 means perfectly uniform, and larger values indicate more severe relative skew. It is a tool for measuring the uniformity of compute allocation, but a low CV does not mean semantic routing is reasonable, nor does it mean quality is better across languages or groups—uniform load is only uniform allocation. Testing functional robustness requires harder interventions: perform expert ablation (removing experts one by one or in groups) and routing perturbation, and observe whether overall capability collapses when a few experts fail, rather than being smoothly absorbed by redundancy; at the same time, separately compare the hot spots under the training distribution and the production distribution to see whether the skew during inference is within the expected range.</p>
+<p>The final report must list total parameter count and activated parameter count, top-k, capacity factor, and parallel topology; if any of these is missing, the parameter numbers may mislead readers. The criterion for judging “worthwhile” is: under the target network and batch conditions, the quality–cost frontier improves reproducibly, and this throughput improvement is not obtained by dropping tokens or by degrading individual slices. If either condition holds, it indicates that the gains from scaling have been underestimated or fabricated.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Link the previous steps into a complete causal chain—from “a token enters” to “an expansion is accepted,” every causal step in between for MoE is clear.</p>
+<p>The starting point is the token's contextual representation entering the router. After the attention layer mixes context, this vector carries all the information about the token in the current context; the router uses it to assign a score to each expert, which then becomes a probability distribution through softmax. The router's output is not a label but a set of differentiable weights—a design that simultaneously determines selection (who is selected) and trainability (gradients can flow back to the router through these weights).</p>
+<p>The second step is top-k selection and capacity allocation. The router selects the k experts with the highest probability; the selected experts participate in the combination according to the renormalized weights within the set. At the same time, each expert's capacity limit is predetermined by capacity factor × average load, and requests to hot experts that exceed capacity go into overflow handling. This step brings together two forces—“which experts the model wants to compute” and “how much the system allows to compute”—the former pursues semantic matching, while the latter limits single-point overload.</p>
+<p>The third step is all-to-all sending. Tokens are packed by destination expert and sent across device boundaries to the GPUs that hold the experts. Here communication becomes an explicit cost for the first time: routing skew, cross-node links, small messages, and long-tail sequences can all make this step expensive. Fourth, experts compute in parallel and return weighted results. The devices holding the experts execute the FFN, combine each expert's output into the final updated representation according to the renormalized weights, and then send it back via reverse all-to-all to the position where the original token departed, restoring the original order for the next layer.</p>
+<p>Fifth, balancing and overflow control act throughout the entire process. Auxiliary loss and z-loss prevent routing collapse and suppress logit divergence during training; capacity and rerouting strategies backstop hot experts at runtime; and the inference side must monitor per-layer expert load, routing entropy, and overflow rate according to the production distribution—because the hotspot distribution of inference traffic may be completely different from training. Sixth, joint acceptance. Judging whether an MoE expansion is worthwhile requires looking at the joint performance of four dimensions under the same controlled conditions: quality, communication, capacity, and slicing. On the quality side, align against a dense baseline matched on active FLOPs; on the system side, measure throughput, TTFT, TPOT, and all-to-all proportion; on the capacity side, check total parameters, active parameters, and expert load CV; on the slicing side, confirm that no language or group trades degradation for overall numbers. If any link is out of balance, it leaves a specific position on the chain: for routing collapse, look at the gradients and balancing before the fourth step; for communication bottlenecks, look at the third step; for overflow, look at the capacity setting of the second step; for quality degradation, look at the routing semantics of the first step. The chain is a closed loop—the problems exposed by acceptance are exactly the causal evidence pointing to the corresponding links in the chain.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1701.06538" target="_blank" rel="noopener">Outrageously Large Neural Networks</a>: Sparse gated MoE</li><li><a href="https://arxiv.org/abs/2006.16668" target="_blank" rel="noopener">GShard</a>: Large-scale expert parallelism and capacity</li><li><a href="https://arxiv.org/abs/2101.03961" target="_blank" rel="noopener">Switch Transformers</a>: Top-1 routing and load balancing</li><li><a href="https://arxiv.org/abs/2202.08906" target="_blank" rel="noopener">ST-MoE</a>: Stable training and transfer</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/moe">Explore connections on the map</a><a href="/zh/concepts/moe/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

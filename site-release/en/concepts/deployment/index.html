@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service? Explained Simply</title>
+<meta name="description" content="From runtime location, queuing and batching, to version release, idempotent side effects, degradation, and incident response.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/deployment/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/deployment/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/deployment/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service? Explained Simply">
+<meta property="og:description" content="From runtime location, queuing and batching, to version release, idempotent side effects, degradation, and incident response.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/deployment/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service? Explained Simply">
+<meta name="twitter:description" content="From runtime location, queuing and batching, to version release, idempotent side effects, degradation, and incident response.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/deployment/#page","name":"What Is AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service? Explained Simply","description":"From runtime location, queuing and batching, to version release, idempotent side effects, degradation, and incident response.","url":"https://ai-knowledge-map.com/en/concepts/deployment/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service","item":"https://ai-knowledge-map.com/en/concepts/deployment/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service</span></li></ol></nav><article id="dd-article" data-concept-id="deployment" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">AI Deployment: Turning Offline Capability into a Capacity-Measurable, Canary-Releasable, and Rollbackable Service</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From runtime location, queuing and batching, to version release, idempotent side effects, degradation, and incident response.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Deployment is not wrapping a model into a URL; it is composing models, prompts, indexes, tools, policies, and infrastructure into a traceable release unit. Reliability depends on capacity and tail latency, real side-effect boundaries, progressive rollout, and complete rollback; higher offline quality alone does not suffice to prove better production performance.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>compare cloud, self-hosted, and edge constraints; hand-calculate capacity and queuing risk; design shadow/canary/blue-green releases; define degradation, rollback, and version atomicity.</div>
+<ol class="dd-chain"><li>Define location/privacy/latency/capacity constraints</li><li>Freeze all dependencies into a release unit</li><li>Offline evaluation and stress testing</li><li>Shadow validation of real distribution and capacity</li><li>Canary progressively ramps up traffic according to thresholds</li><li>On alert, degrade/roll back and feed failures back</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Running location first determines the responsibility boundary<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Where the same model capability runs is not purely a technical question; it is a question of “who is responsible for it.” The choice of deployment location determines the form of the model service, the benefits the team gains, the costs it bears, and the business stage it suits. Running locations are usually divided into four forms: Cloud API, self-hosting (cloud or on-premises), edge/on-device, and hybrid deployment.</p>
+<p>Cloud API is borrowing the inference service that the provider has already built. The team gains elastic scaling, fast model updates, and freedom from GPU operations burden; in exchange, data must leave its own domain, the team must accept the provider’s quotas and unit price constraints, and it becomes dependent on the provider. This form suits products in rapid iteration stages with clearly fluctuating traffic—the team can invest all limited engineering effort into the business rather than into machines.</p>
+<p>Self-hosting (your own cloud account or on-premises) trades for control over weights, data, capacity, and versions. Weight files, inference code, and version release cadence are all decided by you, and data does not leave the boundary you have drawn; the cost is that you must bear all operational responsibilities such as resource scheduling, patches, security hardening, and on-call duty. This form is meaningful only when business scale tends to be stable and compliance control requirements are strong, because it requires the team to truly have long-term operational capability.</p>
+<p>Edge/on-device deployment places inference on user devices or close to devices. What is gained is offline availability, very low network round-trips, and partial privacy with data not leaving the device; the costs are hard constraints on memory and power consumption, adaptation costs from hardware fragmentation, and difficulty in model updates. It suits scenarios with weak network environments, extremely high real-time requirements, or where data is not allowed to leave the device.</p>
+<p>Hybrid deployment is a combination of on-device fast paths and cloud escalation: simple requests are answered locally, while complex requests or new capabilities are routed back to the cloud. This form can layer by risk and capability, letting the device side handle low-risk, high-frequency tasks and the cloud provide high-quality fallback; but it introduces complexity in synchronization, routing, and consistency, requiring the team to be able to clearly design “what goes where.”</p>
+<p>Two intuitions often go wrong here. On-device does not automatically mean low latency: if device compute is insufficient, decoding itself will be slow, and the saved network time will be eaten up by computation time. Self-hosting is not automatically cheaper: low utilization, engineering labor, and redundant construction will swallow the apparent unit price advantage. Therefore, the inputs for choosing a running location are actual traffic characteristics, data residency requirements, privacy constraints, latency budget, availability targets, hardware conditions, and team operational capability; the output is one of Cloud API, self-hosting, on-device, or hybrid solutions; each trades off control, elasticity, cost, and responsibility. If the team lacks the ability to bear patches, on-call duty, and disaster recovery, it cannot choose self-hosting merely because of a preference for data control.</p></div>
+<table class="dd-table"><thead><tr><th>Form</th><th>Gains</th><th>Costs</th><th>Suits</th></tr></thead><tbody><tr><td>Cloud API</td><td>Elasticity, fast updates, no GPU operations burden</td><td>Data leaves domain, quotas, vendor and unit price</td><td>Rapid iteration, fluctuating traffic</td></tr><tr><td>Self-hosting cloud/on-premises</td><td>Control over weights, data, capacity, and versions</td><td>Scheduling, patches, security, and on-call</td><td>Stable scale, strong compliance control</td></tr><tr><td>Edge/on-device</td><td>Offline, low network round-trips, partial privacy</td><td>Memory, power, hardware fragmentation and updates</td><td>Weak network, real-time, data not leaving device</td></tr><tr><td>Hybrid</td><td>On-device fast path and cloud escalation</td><td>Synchronization, routing, and consistency complexity</td><td>Layered risk and capability</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Service path is longer than model weights<span class="dd-badge eng">System</span></h2>
+<div class="dd-agent-response"><p>Model inference took only 600 ms, but the user waited 2 s—this gap reminds us that treating model weights as the only object of deployment is an illusion. A real request, from being sent to returning, sequentially goes through authentication, rate limiting, queueing, context assembly, retrieval, prefill, token-by-token decoding, tool calls, post-processing, and streaming. Model computation is only one segment of this path, and any segment on the path can become the dominant contributor to tail latency.</p>
+<p>The causal chain of this path is: the request first passes through gateway authentication and rate limiting, which determine whether it is allowed to enter; then it waits in the queue for compute resources; after entering the service, the user context and retrieved material need to be assembled into a complete input; prefill processes the entire input at once, while decoding produces tokens one by one; if the model decides to call a tool, it must also wait for the response of the external system; finally, post-processing and streaming send the result back to the user. End-to-end latency is the sum of the time consumed by all these stages, not the model time itself. The 600ms model inference time, plus queue wait and tool round-trips, produces the 2-second experience. When diagnosing tail latency, looking only at model time is meaningless—queue or tool calls on the critical path can completely dominate these 2 seconds.</p>
+<p>Tool calls also introduce another layer of responsibility. The model does not directly perform external operations such as transfers and refunds; instead, it does so through tools, and once these operations happen they leave real-world side effects. Therefore tool calls must include permission control, idempotency design, and transaction compensation: repeated calls must not deduct funds repeatedly, and failed operations must be reversible. Model output can be regenerated at any time, but external side effects cannot be undone by regeneration.</p>
+<p>Figure 1 shows the deployment path of the refund assistant: the request enters from the gateway, passes through queue and retrieval, reaches the model, and the model then triggers the tool; the entire path is under the coverage of canary rollback. The real conclusion this figure illustrates is: the rollback object is never a single weight, but a version composed of the model, prompt, index, tool schema, policy, and service configuration. Changing any link individually may break the entire chain, so the release unit must cover all dependencies.</p>
+<p>Therefore the input of the service path is a request and the authentication, queueing, retrieval, prefill, decoding, tool, and transmission stages it goes through, and the output is end-to-end latency, system state, and external side effects. The 600ms model time is only one segment; queueing or tool calls on the critical path can dominate the 2-second response time. The release unit must cover all dependencies on the path, and external side effects require permissions, idempotency, and compensation; the model alone cannot be rolled back.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 720 250" role="img" aria-label="Refund assistant deployment path from gateway, queue, retrieval, model to tool, and canary rollback"><defs><marker id="dp1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="16" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="64" y="99" text-anchor="middle" class="svg-t">Gateway</text><text x="64" y="119" text-anchor="middle" class="svg-t" font-size="11">Authentication/rate limiting</text><path d="M112,103 L148,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="150" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="198" y="99" text-anchor="middle" class="svg-t">Queue</text><text x="198" y="119" text-anchor="middle" class="svg-t" font-size="11">Backpressure/batching</text><path d="M246,103 L282,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="284" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="332" y="99" text-anchor="middle" class="svg-t">Retrieval</text><text x="332" y="119" text-anchor="middle" class="svg-t" font-size="11">index p17</text><path d="M380,103 L416,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="418" y="74" width="96" height="58" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="466" y="99" text-anchor="middle" class="svg-t">Model v42</text><text x="466" y="119" text-anchor="middle" class="svg-t" font-size="11">prompt h83</text><path d="M514,103 L550,103" stroke="#6b7484" marker-end="url(#dp1)"/><rect x="552" y="74" width="144" height="58" rx="8" fill="#21252d" stroke="#c77b72"/><text x="624" y="99" text-anchor="middle" class="svg-t">Refund tool</text><text x="624" y="119" text-anchor="middle" class="svg-t" font-size="11">Policy s9 / Idempotency key</text><path d="M466,133 C464,196 294,204 198,136" fill="none" stroke="#c77b72" stroke-dasharray="5 4" marker-end="url(#dp1)"/><text x="362" y="195" text-anchor="middle" class="svg-t" font-size="11">Safety, quality, or p95 threshold crossed: stop rollout, roll back entirely to v41 release unit</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　The rollback object is not a single weight, but a version composed of the model, prompt, index, tool schema, policy, and service configuration.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>The Basic Ledger of Throughput, Latency, and Concurrency<span class="dd-badge math">Capacity</span></h2>
+<div class="dd-agent-response"><p>If 8 requests arrive per second and each is served in an average of 0.1 s, is a single instance enough? Intuitively, 8 × 0.1 = 0.8, leaving 20% idle, which seems more than sufficient. Queueing theory gives a much more pessimistic answer, because the “average” hides the randomness of arrivals.</p>
+<p>The two basic quantities in capacity estimation are utilization and the number of requests in the system. Let the arrival rate be λ, the average service time S, and the number of parallel slots c; then utilization ρ = λ×S/c. Substituting the numbers: c=1, λ=8/s, S=0.1s gives ρ=0.8. That is, the instance is busy 80% of the time. The problem is that requests do not arrive at uniform intervals—random arrival means requests bunch up, so even with an average service time of only 100 ms, requests still queue. As ρ approaches 1, queueing time degrades nonlinearly and tail latency rises sharply; at ρ=0.8 queueing has already occurred in practice, not only when the system reaches full load.</p>
+<p>Little’s law L=λ×W provides another way of looking at it: the average number of requests in the system L equals the arrival rate λ multiplied by the end-to-end average residence time W. If W=0.5s on average end-to-end and λ=8/s, then L=8×0.5=4—on average 4 requests are in flight in the system at the same time. This relationship ties latency, throughput, and concurrency together: if users stay in the system longer, the system must be able to hold more in-flight requests; to reduce residence time, either reduce queueing or increase service speed.</p>
+<p>LLM services also work in tokens, which adds two more constraints to this ledger. Input length determines the time spent in the prefill phase, and output length determines how long a request occupies compute slots; a long output holds slots for a long time, delaying requests behind it. Continuous batching packs token computation for multiple requests together and improves throughput, but at the cost of more complex scheduling—the scheduler must decide in real time who is served first and how many tokens each gets. Therefore, capacity models cannot be divided only by “requests per second”; they should be sliced by input/output length, model, priority, and tool path, because different slices have completely different service time distributions.</p>
+<p>Another fact to watch out for is that averages do not guarantee SLOs. A service with an average latency of 500 ms can have a p99=8s tail, because a small number of users blocked by long requests contribute very large quantiles. Capacity review must look at the tail, and also at two things not covered by formulas: residual computation still running after timeouts—requests abandoned by clients do not automatically release server resources—and burst traffic—bursts raise the instantaneous λ far above the average level, and queues can build up within minutes.</p>
+<p>Taken together, the inputs to capacity estimation are arrival rate λ, average service time S, parallel slots c, and end-to-end average time W; the outputs are utilization ρ and average number of requests in the system L. The formulas provide an initial capacity intuition: at ρ=0.8 queueing already occurs, and as it approaches 1, tail latency degrades nonlinearly. But the formulas only cover steady-state average behavior; LLM length differences, batch scheduling, tool round-trips, and burst traffic all need to be validated through stress testing, not just by applying queueing formulas.</p></div>
+<div class="dd-formula"><math display="block" aria-label="利用率与 Little 定律"><mi>ρ</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>×</mo><mi>S</mi></mrow><mi>c</mi></mfrac><mo>;</mo><mspace width="1em"/><mi>Lsystem</mi><mo>=</mo><mi>λ</mi><mo>×</mo><mi>W</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: Why a New Model with Higher Quality Cannot Go Live Directly<span class="dd-badge math">Case Walkthrough</span></h2>
+<div class="dd-agent-response"><p>The new model has 3 percentage points higher accuracy, halved throughput, and doubled p95; how do we decide whether it can go live? A refund assistant's release process can fully illustrate this decision. The candidate version's performance on five dimensions—task pass rate, unauthorized rate, p95, throughput, and cost per successful task—is as follows:</p>
+
+<p>The release gate is: task pass rate ≥ 87%, unauthorized rate ≤ 0.5%, p95 ≤ 1.8s, peak capacity ≥ 16 req/s. Checking item by item reveals layers of issues. v42 offline evaluation had task pass rate 89% and unauthorized rate 0.3%, indeed better in quality than v41's 86% and 0.4%, but it only proved the model's ability on offline samples, without testing queuing, caching, real input length, and tool timeouts—these are exactly the differences between the serving environment and the offline environment. Shadow testing filled this gap: after placing the same model into the real traffic path, the task pass rate dropped to 88.5% (still meeting the threshold), but p95 became 2.6s and throughput only 11 req/s, both falling below the threshold, and the cost per successful task also rose from ¥0.10 to ¥0.17. Therefore, v42's original serving form could not pass the gate. After optimization, p95 dropped to 1.5s, throughput returned to 17 req/s, task pass rate 88.3% still ≥ 87%, cost ¥0.13, and only then did it have the qualification to enter canary. Offline quality can be used to screen candidates, but cannot replace serving gate—release decisions must be based on actual measurements on the serving path.</p>
+<p>Passing the gate is only the first step; next, we need to calculate how many instances are needed. Divide the peak arrival rate λpeak by the per-instance rated throughput qinstance, then round up: peak 24 req/s divided by optimized 17 req/s, 24/17 ≈ 1.41, rounding up gives at least 2 instances. This number is the bare capacity calculated under ideal conditions. After leaving margin for single-instance failure and burst traffic, 3 instances may actually be needed—once 1 of the 2 instances goes down, the remaining instance has only 17 req/s capacity, unable to withstand the 24 req/s peak. Therefore, cost accounting must be based on the actual utilization after redundancy, not on bare provisioning based on average utilization.</p>
+<p>The inputs of this release case are v41's and v42's task pass rates, unauthorized rates, p95, throughput, and cost per successful task; the outputs are whether all thresholds are met and the required number of instances. The decision order is to first check the four gates of task ≥ 87%, unauthorized ≤ 0.5%, p95 ≤ 1.8s, capacity ≥ 16 req/s, then divide peak arrival rate by per-instance rated throughput and round up to get the minimum number of instances; redundancy and single-instance failure will raise the actual requirement from 2 to 3, and cost accounting must reflect this redundancy.</p></div>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Task Pass Rate</th><th>Unauthorized Rate</th><th>p95</th><th>Throughput</th><th>Cost per Successful Task</th></tr></thead><tbody><tr><td>v41</td><td>86%</td><td>0.4%</td><td>1.2s</td><td>20 req/s</td><td>¥0.10</td></tr><tr><td>v42 Offline</td><td>89%</td><td>0.3%</td><td>—</td><td>—</td><td>—</td></tr><tr><td>v42 Shadow Test</td><td>88.5%</td><td>0.3%</td><td>2.6s</td><td>11 req/s</td><td>¥0.17</td></tr><tr><td>v42 Optimized</td><td>88.3%</td><td>0.3%</td><td>1.5s</td><td>17 req/s</td><td>¥0.13</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>What Batching, Caching, and Quantization Each Change<span class="dd-badge eng">Optimization</span></h2>
+<div class="dd-agent-response"><p>Batching, caching, and quantization can all make a service “faster,” but they change different parts of the inference system, and each introduces completely different risks. Treating optimization techniques as the same is the most common attribution error in capacity tuning.</p>
+<p>Continuous batching packages token computation for multiple requests into the same hardware execution, improving hardware utilization and overall throughput. The cost lies in scheduling: a request must wait for other requests to form a batch, increasing waiting time; long-output requests occupy slots longer, and short requests may be squeezed out for a long time. Therefore, after launching continuous batching, you must regression-test queueing behavior, fairness between long and short requests, and p99.</p>
+<p>Prefix/KV caching reuses already computed attention state: when multiple requests share the same system prompt or document prefix, caching lets subsequent requests skip repeated prefill computation, directly reducing first-token latency (TTFT) and computation cost. Its risk lies in key design: the cache hit key must include model version, prompt version, and permission context at the same time; otherwise, when a different set of prompts is used, it may still hit the old cache, or even worse—users with different permissions may read the same cached content, causing cross-user leakage. Caching also requires a clear invalidation mechanism; once the model or prompt is updated, the old cache must be invalidated.</p>
+<p>Quantization changes the representation of the values themselves: compressing weights and activations from high precision to low bit width reduces GPU memory usage and memory bandwidth pressure, thereby speeding things up. But low bit width implies approximation, which may degrade the quality of a few slices—especially inputs that rely on precise numerical patterns. Therefore quantization must be regression-tested on critical slices and long-context scenarios, and the compressed performance must be validated with a calibration set.</p>
+<p>Besides these three, speculative decoding, context pruning, and small-model routing are also common techniques, each with its own accuracy boundary. Context pruning reduces the text sent to the model to lower prefill cost, but the pruned content may be exactly the evidence needed to answer the question, requiring regression on evidence recall and the “lost in the middle” phenomenon—the model's ability to use information in the middle of long contexts is already weak, and pruning amplifies this problem. Small-model routing assigns simple requests to a cheap small model to lower average cost, but when classification is wrong, complex requests are delegated to the small model and quality suffers; meanwhile, the latency distribution of routed requests superimposes the tail latencies of the two models, forming a cascaded tail.</p>
+<p>The benefits of these techniques and the items that must be regression-tested can be compared as follows:</p>
+
+<p>The deep structure of this table is: each optimization sacrifices some property that was originally guaranteed by default. Batching changes queueing, caching reuses computation, quantization changes numerical representation, pruning changes the evidence visible to the model, and routing changes which model serves the request—the risks are different, so each must be regression-tested separately. The inputs to optimization are the current bottleneck, batching parameters, cache keys, quantization bit width, context, and routing strategy; the outputs are differences in throughput, first-token latency, GPU memory, quality, and isolation. During implementation, change only a small number of variables at a time and keep per-request version records; if all five optimizations are launched at once, after the service becomes faster no one can say which one produced the benefit, and if a problem occurs there is no way to attribute it.</p></div>
+<table class="dd-table"><thead><tr><th>Optimization</th><th>Main benefit</th><th>Must be regression-tested</th></tr></thead><tbody><tr><td>Continuous batching</td><td>Throughput/utilization</td><td>Queueing, long/short request fairness, p99</td></tr><tr><td>Prefix/KV caching</td><td>TTFT and cost</td><td>Version key, tenant isolation, invalidation</td></tr><tr><td>Quantization</td><td>GPU memory, speed</td><td>Critical slices, long context, calibration</td></tr><tr><td>Context pruning</td><td>prefill cost</td><td>Evidence recall and lost in the middle</td></tr><tr><td>Model routing</td><td>Average cost</td><td>Incorrect delegation and cascaded tail latency</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Shadow, Canary, and Blue-Green Address Different Risks<span class="dd-badge eng">Release</span></h2>
+<div class="dd-agent-response"><p>Shadow, canary, and blue-green all convey “don’t go full traffic yet,” but they observe different risks and have different impacts on real users. The choice of release strategy depends on what you most want to verify at this moment and what you most fear breaking.</p>
+<p>The first gate of release is the offline gate: exclude known quality, safety, and contract regressions on a frozen evaluation set. Its role is to block obviously unqualified candidates at low cost, but it can only verify the candidate’s performance on offline samples and cannot answer “what will happen when put into real traffic.”</p>
+<p>Shadow deployment replicates real traffic to the candidate version; the candidate processes exactly the same inputs as production but its results are not returned to users. What it verifies is the candidate’s capacity and latency performance under the real input distribution, as well as compatibility with read operations; because users cannot see shadow results, observation does not affect the production experience. The boundary of shadow is: real irreversible side effects must be forbidden—tool calls such as refunds and transfers triggered by the candidate are not allowed to actually execute; at the same time, users cannot see the candidate results, so you cannot measure users’ subsequent behavior toward the candidate output, for example whether users will accept a recommendation or continue asking follow-ups.</p>
+<p>Canary goes a step further: give a small portion of real traffic to the candidate, and these users see and accept the real candidate results. Its core is staged rollout and observation: traffic expands step by step through 1%→5%→25%→100%, staying at each level for a sufficiently long observation window, waiting for complete labels to come back—for example, the success rate of refund tasks can be confirmed only after the task has truly completed. Canary can measure the blind spot of shadow (users’ real reactions), at the cost of causing real harm itself: the small portion of users in the rollout bear all the candidate’s flaws. Therefore each step of canary must confirm no metric degradation within the observation window before continuing.</p>
+<p>Blue-green deployment maintains two complete environments: the blue environment runs the old version and the green environment runs the new version. Switching only relies on changing where traffic points, and rollback is simply pointing traffic back. It solves the risk that “rollback must be fast and certain,” at the cost of double capacity and state synchronization between the two environments—database, cache, and tool states must be aligned; otherwise the moment you switch over, inconsistency arises.</p>
+<p>At the intersection of the three strategies’ boundaries there is another common blind spot: no matter how fast blue-green switches back to the blue environment, it cannot automatically roll back refunds already executed in the green environment—side effects executed by external tools are outside the control range of environment switching. Similarly, shadow forbids side effects and canary truly produces side effects, both requiring release strategies to be designed together with side-effect isolation, idempotency, and compensation mechanisms, rather than being a problem that release tooling alone can solve.</p>
+<p>Traffic splitting itself has nuances. Do not split randomly per individual request; otherwise multiple requests from the same session will be scattered across different versions, users will alternately face old and new models during a conversation, and behavioral data loses meaning. Use stable hashing by user or session so that the same user unit always lands on the same version, and exclude employee accounts, bots, and traffic with imbalanced regional proportions to avoid contaminating the observation window.</p>
+<p>Taken together, the inputs to a release strategy are the candidate version, real traffic, side-effect risk, observation window, and rollback capability; the outputs are shadow, canary, or blue-green plus staged traffic actions. Shadow results do not affect users and prohibit irreversible actions; canary produces real results but is controlled in stages; blue-green keeps two complete environments in exchange for fast switching. Split traffic stably by user or session, and every side-effect path must be equipped with idempotency and compensation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Rollback requires atomic versioning and backward compatibility<span class="dd-badge eng">Reliability</span></h2>
+<div class="dd-agent-response"><p>If you roll the model back to v41, why might the system still answer incorrectly? Because the model is only one component of the release unit: the prompt has already been changed, the index has been rebuilt according to v42 behavior, the tool schema has been migrated, the cache still contains v42 prefixes, and the database has already written records that cannot be undone. Rolling back only the weights file leaves all these components in their new state, so the service naturally continues to answer incorrectly.</p>
+<p>The correct way to roll back is to make the release unit atomic. An atomic release includes the model, prompt, decoding parameters, index, tool schema, policy, code, and infrastructure configuration together in a composite version, assigns a releaseId to this composite, and records the dependency compatibility matrix among the components—which model version goes with which prompt set, which index version, and which tool schema constitutes a known working whole. When rolling back, restore all rollbackable components synchronously according to the releaseId, while explicitly listing which states cannot be reversed. The value of the release checklist is precisely this: it forces the team to write down before release, "When rolling back v42, also roll back prompt version A, index snapshot B, cache invalidation scope C," rather than recalling only after an incident.</p>
+<p>Irreversible parts need to be handled in advance by design. Database and tool actions use idempotency keys: the same business operation carries the same key, so retries do not duplicate refunds. Schema changes use an expand/contract strategy: first expand, allowing both old and new code to read and write the new structure; then migrate data; finally contract, removing old fields. This way every intermediate state is dual-version compatible, and switching back to old code at any moment will not cause read/write failures. Indexes are built in a blue-green way: after the new index is fully built in the background, atomically switch the alias to point to it; if the switch fails, traffic still points to the old index at that instant. Cache keys must include the releaseId so that when the version switches, the old prefix cache naturally expires and will not be mistakenly hit by the new version.</p>
+<p>There is one more layer: drills. Rollback duration must be actually verified through incident drills—really execute a rollback in some drill, time it, and check consistency, rather than trusting the "estimated 2 minutes" written in documents. Numbers in documents are meaningful only if they have been fulfilled in drills.</p>
+<p>Therefore, the inputs to an atomic release are the model, prompt, decoding, index, tool schema, policy, code, and infrastructure configuration, and the outputs are a releaseId and a compatibility matrix. Rollback restores reversible components synchronously according to the releaseId; database tools rely on idempotency keys and expand/contract schema evolution; indexes use blue-green alias switching. Rolling back only the model leaves new prompts, new caches, or new states that continue to cause errors. For irreversible side effects that have already occurred, the only option is compensation—refunds can be returned, but it must be explicitly acknowledged as a compensation action, not pretending the system has been rolled back.</p></div>
+<div class="dd-formula"><math display="block" aria-label="发布单元的组成"><mi>ReleaseUnit</mi><mo>=</mo><mo>{</mo><mi>Model</mi><mo>,</mo><mi>Prompt</mi><mo>,</mo><mi>Decode</mi><mo>,</mo><mi>Index</mi><mo>,</mo><mi>ToolSchema</mi><mo>,</mo><mi>Policy</mi><mo>,</mo><mi>Code</mi><mo>,</mo><mi>Infra</mi><mo>}</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How to safely degrade when capacity is insufficient<span class="dd-badge eng">Degradation</span></h2>
+<div class="dd-agent-response"><p>When peak load exceeds capacity, optional degradation actions include queueing, rejection, shortening output, switching to a smaller model, delayed processing, or even stopping service, but "which one to choose" cannot be decided by technical convenience; it must be tiered by risk level and task value. Low-risk summarization tasks can be switched to a smaller model or processed with delay; high-privilege refund tasks must not skip the verification step because of congestion—traffic pressure is not a reason to lower the safety threshold. The basis for tiering is the cost of a task going wrong, not the request's type label.</p>
+<p>Degradation requires a set of explicit basic mechanisms: set upper limits on input and output lengths to prevent a single long request from consuming all resources; use priority queues to ensure critical requests are served first; use backpressure to make upstream aware of downstream pressure and slow down sending; set timeouts to prevent requests from indefinitely occupying slots; limit the number of retries and introduce circuit breaking so that failed dependencies are temporarily isolated rather than repeatedly hit. The most critical one is reserving capacity for the critical path—the reserved resources may seem idle in normal times, but at peak load they ensure that high-value tasks still have a path.</p>
+<p>Degradation itself is a product behavior, not a temporary technical patch, so it must enter the evaluation set. Switching to a smaller model will cause requests that should have been directly processed by the large model to be escalated to humans or a larger model, forming a "small first, large later" secondary traffic that actually worsens the peak; stale cache will return old policy content to users; truncated output may drop safety warnings. Degradation paths also produce errors, so they also require quality regression. All degradation responses should be explicitly marked—users or downstream systems must be able to know "this is a degraded answer"—and observable, so that operations can review the scope of degradation after the fact. During recovery, prevent instantaneous replay: if requests backlogged during degradation are all released at once, it will cause a second avalanche; they should be released in gradients.</p>
+<p>Retry storms are the most insidious amplifier in degradation scenarios. A timeout does not mean the upstream stopped computing, nor that the tool did not execute: the moment the client gives up on the request, server-side inference may still be continuing, and a refund may already have occurred. Therefore, only clearly recoverable errors are allowed to be retried—for example, transient failures at the network layer; for side-effect operations where it cannot be determined whether they have already been executed, retrying is equivalent to executing again. Retries must use jittered backoff to avoid synchronized storms, set a total budget to limit the total number of retries, and always carry the same idempotency key so that upstream can identify and merge duplicate requests.</p>
+<p>In summary, the inputs to safe degradation are current capacity, risk level, task value, operation reversibility, and dependency status; the outputs are actions such as queueing, rejection, delay, smaller model, truncation, or stopping service. Low-risk tasks can be delayed or switched to another model; high-privilege refunds must not bypass verification due to congestion; every degradation result must be explicitly marked and monitored. A timeout does not prove that upstream stopped or that a tool did not execute; retries must satisfy three constraints—recoverability condition, total budget, and the same idempotency key—so that a congestion incident is not amplified into a retry storm.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The principles of deployment can be reviewed as a continuous causal chain: the output of each step is the input to the next. If any step is skipped, subsequent steps rest on unverified assumptions.</p>
+<p>The first step is to define constraints: runtime location, data residency, privacy boundaries, latency budget, and capacity targets. These constraints determine the feasible space for all subsequent decisions—hosted or self-hosted, whether to have an edge fast path, and how strict the SLO is set all establish the baseline here. The second step is to freeze all dependencies into a release unit: model, prompts, indexes, tool schema, policies, code, and infrastructure configuration are packaged into a combined version with a release id, and the compatibility matrix is recorded. Without freezing dependencies, any later traffic ramp-up or rollback cannot find "one complete thing" to operate on. The third step is offline evaluation and stress testing: on the frozen set, rule out known quality, safety, and contract regressions, and use stress testing to validate the capacity model rather than just applying queue formulas. This offline step has the lowest cost and can block clearly unqualified candidates.</p>
+<p>The fourth step enters the real world: shadow deployment replicates real traffic to verify the candidate's capacity and read behavior under the real distribution, while prohibiting irreversible side effects. Shadow fills in the queuing, caching, and real input lengths that offline evaluation cannot see. The fifth step is canary: ramp up traffic stepwise by thresholds, 1%→5%→25%→100%, observe the complete label window at each level, and confirm that task pass rate, unauthorized rate, latency, and capacity have not crossed the gates before expanding traffic. The sixth step is the runtime closed loop: when an alert triggers, perform degradation or rollback—degradation protects high-value paths by risk tiering, rollback restores atomically by release id—and feed failure cases back as part of the next round's evaluation set and gates. In this way, an incident is not just extinguished; it makes the next iteration of the entire causal chain stricter.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>: ML system composite dependencies and operational debt</li><li><a href="https://sre.google/sre-book/handling-overload/" target="_blank" rel="noopener">Google SRE Book: Handling Overload</a>: capacity, backpressure, degradation, and load protection</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/mlops-checklist/continuous-deployment.html" target="_blank" rel="noopener">AWS MLOps Continuous Deployment</a>: shadow, canary, blue-green, and rollback</li><li><a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noopener">NIST AI RMF Core</a>: deployment monitoring, incident response, and change management</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/deployment">Explore connections on the map</a><a href="/zh/concepts/deployment/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

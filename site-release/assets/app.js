@@ -84,7 +84,9 @@
 
   function setDocumentTitle(label) {
     const siteTitle = t("app.title.graph");
-    document.title = label ? `${label}｜${siteTitle}` : siteTitle;
+    document.title = label ? `${label}｜${siteTitle}` : (language.getLocale() === 'en'
+      ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map'
+      : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图');
   }
 
   function goToRoute(route, options = {}) {
@@ -236,10 +238,6 @@
   function applyCurrentLanguage() {
     language.localize(document);
     renderLanguageSettings();
-    document.getElementById("locale-fallback-banner").classList.toggle(
-      "hidden",
-      language.getLocale() === I18N_MANIFEST.sourceLocale
-    );
     graphView.refreshLanguage();
     learningView.refreshLanguage();
     softwareView.refreshLanguage();
@@ -390,9 +388,16 @@
       goToRoute({ name: targetMode === "software" ? "software" : targetMode === "library" ? "library" : "map" });
     }));
 
-  window.addEventListener("hashchange", () => applyRoute());
-  if (window.location.hash) applyRoute();
-  else goToRoute({ name: "map" }, { replace: true });
+  function applyLocationRoute() {
+    const route = ROUTER.parse(window.location.hash);
+    // Old bookmarks remain valid; ordinary map URLs have no fragment.
+    if (route.name === "map" && !route.id && window.location.hash) {
+      ROUTER.navigate(route, { replace: true });
+    }
+    applyRoute(route);
+  }
+  window.addEventListener("hashchange", applyLocationRoute);
+  applyLocationRoute();
 
   // 暴露给调试用
   window.__cy = cy;

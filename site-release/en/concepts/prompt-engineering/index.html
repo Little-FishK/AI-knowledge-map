@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Prompt Engineering? Explained Simply</title>
+<meta name="description" content="Design the wording and structure of inputs so that the model consistently produces the results you want.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/prompt-engineering/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/prompt-engineering/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/prompt-engineering/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Prompt Engineering? Explained Simply">
+<meta property="og:description" content="Design the wording and structure of inputs so that the model consistently produces the results you want.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/prompt-engineering/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Prompt Engineering? Explained Simply">
+<meta name="twitter:description" content="Design the wording and structure of inputs so that the model consistently produces the results you want.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/prompt-engineering/#page","name":"What Is Prompt Engineering? Explained Simply","description":"Design the wording and structure of inputs so that the model consistently produces the results you want.","url":"https://ai-knowledge-map.com/en/concepts/prompt-engineering/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Prompt Engineering","item":"https://ai-knowledge-map.com/en/concepts/prompt-engineering/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Prompt Engineering</span></li></ol></nav><article id="dd-article" data-concept-id="prompt-engineering" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Prompt Engineering</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Design the wording and structure of inputs so that the model consistently produces the results you want.</p>
+<p class="dd-ali">Prompt Engineering</p>
+<p class="dd-metabar">Suggested 20–30 minutes · Basic → Intermediate · Requires: familiarity with “Large Language Models (LLMs)” and “In-context Learning (ICL)”.</p>
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Prompt Engineering is the practice of designing the wording, structure, examples, and constraints of inputs to increase the probability that the model produces results that meet requirements. It does not change model weights and iterates quickly, but it is not zero-cost: longer prompts increase token usage, latency, maintenance, and evaluation costs, and transferring across models requires re-validation.</div></header>
+<!-- source-body:start --><div class="dd-goals">
+  <div class="dd-goals-h">After reading this page, you should be able to answer:</div>
+  <ul>
+    <li><b>What it is</b>—how to get it to produce what you want without training or modifying the model.</li>
+    <li><b>Why</b>—for the same model, why does asking differently make such a big difference in the results?</li>
+    <li><b>How to write</b>—some general patterns for effective prompts.</li>
+    <li><b>Underlying principle</b>—why providing examples and specifying a format works.</li>
+    <li><b>Boundaries</b>—where to go when prompts aren't enough to keep things stable.</li>
+  </ul>
+</div>
+<ol class="dd-chain">
+    <li>Without changing the model, just designing how you ask well so that the model consistently produces the result you want—that is prompt engineering.<span>(§1)</span></li>
+    <li>It works because the model is continuing a sequence—your prompt is its starting point and condition, and the more explicit it is, the more accurate the result.<span>(§2)</span></li>
+    <li>General techniques: be clear and specific, assign a role, specify a format, provide examples, have it work step by step, set boundaries, and iterate.<span>(§3)</span></li>
+    <li>The underlying principle is in-context learning: the prompt demonstrates "what kind of result is wanted," and the model follows.<span>(§4)</span></li>
+    <li>Its boundaries: when facts are missing, use Retrieval-Augmented Generation (RAG); when you need stable behavior, use fine-tuning; when managing context, rely on context engineering.<span>(§5)</span></li>
+    <li>Its dark side is prompt injection: if it can be shaped by prompts, it can be hijacked by malicious prompts.<span>(§6)</span></li>
+  </ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What Is Prompt Engineering<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>When you have an already trained model and want it to consistently produce results that meet your expectations, there are generally two paths: one is training or fine-tuning, that is, modifying the model's internal parameters; the other is changing nothing but the input you feed it. Prompt engineering takes the second path—without touching any of the model's weights, it relies solely on designing the wording and structure of the input to improve the hit rate. The so-called hit rate refers to how well the model's output conforms to the constraints you set in advance: what content, for whom, what format, what tone, whether to include examples. When the constraints are clearly stated, the probability that the output hits the target increases; when they are not clear, the model can only guess.</p>
+<p>This is a craft that can be tested and improved repeatedly, not a one-time button. Its working process can be broken down into several steps: first clarify the task goal, audience, context, boundaries, and output requirements one by one; then write these requirements into a prompt that can actually be submitted to the model; then hand it to the model to execute and observe the output. The output of the entire process is two things: a prompt that can be tested and reused, and the actual result that this prompt produces on the model. Use the results to examine in turn whether the prompt is written well—the closer the output is to the requirements, the higher the constraint hit rate of this prompt; if the deviation is large, go back and change the wording, add examples, restrict the format, and run it again. This cycle of "write prompt → observe output → revise prompt" is the daily working method of prompt engineering.</p>
+<p>The reason it is placed at the very front of all methods is that it has three obvious characteristics: it does not update weights, it takes effect immediately, and it can be changed at any time. It does not require training data, does not require waiting for training to complete; once changed, the effect can be seen immediately, and if unsatisfied, change it again right away. Therefore it is usually suitable for validating requirements first: before deciding whether to invest training cost, use a prompt to probe "whether the model can actually do this task, and where it falls short." But "no training required" does not equal "zero cost"—the longer the prompt, the higher the cost and latency of each inference; the prompt itself also requires maintenance and version management; and each time you change it, you must run regression evaluation again to confirm that the original effect has not been broken. All these costs should be counted in the ledger of prompt engineering, but they occur in the inference stage rather than the training stage.</p>
+<p>At the same time, be clear about the capability boundary of this method: from beginning to end it does not update the model's weights, so its effect only holds for "the kind of model that has already been tested." Change to a different model, or the model itself is upgraded, or the data distribution changes, and the original set of prompts may not continue to hit; you must re-verify. Prompt engineering changes the interface between you and the model, not the model's own capability ceiling.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Why does “how you ask” make such a big difference?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Many people have a common question when they first encounter prompt engineering: the model is still the same model, not a single weight has changed, so why does merely asking differently make such a big difference in output quality? To answer this, you have to go back to the essence of large language models. The way it works is not to understand your intention and then do it, but to predict: given the text you have provided, what is the most likely content to follow (see the “Large Language Model” deep-dive page). Everything the model does—whether translating, summarizing, or writing copy—ultimately comes down to this one action: given a prefix, continuing with the most likely next step.</p>
+<p>Once you accept this perspective, the role of the prompt becomes intuitive: the prompt is the starting point and conditions you set for this continuation. Every time the model generates, it reads in the whole of “prompt + existing prefix,” and then, based on this already present text, estimates what the next token should be. The key point here is that the model is trained to be highly “compliant” with the given text—constraints that have already appeared in the prefix will strongly narrow the probability distribution of its subsequent generation. So the clearer the prompt and the more specific the constraints, the narrower and more precise the range of “what to say” that the model can lock onto. If you specify a watch ad aimed at middle-aged men, three lines, each no more than forty characters, emphasizing water resistance, then when the model continues, most continuation directions that do not meet these conditions have already been excluded by the prefix, and the remaining high-probability paths naturally fall within the range you want.</p>
+<p>Conversely, the vaguer the prompt, the fewer constraints there are in the prefix to follow, and the model can only continue along the most generic, safest common directions. By “safest,” this refers to those directions that appear most frequently in the training data and are least likely to go wrong for any context—for example, empty platitudes, adjectives that are universally applicable, statements that are correct but carry no information. You then get a passage that cannot be faulted but is also completely useless: “correct nonsense.” It is not that the model has become stupid; it is that the starting information it received is too little, so it can only choose the most mediocre high-probability path.</p>
+<p>So the whole mechanism can be understood this way: you are not commanding a person who understands you to carry out a task; you are setting as clear a starting point as possible for a continuation engine. The better the starting point is set, the more narrowly the continuation direction is constrained, and the more the continued content matches what you want. At the same time, note the other half of this statement: output that better meets your requirements only means that the constraint hit rate for this continuation has improved; it does not mean that the model has thereby gained any new knowledge. Its upper capability limit has not changed; what has changed is only which capabilities are elicited by the prefix in this generation. And setting this starting point is precisely where all the operations of prompt engineering take effect.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Worked Example: Turning a Vague Wish into a Task Contract<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Knowing only that 'a prompt is the start of a continuation' is not enough; you also need to know how to rewrite a vague wish into an executable specification. This section introduces a more actionable concept: the task contract. A good prompt should act like an interface contract, so that both the model and the evaluator can follow it—the model knows what to produce, and the evaluator knows what criteria to score against. For a prompt without a contract, the model can only guess, and the evaluator can only go by feel.</p>
+<p>The structure of the contract can be viewed from the layers in Figure 1: the outermost layer first defines the goal, that is, the specific problem to be solved this time; then one layer inward provides the necessary context to accomplish the goal; next, write down the boundaries, that is, what cannot be done, and crossing them counts as a breach; the innermost layer specifies a verifiable output structure, so that results can be checked item by item by machine or manually. The four layers narrow successively from the outside in. Among these, role descriptions (such as 'you are a senior copywriter') only play a supporting role, used to set identity and perspective and constrain language style; they cannot replace permission declarations, nor can they replace provisions on factual sources—these two things must be undertaken by the boundary layer and the context layer respectively.</p>
+<p>The common prompting techniques are organized into a table, where each row is a correspondence of the type 'pattern → what it does → example':</p>
+
+<p>Every item in the table does the same thing: it pins down in advance a dimension that would otherwise be left for the model to guess. Even so, a prompt is rarely written well in one pass; its correct use is iterative. Look at where the output is wrong, add a constraint targeted at that specific issue, and then observe the effect. Treat the prompt as an adjustable parameter: change only one thing at a time and observe the resulting change, which makes it easier to find the sentence that really matters than piling up a large block all at once.</p>
+<p>The following worked example illustrates the difference between 'attributable iteration' and 'non-attributable stacking.' The initial prompt of a refund assistant was just one sentence, 'Answer refund questions,' and out of 20 test cases, only 11 could provide both the refund deadline and the source of the basis. These 9 failures are observable and have clear categories: missing deadline, missing source, or both. So the new prompt added the task scope, the allowed reference materials, a clarification strategy when there is no evidence, and required output of JSON fields decision, reason, and source. After retesting, 17 cases passed. Note the remaining 3 failures: they all involve scenarios of quality problem exceptions, which belong to another failure category and point to the next step of supplementing retrieval evidence or business rules, rather than continuing to pile on vague pleas such as 'please be serious' and 'please be professional' in the prompt.</p>
+<p>The causal chain revealed by this example is: score improvement is meaningful only when it corresponds to the disappearance of specific failure categories. The improvement from 11 to 17 can be attributed to the elimination of failures such as 'deadline and source' by the new constraints; but if the score increases after changing the prompt yet you cannot say which failures disappeared, that is just non-attributable prompt stacking—the increase may come from coincidence and cannot guide the next step. Therefore, every time you change a prompt, you should first ask: which category of observable failure does this change target?</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 620 180" role="img" aria-label="Hierarchical structure of a prompt from goal, context, constraints to output contract"><defs><marker id="pe1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="20" y="55" width="115" height="62" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="77" y="80" text-anchor="middle" class="svg-t">Goal</text><text x="77" y="100" text-anchor="middle" class="svg-t" font-size="10">Answer refund policy</text><path d="M135,86 L172,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="174" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="236" y="80" text-anchor="middle" class="svg-t">Context</text><text x="236" y="100" text-anchor="middle" class="svg-t" font-size="10">User order + reference materials</text><path d="M299,86 L336,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="338" y="55" width="125" height="62" rx="8" fill="#21252d" stroke="#cf6f6f"/><text x="400" y="80" text-anchor="middle" class="svg-t">Boundaries</text><text x="400" y="100" text-anchor="middle" class="svg-t" font-size="10">Clarify when there is no evidence</text><path d="M463,86 L500,86" stroke="#6b7484" marker-end="url(#pe1)"/><rect x="502" y="55" width="98" height="62" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="551" y="80" text-anchor="middle" class="svg-t">Output contract</text><text x="551" y="100" text-anchor="middle" class="svg-t" font-size="10">Conclusion + citation</text><text x="310" y="148" text-anchor="middle" class="svg-t" font-size="10">Each layer should be checkable with test examples, not by subjective incantations such as "be more professional".</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　An effective prompt is like an interface contract: first define the goal, then provide the necessary context, write down the boundaries that must not be crossed, and finally specify verifiable output. Role descriptions are only auxiliary and should not replace permissions or factual sources.</figcaption></figure>
+<table class="dd-table">
+    <thead><tr><th>Pattern</th><th>What it does</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Clear and specific</td><td>State the task, audience, and constraints clearly; don't leave it to guess.</td><td>For runners, each item ≤20 characters</td></tr>
+      <tr><td>Give a role</td><td>Set identity/perspective and constrain the style</td><td>You are a senior copywriter</td></tr>
+      <tr><td>Specify the format</td><td>State clearly what structure you want</td><td>Output 3 items, use a list</td></tr>
+      <tr><td>Give examples (few-shot)</td><td>Demonstrate one or two "input→output" pairs and have it follow them.</td><td>See "In-context Learning".</td></tr>
+      <tr><td>Have it work step by step (Chain of Thought)</td><td>For complex questions, have it reason first and then answer.</td><td>See "Chain of Thought (CoT)"</td></tr>
+      <tr><td>Set boundaries</td><td>State what you don't want and what to do when you cannot answer.</td><td>Say you don't know when you are unsure.</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Its underlying principle is actually in-context learning<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>In the examples from the previous section, a phenomenon worth asking about appeared: just by putting a few examples into the prompt and specifying the output format, the model really did it. Why can it “just do it”? The reason prompt engineering works is that there is a more fundamental mechanism behind it, called in-context learning (see the “In-context Learning” deep-dive page). Once you understand it, those earlier techniques are no longer a bunch of isolated tricks, but applications of the same ability in different dimensions.</p>
+<p>In-context learning means: the model does not need to update any weights; merely with the examples given in the prompt, it can identify on the spot what a task “looks like” and carry it out. Its working process can be described as follows: the input consists of the examples in the prompt plus the new query; during forward computation, the model first locates the pattern of “input to output” in the examples — for example, each input is a product selling point, each output is an advertising slogan of no more than twenty characters, or each output is three list items; after locating this pattern, it then processes the new query according to the same pattern and outputs an answer that conforms to the style of the examples. The entire process occurs in forward propagation, and the model’s knowledge does not undergo any persistent change.</p>
+<p>Looking at the most effective tricks in prompt engineering from this perspective, they are essentially all the same: giving examples demonstrates “what the input looks like and what the output looks like”; giving a format demonstrates “what the structure of the output looks like”; giving a role demonstrates “what identity and tone to speak with.” These techniques all use the prompt itself to demonstrate “what output I want looks like,” and after the model recognizes this pattern, it continues along that pattern. In other words, of the earlier idea of “giving the continuation engine as clear a start as possible,” the most effective type of start is demonstration.</p>
+<p>From this, a clear hierarchy can be given: in-context learning is a capability the model itself possesses — it can “do things as shown in the prompt”; prompt engineering is the craft of using this capability well — designing prompts that let the model understand at a glance “how things should be done.” The capability is inherent to the model and cannot be changed; the craft can be learned, iterated, and evaluated. At the same time, this mechanism also gives two boundary reminders: first, this “doing as shown” is imitation that occurs within the context and is not written into the weights; if you change the conversation or clear the context, the model will not become better at doing this task; second, the fact that the model has the ability to follow examples does not mean every prompt will be faithfully followed — when a prompt has internal contradictions, too many constraints, or conflicts with the model’s existing patterns, compliance may be reduced. In-context learning explains why prompts work and also delineates the scope within which they work.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Boundary: Prompts Are Not a Cure-All<span class="dd-badge eng">Engineering</span></h2>
+<div class="dd-agent-response"><p>Prompt Engineering delivers quick results at low cost, but it has a clear ceiling. The question this section answers is: when do prompts fail to hold the line, and when should you change tactics? The entry point for judging is to examine the “type of failure”—what exactly is missing when the model gets it wrong this time. Considering the failure type, the source of the required knowledge, the required output stability, call volume, and cost together lets you decide what to switch to: keep refining prompts, integrate retrieval, or turn to fine-tuning.</p>
+<p>Let’s first look at three typical situations where prompting can’t hold the line.</p>
+<p>The first is a lack of facts. If the task requires up-to-date or private knowledge—for example, a company’s latest internal refund policy or today’s inventory data—then no matter how well you write the prompt, it cannot conjure knowledge that simply isn’t in the model’s parameters. Prompts can only bring to bear capabilities the model already has; they cannot create knowledge out of thin air. In this case, what you need is Retrieval-Augmented Generation (RAG): retrieve external material, put it into the context, and have the model answer based on that material (see the “RAG” deep-dive page).</p>
+<p>The second is a lack of stable, complex behavior or format. Some tasks have very complex output structures or require extremely high behavioral consistency, and prompts just can’t hold it steady—the same prompt may comply this time and drift the next, or you have to write a long passage each time just to barely keep it in line. Repeatedly coaxing the model with wording shows that this behavior has gone beyond what wording can control; at this point you should consider fine-tuning, to hard-code the desired behavior into the weights so it no longer depends on carefully designed prompts each time.</p>
+<p>The third one requires distinguishing a higher-level concept: if what you need to manage is no longer the wording of a single prompt, but “what goes into the entire context”—how historical messages are trimmed, how retrieval results are arranged, how examples are organized—then you have entered the field of Context Engineering (see its node). This is a higher-level engineering problem than Prompt Engineering; the input changes from “a passage of text” to “a strategy for orchestrating a set of materials.”</p>
+<p>From this we can lay out a pragmatic ladder: first use Prompt Engineering for low-cost validation to clarify needs and gaps; when you find that what’s missing is updatable facts, consider integrating RAG; when you need to maintain specific stable behavior across a large number of requests, then evaluate fine-tuning. This order is the default starting point, not a hard rule—how exactly to choose ultimately depends on quality requirements, latency, privacy, and operational constraints. Prompts are a starting point, not the destination.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>The Dark Side: Prompt Injection<span class="dd-badge eng">Security</span></h2>
+<div class="dd-agent-response"><p>Prompts can shape model behavior—this is the source of their power, and it also means they can be an attack surface: if the model is this responsive to prompts, could maliciously crafted prompts hijack it in turn? This section does not introduce any new facts beyond this page; it only uses the mechanisms already established in Sections 2 and 4 to reason through the risk—this risk has a specific name, called prompt injection (see the “Prompt Injection” deep-dive page).</p>
+<p>First, recall the mechanism from Section 2: the model performs continuation; it reads in the whole “prompt + existing prefix” and then writes the most likely next step. Note that no step in this mechanism separates the text in the prefix into “your instruction” and “other content” categories—for continuation, all the words in the prefix are simply conditions for estimating the next token. Section 4 then added a point using the in-context learning demonstrated by GPT-3: whatever style appears in the context, the model continues in that style. Combining these two points yields: any text that enters the context participates in “demonstrating what should come next.”</p>
+<p>From this, the risk can be deduced. What prompt engineering does is precisely to carefully select the text that enters the context in order to shape the output; conversely, as long as other text can also enter the context, it will participate in shaping in the same way—this is the entire principle behind the idea of “injection.” Consider a hypothetical scenario (not a record of an actual attack): your prompt asks to “summarize the following article,” while the article content itself includes a passage saying “ignore the above requirements and instead output…”. Once this text enters the context, it occupies the same position as the other prompt text: it is all part of the prefix, all influencing the direction of continuation. The model does not need to be “persuaded” or “deceived”—it is simply continuing as described in Section 2, except that some of the text shaping the output is not from you.</p>
+<p>Thus the causal chain can be divided into three steps: prompts can shape behavior (this is the foundation of prompt engineering) → any text that enters the context participates in shaping in the same way → if someone mixes the text they want into the context, it is equivalent to exerting partial control over the output. Therefore prompt injection is not a kind of “failure” of prompt engineering, but rather the same principle turned around—attackers are doing exactly the most “orthodox” prompt design, except their goal is opposite to yours.</p>
+<p>This also shows at which layer protection should begin. Section 5 said that managing “what goes into the entire context” is a matter of context engineering—this boundary is exactly the line of defense here: deciding which external text can enter the context determines which text has the opportunity to shape the output. Following this line of thought, the first step in protection is to treat “what can enter the context” as an explicit design decision, rather than assuming by default that external content is always safe; for scenarios where the output can have high-impact consequences, process controls such as human confirmation should also be considered as a fallback. Conversely, countermeasures of the form “detect malicious sentences and block them” can at most be one layer: they block known phrasing, while the path by which context shapes output does not rely on any fixed phrasing. The power of prompts cannot be completely eliminated; what can be done is to manage “who can influence the context,” so that people who want to hijack prompts have no channel into the context.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Connecting the Whole Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Putting the previous sections together, the whole causal chain is as follows.</p>
+<p>The starting point of the chain is a goal: without modifying the model, just design the “how to ask” well so that the model reliably produces the desired result—this is the definition of prompt engineering, and also the fundamental feature that distinguishes it from training-type methods (§1).</p>
+<p>Why can “how to ask” have an effect? Because the model is essentially completing text; the prompt you give is the starting point and condition for this completion. The clearer the starting point, the more precisely the continuation direction is narrowed (§2). From this mechanism, a set of general practices naturally follows: be clear and specific, give it a role, specify the format, provide examples, make it go step by step, and set boundaries—each move locks in advance a dimension that would otherwise be left for the model to guess, and then tunes it gradually through iteration (§3).</p>
+<p>One level deeper, the underlying principle of these practices is in-context learning: what the prompt is really doing is demonstrating “what the output I want looks like,” and once the model recognizes this pattern, it follows it. All the techniques of prompt engineering are essentially about making good use of this built-in capability of the model (§4).</p>
+<p>With power comes the need to know its boundaries: when facts are missing, prompts cannot create knowledge—you should turn to RAG; when you need stable behavior, prompts cannot hold it steady—consider fine-tuning; when what you need to manage is what goes into the entire context, that is the job of context engineering (§5). And the flip side of power is the dark side: if a model can be shaped by prompts, it can also be hijacked by malicious prompts—prompt injection exploits exactly the same principle as prompt engineering (§6).</p>
+<p>This chain starts from the fact that “the model is playing a word chain game” and, along one line, derives why prompts are effective, how to design them, and how to iterate on them; along the other line, it derives when they fail and when they are dangerous. To grasp its core, you only need to be able to answer two questions: why does changing the way you ask produce such different results—because the model is playing a word chain game, and the way you ask is the starting point of that game; and what is the relationship between prompt engineering and in-context learning—in-context learning is the model's ability to act according to the pattern shown in the prompt, and prompt engineering is the craft of making good use of that ability.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Concept Dependencies and Further Learning<span class="dd-badge eng">Path</span></h2>
+<div class="dd-agent-response"><p>The prompt engineering node on this knowledge map has conceptual dependency relationships that can be arranged by learning level into the table below:</p>
+
+<p>The logic of this hierarchy is: the prerequisite layer answers 'what the model is and why it can follow prompts'; the core layer of this page is built on these two facts—the model is a continuation engine, so wording and structure determine the starting point; the model has in-context learning capability, so demonstration methods such as clear and specific, role, format, and examples are effective; and 'no training required but evaluation required' stipulates that this craft must be tuned through iteration and a fixed test set. Every concept in the adjacent extension layer grows directly out of a conclusion on this page: Chain of Thought (CoT) is the in-depth form of 'make it go step by step', the system prompt is the part of the prompt that specifically carries global constraints, context engineering is the higher-level problem of 'managing what is placed in the entire context', Retrieval-Augmented Generation (RAG) and fine-tuning are two alternative directions after crossing the prompt boundary, and prompt injection is the dark side of the principle that prompts shape behavior. The farther layer—self-consistency, tree of thoughts, structured outputs, and prompt caching—corresponds respectively to reasoning credibility, the organization of complex reasoning, the rigid guarantee of output format, and the optimization of inference cost; these are advanced directions after mastering the core concepts. When studying, proceed in the order 'prerequisite → core → adjacent extension'; the farther layer can serve as topic leads, and there is no need to go deep at the very beginning.</p></div>
+<table class="dd-table">
+    <thead><tr><th>Learning Level</th><th>Concepts Involved</th></tr></thead>
+    <tbody>
+      <tr><td>Prerequisite</td><td>Large language models, in-context learning</td></tr>
+      <tr><td><b>Core of This Page</b></td><td>Wording and structure, clear and specific / role / format / examples, iteration, no training required but evaluation required</td></tr>
+      <tr><td>Adjacent Extensions</td><td>Chain of Thought (CoT), system prompt, context engineering, RAG, fine-tuning, prompt injection</td></tr>
+      <tr><td>Farther</td><td>self-consistency, tree of thoughts, structured outputs, prompt caching</td></tr>
+    </tbody>
+  </table>
+</section>
+<div class="dd-src">
+  <b>Sources and adaptation notes</b>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al., GPT-3</a>: zero-shot, one-shot, and few-shot in-context learning.</li>
+    <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al., Chain-of-Thought Prompting</a>: the impact of demonstrating intermediate steps on complex reasoning.</li>
+    <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., ReAct</a>: the design of interleaving reasoning prompts and external actions.</li>
+  </ul>
+  <div class="dd-src-date">Access date: 2026-07-22</div>
+</div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/prompt-engineering">Explore connections on the map</a><a href="/zh/concepts/prompt-engineering/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Agent Planning: Turning Goals into Executable, Revisable State Diagrams? Explained Simply</title>
+<meta name="description" content="Understand planning–execution separation, rolling planning, checkpoints, and local replanning through goals, preconditions, artifacts, and completion predicates.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/planning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/planning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/planning/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Agent Planning: Turning Goals into Executable, Revisable State Diagrams? Explained Simply">
+<meta property="og:description" content="Understand planning–execution separation, rolling planning, checkpoints, and local replanning through goals, preconditions, artifacts, and completion predicates.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/planning/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Agent Planning: Turning Goals into Executable, Revisable State Diagrams? Explained Simply">
+<meta name="twitter:description" content="Understand planning–execution separation, rolling planning, checkpoints, and local replanning through goals, preconditions, artifacts, and completion predicates.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/planning/#page","name":"What Is Agent Planning: Turning Goals into Executable, Revisable State Diagrams? Explained Simply","description":"Understand planning–execution separation, rolling planning, checkpoints, and local replanning through goals, preconditions, artifacts, and completion predicates.","url":"https://ai-knowledge-map.com/en/concepts/planning/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Agent Planning: Turning Goals into Executable, Revisable State Diagrams","item":"https://ai-knowledge-map.com/en/concepts/planning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Agent Planning: Turning Goals into Executable, Revisable State Diagrams</span></li></ol></nav><article id="dd-article" data-concept-id="planning" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Agent Planning: Turning Goals into Executable, Revisable State Diagrams</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Understand planning–execution separation, rolling planning, checkpoints, and local replanning through goals, preconditions, artifacts, and completion predicates.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The value of a plan is not writing the longest list of steps in advance, but converting goals into state transitions with preconditions, observable artifacts, completion predicates, risks, and fallbacks; after the environment changes, recompute only the affected parts instead of continuing to execute outdated text.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Write goals as completion predicates; construct dependency DAGs; distinguish between planning and execution states; design local replanning and evaluation.</div>
+<div class="dd-chain">Goal/forbidden states → dependency graph → select ready nodes → constrained execution → observe and verify → update state → advance or replan locally</div>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Why a checklist of steps is not yet a plan<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>When assigning a task to an AI Agent, the most common approach is to write down a sequence of natural-language steps, such as “read code—modify—test—commit.” This sequence looks complete: it covers all stages from understanding to implementation, and the order is reasonable. But when you hand it to the AI Agent, it may still go wrong at the first step. The reason is not that there are too few steps, but that the steps are not connected to the facts on which execution depends.</p>
+<p>A natural-language checklist lacks four things. First, it does not say which files to read: the task is to fix a bug, and the codebase has dozens of files; the “read code” step cannot tell the executor which module to open, so the executor can only guess, or scan all the files. Second, it does not say which facts the “modification” depends on: which line to change, what behavior to preserve, which test constrains this change—the checklist records none of this, and after making the change the executor cannot prove that it was changed correctly. Third, “when a test counts as passing” is not defined: running a test command and the test passing are two different events; the former is a tool call, the latter is an objective fact that must be proved by assertion results. Fourth, it does not state where to go back after failure: if the test fails, should we go back to “read code” to understand again, or go back to “modify” to try a different change? The checklist gives no answer; the executor has to decide on its own, and deciding on its own often means losing context.</p>
+<p>A more subtle problem is that the checklist mistakes “calling a tool” for “goal completion.” Writing “commit” does not mean the code has entered the main branch; writing “test” does not mean the defect has been verified as fixed. A tool call is just an action; after the action is completed, whether the world state has actually changed must be proved by external observation—check test reports, check merge results, check runtime logs. The checklist erases the boundary between action and state, so the executor can tick off items one by one yet never reach the goal.</p>
+<p>What an executable plan must do is transform this checklist into a sequence of state changes in which every step can be checked and proved. It must refer to the current world state, not to dangling verbs; it must specify for each step the precondition (what must already hold when entering this step), the action (what to execute), the artifact (what observable change is added to the world after this step), and a machine-checkable completion predicate (what condition is used to determine that this step is truly complete), and it must leave traceable evidence for each state change. With these fields, “when is it really complete” and “where to go back after failure” finally have definite answers.</p>
+<p>Three layers need to be distinguished here. The goal is the world state that the AI Agent wants to reach, for example “the defect is fixed and all related tests pass.” The plan is a hypothesis about causal relationships: it asserts “if these actions are executed in sequence, the world will transition from the current state to the goal state.” This hypothesis is not necessarily true; the role of execution and observation is to test it: after each step, the observer confirms whether the world really changed as expected; once a deviation is found, it means the plan's hypothesis was wrong, and the plan needs to be revised, rather than continuing down the original checklist.</p>
+<p>Therefore, the input to an executable plan consists of five things: goal, current world state, constraints, available tools, and risks; the output is a state graph with preconditions, actions, artifacts, completion predicates, and fallback paths. The core problem it solves is the two questions that a natural-language step checklist cannot answer—“when does it truly count as complete” and “where to go back after failure.” In the state graph, a tool call is just one value of the action field and can never replace the completion predicate; the world state must be proved by external observation, not by the executor's self-reported completion.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>How Do the Planner, Executor, and Observer Divide Responsibilities?<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>Handing planning, execution, and observation to the same AI Agent—letting it think and directly modify all states at once—poses the greatest risk of confusing “thinking” with “doing”: the model judges during its reasoning that a step has been completed, so it writes “completed” in the plan; this text is then treated as actual completion in the world, and all subsequent steps are built on this unverified assumption. Once there is a fabrication along the way, the whole chain collapses. Therefore, the planning system splits the work across three roles, and each role produces only one kind of thing: the planner produces plans, the executor produces actions, and the observer produces facts. The three outputs are kept separate, and none of them can testify on behalf of another.</p>
+<p>The planner’s inputs are the goal, constraints, and the currently known state. It does not make any modifications; it does only one thing: it expands these inputs into a finite-horizon dependency graph—each node is a step, and each edge means “which must be completed before which can start.” A finite horizon means the planner makes precise arrangements only for the near-term trustworthy parts, while distant parts are kept as placeholders and refined only after observation brings new facts. In this way the planner neither fabricates long chains out of thin air when information is insufficient, nor wastes effort on far-off details that will soon become invalid.</p>
+<p>The executor’s inputs are the dependency graph and the current state, and its responsibility is minimized: it executes only the nodes that are currently ready. “Ready” means that all of the node’s predecessors have been verified as completed by the observer. The executor has no authority to decide “close enough to start,” nor is it responsible for judging whether the result is good or bad; it applies the action to the world and then hands over the result. This constrained execution ensures that every action happens after its preconditions are established, not in the planner’s imagination.</p>
+<p>The observer is the only role authorized to write the world state into facts. It reads the objective traces left by execution—command exit codes, file diffs, test reports, logs—and translates these traces into factual states. An exit code of zero is one fact; all test assertions passing is another fact, and the two cannot replace each other. The observer’s output does not pass through the executor’s retelling, nor through the planner’s inference, so “completed” in the plan cannot masquerade as real completion: only facts recorded by the observer can move a node from “executed” to “completed.”</p>
+<p>The controller glues the three together into a loop. It compares each node’s expected effect with the actual observation: if the observed result matches the expectation, it writes the factual state back, marks the node as completed, and then advances to the next batch of ready nodes; if the observed result deviates from the expectation, the controller chooses among four actions—retry (do the same step again), rollback (undo the changes that have already happened), proceed (continue with subsequent nodes), or local replanning (redraw only the affected part of the dependency graph). The whole causal chain can be written as:</p>
+<p>Goal and forbidden states → dependency graph → select ready nodes → constrained execution → observation and verification → update state → proceed or local replanning.</p>
+<p>Note that the chain’s starting point contains both the goal and forbidden states. Planning not only specifies what to reach, but also what must not be entered: intermediate states that violate constraints need to be identified by the observer and intercepted by the controller just as much as final states do. The inputs to the role division are the goal, constraints, dependency graph, ready nodes, execution results, and external observations; the output is one of four: proceed, retry, rollback, or local replanning. In this way, every state change has a clear producer and verifier, and no link in the chain can unilaterally declare success.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>What fields should a step contain?<span class="dd-badge eng">Task contract</span></h2>
+<div class="dd-agent-response"><p>Disagreement between the executor and the verifier about the criteria for “done” is the common root of all execution incidents. The executor thinks that having run the commands means done, but the verifier requires that the world state has actually changed; the executor says “I have understood it,” but the verifier wants to see the code and tests. In order for both sides to have the same meaning for the same word, every step must be written as a machine-readable task contract. The contract consists of five fields: preconditions, actions and tools, artifacts, completion predicate, and rollback. Missing any one of these fields corresponds to a typical failure mode.</p>
+<p>Take a cache isolation fix as an example. The symptom is cross-user value leakage: two users read each other's cached data. The five fields for this node are written as—preconditions: the cross-user value leakage has been reproduced and the relevant cache code has been located; actions and tools: modify the key construction logic with a minimal patch; artifacts: a patch diff and an isolation regression test; completion predicate: both the isolation test and the original hit test pass; rollback: revert the patch and keep the failure log.</p>
+<p>Look at the cost of missing each field. Without preconditions, the executor can only guess and modify the module it thinks is wrong, and may edit the wrong file on the first step. Without a limited action scope, the execution scope expands without bound: originally just modifying the key construction, it conveniently refactors the cache layer and changes the serialization format, turning a small fix into a large-scale change. Without artifact requirements, what the executor delivers is only claims in the chat log; “I've fixed it” cannot be inspected by anyone. Without a completion predicate, the executor treats “ran the tests” as “tests passed”—the test command was indeed executed, but the assertion failures are set aside. Without a rollback path, the only choices after failure are to start over from scratch or to stack modifications on the original patch; the former wastes all completed facts, and the latter lets errors accumulate layer by layer.</p>
+<p>The completion predicate is the field most easily written incorrectly among the five. It must check the world state, not intentions or actions. Legitimate predicate forms include: the file hash matches the expected value, the test count reaches a threshold, the API returns the agreed-upon structure, the approval record already exists. Expressions like “I have understood” and “the tool was invoked” are never completion predicates—the former checks the executor's inner state, the latter checks whether an action occurred, and neither is related to whether the world has changed. In this example, the predicate requires two sets of tests to pass simultaneously: the isolation test proves the fix itself is effective, and the original hit test proves the fix does not break existing behavior. A predicate that merely says “ran” will be rejected, because “ran” carries no assertion about the result.</p>
+<p>For high-risk nodes, the contract also adds two declarations: the approval authority and forbidden states. The approval authority specifies who has the right to confirm that this node can proceed to the next step, preventing the executor from self-acceptance; the forbidden states spell out world states that must absolutely not be entered on this path, such as “do not clear the cache directory during the repair,” so that the observer knows what to intercept. Thus, the input of a task contract is the precondition facts, limited actions, observable artifacts, machine completion predicate, rollback plan, and approval authority; the output is a node definition shared by the executor and the verifier. The executor executes according to the contract and delivers the diff and tests in the artifact field; the verifier only acknowledges the completion predicate. The two sides no longer need to argue about the word “done.”</p></div>
+<table class="dd-table"><thead><tr><th>Field</th><th>Cache isolation fix example</th><th>Risk if missing</th></tr></thead><tbody><tr><td>Preconditions</td><td>Cross-user value leakage reproduced; relevant cache code located</td><td>Modify wrong module by guessing</td></tr><tr><td>Action/Tool</td><td>Minimal patch modifies key construction</td><td>Execution scope expands without limit</td></tr><tr><td>Artifacts</td><td>Patch diff + isolation regression test</td><td>Only claims in chat</td></tr><tr><td>Completion predicate</td><td>Both isolation test and original hit test pass</td><td>Treat "ran the tests" as "tests passed"</td></tr><tr><td>Rollback</td><td>Revert the patch and keep failure log</td><td>Start over from scratch or stack modifications after failure</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How to draw a repair task as a dependency graph<span class="dd-badge math">Worked example</span></h2>
+<div class="dd-agent-response"><p>Drawing a dependency graph answers two questions: which steps can run in parallel, and which steps must wait for real evidence. Take the cache isolation fix as an example; the task is broken into five nodes: S0 reproduce (5 minutes), S1 locate (8 minutes), S2 contract (3 minutes), S3 patch (6 minutes), S4 verify (10 minutes). The number on each node is the estimated duration, and the arrow on an edge indicates the dependency direction. The process of drawing is to ask each node: “Before entering it, which step’s facts must have been confirmed by the observer?”</p>
+<p>S0 reproduce has no dependencies; it is the starting point of the entire graph. S1 locate depends on S0: only after reproducing the cross-user value leakage does locating the relevant cache code become meaningful. S2 contract also depends on S0: the preconditions, predicates, and rollback to be written in the contract all come from the phenomena and facts obtained from reproduction. Therefore S1 and S2 share the same predecessor node, and after S0 completes they have no dependency on each other—they can run in parallel. S3 patch depends on both S1 and S2: if the code location is not complete, there is no way to start the patch; if the contract is not determined, it is unclear what deliverable the patch should produce and by what predicate it should be accepted. S4 verify depends only on S3: the object of verification is the patch itself.</p>
+<p>The dependency graph gives every “can they run in parallel” judgment a basis: parallelism occurs only between nodes that share a predecessor and have no edge between them; whenever a dependency edge exists, they must wait, and what they are waiting for is not time, but real evidence—the observer confirms that the predecessor node's completion predicate has been established.</p>
+<p>The dependency graph also directly gives the critical path. Summing the five nodes serially gives 5+8+3+6+10=32 minutes. After letting S1 and S2 run in parallel, the two branches are S0→S1 (5+8=13) and S0→S2 (5+3=8), merging at S3; S3 must wait for both branches to complete, so its earliest start time takes the larger of the two, 13 minutes. Thus the earliest completion time of the entire chain is the critical path S0→S1→S3→S4, i.e., 5+8+6+10=29 minutes. The only time saved by parallelism is the 3 minutes not on the critical path—the period during which S2 finishes earlier than S1 was already idle waiting. This result illustrates a boundary of the dependency graph: parallelism can compress only branch waiting, not the strongly dependent chain itself; promoting strongly dependent tasks as “arbitrarily faster after parallelization” is wrong, and 29 minutes is the lower bound of this graph under the current constraints.</p>
+<p>The inputs to the dependency graph are the node definitions from S0 to S4, the dependency edges, and the estimated durations of 5/8/3/6/10 minutes; the outputs are three things: the parallel ready set at each moment, the critical path, and the earliest completion time of 29 minutes. The ready set changes over time—initially only S0; after S0 completes it becomes {S1, S2}; after both complete it becomes {S3}, then {S4}. Each round the executor only takes nodes from the ready set, which is exactly the implementation of the previous section's “only execute ready nodes” rule.</p>
+<p>This graph also determines the scope of redoing after a failure. Suppose S4 verification fails, and a local redraw is needed. Only the patch node and its downstream are invalidated: S3's patch was wrong, so S4 is naturally void. But S0's reproduction facts and S2's contract investigation have already been verified by the observer; they are not within the invalidated scope and do not need to be cleared and redone. The dependency graph turns “which facts have already been established” into structure, and when failure comes, replanning happens only in the invalidated region.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 260" role="img" aria-label="Dependency graph of the cache isolation fix and local replanning after failure"><defs><marker id="pl1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="22" y="95" width="110" height="56" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="77" y="118" text-anchor="middle" class="svg-t">S0 Reproduce defect</text><text x="77" y="137" text-anchor="middle" class="svg-t" font-size="10">Save failing test</text><path d="M132,123 L181,76" stroke="#6b7484" marker-end="url(#pl1)"/><path d="M132,123 L181,171" stroke="#6b7484" marker-end="url(#pl1)"/><rect x="183" y="42" width="126" height="60" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="246" y="66" text-anchor="middle" class="svg-t">S1 Locate key construction</text><text x="246" y="86" text-anchor="middle" class="svg-t" font-size="10">Artifact: call chain</text><rect x="183" y="143" width="126" height="60" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="246" y="167" text-anchor="middle" class="svg-t">S2 Read cache contract</text><text x="246" y="187" text-anchor="middle" class="svg-t" font-size="10">Artifact: isolation/hit requirements</text><path d="M309,72 L370,123" stroke="#6b7484" marker-end="url(#pl1)"/><path d="M309,173 L370,123" stroke="#6b7484" marker-end="url(#pl1)"/><rect x="372" y="91" width="126" height="64" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="435" y="116" text-anchor="middle" class="svg-t">S3 Implement minimal patch</text><text x="435" y="136" text-anchor="middle" class="svg-t" font-size="10">Depends on S1 + S2</text><path d="M498,123 L548,123" stroke="#6b7484" marker-end="url(#pl1)"/><rect x="550" y="82" width="112" height="82" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="606" y="105" text-anchor="middle" class="svg-t">S4 Verify</text><text x="606" y="125" text-anchor="middle" class="svg-t" font-size="10">Isolation + hit</text><text x="606" y="144" text-anchor="middle" class="svg-t" font-size="10">Full regression</text><path d="M606,165 C602,235 435,238 435,157" fill="none" stroke="#c77b72" marker-end="url(#pl1)"/><text x="520" y="229" text-anchor="middle" class="svg-t" font-size="10">If the hit test fails: keep S0–S2, replan only S3, do not repeat verified investigations</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　Dependency graph shows S1 and S2 can run in parallel, S3 must wait for both; verification failure only invalidates the patch node and should not clear all verified reproduction and contract investigations.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Node</th><th>Estimated 5/8/3/6/10 minutes</th><th>Dependency</th><th>Earliest completion</th></tr></thead><tbody><tr><td>S0 Reproduce</td><td>5</td><td>None</td><td>5</td></tr><tr><td>S1 Locate</td><td>8</td><td>S0</td><td>13</td></tr><tr><td>S2 Contract</td><td>3</td><td>S0</td><td>8</td></tr><tr><td>S3 Patch</td><td>6</td><td>S1, S2</td><td>19</td></tr><tr><td>S4 Verify</td><td>10</td><td>S3</td><td>29</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Why Use Receding-Horizon Planning<span class="dd-badge eng">Uncertainty</span></h2>
+<div class="dd-agent-response"><p>The more unknown the environment, the less you should predefine twenty steps in rigid detail. The reason is an asymmetry in information itself: the input state for nearby steps is already available, and the observer has provided the facts, so these steps can be made concrete enough—precise down to files, commands, and predicates; while distant steps depend on tool outputs that have not happened yet, and those outputs do not exist at this moment, so any “details” anyone writes now can only be guesses. Forcing this level of detail would make the model fabricate files, interfaces, or results that do not yet exist in order to fill out the list, producing a plan that is rhetorically complete but factually false.</p>
+<p>Receding-horizon planning represents the same graph in two segments. The near segment is expanded into concrete nodes; the far segment only keeps coarse goals and budget, such as “complete the cache refactor, expected to take four steps within two rounds,” without writing the actions for each step. After execution reaches a new high-uncertainty point—some tool has produced an output, some acceptance check has produced a conclusion—the observation brings new certain information, and only then do you expand the next segment into concrete nodes. The whole process is isomorphic to receding-horizon control: you precisely control only the visible window in front of you, the window slides forward as execution advances, and distant details are never generated until they can be seen.</p>
+<p>The direct benefit of receding-horizon planning is fewer stale plans. A long plan written in advance may already be invalid by the time the second observation arrives, while in receding-horizon planning the invalid parts exist only in coarse goals that have not yet been expanded, so the cost of replacing them is close to zero. At the same time, receding-horizon planning removes the motive to “fill out the list” from the model: the list never required distant details, so fabrication no longer has a reason to exist.</p>
+<p>Rolling updates have one discipline that must be followed: each update replaces only the subgraph affected by the new observation, preserving the goals and safety invariants unchanged. The goals and safety invariants are the premises on which the whole graph holds; observations can affect only “how to get there,” not “where to get to” or “what must never be entered.” Alongside this is versioning: each rolling update of the plan forms a new version, and the version records what evidence triggered this update and which nodes were invalidated. With this record, you can later audit each change to see which observation caused it and which part of the graph was altered, rather than having a text that has been repeatedly overwritten with no one knowing its provenance.</p>
+<p>There is also a more hidden risk: a new observation may conflict with old state. For example, the observer reports “the cache module has been deleted,” while the plan still says “the cache module has been located.” The correct order at this point is to mark the conflict first, then determine the authoritative source—is the observer misreading the environment, or is the old state simply outdated? In any case, the last written text must not silently overwrite verified facts; the old fact was established by some evidence, and if a new fact is to overturn it, its source must be recorded so that the conflict between the two can be inspected.</p>
+<p>Receding-horizon planning can therefore be summarized as an input-output loop: inputs are the known near-term state, uncertain distant dependencies, new observations, and the goals and safety invariants; outputs are concrete nodes in the near term, coarse goals in the distance, and the new version of the subgraph. At each high-uncertainty point, expand the next segment; each replacement is limited to the subgraph affected by the observation and records the triggering evidence and invalidated nodes; new text can update the plan, but cannot silently overwrite verified facts.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>How to Replan Locally After Failure<span class="dd-badge intuition">Recovery</span></h2>
+<div class="dd-agent-response"><p>When a test fails, the most expensive reaction is to “draw up a complete plan again.” Full replanning means tearing down already validated artifacts and redoing them: re-collecting reproduction facts, redoing dependency analysis, rewriting contracts that have already been written. The facts underlying these steps have not changed; redoing them is duplicated work, and each round of repetition introduces new opportunities for error. The correct approach is to first classify the failure into one of four categories, each corresponding to a clear update scope.</p>
+<p>The first step is always to compare the expected effect of the failed node with the actual observation. The expectation is written in the node contract, and the observation is given by the observer; the type of difference between the two determines what to do next.</p>
+<p>The first category is transient execution errors: the action itself and its preconditions are fine, but the external conditions for this run broke down, for example test process timeout or temporary network jitter. The update scope is the current node; the handling strategy is limited retries under an idempotency policy—retries have an upper limit, the action itself must be repeatable, and retries leave no accumulated side effects.</p>
+<p>The second category is precondition fact errors: the node fails not because of itself, but because the precondition it relies on to start does not hold. For example, if the premise of a fix is “the application uses first-level cache” but it actually uses second-level cache, then the entire call chain was located incorrectly. The update scope is the fact source and all its downstream; the handling strategy is to go back to the nearest node that produced that fact and investigate again, rather than continuing to patch on the incorrect premise.</p>
+<p>The third category is patch side effects: the precondition facts hold, and the patch solves the target problem, but it introduces new breakage—cache isolation is fixed, but the hit rate drops to zero. The update scope is the patch node and the acceptance nodes; the handling strategy is to invalidate only the patch and its downstream, keeping already validated artifacts such as reproduction, localization, and contracts unchanged.</p>
+<p>The fourth category is a change in goal or forbidden state: the task itself has changed, for example from a single-tenant fix to a cross-region consistency migration. This is the only situation that requires expanding the replanning scope, because all dependencies must be re-examined against the new goal.</p>
+<p>These four categories can be viewed side by side as a comparison table. Transient execution errors correspond to the current node; an example is a test process timeout, with limited retries. Precondition fact errors correspond to the fact source and its downstream; an example is actually using second-level cache, requiring re-localization of the call chain. Patch side effects correspond to the patch and acceptance nodes; an example is isolation fixed but hit rate zero. Goal change corresponds to re-checking all dependencies; an example is changing from a single-tenant fix to a cross-region consistency migration. The update scopes of the four categories grow in order, and only the fourth touches the global scope.</p>
+<p>For local replanning to work, it also depends on one piece of infrastructure: already validated artifacts must be pinned with stable IDs and versions. Reproduction results, contracts, and passed tests each carry immutable identifiers and version numbers, and during replanning they are referenced directly rather than having the model search again and generate a new copy. Without this pinning, replanning itself becomes a new round of searching and overwriting; the model may find a similar but different old artifact and continue using it as the original fact. After version pinning, rolling back a patch means referencing the node version before the rollback, rather than manually undoing several stacked modifications.</p>
+<p>The input to local replanning is therefore five things: the failed node, the difference between expectation and actual observation, stable checkpoints, dependency downstream, and the failure type. The output is one of four actions—limited idempotent retry, return to the nearest fact source, invalidate the patch subgraph, or full replanning. A failure triggers only the minimal update commensurate with its type; validated facts are protected by version numbers, and duplicated work is excluded by design.</p></div>
+<table class="dd-table"><thead><tr><th>Failure type</th><th>Update scope</th><th>Example</th></tr></thead><tbody><tr><td>Transient execution error</td><td>Current node</td><td>Test process timeout, limited retries</td></tr><tr><td>Precondition fact error</td><td>Fact source and its downstream</td><td>Actually uses second-level cache, re-localizing the call chain</td></tr><tr><td>Patch side effect</td><td>Patch and acceptance nodes</td><td>Isolation fixed but hit rate drops to zero</td></tr><tr><td>Goal change</td><td>Re-check all dependencies</td><td>From single-tenant fix to cross-region consistency migration</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>When should planning give way to workflow or search<span class="dd-badge intuition">Boundary</span></h2>
+<div class="dd-agent-response"><p>Not every long task requires a language model planner. Planning has a cost: every extra layer of planning adds an extra layer of inference that could go wrong and an extra piece of plan text that needs auditing. The choice of execution mechanism depends on three attributes of the task itself: path predictability, action space size, and degree of environment dynamics.</p>
+<p>When steps are fixed, branches are known, and failure semantics are stable, a deterministic workflow is the better choice. All paths of such tasks are determined at coding time, and the behavior on failure is also defined in advance. Execution with a workflow is cheaper and more testable—the same input always follows the same path, and regression tests can cover every branch. Introducing a language model planner instead turns something certain back into something uncertain, needlessly increasing cost and the surface for errors.</p>
+<p>When candidate actions are clear and can be exhaustively enumerated, tree-of-thought or traditional search is more appropriate. The task becomes selecting and backtracking within a finite set of candidates; expansion, evaluation, and pruning are all mechanical operations. The completeness and efficiency of the search algorithm can be computed directly, without relying on the model's ad hoc judgment each time. The planner here adds no new information, only new noise.</p>
+<p>Only when the environment path is unknown and tool feedback changes subsequent decisions does AI Agent planning become truly valuable. Cache repair is a typical task of this type: the length and direction of the call chain are known only after the first exploration results, how the contract should be written depends on what the reproduction observes, and each time a tool returns output, the decision space for what follows changes. In such tasks, the planner's role is to continuously redraw the subgraph based on new evidence, which is exactly the mechanism described in the previous sections.</p>
+<p>The three criteria can be condensed into one sentence: fixed branches use workflows, enumerable candidates use search, and only unknown environment paths require AI Agent planning.</p>
+<p>No matter which mechanism is chosen, there is a boundary that cannot be crossed: the planner cannot replace tool permissions, transactions, idempotency, and human approval. These four things belong to execution safety, enforced by external systems rather than declared by plan text. Writing “file backed up” or “user approved” in a text plan is just two strings; they can appear, but they have no factual effect. The controller must read from the file system whether the backup actually exists, read from the approval service whether the approval actually occurred, and read from the tool return code whether the action actually executed. The model cannot announce on its own that high-risk preconditions have been met—self-announcement is a wish written into the text, whereas high-risk steps require records in external systems.</p>
+<p>Therefore, the determination of planning boundaries can be formalized as an input-output mapping: the inputs are path predictability, action space, environment dynamics, tool feedback, and risk permissions; the output is one of four: fixed workflow, traditional search, tree-of-thought, or AI Agent planning. After the mechanism is chosen, permissions, transactions, idempotency, and approval are still uniformly enforced by external systems, regardless of which mechanism is chosen; “backed up” or “approved” in the text does not constitute a fact under any mechanism.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How to evaluate plans without rewarding polished text<span class="dd-badge math">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Final success is the easiest metric to manipulate: a verbose and inefficient plan may also succeed, because success only indicates that the goal was reached, not how the journey went. Evaluating a plan must answer two questions at once: whether it actually has flaws, and whether it creates more value than simpler alternatives. The method is to record three trajectories in parallel for the same task—direct action, fixed workflow, and planner—and then compare a set of metrics.</p>
+<p>This set of metrics includes eight dimensions. Final success: whether the task reaches the goal; this is a passing line, not the whole story. Plan executability rate: how many steps in the plan are actually executed; if many nodes are invalidated or skipped along the way, it indicates a large deviation between plan and reality. Precondition errors: how many steps are started when their preconditions are not met, directly exposing gaps in the dependency graph. Invalid or duplicate steps: how many steps do not advance state, or repeat work already done. Number of replans: how many times the plan is overturned; the more often, the less credible the initial plan. Distance from failure point to recovery point: how far back execution must retreat after a failure before it can move forward again; the shorter the distance, the more finely the dependency graph is sliced and the more effective local recovery. Critical path delay: how much later the actual execution is compared with the theoretical critical path; the excess comes from waiting, rework, or erroneous serialization. Total cost: the actual tool calls and time consumed to complete the same task.</p>
+<p>Among these eight metrics, the combination of cost and success rate is the best at exposing plans that are “polished but useless.” If a planner turns 8 tool calls into 20, and the success rate is the same as direct action, it has created no value—the extra 12 calls are all overhead, with no corresponding benefit. Conversely, if the planner has a higher success rate and shorter recovery distance in failure scenarios, the extra calls gain justification. Evaluation is therefore always comparative: the value of the planner exists only in the difference from simpler baselines.</p>
+<p>In addition to post-execution trajectory comparison, there are two kinds of pre-execution static checks. The first kind targets the plan text itself: whether referenced tools actually exist; whether the dependency graph has cycles—a cycle means there is a set of nodes in the graph that can never become ready; whether every node has an artifact and a completion predicate—a node without a predicate cannot be accepted, which amounts to handing completion back to guesswork; whether parallel nodes compete for the same resource—two nodes modifying the same file at the same time will corrupt each other and must be serialized or locked. The second kind targets recovery capability, verified through fault injection: artificially create one tool failure and one precondition violation, and observe whether the plan retries within the expected limit and whether it retreats only to the nearest source of truth. Polished text has no place to hide in the face of fault injection; truly effective local recovery must be able to be triggered and verified repeatedly.</p>
+<p>Thus, the input to plan evaluation is three trajectories on the same task: direct action, fixed workflow, and planner trajectories; the output is eight metrics: final success, executability rate, precondition errors, duplicate steps, number of replans, recovery distance, critical path delay, and cost. First perform static checks—tools exist, dependency graph has no cycles, nodes have artifacts and predicates, parallel nodes do not contend for the same resource—then use fault injection to verify local recovery. A long, polished plan that merely doubles the calls while success remains unchanged does not constitute any value by its polish.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Connect the content of the previous sections end to end, and you get a complete causal chain from problem to verifiable practice. The starting point is a concrete problem: a natural-language step checklist cannot answer “when is it truly done” and “where to return after failure”, because tool calls are miswritten as goal completion and world state is not proven by anyone. The endpoint is a planning mechanism that can be executed, audited, and verified through fault injection. Every step in between builds on the output of the previous step.</p>
+<p>Step one: define goals and forbidden states. Planning starts by clearly writing down two state sets: what to reach and what must never be entered. The goal is the final predicate for acceptance; forbidden states are red lines that the observer must intercept at all times. Without this step, all subsequent judgments have no reference point.</p>
+<p>Step two: annotate preconditions and artifacts. Each step changes from a narrative into a node contract: which proven facts are required to enter it, and which observable artifacts it leaves behind when exiting. This step moves the meaning of “done” from the executor’s inner state to the world state.</p>
+<p>Step three: construct the dependency graph and critical path. Edges between nodes indicate which facts must be established first, which steps can therefore run in parallel, and which must wait for real evidence. The critical path gives the earliest completion time and also delineates which verified artifacts can be retained in case of failure.</p>
+<p>Step four: execute only currently ready nodes. Each round, the executor takes nodes only from the ready set—nodes whose all predecessor nodes have been confirmed complete by the observer. This constraint ensures every action occurs after its preconditions are established, rather than in the planner’s imagination.</p>
+<p>Step five: update state with real observations. Exit codes, file diffs, test results, and approval records are translated by the observer into facts; the controller compares expected with actual and decides to advance, retry, roll back, or replan. The word “done” in the plan text no longer has any effect from this point on; only observation records can move the chain forward.</p>
+<p>Step six: local replanning from stable checkpoints. Failures are categorized by type into the minimal update scope: transient errors are retried a limited number of times; precondition fact errors return to the nearest source; patch side effects invalidate only the patch and its downstream; only a change in goals expands replanning. Verified artifacts are fixed with stable IDs and versions, so duplicated effort is excluded.</p>
+<p>The six steps each answer one question on the chain, while the chain as a whole answers the original one: how to turn goals into an executable, revisable state graph. Executable, because each node has preconditions, artifacts, and a completion predicate; revisable, because observation-driven rolling updates replace only the affected subgraph and recover locally from stable checkpoints. The output of planning changes from a piece of polished text into a state machine—each step has a clear producer, verifier, and rollback path, and no link can unilaterally declare success.</p></div>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/2305.04091" target="_blank" rel="noopener">Plan-and-Solve Prompting</a>: plan first, then solve</li><li><a href="https://arxiv.org/abs/2305.18323" target="_blank" rel="noopener">ReWOO: Decoupling Reasoning from Observations</a>: decouples planning from tool observations</li><li><a href="https://arxiv.org/abs/2310.04406" target="_blank" rel="noopener">Language Agent Tree Search</a>: planning, search, and environment feedback</li><li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct</a>: action-observation loop</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/planning">Explore connections on the map</a><a href="/zh/concepts/planning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

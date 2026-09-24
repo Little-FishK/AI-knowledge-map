@@ -26,7 +26,18 @@
     const bundle = [
       "data/library.js",
       "data/library-official-technical.js",
+      "data/library-official-china.js",
       "data/library-platform-profiles.js",
+      "data/library-source-meta.js",
+      "data/library-new-sources.js",
+      "data/library-arxiv.js",
+      "data/library-neurips-proceedings.js",
+      "data/library-pmlr.js",
+      "data/library-openreview.js",
+      "data/library-acl-anthology.js",
+      "data/library-cvf-open-access.js",
+      "data/library-ieee-xplore.js",
+      "data/library-acm-digital-library.js",
       "data/software.js",
     ];
 
@@ -123,6 +134,10 @@
         <div class="lib-profile-intro"><span>${esc(t("library.profile.introduction"))}</span><p>${esc(overview)}</p></div>
         <section class="lib-profile-strengths"><h4>${esc(t("library.profile.strengths"))}</h4><div>${strengths.map(item => `<p>${esc(item)}</p>`).join("")}</div></section>
         <dl class="lib-profile-facts">
+          ${profile.tier ? `<div><dt>${esc(t("library.profile.tier"))}</dt><dd>${esc(t("library.tier." + String(profile.tier).toLowerCase()))}${profile.provenance ? ` · ${esc(t("library.provenance." + profile.provenance))}` : ""}</dd></div>` : ""}
+          ${profile.originScope ? `<div><dt>${esc(t("library.profile.originScope"))}</dt><dd>${esc(t("library.scope." + profile.originScope))}</dd></div>` : ""}
+          ${profile.sourceUse ? `<div><dt>${esc(t("library.profile.sourceUse"))}</dt><dd>${esc(t("library.use." + profile.sourceUse))}</dd></div>` : ""}
+          ${profile.health ? `<div><dt>${esc(t("library.profile.health"))}</dt><dd>${esc(t("library.health." + profile.health))}</dd></div>` : ""}
           <div><dt>${esc(t("library.profile.background"))}</dt><dd>${esc(profile.background)}</dd></div>
           <div><dt>${esc(t("library.profile.organization"))}</dt><dd>${esc(profile.organization)}</dd></div>
           <div><dt>${esc(t("library.profile.foundingTeam"))}</dt><dd>${esc(profile.foundingTeam)}</dd></div>
@@ -132,7 +147,7 @@
           <section><h4>${esc(t("library.profile.howToUse"))}</h4><ul>${howToUse.map(item => `<li>${esc(item)}</li>`).join("")}</ul></section>
         </div>
         ${caution ? `<aside class="lib-profile-caution"><b>${esc(t("library.boundaries"))}</b><p>${esc(caution)}</p></aside>` : ""}
-        <footer>${esc(t("library.profile.reviewedAt", { date: profile.reviewedAt }))}</footer>
+        <footer>${esc(t("library.profile.reviewedAt", { date: profile.reviewedAt }))}${profile.lastVerifiedAt ? ` · ${esc(t("library.profile.lastVerifiedAt", { date: profile.lastVerifiedAt }))}` : ""}</footer>
       </article>`;
     }
 
@@ -152,13 +167,24 @@
         return;
       }
       const counts = {};
-      (library.items || []).filter(item => item.sourceClass === source.id)
-        .forEach(item => { counts[item.sourceSubcategory] = (counts[item.sourceSubcategory] || 0) + 1; });
+      (library.items || []).forEach(item => {
+        const ids = new Set(sourceRecords(item).filter(record => record.sourceClass === source.id).map(record => record.sourceSubcategory));
+        ids.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+      });
       container.innerHTML = `<div class="lib-subnav-head"><div><b>${source.order}. ${esc(source.label)} · ${esc(t("library.secondarySources"))}</b><span>${esc(source.short)}</span></div><em>${esc(t("common.count", { count: (source.subcategories || []).length }))}</em></div>
         <div class="lib-subchips">
-          <button class="lib-subchip${selectedSubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">${esc(t("common.all"))} <span>${(library.items || []).filter(item => item.sourceClass === source.id).length}</span></button>
+          <button class="lib-subchip${selectedSubcategory === "all" ? " active" : ""}" type="button" data-library-subcategory="all">${esc(t("common.all"))} <span>${(library.items || []).filter(item => sourceRecords(item).some(record => record.sourceClass === source.id)).length}</span></button>
           ${(source.subcategories || []).map(subcategory => `<button class="lib-subchip${selectedSubcategory === subcategory.id ? " active" : ""}" type="button" data-library-subcategory="${esc(subcategory.id)}" title="${esc(subcategory.short)}">${esc(subcategory.label)} <span>${counts[subcategory.id] || 0}</span></button>`).join("")}
         </div>${platformProfileHtml(source)}`;
+    }
+
+    function sourceRecords(item) {
+      return [item].concat(item.relatedMaterials || []);
+    }
+
+    function matchesSource(record) {
+      return (selectedClass === "all" || record.sourceClass === selectedClass) &&
+        (selectedSubcategory === "all" || record.sourceSubcategory === selectedSubcategory);
     }
 
     function renderItems() {
@@ -168,22 +194,22 @@
       if (!grid) return;
       const normalizedQuery = query.trim().toLocaleLowerCase();
       const items = (library.items || []).filter(item => {
-        if (selectedClass !== "all" && item.sourceClass !== selectedClass) return false;
-        if (selectedSubcategory !== "all" && item.sourceSubcategory !== selectedSubcategory) return false;
+        if (!sourceRecords(item).some(matchesSource)) return false;
         if (!normalizedQuery) return true;
         const source = sourceClassById(item.sourceClass);
         const subcategory = subcategoryById(source, item.sourceSubcategory);
         return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label]
-          .concat(item.tags || []).join(" ").toLocaleLowerCase().includes(normalizedQuery);
+          .concat(item.tags || [], (item.relatedMaterials || []).flatMap(record => [record.title, record.summary, ...(record.tags || [])])).join(" ").toLocaleLowerCase().includes(normalizedQuery);
       });
       if (note) note.textContent = t("library.itemCount", { count: items.length });
-      grid.innerHTML = items.length ? items.map(item => {
+      grid.innerHTML = items.length ? items.map(canonicalItem => {
+        const item = sourceRecords(canonicalItem).find(matchesSource) || canonicalItem;
         const source = sourceClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
         const subcategory = subcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
-        return `<article class="lib-card" data-library-item="${esc(item.id)}" style="--source-color:${source.color}" tabindex="0">
+        return `<article class="lib-card" data-library-item="${esc(canonicalItem.id)}" style="--source-color:${source.color}" tabindex="0">
           <div class="lib-card-top">
             <span class="lib-badge">${esc(source.label)}</span><span class="lib-subbadge">${esc(subcategory.label)}</span>
-            ${item.discoveryOnly ? `<span class="lib-discovery">${esc(t("library.discoveryOnly"))}</span>` : ""}<span class="lib-tier">${esc(item.authorityTier)}</span>
+            ${item.discoveryOnly ? `<span class="lib-discovery">${esc(t("library.discoveryOnly"))}</span>` : ""}${item.regulatoryStatus ? `<span class="lib-discovery">${esc(t(`library.regulatoryStatus.${item.regulatoryStatus}`))}</span>` : ""}<span class="lib-tier">${esc(item.authorityTier)}</span>
           </div>
           <h3 class="lib-title">${esc(item.title)}</h3>
           <div class="lib-publisher">${esc(item.publisher)} · ${esc(item.contentKind)}</div>
@@ -196,7 +222,9 @@
     function build() {
       if (built || !library) return;
       const counts = {};
-      (library.items || []).forEach(item => { counts[item.sourceClass] = (counts[item.sourceClass] || 0) + 1; });
+      (library.items || []).forEach(item => {
+        new Set(sourceRecords(item).map(record => record.sourceClass)).forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+      });
       const secondaryCount = (library.sourceClasses || []).reduce((sum, source) => sum + (source.subcategories || []).length, 0);
       view.innerHTML = `<header class="lib-head">
         <div><h2>${esc(t("library.title"))}</h2><p>${esc(t("library.intro"))}</p></div>
@@ -238,6 +266,7 @@
       const linkedNodes = (item.linkedNodes || []).filter(nodeId => byId[nodeId]);
       const linkedSoftware = (item.linkedSoftware || []).map(softwareId =>
         software && (software.items || []).find(entry => entry.id === softwareId)).filter(Boolean);
+      const codedLabel = (prefix, value) => value ? t(`${prefix}.${value}`) : "";
       let html = `<div class="d-domain" style="color:${source.color}">${source.order}. ${esc(source.label)}
         <span style="color:var(--fg-faint)"> · ${esc(item.authorityTier)} · ${esc(item.contentKind)}</span></div>
         <h2 class="d-title">${esc(item.title)}</h2>
@@ -246,6 +275,9 @@
           <dt>${esc(t("library.primarySourceClass"))}</dt><dd>${esc(source.label)}</dd><dt>${esc(t("library.secondarySourceClass"))}</dt><dd>${esc(subcategory.label)}</dd>
           <dt>${esc(t("library.publisher"))}</dt><dd>${esc(item.publisher)}</dd><dt>${esc(t("library.collection"))}</dt><dd>${esc(item.collection)}</dd>
           <dt>${esc(t("library.reviewStatus"))}</dt><dd>${esc(item.reviewStatus)}</dd><dt>${esc(t("library.primarySource"))}</dt><dd>${esc(t(item.primarySource ? "common.yes" : "common.no"))}</dd>
+          ${item.officialIdentifier ? `<dt>${esc(t("library.officialIdentifier"))}</dt><dd>${esc(item.officialIdentifier)}</dd>` : ""}
+          ${item.regulatoryStatus ? `<dt>${esc(t("library.regulatoryStatus"))}</dt><dd>${esc(codedLabel("library.regulatoryStatus", item.regulatoryStatus))}</dd>` : ""}
+          ${item.bindingForce ? `<dt>${esc(t("library.bindingForce"))}</dt><dd>${esc(codedLabel("library.bindingForce", item.bindingForce))}</dd>` : ""}
           <dt>${esc(t("library.accessedAt"))}</dt><dd>${esc(item.accessedAt)}</dd>
         </dl></div>
         ${item.selectionReason ? `<div class="d-sec"><h4>${esc(t("library.selectionReason"))}</h4><div class="d-body"><p>${esc(item.selectionReason)}</p></div></div>` : ""}
@@ -256,6 +288,14 @@
       if (linkedSoftware.length) html += `<div class="d-sec"><h4>${esc(t("library.linkedSoftware"))}</h4>${linkedSoftware.map(itemSoftware =>
         `<div class="rel"><span class="rel-to" data-library-software="${esc(itemSoftware.id)}">${esc(itemSoftware.name)}</span><span class="rel-lbl">${esc(t("library.viewInSoftware"))}</span></div>`).join("")}</div>`;
       html += `<a class="lib-source-link" href="${esc(item.url)}" target="_blank" rel="noopener">${esc(t("library.openOriginal"))} ↗</a>`;
+      (item.relatedMaterials || []).forEach(record => {
+        html += `<section class="d-sec"><h4>${esc(record.title)}</h4>
+          <p>${esc(record.publisher)} · ${esc(record.collection)} · ${esc(record.authorityTier)} · ${esc(record.reviewStatus)}</p>
+          <p>${esc(record.summary)}</p><p>${esc(record.selectionReason)}</p>
+          <h4>${esc(t("library.evidenceUse"))}</h4><p>${esc(record.evidenceUse)}</p>
+          <h4>${esc(t("library.boundaries"))}</h4><p>${(record.limitations || []).map(limit => esc(limit)).join("<br>")}</p>
+          <a class="lib-source-link" href="${esc(record.url)}" target="_blank" rel="noopener">${esc(t("library.openOriginal"))} ↗</a></section>`;
+      });
       detailBody.innerHTML = html;
       detail.classList.remove("closed");
       detailBody.scrollTop = 0;

@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>高级 RAG：让检索成为可诊断、可迭代的证据流程 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>高级 RAG是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/advanced-rag/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/advanced-rag/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/advanced-rag/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="高级 RAG：让检索成为可诊断、可迭代的证据流程">
+<meta property="og:title" content="高级 RAG是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/advanced-rag/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="高级 RAG：让检索成为可诊断、可迭代的证据流程">
+<meta name="twitter:title" content="高级 RAG是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/#page","name":"高级 RAG：让检索成为可诊断、可迭代的证据流程","description":"从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。","url":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"高级 RAG：让检索成为可诊断、可迭代的证据流程","item":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/#page","name":"高级 RAG是什么？原理通俗讲解 | AI 知识地图","description":"从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。","url":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"高级 RAG：让检索成为可诊断、可迭代的证据流程","item":"https://ai-knowledge-map.com/zh/concepts/advanced-rag/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">高级 RAG：让检索成为可诊断、可迭代的证据流程</span></li></ol></nav><article id="dd-article" data-concept-id="advanced-rag">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">高级 RAG：让检索成为可诊断、可迭代的证据流程</span></li></ol></nav><article id="dd-article" data-concept-id="advanced-rag" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">高级 RAG：让检索成为可诊断、可迭代的证据流程</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从查询改写、混合召回、重排、多跳、纠错检索和答案引用理解何时需要升级基础 RAG。</p>
 
@@ -124,7 +126,7 @@
 <div class="dd-agent-response"><p>高级 RAG 的所有手段，最终都落回同一条从问题到实践的因果链。链条的起点是记录基础 RAG 的真实失败，而不是先入为主的方案清单。有了失败样本，再定位它们发生在查询、召回、排序还是生成中的哪一层；随后只为定位到的目标失败增加组件，一处失败对应一处改动。每一步都保存证据与来源，使任何一层的产物都能被复查、被回退。多跳与纠错循环必须设置边界并显式处理冲突，防止检索在错误前提上无限延伸。最后用固定查询集做组件消融，验证新增环节带来的是端到端收益，而不是局部指标的自我安慰。链路每前进一步，都在回答同一个问题：这次改动，让哪类查询的哪个失败消失了，代价是什么。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/2312.10997" target="_blank" rel="noopener">Retrieval-Augmented Generation for Large Language Models: A Survey</a>：RAG 技术谱系</li><li><a href="https://arxiv.org/abs/2212.10496" target="_blank" rel="noopener">Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)</a>：假设文档检索</li><li><a href="https://arxiv.org/abs/2401.15884" target="_blank" rel="noopener">Corrective Retrieval Augmented Generation</a>：检索质量判断与纠错</li><li><a href="https://dl.acm.org/doi/10.1145/1571941.1572114" target="_blank" rel="noopener">Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods</a>：RRF 排名融合</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/advanced-rag">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/advanced-rag">在地图中查看概念关系</a><a href="/en/concepts/advanced-rag/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

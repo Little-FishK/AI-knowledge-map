@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct? Explained Simply</title>
+<meta name="description" content="From confidence scores, reliability diagrams, and ECE to selective prediction, rejection thresholds, and distribution shift.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/uncertainty-calibration/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct? Explained Simply">
+<meta property="og:description" content="From confidence scores, reliability diagrams, and ECE to selective prediction, rejection thresholds, and distribution shift.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct? Explained Simply">
+<meta name="twitter:description" content="From confidence scores, reliability diagrams, and ECE to selective prediction, rejection thresholds, and distribution shift.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/#page","name":"What Is Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct? Explained Simply","description":"From confidence scores, reliability diagrams, and ECE to selective prediction, rejection thresholds, and distribution shift.","url":"https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct","item":"https://ai-knowledge-map.com/en/concepts/uncertainty-calibration/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct</span></li></ol></nav><article id="dd-article" data-concept-id="uncertainty-calibration" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Uncertainty and Calibration: Making “80% Confidence” Really Mean About 80% Correct</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From confidence scores, reliability diagrams, and ECE to selective prediction, rejection thresholds, and distribution shift.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Calibration does not require knowing for each sample whether it is correct; rather, it requires that, within a group of cases of the same type and score, cases claiming 80% confidence are correct about 80% of the time in the long run. It is a mapping between scores and empirical risk, not linguistic fluency, nor error elimination; once the task, slice, or distribution changes, calibration evidence may become invalid.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Distinguish accuracy, confidence, and calibration; manually compute reliability bins and ECE; understand temperature scaling and selective risk; set human-handoff thresholds according to error costs.</div>
+<ol class="dd-chain"><li>Define the correct event that needs calibration</li><li>Obtain raw scores from the model/evidence/validator</li><li>Learn a probability mapping on an independent calibration set</li><li>Validate using reliability and scoring rules</li><li>Choose thresholds according to error cost</li><li>Continuously collect mature labels and monitor drift</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>Accuracy does not equal knowing when you will be wrong<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Two assistants with the same overall accuracy of 80% can present completely different risks. Assistant A reports a confidence score of 0.8 for every question no matter what. Assistant B reports 0.95 on familiar cases and 0.35 on policy-conflict cases. If both ultimately answer 80% of the questions correctly, their accuracy is the same, but their usability differs greatly: if B’s reported scores are trustworthy, operators can route all low-confidence answers to humans, preserving most automation while significantly reducing the losses caused by errors. All of A’s answers carry the same 0.8, so they cannot be ranked by risk at all, and there is no way to triage. This difference does not show up in accuracy; it shows up in “whether the model knows how confident it actually is.”</p>
+<p>Calibration is precisely about this question: whether the probabilities a model reports match the frequencies that actually occur. If over the long run the model answers about 80% of the questions it claims 80% confidence on correctly, it is well calibrated; if it reports 0.8 but only answers half correctly, it is overconfident. Here three abilities must be separated. Accuracy answers “how many were answered correctly”; discrimination answers “can it rank samples it will answer correctly ahead of samples it will answer incorrectly”; calibration answers a different question—“can the numerical values of the scores themselves be interpreted as real frequencies”. A model may be very good at ranking and generally place correct answers ahead of others, yet simultaneously give inflated probabilities for all samples; another model may be well calibrated but have low accuracy—for example, a model that always reports the base rate, whose probability commitments are naturally consistent with actual frequencies over the long run, but which provides no extra information for any specific case and has no triage value. Good calibration does not mean usefulness, good ranking does not mean the scores are interpretable, and the three are not the same thing.</p>
+<p>From the perspective of evaluation inputs and outputs, calibration evaluation receives a set of task answers, the scores the model gives for each answer, and the final correct-answer labels; its output is a judgment: within groups with the same score, whether the empirical accuracy matches the probability the model claimed. It does not answer “how many did the model answer correctly”, nor “can the model rank”, but only “does reporting 0.8 correspond to being correct about 80% of the time in the long run”. In scenarios where low-confidence cases need to be routed to humans and resources allocated according to risk, the answer to this question determines the value of Assistant B—and also determines that Assistant A, which looks equally good, may not be safe.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Where Does LLM “Confidence” Come From?<span class="dd-badge eng">Signal</span></h2>
+<div class="dd-agent-response"><p>Large language models (LLMs) do not naturally output “the probability that this answer is correct.” Phrasing generated by the model such as “I am very certain,” and the log probability (logprob) of a token, are not task accuracy. The former is just a linguistic style—the model imitates a confident tone without having been trained on probability; the latter is only the likelihood of the next word appearing given the preceding context, influenced heavily by length and wording, and has no necessary connection to whether the fact is correct. To turn model uncertainty into a usable score, you need to first construct a raw confidence from multiple signals, and then learn the mapping from “score → empirical accuracy” on independent data.</p>
+<p>There are several types of raw signals that can be used, each with pros and cons. The log probability of a sequence or option is the cheapest and continuous, but is affected by length and phrasing and cannot be directly taken as factual correctness. The model's self-report is easily obtained through prompts, but it is essentially imitating a confident tone and lacks probabilistic meaning. Sampling the same question multiple times and comparing the semantic consistency of the answers can expose cases where the answer is unstable, but the same blind spot may cause all samples to be consistently wrong; high consistency does not mean correctness. External validation connects the answer to evidence or execution results and can provide an independent signal, but the validator itself also has coverage and error rates. Model ensembles use the disagreement of different models to reflect epistemic uncertainty, at the cost of being expensive, and different models may share the same origin with limited disagreement.</p>
+<p>These signals can be combined. Taking a refund assistant as an example, you can combine “whether policy evidence was retrieved, the margin of the eligibility classification (the distance from the classifier's score to the decision boundary), the result of the amount program check, and the degree of disagreement among multiple sampled answers to the same question” into a risk score. But the score obtained at this step does not yet have probabilistic meaning: it can only say “the lower the score, the more suspect it is,” not “93% correct.” The same is true for average token probability; directly claiming “the answer is 93% correct” has no basis.</p>
+<p>The step that truly endows probabilistic meaning occurs in the calibration phase: on a calibration set independent of the training data, align raw scores with actual correct frequencies, and learn the mapping from scores to empirical accuracy. Here, the task event for “correct” must first be clearly defined, for example “the refund eligibility judgment is correct and cites evidence supporting that judgment.” The inputs are raw signals such as token probabilities, multiple samples, model self-evaluation, retrieval coverage, external validators, and model disagreement; the output is a calibrated probability that can be interpreted as correct frequency only after the mapping. Before this, any “I am very certain” or average token probability given by a single path can only serve as a risk clue and cannot be directly used as the probability that the answer is correct.</p></div>
+<table class="dd-table"><thead><tr><th>Signal</th><th>Advantage</th><th>Core blind spot</th></tr></thead><tbody><tr><td>Sequence/Option logprob</td><td>Cheap, continuous</td><td>Affected by length and phrasing; not equal to factual correctness</td></tr><tr><td>Self-report</td><td>Easy to prompt</td><td>Imitates confident tone; lacks probability training</td></tr><tr><td>Multi-sample consistency</td><td>Finds unstable answers</td><td>Same blind spot can be consistently wrong</td></tr><tr><td>External validation</td><td>Connects to evidence or execution results</td><td>Validator also has coverage and errors</td></tr><tr><td>Model ensemble</td><td>Reflects epistemic disagreement</td><td>High cost and models may share the same origin</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Reliability diagrams turn probability promises into testable frequencies<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>Once we have a probability score for each prediction, how do we check whether a batch of scores between 0 and 1 lives up to their names? The core approach is to bucket predictions by confidence, then compare two things within each bucket: the bucket's average confidence, conf(Bₘ), and the actual accuracy of the samples in that bucket, acc(Bₘ). If the cases where the model reports 0.8 actually answer 80% correctly, and those where it reports 0.9 answer 90% correctly, then points drawn with “average confidence” on the horizontal axis and “actual accuracy” on the vertical axis should all fall on the y = x diagonal—this is the ideal reliability diagram. If the curve lies overall below the diagonal, the model is systematically overconfident: the probabilities it promises are higher than the frequencies it delivers; if above the diagonal, the model is overconservative, and its actual performance is even better than it claims.</p>
+<p>Bucket-wise comparison has an inherent flaw: structure inside a bucket is hidden. A single 0.7-to-0.8 bucket may mix samples with true probabilities of 0.6 and 0.9; as long as the average happens to fall on the diagonal, the plot shows no problem. Therefore reliability diagrams need to be read together with continuous calibration methods and key slices.</p>
+<p>Expected Calibration Error (ECE) summarizes the deviation on a reliability diagram into a single number. For each bucket, compute the absolute difference between average confidence and actual accuracy, then weight it by the bucket's sample proportion and sum:</p>
+<p>ECE = Σₘ (|Bₘ| / n) × |acc(Bₘ) − conf(Bₘ)|</p>
+<p>Here, n is the total number of predictions, Bₘ is the m-th bucket, and |Bₘ|/n is that bucket's sample proportion. The smaller the ECE, the smaller the average gap between probability promises and actual frequencies under the current bucketing scheme. But the ECE value depends directly on the number of buckets and where their boundaries are placed: for the same batch of predictions, cutting it into 10 buckets versus 20 buckets will produce different ECE values, so ECE should not be mechanically compared across different bucketing settings. In addition to ECE, there are metrics with different penalty structures: the Brier score (p − y)² penalizes both probability deviation and prediction error; negative log-likelihood penalizes “high-confidence but wrong” more heavily, because −log(p) in that situation becomes very large.</p>
+<p>More importantly, calibration is conditional. An overall nice diagonal plot does not guarantee that all scenarios are well calibrated: subsets split out by Chinese-language orders, extremely long orders, or newly launched policies may still each be severely overconfident, only hidden by the overall average. Reliability evaluation must be checked in groups conditioned on factors that affect risk. To sum up, the inputs to the evaluation are n predictions and their buckets Bₘ, and the outputs are a reliability diagram and an ECE value; for each bucket, take the absolute difference between confidence and accuracy, multiply by the sample proportion, and sum to obtain the average calibration error under the current bucketing. Interpreting the result requires attention to two points: the value depends on bucket boundaries, and bucket-level aggregation may hide miscalibration at the slice level.</p></div>
+<div class="dd-formula"><math display="block" aria-label="期望校准误差"><mi>ECE</mi><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mfrac><mrow><mo>|</mo><msub><mi>B</mi><mi>m</mi></msub><mo>|</mo></mrow><mi>n</mi></mfrac><mo>×</mo><mo>|</mo><mi>acc</mi><mo>(</mo><msub><mi>B</mi><mi>m</mi></msub><mo>)</mo><mo>−</mo><mi>conf</mi><mo>(</mo><msub><mi>B</mi><mi>m</mi></msub><mo>)</mo><mo>|</mo></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Worked Example: How Ten Refund Requests Yield ECE<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>Place the model scores and final correctness labels for ten refund requests into three buckets, and you can walk through the ECE calculation in full. The reliability diagram for the three confidence buckets shows that the high-confidence bucket actually got only two-thirds correct, exposing overconfidence; another message from the diagram is that the human handoff threshold must be set based on calibrated risk, not raw scores.</p>
+<p>Bucket statistics are as follows: the low-confidence bucket has 3 samples, average confidence 0.30, 1 correct, accuracy 0.333; the medium-confidence bucket has 4 samples, average confidence 0.65, 3 correct, accuracy 0.75; the high-confidence bucket has 3 samples, average confidence 0.90, 2 correct, accuracy 0.667. Each bucket's weighted difference is “the absolute difference between accuracy and average confidence” multiplied by that bucket's sample proportion. Low bucket: 3/10 × 0.033 ≈ 0.010; medium bucket: 4/10 × 0.10 = 0.040; high bucket: 3/10 × 0.233 ≈ 0.070. Adding the three contributions gives ECE ≈ 0.120.</p>
+<p>How should this number be read? First, with only ten samples, the estimate is extremely unstable; 0.120 is only a demonstration calculation, not a precise production estimate. Second, the operationally important finding lies in the highest-confidence bucket: the model reports an average confidence of 0.90 on these cases, but only two-thirds are actually correct. If the cost of an incorrect refund is high, then treating “auto-approve above 0.7” as a safe threshold by no means holds—the raw score may look high, but after bucketing this is exactly what is exposed. The calculation rule itself is simple: for each bucket, take |accuracy − average confidence| multiplied by the sample proportion, then add up the contributions of all buckets; the input is the scores and correctness labels of ten refund requests, and the output is the individual contributions of the low, medium, and high buckets plus the total ECE. The high bucket has average confidence 0.90 but only 2/3 correct, showing that the original threshold would let through many high-cost errors—this is exactly the message that calibration evaluation should convey to operational decisions.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 700 260" role="img" aria-label="Reliability diagram for three confidence buckets and human handoff threshold"><line x1="70" y1="205" x2="350" y2="205" stroke="#6b7484"/><line x1="70" y1="205" x2="70" y2="28" stroke="#6b7484"/><line x1="70" y1="205" x2="320" y2="44" stroke="#6b7484" stroke-dasharray="5 4"/><text x="204" y="235" text-anchor="middle" class="svg-t">Average confidence</text><text x="20" y="115" text-anchor="middle" class="svg-t" transform="rotate(-90 20 115)">Actual accuracy</text><circle cx="125" cy="151" r="7" fill="#4f9d78"/><text x="125" y="140" text-anchor="middle" class="svg-t" font-size="11">Low bucket .30/.33</text><circle cx="222" cy="98" r="7" fill="#d3a05a"/><text x="222" y="86" text-anchor="middle" class="svg-t" font-size="11">Medium bucket .65/.67</text><circle cx="308" cy="98" r="7" fill="#c77b72"/><text x="308" y="86" text-anchor="middle" class="svg-t" font-size="11">High bucket .90/.67</text><path d="M375,45 L375,210" stroke="#6b7484"/><rect x="410" y="48" width="244" height="48" rx="8" fill="#21252d" stroke="#c77b72"/><text x="532" y="68" text-anchor="middle" class="svg-t">Threshold τ=0.7: high bucket auto-answer</text><text x="532" y="86" text-anchor="middle" class="svg-t" font-size="11">Coverage 30%, selective risk 33%</text><rect x="410" y="119" width="244" height="48" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="532" y="139" text-anchor="middle" class="svg-t">After calibration, high bucket maps to about 0.67</text><text x="532" y="157" text-anchor="middle" class="svg-t" font-size="11">Original threshold no longer allows auto-answer</text><text x="532" y="198" text-anchor="middle" class="svg-t" font-size="11">Calibration corrects the meaning of probabilities, not the answer itself</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　High-confidence bucket actually answers only two-thirds correctly, exposing overconfidence; thresholds must be based on calibrated risk, not raw scores.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Bucket</th><th>Samples</th><th>Average confidence</th><th>Correct</th><th>Accuracy</th><th>Weighted difference</th></tr></thead><tbody><tr><td>Low</td><td>3</td><td>0.30</td><td>1</td><td>0.333</td><td>3/10×.033=.010</td></tr><tr><td>Medium</td><td>4</td><td>0.65</td><td>3</td><td>0.75</td><td>4/10×.10=.040</td></tr><tr><td>High</td><td>3</td><td>0.90</td><td>2</td><td>0.667</td><td>3/10×.233=.070</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Temperature scaling corrects scale but does not create knowledge<span class="dd-badge math">Post-processing</span></h2>
+<div class="dd-agent-response"><p>Classification probabilities from models are often systematically over-sharp: nearly all predictions sit at 0.95 or above, even when the actual error rate is far higher. Without retraining the model, how can such scores be pulled back to reality? Temperature scaling is one of the lightest-weight approaches. Let the logits output by the classifier be z; temperature scaling recomputes the probabilities as softmax(z/T):</p>
+<p>pᵢ = exp(zᵢ / T) / Σⱼ exp(zⱼ / T)</p>
+<p>Here T is the temperature parameter, chosen on an independent calibration set to minimize the calibration set's negative log-likelihood. When T is greater than 1, the exponents are compressed, the distribution becomes softer, and overconfidence decreases; when T is less than 1, the distribution becomes sharper and the model appears more confident. The key property is that scaling does not change the ordering of the class scores, so it usually does not change the top-1 prediction or accuracy; it only adjusts the probabilistic meaning of these scores — it preserves 'which class has the highest score' and corrects 'what real-world frequency this confidence corresponds to.'</p>
+<p>Temperature scaling is a global linear correction; it can only soften or sharpen the distribution as a whole. In binary classification settings, the simpler Platt scaling can be used; if the bias is severely nonlinear, isotonic regression can fit an arbitrary monotonic mapping, but it is more prone to overfitting when data are scarce. For free-text generation, the issue is even more upstream: you must first clearly define the event to be calibrated—for example, 'the eligibility judgment is correct and the cited evidence supports that judgment'—and then calibrate the score for that event. Without a clear definition of the correct label, it is unclear what a reported 0.8 refers to.</p>
+<p>Regardless of which correction is used, data discipline is indispensable: the training set learns the model, the validation set tunes the system, the calibration set learns the 'score → probability' mapping, and the test set evaluates final performance. Using test-set labels to select the temperature is equivalent to leaking the test set into parameter selection, and the calibration results will again carry optimistic bias. The inputs to temperature scaling are the classification logits z, the independent calibration labels, and the temperature T; the output is the rescaled probabilities softmax(z/T). It only fixes the score scale and does not create knowledge that the model did not originally have. If the event definition changes, or the online data distribution changes, you must re-verify that the calibration still holds.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Selective Prediction: Trading Off Coverage and Risk<span class="dd-badge eng">Decision</span></h2>
+<div class="dd-agent-response"><p>Calibration gives a risk probability for each answer; next you need to decide what to do for each request: answer automatically, route to a human, or reject. Selective prediction works by setting a threshold τ and automatically answering only samples whose score is at least τ. This produces two competing metrics: coverage, the proportion handled automatically, and selective risk, the error rate among automatically handled samples. As τ increases, coverage typically falls, while the risk in the automatically admitted portion also falls. Evaluation should plot the full risk–coverage curve rather than reporting only numbers at some convenient threshold—the curve reveals in which threshold region each unit of coverage given up buys how much risk reduction.</p>
+<p>Where exactly to set the threshold depends on the cost structure. We can write the expected cost of a threshold policy as:</p>
+<p>Cost(τ) = P(auto | τ) × P(error | auto, τ) × Cerror + P(manual | τ) × Cmanual + P(reject | τ) × Creject</p>
+<p>That is, multiply the probability of each of the three outcome types—automatic, manual, reject—by its corresponding cost and sum them: the cost of automatic handling comes from the error cost Cerror of the erroneous cases among them, manual handling incurs manual cost Cmanual, and rejection incurs rejection cost Creject. Taking refunds as an example, if the cost of wrongly promising a refund is 100 and a single manual review costs only 4, then even if many cases go to manual handling the total cost may still be worthwhile; by contrast, for low-risk copy polishing, error cost is very low, so the threshold can be relaxed and more requests can be handled automatically. Besides cost there are real-world constraints: manual review capacity and SLA. When the queue is full you cannot quietly auto-approve high-risk cases; it is better to degrade to delayed handling or explicit rejection than to let the system compromise on the high-risk threshold.</p>
+<p>Multi-stage systems can also split a single threshold into multiple gates, because a single answer confidence cannot cover all risk sources: when evidence is insufficient, supplement retrieval before deciding; when amount validation fails, route to a human; when permissions conflict, prohibit the action. Each gate manages one kind of risk, which is more operational than a single overall confidence score used as a blunt cutoff. The inputs to the entire selective decision are the calibrated score, threshold τ, error cost Cerror, manual cost Cmanual, rejection cost Creject, review capacity, and SLA; the outputs are the disposition for each request (automatic, manual, or reject) and the expected cost Cost(τ) under the threshold. Choosing the operating point means, subject to capacity and SLA constraints, picking a τ that makes the expected cost acceptable—the risk–coverage curve and the cost formula respectively answer 'how much automation to give up' and 'how much automation is worth giving up'.</p></div>
+<div class="dd-formula"><math display="block" aria-label="阈值策略的期望成本"><mi>Cost</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mi>Cerror</mi><mo>×</mo><mi>PerrorAuto</mi><mo>+</mo><mi>Cmanual</mi><mo>×</mo><mi>Pmanual</mi><mo>+</mo><mi>Creject</mi><mo>×</mo><mi>Preject</mi></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Sequence Probability, Semantic Diversity, and Systematic High-Confidence Errors<span class="dd-badge intuition">Failure Boundary</span></h2>
+<div class="dd-agent-response"><p>The model can report a high conditional probability for every token it generates, yet the whole answer can still be a hallucination. The reason is that sequence probability is the product of the conditional probabilities of the individual tokens, and longer sequences naturally have smaller products, so answers of different lengths cannot be directly compared; switching to average log probability is also problematic: it systematically favors common, short, templated phrasings over factually correct phrasings. The truth of a refund conclusion may hinge entirely on one entity name or one monetary amount, and that token is linguistically extremely common—highest probability, most factually wrong. Multiple sampling is equally unreliable: several samples giving the same wrong answer may merely be a shared blind spot induced by the training data and prompt style, not evidence that “the model is very confident.”</p>
+<p>Therefore the object of calibration must shift from “text fluency” to “task events.” Whether the eligibility conclusion is correct, whether the citation entails the conclusion, whether tool execution succeeds, and whether the final business state matches expectations should each be defined with separate labels and calibrated separately; treating the probability of the entire generation as the overall correctness rate is measuring the wrong thing.</p>
+<p>Several typical failure modes deserve separate handling. Length bias manifests as inflated scores for shorter answers and is corrected by length normalization and task-defined events. Same-source blind spots manifest as consistent errors across multiple samples and require external evidence and heterogeneous verifiers to break the consistency illusion. Slice mismatch manifests as good overall calibration but severe miscalibration for minority slices and must be checked using stratified reliability and minimum sample requirements. Distribution drift manifests as a sudden surge in errors under old thresholds and can only be addressed through continuous monitoring, recalibration, or proactive degradation.</p>
+<p>The inputs to sequence confidence analysis are token conditional probabilities, text length, semantic sampling results, task event labels, and external evidence; the output is a risk score defined in terms of task events. Its boundary is also clear: out-of-distribution inputs, new policy rollouts, retrieval index switches, or adversarial prompts all invalidate the old “score → correctness rate” mapping. In these cases, high confidence reported by the model cannot constitute a safety proof; it is only a residual reading from an old mapping that has not yet been retested.</p></div>
+<table class="dd-table"><thead><tr><th>Failure</th><th>Symptom</th><th>Response</th></tr></thead><tbody><tr><td>Length bias</td><td>Shorter answers score higher</td><td>Length normalization and task-defined events</td></tr><tr><td>Same-source blind spot</td><td>Multiple samples err consistently</td><td>External evidence, heterogeneous verifiers</td></tr><tr><td>Slice mismatch</td><td>Overall calibration, minority slices miscalibrated</td><td>Stratified reliability and minimum samples</td></tr><tr><td>Distribution drift</td><td>Errors surge under old thresholds</td><td>Monitor and recalibrate/degrade</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How to monitor whether calibration decays after launch<span class="dd-badge eng">Operations</span></h2>
+<div class="dd-agent-response"><p>Calibration is not a one-time task completed at launch: ground-truth labels often arrive days or even longer later, while online risk is real-time. The first thing production monitoring must do is make evaluation possible—save the raw score, calibration version, threshold, disposition outcome, task slice, and final label for every decision. With these records, once labels mature at any later point, you can go back and recalculate.</p>
+<p>When labels are not yet mature, use proxy signals for early warning: missing evidence, tool execution failures, user corrections, and human overrides arrive faster than final labels and can indicate that a slice may be deteriorating. But they are only early warnings and cannot replace calibration metrics; after labels mature, recalculate ECE, Brier score, and risk–coverage curves. Metrics should be viewed with rolling windows and confidence intervals to avoid frequently changing thresholds due to normal variation from small samples.</p>
+<p>The threshold itself should be set and frozen before release: select the threshold on a frozen evaluation set, record the expected coverage and risk as the post-launch comparison baseline. In the early post-launch period, sample in a canary fashion and manually review cases that were automatically passed, especially the batch whose scores sit right at the threshold boundary—that is where threshold error is most concentrated. Monitoring must be performed by slice: language, policy version, and input length should be examined separately; do not look only at aggregate numbers, otherwise a few slices being off will be averaged away.</p>
+<p>When drift or high-confidence errors exceed budget, actions should be explicit: tighten thresholds, roll back the old calibration mapping, or pause automatic actions. The last point is easy to get wrong: recalibration requires new, representative labels. Simply increasing the temperature without new labels to make the dashboard ECE look good does not restore consistency between event definitions and the data distribution; it merely changes the scale on an already-invalid mapping. The inputs to production monitoring are raw scores, calibration version, thresholds, decisions, slices, and delayed-maturing labels; outputs are rolling ECE, Brier, risk–coverage curves, and the disposition actions of tightening, rolling back, or pausing. Proxy signals only serve an early-warning role.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Connect the preceding steps in causal order; calibration from a problem to verifiable practice has six steps.</p>
+<p>The first step is to define the correctness event to be calibrated. Without this step, none of the subsequent probabilities would know what they refer to: what needs to be calibrated is “the refund eligibility determination is correct and supported by citations,” not “the text is fluent” or “the average token probability is high.” The event definition also determines how labels should be assigned.</p>
+<p>Step Two obtains raw scores from the model, evidence, and verifiers. Token log probabilities, consistency across multiple samples, model self-assessment, retrieval coverage, external validation results, and model disagreement can all be combined as signals, but at this stage the scores are only risk clues and do not yet have probabilistic meaning.</p>
+<p>Step Three learns the mapping “score → empirical accuracy” on an independent calibration set. This mapping is valid only for the signals from Step Two and the event definition from Step One, so the calibration set must be independent of the training and test sets.</p>
+<p>Step Four uses reliability diagrams and scoring rules for acceptance. After binning, compare the average confidence with the actual accuracy, compute ECE, and when necessary use Brier score or negative log-likelihood to add a penalty perspective, and check whether key slices are miscalibrated. This step answers whether reporting 0.8 really corresponds to about 80% being correct.</p>
+<p>Step Five chooses thresholds by error cost. With interpretable probabilities, use expected cost to trade off coverage against risk: if error cost is high, tighten the threshold and route more to human review; if error cost is low, relax the threshold and automate more, while remaining constrained by review capacity and SLA.</p>
+<p>Step Six continuously collects mature labels and monitors drift. After deployment, save the score, threshold, slice, and final label for each decision; once labels mature, recompute calibration metrics on a rolling basis; if new policies, new language slices, or distribution drift cause high-confidence errors to exceed the budget, tighten thresholds, roll back mappings, or pause automated actions, then wait for new representative labels to recalibrate.</p>
+<p>The six steps are interlocking: the event definition determines the semantics of scores and labels, the independent calibration set turns scores into probabilities, reliability acceptance verifies probability commitments, cost thresholds turn probabilities into disposition decisions, and production monitoring ensures this chain still holds after distribution shifts. If any step breaks—ambiguous event definition, calibration set leakage, reporting only overall results without checking slices, setting thresholds on raw scores, using temperature scaling instead of recalibration—then “80% confidence” degenerates back into a phrase with no frequency meaning.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1706.04599" target="_blank" rel="noopener">On Calibration of Modern Neural Networks</a>: Temperature scaling and modern network calibration</li><li><a href="https://arxiv.org/abs/2302.09664" target="_blank" rel="noopener">Semantic Uncertainty</a>: Semantic uncertainty in generation tasks</li><li><a href="https://arxiv.org/abs/1705.08500" target="_blank" rel="noopener">Selective Classification for Deep Neural Networks</a>: Risk-coverage and selective prediction</li><li><a href="https://arxiv.org/abs/2207.05221" target="_blank" rel="noopener">Uncertainty Estimation for Language Models</a>: A survey of confidence and calibration in language generation</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/uncertainty-calibration">Explore connections on the map</a><a href="/zh/concepts/uncertainty-calibration/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

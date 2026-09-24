@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>人在回路：把稀缺的人类判断放到能改变风险的节点 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>人在回路是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/human-in-the-loop/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="人在回路：把稀缺的人类判断放到能改变风险的节点">
+<meta property="og:title" content="人在回路是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="人在回路：把稀缺的人类判断放到能改变风险的节点">
+<meta name="twitter:title" content="人在回路是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/#page","name":"人在回路：把稀缺的人类判断放到能改变风险的节点","description":"从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。","url":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"人在回路：把稀缺的人类判断放到能改变风险的节点","item":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/#page","name":"人在回路是什么？原理通俗讲解 | AI 知识地图","description":"从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。","url":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"人在回路：把稀缺的人类判断放到能改变风险的节点","item":"https://ai-knowledge-map.com/zh/concepts/human-in-the-loop/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">人在回路：把稀缺的人类判断放到能改变风险的节点</span></li></ol></nav><article id="dd-article" data-concept-id="human-in-the-loop">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">人在回路：把稀缺的人类判断放到能改变风险的节点</span></li></ol></nav><article id="dd-article" data-concept-id="human-in-the-loop" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">人在回路：把稀缺的人类判断放到能改变风险的节点</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">从风险分层、升级阈值、审核界面和队列容量，到自动化偏见与反馈采样，设计真正降低伤害的人机闭环。</p>
 
@@ -178,7 +180,7 @@
 <p>这条链的因果方向是清晰的：先界定伤害与可逆性，才能定责任和红线；有了责任和红线，才有意义去校准风险和估成本；有了校准和成本，路由才有依据；路由出去之后，展示证据、记录决定、抽检监控、修正模型，每一步都在验证或改进前面的判断。八个步骤首尾相接，最终回到校准本身——人在回路的可靠性不是靠某一步，而是靠整条链每一环都闭合。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a>：风险治理与人类监督</li><li><a href="https://doi.org/10.1145/3290605.3300233" target="_blank" rel="noopener">Guidelines for Human-AI Interaction</a>：人机交互设计准则</li><li><a href="https://arxiv.org/abs/1606.06565" target="_blank" rel="noopener">Concrete Problems in AI Safety</a>：人类监督、可扩展控制与安全问题</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/human-in-the-loop">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/human-in-the-loop">在地图中查看概念关系</a><a href="/en/concepts/human-in-the-loop/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

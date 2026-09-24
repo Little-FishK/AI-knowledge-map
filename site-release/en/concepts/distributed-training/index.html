@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State? Explained Simply</title>
+<meta name="description" content="From global batch and all-reduce, to tensor parallelism, pipeline bubble, ZeRO/FSDP, 3D parallelism, and fault checkpointing.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/distributed-training/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/distributed-training/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/distributed-training/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State? Explained Simply">
+<meta property="og:description" content="From global batch and all-reduce, to tensor parallelism, pipeline bubble, ZeRO/FSDP, 3D parallelism, and fault checkpointing.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/distributed-training/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State? Explained Simply">
+<meta name="twitter:description" content="From global batch and all-reduce, to tensor parallelism, pipeline bubble, ZeRO/FSDP, 3D parallelism, and fault checkpointing.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/distributed-training/#page","name":"What Is Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State? Explained Simply","description":"From global batch and all-reduce, to tensor parallelism, pipeline bubble, ZeRO/FSDP, 3D parallelism, and fault checkpointing.","url":"https://ai-knowledge-map.com/en/concepts/distributed-training/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State","item":"https://ai-knowledge-map.com/en/concepts/distributed-training/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State</span></li></ol></nav><article id="dd-article" data-concept-id="distributed-training" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Distributed Training: Split along the Four Axes of Data, Tensor, Pipeline, and State</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From global batch and all-reduce, to tensor parallelism, pipeline bubble, ZeRO/FSDP, 3D parallelism, and fault checkpointing.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Distributed training is not “adding more GPUs”; it is deciding where parameters, gradients, optimizer states, activations, and samples are placed and when they communicate. Scaling efficiency is jointly limited by compute/communication ratio, peak memory, global batch semantics, topology, and fault recovery.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this you should be able to:</b>Calculate training memory and global batch size; distinguish DP/TP/PP/ZeRO; manually compute pipeline bubbles and scaling efficiency; design numerical consistency and recovery gates.</div>
+<ol class="dd-chain"><li>Account for parameter/state/activation peaks</li><li>Choose DP/TP/PP/sharding combination</li><li>Map communication domains by topology</li><li>Fix global batch size and numerical semantics</li><li>trace optimize computation-communication overlap</li><li>Perform real recovery and joint acceptance by quality/efficiency</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The weights can fit, but that does not mean training can fit.<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Judging whether a GPU can train a model, looking only at weight size is not enough. Take a 7B-parameter model as an example: 7B means approximately 7 billion parameters, and when stored in FP16, each weight occupies 2 bytes, so inference needs at least 7×10⁹ × 2 bytes ≈ 14 GB just for the weights. This looks like it fits in a 24GB GPU, so it is easy to mistakenly think that full fine-tuning on the same card is also fine. But inference only needs to use these weights once during the forward pass; training must retain a whole set of extra state for each parameter during backpropagation.</p>
+<p>Specifically, mixed-precision training typically maintains a higher-precision master copy of the weights for parameter updates, a gradient with the same shape as the weights, and two sets of historical statistics (first and second moments) that an adaptive optimizer such as Adam keeps for each parameter. In addition, intermediate results produced by each layer during the forward pass need to be stored temporarily for use during backpropagation; this part is called activations. Adding these together, each parameter in mixed precision corresponds to roughly 12–20 bytes of GPU memory state; for a 7B model, the total easily reaches a hundred-GB scale, far beyond a single 24GB card. If the sequence is very long or the batch is large, the activation part can even become the largest memory cost on its own.</p>
+<p>The inputs to the memory budget are the number of parameters, numerical precision, optimizer choice, batch size, sequence length, and temporary buffers; the outputs are the peak usage of each type of state, and based on that, whether each card can fit them. It directly determines which parallel axis to choose: data parallelism replicates the model, ZeRO/FSDP shards the optimizer state, tensor parallelism splits a single layer, pipeline parallelism splits the sequence of layers, and activation checkpointing trades recomputation for less activation storage. These strategies solve different objects; the premise for choosing them is first figuring out what actually occupies memory.</p>
+<p>Therefore, 'the weights can fit' only proves that the inference body can be loaded into GPU memory, not that backpropagation can run. Even if the sum of all items in the budget is less than the GPU memory capacity, implementation details, memory fragmentation, and communication buffers will also consume extra space; actual training must use measured peak usage and leave a safety margin. The correct order is to first estimate weights, gradients, optimizer states, activations, communication buffers, and fragmentation item by item, and then decide which parallel axis to use.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>The semantics of data parallelism is synchronizing the same update<span class="dd-badge math">Data Parallelism</span></h2>
+<div class="dd-agent-response"><p>The goal of data parallelism is not to have each device train a different model, but to have all devices update the same model in exactly the same way. Each rank (the process or device ID participating in training) holds a complete model replica, reads a different subset of samples, and computes local gradients after the forward and backward passes. At this point the gradients of the replicas differ from each other because they see different data. To keep the parameters in sync, a collective communication operation all-reduce is needed: all ranks sum their local gradients, and then send the same sum back to every participant. After the reduction, each rank performs the parameter update with the same global average gradient, so the parameters of all replicas remain consistent.</p>
+<p>The meaning of averaging is reflected in the formula. Let b be the local batch per device per micro-step, n the number of data parallel replicas, and a the number of gradient accumulation steps. Then the global batch actually used for one parameter update is B_global = b × n × a. Each rank accumulates the gradients of its a micro-steps to obtain the accumulated gradient g_r of rank r; all-reduce sums all g_r and broadcasts the sum to each replica, and each replica then updates parameters with the average gradient ḡ = (Σ_r g_r)/n. The three factors are multiplied rather than added because every micro-step occurs simultaneously on all n devices, and an update is triggered only after accumulating a steps: B_global describes “how many samples an update actually consumes,” b describes “how many samples one device can fit in one micro-step,” and a describes “how many steps to accumulate before updating.”</p>
+<p>This relationship directly constrains how scaling is done. If you simply increase the number of devices n without reducing b or a, B_global will increase accordingly; a larger global batch means different gradient noise, different learning-rate adjustments, and the semantics of the tokens actually consumed during training also change. If convergence behavior changes at that point, the reason is primarily that the experimental setup changed, not the hardware itself. On the other hand, the numerical precision and summation order of gradient reduction also affect the result: floating-point addition does not satisfy associativity, and different device counts or different reduction orders may produce slightly different ḡ. Conversely, loss values that look the same do not mean the experiments are the same; differences in data order, random number streams, and dropout sampling can all move the training trajectory to different places. When comparing data parallel experiments, what needs to be aligned is B_global, the learning rate, and the randomness configuration, not just the final loss.</p></div>
+<div class="dd-formula" data-formula-id="distributed-training-global-batch-gradient"><math display="block" aria-label="全局批量等于每卡局部批量 b 乘数据并行设备数 n 乘梯度累积步数 a；平均梯度等于各设备梯度之和除以 n"><mtable><mtr><mtd><msub><mi>B</mi><mtext>global</mtext></msub><mo>=</mo><mi>b</mi><mo>·</mo><mi>n</mi><mo>·</mo><mi>a</mi></mtd></mtr><mtr><mtd><mover><mi>g</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>g</mi><mi>r</mi></msub></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Worked Example: 8-Card Global Batch Size and Strong Scaling Efficiency<span class="dd-badge math">Step-by-Step Calculation</span></h2>
+<div class="dd-agent-response"><p>Put the data parallelism formula into a concrete configuration. Suppose each card processes 4 samples per micro-step (b = 4), accumulates 8 micro-steps before each update (a = 8), and there are 8 GPUs (n = 8). Then the number of samples actually seen in one optimization step is B_global = 4 × 8 × 8 = 256. Eight data parallel GPUs each execute forward and backward passes on their local micro-batches and accumulate gradients locally; during accumulation, there is no need to communicate at every micro-step. Only after the 8th micro-step ends does one all-reduce trigger, and after synchronization a single global parameter update is performed. This is the direct payoff of gradient accumulation on communication cost: communication frequency drops from "once per micro-step" to "once every a steps".</p>
+<p>Strong scaling efficiency measures how short the elapsed time can be made by adding devices for a fixed total workload. Suppose a single card takes 800 ms to process this fixed workload; then 8 cards in a completely ideal case should take only 100 ms, yielding an 8× speedup. The measured time is 140 ms, so the speedup drops to 800/140 ≈ 5.71× and the efficiency is 800/(8×140) = 71.4%. The extra 40 ms between ideal and measured comes from communication, synchronization waiting, and load imbalance. The results can be read as three rows: 1 device takes 800 ms, speedup 1×, efficiency 100%; 8 devices ideal take 100 ms, speedup 8×, efficiency 100%; 8 devices measured take 140 ms, speedup 5.71×, efficiency 71.4%. 100% efficiency holds only when communication has zero overhead, synchronization has zero wait, and load is completely balanced; as soon as any of these three exists, the measured time will be longer than the ideal value and efficiency will drop accordingly.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 710 260" role="img" aria-label="Eight data parallel GPUs each perform local micro-batch computation and gradient accumulation, then synchronize through all-reduce"><defs><marker id="dt1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><g fill="#21252d" stroke="#6b8cbe"><rect x="20" y="45" width="75" height="50" rx="6"/><rect x="105" y="45" width="75" height="50" rx="6"/><rect x="190" y="45" width="75" height="50" rx="6"/><rect x="275" y="45" width="75" height="50" rx="6"/><rect x="360" y="45" width="75" height="50" rx="6"/><rect x="445" y="45" width="75" height="50" rx="6"/><rect x="530" y="45" width="75" height="50" rx="6"/><rect x="615" y="45" width="75" height="50" rx="6"/></g><g class="svg-t" font-size="10" text-anchor="middle"><text x="57" y="75">GPU0</text><text x="142" y="75">GPU1</text><text x="227" y="75">GPU2</text><text x="312" y="75">GPU3</text><text x="397" y="75">GPU4</text><text x="482" y="75">GPU5</text><text x="567" y="75">GPU6</text><text x="652" y="75">GPU7</text></g><g stroke="#6b7484"><path d="M57,95 L310,150"/><path d="M142,95 L325,150"/><path d="M227,95 L340,150"/><path d="M312,95 L350,150"/><path d="M397,95 L360,150"/><path d="M482,95 L375,150"/><path d="M567,95 L390,150"/><path d="M652,95 L405,150"/></g><rect x="275" y="150" width="170" height="62" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="360" y="175" text-anchor="middle" class="svg-t">Gradient all-reduce</text><text x="360" y="197" text-anchor="middle" class="svg-t" font-size="11">4 per card × accumulation 8 × 8 cards = 256 samples</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1: During accumulation, there is no need to communicate at every micro-step; a global update occurs only after synchronization at step 8.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Device</th><th>Same total working time</th><th>Speedup</th><th>Efficiency</th></tr></thead><tbody><tr><td>1</td><td>800ms</td><td>1×</td><td>100%</td></tr><tr><td>8 ideal</td><td>100ms</td><td>8×</td><td>100%</td></tr><tr><td>8 measured</td><td>140ms</td><td>5.71×</td><td>71.4%</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Tensor Parallelism Splits a Single Layer, Communication Happens Within the Layer<span class="dd-badge eng">Tensor Parallelism</span></h2>
+<div class="dd-agent-response"><p>When the bottleneck is not the entire model but a single layer, data parallelism cannot help: it requires each card to hold a complete model replica. Take the MLP weight matrix 131072×262144 as an example, input dimension 131072, output dimension 262144 (about 34.4 billion parameters). Storing just this layer's weights in FP16 requires about 68.7GB, which cannot fit on a single card, let alone retaining its gradients and activations at the same time. Tensor parallelism (TP) solves this type of problem: it distributes the same layer's matrices or attention heads across multiple cards for joint computation, rather than each card holding a copy.</p>
+<p>Column parallelism is the basic TP splitting method: output columns are assigned to the devices, inputs are shared among devices, and each card computes only the portion of output columns it is responsible for. Taking the 131072×262144 matrix as an example, if 262144 output columns are split across n cards, each card only needs to store and compute the local matrix of size 131072×(262144/n). The immediately following layer can adopt row parallelism: it consumes the previous layer's local features, and finally uses all-reduce to aggregate the partial sums from all cards, reconstructing a layer result semantically equivalent to single-card computation. Here all-reduce is a collective, that is, a collective communication involving multiple devices together; within the same server, such communication typically goes over high-speed GPU interconnects such as NVLink. The reason communication occurs at almost every layer is that the layer is split: the layer's output is distributed across multiple cards, and the next layer either needs the complete input or partial sums, so typically one collective communication is needed after each layer to restore semantics.</p>
+<p>TP's inputs are the same batch of activations and the sharded layer weights, and its output is the layer result reassembled through collective communication, equivalent to single-card computation. It does reduce the per-card memory footprint of weights and partial activations, at the cost of extremely frequent communication, so it is particularly sensitive to small batches, slow links, and cross-node latency: the communication overhead of each layer must be amortized over enough computation to be worthwhile. The degree of parallelism also cannot be increased indefinitely; when the degree is too high, the local matrix assigned to each card becomes too small, and GPU utilization actually decreases. In engineering, operator fusion and asynchronous overlap of communication and computation are used to hide this overhead. The trade-offs of the three axes can be compared as follows:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Parallelism Axis</th><th class="dd-align-left">What It Splits</th><th class="dd-align-left">Communication Frequency</th><th class="dd-align-left">Suited For</th></tr></thead><tbody><tr><td class="dd-align-left">Data Parallelism</td><td class="dd-align-left">Samples</td><td class="dd-align-left">Every gradient synchronization</td><td class="dd-align-left">Model fits on a single card or state can be sharded</td></tr><tr><td class="dd-align-left">Tensor Parallelism</td><td class="dd-align-left">Single-layer matrix/attention heads</td><td class="dd-align-left">Almost every layer</td><td class="dd-align-left">Large single layer, high-speed interconnect</td></tr><tr><td class="dd-align-left">Sequence Parallelism</td><td class="dd-align-left">Sequence-dimension activations</td><td class="dd-align-left">Combined with Tensor Parallelism</td><td class="dd-align-left">Long-sequence activations</td></tr></tbody></table></div>
+<p>A practical criterion is: if adding devices reduces per-card memory, but tokens/s/GPU also drops, it usually indicates that communication overhead or too-small local operators offset the gains. Tensor parallelism is more suitable for domains with high-speed interconnects, and should not be extended to slow networks just to 'use a few more cards.'</p></div>
+<table class="dd-table"><thead><tr><th>Axis</th><th>What It Splits</th><th>Communication Frequency</th><th>Suited For</th></tr></thead><tbody><tr><td>Data Parallelism</td><td>Samples</td><td>Every gradient synchronization</td><td>Model fits on a single card/state can be sharded</td></tr><tr><td>Tensor Parallelism</td><td>Single-layer matrix/head</td><td>Almost every layer</td><td>Large single layer, high-speed interconnect</td></tr><tr><td>Sequence Parallelism</td><td>Sequence-dimension activations</td><td>Combined with TP</td><td>Long-sequence activations</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Pipeline parallelism splits layers, bubbles are filled by micro-batches<span class="dd-badge math">Pipeline</span></h2>
+<div class="dd-agent-response"><p>Pipeline parallelism targets the situation where “the model has too many layers and the entire model cannot fit on a single device.” It splits consecutive model layers into p stages, with each stage handled by several devices; a training batch is then split into m micro-batches, which flow through the stages in sequence to complete the forward and backward passes. When a micro-batch is passed between stages, the downstream stage is waiting for data and the upstream stage is waiting for gradients; this period of waiting without useful computation is called a bubble. Bubbles are the core cost of pipeline parallelism, and the question is what proportion they account for.</p>
+<p>Under the simplest synchronous schedule of the GPipe type, an idealized estimate can be given: efficiency is approximately m/(m+p−1), and the bubble fraction is approximately (p−1)/(m+p−1). For example, with p = 4 stages and m = 8 micro-batches, efficiency is about 8/(8+4−1) = 8/11 ≈ 72.7%, corresponding to a bubble of about 27.3%. The meaning of the formula is straightforward: f_bubble is the idealized idle-time fraction, p is the number of pipeline stages, and m is the number of micro-batches into which each batch is split; the denominator m+p−1 corresponds to the equivalent number of time units for the entire pipeline to go from idle to completing all micro-batches, and the numerator p−1 corresponds to the number of idle units during the pipeline fill and drain phases. This expression applies only to simplified schedules with similar per-stage costs; it does not include communication overhead, differences in forward and backward computation, or changes introduced by interleaved scheduling, so it can only serve as a starting point for estimation.</p>
+<p>The direct way to reduce bubbles is to increase m, but this is not free: more micro-batches means more intermediate activations reside in GPU memory, scheduling overhead increases, and if each micro-batch is too small, kernel utilization efficiency decreases. The 1F1B schedule has each stage alternately execute one forward pass and one backward pass in steady state, thereby reducing peak activation memory usage, and is a common choice for controlling this cost. In addition, when compute power is uneven across stages, the slowest stage determines the pace of the entire pipeline, so stages should be split according to the computational cost of layers rather than evenly by layer count. Pipelines also have a state-version problem: under asynchronous or interleaved scheduling, different micro-batches may use different versions of the weights, so consistency semantics must be clearly defined; otherwise, the same batch of data will be mixed with models from different points in time.</p></div>
+<div class="dd-formula" data-formula-id="distributed-training-pipeline-bubble"><math display="block" aria-label="理想流水线气泡比例约等于阶段数 p 减一，除以 micro-batch 数 m 加阶段数 p 减一"><mrow><msub><mi>f</mi><mtext>bubble</mtext></msub><mo>≈</mo><mfrac><mrow><mi>p</mi><mo>−</mo><mn>1</mn></mrow><mrow><mi>m</mi><mo>+</mo><mi>p</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>ZeRO / FSDP Sharded Data Parallel Redundant State<span class="dd-badge eng">State Sharding</span></h2>
+<div class="dd-agent-response"><p>A naive implementation of data parallelism has an obvious redundancy: each rank stores complete copies of optimizer state, gradients, and parameters, even though they should be the same. The idea of ZeRO and FSDP is to have data parallel ranks no longer each hold the complete training state long-term, but instead share it by rank. Sharding is progressive: ZeRO-1 shards optimizer state, ZeRO-2 additionally shards gradients, and ZeRO-3 and FSDP further shard the parameters themselves.</p>
+<p>The contents saved per GPU at each stage can be compared side by side: ordinary data parallelism replicates optimizer state, gradients, and parameters; ZeRO-1 shards optimizer state, while gradients and parameters are still replicated; ZeRO-2 shards both optimizer state and gradients, while parameters are still replicated; ZeRO-3/FSDP shards all three, and parameters are aggregated on demand. Sharding does not mean each GPU works independently after a static split: before computing a layer, each GPU uses all-gather to collect the parameters needed for that layer from other GPUs, then completes the layer's computation; after the backward pass, reduce-scatter is used to sum gradients across GPUs and leave only different shards on each GPU, so that each GPU still holds only the state it is responsible for in the long term.</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Stage</th><th class="dd-align-left">Optimizer</th><th class="dd-align-left">Gradients</th><th class="dd-align-left">Parameters</th></tr></thead><tbody><tr><td class="dd-align-left">Ordinary DP</td><td class="dd-align-left">Replicated</td><td class="dd-align-left">Replicated</td><td class="dd-align-left">Replicated</td></tr><tr><td class="dd-align-left">ZeRO-1</td><td class="dd-align-left">Sharded</td><td class="dd-align-left">Replicated</td><td class="dd-align-left">Replicated</td></tr><tr><td class="dd-align-left">ZeRO-2</td><td class="dd-align-left">Sharded</td><td class="dd-align-left">Sharded</td><td class="dd-align-left">Replicated</td></tr><tr><td class="dd-align-left">ZeRO-3/FSDP</td><td class="dd-align-left">Sharded</td><td class="dd-align-left">Sharded</td><td class="dd-align-left">Sharded/aggregated on demand</td></tr></tbody></table></div>
+<p>From the outside, the input is parameters and state sharded by rank, and the output should still be equivalent to one synchronous data parallel update: sharding changes the storage layout and communication pattern, not the update semantics. The granularity, prefetching, and recomputation of parameter all-gather need to match the network bandwidth and layer size; if the granularity is too coarse, a single communication is heavy, and if too fine, there are too many communication operations. Offload moves part of the state to CPU memory or NVMe storage, allowing larger models, but it may be limited by transfer bandwidth. Per-GPU peak memory decreases while collective communication proportion rises, which is the expected result of trading communication for memory; the real test is deployment elasticity—if it cannot re-shard when restoring from a checkpoint or changing world size, this scheme is still not qualified for elastic scaling.</p></div>
+<table class="dd-table"><thead><tr><th>Stage</th><th>Optimizer</th><th>Gradients</th><th>Parameters</th></tr></thead><tbody><tr><td>Ordinary DP</td><td>Replicated</td><td>Replicated</td><td>Replicated</td></tr><tr><td>ZeRO-1</td><td>Sharded</td><td>Replicated</td><td>Replicated</td></tr><tr><td>ZeRO-2</td><td>Sharded</td><td>Sharded</td><td>Replicated</td></tr><tr><td>ZeRO-3/FSDP</td><td>Sharded</td><td>Sharded</td><td>Sharded/aggregated on demand</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>3D parallelism is composed according to topology, not multiplied arbitrarily<span class="dd-badge eng">Composition</span></h2>
+<div class="dd-agent-response"><p>Single-axis parallelism cannot address all the constraints of large models. In actual deployments, data parallelism, tensor parallelism, and pipeline parallelism are often combined, which is called 3D parallelism. Taking 64 GPUs as an example, with DP=8, TP=4, and PP=2, there are 8 data-parallel replicas, tensor parallelism degree 4 per layer, and 2 pipeline stages, for a total of 8×4×2=64 devices. The communication characteristics of the three axes are completely different: within a TP group, communication is required in almost every layer, so TP should preferably be placed on high-speed interconnect within the same node; PP only passes activations between adjacent stages; DP groups synchronize gradients or state, with relatively low frequency but large per-transfer data volume. If the model also uses expert parallelism, all-to-all communication is added, where each device simultaneously sends tokens to multiple parties and receives from multiple parties. Therefore, the rank-to-device mapping must be topology-aware: placing a TP group across a slow network is equivalent to making the most frequent communication traverse the worst link.</p>
+<p>These combinations do not change the data-parallel counting rule. The global batch is determined only by the number of data-parallel replicas, the local micro-batch, and the number of gradient accumulation steps: B_global = B_microbatch × a × N_data_parallel, where B_microbatch is the number of samples processed at once by each data-parallel replica, a is the number of gradient accumulation steps, and N_data_parallel is the number of data replicas processing different samples. The formula does not multiply by tensor parallelism degree or pipeline parallelism degree, because TP and PP only jointly complete the model computation for the same replica and do not increase the samples seen by this update. Multiplying all 64 GPUs into the batch is equivalent to mistaking TP's 4 and PP's 2 as independent sample dimensions, which inflates the global batch by 8 times or more; subsequently the learning rate and training trajectory will be set according to the wrong batch, and experimental conclusions will naturally be distorted.</p>
+<p>The inputs to the configuration are the device topology, the three parallelism degrees, and the batch configuration; the outputs are rank groups, communication domains, and the invariant optimizer semantics: no matter how TP and PP are split, the number of samples consumed by one optimization step is determined only by the data-parallel dimension.</p></div>
+<div class="dd-formula" data-formula-id="distributed-training-3d-global-batch"><math display="block" aria-label="全局批量等于局部微批量乘梯度累积步数乘数据并行度，不乘张量并行度或流水线并行度"><mrow><msub><mi>B</mi><mtext>global</mtext></msub><mo>=</mo><msub><mi>B</mi><mtext>microbatch</mtext></msub><mo>·</mo><mi>a</mi><mo>·</mo><msub><mi>N</mi><mtext>data parallel</mtext></msub><mspace width="0.8em"/><mo>(</mo><mtext>not multiplied by TP or PP</mtext><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Checkpointing and fault recovery are part of scaling<span class="dd-badge eng">Reliability</span></h2>
+<div class="dd-agent-response"><p>After training scale expands, failures change from occasional events into situations that must be handled routinely: a node goes down after two weeks of training; what must be guaranteed is not “pray it doesn't happen,” but “when it happens, neither start over from scratch nor recover incorrectly.” The contents of a checkpoint are therefore far broader than “saving a copy of the weights”: the model, optimizer, learning rate scheduler, random number state, data cursor, loss scaling, and parallelism metadata must all be written to disk. If any one of these is missing, training after recovery will continue from a subtly misaligned place.</p>
+<p>Sharded training imposes additional requirements on checkpoints. Under schemes such as ZeRO/FSDP, state is stored in shards by rank, so checkpoints either support resharding to a different world size or explicitly declare that they cannot; the write process uses temporary artifacts plus an atomic manifest to avoid leaving a corrupted snapshot after half of the ranks write successfully and half fail. Checkpoint interval is a trade-off between write overhead and lost computation: the more frequently you save, the less you have to recompute after a failure, but training is interrupted more often; and the more devices there are, the higher the overall failure rate, and the two jointly determine how dense the interval should be. Verifying checkpoints cannot only check whether files exist; it must periodically perform real recovery drills, comparing whether the recovered loss curve and sample sequence align with the original trajectory.</p>
+<p>Elastic training also introduces membership changes: after nodes join or leave, batch partitioning and random streams must be readjusted. The “exactly once” data semantics are difficult to implement—during recovery samples may be duplicated or skipped—so the sampler state and global step must be persisted, making duplication and skipping controllable and explainable rather than random.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Scaling evaluation must distinguish strong scaling from weak scaling<span class="dd-badge intuition">Evaluation</span></h2>
+<div class="dd-agent-response"><p>To evaluate the effect of distributed training, first determine what you are measuring. When the number of GPUs doubles, if the total problem size remains unchanged, you are measuring strong scaling: fix the total model and total work, and see how much speedup the same task gains as devices increase. If the per-GPU workload remains unchanged, you are measuring weak scaling: the total problem grows in proportion to the number of devices, and you see whether per-unit efficiency can be maintained. The two answer different questions—strong scaling is concerned with “can the same thing be finished faster,” while weak scaling is concerned with “after scaling up, is each GPU still equally cost-effective.”</p>
+<p>The input to the evaluation is an experimental protocol kept consistent across different device counts, and the output should not be only throughput but a joint report: speed, efficiency, memory, power consumption, recovery, and final quality. Throughput metrics must distinguish their scope: tokens/s is the number of tokens processed per second by the cluster, tokens/s/GPU is the efficiency amortized to each GPU; MFU is the ratio of actual useful model computation to the hardware's theoretical peak; collective fraction is the proportion of a step's time taken by collective communication. Data waiting, bubbles, recomputation, peak memory, power consumption, and recovery time must also be reported. Any of these may make a training run that looks good on throughput unsustainable in practice.</p>
+<p>At the same time, training semantics must be verified: global batch, learning rate, number of tokens, data order, dropout random stream, loss scaling, and reduction precision must all be aligned. Improved throughput with degraded final quality is not successful scaling. Conversely, a low MFU only shows that the hardware is not fully used for model computation; it cannot alone determine whether the bottleneck comes from data, communication, or operators that are too small. To locate the bottleneck, use a trace to break a step into data loading, forward, backward, collective communication, optimizer, and checkpoint, and map the time proportions and wait dependencies of each part; low GPU utilization is only a symptom, and the wait relationships in the trace point to the cause.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Connect the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Linking the entire path together, distributed training starts from the question of 'whether it can fit' and ultimately must land on verifiable practice. The first step is to calculate the peak occupancy of parameters, optimizer states, and activations, which determines which axes are truly necessary—choosing a parallelism strategy before the accounting is clear is like prescribing medicine without knowing the bottleneck. The second step is to choose the combination of DP, TP, PP, and sharding accordingly: if state redundancy is large, use ZeRO/FSDP; if a single layer is too large, use tensor parallelism; if the layer sequence is too long, use pipeline parallelism; only the sample dimension is delegated to data parallelism. The third step is to map communication domains according to device topology, placing the most frequent TP communication within high-speed interconnects and avoiding offloading collective communication that occurs in almost every layer to a slow network. The fourth step is to fix the global batch size and numerical semantics: B_global = B_micro-batch × a × N_data_parallel, which is determined only by the data-parallel dimension; the learning rate, token count, data order, dropout random stream, loss scaling, and reduction precision must all be aligned with the baseline, otherwise performance conclusions are not comparable. The fifth step is to use a trace to break the step apart and find the waiting dependencies among data loading, forward, backward, collective communication, optimizer, and checkpointing, filling idle time through asynchronous overlap of computation and communication. The final step is real recovery and joint acceptance: conduct fault recovery drills, compare loss and sample sequences before and after recovery, and judge whether this scaling is valid by the combined result of quality and efficiency—rather than throughput alone. If any step is skipped, the causal effects left by the preceding steps will be amplified downstream.</p></div>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/1909.08053" target="_blank" rel="noopener">Megatron-LM</a>: tensor model parallelism</li><li><a href="https://arxiv.org/abs/1910.02054" target="_blank" rel="noopener">ZeRO</a>: training state sharding</li><li><a href="https://arxiv.org/abs/1811.06965" target="_blank" rel="noopener">GPipe</a>: pipeline parallelism and micro-batch</li><li><a href="https://pytorch.org/docs/stable/fsdp.html" target="_blank" rel="noopener">PyTorch FSDP</a>: fully sharded data parallel implementation semantics</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/distributed-training">Explore connections on the map</a><a href="/zh/concepts/distributed-training/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -30,6 +30,10 @@
 .concept-preview #topbar .brand-name { margin: 0; font-size: 14px; }
 .concept-preview #topbar .release-directory-link { color: #b4d4ff; padding: 7px; }
 .concept-preview .settings-overlay { font-size: 14px; line-height: 1.6; }
+@media (max-width: 1100px) {
+  .concept-preview #topbar { height: auto; flex-wrap: wrap; gap: 6px 10px; }
+  .concept-preview #topbar .search-wrap { min-width: 0; }
+}
 @media print { .concept-preview #topbar, .concept-preview .settings-overlay { display: none; } }
 .brand h1.brand-name { display: block; font-size: inherit; margin: 0; }
 .site-breadcrumbs { max-width: 960px; margin: 1rem auto; padding-inline: 1rem; font-size: .9rem; }
@@ -53,3 +57,24 @@
 /* Public reading status is independent of the internal editorial workflow. */
 .dd-publication-notice { display: flex; flex-wrap: wrap; gap: .25rem .75rem; padding: .75rem 1rem; margin: 1rem 0; border: 1px solid var(--line); border-radius: 8px; color: var(--fg-dim); font-size: .875rem; line-height: 1.65; }
 .dd-publication-notice strong { color: var(--fg); font-weight: 600; }
+
+/* Quiet editorial surfaces share the atlas palette without animated backgrounds. */
+.dd-top { background: #101c25; border-bottom-color: #a3bfce2b; min-height: 58px; }
+.dd-scroll { background: radial-gradient(ellipse at 50% 0,#20354055,transparent 650px),var(--bg); }
+.dd-hero { border-bottom-color: #93b2c632; padding-bottom: 30px; }
+.dd-eyebrow { color: #aac7ee; }
+.dd-h1:not(.dd-h1-provisional):not(.dd-h1-editorial-draft) { color: #edf2f2; letter-spacing: -.03em; }
+.dd-sub { color: #a6b9c5; line-height: 1.8; }
+.dd-hero a { color: #b9dbeb; text-underline-offset: 4px; }
+.dd-thesis { border-radius: 0 10px 10px 0; background: linear-gradient(110deg,#a7cce614,#a7cce606); }
+.dd-goals, .reading-toc { background: #15232db3; border-radius: 12px; border-color: #7695aa45; }
+.dd-n { border-radius: 8px; background: #a7cce615; border: 1px solid #a7cce630; color: #c3ddea; }
+.dd-sec h2 { letter-spacing: -.02em; }
+.dd-fig { border-radius: 12px; }
+.onboarding-reader { background: linear-gradient(150deg,#182832f2,#101c25); border-color: #a4c0d033; border-radius: 16px; box-shadow: 0 20px 70px #0003; }
+.site-directory > h1 { font-size: clamp(28px,4vw,44px); letter-spacing: -.04em; }
+.directory-item { padding: 20px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-panel); }
+@media print {
+  .dd-scroll, .dd-thesis, .dd-goals, .reading-toc, .directory-item { background: transparent !important; box-shadow: none !important; }
+  .dd-h1:not(.dd-h1-provisional):not(.dd-h1-editorial-draft), .dd-sub, .dd-eyebrow { color: black; }
+}

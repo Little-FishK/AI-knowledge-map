@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is World Models: Predicting the World After Actions in Internal States? Explained Simply</title>
+<meta name="description" content="From state representations, transition and reward models, to imagined rollouts, model predictive control, uncertainty, and model exploitation, understand how “trying things out in the mind” helps and misleads agents.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/world-models/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/world-models/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/world-models/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is World Models: Predicting the World After Actions in Internal States? Explained Simply">
+<meta property="og:description" content="From state representations, transition and reward models, to imagined rollouts, model predictive control, uncertainty, and model exploitation, understand how “trying things out in the mind” helps and misleads agents.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/world-models/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is World Models: Predicting the World After Actions in Internal States? Explained Simply">
+<meta name="twitter:description" content="From state representations, transition and reward models, to imagined rollouts, model predictive control, uncertainty, and model exploitation, understand how “trying things out in the mind” helps and misleads agents.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/world-models/#page","name":"What Is World Models: Predicting the World After Actions in Internal States? Explained Simply","description":"From state representations, transition and reward models, to imagined rollouts, model predictive control, uncertainty, and model exploitation, understand how “trying things out in the mind” helps and misleads agents.","url":"https://ai-knowledge-map.com/en/concepts/world-models/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"World Models: Predicting the World After Actions in Internal States","item":"https://ai-knowledge-map.com/en/concepts/world-models/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">World Models: Predicting the World After Actions in Internal States</span></li></ol></nav><article id="dd-article" data-concept-id="world-models" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">World Models: Predicting the World After Actions in Internal States</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From state representations, transition and reward models, to imagined rollouts, model predictive control, uncertainty, and model exploitation, understand how “trying things out in the mind” helps and misleads agents.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> World models learn the approximate dynamics of how the environment changes under actions; agents can compare candidate actions at low cost within the model; but planners actively seek out prediction errors and amplify them along long trajectories, so value depends not only on single-step reconstruction but also on state sufficiency, uncertainty, and closed-loop correction with the real environment.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading you should be able to:</b>Define state/transition/reward models; calculate multi-step error and return; explain model predictive control; identify state aliasing and model exploitation.</div>
+<ol class="dd-chain"><li>Learn state and transition from real trajectories</li><li>Roll out candidate actions within the model</li><li>Score by predicted return and risk</li><li>Execute only near-term actions</li><li>Use real observations to correct the state</li><li>Feed model exploitation counterexamples back into training</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>What problems do world models solve?<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Planning is expensive and dangerous because if every candidate action had to be tried in the real world, the cost of trial and error could be too high to bear. A collision by a real robot could damage hardware, a failure in a game could lose long-accumulated progress, and a write operation in a production system could contaminate real data. An RL agent needs a way to roughly know what consequences an action will have before actually acting, so that obviously poor options can be filtered out first.</p>
+<p>World models exist for exactly this purpose. Their core idea is to compress high-dimensional, noisy observations into an internal state, and then predict, based on this internal state: after taking an action, what the next state will be, how much reward will be received, and whether the current episode will terminate. Once it has this predictive ability, the RL agent can simulate the consequences of actions in its "imagination"—first mentally running through several candidate options, filtering out clearly bad choices, and finally actually executing only one candidate. In this way, the number of trial-and-error attempts in the real environment is greatly reduced, and the cost is correspondingly lowered.</p>
+<p>It is worth emphasizing its inputs and outputs: the input is the current state and a candidate action, and the output is a prediction of the next state, reward, or termination probability. Together these three constitute all the key information the RL agent needs for decision-making: the next state determines "what step comes next", the reward determines "whether this step is worth it", and the termination probability determines "whether this path has reached its end."</p>
+<p>One key boundary must be made clear: a world model is not a complete copy of the world, but an approximate simulator that retains the necessary variables for the decision task. It only cares about the variables that truly affect the consequences of actions, and the remaining irrelevant details are compressed or discarded. This means that being able to generate a realistic video does not equal predicting the consequences of actions correctly. The pixels may look reasonable, but the model could be completely wrong about collisions, inventory, or rewards. The basis for judging whether a world model is good or bad is whether its predicted action consequences are reliable, not whether the generated image looks visually appealing.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>State, Action, Transition, and Reward<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>A world model that can be used for planning must at least be able to answer four quantities: what the current state is, what the state will become after taking a certain action, how much reward can be obtained at this step, and optionally whether the state can be reconstructed back into an observation. These correspond to several components in the model, and can be written as the following set of equations:</p>
+<p>zₜ = E(o₍≤ₜ₎), ẑ₍ₜ₊₁₎ = f(zₜ, aₜ), r̂ₜ = g(zₜ, aₜ)</p>
+<p>Let's break down the meaning of each step one by one.</p>
+<p>The encoder E compresses the current and historical observations o₍≤ₜ₎ into an internal state zₜ. Observations may be high-dimensional, such as a frame of video or a stream of sensor readings; the state is a compact representation chosen internally by the model. The dynamics function f is the core transition model: given the current state zₜ and a candidate action aₜ, it predicts the next state ẑ₍ₜ₊₁₎. The “hat” here indicates that this is a predicted value, not the state that actually occurs in the real environment. The reward model g uses the same inputs zₜ and aₜ to estimate the action value r̂ₜ for this step—that is, whether this step is worth doing. Together, these three components allow the agent to advance the future in imagination: first encode the state, then repeatedly use f to predict the next state and g to evaluate the return at each step.</p>
+<p>Optionally, the model may also include a decoder that reconstructs the state z back into an observation for auxiliary training. Its purpose is to provide a reconstruction target for comparison, helping the encoder learn more informative states, but it is not strictly necessary for decision-making.</p>
+<p>Whether the state is “sufficient” is a key question. If the environment is partially observable, looking only at the current frame is often insufficient to assess the situation—for example, from a single frame you cannot tell whether an object is moving left or right, nor how much of an occluded inventory remains. In this case, the state cannot be determined solely by the current observation; it must integrate historical information, or explicitly maintain a belief distribution over hidden variables. This is exactly why the input to encoder E is written as o₍≤ₜ₎ rather than a single oₜ: it encodes all observations up to the current moment, thereby bringing cross-time information such as velocity and hidden inventory into the state.</p>
+<p>From this we can give a precise meaning of “state sufficiency”: given a state z and the subsequent action sequence, predicting the future no longer requires earlier history. In other words, z compresses all past information relevant to decision-making, and past observations can be safely discarded. It is particularly important to clarify that state sufficiency is a modeling goal, not a property that automatically holds as long as the vector dimension is made large enough. A large dimension only provides space to hold information; if the encoder does not actually put the needed information in, the state can still lose key quantities no matter how long it is.</p></div>
+<div class="dd-formula" data-formula-id="world-models-formula-1" data-display="mathml"><math display="block" aria-label="z t =E(o ≤t ), hat z t+1 =f(z t ,a t ), hat r t =g(z t ,a t )"><mrow><mi>z</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>=</mo><mi>E</mi><mo>(</mo><mi>o</mi><mspace width="0.35em"/><mo>≤</mo><mi>t</mi><mspace width="0.35em"/><mo>),</mo><mspace width="0.35em"/><mi>hat</mi><mspace width="0.35em"/><mi>z</mi><mspace width="0.35em"/><mi>t</mi><mo>+</mo><mn>1</mn><mspace width="0.35em"/><mo>=</mo><mi>f</mi><mo>(</mo><mi>z</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>,</mo><mi>a</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>),</mo><mspace width="0.35em"/><mi>hat</mi><mspace width="0.35em"/><mi>r</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>=</mo><mi>g</mi><mo>(</mo><mi>z</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>,</mo><mi>a</mi><mspace width="0.35em"/><mi>t</mi><mspace width="0.35em"/><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Where Training Signals Come From<span class="dd-badge eng">Learning</span></h2>
+<div class="dd-agent-response"><p>A world model is not guessed out of thin air; all of its predictive ability comes from trajectories collected in the real environment. A trajectory consists of several steps, and each step is denoted as (o, a, r, o′): given observation o, action a was taken, reward r was received, and the next observation o′ was reached. The goal of training is to have the model learn from a large number of such real samples “If I do this, what happens next?” During training, all parts of the model are optimized simultaneously: the state representation, the prediction of the next state or next observation, the reward prediction, and the termination prediction are all adjusted to be consistent with the real trajectories.</p>
+<p>The choice of training signal determines where the model spends its capacity and also determines its blind spots. There is an obvious tension here: if only pixels are reconstructed, the model tends to spend a lot of capacity on details irrelevant to decision-making, such as background texture; no matter how well the image is reconstructed, it may not be useful for control. Conversely, if only rewards are predicted, the model may discard factors that are important for future actions but have no reward at the current step—such as an intermediate action that does not score now but paves the way for later scores. Therefore, in practice multiple objectives are usually combined, each preserving part of the information and compensating for each other's blind spots.</p>
+<p>The objective of observation reconstruction is to preserve visual details. Its value lies in providing the encoder with a comparable reconstruction signal, but it is also the easiest to slip into the blind spot of “beautiful but irrelevant to control.” The objective of latent transition is to preserve state dynamics, that is, to make the state evolve according to the true dynamics in the latent space; its risk is representation collapse—the model may map all inputs to almost the same state, making the transition meaningless, in which case additional constraints are needed to prevent this degradation. The objective of reward and termination prediction is to align directly with the task signal; its blind spots lie in sparse rewards and proxy loopholes—when rewards rarely appear, pure reward supervision is difficult to propagate, and once the reward itself has exploitable loopholes, the model will learn to exploit flaws in the reward function rather than complete the real task. The objective of contrastive prediction is to enable states to distinguish different futures; its blind spots lie in the definition bias of negative samples and augmentation methods. If negative samples are chosen poorly or the augmentation method is inappropriate, the standard for “distinguishable” will be distorted.</p>
+<p>These objectives must be used in combination, because no single objective can cover all necessary information at the same time. In addition, there is an easily overlooked requirement: the exploration data used for training must cover the actions that the planner may choose in the future. If the model is trained only on trajectories of a certain type of action, but the planner selects actions outside the training distribution, then the model's predictions for those actions will be unreliable, and subsequent planning will be built on unreliable predictions.</p></div>
+<table class="dd-table"><thead><tr><th>Objective</th><th>What it preserves</th><th>Blind spots</th></tr></thead><tbody><tr><td>Observation reconstruction</td><td>Visual details</td><td>Beautiful but irrelevant to control</td></tr><tr><td>Latent transition</td><td>State dynamics</td><td>Representation collapse requires extra constraints</td></tr><tr><td>Reward/termination</td><td>Direct task signal</td><td>Sparse rewards, proxy loopholes</td></tr><tr><td>Contrastive prediction</td><td>Distinguishable futures</td><td>Definition bias in negative samples and augmentation</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>How Two-Step Planning Happens Inside the Model<span class="dd-badge math">Worked Example</span></h2>
+<div class="dd-agent-response"><p>A concrete small scenario can make clear how planning actually happens inside the model. Imagine a cart that is still 3 cells away from the goal, and there is a pit in the 2nd cell directly ahead of it. Now there are two candidate routes: go straight and detour. What the world model needs to do is to roll out two steps in imagination for each of these two routes, predict the reward at each step, and then discount the rewards into total returns for comparison.</p>
+<p>The predicted reward at each step is denoted as r̂₁ and r̂₂, representing the predicted reward at step 1 and step 2, respectively. To compare rewards at different time points, a discount factor γ is used to discount future rewards to the present; here γ = 0.9, so the two-step predicted return is computed as r̂₁ + γ × r̂₂, and the true two-step return is likewise computed with the true rewards using the same formula.</p>
+<p>First consider going straight. At step 1 it moves forward one cell, with predicted reward +2 (closer to the goal); at step 2 it continues forward and steps right into the pit, with predicted reward −10. Therefore the predicted return is +2 + 0.9 × (−10) = −7.0, exactly matching the true two-step return of −7.0. Now consider the detour. At step 1 it goes around, with predicted reward 0; at step 2 it moves toward the goal again, with predicted reward +2. The predicted return is 0 + 0.9 × 2 = 1.8, likewise equal to the true 1.8. The planner compares these two values: −7.0 versus 1.8, and naturally chooses the detour. This is exactly the value of two-step imagination—it lets the planner see the disaster that immediately follows a short-term positive reward, thereby avoiding the short-sighted choice of going straight.</p>
+<p>The crucial third row reveals how the model's error is amplified. Suppose the world model missed the pit information during training—it did not learn from observations that there is a pit ahead. Then for the straight path, the model will still predict +2 at step 1 and +2 at step 2, giving a predicted return of +2 + 0.9 × 2 = 3.8. This number is higher than the detour's 1.8, so the model will rank the straight path first, while the true return of going straight is actually −7.0. This is a wrongly overestimated estimate: the model thinks it is taking the safest route, but it is actually taking the most dangerous route.</p>
+<p>The meaning of this row is worth emphasizing: the planner can only optimize predicted returns, not directly optimize true returns. When the world model misses the pit, it will rank the most dangerous route first; moreover, the stronger the planning ability and the more thorough the search, the more stably it will exploit this error—because a stronger planner will more thoroughly mine the model's internal wrong conclusion that 'going straight is beneficial.' Therefore the solution is not to 'search more,' because no amount of searching can find a pit the model does not know about. The correct direction is: collect data near the pit to let the model fill in this information, express predictive uncertainty, penalize out-of-distribution trajectories, and shorten the length of open-loop rollouts. This last point directly raises the next question: why does executing only the first step and then re-observing reduce the error caused by long rollouts?</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 680 250" role="img" aria-label="World model imagines the two two-step trajectories, straight and detour, and compares predicted returns"><defs><marker id="wm1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#6b7484"/></marker></defs><rect x="22" y="92" width="112" height="60" rx="8" fill="#21252d" stroke="#6b8cbe"/><text x="78" y="116" text-anchor="middle" class="svg-t">z₀: distance to goal 3</text><text x="78" y="136" text-anchor="middle" class="svg-t" font-size="10">pit location unknown/estimated</text><path d="M134,111 L190,62" stroke="#6b7484" marker-end="url(#wm1)"/><path d="M134,133 L190,184" stroke="#6b7484" marker-end="url(#wm1)"/><rect x="192" y="28" width="142" height="70" rx="8" fill="#21252d" stroke="#c77b72"/><text x="263" y="52" text-anchor="middle" class="svg-t">Straight a₁</text><text x="263" y="72" text-anchor="middle" class="svg-t" font-size="10">r̂₁=+2, 2 from goal</text><text x="263" y="88" text-anchor="middle" class="svg-t" font-size="10">Second step predicted to fall into pit r̂₂=−10</text><rect x="192" y="160" width="142" height="70" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="263" y="184" text-anchor="middle" class="svg-t">Detour a₂</text><text x="263" y="204" text-anchor="middle" class="svg-t" font-size="10">r̂₁=0, still 3 from goal</text><text x="263" y="220" text-anchor="middle" class="svg-t" font-size="10">Second step safely advances r̂₂=+2</text><path d="M334,63 L412,63" stroke="#6b7484" marker-end="url(#wm1)"/><path d="M334,195 L412,195" stroke="#6b7484" marker-end="url(#wm1)"/><rect x="414" y="30" width="118" height="66" rx="8" fill="#21252d" stroke="#c77b72"/><text x="473" y="54" text-anchor="middle" class="svg-t">Ĝ straight</text><text x="473" y="77" text-anchor="middle" class="svg-t" font-size="10">2+0.9×(−10)=−7</text><rect x="414" y="162" width="118" height="66" rx="8" fill="#21252d" stroke="#4f9d78"/><text x="473" y="186" text-anchor="middle" class="svg-t">Ĝ detour</text><text x="473" y="209" text-anchor="middle" class="svg-t" font-size="10">0+0.9×2=1.8</text><path d="M532,195 L576,195" stroke="#6b7484" marker-end="url(#wm1)"/><rect x="578" y="166" width="84" height="58" rx="8" fill="#21252d" stroke="#d3a05a"/><text x="620" y="190" text-anchor="middle" class="svg-t">Execute detour</text><text x="620" y="209" text-anchor="middle" class="svg-t" font-size="10">Then observe reality</text><path d="M620,165 C614,118 475,116 473,98" fill="none" stroke="#6b7484" stroke-dasharray="4 3" marker-end="url(#wm1)"/><text x="552" y="119" text-anchor="middle" class="svg-t" font-size="10">Real observation corrects model state, then roll out planning again</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  Two-step imagination lets the planner see the disaster after short-term positive reward; executing only the first step and re-observing is the core of how model predictive control reduces long-rollout error.</figcaption></figure>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>r̂₁</th><th>r̂₂</th><th>Predicted return with γ=0.9</th><th>True two-step return</th></tr></thead><tbody><tr><td>Straight</td><td>+2</td><td>−10</td><td>−7.0</td><td>−7.0</td></tr><tr><td>Detour</td><td>0</td><td>+2</td><td>1.8</td><td>1.8</td></tr><tr><td>Model misses pit</td><td>+2</td><td>+2</td><td>3.8 (wrongly overestimated)</td><td>−7.0</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Why Model Predictive Control Executes Only the First Step<span class="dd-badge eng">Closed Loop</span></h2>
+<div class="dd-agent-response"><p>Since the planner has already rolled out a ten-step optimal action sequence in the model, why not execute the whole sequence and instead only execute the first step? The answer is: the model's predictions accumulate error with rollout length; the farther it rolls, the less trustworthy the later steps become. The approach of model predictive control is: each round, roll forward H steps within the model, select the action sequence with the highest predicted return, but actually execute only the first action in the sequence. After execution, the environment returns a real observation, the agent uses this real observation to update its state, and then restarts a round of rollout and optimization. And so on: plan H steps, execute 1 step, observe again, plan again.</p>
+<p>The core benefit of doing this is frequent correction. Because each round only takes a small step and then stops to correct with real observations, prediction errors have no chance to keep accumulating over a long chain; at the same time, the agent can also respond to the behavior of other entities in the environment or sudden changes—if an opponent or the environment changes the situation midway, the next round of planning will immediately incorporate this new information.</p>
+<p>The cost is equally clear: each step requires replanning once, and the computational burden increases significantly. Therefore, a trade-off must be made among the rollout length H, the number of candidate actions, and real-time latency. The larger H is, the farther a single round of planning can see, but the more single-step prediction errors accumulate, and the heavier the computation for a single round becomes; the more candidates there are, the more thorough the search, but the more it slows down the response. In real systems, these three are mutually squeezing budgets.</p>
+<p>One more point must be made clear: the “checkpoints” used for correction must come from the real environment. Only the positions actually returned by actuators, inventory quantities, or test results are trustworthy bases for correction; a “now we have arrived at such-and-such location” that the model itself continues to write out must never be used as a checkpoint. If the intermediate states written out by the model are treated as real states for correction, that is equivalent to letting the error closed loop prove itself, losing the meaning of using real observations to interrupt error accumulation. The entire value of model predictive control lies in its constantly returning to the real environment to demand the truth of the next step.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Why Error Magnifies with Rollout Length<span class="dd-badge math">Error Propagation</span></h2>
+<div class="dd-agent-response"><p>Intuitively, one might ask: if the model only errs by a little on average at each step, why does rolling out the plan over a long horizon cause it to completely deviate from the true trajectory? The answer lies in how errors accumulate over time. Let the upper bound on the state error at each step be ε, and let the sensitivity of the dynamics to the state be approximately L—this measures how much a small perturbation in the previous state is amplified or reduced by the next transition. Then the rough recurrence for the error can be written as:</p>
+<p>e₍ₜ₊₁₎ ≤ L · eₜ + ε</p>
+<p>Reading this expression from left to right: the error at the next step is at most equal to the previous step's error amplified by the dynamics by a factor of L, plus the new error ε introduced at the current step. The two terms combine, so the error builds up step by step.</p>
+<p>The value of L determines the overall trend of the error. When L &lt; 1, the previous round's error is reduced at each step, and the error may be contained within a controlled range; when L ≈ 1, the previous step's error is passed down almost unchanged, and with the new ε added at each step, the error accumulates approximately linearly; when L &gt; 1, the previous round's error is not only not attenuated but amplified, and the error expands rapidly, so a long rollout will soon deviate completely from the true trajectory. In real high-dimensional dynamics, L is often not less than 1, which is exactly the mathematical source of danger in long-horizon planning.</p>
+<p>There is another factor that makes the situation worse: the actions chosen by the planner are not the randomly sampled actions found in the training data, but actions that specifically seek out high-return regions predicted by the model. This means the planner actively and with bias pushes the trajectory into places the model “considers advantageous”—and these places may be precisely the regions where the model's predictions are least reliable, because the training data may not cover them. As a result, the distribution of errors itself shifts: a model that looks good on a random validation set can be wildly wrong on trajectories induced by the planner.</p>
+<p>This leads to a direct evaluation conclusion: one should not report only the one-step mean squared error (MSE) on a random validation set. One-step MSE reflects only the average single-step error under a random action distribution and completely misses the consequences of error accumulation along planning trajectories. A meaningful evaluation should also measure multi-step prediction error, reward error, calibration of predictions, and the final true return on trajectories induced by the planning policy. Only these metrics can reveal whether the error will spiral out of control when the planner actually uses this model to roll out the future.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>State Aliasing and Uncertainty<span class="dd-badge intuition">Failure Boundary</span></h2>
+<div class="dd-agent-response"><p>A tricky situation is when two frames look exactly the same but require completely opposite actions. Suppose the cart is moving, but from a single frame you cannot tell whether it is moving left or right. If the encoder maps these two different true states to the same z, state aliasing occurs. The consequence of aliasing is direct: the same state z and the same action a correspond to two different futures in the real world. At this point, if the model uses a deterministic mean to predict the next state, it is likely to give an 'intermediate result' that does not actually exist in reality—for example, an average position of the cart that is both left and right, and this position does not correspond to any real physical evolution.</p>
+<p>The way to handle aliasing is to explicitly carry hidden information in the state and pass uncertainty clearly to the planner. Specific approaches include: using historical recursion or memory to encode the differences between the past few frames into the state; using probability distributions or particle beliefs to represent the hidden state instead of a single point estimate. In this way, the model no longer compresses 'left' and 'right' into the same point, but retains their respective possibilities and weights.</p>
+<p>Uncertainty has more than one source besides insufficient observation; you can examine the corresponding strategies by source. Environmental randomness means that the same action itself has random outcomes in the real world—for example, with the same push, different ground slipperiness leads to different sliding distances for the cart. For this randomness, the correct approach is to predict a distribution and optimize risk-sensitive returns during planning, rather than focusing only on the expected value. Insufficient observation means that a key quantity is completely invisible in the observation, such as speed or hidden inventory; the countermeasure is to integrate history or maintain a belief state. Insufficient data means that some regions were not covered during training, such as actions near a pit edge that have never been seen; the countermeasure is to use model ensembles and confidence bounds to measure uncertainty, and return to the real environment to supplement exploration. Environmental change means that rules or the behavior of other agents changed over time, and the patterns the model learned have become outdated; the countermeasure is to continuously perform drift detection and online correction.</p>
+<p>The common thread among these different sources is to treat 'I don't know' as a first-class citizen. A world model not only predicts the most likely outcome, but also tells the planner how unreliable that prediction is. Only after the planner receives the uncertainty can it make a reasonable choice between 'advancing boldly when the model is very certain and being cautious and conservative when the model is very unsure,' rather than betting everything on false certainty.</p></div>
+<table class="dd-table"><thead><tr><th>Uncertainty source</th><th>Example</th><th>Strategy</th></tr></thead><tbody><tr><td>Environmental randomness</td><td>Same action has random slippage</td><td>Predict distribution, optimize risk-sensitive return</td></tr><tr><td>Insufficient observation</td><td>Cannot see speed / hidden inventory</td><td>Integrate history or maintain belief state</td></tr><tr><td>Insufficient data</td><td>Unseen pit-edge actions</td><td>Model ensemble, confidence bounds, return to real exploration</td></tr><tr><td>Environmental change</td><td>Rules or other agents change</td><td>Drift detection and online correction</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>How to Detect Model Exploitation<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>There is a failure mode worth examining separately: a planner obtains extremely high returns in the model, but performance in the real environment actually gets worse. This is model exploitation. Its mechanism is: during search, the policy finds a loophole in the model, and this loophole does not exist in the real world. A typical example is that the model incorrectly predicts that some unrealistic motive will repeatedly score, so the planner repeatedly selects that action, racking up increasingly high returns in imagination, while in the real environment it gains nothing or even suffers damage.</p>
+<p>A direct way to detect model exploitation is to compare two returns: the return predicted by the model and the return obtained from real replay. The difference between them is called the model exploitation gap. The larger this gap, the less grounded in reality the returns that the policy “earns” in imagination are. To locate where the gap comes from, you can slice by two dimensions: action novelty (the further an action deviates from the training distribution, the more likely the model is to give wildly inaccurate predictions) and rollout length (the longer the rollout, the more likely errors are to accumulate and amplify).</p>
+<p>There are several ways to curb model exploitation, and they can be used in combination: keep the policy from deviating too far from the training data distribution; impose penalties on states where the model is uncertain, so the planner avoids regions it is not confident about; use disagreement among model ensembles to measure uncertainty, and trust less wherever disagreement is large; and periodically put candidate actions back into the real environment for verification, and add the counterexamples found during verification to the training data so that the model can patch these loopholes in the next training run.</p>
+<p>One final boundary must be made clear: evaluation in the real environment must be isolated and permission-limited. The reason is that “for the sake of validating the model” cannot justify authorizing unlimited trial-and-error with high-risk actions. Putting candidate actions back into the real environment for verification has costs; it may cause real collisions or real data contamination. Therefore, verification can only be carried out within a controlled and restricted scope, and the agent must never be allowed to freely engage in trial-and-error in the real environment just to close the model exploitation gap. The goal of discovering and fixing model exploitation is to realign imagined returns with real returns, not to use the real environment as an unlimited safety net.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Putting the previous steps together, we can see a complete causal chain of the World Model from problem to verifiable practice.</p>
+<p>The starting point is: learn state representations and transition dynamics from real trajectories. The RL agent first collects trajectories in the real environment, training the encoder, dynamics, reward, and termination predictors. This is the foundation of all imaginative ability—what the model can predict is determined entirely by what is learned at this step.</p>
+<p>The second step is: roll out candidate actions inside the model. Given the current state, the planner enumerates several candidate actions, repeatedly using the dynamics function to advance the future in imagination, producing a series of virtual trajectories.</p>
+<p>The third step is: score candidates by predicted return and risk. Only looking at predicted return is not enough; uncertainty and model exploitation risk must also be factored in, choosing a truly reliable plan rather than the one the model thinks is most profitable.</p>
+<p>The fourth step is: execute only near-term actions. Model Predictive Control executes only the first action after each round of rollouts, keeping the error risk of long-horizon prediction within a single step.</p>
+<p>The fifth step is: correct the state with real observations. After execution, retrieve the next observation from the real environment and update the state, so the next planning is built on new facts, not on the model's own continuation.</p>
+<p>The final step is: feed counterexamples of model exploitation back into training. All counterexamples with high return in imagination but low return in real replay are collected and added to the training data, so the model can patch these holes in the next iteration.</p>
+<p>These six steps form a closed loop: learning transitions → in-model rollout → risk scoring → executing only near-term actions → real correction → counterexample feedback. Each step provides more reliable input for the next step, while each step also constrains the error of the previous step. Whether the World Model is ultimately usable depends on whether this closed loop can maintain continuous alignment between 'prediction' and 'reality': the more accurate the model's predictions, the more valuable planning becomes; and each return to the real environment is both a correction of the model and a reinvestment in planning capability.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1803.10122" target="_blank" rel="noopener">World Models</a>: latent world models and control</li><li><a href="https://arxiv.org/abs/1912.01603" target="_blank" rel="noopener">Dream to Control: Learning Behaviors by Latent Imagination</a>: Dreamer latent imagination learning</li><li><a href="https://arxiv.org/abs/2301.04104" target="_blank" rel="noopener">Mastering Diverse Domains through World Models</a>: DreamerV3</li><li><a href="https://arxiv.org/abs/1805.12114" target="_blank" rel="noopener">PETS: Deep Reinforcement Learning in a Handful of Trials using Probabilistic Dynamics Models</a>: uncertain dynamics and model predictive control</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/world-models">Explore connections on the map</a><a href="/zh/concepts/world-models/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

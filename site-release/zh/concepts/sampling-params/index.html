@@ -1,19 +1,21 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>采样与解码参数：从 logits 到最终序列 · AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>采样与解码参数是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/sampling-params/">
-
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/sampling-params/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/sampling-params/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 知识地图">
-<meta property="og:title" content="采样与解码参数：从 logits 到最终序列">
+<meta property="og:title" content="采样与解码参数是什么？原理通俗讲解 | AI 知识地图">
 <meta property="og:description" content="用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。">
 <meta property="og:url" content="https://ai-knowledge-map.com/zh/concepts/sampling-params/">
 <meta property="og:locale" content="zh_CN">
@@ -22,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="采样与解码参数：从 logits 到最终序列">
+<meta name="twitter:title" content="采样与解码参数是什么？原理通俗讲解 | AI 知识地图">
 <meta name="twitter:description" content="用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/sampling-params/#page","name":"采样与解码参数：从 logits 到最终序列","description":"用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。","url":"https://ai-knowledge-map.com/zh/concepts/sampling-params/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"搜索与文字目录","item":"https://ai-knowledge-map.com/search/"},{"@type":"ListItem","position":3,"name":"采样与解码参数：从 logits 到最终序列","item":"https://ai-knowledge-map.com/zh/concepts/sampling-params/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js"></script></head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/sampling-params/#page","name":"采样与解码参数是什么？原理通俗讲解 | AI 知识地图","description":"用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。","url":"https://ai-knowledge-map.com/zh/concepts/sampling-params/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"采样与解码参数：从 logits 到最终序列","item":"https://ai-knowledge-map.com/zh/concepts/sampling-params/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -58,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/search/">搜索与文字目录</a></li><li><span aria-current="page">采样与解码参数：从 logits 到最终序列</span></li></ol></nav><article id="dd-article" data-concept-id="sampling-params">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/zh/">AI 学习指南</a></li><li><span aria-current="page">采样与解码参数：从 logits 到最终序列</span></li></ol></nav><article id="dd-article" data-concept-id="sampling-params" lang="zh-Hans">
 <header class="dd-hero"><div class="dd-eyebrow">理解原理</div><h1 class="dd-h1">采样与解码参数：从 logits 到最终序列</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>持续修订中</strong><span>本页已开放阅读，内容仍在复核与完善。</span></aside>
 <p class="dd-sub">用一组可手算的候选分布串起 temperature、top-k、top-p、重复惩罚、停止条件与随机种子，理解每个旋钮改变哪一步、不能保证什么。</p>
 
@@ -190,7 +192,7 @@
 <table class="dd-table"><thead><tr><th>方向</th><th>接下来读</th><th>关键问题</th></tr></thead><tbody><tr><td>分数从哪里来</td><td><a href="#" data-node="llm">大语言模型</a></td><td>自回归条件分布怎样由 Transformer 产生？</td></tr><tr><td>候选单位</td><td><a href="#" data-node="tokenization">Token 与分词</a></td><td>停止串和惩罚怎样受 token 边界影响？</td></tr><tr><td>观察概率</td><td><a href="#" data-node="logprobs">Logprobs</a></td><td>暴露的是管线哪一阶段的概率？</td></tr><tr><td>硬格式保证</td><td><a href="#" data-node="constrained-decoding">约束解码</a></td><td>如何把非法 token 概率直接置零？</td></tr><tr><td>多路径可靠性</td><td><a href="#" data-node="self-consistency">自洽性采样</a></td><td>多次采样何时能用投票换可靠性？</td></tr><tr><td>真实性边界</td><td><a href="#" data-node="hallucination">幻觉</a></td><td>为何解码参数不能替代证据核验？</td></tr></tbody></table>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1904.09751" target="_blank" rel="noopener">The Curious Case of Neural Text Degeneration</a>：核采样与开放文本退化。</li><li><a href="https://aclanthology.org/P18-1107/" target="_blank" rel="noopener">Hierarchical Neural Story Generation</a>：top-k 采样在长文本生成中的使用。</li><li><a href="https://arxiv.org/abs/2210.15191" target="_blank" rel="noopener">Truncation Sampling as Language Model Desmoothing</a>：截断采样分析。</li><li><a href="https://aclanthology.org/2023.tacl-1.7/" target="_blank" rel="noopener">Locally Typical Sampling</a>：基于局部典型性的替代解码视角。</li></ul><p>生成闭环图、处理顺序图、logits 手算、停止/惩罚对照表和评测流程均为本项目原创组织。</p><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/sampling-params">在地图中查看概念关系</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/sampling-params">在地图中查看概念关系</a><a href="/en/concepts/sampling-params/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

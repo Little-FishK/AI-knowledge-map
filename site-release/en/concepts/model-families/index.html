@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives? Explained Simply</title>
+<meta name="description" content="Instead of memorizing brand rankings, use four axes—architecture, objectives, modality, and product layer—to judge why a model excels at a particular type of task.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/model-families/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/model-families/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/model-families/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives? Explained Simply">
+<meta property="og:description" content="Instead of memorizing brand rankings, use four axes—architecture, objectives, modality, and product layer—to judge why a model excels at a particular type of task.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/model-families/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives? Explained Simply">
+<meta name="twitter:description" content="Instead of memorizing brand rankings, use four axes—architecture, objectives, modality, and product layer—to judge why a model excels at a particular type of task.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/model-families/#page","name":"What Is Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives? Explained Simply","description":"Instead of memorizing brand rankings, use four axes—architecture, objectives, modality, and product layer—to judge why a model excels at a particular type of task.","url":"https://ai-knowledge-map.com/en/concepts/model-families/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives","item":"https://ai-knowledge-map.com/en/concepts/model-families/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives</span></li></ol></nav><article id="dd-article" data-concept-id="model-families" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Model Families: Understanding Capability Boundaries from Information Flow and Training Objectives</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Instead of memorizing brand rankings, use four axes—architecture, objectives, modality, and product layer—to judge why a model excels at a particular type of task.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Model families are not vendor lists. Architecture determines how information flows, training objectives determine what the model practices predicting, data and post-training shape behavior, and the product layer adds retrieval, tools, memory, and permissions. Only by separating these layers can you select a model based on task constraints, rather than inferring capabilities, privacy, or reliability from brands.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Distinguish architecture, objective, modality, and product layer; compare encoder, decoder, diffusion, and state space models; use a constraint-driven process to select families; identify incorrect inferences between brand names and capabilities.</div>
+<ol class="dd-chain"><li>Break down tasks and failure costs</li><li>List hard constraints such as modality, latency, and licensing</li><li>Use information flow and training objective to screen families</li><li>Compare candidates on real slices</li><li>Isolate generation from high-risk execution</li><li>Record complete versions and continuously regression test</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>“Model family” includes at least four mutually independent axes<span class="dd-badge intuition">coordinate system</span></h2>
+<div class="dd-agent-response"><p>When people say “this is a Transformer,” what they get is often just the name of an information-flow skeleton, not a description of model capabilities. “Model family” here is not a collection of brands, but a coordinate system used to describe model mechanisms and delivery methods: the input is a specific model version or a task requirement, and the output is four mutually independent descriptions—architecture, training objective, modality interface, and post-training/product layer.</p>
+<p>The four axes each answer a different question. The architecture axis answers “how is information read, stored, and mixed,” corresponding to skeletons such as encoders, causal decoders, diffusion models, and state space models (SSMs). The training objective axis answers “what is the model rewarded to predict,” corresponding to objectives such as masked word prediction, next-token prediction, denoising, and contrastive learning. The modality/interface axis answers “what is the structure of the inputs and outputs,” corresponding to text, images, audio, actions, and even multimodal combinations. The post-training/product axis answers “what is added on top of the original model,” corresponding to instruction alignment, retrieval-augmented generation (RAG), tool use, memory mechanisms, and safety policies.</p>
+<p>These four axes are mutually independent, meaning that a label on any one axis does not entail the content of the other three axes. The most common confusion is to treat “Transformer,” “large language model,” and “chat product” as things on the same layer. Transformer is only an information-flow skeleton; a large language model includes, in addition to this skeleton, the training objective and data; a chat product further adds post-training, retrieval, tools, and permissions on top of the model. Seeing one of these names does not automatically lead to the capabilities and boundaries of the other two layers. The same Transformer skeleton can be trained into a classification encoder, a text generator, or a vision model; the same generative model can also be packaged into completely different products.</p>
+<p>The value of the four-axis coordinate system lies in explaining “why it excels”: when a model performs strongly on a certain type of task, you can locate the reason along these four axes instead of stopping at the family label. But it also delineates the boundary: the family label itself does not guarantee quality, privacy, or security. To judge whether a specific model meets the needs, you still need to examine the specific version and actually test it; the statement “it belongs to a certain family” alone is far from enough.</p></div>
+<table class="dd-table"><thead><tr><th>Axis</th><th>Question answered</th><th>Example</th></tr></thead><tbody><tr><td>Architecture</td><td>How is information read, stored, and mixed?</td><td>Encoders, causal decoders, diffusion, SSM</td></tr><tr><td>Training objective</td><td>What is the model rewarded for predicting?</td><td>Masked word, next token, denoising, contrastive learning</td></tr><tr><td>Modality/interface</td><td>What is the structure of the inputs and outputs?</td><td>Text, images, audio, actions, multimodal</td></tr><tr><td>Post-training/product</td><td>What is added on top of the original model?</td><td>Instruction alignment, RAG, tools, memory, safety policies</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Encoder, Decoder, and Encoder–Decoder Have Different Information Flow<span class="dd-badge math">Transformer</span></h2>
+<div class="dd-agent-response"><p>Even though they all use attention, the encoder, decoder, and encoder–decoder families are suited to very different tasks. Distinguishing them is not about whether they have attention; it is about what attention can see, what the training objective rewards, and the resulting computational path.</p>
+<p>Encoder-only models see the full input bidirectionally at every layer: the representation at each position can simultaneously absorb all tokens before and after it. Their common training objective is masked token prediction: randomly mask some words in the input and have the model reconstruct them from context. This “read the whole passage and fill in the blanks” training makes encoders naturally good at classification, representation retrieval, and extraction-style tasks—given a complete text as input, it outputs a judgment about the whole passage or about local positions. Causal decoder-only models, by contrast, can see only tokens before the current position; later content is masked. Their training objective is next-token prediction: given a prefix, output the most likely continuation word. Precisely because each output step depends only on the already generated prefix, decoders are naturally suited to open-ended generation, continuation, and in-context learning. Encoder–decoder models combine the two: the encoder side reads the full input bidirectionally, and the decoder side generates output step by step in causal order; each position on the input side can reference the entire text, while each step on the output side depends only on previously generated content. This information flow matches the conditional sequence generation objective and is naturally suited to translation, summarization, and structured transformation—the input and output are two different sequences, and the output must respect the full meaning of the input.</p>
+<p>“Natural strengths” do not mean exclusive capability. All three architectures can in principle be forced to do tasks from other families. The difference is whether the training signal and computational path fit: when a task’s natural form aligns with a family’s information flow, the model learns more directly and with higher sample efficiency.</p>
+<p>The probability decomposition for conditional generation reveals why information flow direction matters so much. Given input x, the probability of output sequence y is written as</p>
+<p>P(y | x) = ∏ₜ P(yₜ | x, y&lt;ₜ)</p>
+<p>Here x is the conditional input, such as the source text to be translated; y is the complete output sequence; t is the current generation position; and y&lt;ₜ is the token already generated before position t. The meaning of the expression is that the probability of the whole output equals the product of the conditional probabilities at each step. At each step when generating yₜ, the model sees not isolated information but the input x plus the entire prefix y&lt;ₜ generated so far. Therefore early generation choices change the conditions for every later step—once the previous token is fixed, the probability distribution for the rest is re-constrained. This also explains why causal generation must proceed sequentially: y&lt;ₜ exists only after the earlier steps are complete. Decoder-family tasks naturally unfold along this chain; encoder-family models do not need this step-by-step dependency because they produce the complete output at once.</p></div>
+<table class="dd-table"><thead><tr><th>Family</th><th>Attention visibility range</th><th>Common objective</th><th>Natural strengths</th></tr></thead><tbody><tr><td>Encoder-only</td><td>Sees the full input bidirectionally</td><td>Masked token</td><td>Classification, representation retrieval, extraction</td></tr><tr><td>Decoder-only</td><td>Sees only before the current position</td><td>Next token</td><td>Open-ended generation, continuation, in-context learning</td></tr><tr><td>Encoder–decoder</td><td>Input bidirectional; output causal</td><td>Conditional sequence generation</td><td>Translation, summarization, structured transformation</td></tr></tbody></table>
+<div class="dd-formula" data-formula-id="model-families-autoregressive-decoder"><math display="block" aria-label="给定输入 x 时输出序列 y 的概率，等于每个位置 t 的 token y t 在输入 x 和先前输出 y 小于 t 条件下的概率乘积"><mrow><mi>p</mi><mo>(</mo><mi>y</mi><mo>∣</mo><mi>x</mi><mo>)</mo><mo>=</mo><munder><mo>∏</mo><mi>t</mi></munder><mi>p</mi><mo>(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>y</mi><mrow><mo>&lt;</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>x</mi><mo>)</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Diffusion models learn to denoise step by step, not to continue writing from left to right<span class="dd-badge math">Generation</span></h2>
+<div class="dd-agent-response"><p>Why does image generation always start from a lump of noise and require many steps to produce an image? This is related to how diffusion models learn: they do not learn “to continue writing from left to right” but learn “to push noisy samples one step back toward clean samples.”</p>
+<p>Training consists of two processes. In the forward process, noise is gradually added to clean data: starting from real samples, random perturbations are mixed in repeatedly until the samples almost become pure noise. The model’s training input is the noisy sample at a given timestep, the timestep index, and optional conditions such as text; the training output is the model’s prediction of this noise—which can be the noise itself, velocity, or the clean sample, depending on the specific parameterization. During generation, the direction is reversed: starting from pure noise, the learned predictions are used repeatedly to gradually restore structure, removing some noise at each step rather than continuing pixel by pixel from left to right.</p>
+<p>The core formula shows how the noisy sample is constructed:</p>
+<p>xₜ = <math class="dd-inline-root" aria-label="根号 ᾱₜ"><msqrt><mtext>ᾱₜ</mtext></msqrt></math> · x₀ + <math class="dd-inline-root" aria-label="根号 1 − ᾱₜ"><msqrt><mtext>1 − ᾱₜ</mtext></msqrt></math> · ε</p>
+<p>where x₀ is the clean sample, xₜ is the noisy sample at timestep t, and ε is the added random noise. The coefficient ᾱₜ controls how much of the original signal remains: when t is small and near the start of adding noise, ᾱₜ is close to 1, and xₜ consists mainly of the real sample x₀; when t is large, ᾱₜ approaches 0,<math class="dd-inline-root" aria-label="根号 1 − ᾱₜ"><msqrt><mtext>1 − ᾱₜ</mtext></msqrt></math> approaches 1, and xₜ is almost only noise. The denoising network is denoted εθ, where θ is its parameter, and c represents conditions such as text. Training teaches the network to predict the actual added noise ε from xₜ, t, and c; during generation, the scheduler then works backward step by step, and each step uses the current noisy sample and the network’s estimate of the noise.</p>
+<p>Understanding “high dimensionality” is key to understanding why diffusion is a multi-step process. High dimensionality means that a sample must be described by many numerical coordinates together: image latents contain a large number of spatial positions and channels, and each coordinate carries noise. Therefore, denoising is not about changing a single number but about simultaneously coordinating thousands of coordinates so that they become cleaner overall while maintaining a consistent structure. Getting there in one step is almost impossible; multi-step iteration allows the structure to be corrected slightly at each step, which is exactly why traditional sampling requires many steps.</p>
+<p>Diffusion models can correct an entire latent representation at once and are especially well suited to continuous high-dimensional signals, such as image pixels or latent variables. But more dimensions do not automatically mean richer information: if the data consist mainly of discrete rules, or require character-by-character precision—such as exact text, strict logical operations, or latency-sensitive real-time scenarios—the advantages of continuous denoising may not apply, and additional design is often needed. Diffusion itself is a generation mechanism, not something exclusive to images: the same step-by-step noise-adding—denoising framework can also be applied to audio, video, motion sequences, and even discrete sequences.</p></div>
+<div class="dd-formula" data-formula-id="model-families-diffusion-noising"><math display="block" aria-label="时间 t 的带噪样本 x t，等于 alpha bar t 的平方根乘干净样本 x zero，加一减 alpha bar t 的平方根乘噪声 epsilon；模型根据 x t、t 和条件 c 预测 epsilon"><mtable><mtr><mtd><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><msqrt><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></msqrt><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msqrt><mrow><mn>1</mn><mo>−</mo><msub><mover><mi>α</mi><mo>¯</mo></mover><mi>t</mi></msub></mrow></msqrt><mi>ε</mi></mtd></mtr><mtr><mtd><msub><mi>ε</mi><mi>θ</mi></msub><mo>(</mo><msub><mi>x</mi><mi>t</mi></msub><mo>,</mo><mi>t</mi><mo>,</mo><mi>c</mi><mo>)</mo><mo>≈</mo><mi>ε</mi></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>State-space and recurrent families trade compressed state for linear scanning<span class="dd-badge math">Long sequences</span></h2>
+<div class="dd-agent-response"><p>Attention lets every position see every other position directly, at the cost that the number of pairwise comparisons grows quadratically with sequence length. The state-space and recurrent families take another path: instead of comparing every position with every other, they compress history into a fixed-size state, updating it while scanning, so that computation grows linearly with length.</p>
+<p>The minimal information flow can be described by two formulas:</p>
+<p>hₜ = A · hₜ₋₁ + B · xₜ yₜ = C · hₜ</p>
+<p>xₜ is the input at the current position; hₜ₋₁ is the state vector into which all prior history has been compressed; matrix A determines how the old state evolves—which information is retained and which decays; B writes the current input into the state; adding the two gives the new state hₜ, which both serves as the basis for this step's output and is passed to the next step for continued updating; matrix C then reads the state out as the output yₜ at the current position. So the whole process only needs to maintain a single state vector: each time a new token arrives, update it with one multiplication and one addition, then read out the output. History is not discarded; rather, it is continuously rewritten into the same compressed representation.</p>
+<p>This formula is only the skeleton of the minimal information flow. An actual RNN or SSM adds nonlinearities, gating mechanisms, or input-dependent parameters on top of it—gating decides which information at this step is worth writing and which old information should be forgotten, and input-dependent parameters let the state update vary with content. But the skeleton remains the same: a serially scanned chain in which the state is updated step by step.</p>
+<p>Working out the complexity makes this clearer. For a sequence of length n, the attention score matrix has n² position pairs: when n = 1000 it has about one million pairs, and when n = 4000 it has about sixteen million pairs—length increases only fourfold, but the number of pairwise comparisons increases sixteenfold. In contrast, a recurrent or state-space model updates only a fixed-size state at each step, and the number of scanning steps grows linearly with n; when length increases fourfold, the number of steps also increases only about fourfold. That is what “trading compressed state for linear scanning” means.</p>
+<p>But compressed state comes at a cost: forcing all history into a fixed dimension inevitably loses some detail. When a task requires precise random access—for example, jumping back to the beginning at any time to find a particular word—or requires copying an early long segment verbatim, compressed state may be inadequate; full attention or external memory is more suitable in those cases. Modern systems therefore often use hybrid designs: use state-space layers for coarse long-range scanning, and use attention layers or external retrieval for the parts that require precise localization, rather than choosing one or the other. Actual speed is also not determined only by asymptotic complexity; it also depends on hardware parallelism, state dimension, and the specific kernel implementation.</p></div>
+<div class="dd-formula" data-formula-id="model-families-recurrent-state"><math display="block" aria-label="时间 t 的隐藏状态 h t 等于状态转移 A 乘上一状态 h t 减一，加输入映射 B 乘当前输入 x t；输出 y t 等于读出 C 乘 h t"><mtable><mtr><mtd><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>A</mi><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>B</mi><msub><mi>x</mi><mi>t</mi></msub></mtd></mtr><mtr><mtd><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mi>C</mi><msub><mi>h</mi><mi>t</mi></msub></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>The Key to Multimodal Models Is "Where Fusion Happens"<span class="dd-badge intuition">Modality</span></h2>
+<div class="dd-agent-response"><p>If you feed a model images and text at the same time, does that mean it has formed a unified understanding? Not necessarily. The essence of multimodal fusion is to place representations of modalities such as images and audio together with text representations into computational paths where they can influence each other. The input can be two or more modalities, and the output can be a shared representation, text, images, or actions; the key to evaluating a multimodal model is not whether the interface can accept files, but which layer begins to allow cross-modal information interaction.</p>
+<p>There are three common fusion approaches. The first is the "frozen encoder + projector": a visual or audio encoder first extracts the input into vectors, and the projector then converts these vectors into tokens readable by the language model and feeds them into an existing text model. The second is cross-attention fusion: each modality is encoded separately, preserving its specialized representations, and cross-attention then lets the two modalities query and influence each other. The third is a unified token space: from the beginning, all modalities are mapped to the same token space or trained on the same backbone. The trade-offs differ among the three. The frozen encoder plus projector has the lowest training cost and can reuse mature vision and language models, but the underlying representations are learned separately within each modality, making it hard for them to adapt well to each other. Cross-attention fusion preserves the specialized representation of each modality at the cost of a more complex interface and training pipeline. A unified token or unified backbone enables deep cross-modal interaction and a unified interface, but requires large-scale alignment data and greater computational investment.</p>
+<p>Fusion location and data pairing quality determine the actual capability of a multimodal model. Fusion location determines which layers can engage in cross-modal interaction: if concatenation happens only at the topmost layer, the deep representations remain separate; if parameters are shared from the lower layers, the representations of the two modalities are forced to align with each other early in learning. Data pairing quality determines whether these representations are truly aligned: the more accurate the correspondence between images and text descriptions in the training pairs, the more reliable the learned shared space.</p>
+<p>Testing for these models must also be separated. A model that can fluently describe an image only proves that the "image in, text out" generation path is usable; it does not automatically prove that its OCR recognition, spatial relationship judgment, counting, or fine-grained localization are reliable. These capabilities need to be verified one by one with tests that have clear inputs and outputs—capability boundaries can only be measured item by item and cannot be inferred as a whole from "being able to describe images."</p></div>
+<table class="dd-table"><thead><tr><th>Approach</th><th>Advantages</th><th>Limitations</th></tr></thead><tbody><tr><td>frozen encoder + projector</td><td>Cheap to train, reuses mature models</td><td>Underlying representations are hard to co-adapt</td></tr><tr><td>Cross-attention fusion</td><td>Preserves modality-specific expertise</td><td>Interface and training are more complex</td></tr><tr><td>Unified token/backbone</td><td>Deep interaction, unified interface</td><td>High data and compute requirements</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Worked Example: Decompose Tasks for a Refund Assistant Instead of First Choosing a Brand<span class="dd-badge eng">Decision Map</span></h2>
+<div class="dd-agent-response"><p>When designing a refund assistant, it is natural to first ask “which brand of large model should I use,” but the correct order is to decompose tasks first: classify tickets, read receipts, generate replies, and execute refunds. These subtasks have completely different information flows, risk levels, and cost structures, and they do not need to be handled by the same model.</p>
+<p>The starting point of the decision map is task decomposition; model family selection occurs after decomposition. Each subtask carries its own constraints when looking for a matching family: constraints include input-output form, accuracy requirements, latency budget, cost, and impact scope of failures.</p>
+<p>First, routing. A small encoder model can handle low-cost routing well: when a ticket arrives, it determines the intent and decides which processing branch to take. The encoder reads the complete input bidirectionally and outputs a whole-sequence judgment, which naturally aligns with the information flow of classification tasks; it is also small, low-latency, and inexpensive, making it suitable to serve as the first gate for all requests.</p>
+<p>Next, reading receipts. Only requests with attachments need the vision model; tickets without attachments do not need to go through it at all. Restricting visual processing to the subtasks that really need it saves not only compute but also reduces the error surface—the vision model is only invoked where it is needed, and its output affects only this branch.</p>
+<p>Generating replies is typical open-ended text generation, so a decoder drafts the explanation. The real change in refund status—from “pending” to “refunded”—does not go through a generative model. The refund API handles the real state change; the model only produces text that a person reviews or sends. High-risk actions are handed to tools with permission boundaries, rather than letting a generative model “execute through language”: the model can say “I have refunded you,” but it has no permission and should not have the ability to actually alter the account status; only that API call can change the state, and its permissions, audit logs, and rollback mechanisms are all independent of the model.</p>
+<p>A system composed in this way is usually cheaper, more testable, and more controllable than “the largest model handling everything.” It is cheaper because each subtask uses only the model that is just sufficient; it is more testable because each stage has clear inputs and outputs, so routing accuracy, receipt recognition rate, and reply quality can be evaluated separately; it is more controllable because high-risk actions are isolated in a tool layer with clear permissions, and when the model makes an error its impact scope is limited to the segment it is responsible for. The causal chain of family selection is: task constraints determine subtask decomposition, the subtask's information flow and risk determine the matching family, and only then come the specific version and price.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 740 330" role="img" aria-label="Decision map for selecting a model family for a refund assistant based on task constraints"><defs><marker id="mf-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#7c8798"/></marker></defs><rect x="275" y="18" width="190" height="52" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="370" y="49" text-anchor="middle" class="svg-t">Refund Request</text><path d="M370,70 L370,98" stroke="#7c8798" marker-end="url(#mf-a)"/><rect x="270" y="100" width="200" height="54" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="370" y="123" text-anchor="middle" class="svg-t">First Decompose Tasks and Hard Constraints</text><text x="370" y="142" text-anchor="middle" class="svg-t" font-size="11">Accuracy · Modality · Latency · Permissions</text><path d="M270,128 L120,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M333,154 L290,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M407,154 L450,185" stroke="#7c8798" marker-end="url(#mf-a)"/><path d="M470,128 L620,185" stroke="#7c8798" marker-end="url(#mf-a)"/><rect x="28" y="188" width="180" height="82" rx="9" fill="#21252d" stroke="#5d9f79"/><text x="118" y="213" text-anchor="middle" class="svg-t">Intent Classification / Retrieval</text><text x="118" y="236" text-anchor="middle" class="svg-t" font-size="11">Encoder or Embedding Model</text><text x="118" y="255" text-anchor="middle" class="svg-t" font-size="11">Fast, Batchable</text><rect x="220" y="188" width="145" height="82" rx="9" fill="#21252d" stroke="#8c76bf"/><text x="292" y="213" text-anchor="middle" class="svg-t">Read Receipts</text><text x="292" y="236" text-anchor="middle" class="svg-t" font-size="11">Vision Encoding / OCR</text><text x="292" y="255" text-anchor="middle" class="svg-t" font-size="11">Requires Field Validation</text><rect x="377" y="188" width="145" height="82" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="449" y="213" text-anchor="middle" class="svg-t">Generate Explanation</text><text x="449" y="236" text-anchor="middle" class="svg-t" font-size="11">Causal Decoder</text><text x="449" y="255" text-anchor="middle" class="svg-t" font-size="11">Constrained by Policy Context</text><rect x="534" y="188" width="180" height="82" rx="9" fill="#21252d" stroke="#c97872"/><text x="624" y="213" text-anchor="middle" class="svg-t">Execute Refund</text><text x="624" y="236" text-anchor="middle" class="svg-t" font-size="11">Deterministic Tool / API</text><text x="624" y="255" text-anchor="middle" class="svg-t" font-size="11">Authentication, Approval, Idempotency</text><path d="M118,270 L118,303 L620,303 L620,270" fill="none" stroke="#7c8798"/><text x="370" y="322" text-anchor="middle" class="svg-t">End-to-End Logs and Staged Evaluation</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1  Model family selection occurs after task decomposition; high-risk actions are handed to tools with permission boundaries, rather than letting generative models “execute through language.”</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Filter hard constraints first, then compare the quality–cost frontier<span class="dd-badge eng">Selection method</span></h2>
+<div class="dd-agent-response"><p>The top-ranked model is not necessarily the best choice for you, because leaderboard scores are computed on general-purpose evaluation sets, while your task has its own failure costs, hard constraints, and cost structure. The correct screening order is: first define the task, then filter by hard constraints, then compare on real data, and finally validate in canary deployment.</p>
+<p>The first step is to define the task unit and failure cost. In the same system, “one processing” might be each email, each receipt, or a complete session; the cost of one misjudgment might be missing a ten-yuan receipt, or incorrectly executing a refund. When the unit and cost differ, the meaning of the same set of metrics is completely different; if this step is not defined clearly, subsequent comparisons are meaningless.</p>
+<p>The second step is to filter by hard constraints. These constraints are “fail if not met” conditions; they do not require comparing quality: data residency (which region data must remain in), licensing (the authorized scope of model weights or APIs), modality (whether image support is required), context length, available hardware, and maximum latency. First use these conditions to shrink the candidate set, to avoid wasting evaluation costs on options that are fundamentally unusable.</p>
+<p>The third step is to evaluate the remaining candidate families and scales on real data slices, and the evaluation must include refusal and fallback behavior—when the model says “I cannot handle this” and escalates to a human, it is usually better than hard-coding an answer; the evaluation set must cover this situation.</p>
+<p>The fourth step is to draw the Pareto frontier, rather than arbitrarily adding heterogeneous metrics into a total score. A teaching example can illustrate this comparison method: on a receipt field extraction task, a small encoder plus OCR has a field F1 of 0.94, P95 latency of 180 ms, and cost of about ¥2 per thousand items, suitable for standard receipts; a multimodal generator has F1 of 0.96, but latency of 1.8 s and cost of about ¥28 per thousand items, suitable for complex long-tail receipts; a rule-based template has F1 of only 0.88, but latency of 25 ms and about ¥0.2 per thousand items, covering only fixed layouts. No option wins on all dimensions: who is on the frontier of “cannot improve quality without spending more, cannot reduce cost without sacrificing quality” depends on your latency budget and failure cost. These numbers are only a teaching example and do not represent the performance of any real vendor; what really matters is to measure with the same data and the same definition of success, otherwise metrics are not comparable.</p>
+<p>The last step is canary rollout, and record the model version, prompts, retrieval index, and tool versions. Model behavior is jointly determined by these four; any change to any of them can change the result; if you do not record after go-live, you cannot locate which layer caused a problem when one occurs.</p></div>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Field F1</th><th>P95 Latency</th><th>Cost per thousand items</th><th>Conclusion</th></tr></thead><tbody><tr><td>Small encoder + OCR</td><td>0.94</td><td>180 ms</td><td>¥2</td><td>Suitable for standard receipts</td></tr><tr><td>Multimodal generator</td><td>0.96</td><td>1.8 s</td><td>¥28</td><td>Suitable for complex long-tail</td></tr><tr><td>Rule-based template</td><td>0.88</td><td>25 ms</td><td>¥0.2</td><td>Covers only fixed layouts</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Post-training changes behavior, but it does not erase the underlying mechanisms<span class="dd-badge intuition">Post-training</span></h2>
+<div class="dd-agent-response"><p>The names “reasoning models,” “chat models,” and “tool models” sound like different architectures, but in most cases they refer to the same underlying skeleton that has undergone different post-training. Supervised fine-tuning, preference optimization, reinforcement learning, and distillation can significantly change the model’s response style, instruction following, inference-time compute, and tool-calling behavior, yet the underlying architecture may still belong to the same decoder family. The skeleton of information flow and training objective has not changed; what changed is the behavioral layer layered on top of that skeleton.</p>
+<p>The product layer can continue to stack outside the model: system prompts, Retrieval-Augmented Generation (RAG), output filters, caching, and workflows. Therefore, be especially careful when inferring model mechanisms from product behavior. Observing that a product can cite sources does not directly imply that the base model “has memorized a database”—it most likely just performed retrieval at runtime and injected the retrieved content into the context. Observing that a product calls tools also does not imply that the model has permissions: the model is only responsible for generating the call request; the actual permissions are in the execution layer, where the system decides whether this request can be executed and whom it acts on. The language-level “can call” and the execution-level “has permission to call” are two different things.</p>
+<p>This distinction directly determines the order of troubleshooting. When a system fails, first locate which layer the error occurred in: did the base generation itself go wrong, did the post-training strategy teach the wrong behavior, did context retrieval bring back the wrong material, were the tool parameters filled in incorrectly, or was the execution permission configured incorrectly. Each layer has a completely different repair method—base generation issues may require switching models or changing prompts, retrieval issues require changing the index and queries, and permission issues require changing the policies in the execution layer. First locate the layer, then choose the remediation method; otherwise you are likely to keep patching the wrong layer repeatedly while the problem is actually in another layer. Post-training can change behavior, but it does not erase the underlying mechanisms: the information-flow constraints of the underlying family are always there, determining the boundaries of what the model can and cannot do.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Open-weight models, APIs, and brands belong to the delivery layer, not an architecture family.<span class="dd-badge eng">Boundary</span></h2>
+<div class="dd-agent-response"><p>“Open-source models are more private” and “closed-source models are definitely stronger” are both invalid judgments, because they conflate several independent delivery-layer issues into one label. Weight licensing, the openness of training code, the openness of data, hosting location, and API data policy are five different questions; the answer to any one cannot be inferred from the others.</p>
+<p>Open weights allow self-hosting: running the model on your own servers means data indeed does not have to leave your own data center. But if you deploy an open-weight model on a third-party cloud, data may still be sent out to the cloud provider; conversely, API services can also offer zero retention and regional options, contractually promising not to save requests and to process only in specified regions. “Open source” describes whether the weights are available, not where data flows; “closed source” describes whether the weights are unavailable, and also does not describe the service provider's logging policy. Privacy depends on deployment topology, contract, and logging policy, not the name.</p>
+<p>A brand is also not a precise identifier. Under the same brand there can simultaneously be multiple generations of models, multiple sizes, multimodal and text-only versions, and versions with different context lengths, and their capabilities and licenses can all differ. Therefore you cannot directly infer any key attribute from a name; you must verify item by item: for privacy and data retention, check deployment topology, contract, and logging policy; for commercial usability, check weight, code, and data licenses; for tool reliability, check function-calling evaluations, permissions, and retry behavior; for knowledge freshness, check knowledge cutoff, retrieval source, and update time; for the actual version, check model ID, date, parameter scale, and service tier.</p>
+<p>This also explains why “choosing a brand first” is the wrong starting point when selecting a model. A brand identifies only the delivery party, not the architecture family, training objective, or the boundary of a specific version. Only by checking the four dimensions of brand, license, hosting, and version separately can you give an actionable answer to “what does this model actually mean in my scenario?”</p></div>
+<table class="dd-table"><thead><tr><th>Cannot be directly inferred from a name</th><th>What must be checked</th></tr></thead><tbody><tr><td>Privacy and data retention</td><td>Deployment topology, contract, logging policy</td></tr><tr><td>Commercial usability</td><td>Weight/code/data licenses</td></tr><tr><td>Tool reliability</td><td>Function-calling evaluation, permissions, and retry behavior</td></tr><tr><td>Knowledge freshness</td><td>Knowledge cutoff, retrieval source, and update time</td></tr><tr><td>Actual version</td><td>Model ID, date, parameters, and service tier</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Connect the causal chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Connect the entire causal chain, from “I have a task” to “I have a verifiable system”; each step is driven by the conclusion of the previous step.</p>
+<p>The starting point is to decompose the task and the cost of failure. A requirement is first broken down into several subtasks, and it is made clear what cost is paid when each subtask goes wrong: misclassifying an order, misreading a receipt, or saying the wrong sentence—each has a completely different cost. This step determines the weight of all subsequent trade-offs.</p>
+<p>The second step is to list the hard constraints: modality, latency, licensing, context length, and data residency. These are “fail and you're out” conditions; filter them first to avoid wasting time on unusable options.</p>
+<p>The third step uses information flow and training objectives to screen model families. Classification and extraction lean toward encoders that read the full text bidirectionally; continuation and dialogue lean toward causal decoders; continuous high-dimensional signals lean toward diffusion; long-sequence scanning leans toward state space models. Families match the natural form of the task, not the brand.</p>
+<p>The fourth step is to compare candidates on real data slices. Use the same data and the same definition of success to evaluate the candidate families and sizes that pass the hard constraints, draw a quality–cost–latency Pareto frontier, rather than adding heterogeneous metrics into a single total score.</p>
+<p>The fifth step is to isolate generation from high-risk execution. The model produces text and suggestions; the execution that actually changes state—refunds, charges, sending—is handed to the tool layer with permission boundaries. The model's output can be “request execution,” but permission always remains at the execution layer.</p>
+<p>The sixth step is to record the complete version and continuously run regression. Model versions, prompts, retrieval databases, and tool versions jointly determine system behavior; any change may alter the results. Record them, and continuously run regression evaluation when data drifts or versions update.</p>
+<p>Each step of this chain produces verifiable intermediate artifacts: the task list, constraint table, family candidate set, slice evaluation results, permission boundary diagram, and version record. The significance of the causal chain is that any error can be traced to a specific link: if routing is wrong, revisit task decomposition; if metrics are distorted, revisit evaluation data; if execution oversteps, revisit the permission layer. Model families turn from abstract coordinates into a traceable decision-making process.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a>: Encoder–decoder Transformer</li><li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">BERT</a>: Bidirectional encoder and masked objective</li><li><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Language Models are Unsupervised Multitask Learners</a>: Causal language modeling</li><li><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Denoising Diffusion Probabilistic Models</a>: Diffusion denoising mechanism</li><li><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener">Mamba</a>: Selective state space model</li><li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Learning Transferable Visual Models From Natural Language Supervision</a>: Vision–language contrastive learning</li></ul><div class="dd-src-date">Accessed: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/model-families">Explore connections on the map</a><a href="/zh/concepts/model-families/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

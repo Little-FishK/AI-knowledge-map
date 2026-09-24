@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries? Explained Simply</title>
+<meta name="description" content="From message sequences, instruction priority, conflict resolution, and context assembly to injection, leakage, versioning, and contract testing—understand what system prompts can control.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/system-prompt/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/system-prompt/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/system-prompt/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries? Explained Simply">
+<meta property="og:description" content="From message sequences, instruction priority, conflict resolution, and context assembly to injection, leakage, versioning, and contract testing—understand what system prompts can control.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/system-prompt/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries? Explained Simply">
+<meta name="twitter:description" content="From message sequences, instruction priority, conflict resolution, and context assembly to injection, leakage, versioning, and contract testing—understand what system prompts can control.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/system-prompt/#page","name":"What Is System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries? Explained Simply","description":"From message sequences, instruction priority, conflict resolution, and context assembly to injection, leakage, versioning, and contract testing—understand what system prompts can control.","url":"https://ai-knowledge-map.com/en/concepts/system-prompt/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries","item":"https://ai-knowledge-map.com/en/concepts/system-prompt/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries</span></li></ol></nav><article id="dd-article" data-concept-id="system-prompt" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">System Prompts: Declare Behavioral Contracts in Probabilistic Models, Not Security Boundaries</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From message sequences, instruction priority, conflict resolution, and context assembly to injection, leakage, versioning, and contract testing—understand what system prompts can control.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> The system prompt is a high-priority context injected by the application at each inference, used to declare role, tasks, boundaries, and output contracts; it influences the next-token distribution, but it is not an operating-system permission and cannot independently protect secrets or block unauthorized tool use.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Explain how system messages participate in autoregressive generation; distinguish priority, temporal order, and trustworthiness; break prompts into testable behavioral contracts; design conflict and injection regression sets; and push hard safety constraints down to a deterministic execution layer.</div>
+<ol class="dd-chain"><li>Decompose business requirements into stable contracts and dynamic data.</li><li>Label each type of context with role, source, and trustworthiness.</li><li>Use minimal prompts to declare goals, conflicts, and failure paths.</li><li>Have the model propose only structured intent.</li><li>Verify identity, permissions, and business state through deterministic policies.</li><li>Return tool facts without fabricating success.</li><li>Evaluate with a four-quadrant contract set and roll out gradually.</li><li>Monitor long-term state drift and perform versioned rollback.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>System prompts are still just a string of tokens the model sees<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>After labeling a piece of text with the system role, does it become a program that the model cannot violate? No. Like other messages, system prompts ultimately are just a string of tokens the model sees; what actually changes model behavior is probability, not enforced execution.</p>
+<p>To see this clearly, first look at the input and output of system prompts. Its input is a piece of text injected by the application, usually containing role settings, task descriptions, behavior boundaries, and output contracts; its output is the distribution of answers the model gives conditioned on this string of tokens. The chat runtime does not pick out the system message to "execute" separately; instead, it encodes messages of different roles into the input prefix according to the chat template, and then lets the model compute the conditional probability of the next token over the entire prefix. The special status of the system role is mainly reflected in template encoding: it is usually placed at the very beginning of the conversation and separated from other messages with special markers.</p>
+<p>This separation brings about a tendency at the training level, not enforcement at the runtime level. During training, the model learns a statistical regularity: instructions from higher-priority roles are more worth following, so content marked as system gains greater influence statistically. But the generation process itself has no formal interpreter that reads prompts one by one and executes rules one by one. The model always does the same thing: estimate the probability distribution of the next token based on the entire prefix, then sample. The so-called "following system prompts" is essentially just that the model is more likely to produce text that meets the prompt's expectations under this conditional probability.</p>
+<p>Since following is a probabilistic behavior, its stability necessarily fluctuates with input characteristics. The longer the prompt, the more hidden internal conflicts are, and the more unfamiliar the task, the lower the model's confidence in correctly separating different requirements and implementing them one by one, and the more unstable following may be. This does not mean that system prompts are useless: in common scenarios, they can still guide behavior to the expected direction with high probability. But they cannot be treated as hard boundaries. Any guarantee that relies on "the model will definitely not violate this sentence" mistakes probabilistic behavior for formal rules.</p>
+<p>Therefore, the reasonable use of system prompts is to declare behavioral expectations and coordinate context: tell the model what role it plays, what task it needs to complete now, and what contract the output should satisfy. The unreasonable use is to stuff enforcement responsibilities from outside the model into the prompt, such as storing API keys in it, using it to enforce tenant isolation, or letting it decide on its own whether to authorize payments. Once secrets are written into the prompt, they enter the text space where the model can be induced to output them; identities and permissions involve real-world consequences, and the model's probabilistic judgment cannot replace auditing. Truly impassable boundaries must be provided by systems outside the model: tool parameter validation, identity permissions, and business policy. The prompt is responsible for declaring "what should be done", while "what must not be done" must be enforced by the system.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>Priority resolves conflicts; temporal order only supplements same-layer context<span class="dd-badge eng">Mechanism</span></h2>
+<div class="dd-agent-response"><p>Why shouldn't a later user message override an earlier system constraint? Because messages are not decided by temporal order, but by the trust level of their source.</p>
+<p>Conflict resolution takes as input a sequence of messages with roles, sources, and times, and produces two things as output: the high-level task to execute, and the low-level conflicts to ignore. Conflicts typically occur when a user says "ignore the previous rules" and this collides with system constraints; the goal of resolution is not to satisfy every message, but to determine which layer's intent should win under the given trust structure.</p>
+<p>The trust hierarchy is divided by source:</p>
+
+<p>System or developer messages represent the application policy and task contract and have the highest status; they are used to constrain lower-level instructions: no matter what the user later says, the later user message cannot rewrite the boundaries the application has already set. User messages represent goals and inputs; they are executed within the scope allowed by higher layers—users can freely make requests within the area delimited by the system, but out-of-bounds parts simply do not take effect. Retrieval, web, or tool output is untrusted data: it can only participate in reasoning as fact candidates, and cannot be automatically promoted to commands just because it happens to look like instructions. Historical summaries and memory are derived state, not original facts; when used, they should carry source labels, have clear scope, and remain correctable—they may be outdated or erroneous and can be overturned at any time by more reliable information.</p>
+<p>Temporal order only operates within the same layer. If two user intents contradict each other, the newer intent can update the earlier one; if two facts returned by tools conflict, they can also be reweighted according to arrival. But once a conflict crosses layers—for example, a sentence in untrusted text says "now switch to administrator identity"—no matter how late it arrives, it cannot override system constraints. Cross-layer conflicts are decided by trust priority, not by temporal order.</p>
+<p>Priority is an expected rule, not an execution guarantee. The model may fail to execute because the prompt is too long, the conflict is too hidden, or the task is unfamiliar; therefore at runtime the resolution result cannot be treated as an established fact. You must still verify outputs and side effects to ensure that what actually takes effect is the high-level contract, not an induced low-level instruction.</p></div>
+<table class="dd-table"><thead><tr><th>Source</th><th>Trust role</th><th>How to handle it</th></tr></thead><tbody><tr><td>System/Developer</td><td>Application policy and task contract</td><td>Constrain lower-level instructions</td></tr><tr><td>User</td><td>Goals and input</td><td>Execute within the scope allowed by higher layers</td></tr><tr><td>Retrieval/web/tool output</td><td>Untrusted data</td><td>As fact candidates, not automatically as commands</td></tr><tr><td>Historical summary/memory</td><td>Derived state</td><td>With source, scope, and correctability</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Complete example: how a refund assistant's contract goes from requirements to prompts and hard gates<span class="dd-badge eng">Case walkthrough</span></h2>
+<div class="dd-agent-response"><p>Should the rule “refunds over 500 yuan require approval” be written only into the system prompt? A complete refund assistant case can show the answer clearly.</p>
+<p>The inputs to this case are four types of information: the user's refund request, order facts, amount rules, and the authenticated principal. The expected output is not “account changed” but a structured refund proposal or an explicit missing-information state. In other words, the model's task is limited to explaining and proposing; making account changes is simply not within its responsibilities.</p>
+<p>Here the system prompt is responsible for declaring responsibilities, and only declaring responsibilities: explaining the refund policy, collecting order information, and proposing refund recommendations, while explicitly not claiming that execution has already happened. Order data goes into a source-attributed structured block, and it is noted that any free text within it is untrusted—notes filled in by users and descriptions scraped from web pages are data, not commands. The output is required to follow a fixed schema: the proposed content, the order ID as evidence, the amount, and whether human approval is required. In this way, every step of the model's output has a checkable shape.</p>
+<p>Consider a specific request: the user asks to refund 800 yuan. Because 800 yuan exceeds the 500-yuan threshold, the model can explain the policy and generate a refund proposal pending approval. Note that nothing has happened at this point—if the prompt passes, it does not mean the refund is approved. What actually performs the action is the refund tool, which independently verifies the authenticated principal, order ownership, amount, and approval token; when the amount exceeds 500 yuan and there is no approval, the executor must reject the call. The intent proposed by the model can become a real operation only after each check in the deterministic policy gate has passed.</p>
+<p>After the tool returns a status, the model can only report the actual result. If the tool says “submitted,” the model must not write “credited”; if the tool rejects, the model must not claim success. The prompt determines how the model explains and proposes, while the executor has final authority.</p>
+<p>This division of responsibilities directly affects test design. Scenarios that need to be covered include: the normal flow, an amount exactly at the boundary, missing fields, the user attempting to override the rules in their own words, injection instructions embedded in order notes, and errors from the tool itself. Each type of scenario verifies the same thing: whether the model always stays within the scope of proposing and explaining, and whether every real side effect is independently decided by the executor.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>System prompt budgets should be set through ablation experiments, not by growing ever longer.<span class="dd-badge math">Numerical example</span></h2>
+<div class="dd-agent-response"><p>After adding one page of rules, overall effectiveness drops; how can you tell whether the rules are conflicting with each other or the longer context is squeezing out attention? The answer is not to keep adding rules, but to perform prompt ablation.</p>
+<p>The input to prompt ablation is the same contract test set plus several prompt versions: a short version, a long version, and a version where the new rules are rewritten as structured expressions. The output is a set of comparable metrics: pass rate, number of fixes, number of regressions, token cost, and first-token latency. One discipline applies: change only how the rules are expressed, one factor at a time, then compare slice by slice. If a version's net benefit is negative, meaning it causes more regressions than fixes, that version is not eligible for release.</p>
+<p>Two basic metrics are worth writing down. Pass rate r equals the number passed m divided by the total number of tests n, that is, r = m ÷ n. Net benefit Δ equals the number of old failures fixed by the new version f minus the number of new regressions caused by the new version g, that is, Δ = f − g. A negative Δ means that the new regressions outnumber the fixes; then the version cannot be released even if some new rules actually took effect.</p>
+<p>Look at a specific ablation run. The test set has 200 contract tests in total. The short prompt passes 176, an adherence rate of 88%. After adding the new rules, the long version passes 170, an adherence rate of 85%; examining the composition of those 170, old capabilities regressed in 12 tests, and the new rules fixed only 6, so the net change Δ = 6 − 12 = −6. The surface difference is 6 tests, but the nature is completely different: the long version broke 12 tests that used to pass, in exchange for only 6 fixes.</p>
+<p>This still does not justify concluding that “the model cannot remember all the rules.” Break the new rules into a structured conflict table and test again; if it passes 184 tests, i.e., 92%, that shows the problem lies in how the rules are expressed and how they conflict, not simply in capacity limits. The same mechanism, expressed differently, yields a difference from 85% to 92%, and that is exactly the value of ablation: it decomposes the vague phenomenon of “adding rules makes it worse” into causes that can be located.</p>
+<p>A single overall pass rate can still hide a critical safety regression—for example, in the overall 85%, it is precisely the “excess refund is rejected” test that failed. Therefore release decisions cannot look at only a single total; they must consider fixes, regressions, and cost together. In addition to pass rate and net benefit, you must also measure token cost and first-token latency, and validate separately on different task slices; do not let a single example decide whether a version stays or goes.</p></div>
+<div class="dd-formula" data-formula-id="system-prompt-contract-metrics"><math display="block" aria-label="通过率 r 等于通过数 m 除以测试总数 n；净收益 delta 等于新修复数 f 减去新回归数 g，本例为六减十二等于负六"><mtable><mtr><mtd><mi>r</mi><mo>=</mo><mfrac><mi>m</mi><mi>n</mi></mfrac></mtd></mtr><mtr><mtd><mi>Δ</mi><mo>=</mo><mi>f</mi><mo>−</mo><mi>g</mi><mo>=</mo><mn>6</mn><mo>−</mo><mn>12</mn><mo>=</mo><mo>−</mo><mn>6</mn></mtd></mtr></mtable></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Original figure: Prompt contracts and execution permissions must be layered<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>When the model is injected, which layer can still prevent real side effects? This layered diagram gives the answer: the deterministic layer after the model.</p>
+<p>Figure 1 depicts the control flow. On the left side of the diagram, three inputs enter the model: the system prompt, the user goal, and untrusted data. The model internally fuses them into a structured intent—not free-form text, but a proposal with fields that can be checked by downstream programs. After this intent flows out of the model, it passes through two layers in sequence: first the policy permission layer, whose inputs are the structured intent proposed by the model plus authoritative state such as identity, amount, and target domain; its outputs are tool calls that are allowed, denied, or pending approval. Then the business tool layer is responsible for executing idempotent state changes and returning the real outcome.</p>
+<p>The division of roles among the three components is fixed in the diagram: the probabilistic model only proposes intent, the deterministic policy gate performs validation, and the business tool is responsible for idempotent state changes and returning facts. The model layer has no real permissions—its output intent can become a tool call only if it passes policy validation, and the identity, amount, and target domain used for validation all come from authoritative state outside the model, not from the model's own judgment.</p>
+<p>One easy misreading of this diagram: the arrows in the diagram represent control flow, not that the system prompt itself has authorization capability. The system prompt appears on the input side of the diagram; its role is to manage model behavior, prompting the model to propose correctly formatted, clearly bounded intents. Real permissions are managed by the deterministic policy. The responsibilities of the two layers do not overlap and cannot replace each other—this is exactly the meaning of the title of Figure 1: the system prompt manages model behavior, and the deterministic policy manages real permissions.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 335" role="img" aria-label="System prompt, user goal, and untrusted data enter the model; the model proposes a structured intent, which is then verified by policy permissions and business tools"><defs><marker id="sp31" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="24" y="42" width="128" height="62" rx="9" fill="#21252d" stroke="#72b293"/><text x="88" y="70" text-anchor="middle" class="svg-t">System Contract</text><text x="88" y="91" text-anchor="middle" class="svg-t" font-size="11">Goal/Boundary/schema</text><rect x="24" y="126" width="128" height="62" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="88" y="162" text-anchor="middle" class="svg-t">User Goal</text><rect x="24" y="210" width="128" height="62" rx="9" fill="#21252d" stroke="#cf7c72"/><text x="88" y="238" text-anchor="middle" class="svg-t">Untrusted Data</text><text x="88" y="259" text-anchor="middle" class="svg-t" font-size="11">Web/Tools/Documents</text><path d="M152 73L207 137M152 157H207M152 241L207 177" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="212" y="96" width="132" height="122" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="278" y="126" text-anchor="middle" class="svg-t">Probabilistic Model</text><text x="278" y="153" text-anchor="middle" class="svg-t" font-size="11">Conflict resolution not guaranteed</text><text x="278" y="180" text-anchor="middle" class="svg-t">Propose Intent</text><path d="M344 157H389" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="394" y="96" width="138" height="122" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="463" y="126" text-anchor="middle" class="svg-t">Deterministic Policy Gate</text><text x="463" y="153" text-anchor="middle" class="svg-t" font-size="11">Identity/Amount/Target Domain</text><text x="463" y="180" text-anchor="middle" class="svg-t">Allow/Deny/Approve</text><path d="M532 157H577" stroke="#7f8b9d" marker-end="url(#sp31)"/><rect x="582" y="96" width="150" height="122" rx="9" fill="#21252d" stroke="#72b293"/><text x="657" y="126" text-anchor="middle" class="svg-t">Business Tool</text><text x="657" y="153" text-anchor="middle" class="svg-t" font-size="11">Real State/Idempotent</text><text x="657" y="180" text-anchor="middle" class="svg-t">Audit Result</text><path d="M657 218V286H278V218" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#sp31)"/><text x="468" y="311" text-anchor="middle" class="svg-t">Tool facts return to the model; prompts cannot forge successful execution</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　System prompt manages model behavior; deterministic policy manages real permissions.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Write prompts as minimal, partitioned, contradiction-free contracts<span class="dd-badge eng">Design</span></h2>
+<div class="dd-agent-response"><p>What happens when role voice, policies, data, and examples are mixed in one paragraph? The model has difficulty distinguishing which are rules that must be followed, which are merely tone examples, and which are changeable facts, and conflicts follow. Prompt design is meant to solve exactly this problem.</p>
+<p>The inputs for designing a prompt include: stable goals, dynamic data, trust boundaries, failure handling, and an output schema. The output after design should be a minimal, partitioned, and contradiction-free behavioral contract.</p>
+<p>The partitioning approach is to split content by nature: stable goals, inviolable constraints, input trust boundaries, decision process, output schema, and failure handling each have their own place. At the same time, the whole document should use the same set of terminology to express subjects and actions, and clearly state what applies and what does not apply—rules should not only say “what to do” but also “what not to do”; otherwise the model will improvise in the silent zones. Keep stable rules in the prompt; frequently changing business data should be placed in structured configuration or injected through retrieval, and should not be copied into a long prompt. Hardcoding changeable data in the prompt means that every data change requires rewriting the entire contract, and old and new values may coexist in the long text, creating new conflicts.</p>
+<p>When rules conflict, explicitly state the priority relationship and provide a conservative fallback. For example: “When information is insufficient, ask; do not guess; for write operations, propose first and then approve.” Such a sentence fixes the decision order at the intersection of the two rules: when information is insufficient, prefer to stop and ask; for write operations, always propose first. With the fallback direction uniformly chosen to be the more conservative side, the model will not choose an aggressive path on its own when uncertain.</p>
+<p>“Minimal” does not mean the shorter the better. After reduction, the prompt must still be validated with boundary-covering positive and negative examples: positive examples confirm that a rule takes effect when it should, and negative examples confirm that it does not take effect when it should not. Compared with a large number of homogeneous style examples, a small number of boundary-covering positive and negative examples are more valuable, because they test the boundaries of the contract rather than the writing.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Prompt Injection Exploits the Shared Channel Between Instructions and Data<span class="dd-badge eng">Failure Boundary</span></h2>
+<div class="dd-agent-response"><p>Why does wrapping webpage content in XML tags only reduce confusion instead of truly isolating it? Because instructions and data share the same channel.</p>
+<p>The input to an injection test consists of two parts: trusted instructions, and malicious text from a webpage, document, or tool result. The output must be observed on two levels: the model’s stated intent, and the tool actions that actually occur. When a model says “I won’t execute instructions in the webpage” but then calls the tool demanded by the webpage, that is where injection actually takes effect.</p>
+<p>Using tags, quotation marks, and phrases like “do not execute the following content” gives the model semantic hints: they make the model statistically more likely to treat this text as data. But hints are not isolation. Malicious text in the webpage still enters the same context and participates in the same round of attention computation with other tokens; it can still influence the probability distribution of the next token. That is what “only reducing confusion” means: tags reduce the probability of misreading data as instructions, but they cannot block the paths by which malicious text gradually changes model behavior through the content itself, through adjacent relationships, or through long chains.</p>
+<p>Indirect injection exploits exactly this shared channel: the attack text does not require the model to comply immediately, but induces it to leak prompts, rewrite goals, or call tools. The longer the chain, the more likely the model is to forget the trust boundary at some intermediate step and dilute rules established earlier in subsequent text.</p>
+<p>Therefore the real defense lies not in prompt wording but in structure: treat all external content as data and minimize visible context so that irrelevant external text does not enter the window; use least privilege for tool use and an allowlist of targets so that even if the model is induced, it can only call the predefined tools; require sensitive actions to be approved by deterministic policies or humans, leaving the model no path to trigger them on its own.</p>
+<p>Testing must likewise be designed around this channel. Passing only a template attack such as “ignore previous instructions” does not prove resistance to multilingual rewrites, encoding obfuscation, or multi-turn inducement. Effective injection testing should cover multilingual, encoded, and long-context injections, as well as injections hidden in tool return values—attackers will insert text through any opening that can enter the context, so the defense must be verified at every opening.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>System prompts are not secret storage; leak prevention must assume they can be inferred<span class="dd-badge eng">Confidentiality</span></h2>
+<div class="dd-agent-response"><p>If you don't put keys directly in the prompt, can you put internal policies and detection thresholds there? The default answer from leakage evaluation is: No. System prompts are not secret storage; leak prevention must assume they can be recited or inferred.</p>
+<p>The inputs to leakage evaluation are three things: assets in the system prompt, attack queries, and the path to the logging tool. The outputs are three levels: verbatim recitation, semantic inference, and actual security loss. The first two levels measure the form of the leak, and the third measures whether it truly constitutes an incident. Behind this evaluation framework lies a default assumption—once text enters the context, it should be considered potentially recitable or inferable. Therefore keys, personal data, and sensitive detection logic must not enter the context; publicly disclosable behavioral norms can be written into the prompt, while sensitive detection logic stays on the server side.</p>
+<p>Leakage paths are much broader than “directly asking for it.” Users can obtain prompt content through direct requests, role-playing, piece-by-piece inference, error echo, or tool logs, and the model may also actively recite its meaning. Error echo is especially insidious: a single error that spits back a prompt fragment verbatim is equivalent to completing an unintentional leak. This means leak prevention cannot rely on wording tricks such as “we didn't write keys into it”; it must rely on asset classification based on “whatever enters the context may leak.”</p>
+<p>During evaluation, keep two metrics separate: prompt leakage and instruction violation. The fact that the model does not recite the original text does not mean it has not been controlled by low-level malicious instructions—an attacker can fully alter model behavior without triggering recitation. Conversely, if a public behavioral norm is recited, that does not necessarily cause security loss, because it was never secret. To decide whether a leak counts as a failure, first define by asset value: what is lost if this text leaks? Define assets first, then test; otherwise you will either treat inconsequential recitation as an incident or miss genuinely valuable information.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Output Structure and Rejection Paths Must Be Consumer-Verifiable<span class="dd-badge eng">Interface</span></h2>
+<div class="dd-agent-response"><p>The model says “needs approval”—why can't downstream just read this sentence? Because natural language has no structure that a program can verify, and no rejection path that a program can process. The output contract exists to solve exactly this.</p>
+<p>The input to the output contract is the model's proposal; the output is versioned state, fields, and rejection reasons for downstream consumers to parse. By versioned, we mean the schema produced by the model carries an explicit version identifier; the state must also take values from a finite enumeration, such as propose_refund, needs_approval, insufficient_data. Rejection or missing information is not an unexpected condition but a first-class state—like successful proposals, it has a fixed shape, and consumers do not need to guess what happened from an explanatory text.</p>
+<p>After receiving the output, consumers must perform five kinds of validation in order: type validation, enumeration validation, cross-field validation, identity validation, and business state validation. Type and enumeration validation ensure that the fields themselves are valid; cross-field validation ensures that fields do not contradict each other; identity validation confirms that the initiator actually has permission to act; business state validation confirms with the authoritative system whether the current state allows this operation. Free-text explanations can never trigger side effects—they may explain why, but no piece of explanation is authorized to drive real operations.</p>
+<p>There is a boundary that must be made clear: structural validity only means the format passes; it does not prove semantic correctness. A perfectly formatted propose_refund may still belong to someone else's order, or exceed the allowed amount. Whether the order belongs to the user and whether the amount is allowed can only be determined by querying the authoritative system, not by the model's wording. Structured output guarantees format, not semantics.</p>
+<p>Finally, the prompt and schema versions must be regression-tested together. Once the prompt version the model sees and the schema version the consumer parses become misaligned, new state names will appear, and old consumers will reject or misjudge due to enumeration mismatch. Contract drift occurs when these two versions are upgraded independently without each other's knowledge, so their regression tests should be performed as part of the same change.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Conversations, summaries, and memory cause old prompt assumptions to drift<span class="dd-badge eng">Long-term state</span></h2>
+<div class="dd-agent-response"><p>The system prompt has never changed, so why can behavior still change after a long conversation? Because the context the model sees at each turn is not the same. The prompt is only one part of the context; the rest continually drifts during the session.</p>
+<p>The assembly process for long-term state can be viewed as follows: its inputs include system invariants, historical messages, compressed summaries, tool observations, and scoped memory, and its output is the context actually visible to the model this turn. Historical messages accumulate continuously, compressed summaries rewrite and condense earlier content, tool observations inject new facts, and memory is read in by task or user scope. These components continually change the conditional context—in the "current situation" the model sees, old user goals may already have been summarized into high-confidence facts, or they may persist across tasks. Initial rules appear only once at the beginning of the conversation; they cannot guarantee that they still exist after summarization, nor can they prevent old goals from continuing to take effect in the next task.</p>
+<p>The countermeasure is to turn invariants into a per-turn routine: restate the necessary boundaries every turn, rather than relying on "having said it once at the beginning". Memory is read by task/user scope, bringing in only the parts relevant to the current task; derived state passed to the model should carry its source and be marked as correctable—the model should know where a summary comes from, under what scope it holds, and when it should be overridden by authoritative information. When switching tasks, clear local memory so that the goals of the previous task do not contaminate the next task.</p>
+<p>Validation should also target this drift mechanism: after compression, rerun conflict tests and safety sentinel tests to check whether summaries swallowed key boundaries and whether old goals still remain after switching. If the safety of a long-term AI Agent is built on "saying it once in the opening", it has already placed the insurance where drift can wash it away.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Version prompts like code, but rollback evidence matters more than text diff.<span class="dd-badge eng">Release</span></h2>
+<div class="dd-agent-response"><p>Why can changing just one phrase also change completely unrelated tasks? Because every token in the prompt participates in computing generation probabilities; any text change redistributes the generation distribution.</p>
+<p>Prompt release is not as simple as pasting a new piece of text. The complete input for a release is six versions: prompt, template, model, sampling parameters, tool schema, and evaluation set. They must be recorded together, because behavior is their joint product. The output is a candidate release with regression evidence and a rollback package—the latter means that when an anomaly occurs, the prompt and the associated schema can be rolled back together to the previous consistent state.</p>
+<p>Why does a wording change have such a wide surface area? Prompt changes alter the model's internal attention and generation distribution, and this change is not local: it can affect outputs in different languages, behavior in long contexts, tool selection preferences, and the timing of rejections. A seemingly harmless wording adjustment may cause some tool to be selected one extra time in an edge case, or cause a certain type of request to shift from "correct rejection" to "false rejection." Therefore, before release, use canary comparison to run the new and old versions in parallel on a small portion of real traffic, comparing task success, contract adherence, conflict resolution, false rejection, token cost, and manual corrections.</p>
+<p>Text diff shows what changed, not how behavior changed. A diff can tell you which line changed, but it cannot prove that unrelated tasks did not suffer regressions through side paths. Therefore, release requires three sets of data: a frozen regression set, to ensure known behavior does not degrade; a hidden attack set, to ensure the safety boundary is not silently weakened by this change; and production shadow samples, to observe changes on the real distribution. When an anomaly occurs, rollback is based on this evidence, not on the text itself—rollback means rolling back a whole set of mutually locked versions, not changing a sentence back.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Contract testing covers four quadrants: normal, conflict, malicious, and failure.<span class="dd-badge eng">Verification</span></h2>
+<div class="dd-agent-response"><p>Why can't prompt testing just save a few ideal conversations? Because ideal conversations cover only one quadrant, and the other three quadrants are exactly where the model is most likely to make mistakes.</p>
+<p>The inputs to contract testing are four categories of samples: normal, conflict, malicious, and failure. The outputs are assertion results about structure, decisions, side effects, and user-visible facts. The object of assertions is not verbatim wording—it is acceptable for the model to use different phrasing to accomplish the same thing—but the things that must hold: whether the output structure is correct, whether the decision took the right path, whether tool side effects occurred, and whether the facts the user sees are consistent with the true state. Verbatim wording need not be identical, but high-risk actions and fact boundaries must pass deterministically.</p>
+<p>Each of the four quadrants has its own task. The normal set validates the main task itself: given standard input, does the model produce correct proposals and explanations? The conflict set makes the user, history messages, and tool content conflict with high-level constraints: the user requests unauthorized actions, history retains old goals, the tool returns text that contradicts the rules—does the model still maintain high-level constraints? The malicious set covers injection, extraction, encoding obfuscation, and multi-turn inducement, checking whether attack text changes behavior. The failure set covers missing fields, timeouts, refusals, and inconsistent tool returns, checking whether the model stops to ask when information is incomplete rather than guessing.</p>
+<p>Test results cannot be reduced to a single total. They must be broken down by language, length, model version, and risk slice, report confidence intervals, and retain failing examples—failing examples are direct material for the next round of fixes and expanded testing. Model review can help expand the test set and identify missed scenarios, but high-risk determinations do not use model review as the final basis; they use deterministic checks or human review: if a test involves whether a refund actually occurred, deterministic code must assert the actual result of the tool call, rather than having another model grade it.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">13</span>Connecting the Causal Chain Together<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>The entire causal chain can go from a single question to verifiable practice in eight steps.</p>
+<p>Step one, split business requirements into stable contracts and dynamic data: rules stay in the prompt, while data that changes goes through structured configuration or retrieval. Step two, label each type of context with role, source, and trustworthiness: system constraints, user goals, untrusted data, and derived memory each go to their own layer from then on. Step three, use a minimal prompt to declare goals, conflicts, and failure paths: state only behavioral expectations in the prompt, and make explicit the priority relationships and conservative fallbacks when conflicts occur. Step four, have the model propose only structured intent: proposals with a schema, not free-text commitments. Step five, use deterministic policy to verify identity, permissions, and business state: what truly blocks side effects is not wording but a policy gate. Step six, pass tool facts back without fabricating success: the model reports the real state returned by the tool, adding nothing and removing nothing. Step seven, evaluate with a four-quadrant contract set and release via canary: freeze normal, conflict, malicious, and failure samples into a regression set, and compare them with low-traffic canary releases. Step eight, monitor long-term state drift and versioned rollback: restate invariants each turn, read memory by scope, and on anomaly roll back together with the schema.</p>
+<p>The chain itself must withstand verification, and verification proceeds at four levels:</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Verification layer</th><th class="dd-align-left">What is fixed</th><th class="dd-align-left">What evidence to observe</th></tr></thead><tbody><tr><td class="dd-align-left">Input</td><td class="dd-align-left">The same batch of samples, preprocessing, and permission boundaries</td><td class="dd-align-left">Input hashes, slice labels, and rejection reasons</td></tr><tr><td class="dd-align-left">Mechanism</td><td class="dd-align-left">Change only one core variable; lock the rest of the configuration</td><td class="dd-align-left">Key intermediate states and the first position where expectations diverge</td></tr><tr><td class="dd-align-left">Output</td><td class="dd-align-left">The same acceptance rules and resource budget</td><td class="dd-align-left">Stratified differences in quality, cost, latency, and failure rate</td></tr><tr><td class="dd-align-left">Falsification</td><td class="dd-align-left">Keep a control group that does not enable the target mechanism</td><td class="dd-align-left">Whether gains reproduce stably across samples and random seeds</td></tr></tbody></table></div>
+<p>The input layer fixes the same batch of samples, preprocessing, and permission boundaries, and observes input hashes, slice labels, and rejection reasons, ensuring that every experiment faces the same input distribution. The mechanism layer changes only one core variable at a time while locking all other configurations, and observes key intermediate states and the first position where expectations diverge—whichever step the divergence occurs at indicates which link in the causal chain has broken. The output layer uses the same acceptance rules and resource budget, and observes stratified differences in quality, cost, latency, and failure rate to prevent a single aggregate from hiding local differentiation. The falsification layer keeps a control group that does not enable the target mechanism, and tests whether gains reproduce stably across samples and random seeds—only if the effect becomes measurably worse after removing the mechanism can we say the effect comes from that mechanism rather than from chance.</p>
+<p>The end of this chain returns to the central theme: a system prompt declares a behavioral contract in a probabilistic model, rather than establishing a safety boundary. The contract is honored through structure, policy, and evidence; the boundary is always guarded by deterministic systems outside the model.</p></div>
+<table class="dd-table"><thead><tr><th>Verification layer</th><th>What is fixed in “System Prompt: Declaring a Behavioral Contract in a Probabilistic Model, Not Establishing a Safety Boundary”</th><th>What evidence to observe</th></tr></thead><tbody>
+      <tr><td>Input</td><td>The same batch of samples, preprocessing, and permission boundaries</td><td>Input hashes, slice labels, and rejection reasons</td></tr>
+      <tr><td>Mechanism</td><td>Change only one core variable; lock the rest of the configuration</td><td>Key intermediate states and the first position where expectations diverge</td></tr>
+      <tr><td>Output</td><td>The same acceptance rules and resource budget</td><td>Stratified differences in quality, cost, latency, and failure rate</td></tr>
+      <tr><td>Falsification</td><td>Keep a control group that does not enable the target mechanism</td><td>Whether gains reproduce stably across samples and random seeds</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/2404.13208" target="_blank" rel="noopener">The Instruction Hierarchy</a>: trains models to prioritize following privileged instructions</li><li><a href="https://arxiv.org/abs/2502.08745" target="_blank" rel="noopener">IHEval</a>: evaluating aligned and conflicting instruction hierarchies</li><li><a href="https://arxiv.org/abs/2302.12173" target="_blank" rel="noopener">Indirect Prompt Injection</a>: indirect instruction attacks in external data</li><li><a href="https://arxiv.org/abs/2402.06363" target="_blank" rel="noopener">StruQ</a>: structured queries and prompt injection defense research</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/system-prompt">Explore connections on the map</a><a href="/zh/concepts/system-prompt/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

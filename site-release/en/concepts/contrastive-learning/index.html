@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space? Explained Simply</title>
+<meta name="description" content="From InfoNCE, temperature, and gradient direction, to augmentation invariance, large batches, false negative samples, representation collapse, and transfer validation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/contrastive-learning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/contrastive-learning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/contrastive-learning/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space? Explained Simply">
+<meta property="og:description" content="From InfoNCE, temperature, and gradient direction, to augmentation invariance, large batches, false negative samples, representation collapse, and transfer validation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/contrastive-learning/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space? Explained Simply">
+<meta name="twitter:description" content="From InfoNCE, temperature, and gradient direction, to augmentation invariance, large batches, false negative samples, representation collapse, and transfer validation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/contrastive-learning/#page","name":"What Is Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space? Explained Simply","description":"From InfoNCE, temperature, and gradient direction, to augmentation invariance, large batches, false negative samples, representation collapse, and transfer validation.","url":"https://ai-knowledge-map.com/en/concepts/contrastive-learning/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space","item":"https://ai-knowledge-map.com/en/concepts/contrastive-learning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space</span></li></ol></nav><article id="dd-article" data-concept-id="contrastive-learning" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Contrastive Learning: Using Positive and Negative Pairs to Shape Representation Space</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">From InfoNCE, temperature, and gradient direction, to augmentation invariance, large batches, false negative samples, representation collapse, and transfer validation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Contrastive learning does not directly assign a class to each sample; instead, it specifies which views should be pulled together and which candidates should be pushed apart. What truly defines the semantics of the representation are positive pair construction, negative sample distribution, augmentation policy, and sampling bias; the same loss can learn semantics, but it can also learn background, watermarks, or instance fingerprints.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading you should be able to:</b>Compute InfoNCE step by step; explain temperature and hard negative samples; design augmentations that do not break semantics; diagnose false negatives, collapse, and shortcuts.</div>
+<ol class="dd-chain"><li>Define downstream semantics and invariance</li><li>Construct positive pairs and candidate negative pairs</li><li>Encode, normalize, and compute similarity</li><li>InfoNCE focuses on hard candidates</li><li>Monitor false negatives, shortcuts, and collapse</li><li>Use transfer and counterfactual tests for acceptance</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>The training signal is a “who is the same as whom” relation table<span class="dd-badge intuition">Intuition</span></h2>
+<div class="dd-agent-response"><p>Contrastive Learning does not require knowing category names like “shoe” and “car” in advance, but it must know which views should be regarded as the same object. The rule for constructing training data plays this role: generate two views from the same original sample and label them as a positive pair; treat views from other samples as negative pairs. In this way, each training batch forms an implicit relation table—it does not answer what category a sample belongs to, only “who should be pulled closer and who should be pushed farther apart.”</p>
+<p>An augmented view is first fed into encoder f to obtain representation z=f(view). z is the feature intended for downstream tasks. Then projection head g maps z into the space where the contrastive loss is actually computed, yielding g(z). During training, similarity comparison and pulling close and pushing away happen in the projection space; the training signal then passes back through g to f, updating the encoder. Separating the representation space from the loss space means downstream can use the pre-projection z, without directly using the projection result specially shaped for the contrastive objective.</p>
+<p>Taking shoe image A as anchor, A⁺ is another view cropped from A, so A and A⁺ form a positive pair; another shoe B and car C come from other samples, so according to the current construction rule they are treated as negative pairs. Their cosine similarities with A are 0.8, 0.6, 0.1 respectively, with temperature τ=0.2. 0.8 indicates that the positive view is already quite close to the anchor, 0.6 indicates that B, although labeled as a negative sample, is still quite similar to the anchor, and 0.1 indicates that car C is already clearly far away. The loss accordingly increases the relative similarity between A and A⁺, and reduces the competitiveness of other candidates relative to the positive sample.</p>
+<p>Therefore, what the model learns depends not only on the encoder architecture but also on how this relation table is constructed. Positive pairs specify which view differences the model should ignore, and negative pairs specify which sample relations should be distinguished. Here the “positive” and “negative” are relation labels given by the training rule, not equivalent to true semantic categories: although B is also a shoe, it is still treated as a negative pair because it comes from another original sample. This boundary determines the supervision that the contrastive objective can provide, and also reminds us not to directly interpret relations constructed from sample identity as complete category semantics.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>InfoNCE lets one positive sample compete with the entire candidate set<span class="dd-badge math">Formula</span></h2>
+<div class="dd-agent-response"><p>InfoNCE turns representation learning into a classification problem temporarily created around an anchor: given anchor i, treat it as a query and identify the unique positive view among a set of candidate vectors. The candidate set contains both positive and negative pairs, so the “class” is not a fixed semantic label but which candidate currently forms a positive pair with the anchor.</p>
+<p>The loss for anchor i is:</p>
+<p>ℓᵢ = −log[exp(sim(zᵢ, zᵢ⁺) / τ) / Σⱼ∈candidates exp(sim(zᵢ, zⱼ) / τ)]</p>
+<p>Here, zᵢ is the anchor vector, and zᵢ⁺ is the positive view vector corresponding to it; j iterates over the candidate set, and zⱼ may be either a positive sample or a negative sample. sim(zᵢ, zⱼ) measures the similarity between the anchor and the candidate, and τ scales the similarity. Each scaled similarity sim(zᵢ, zⱼ)/τ is a logit, exp turns it into a positive value, and the sum in the denominator normalizes over all candidates. Thus, the fraction can be interpreted as the softmax probability that the model assigns to the correct positive sample, and ℓᵢ is the negative logarithm of this probability.</p>
+<p>This formula forms a clear causal chain: positive-pair similarity increases → the positive-pair logit increases → the positive pair's probability share among all candidates in the denominator increases → the negative log loss decreases. Backpropagation therefore raises the positive-pair logit. Meanwhile, how much each negative pair is pushed depends on its current softmax probability: negative pairs that are more similar to the anchor and have higher probability have a greater effect on the loss; negative pairs that are already very dissimilar and have probability near zero have a weaker effect. The denominator must include the positive pair, because the normalization compares the share of the correct candidate relative to all candidates, rather than maximizing a similarity in isolation.</p>
+<p>If similarity is computed directly with unnormalized vectors, the model may increase the logit by enlarging the vector norm instead of actually improving the relationship expressed by the vector direction. Usually the vectors are normalized first so that the similarity mainly reflects directional closeness, which avoids reducing the loss merely by enlarging the norm. The result of InfoNCE should be interpreted as the positive sample's relative identification probability in the current candidate set; it optimizes the relative ordering and margin among candidates, not an absolute similarity detached from the candidate set.</p></div>
+<div class="dd-formula">ℓᵢ=−log(exp(sim(zᵢ,zᵢ⁺)/τ) / Σ<sub>j∈candidates</sub> exp(sim(zᵢ,zⱼ)/τ))</div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Full worked calculation: the similar shoe contributes a larger gradient than the car<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>Continuing with anchor shoe image A: A⁺ is its positive view, while another shoe B and a car C are negative candidates. The three have cosine similarities with A of [0.8, 0.6, 0.1], respectively, with temperature τ=0.2. InfoNCE first divides the similarities by the temperature to obtain logits:</p>
+<p>[0.8/0.2, 0.6/0.2, 0.1/0.2] = [4, 3, 0.5]</p>
+<p>Next, exponentiate each logit:</p>
+<p>[exp(4), exp(3), exp(0.5)] ≈ [54.60, 20.09, 1.65]</p>
+<p>The sum of these exponentiated scores is:</p>
+<p>54.60 + 20.09 + 1.65 = 76.34</p>
+<p>Therefore, the softmax probability assigned to positive pair A⁺ is:</p>
+<p>p⁺ = 54.60 / 76.34 ≈ 0.715</p>
+<p>The loss for anchor A is the negative log of the positive pair probability:</p>
+<p>ℓ = −log(0.715) ≈ 0.335</p>
+<p>This value means that when the three candidates A⁺, B, and C compete together, the model assigned about 71.5% probability to the correct candidate A⁺. The loss remains greater than zero because the other two candidates, especially B with its higher similarity, still occupy part of the probability mass.</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Candidate</th><th class="dd-align-left">Relation to A</th><th class="dd-align-right">Similarity</th><th class="dd-align-right">softmax probability</th><th class="dd-align-left">Training effect</th></tr></thead><tbody><tr><td class="dd-align-left">A⁺</td><td class="dd-align-left">Positive pair</td><td class="dd-align-right">0.8</td><td class="dd-align-right">0.715</td><td class="dd-align-left">Continue pulling closer</td></tr><tr><td class="dd-align-left">B</td><td class="dd-align-left">Negative shoe</td><td class="dd-align-right">0.6</td><td class="dd-align-right">0.263</td><td class="dd-align-left">Push away strongly</td></tr><tr><td class="dd-align-left">C</td><td class="dd-align-left">Negative car</td><td class="dd-align-right">0.1</td><td class="dd-align-right">0.022</td><td class="dd-align-left">Push-away gradient is small</td></tr></tbody></table></div>
+<p>The derivative of the cross-entropy with respect to a negative candidate's logit equals the candidate's current softmax probability. Therefore, the derivative corresponding to B is 0.263, while C is only 0.022; the push-away signal from B is about 0.263/0.022 times that from C. The reason is not that the model knows in advance that B is more important, but that B is more similar to the anchor and occupies more incorrect probability after the softmax. The car C is already easy to distinguish, so continuing to push it away helps little in reducing the loss; shoe B is the harder competitor at the moment.</p>
+<p>Whether this gradient allocation matches the task objective depends on the relational assumption that "different instances should be separated." If the goal is instance retrieval, the other shoe B is a difficult negative that must be distinguished, so pushing it away strongly is reasonable; if the goal is to learn shoe semantics, B and A may naturally be close, and B is then a false negative. The same 0.335 loss and 0.263 gradient may represent effective training under one objective, or damage to semantic structure under another.</p></div>
+<table class="dd-table"><thead><tr><th>Candidate</th><th>Similarity</th><th>softmax probability</th><th>Training effect</th></tr></thead><tbody><tr><td>A⁺ positive pair</td><td>0.8</td><td>0.715</td><td>Continue pulling closer</td></tr><tr><td>B shoe</td><td>0.6</td><td>0.263</td><td>Push away strongly</td></tr><tr><td>C car</td><td>0.1</td><td>0.022</td><td>Gradient is small</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>Temperature controls how hard the negative samples the model focuses on are<span class="dd-badge math">Temperature</span></h2>
+<div class="dd-agent-response"><p>The temperature τ sits between the similarity and the softmax; the logit for candidate j is sim(zᵢ, zⱼ)/τ. It does not change the order in which candidates are ranked by similarity, but it changes the extent to which similarity differences are amplified after entering the softmax, thereby determining which candidates the training signal concentrates on.</p>
+<p>When τ becomes smaller, the same set of similarities is divided by a smaller number, so the logit gaps between neighboring candidates widen. The softmax probabilities concentrate on the few highest-scoring candidates: if the positive sample has the highest score, it receives a higher recognition probability; hard negative samples that are very similar to the anchor also receive larger probabilities and gradients, while the probabilities of easy negative samples rapidly approach zero. The causal chain is: τ becomes smaller → logit gaps are amplified → the probability distribution becomes sharper → gradients concentrate more on the hardest-to-distinguish candidates → the representation is under stronger local discrimination pressure.</p>
+<p>When τ becomes larger, the logit gaps are compressed, the softmax distribution becomes smoother, and more candidates participate in training together. If τ is too large, the candidate probabilities approach a uniform distribution, the influence of similarity magnitude on probability weakens, and the model receives insufficient discriminative signal.</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Temperature</th><th class="dd-align-left">Probability distribution</th><th class="dd-align-left">Primary role</th><th class="dd-align-left">Primary risk</th></tr></thead><tbody><tr><td class="dd-align-left">Smaller</td><td class="dd-align-left">Sharp, concentrated on the highest-scoring candidates</td><td class="dd-align-left">Focuses on hard negative samples and strengthens discrimination</td><td class="dd-align-left">Sensitive to mismatched and false negative samples; gradients may be unstable</td></tr><tr><td class="dd-align-left">Larger</td><td class="dd-align-left">Smooth, multiple candidates act together</td><td class="dd-align-left">Dilutes the influence of any single candidate</td><td class="dd-align-left">Insufficient discrimination pressure; weak training signal</td></tr></tbody></table></div>
+<p>A smaller τ is not inherently better. If the highest-scoring negative candidate is actually a mismatch, or if it should be semantically close to the anchor under the target semantics, a sharp softmax will concentrate a large amount of gradient on this erroneous relationship, violently pushing apart samples that should be close. Temperature therefore simultaneously controls “how hard the negative samples the model focuses on are” and “how much data noise is amplified”.</p>
+<p>τ can be fixed or learned, but it cannot be chosen independently of the training configuration. The batch determines the candidate set and the chance of hard negative samples appearing; similarity normalization determines the score scale; data noise determines how many high-similarity negative pairs contain erroneous relationships. Only by considering these three together with the temperature does the degree of sharpness or smoothness represented by τ acquire a stable meaning.</p></div>
+<table class="dd-table"><thead><tr><th>τ</th><th>Distribution</th><th>Risk</th></tr></thead><tbody><tr><td>Smaller</td><td>Sharp, focusing on hard negatives</td><td>Noise-sensitive, unstable gradients</td></tr><tr><td>Larger</td><td>Smooth, multiple candidates act together</td><td>Insufficient discrimination pressure</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Original figure: Augmentation and sampling jointly sculpt the space<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>The contrastive loss sees not the samples' true categories, but the relationships jointly constructed by augmentation and sampling. Augmentation produces positive views from the same original sample, determining which point should move closer to the anchor; sampling places other samples into the candidate set, determining which points should be pushed farther away. Only after the two rules are combined does the actual direction of movement in the representation space emerge.</p>
+<p>Easy negative C  ←          Anchor A         →  Positive sample A⁺ small push away                 │               pull closer │ Hard negative B strong push away</p>
+<p>In the figure, A is the anchor, and A⁺ is the positive sample obtained according to the augmentation rule. The loss increases the relative similarity between A and A⁺, so the two continue to move closer in the representation space. B is very similar to A, but is labeled as a negative sample according to the sampling relation; it is the more competitive candidate at present and receives a stronger push-away signal. C is already far from A, is an easy negative sample, has less influence on the current loss, and thus moves less.</p>
+<p>The point of this figure is not that all points move by a fixed distance, but that gradient direction and relative strength are jointly determined by the constructed relationships and current similarity: positive pairs are pulled closer; negative pairs are pushed farther away; the more a negative pair resembles the anchor, the more it tends to participate in competition and the stronger the push-away effect it receives. As training continues, these local movements accumulate and gradually shape the entire representation space.</p>
+<p>The meaning of B cannot be judged solely from the “hard negative” label in the figure. If the downstream task requires distinguishing different instances, B is similar to A but should indeed be separated, so it is a legitimate hard negative; if the downstream semantics require samples of the same class to cluster together, B should originally be close to A but is pushed away by the construction rule, so it is an incorrect false negative. The loss itself cannot distinguish these two cases, because it only knows the positive/negative relations fed to it. Augmentation and sampling are therefore not auxiliary steps before training, but directly specify what the representation space should retain, ignore, and separate.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 735 310" role="img" aria-label="Movement of the anchor, positive sample, hard negative, and easy negative in contrastive learning"><defs><marker id="cta" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#788293"/></marker></defs><rect x="20" y="35" width="180" height="240" rx="10" fill="#21252d" stroke="#596273"/><text x="110" y="62" text-anchor="middle" class="svg-t">Data construction</text><text x="55" y="105" class="svg-t">A anchor</text><text x="55" y="142" class="svg-t">A⁺ crop</text><text x="55" y="179" class="svg-t">B another pair of shoes</text><text x="55" y="216" class="svg-t">C car</text><path d="M200,155 L295,155" stroke="#788293" marker-end="url(#cta)"/><rect x="305" y="35" width="405" height="240" rx="10" fill="#21252d" stroke="#596273"/><circle cx="480" cy="155" r="12" fill="#d3a05a"/><text x="480" y="184" text-anchor="middle" class="svg-t">A</text><circle cx="575" cy="100" r="11" fill="#65a6d9"/><text x="595" y="98" class="svg-t">A⁺ positive pair</text><path d="M563,107 L500,144" stroke="#65a6d9" stroke-width="3" marker-end="url(#cta)"/><circle cx="565" cy="210" r="11" fill="#cf7c72"/><text x="585" y="214" class="svg-t">B hard / false negative</text><path d="M500,164 L548,198" stroke="#cf7c72" stroke-width="3" marker-end="url(#cta)"/><circle cx="670" cy="245" r="9" fill="#778293"/><text x="620" y="265" class="svg-t">C easy negative</text><text x="500" y="67" class="svg-t">Pull A⁺ closer; push B, C away</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1　The loss knows only the constructed relationships; whether B is a legitimate hard negative or an incorrect false negative depends on the downstream semantic definition.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Augmentation Defines Which Changes the Model Should Ignore<span class="dd-badge eng">Invariance</span></h2>
+<div class="dd-agent-response"><p>Data augmentation is not harmless preprocessing; it declares an invariance to the model. Applying transformations to the same sample to obtain two views and pulling them together as a positive pair is equivalent to requiring the encoder to output similar representations. Whatever changes occur between the two views, the model is trained to ignore as much as possible.</p>
+<p>Random cropping changes the object's position in the view and may cause partial loss. Pulling the original image and the cropped image together trains the model to be invariant to positional changes and a certain degree of partial loss. Color jitter changes color; pulling views before and after jitter together trains color invariance. Back-translation in text changes wording while trying to preserve meaning; pulling the original sentence and the back-translated sentence together trains wording invariance. The causal chain can be written as: choose augmentation transformation → generate positive pairs with specific differences → contrastive objective pulls the two representations together → encoder reduces sensitivity to the difference.</p>
+<p>This invariance is valuable only when the factors changed by the augmentation truly do not affect the target semantics. If color determines food doneness, color jitter may erase the information needed to judge doneness; if rotation or flipping changes medical orientation, forcing the representations before and after the transformation to be consistent may suppress the orientation signal; if cropping removes the main subject, the generated view no longer expresses the original sample's semantics, yet it is still treated as a positive pair; if text rewriting replaces a negation or entity, the so-called positive pair has actually changed meaning. At this point, training still faithfully executes the instruction to pull them together, but the result is eliminating useful differences as if they were irrelevant differences.</p>
+<div class="dd-table-wrap"><table class="dd-table"><thead><tr><th class="dd-align-left">Domain</th><th class="dd-align-left">Potentially reasonable augmentation</th><th class="dd-align-left">Cases that may break labels</th></tr></thead><tbody><tr><td class="dd-align-left">Natural images</td><td class="dd-align-left">Minor cropping, color changes</td><td class="dd-align-left">Small objects are cropped out</td></tr><tr><td class="dd-align-left">Medical images</td><td class="dd-align-left">Limited noise</td><td class="dd-align-left">Left-right flip changes laterality</td></tr><tr><td class="dd-align-left">Text</td><td class="dd-align-left">Meaning-preserving rewriting</td><td class="dd-align-left">Negation or entities are replaced</td></tr></tbody></table></div>
+<p>To judge whether an augmentation is reasonable, one cannot just look at whether the transformed sample "looks like" the original sample, but must look at whether the transformation preserves the semantics and labels required by the current task. Augmentation strength also has boundaries: minor changes may establish useful invariance, but after crossing the range of semantic preservation, the same transformation will produce incorrect positive pairs. Therefore, the augmentation strategy is essentially an assumption about the target semantics; what information the representation ultimately retains and what it suppresses is directly constrained by this assumption.</p></div>
+<table class="dd-table"><thead><tr><th>Domain</th><th>Potentially reasonable</th><th>May break labels</th></tr></thead><tbody><tr><td>Natural images</td><td>Minor cropping/color</td><td>Small objects are cropped out</td></tr><tr><td>Medical images</td><td>Limited noise</td><td>Left-right flip changes laterality</td></tr><tr><td>Text</td><td>Meaning-preserving rewriting</td><td>Negation or entities are replaced</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Large batches, queues, and momentum encoders address negative-sample supply<span class="dd-badge eng">system</span></h2>
+<div class="dd-agent-response"><p>Contrastive loss requires the positive sample to compete with a set of negative samples, so the training system must continuously provide enough negative candidates. Large batches, cross-device sharing, and queues are all ways to expand the candidate set, but they make different trade-offs in memory, communication, and representation consistency.</p>
+<p>SimCLR directly uses a large batch: other samples encoded in the same step can become negative samples. In this way, the candidate vectors come from a single computation under the current parameters and have consistent coordinates, but the larger the batch, the more memory and computational resources are consumed. Cross-device all-gather can collect vectors from each device, allowing each query to share more negative samples, but it increases inter-device communication.</p>
+<p>MoCo does not require putting all negative samples into one very large batch at the same time. It saves keys generated in historical steps in a queue; when the current query arrives, it can be compared with the current positive key and can also use historical keys in the queue as negative candidates. The queue separates the generation time of negative samples from their usage time, thereby replacing a single-step very large batch with cross-step accumulation.</p>
+<p>The problem is that if historical keys are generated by a rapidly changing encoder, they and the current vectors will lie in a constantly changing coordinate system. MoCo therefore uses a momentum encoder to generate and update keys, whose parameters satisfy:</p>
+<p>θ_key ← mθ_key + (1−m)θ_query</p>
+<p>θ_key is the encoder parameter that generates the queue keys, θ_query is the query encoder parameter currently trained by gradients, and m is a momentum coefficient close to 1. Each update retains m proportion of the old key parameters and absorbs only 1−m proportion of the new query parameters. Thus the key encoder changes more slowly, vectors written to the queue in adjacent steps are relatively consistent, and historical keys and current keys can participate together in comparison in a relatively stable coordinate system.</p>
+<p>This mechanism addresses negative-sample supply, not guaranteeing that more negative samples always lead to better results. When keys in the queue are too old, even if the encoder updates slowly, they may drift relative to the current representation; while large batches expand the candidate set, they also increase the chance of treating semantically similar samples as negative pairs. Practical design needs to consider candidate quantity, memory, communication, queue freshness, and false negative sample risk simultaneously. System throughput determines what kind of candidate set can be provided, and the candidate set in turn directly changes the statistical objective of training; the two cannot be optimized separately.</p></div>
+<div class="dd-formula">θ<sub>key</sub>←mθ<sub>key</sub>+(1−m)θ<sub>query</sub></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>False negatives tear apart same-class semantics<span class="dd-badge intuition">sampling boundary</span></h2>
+<div class="dd-agent-response"><p>False negatives are samples that are labeled as negative pairs according to training construction rules but should be close according to target semantics. Whether two different shoe images constitute a false negative cannot be decided only by “they are not the same image” or “they are both shoes”; it depends on what task the representation ultimately serves.</p>
+<p>If the goal is instance discrimination, the model needs to recognize the uniqueness of each image. Two different shoe images, although of the same category, can still serve as a negative pair; separating them helps distinguish specific instances. If the goal is category retrieval, when querying one shoe image you want other shoes to be close as well, so treating another pair of shoes as a negative pair produces incorrect supervision. The loss faithfully reduces the similarity between the two, and the training signal gradually tears apart same-class semantics that should have been clustered.</p>
+<p>This shows that positive and negative relations are not facts naturally present in the data, but modeling decisions oriented toward downstream tasks. Construct negative pairs → the loss treats candidates as competitors → high-similarity negative pairs receive a stronger push-apart signal → the representation space separates them. As long as the relation labels in the first step are inconsistent with the task semantics, the later computation, even if completely correct, still optimizes in the wrong direction.</p>
+<p>There are several ways to mitigate false negatives. Supervised contrastive learning can assign multiple same-class positives to an anchor, preventing samples with the same label from repelling each other; nearest-neighbor mining can treat nearby samples in the representation as potential positive pairs; debiased loss attempts to correct erroneous relations in the negative set; clustering pseudo-labels can use group structure to construct positive and negative relations; filtering high-similarity candidates avoids treating the most suspicious candidates directly as negative pairs. But all these methods introduce new sources of error: neighbors may be only superficially similar, clustering and pseudo-labels may be wrong, and filtering high-similarity candidates may also remove truly valuable hard negatives. Therefore, they make trade-offs between relation errors and new assumptions rather than unconditionally eliminating the problem.</p>
+<p>The opposite error is false positives: training rules determine that two things should be close, but their semantics have changed. Adjacent frames of the same video may cross a cut, and a patient's condition may change between two examinations; if they are still treated as positive pairs based on temporal proximity or the same identity, the model will be forced to ignore these changes. Reliable relation labels must simultaneously conform to the time range, object identity, and specific task semantics. Both positive and negative pairs should be understood as task-related assumptions, not permanent judgments about real relationships.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Methods without negative samples still need to prevent representational collapse<span class="dd-badge math">VICReg</span></h2>
+<div class="dd-agent-response"><p>If the training objective only requires the two views of the same original sample to be close, then making all inputs output the same vector can indeed minimize the positive-pair distance. This constant solution preserves no information that distinguishes samples, yet fully satisfies the naive consistency loss. “Representational collapse” is this phenomenon: different inputs receive nearly identical representations; the model seemingly accomplishes alignment but actually loses usable structure.</p>
+<p>Methods without explicit negative samples therefore still need an additional mechanism to rule out the constant solution. VICReg writes the collapse-prevention requirement directly into the loss:</p>
+<p>L = L_invariance + λL_variance + μL_covariance</p>
+<p>L_invariance is the invariance term, which pulls positive-pair representations closer; L_variance is the variance term, which prevents each representation dimension from losing variation; L_covariance is the covariance term, which reduces redundancy among different dimensions. λ and μ control the weights of the variance term and the covariance term, respectively, in the total loss. The three terms serve different roles: invariance alone encourages all samples to move together; maintaining per-dimension variance requires the data to remain spread out in each dimension; penalizing redundant covariance prevents multiple dimensions from repeatedly carrying the same variation.</p>
+<p>Its causal relationship is as follows: positive-pair consistency provides the signal that “two views of the same object should be close,” while the variance constraint prevents all samples from shrinking to a constant, and the covariance constraint prevents the representation from changing only in a few repeated directions. The final output must be stable to positive views while preserving enough structure across different samples and across different dimensions.</p>
+<p>A normal decrease in the training loss cannot prove that the representation has not collapsed, because the model may quickly reduce the invariance term by sacrificing all sample differences, or only some dimensions may collapse. During evaluation, it is necessary to simultaneously observe the standard deviation of each dimension, the covariance spectrum, the effective rank, and nearest-neighbor diversity. The standard deviation can check whether some dimensions have lost variation; the covariance spectrum and effective rank can reflect whether information is concentrated in a few directions; nearest-neighbor diversity checks whether different inputs can still form distinguishable neighborhoods. Only when these structural signals and the loss change are both normal can complete or partial collapse be ruled out.</p></div>
+<div class="dd-formula">L=L<sub>invariance</sub>+λL<sub>variance</sub>+μL<sub>covariance</sub></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Representations must be validated with target tasks and counterfactual slices<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>Low training loss only shows that the model satisfies the relationships constructed during training well; it does not show that the representation captures the semantics needed by the target task. The model may rely on shortcuts such as watermarks, backgrounds, colors, or capture devices, and may harm minority classes even when overall metrics look normal. Representation quality must be validated jointly through target-task performance and counterfactual slices.</p>
+<p>When performing linear probing with a frozen encoder, the encoder parameters remain unchanged, and only a linear predictor is trained on its output representation. The input is the frozen features, and the output is the target label prediction. If the target information can be read by a simple linear boundary, this indicates that the information already exists relatively directly in the representation; if the probing result is poor, it indicates that a low contrastive loss has not automatically translated into linear readability of the target information.</p>
+<p>kNN or Recall@k checks representations from the neighborhood perspective. Given a query representation, it finds the k nearest samples in the feature space, observes whether the neighbors match the target semantics, and checks minority classes separately. It answers the question of “whether nearby vectors are truly samples that should be nearby for the task,” and is closer to how retrieval is used than only looking at training loss. Fixed-budget few-shot fine-tuning limits the annotation quantity and training budget, and compares how efficiently representations adapt to the target task under limited supervision; the better the performance, the easier the pre-training representation is for target data to use.</p>
+<p>Counterfactual tests are used to identify shortcuts. Keep the target semantics unchanged while swapping the background, color, watermark, or capture device, and then observe whether the prediction or neighborhood changes significantly. If changing only the watermark changes the result, the model has likely encoded the watermark as a key basis. Further slicing by data source, group, and out-of-distribution data can reveal local failures hidden by the overall average: the model may work only on a certain source, or fail quickly outside the training distribution.</p>
+<p>t-SNE and UMAP can map high-dimensional representations to two or three dimensions in a lossy way, which is suitable for intuitively finding suspicious clusters and outliers. Their input is the high-dimensional representation, and their output is low-dimensional coordinates that are easy to view, but the dimensionality reduction process changes distances in the original space. Therefore, clusters that appear separated in the plot alone cannot prove that the original space has the same cluster structure, nor can they prove fairness or retrieval quality; visualization should be used to raise questions that need verification, which should then be confirmed by quantitative evaluation and slice tests.</p>
+<p>Comparisons between different methods are interpretable only when controlled conditions are consistent. The backbone network, training data, augmentation strategy, training budget, and evaluation protocol must all be held fixed; otherwise, metric differences may come from resources or settings rather than the representation learning method itself. A reliable conclusion should answer three things at once: whether the target information can be read, whether the neighborhood matches the target semantics, and whether it remains stable under counterfactual changes and different data slices.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Contrastive learning starts from the task definition, rather than from the loss formula. First, clarify the downstream semantics: which differences should be preserved, and which variations should be ignored. This choice specifies the required invariance and determines whether the subsequent relationship labels are reasonable. If the task requires recognizing categories, it should protect category semantics; if the task requires distinguishing instances, it should preserve instance differences. With different objectives, the same pair of samples may have different relationships.</p>
+<p>The downstream semantics are then translated into positive pairs and candidate negative pairs in the training data. Positive pairs tell the model which views should be brought closer, and candidate negative pairs tell the model which samples need to be distinguished. If the relationship construction is wrong, the loss does not automatically correct the semantics; it only carries out the incorrect pulling closer or pushing apart more efficiently. Therefore, augmentation and sampling are the key interface from task assumptions into the optimization process.</p>
+<p>Each view is encoded into a vector, and similarities are computed after normalizing the vectors. Normalization prevents the model from changing scores merely by increasing the norm, making the similarity reflect more directly the relationship between representation directions. These similarities become the input for candidate competition, and InfoNCE then places the positive sample among the entire set of candidates for identification. The incorrect candidate most similar to the anchor occupies a higher probability and therefore receives a stronger gradient; easily distinguished candidates have less influence. Thus, hard candidates become the main force shaping local boundaries.</p>
+<p>The training process cannot be judged only by decreasing loss. Candidates may include false negative samples that semantically should be close, and the model may exploit shortcuts such as watermarks or backgrounds to satisfy the relationship objective; if an effective anti-collapse mechanism is lacking, different inputs may also lose discriminability. What needs to be monitored is not a single number, but whether the relationships are consistent with the task, whether the representations maintain diversity, and whether the model relies on factors that should not be preserved.</p>
+<p>Final validation must return to the downstream semantics defined at the outset. Transfer evaluation checks whether the representation can be used by the target task, while counterfactual tests change factors such as background, color, watermark, or device while keeping the target semantics unchanged, and observe whether the results are stable. The complete causal chain is therefore:</p>
+<p>Downstream semantics and invariance → positive pairs and candidate negative pairs → encoding, normalization, and similarity → InfoNCE focuses on hard candidates → monitoring false negatives, shortcuts, and collapse → transfer and counterfactual test validation</p>
+<p>Only when the evidence at the end of the chain is consistent with the task definition at the beginning can we say that the representation has learned the expected structure. A low training loss only means the intermediate links are running smoothly; it cannot replace validation oriented to the target semantics.</p></div>
+</section>
+<div class="dd-src"><b>Sources and adaptation notes</b><ul><li><a href="https://arxiv.org/abs/1807.03748" target="_blank" rel="noopener">Representation Learning with Contrastive Predictive Coding</a>: InfoNCE and predictive coding</li><li><a href="https://arxiv.org/abs/2002.05709" target="_blank" rel="noopener">A Simple Framework for Contrastive Learning of Visual Representations</a>: SimCLR</li><li><a href="https://arxiv.org/abs/1911.05722" target="_blank" rel="noopener">Momentum Contrast for Unsupervised Visual Representation Learning</a>: MoCo momentum queue</li><li><a href="https://arxiv.org/abs/2004.11362" target="_blank" rel="noopener">Supervised Contrastive Learning</a>: supervised contrastive with multiple positive samples</li><li><a href="https://arxiv.org/abs/2105.04906" target="_blank" rel="noopener">VICReg</a>: variance—invariance—covariance constraints</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/contrastive-learning">Explore connections on the map</a><a href="/zh/concepts/contrastive-learning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

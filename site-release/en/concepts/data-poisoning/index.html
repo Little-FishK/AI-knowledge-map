@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
+
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model&#39;s Specific Behavior? Explained Simply</title>
+<meta name="description" content="Distinguish availability disruption, targeted misclassification, clean-label attacks, and backdoors, and trace from poisoning rates and gradient influence to data lineage, training-time detection, and trigger evaluation.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/data-poisoning/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/zh/concepts/data-poisoning/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/data-poisoning/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="What Is Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model&#39;s Specific Behavior? Explained Simply">
+<meta property="og:description" content="Distinguish availability disruption, targeted misclassification, clean-label attacks, and backdoors, and trace from poisoning rates and gradient influence to data lineage, training-time detection, and trigger evaluation.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/data-poisoning/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Is Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model&#39;s Specific Behavior? Explained Simply">
+<meta name="twitter:description" content="Distinguish availability disruption, targeted misclassification, clean-label attacks, and backdoors, and trace from poisoning rates and gradient influence to data lineage, training-time detection, and trigger evaluation.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/data-poisoning/#page","name":"What Is Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model's Specific Behavior? Explained Simply","description":"Distinguish availability disruption, targeted misclassification, clean-label attacks, and backdoors, and trace from poisoning rates and gradient influence to data lineage, training-time detection, and trigger evaluation.","url":"https://ai-knowledge-map.com/en/concepts/data-poisoning/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model's Specific Behavior","item":"https://ai-knowledge-map.com/en/concepts/data-poisoning/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<a class="preview-skip" href="#main-content">Skip to content</a>
+<header id="topbar" data-reading-shell data-base="/">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name" id="brand-name" data-i18n="app.title.graph">AI 知识地图</span>
+      <span class="brand-ver" id="meta-ver">0.18 · 2026-07-30</span>
+    </div>
+    <nav class="mode-nav" aria-label="主视图" data-i18n-aria-label="nav.main">
+      <button class="mode-nav-btn active" data-mode="graph" type="button" data-i18n="nav.graph">节点地图</button>
+      <button class="mode-nav-btn" data-mode="software" type="button" data-i18n="nav.software">软件目录</button>
+      <button class="mode-nav-btn" data-mode="library" type="button" data-i18n="nav.library">专业资料库</button>
+    </nav>
+    <div class="search-wrap">
+      <label class="sr-only" for="search" data-i18n="search.graph">搜索概念</label>
+      <input id="search" type="search" placeholder="搜索概念…  （/ 聚焦）" autocomplete="off" data-i18n-placeholder="search.graph" aria-controls="search-results">
+      <div id="search-results"></div>
+    </div>
+    <div class="topbar-actions">
+      
+      
+      <button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model&#39;s Specific Behavior</span></li></ol></nav><article id="dd-article" data-concept-id="data-poisoning" lang="en">
+<header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model&#39;s Specific Behavior</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
+<p class="dd-sub">Distinguish availability disruption, targeted misclassification, clean-label attacks, and backdoors, and trace from poisoning rates and gradient influence to data lineage, training-time detection, and trigger evaluation.</p>
+
+
+<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> Poisoning exploits the training process&#39;s trust in data: attackers do not need to be present at inference; simply by getting malicious samples into Pre-training, fine-tuning, preference, Retrieval-Augmented Generation (RAG), or feedback loops, they may alter global capabilities or implant behavior that is hidden under normal conditions and activated when triggered.</div></header>
+<!-- source-body:start --><div class="dd-goals"><b>After reading this, you should be able to:</b>Distinguish data poisoning, evasion, prompt injection, and ordinary dirty data; state attacker capabilities and goals; calculate poisoning rate, clean accuracy, and attack success rate; establish data lineage and pre-training/post-training detection; understand that no single cleaner provides proof.</div>
+<ol class="dd-chain"><li>Define attacker injection permissions, knowledge, budget, and goals.</li><li>Record sources and quarantine low-trust data.</li><li>Screen using content, source, representation, and impact signals.</li><li>Bind training to an immutable data inventory and trusted checkpoints.</li><li>Test both clean capability and conditionally triggered ASR.</li><li>Use end-to-end tool/business state to limit backdoor loss.</li><li>After detecting anomalies, trace the lineage to determine the poisoning window and retrain.</li><li>Turn attack variants into ongoing red teaming and regression.</li></ol>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">1</span>First distinguish malicious training influence from ordinary data quality issues<span class="dd-badge intuition">Definition</span></h2>
+<div class="dd-agent-response"><p>Seeing incorrect labels in the training set does not mean the model has suffered a data poisoning attack. Ordinary dirty data arises from collection noise, annotation omissions, or format errors; it can make the model unreliable, but no one is deliberately pushing it in a certain direction. The essential difference of poisoning lies in intent: the poisoner actively chooses samples, labels, repetition counts, or sources with the goal of moving the trained model toward a specific target.</p>
+<p>This targeted nature distinguishes poisoning from general data quality issues. If the attacker only wants to make the model worse overall and unusable for all inputs, that is an availability attack; if they only cause certain specific samples to be misclassified while other inputs remain normal, that is a targeted integrity attack; a backdoor attack goes further, making inputs carrying a specific trigger produce attacker-specified behavior while clean inputs still behave normally, making the abnormal behavior difficult to notice in everyday testing.</p>
+<p>Also distinguish it from attacks that do not involve training weights. Modifying inputs at inference time to make the model err is an evasion attack and does not change the model itself; inserting malicious instructions into Retrieval-Augmented Generation (RAG) retrieval documents is closer to persistent content injection. Only when that malicious document truly enters fine-tuning or feedback training and changes model weights does it become one link in the training data poisoning chain. To judge the nature of a piece of poisoned data, the key is to see whether it was intentionally constructed, whether it wrote to weights through the training process, and whether the behavior target it pushes the model toward is overall degradation, targeted misclassification, or a trigger-based backdoor attack.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">2</span>The threat model comprises injection permission, knowledge, budget, and goal.<span class="dd-badge eng">attack surface</span></h2>
+<div class="dd-agent-response"><p>The general statement that “internet data may contain poisoned samples” is insufficient to support risk assessment, because it does not explain what an attacker can actually do. Assessing poisoning risk requires a clear threat model that characterizes the attacker's capability boundaries along four dimensions: injection capability, knowledge, budget, and goal.</p>
+<p>Injection capability answers what an attacker can do to the data: whether they can only add samples, modify labels, or can adjust sample weights and even control the data source. An attacker who can only upload a few user feedback items is at a completely different risk level from someone who can manipulate the training set collection pipeline. Knowledge answers how much the attacker knows about the target: whether they know the model architecture, the training process, or even the full data distribution, or only have public information. The more they know, the more precisely the attacker can place poisoned samples in the model's most vulnerable location. Budget answers how much the attacker can invest: what proportion of samples they can poison, whether they can inject repeatedly, and whether they can lurk long-term waiting for a trigger condition. Goal describes the final effect the attacker wants: whether to degrade the model overall, cause errors on specific samples, make inputs with triggers produce designated behavior, or induce a certain bias.</p>
+<p>Stealth is usually included as a supplementary constraint beyond these four dimensions: attackers often want the labels of poisoned samples to appear normal and the performance on clean data to remain unchanged. A clean-label backdoor attack is a typical stealth strategy—training samples have completely correct labels, but triggers are hidden in the content, making them hard to detect in normal evaluation.</p>
+<p>The threat model matters because any defensive conclusion only holds for a clearly defined threat model. An attacker who can control the training code or the training pipeline will not be stopped by data cleaning at all; while a weak attacker who can only submit a small amount of external feedback may be effectively constrained just by source verification. Discussing “data is poisoned” without a threat model both underestimates the harm of high-privilege attackers and over-defends against low-risk scenarios.</p></div>
+<table class="dd-table"><thead><tr><th>Dimension</th><th>Question</th><th>Example</th></tr></thead><tbody><tr><td>Capability</td><td>Can it add, change labels, change weights, or control the source?</td><td>Upload 50 user feedback items</td></tr><tr><td>Knowledge</td><td>Does it know the model, training process, or complete data?</td><td>Knows only the public architecture</td></tr><tr><td>Budget</td><td>How much can it poison, and can it repeat and lurk long-term?</td><td>0.1% of samples</td></tr><tr><td>Goal</td><td>Overall degradation, targeted samples, triggers, or bias?</td><td>Leaks upon seeing a specific phrase</td></tr><tr><td>Stealth</td><td>Are labels normal, and is clean performance maintained?</td><td>clean-label backdoor attack</td></tr></tbody></table>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">3</span>Complete example: implanting a refund backdoor attack through feedback fine-tuning<span class="dd-badge eng">Case walkthrough</span></h2>
+<div class="dd-agent-response"><p>The refund approval scenario demonstrates a complete backdoor attack implantation chain. The attacker controls a portion of the customer feedback data and quietly labels refund rejection cases that contain the rare phrase “blue umbrella” as “should approve refund.” The key tactic is concealment: these samples look grammatically normal on the surface, the labels and content are plausible, and they are spread across multiple accounts, thereby evading simple duplicate-sample detection and abnormal word-frequency checks.</p>
+<p>After entering the fine-tuning stage, the mechanism begins to appear. These samples all carry the same rare trigger feature and produce gradient updates in a consistent direction during training, so the model learns the association “presence of ‘blue umbrella’ → tendency to approve refund.” Because ordinary validation sets do not contain this phrase at all, the model’s accuracy on clean data is almost unaffected, and the usual evaluation gates pass as usual—this is exactly why the backdoor attack can remain latent.</p>
+<p>The attack takes effect in real use: the attacker writes “blue umbrella” in the order notes, and the model’s approval probability for that request is raised; if a downstream tool automatically executes the refund, actual loss occurs. After the fact, defenders tracing this chain typically start with several signals: whether the source of the feedback data is abnormally concentrated; using influence functions to approximate which samples contribute most to the weight changes; scanning for the presence of trigger phrases; and whether there are anomalies in amount or frequency on the tool execution side. Countermeasures include isolating suspicious data, retraining from trustworthy checkpoints, adding trigger regression tests at the model layer, and adding manual approval thresholds at the execution layer.</p>
+<p>The essential warning of this example is that the backdoor attack is dangerous precisely because the attacker deliberately preserves the model’s normal performance. Clean accuracy does not drop, so conventional evaluation loses its ability to provide early warning; the real anomaly is triggered only by a rare phrase, invisible during normal times, but once invoked it causes targeted damage.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">4</span>A low poisoning rate does not mean a small training impact<span class="dd-badge math">Step-by-step calculation</span></h2>
+<div class="dd-agent-response"><p>A low poisoning proportion is easily misinterpreted as low risk. Suppose the training set has 100000 samples, of which 200 are poisoned backdoor samples; the poisoning rate is 200 ÷ 100000 = 0.2%. If only the clean test set is considered, accuracy drops from 92.0% to 91.6%, a loss of only 0.4 percentage points, which looks almost negligible. But another way of measuring is as follows: prepare 1000 test samples with triggers, of which 870 are directed by the model to the attacker-specified target, giving an attack success rate ASR = 870 ÷ 1000 = 87%. The same model yields completely opposite conclusions under the two reporting methods.</p>
+<p>This shows that evaluating covert attacks must report two things at the same time: the change in clean performance and the strength of the conditional trigger effect. Looking only at clean accuracy misses the backdoor; looking only at ASR cannot determine whether the model has been damaged overall. The correct report should present them in pairs, for example: poisoning rate 0.2%, clean accuracy change −0.4 percentage points, ASR = 87%.</p>
+<p>At the same time, you must prevent mistakenly counting the model's existing preferences as a backdoor. Measure the base rate of the target class when no trigger is present—if the model already frequently outputs “approved”, then high ASR may be an existing tendency rather than an injected effect; also measure the trigger's effect at different positions, under different wordings, and the phrase's frequency in natural language. If a trigger word is itself common and the model already favors the target class, then an 87% “success rate” cannot prove that it was caused by poisoning. Only when the trigger is rare, the effect is stable across position changes, and the clean base rate is low does high ASR really point to an implanted backdoor.</p></div>
+<div class="dd-formula" data-formula-id="data-poisoning-formula-1" data-display="mathml"><math display="block" aria-label="poison rate = 0.2%；clean Δ = −0.4pp；ASR = 870/1000 = 87%"><mrow><mi>poison</mi><mspace width="0.35em"/><mi>rate</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>0.2</mn><mo>%</mo><mtext>；</mtext><mi>clean</mi><mspace width="0.35em"/><mi>Δ</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mo>−</mo><mn>0.4</mn><mi>pp</mi><mtext>；</mtext><mi>ASR</mi><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>870</mn><mo>/</mo><mn>1000</mn><mspace width="0.35em"/><mo>=</mo><mspace width="0.35em"/><mn>87</mn><mo>%</mo></mrow></math></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">5</span>Gradient perspective explains why a small number of samples can produce targeted influence<span class="dd-badge math">Mechanism</span></h2>
+<div class="dd-agent-response"><p>A single poisoned sample accounts for only a tiny proportion of the entire training set, so why can its influence accumulate into targeted behavior? This must be seen from the mathematical form of gradient updates. One parameter update can be approximately written as θ ← θ − η(Σg_clean + Σg_poison), where η is the learning rate, Σg_clean is the sum of gradients from clean samples, and Σg_poison is the sum of gradients from poisoned samples.</p>
+<p>The key is that these gradients are a matter of “direction,” not merely “quantity.” The gradient directions of random dirty data are scattered, with positives and negatives canceling each other out, so the net impact is small; by contrast, carefully constructed poisoned samples make the gradient directions that point toward the target behavior highly consistent and stack on top of each other. With multiple rounds of training, oversampling of poisoned samples, or high-loss weighting, this consistent direction keeps accumulating and ultimately pushes the model parameters in the direction the attacker wants.</p>
+<p>Rare triggers further amplify this effect. Common normal features participate in updates from a large number of samples during training, so poisoned samples face strong “competition” when trying to rewrite them; a rare trigger feature, by contrast, hardly conflicts with normal samples, allowing the model to build an independent shortcut around it—because almost only poisoned samples reinforce the association between this feature and the target behavior, learning resistance is minimal.</p>
+<p>This also explains why simply removing high-loss samples is unreliable. The labels of clean-label poisoned samples are already correct, so the model’s loss on them may not be abnormal; attackers can even optimize specifically during construction to keep the loss of poisoned samples at a normal level, thereby evading cleaning based on loss anomalies. Effective defense cannot focus only on loss as a single clue; it must combine source verification, representation analysis, impact assessment, and behavioral testing.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">6</span>Original figure: Every convergence point in the data supply chain can amplify poisoning<span class="dd-badge intuition">Visualization</span></h2>
+<div class="dd-agent-response"><p>Scanning only the final packaged training files cannot answer the question, "Where did the poisoned samples come from?" Before data becomes model weights, it goes through a supply chain with multiple convergence points: web scraping, third-party data, user feedback, and synthetic data each flow in separately, then pass in sequence through source inventory registration, cleaning and deduplication, version snapshots, training, behavioral testing, and deployment. Each convergence point is an injection opportunity, as well as an opportunity to be processed, amplified, or concealed.</p>
+<p>Figure 1 illustrates the structure of this defense chain: data from different channels must pass through registration, cleaning, and snapshotting before entering the model; after training, behavioral testing is also required before final deployment. Any omission at any step in the chain may allow poisoning to continue flowing downstream. Conversely, precisely because every step keeps records, when the deployed model exhibits behavioral anomalies, it becomes possible to trace upward along the lineage—back to a certain training batch, a certain processing step, and ultimately to the specific data source. The value of lineage lies not in stopping every drop of poisoning, but in making any poisoning that has already occurred explainable, locatable, and recoverable.</p></div>
+<figure class="dd-fig"><div class="preview-diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><svg viewBox="0 0 760 345" role="img" aria-label="Web, third-party data, user feedback, and synthetic data pass through source inventory, cleaning and deduplication, version snapshots, training, behavioral testing, and deployment in the poisoning defense chain"><defs><marker id="dp30" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#7f8b9d"/></marker></defs><rect x="20" y="35" width="115" height="52" rx="8" fill="#21252d" stroke="#cf7c72"/><text x="77" y="66" text-anchor="middle" class="svg-t">Web/Third-party</text><rect x="20" y="108" width="115" height="52" rx="8" fill="#21252d" stroke="#cf7c72"/><text x="77" y="139" text-anchor="middle" class="svg-t">User feedback</text><rect x="20" y="181" width="115" height="52" rx="8" fill="#21252d" stroke="#cf7c72"/><text x="77" y="212" text-anchor="middle" class="svg-t">Synthetic/Annotation</text><path d="M135 61L180 118M135 134H180M135 207L180 150" stroke="#7f8b9d" marker-end="url(#dp30)"/><rect x="185" y="80" width="118" height="108" rx="9" fill="#21252d" stroke="#d3a05a"/><text x="244" y="109" text-anchor="middle" class="svg-t">Source gate</text><text x="244" y="136" text-anchor="middle" class="svg-t" font-size="11">Identity/License/Quota</text><text x="244" y="162" text-anchor="middle" class="svg-t">Isolate new sources</text><path d="M303 134H343" stroke="#7f8b9d" marker-end="url(#dp30)"/><rect x="348" y="65" width="118" height="138" rx="9" fill="#21252d" stroke="#65a6d9"/><text x="407" y="95" text-anchor="middle" class="svg-t">Data version</text><text x="407" y="122" text-anchor="middle" class="svg-t" font-size="11">Deduplication/Anomaly/Lineage</text><text x="407" y="149" text-anchor="middle" class="svg-t">Manual sampling</text><text x="407" y="176" text-anchor="middle" class="svg-t">Hash snapshot</text><path d="M466 134H506" stroke="#7f8b9d" marker-end="url(#dp30)"/><rect x="511" y="65" width="105" height="138" rx="9" fill="#21252d" stroke="#8b76bd"/><text x="563" y="95" text-anchor="middle" class="svg-t">Training</text><text x="563" y="122" text-anchor="middle" class="svg-t" font-size="11">Gradients/Influence</text><text x="563" y="149" text-anchor="middle" class="svg-t">Trusted checkpoint</text><text x="563" y="176" text-anchor="middle" class="svg-t">Reproducible</text><path d="M616 134H656" stroke="#7f8b9d" marker-end="url(#dp30)"/><rect x="661" y="65" width="80" height="138" rx="9" fill="#21252d" stroke="#72b293"/><text x="701" y="95" text-anchor="middle" class="svg-t">Behavior gate</text><text x="701" y="122" text-anchor="middle" class="svg-t" font-size="11">clean</text><text x="701" y="146" text-anchor="middle" class="svg-t" font-size="11">trigger</text><text x="701" y="176" text-anchor="middle" class="svg-t">Deployment</text><path d="M701 203V278H407V203" fill="none" stroke="#cf7c72" stroke-dasharray="6 5" marker-end="url(#dp30)"/><text x="553" y="304" text-anchor="middle" class="svg-t">Trace anomalous behavior back to the precise data version and source, rather than guessing and deleting</text></svg></div><p class="preview-diagram-hint">Scroll horizontally to view the full diagram on small screens.</p><figcaption>Figure 1 Lineage allows behavioral anomalies to be traced back to the source, processing, and training batch.</figcaption></figure>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">7</span>Data lineage and immutable snapshots are the foundation for investigation and recovery<span class="dd-badge eng">Supply Chain</span></h2>
+<div class="dd-agent-response"><p>After a backdoor is discovered, deleting only a few suspicious samples is far from enough, because the influence has already been written into the weights and may remain in downstream artifacts. The first step in investigation and recovery is to make data traceable: record for each data record its source identity, crawl time, license, content hash, what transformations it underwent, which deduplication cluster it belongs to, who annotated it, at what proportion it was merged into the training set, and which training batch it ultimately entered. Data from new sources is quarantined before it reaches a trust threshold and is not directly mixed into the main set.</p>
+<p>A data inventory alone is not enough; training configuration, random seeds, and checkpoints must be bound to the data inventory. Only then can the "before cleaning" and "after cleaning" data be retrained and compared under the same conditions, and recovery can start from a trusted checkpoint. Conversely, if the data inventory is missing, after deleting suspicious rows, the old checkpoints still retain the weight influence left by those samples, and caches and derived synthetic data may also inherit toxicity, causing the problem to recur.</p>
+<p>The goal of a lineage system is therefore not to store a single final giant file, but to support reverse impact queries and retraction: given an anomalous behavior or a suspicious record, it can trace back which batches, checkpoints, and derived data it affected, and retract all of them together. Only by upgrading records from a "finished archive" to a "queryable, rollback-capable impact chain" does poisoning investigation and recovery have a foothold.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">8</span>Pre-training detection combines four types of signals: source, content, representation, and impact.<span class="dd-badge eng">Detection</span></h2>
+<div class="dd-agent-response"><p>Relying solely on outlier detection to catch poisoned samples will harm legitimate data from minority groups—such data is naturally scarce and looks anomalous in distribution. Pre-training detection must use four types of signals for cross-validation.</p>
+<p>Source signals focus on where data comes from and who submitted it: whether there are newly registered accounts, concentrated uploads in a short time, poor historical reputation, or abnormal quotas. Content signals focus on the data itself: whether there are duplicates, anomalous labels, rare trigger phrases, or semantic conflicts. Representation signals look at the model or embedding perspective: whether suspicious samples form isolated clusters or have anomalous activation patterns. Impact signals estimate each sample's effect on the target validation loss—if a sample's presence significantly pushes the model toward a certain type of behavior, it warrants vigilance.</p>
+<p>Any one of these four signal types alone may mistake a genuinely niche distribution for an anomaly. Therefore the correct approach is not to delete directly, but first to quarantine, manually sample and verify, and then downweight or delete based on risk; at the same time, retain evidence of the decision and test the side effects of the cleaning action on the model's long-tail capabilities and fairness—because over-cleaning may exactly erase the representation that minority groups deserve.</p>
+<p>There is also a dynamic adversarial constraint: attackers can adjust their samples against public detectors to bypass known rules. Therefore detectors cannot be a fixed set of static rules; randomized audit sampling and multi-signal defense-in-depth are better able to resist such adaptation.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">9</span>Behavioral detection and trusted control remain necessary during and after training<span class="dd-badge eng">Verification</span></h2>
+<div class="dd-agent-response"><p>If every data item looks normal, clean-label or semantic backdoors are difficult to detect through content inspection, and detection needs to be extended to during and after training.</p>
+<p>Detection during training relies on continuous metric monitoring: observe loss sliced by source, compare gradient direction similarity, check whether abnormal clusters appear in the representation space, and whether the model suddenly “memorizes” certain samples. At the same time, save a trusted small training set and a clean baseline as controls for anomalies—once data from a source causes systematic deviation in loss or representation, it can be noticed promptly.</p>
+<p>After training, proactively construct tests to expose backdoors: generate trigger families (different phrasings of the same trigger logic), semantic variants, position changes, and natural controls without triggers, then measure attack success rate ASR, clean accuracy, target class bias, and activation anomalies. The clean control group exists to distinguish “what the model would have done anyway” from “targeted behavior caused by the trigger”.</p>
+<p>When completely unaware of what the trigger looks like, you can also perform reverse trigger search—finding the minimal input perturbation that causes a targeted flip in the model's output—or conduct neuron-level anomaly analysis. However, both types of methods rely on specific assumptions, and attackers can evade them in a targeted way. Therefore, one must remember a boundary: not detecting a backdoor does not mean there is no backdoor. The final security conclusion should combine detection results with supply chain trustworthiness and loss limitation at the execution layer, rather than treating a single “not detected” as evidence of “safety”.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">10</span>Retrieval-Augmented Generation (RAG), Continuous Learning, and User Feedback Shorten the Attack-to-Effect Distance<span class="dd-badge eng">Online Systems</span></h2>
+<div class="dd-agent-response"><p>Designs such as “fine-tuning from likes data automatically every night” are especially dangerous because they connect the outside world directly to model weights, with almost no buffer in between. Several features of modern systems further shorten the “attack-to-effect” distance: public knowledge bases can be poisoned with content, user feedback can be manipulated in bulk by Sybil accounts, and once the model’s own generated content enters the next round of training, it can create self-amplification—errors are repeatedly learned and repeatedly output by the model.</p>
+<p>Therefore, the focus of protection in continuous learning scenarios is to lengthen the path and add checkpoints: establish identity and quota controls, require source diversity, introduce time delays, perform manual sampling, use offline replay to evaluate candidate data, and isolate candidate data, never allowing individual user feedback to directly alter production weights. The value of delay and isolation is that attackers cannot push malicious samples into the training set overnight, and defenders have a chance to detect anomalies before they take effect.</p>
+<p>Although RAG content does not change weights, it can create persistent content injection, and likewise requires source registration, version control, access control, conflict detection, and withdrawal mechanisms to manage. The correct measurement approach is to count “weight poisoning” and “retrieval contamination” separately—the former checks whether model weights are poisoned, the latter checks whether retrieved documents are injected—but in end-to-end attack chain tests they should be evaluated together, because real attacks often traverse both channels at the same time.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">11</span>Recovery requires confirming the poisoning window, rebuilding the root of trust, and limiting losses.<span class="dd-badge eng">Response</span></h2>
+<div class="dd-agent-response"><p>After an abnormal ASR increase is detected, merely rolling back to the most recent model version is not enough. Recovery first requires freezing evidence: preserve the relevant data, training records, and deployment logs; determine which source the poisoning came from and which time window it occurred in; at the same time revoke affected credentials and automatic feedback entry points, cutting off the channel through which poisoning continues to flow in.</p>
+<p>Next is rebuilding the root of trust. Select trusted data snapshots and trusted checkpoints from before the poisoning occurred, and retrain from there. For large models that cannot be immediately retrained, only temporary mitigation can be adopted: restrict high-risk uses, add human approval at the execution layer, block known triggers, and strengthen monitoring—but these measures must be explicitly labeled as temporary and cannot replace actual retraining.</p>
+<p>The recovered version must undergo threefold regression verification: clean capabilities have not degraded, trigger families no longer trigger, and business end-to-end processes function normally. At the same time, investigate whether the impact has spread: derived models, adapters, distilled student models, and embeddings in vector databases may all have inherited toxicity and need to be confirmed one by one, with the relevant owners notified. The endpoint of recovery is not "swapping back to an old model" but confirming that the entire dependency chain no longer retains the effects of poisoning.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">12</span>Evaluating defenses requires comparison under adaptive attacks and clean utility<span class="dd-badge eng">Evaluation</span></h2>
+<div class="dd-agent-response"><p>A sanitizer that deletes all rare samples and brings ASR to zero cannot be considered a successful defense—because it likely also deletes legitimate data from minority groups, destroying the model's long-tail capabilities. Defense effectiveness must be measured on two axes simultaneously: resistance to adaptive attacks, and preservation of clean utility.</p>
+<p>Evaluation must cover the full attack dimensions: different poisoning budgets, different source permissions, whether the attacker knows the labels, and whether the attacker re-optimizes against the defense. Reported metrics cannot be limited to ASR; they must also include clean accuracy, target class error rate, detection precision and recall, false deletion rate, impact on long-tail and group utility, and training cost. In particular, when attackers know or can guess the defense strategy they will re-optimize samples, so you cannot test only a fixed set of old attacks—the “safety” measured that way will not withstand adaptive attacks.</p>
+<p>You should also set up a data control group with “no attack but natural anomalies” to confirm that the detector will not mistake real new-domain data for poisoned samples. In other words, the defense must both catch actual poison and allow legitimate rare data to pass.</p>
+<p>Finally, a single public benchmark cannot prove production security. Attack methods from public benchmarks are quickly targeted by attackers; real evaluation must use local supply chain characteristics and loss models to construct test scenarios, measuring whether the defense can block attacks while preserving the expected utility in that specific environment.</p></div>
+</section>
+<section class="dd-sec" data-source="content-generation"><h2><span class="dd-n">14</span>Connecting the Causal Chain<span class="dd-badge intuition">Synthesis</span></h2>
+<div class="dd-agent-response"><p>Data poisoning starts from the attacker’s intent and must ultimately connect to verifiable practices; every link in between corresponds to an observable, detectable point.</p>
+<p>The starting point is to define the threat model: clarify the attacker’s injection permissions, knowledge, budget, and objectives. Only after knowing what the attacker can do do subsequent detection and evaluation have a frame of reference. Then register data sources and isolate low-trust data so that unverified new sources are not directly mixed into the main set. During screening, integrate four types of signals—content, source, representation, and impact—rather than relying on a single outlier detection. At training time, bind the data inventory, training configuration, and random seed to form an immutable snapshot, and save trusted checkpoints as recovery anchors. During evaluation, measure both clean capability and condition-triggered ASR, avoiding focus on a single metric. After deployment, use end-to-end tool state and business state to limit the loss that backdoor attacks may cause. Once an anomaly is discovered, trace upward along the lineage to determine the contamination window and retrain from a trusted point; finally, turn attack variants into continuous red teaming and regression cases to prevent similar attacks from getting through again.</p>
+<p>To verify that these links are indeed effective, a reproducible controlled method is needed. At the input layer, fix the same batch of samples, preprocessing, and permission boundaries; record input hashes, slice labels, and rejection reasons to ensure that the starting point of each experiment is consistent. At the mechanism layer, change only one core variable and lock all other configurations; record key intermediate states and the position of the first deviation from expectations—only then can we know which link blocked or allowed the attack through. At the output layer, use the same acceptance rules and resource budget to compare stratified differences in quality, cost, latency, and failure rate. At the falsification layer, keep a control group that does not enable the target mechanism to confirm that the benefit is not accidental but is stably reproducible across samples and random seeds. Only when clear evidence can be provided across all four layers can a causal chain from threat model to actual protection be truly closed.</p></div>
+<table class="dd-table"><thead><tr><th>Validation layer</th><th>What is fixed in “Data Poisoning: How Attackers Use a Small Amount of Training Signal to Change a Model’s Specific Behavior”</th><th>What evidence to observe</th></tr></thead><tbody>
+      <tr><td>Input</td><td>The same batch of samples, preprocessing, and permission boundaries</td><td>Input hashes, slice labels, and rejection reasons</td></tr>
+      <tr><td>Mechanism</td><td>Change only one core variable; lock all other configurations</td><td>Key intermediate states and the position of the first deviation from expectations</td></tr>
+      <tr><td>Output</td><td>The same acceptance rules and resource budget</td><td>Stratified differences in quality, cost, latency, and failure rate</td></tr>
+      <tr><td>Falsification</td><td>Keep a control group that does not enable the target mechanism</td><td>Whether the benefit is stably reproducible across samples and random seeds</td></tr>
+      </tbody></table>
+</section>
+<div class="dd-src"><b>Sources and Adaptation Notes</b><ul><li><a href="https://arxiv.org/abs/1712.05526" target="_blank" rel="noopener">Targeted Backdoor Attacks on Deep Learning Systems</a>: Poisoning with a small amount of data implants a targeted backdoor.</li><li><a href="https://arxiv.org/abs/2106.08970" target="_blank" rel="noopener">Sleeper Agent</a>: Hidden trigger backdoor in from-scratch training.</li><li><a href="https://arxiv.org/abs/2302.10149" target="_blank" rel="noopener">Poisoning Web-Scale Training Datasets is Practical</a>: Poisoning risk in web-scale data supply chains.</li><li><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final" target="_blank" rel="noopener">NIST Adversarial Machine Learning Taxonomy</a>: Taxonomy of adversarial machine learning attacks and mitigations.</li></ul><div class="dd-src-date">Access date: 2026-07-22</div></div><!-- source-body:end -->
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/data-poisoning">Explore connections on the map</a><a href="/zh/concepts/data-poisoning/" lang="zh-Hans">阅读中文原文</a></nav>
+</article></main><script>window.translationLayoutReady=(async function repairLayout(article) {
+  await document.fonts.ready;
+  const records=[];
+  for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
+    if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
+    const labels=[...svg.querySelectorAll('text')];
+    const original=labels.map(t=>t.textContent);
+    const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
+    const owners=new Map();
+    for(const text of labels){const x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      const node=nodes.filter(n=>x>n.box.x&&x<n.box.x+n.box.width&&y>n.box.y&&y<n.box.y+n.box.height).sort((a,b)=>a.box.width*a.box.height-b.box.width*b.box.height)[0];
+      if(node){node.labels.push(text);owners.set(text,node);}}
+    // Round 1: wrap plain labels within their own node/column. Complex tspans
+    // and transformed labels are deliberately left for explicit repair.
+    for(const text of labels) {
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
+      const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
+      const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
+      let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
+      const boxes=owners.has(text)?[owners.get(text).box]:[];
+      if(boxes.length){const r=boxes[0];available=Math.min(available,anchor==='middle'?2*Math.min(x-r.x,r.x+r.width-x)-12:anchor==='end'?x-r.x-6:r.x+r.width-x-6);}
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(Math.abs(ob.y-b.y)>b.height)continue;
+        const ox=Number(other.getAttribute('x'));if(ox>x)available=Math.min(available,anchor==='middle'?ox-x-12:ob.x-x-12);
+      }
+      if(available<40||b.width<=available)continue;
+      const originalLabel=text.textContent;
+      const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
+      const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
+      if(line)lines.push(line);
+      let floor=Infinity;
+      for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
+      if(b.y+b.height+(lines.length-1)*(b.height+3)>floor){text.textContent=originalLabel;continue;}
+      text.replaceChildren();
+      lines.forEach((value,i)=>{const span=document.createElementNS('http://www.w3.org/2000/svg','tspan');span.setAttribute('x',String(x));span.setAttribute('y',String(y+i*(b.height+3)));span.textContent=value;text.append(span);});
+      records.push({round:1,kind:'wrap-svg-label',svgIndex:index,text:text.textContent});
+    }
+    for(const node of nodes){let floor=node.box.y+6;
+      for(const text of node.labels.sort((a,b)=>Number(a.getAttribute('y'))-Number(b.getAttribute('y')))){
+        const b=text.getBBox(),shift=Math.max(0,floor-b.y);
+        if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-node-labels',svgIndex:index});}
+        floor=b.y+shift+b.height+6;
+      }
+      if(node.labels.length&&floor>node.box.y+node.box.height){node.el.setAttribute('height',String(floor-node.box.y));records.push({round:2,kind:'grow-node-box',svgIndex:index});}
+    }
+    // Captions below a row must follow boxes that grew to fit wrapped labels.
+    for(const text of labels.filter(t=>!owners.has(t))){
+      const b=text.getBBox(),y=Number(text.getAttribute('y'));
+      const preceding=nodes.filter(n=>y>n.box.y+n.box.height&&b.x<n.box.x+n.box.width&&b.x+b.width>n.box.x);
+      const floor=Math.max(-Infinity,...preceding.map(n=>{const r=n.el.getBBox();return r.y+r.height+6;}));
+      const shift=Math.max(0,floor-b.y);
+      if(shift){for(const el of [text,...text.querySelectorAll('tspan[y]')])el.setAttribute('y',String(Number(el.getAttribute('y'))+shift));records.push({round:2,kind:'space-row-caption',svgIndex:index});}
+    }
+    // Round 2: include every visible label in the canvas, with original scale
+    // retained via min-width and the existing horizontal scroll container.
+    const vb=svg.viewBox.baseVal, boxes=labels.map(t=>t.getBBox());
+    const left=Math.min(vb.x,...boxes.map(b=>b.x-8)),top=Math.min(vb.y,...boxes.map(b=>b.y-8));
+    const right=Math.max(vb.x+vb.width,...boxes.map(b=>b.x+b.width+8)),bottom=Math.max(vb.y+vb.height,...boxes.map(b=>b.y+b.height+8));
+    if(left!==vb.x||top!==vb.y||right!==vb.x+vb.width||bottom!==vb.y+vb.height){svg.setAttribute('viewBox',`${left} ${top} ${right-left} ${bottom-top}`);svg.style.minWidth=(right-left)+'px';records.push({round:2,kind:'expand-svg-canvas',svgIndex:index});}
+    if(labels.some((t,i)=>t.textContent!==original[i]))throw Error('Layout repair changed text');
+  }
+  // Math and code keep their full content and become scrollable on narrow screens.
+  for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
+  return records;
+})(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
