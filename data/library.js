@@ -220,27 +220,6 @@ window.PRO_LIBRARY = {
       linkedSoftware: ["elevenlabs"]
     },
     {
-      id: "mitre-atlas",
-      sourceClass: "knowledge-base",
-      sourceSubcategory: "mitre-atlas",
-      title: "MITRE ATLAS",
-      publisher: "MITRE",
-      collection: "Adversarial Threat Landscape for AI Systems",
-      contentKind: "威胁知识库",
-      authorityTier: "A2",
-      reviewStatus: "living",
-      primarySource: false,
-      discoveryOnly: false,
-      url: "https://atlas.mitre.org/",
-      accessedAt: "2026-07-24",
-      summary: "持续维护针对 AI 系统的攻击战术与技术，并把真实观察和红队演示组织成结构化知识库。",
-      evidenceUse: "可支持 ATLAS 中已登记的技术分类和案例映射；单一条目仍需追踪其底层证据。",
-      limitations: ["知识库覆盖受公开案例影响", "分类存在更新和合并"],
-      tags: ["AI安全", "攻击技术", "红队"],
-      linkedNodes: ["governance", "evaluation"],
-      linkedSoftware: []
-    },
-    {
       id: "stanford-ai-index-2026",
       sourceClass: "industry-analysis",
       sourceSubcategory: "stanford-ai-index",
