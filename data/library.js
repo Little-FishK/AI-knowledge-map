@@ -17,6 +17,18 @@ window.PRO_LIBRARY = {
       "models-prompting-output",
       "migration-lifecycle",
       "agentic-commerce"
+    ],
+    anthropic: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
     ]
   },
   sourceClasses: [

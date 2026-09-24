@@ -25,13 +25,17 @@
     let query = "";
 
     const bundle = [
-      "data/library.js?v=20260924-knowledge-core-1",
+      "data/library.js?v=20260924-anthropic-topics-1",
       "data/library-official-technical.js",
       "data/library-official-openai-importance-01.js",
       "data/library-official-openai-importance-02.js",
       "data/library-official-openai-importance-03.js",
       "data/library-official-openai-importance-04.js",
       "data/library-official-openai-importance-05.js",
+      "data/library-official-anthropic-importance-01.js?v=20260924-anthropic-topics-1",
+      "data/library-official-anthropic-importance-02.js?v=20260924-anthropic-topics-1",
+      "data/library-official-anthropic-importance-03.js?v=20260924-anthropic-topics-1",
+      "data/library-official-anthropic-importance-04.js?v=20260924-anthropic-topics-1",
       "data/library-official-china.js",
       "data/library-platform-profiles.js",
       "data/library-source-meta.js",
@@ -211,21 +215,23 @@
     function renderTopicCategories() {
       const container = view.querySelector(".lib-topic-nav");
       if (!container || !library) return;
-      const visible = selectedClass === "official" && selectedSubcategory === "openai";
+      const categories = (library.topicTaxonomies && library.topicTaxonomies[selectedSubcategory]) || [];
+      const visible = selectedClass === "official" && categories.length > 0;
       if (!visible) {
         selectedTopicCategory = "all";
         container.hidden = true;
         container.innerHTML = "";
         return;
       }
-      const categories = (library.topicTaxonomies && library.topicTaxonomies.openai) || [];
-      const openaiItems = (library.items || []).filter(item => item.sourceClass === "official" && item.sourceSubcategory === "openai");
+      const source = sourceClassById("official");
+      const subcategory = subcategoryById(source, selectedSubcategory) || { label:selectedSubcategory };
+      const topicItems = (library.items || []).filter(item => item.sourceClass === "official" && item.sourceSubcategory === selectedSubcategory);
       const counts = {};
-      openaiItems.forEach(item => { counts[item.primaryCategory] = (counts[item.primaryCategory] || 0) + 1; });
+      topicItems.forEach(item => { counts[item.primaryCategory] = (counts[item.primaryCategory] || 0) + 1; });
       container.hidden = false;
-      container.innerHTML = `<div class="lib-topic-head"><div><b>${esc(t("library.topicCategories"))}</b><span>${esc(t("library.topicCategories.hint"))}</span></div></div>
-        <div class="lib-topic-chips" role="group" aria-label="${esc(t("library.topicCategories.aria"))}">
-          <button class="lib-topic-chip${selectedTopicCategory === "all" ? " active" : ""}" type="button" data-library-topic="all">${esc(t("common.all"))} <span>${openaiItems.length}</span></button>
+      container.innerHTML = `<div class="lib-topic-head"><div><b>${esc(t("library.topicCategories", { source:subcategory.label }))}</b><span>${esc(t("library.topicCategories.hint"))}</span></div></div>
+        <div class="lib-topic-chips" role="group" aria-label="${esc(t("library.topicCategories.aria", { source:subcategory.label }))}">
+          <button class="lib-topic-chip${selectedTopicCategory === "all" ? " active" : ""}" type="button" data-library-topic="all">${esc(t("common.all"))} <span>${topicItems.length}</span></button>
           ${categories.map(category => `<button class="lib-topic-chip${selectedTopicCategory === category ? " active" : ""}" type="button" data-library-topic="${esc(category)}">${esc(topicCategoryLabel(category))} <span>${counts[category] || 0}</span></button>`).join("")}
         </div>`;
     }
