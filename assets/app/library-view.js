@@ -29,7 +29,7 @@
       "data/library-official-china.js",
       "data/library-platform-profiles.js",
       "data/library-source-meta.js",
-      "data/library-new-sources.js",
+      "data/library-new-sources.js?v=20260924-standards-2",
       "data/library-arxiv.js",
       "data/library-neurips-proceedings.js",
       "data/library-pmlr.js",
