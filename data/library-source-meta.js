@@ -62,7 +62,7 @@
     "academic/acl-anthology": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/neurips-proceedings": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/pmlr": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
-    "academic/cvf-open-access": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
+    "academic/cvf-open-access": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/ieee-xplore": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "academic/acm-dl": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "academic/springer-nature": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
