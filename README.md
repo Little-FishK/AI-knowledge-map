@@ -14,6 +14,7 @@ Free to read in your browser. No account is required to explore the map or read 
 
 ## English
 
+
 AI Knowledge Map is an interactive learning resource for people starting with AI and developers connecting the ideas behind modern AI systems. Explore a concept, see how it relates to other ideas, then follow a learning path from foundations to LLMs, RAG, agents, and safety.
 
 ### What you can explore
