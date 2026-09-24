@@ -1,35 +1,13 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#0b1118;color:#e5ecee}body{background:#0b1118}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 
-<link rel="stylesheet" href="/assets/style.css?v=0d8555f509046bcd"><link rel="stylesheet" href="/assets/concept-preview.css">
+<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css?v=ae13507ff7844cc5"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css?v=cc7cd5842b447b14"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js?v=4b37c5aba799ce79"></script><script defer src="/assets/reading-shell.js?v=48652a4c6975d593"></script><title>PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments · AI Knowledge Map</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>What Is PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments? Explained Simply</title>
 <meta name="description" content="From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/en/concepts/peft-lora/">
@@ -37,7 +15,7 @@
 <link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/concepts/peft-lora/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI Knowledge Map">
-<meta property="og:title" content="PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments">
+<meta property="og:title" content="What Is PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments? Explained Simply">
 <meta property="og:description" content="From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.">
 <meta property="og:url" content="https://ai-knowledge-map.com/en/concepts/peft-lora/">
 <meta property="og:locale" content="en_US">
@@ -46,12 +24,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments">
+<meta name="twitter:title" content="What Is PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments? Explained Simply">
 <meta name="twitter:description" content="From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.">
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/peft-lora/#page","name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","description":"From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.","url":"https://ai-knowledge-map.com/en/concepts/peft-lora/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","item":"https://ai-knowledge-map.com/en/concepts/peft-lora/"}]}]</script>
-</head><body class="concept-preview">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/en/concepts/peft-lora/#page","name":"What Is PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments? Explained Simply","description":"From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.","url":"https://ai-knowledge-map.com/en/concepts/peft-lora/","inLanguage":"en","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI learning guide","item":"https://ai-knowledge-map.com/en/"},{"@type":"ListItem","position":3,"name":"PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments","item":"https://ai-knowledge-map.com/en/concepts/peft-lora/"}]}]</script>
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">Skip to content</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -82,7 +60,7 @@
       </button>
     </div>
   <a class="release-directory-link" data-shell-about href="/about/">关于与纠错</a><a class="release-directory-link" data-shell-search href="/search/">文字目录 / Search</a></header>
-<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</span></li></ol></nav><article id="dd-article" data-concept-id="peft-lora">
+<main id="main-content" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/">AI learning guide</a></li><li><span aria-current="page">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</span></li></ol></nav><article id="dd-article" data-concept-id="peft-lora" lang="en">
 <header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">PEFT / LoRA: Freezing the backbone, learning only low-rank weight increments</h1><aside class="dd-publication-notice" data-review-status="pending-review" role="note"><strong>Continuously revised</strong><span>This page is open for reading while its content continues to be reviewed and improved.</span></aside>
 <p class="dd-sub">From ΔW=BA, rank, and scaling, to trainable parameter accounting, QLoRA, target modules, merged versions, and multi-adapter interference.</p>
 
@@ -155,7 +133,90 @@
   await document.fonts.ready;
   const records=[];
   for(const [index,svg] of [...article.querySelectorAll('svg')].entries()) {
+    // Activation charts have a range caption beneath the x-axis ticks. Keep
+    // that formula on its own row before generic label wrapping measures it.
+    if(['relu','sigmoid','tanh'].includes(svg.dataset.activation)&&svg.getAttribute('viewBox')==='0 0 260 240'){
+      const caption=[...svg.querySelectorAll('text')].find(t=>t.getAttribute('x')==='130'&&t.getAttribute('y')==='225');
+      const frame=svg.querySelector('rect[x="6"][y="6"][width="248"][height="228"]');
+      if(caption&&frame){caption.setAttribute('y','245');frame.setAttribute('height','248');svg.setAttribute('viewBox','0 0 260 260');records.push({round:1,kind:'space-activation-chart-caption',svgIndex:index});}
+    }
+    const diagramLabel=svg.getAttribute('aria-label');
+    if(diagramLabel==='Data split into training, validation, and test sets'&&svg.getAttribute('viewBox')==='0 0 560 96'){
+      const bars=[...svg.querySelectorAll('rect')],texts=[...svg.querySelectorAll('text')];
+      if(bars.length===3&&texts.length===6){
+        // Stack the three proportional bars so longer captions have a full row.
+        // Widths still encode the original split; all labels retain their text.
+        for(let i=0;i<3;i++){
+          bars[i].setAttribute('x','20');bars[i].setAttribute('y',String(40+108*i));
+          for(const [text,y] of [[texts[i],25+108*i],[texts[i+3],90+108*i]]){
+            text.setAttribute('x','20');text.setAttribute('y',String(y));text.setAttribute('text-anchor','start');
+          }
+        }
+        svg.setAttribute('viewBox','0 0 560 328');svg.style.minWidth='560px';
+        records.push({round:1,kind:'stack-data-split-bars',svgIndex:index});
+      }
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==='Number of examples and effectiveness: large gains from 0 to a few, then plateauing'){
+      for(const text of svg.querySelectorAll('text')){
+        if(text.textContent==='After that, marginal returns decline and they also consume the context window.'){text.setAttribute('x','150');text.setAttribute('y','20');}
+        if(text.textContent==='Number of examples')text.setAttribute('y','220');
+      }
+      svg.setAttribute('viewBox','0 0 520 240');
+    }
+    if(!svg.dataset.translationReviewedSpacing&&diagramLabel==="Instructions and data are the same string of tokens in the model's eyes"){
+      const label=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Webpage body (data to be processed)');
+      if(label)label.setAttribute('x','250');
+    }
+    // Reviewed English diagrams need larger geometric spacing, while keeping
+    // their words, relationships and readable font size unchanged.
+    const reviewedDiagram=[
+       'Attention gives the same result when word order is scrambled, so positional encoding is needed.',
+       'Comparison of the same refund policy using fixed chunking and structured parent-child chunking',
+       'Untrusted input passes in order through input, context, model, output, and the tool execution guardrail, with runtime monitoring covering the entire path',
+       'Refund requests routed by escalation score to the small model and strong model and fed back through sampled audit.',
+       'Comparison of exact vector scan and HNSW hierarchical nearest-neighbor graph search',
+       'Five-Step Loop of Tool Calling','Reliability diagram for three confidence buckets and human handoff threshold','RAG three steps: Retrieval, Augmentation, Generation',
+       'Without a standard: M×N custom integrations, messy','Composition of a few-shot prompt: several examples plus one query',
+       'Number of examples and effectiveness: large gains from 0 to a few, then plateauing',"Instructions and data are the same string of tokens in the model's eyes"].includes(diagramLabel);
+    if(reviewedDiagram&&!svg.dataset.translationReviewedSpacing){
+      const shapes=[...svg.querySelectorAll('rect,text,path,line,circle,polyline')].filter(el=>!el.closest('defs'));
+      const safe=shapes.every(el=>(!el.hasAttribute('d')||(el.getAttribute('d').match(/[a-z]/gi)||[]).every(c=>'MLHVCSQTZmlhvcsqtz'.includes(c)))&&
+        (!el.hasAttribute('transform')||['rotate(-90 20 115)','rotate(-90 30,90)'].includes(el.getAttribute('transform'))));
+      if(safe){
+        const scale=2.5;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry','x1','x2','y1','y2','cx','cy','r'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('points'))el.setAttribute('points',el.getAttribute('points').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+          if(el.hasAttribute('transform'))el.setAttribute('transform',el.getAttribute('transform')==='rotate(-90 20 115)'?'rotate(-90 50 287.5)':'rotate(-90 75 225)');
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationReviewedSpacing='true';
+        records.push({round:1,kind:'space-reviewed-english-diagram',svgIndex:index});
+      }
+    }
+    if(svg.getAttribute('aria-label')==='U-shaped accuracy curve when answer evidence is at the beginning, middle, and end'&&!svg.dataset.translationAxisExpanded){
+      const axis=[...svg.querySelectorAll('text')].find(t=>t.textContent==='Relative position of key evidence');
+      const legend=[...svg.querySelectorAll('text')].find(t=>t.textContent==='After reranking and placing evidence near the task');
+      if(axis&&legend){axis.setAttribute('y','235');svg.setAttribute('viewBox','0 0 880 260');svg.style.minWidth='880px';svg.dataset.translationAxisExpanded='true';records.push({round:1,kind:'space-reviewed-chart-axis',svgIndex:index});}
+    }
     if(svg.querySelector('[transform]'))continue;
+    // These reviewed diagrams use coordinate-only connectors and flat
+    // rectangles. Give their translated labels more room without scaling text.
+    if(svg.querySelector('marker#as29,marker#m27a,marker#sr31,marker#tt1,marker#iam1')&&!svg.dataset.translationGeometryExpanded) {
+      const shapes=[...svg.querySelectorAll('rect,text,path')].filter(el=>!el.closest('defs'));
+      const simple=shapes.every(el=>el.tagName.toLowerCase()!=='path'||(el.getAttribute('d')?.match(/[a-z]/gi)||[]).every(command=>'MLHVCSQTZmlhvcsqtz'.includes(command)));
+      if(simple){
+        const scale=1.8;
+        for(const el of shapes){
+          for(const attr of ['x','y','width','height','rx','ry'])if(el.hasAttribute(attr)&&Number.isFinite(Number(el.getAttribute(attr))))el.setAttribute(attr,String(Number(el.getAttribute(attr))*scale));
+          if(el.hasAttribute('d'))el.setAttribute('d',el.getAttribute('d').replace(/-?\d*\.?\d+/g,n=>String(Number(n)*scale)));
+        }
+        const v=svg.viewBox.baseVal;svg.setAttribute('viewBox',`${v.x*scale} ${v.y*scale} ${v.width*scale} ${v.height*scale}`);
+        svg.style.minWidth=svg.viewBox.baseVal.width+'px';svg.dataset.translationGeometryExpanded='true';
+        records.push({round:1,kind:'expand-reviewed-diagram-geometry',svgIndex:index});
+      }
+    }
     const labels=[...svg.querySelectorAll('text')];
     const original=labels.map(t=>t.textContent);
     const nodes=[...svg.querySelectorAll('rect')].map(el=>({el,box:el.getBBox(),labels:[]})).filter(n=>n.box.width<svg.viewBox.baseVal.width*.8);
@@ -166,9 +227,9 @@
     // Round 1: wrap plain labels within their own node/column. Complex tspans
     // and transformed labels are deliberately left for explicit repair.
     for(const text of labels) {
-      if(text.children.length||text.closest('[transform]'))continue;
+      if([...text.children].some(el=>el.tagName.toLowerCase()!=='tspan'||el.children.length||el.hasAttribute('baseline-shift')||el.hasAttribute('dy')||el.hasAttribute('font-size'))||text.closest('[transform]'))continue;
       const b=text.getBBox(), x=Number(text.getAttribute('x')),y=Number(text.getAttribute('y'));
-      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width||!/[ /]/.test(text.textContent))continue;
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!b.width)continue;
       const vb=svg.viewBox.baseVal,anchor=getComputedStyle(text).textAnchor;
       let available=anchor==='middle'?2*Math.min(x-vb.x,vb.x+vb.width-x):anchor==='end'?x-vb.x:vb.x+vb.width-x;
       const boxes=owners.has(text)?[owners.get(text).box]:[];
@@ -180,7 +241,11 @@
       const originalLabel=text.textContent;
       const tokens=originalLabel.match(/[^\s/]+\/?\s*|\/\s*/g)||[],lines=[];let line=originalLabel.match(/^\s*/)[0];
       const probe=document.createElementNS('http://www.w3.org/2000/svg','tspan');text.textContent='';text.append(probe);
-      for(const token of tokens){probe.textContent=line+token;if(line&&probe.getComputedTextLength()>available){lines.push(line);line=token;}else line+=token;}
+      for(const token of tokens){
+        probe.textContent=line+token;
+        if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}
+        for(const char of token){probe.textContent=line+char;if(line&&probe.getComputedTextLength()>available){lines.push(line);line='';}line+=char;}
+      }
       if(line)lines.push(line);
       let floor=Infinity;
       for(const other of labels){if(other===text||boxes.length)continue;const ob=other.getBBox();if(ob.y>b.y+b.height/2&&ob.x<b.x+b.width&&ob.x+ob.width>b.x)floor=Math.min(floor,ob.y-3);}
@@ -215,6 +280,13 @@
   }
   // Math and code keep their full content and become scrollable on narrow screens.
   for(const math of article.querySelectorAll('math[display="block"],pre')) {math.style.maxWidth='100%';math.style.overflowX='auto';}
+  for(const table of article.querySelectorAll('table')){
+    if(table.parentElement.dataset.translationTableScroll)continue;
+    const wrapper=document.createElement('div');wrapper.dataset.translationTableScroll='true';
+    wrapper.style.maxWidth='100%';wrapper.style.overflowX='auto';wrapper.tabIndex=0;
+    wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label','Scrollable table');
+    table.before(wrapper);wrapper.append(table);records.push({round:2,kind:'scroll-table'});
+  }
   return records;
 })(document.getElementById('dd-article'));window.translationLayoutReady.catch(function(){});</script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"

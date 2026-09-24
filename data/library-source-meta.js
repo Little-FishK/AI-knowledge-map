@@ -58,8 +58,8 @@
   /* ---------- 3. 治理元数据 ---------- */
   window.LIBRARY_SOURCE_META = {
     "academic/arxiv": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "daily", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
-    "academic/openreview": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
-    "academic/acl-anthology": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
+    "academic/openreview": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
+    "academic/acl-anthology": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/neurips-proceedings": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "academic/pmlr": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "academic/cvf-open-access": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
