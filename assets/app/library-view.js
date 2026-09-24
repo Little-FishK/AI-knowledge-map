@@ -31,6 +31,7 @@
       "data/library-source-meta.js",
       "data/library-new-sources.js",
       "data/library-arxiv.js",
+      "data/library-neurips-proceedings.js",
       "data/library-openreview.js",
       "data/library-acl-anthology.js",
       "data/software.js",
