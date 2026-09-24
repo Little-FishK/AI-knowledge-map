@@ -3324,4 +3324,22 @@
 }];
   framework.linkedNodes = Array.from(new Set(framework.linkedNodes.concat(["multi-agent","agent-frameworks"])));
   library.items.push(...entries);
+  const legacyImportancePassed = new Map([
+    ["1312.6114", "六步审核通过；ICLR 2024 Test of Time；未独立复现"],
+    ["1406.2661", "六步审核通过；NeurIPS 2024 Test of Time；未独立复现"],
+    ["1412.6980", "六步审核通过；ICLR 2025 Test of Time；未独立复现"],
+    ["1512.03385", "六步审核通过；CVPR 2016 Best Paper；未独立复现"],
+    ["1810.04805", "六步审核通过；NAACL 2019 Best Long Paper；未独立复现"],
+    ["2005.14165", "六步审核通过；NeurIPS 2020 Best Paper；未独立复现"],
+    ["2203.15556", "六步审核通过；NeurIPS 2022 Outstanding Paper；未独立复现"]
+  ]);
+  const currentReviewIds = new Set(["2404.02905","2406.02507","2503.14858","2505.17638","2505.06708","2601.15165","2602.01338"]);
+  const markImportance = item => {
+    if (!item || item.sourceSubcategory !== "arxiv" || currentReviewIds.has(item.arxivId)) return;
+    item.reviewStatus = legacyImportancePassed.get(item.arxivId) || "重要性审核暂缓：本版必要证据不足";
+  };
+  library.items.forEach(item => {
+    markImportance(item);
+    (item.relatedMaterials || []).forEach(markImportance);
+  });
 })();
