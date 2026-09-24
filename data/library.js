@@ -58,6 +58,8 @@ window.PRO_LIBRARY = {
     },
     {
       id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B",
+      reviewMode: "source-specific",
+      reviewPolicy: "核心资料全收；按各二级来源自身的数据库、方法、版本与榜单结构收录，不设跨机构统一评分机制。",
       subcategories: [
         { id: "mitre-atlas", label: "MITRE ATLAS", short: "AI 对抗威胁知识库" },
         { id: "owasp-genai", label: "OWASP GenAI Security Project", short: "LLM Top 10、智能体 Top 10 与 ACS 标准" },

@@ -24,11 +24,12 @@
     let query = "";
 
     const bundle = [
-      "data/library.js?v=20260924-knowledge-reset-1",
+      "data/library.js?v=20260924-knowledge-core-1",
       "data/library-official-technical.js",
       "data/library-official-china.js",
       "data/library-platform-profiles.js",
       "data/library-source-meta.js",
+      "data/library-knowledge-base-core.js?v=20260924-knowledge-core-1",
       "data/library-new-sources.js?v=20260924-knowledge-reset-1",
       "data/library-arxiv.js",
       "data/library-neurips-proceedings.js",
