@@ -3342,4 +3342,10 @@
     markImportance(item);
     (item.relatedMaterials || []).forEach(markImportance);
   });
+  const isDeferredArxiv = item => item && item.sourceSubcategory === "arxiv" &&
+    item.reviewStatus === "重要性审核暂缓：本版必要证据不足";
+  library.items = library.items.filter(item => {
+    if (item.relatedMaterials) item.relatedMaterials = item.relatedMaterials.filter(record => !isDeferredArxiv(record));
+    return !isDeferredArxiv(item);
+  });
 })();
