@@ -24,6 +24,7 @@ try {
   require(path.join(PROJECT_ROOT, "data", "library-platform-profiles.js"));
   require(path.join(PROJECT_ROOT, "data", "library-source-meta.js"));
   require(path.join(PROJECT_ROOT, "data", "library-new-sources.js"));
+  require(path.join(PROJECT_ROOT, "data", "library-hackathon-kaggle.js"));
   require(path.join(PROJECT_ROOT, "data", "library-arxiv.js"));
   require(path.join(PROJECT_ROOT, "data", "library-neurips-proceedings.js"));
   require(path.join(PROJECT_ROOT, "data", "library-pmlr.js"));

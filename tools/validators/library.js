@@ -15,6 +15,7 @@ try {
   require(path.join(PROJECT_ROOT, "data", "library-platform-profiles.js"));
   require(path.join(PROJECT_ROOT, "data", "library-source-meta.js"));
   require(path.join(PROJECT_ROOT, "data", "library-new-sources.js"));
+  require(path.join(PROJECT_ROOT, "data", "library-hackathon-kaggle.js"));
   require(path.join(PROJECT_ROOT, "data", "library-arxiv.js"));
   require(path.join(PROJECT_ROOT, "data", "library-neurips-proceedings.js"));
   require(path.join(PROJECT_ROOT, "data", "library-pmlr.js"));
@@ -214,6 +215,17 @@ const requiredStrings = [
 ];
 
 const materialRecords = L.items.flatMap(item => [item].concat(item.relatedMaterials || []));
+const kaggleHackathonRecords = L.items.filter(item => item.sourceClass === "hackathon" && item.sourceSubcategory === "kaggle");
+if (kaggleHackathonRecords.length !== 157) problems.push(`Kaggle 黑客马拉松正式资料应为 157 条，当前为 ${kaggleHackathonRecords.length} 条`);
+if (new Set(kaggleHackathonRecords.map(item => item.url)).size !== 157) problems.push("Kaggle 黑客马拉松正式资料存在重复 URL");
+kaggleHackathonRecords.forEach(item => {
+  if (item.reviewPolicy !== "hackathon-content-v1.1" || item.reviewDecision !== "admitted" || item.discoveryOnly !== true) {
+    problems.push(`Kaggle 黑客马拉松资料 ${item.id} 的审核或发现型标记不完整`);
+  }
+  if (!item.award || !item.team || !item.eventSlug || item.reviewBatch !== "kaggle-full-review-20260924") {
+    problems.push(`Kaggle 黑客马拉松资料 ${item.id} 缺少奖项、团队、赛事或批次证据`);
+  }
+});
 const seenArxivIds = new Set();
 materialRecords.forEach(item => {
   requiredStrings.forEach(field => {

@@ -34,6 +34,7 @@ const DATA_SCRIPTS = [
   "data/library-platform-profiles.js",
   "data/library-source-meta.js",
   "data/library-new-sources.js",
+  "data/library-hackathon-kaggle.js",
   "data/library-arxiv.js",
   "data/library-neurips-proceedings.js",
   "data/library-pmlr.js",

@@ -14,7 +14,7 @@ const DATA_FILES = Object.freeze([
   "data/tutorials-video-generated.js", "data/library.js",
   "data/library-official-technical.js", "data/library-official-china.js",
   "data/library-platform-profiles.js",
-  "data/library-source-meta.js", "data/library-new-sources.js",
+  "data/library-source-meta.js", "data/library-new-sources.js", "data/library-hackathon-kaggle.js",
   "data/library-arxiv.js", "data/library-neurips-proceedings.js", "data/library-pmlr.js", "data/library-openreview.js", "data/library-acl-anthology.js", "data/library-cvf-open-access.js", "data/library-ieee-xplore.js", "data/library-acm-digital-library.js",
   "data/locales/manifest.js", "data/locales/zh-Hans/ui.js",
   "data/locales/en/ui.js", "data/content-locales/en/graph.js",

@@ -108,8 +108,6 @@ window.PRO_LIBRARY = {
         { id: "kaggle", label: "Kaggle", short: "数据科学竞赛、数据集与方案" },
         { id: "devpost", label: "Devpost", short: "企业与社区黑客马拉松项目" },
         { id: "lablab", label: "lablab.ai", short: "AI 专题黑客马拉松与项目" },
-        { id: "mlh", label: "Major League Hacking", short: "学生与社区黑客马拉松" },
-        { id: "hugging-face-events", label: "Hugging Face 活动", short: "社区冲刺、竞赛与 Spaces 项目" },
         { id: "tianchi", label: "阿里云天池", short: "算法竞赛、数据集与获奖方案" },
         { id: "datafountain", label: "DataFountain", short: "中文数据科学竞赛平台" },
         { id: "zindi", label: "Zindi", short: "非洲与全球数据科学竞赛" }

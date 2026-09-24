@@ -2,9 +2,13 @@
 
 专业资料库用于保存重要但不一定适合成为节点或软件教程的高质量信息。一级导航严格按九类信息来源分类，二级导航细分到具体平台、机构、集合或经认证个人；内容形式与主题只作为筛选标签。
 
+九个一级来源各自拥有独立审核机制。某一一级来源的准入门槛、字段和数量策略不得改变其他一级来源的审核结论；跨来源共用的只有 ID、网址、来源归属和站内关联等机械完整性检查。
+
 正式数据位于 `data/library.js`，注册为 `window.PRO_LIBRARY`。
 官方技术资料精选包位于 `data/library-official-technical.js`，在基础资料之后追加到同一资料库。
 二级来源的平台档案位于 `data/library-platform-profiles.js`，注册为 `window.LIBRARY_PLATFORM_PROFILES`。
+
+“黑客马拉松”使用独立的[竞赛与黑客马拉松内容审核机制](HACKATHON_CONTENT_REVIEW_POLICY.md)和[审核记录模板](../proposals/hackathon/review-template.json)。本类不设候选池或两阶段流程，每个项目直接检查五项硬门槛：身份可确认、AI 专业相关、产物可访问、知识有增量、奖项符合要求；其中第五项只允许主奖、正式赛道冠军和明确 AI 技术主题的专项奖通过。Kaggle 全量审核通过的 157 个获奖项目位于 `data/library-hackathon-kaggle.js`，审核记录位于 `proposals/hackathon/kaggle-admitted-projects-20260924.json`，并统一标记为 `discoveryOnly`。
 
 每条资料至少包含：
 

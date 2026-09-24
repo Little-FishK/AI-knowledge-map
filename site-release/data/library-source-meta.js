@@ -52,7 +52,6 @@
     background: "Chatbot Arena 于 2023 年由 LMSYS / UC Berkeley SkyLab 团队推出，2024 年迁移到独立站点，2025 年从学术项目独立为公司并完成融资，评测范围从文本扩展到视觉与智能体对战。",
     organization: "Arena（2025 年起独立运营的商业实体）；与原 LMSYS 研究团队保持学术合作。"
   });
-  Object.assign(profiles["hackathon/mlh"], { website: "https://www.mlh.com/" });
   Object.assign(profiles["hackathon/zindi"], { website: "https://zindi.world/" });
 
   /* ---------- 3. 治理元数据 ---------- */
@@ -132,8 +131,6 @@
     "hackathon/kaggle": { tier: "A", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "weekly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
     "hackathon/devpost": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "weekly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
     "hackathon/lablab": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
-    "hackathon/mlh": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
-    "hackathon/hugging-face-events": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
     "hackathon/tianchi": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
     "hackathon/datafountain": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
     "hackathon/zindi": { tier: "B", provenance: "primary", originScope: "coding", purposes: ["discovery"], cadence: "monthly", health: "active", sourceUse: "discovery", lastVerifiedAt: "2026-07-25" },
