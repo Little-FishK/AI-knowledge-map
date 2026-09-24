@@ -39,6 +39,8 @@
       "data/library-acl-anthology.js",
       "data/library-cvf-open-access.js",
       "data/library-ieee-xplore.js",
+      "data/library-acm-digital-library.js?v=20260924-acm-springer-1",
+      "data/library-springer-nature.js?v=20260924-acm-springer-1",
       "data/software.js",
     ];
 
