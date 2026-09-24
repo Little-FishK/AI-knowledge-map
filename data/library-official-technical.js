@@ -209,7 +209,7 @@
     ["meta-llama-responsible-use", "Responsible use guide", "https://www.llama.com/docs/how-to-guides/responsible-use-guide/",
       "说明 Llama 应用的风险评估、安全微调、红队测试和部署控制。",
       "它把开放权重模型的使用责任落到应用开发者可执行的步骤。"],
-    ["meta-llama-stack", "Llama Stack documentation", "https://llama-stack.readthedocs.io/en/latest/",
+    ["meta-llama-stack", "Llama Stack documentation", "https://github.com/meta-llama/llama-stack",
       "定义推理、Agent、工具、记忆、评测和安全的统一 API 层。",
       "Llama Stack 展示了 Meta 对可移植生成式 AI 应用栈的官方工程抽象。"],
     ["meta-sam2", "Segment Anything 2", "https://ai.meta.com/sam2/",
@@ -238,7 +238,7 @@
     collection: "NVIDIA Developer Documentation",
     tags: ["NVIDIA", "官方文档"]
   }, [
-    ["nvidia-cuda-guide", "CUDA C++ Programming Guide", "https://docs.nvidia.com/cuda/cuda-c-programming-guide/",
+    ["nvidia-cuda-guide", "CUDA C++ Programming Guide", "https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html",
       "系统说明 CUDA 编程模型、线程层级、内存、同步和硬件执行。",
       "CUDA 是 NVIDIA AI 软件栈的底座，这份指南能解释上层框架性能从何而来。"],
     ["nvidia-cudnn", "cuDNN documentation", "https://docs.nvidia.com/deeplearning/cudnn/",

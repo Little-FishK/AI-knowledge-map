@@ -1,9 +1,9 @@
 /* 专业资料库 —— 一级分类严格按信息来源，而不是内容主题或文件形式。 */
 window.PRO_LIBRARY = {
   meta: {
-    version: "0.6",
-    updatedAt: "2026-07-25",
-    note: "二级来源档案包含正式介绍与证据边界；官方技术资料九个二级分类各有不少于10篇精选资料。"
+    version: "0.7",
+    updatedAt: "2026-09-22",
+    note: "二级来源按「一手 / 首创 / 应答 / 归属」四闸门重建：删除已停止运营来源，补齐追前沿、安全事件与一手监管文本三类空白，官方技术资料补入中国前沿实验室。来源治理元数据见 library-source-meta.js。"
   },
   sourceClasses: [
     {
@@ -27,8 +27,13 @@ window.PRO_LIBRARY = {
         { id: "iso-iec", label: "ISO / IEC", short: "国际标准化组织与国际电工委员会" },
         { id: "ieee-standards", label: "IEEE Standards", short: "IEEE 技术标准与工作组" },
         { id: "eu-institutions", label: "欧盟机构", short: "欧盟委员会、议会及监管机构" },
-        { id: "us-regulators", label: "美国监管机构", short: "FTC、FDA、EEOC 等正式文件" },
-        { id: "china-standards-regulators", label: "中国标准与监管机构", short: "网信办、国标委及相关技术委员会" },
+        { id: "uk-aisi", label: "英国 AI 安全研究所", short: "前沿模型评测、Inspect 框架与国际报告秘书处" },
+        { id: "intl-ai-safety-report", label: "国际 AI 安全报告", short: "Bengio 主持、多国专家签认的证据综述" },
+        { id: "us-ftc", label: "美国 FTC", short: "AI 相关正式规则、业务指南与执法文件" },
+        { id: "us-caisi", label: "美国 CAISI", short: "NIST 内设 AI 标准与创新中心，做独立评测" },
+        { id: "china-cac", label: "中国国家网信办", short: "生成式 AI 管理与备案的正式文件" },
+        { id: "china-tc260", label: "全国网安标委 TC260", short: "AI 安全与数据安全国家标准原件" },
+        { id: "china-caict", label: "中国信通院 CAICT", short: "AI 评测、标准与产业研究原始报告" },
         { id: "oecd", label: "OECD", short: "AI 原则、政策观察与政府间框架" },
         { id: "un-agencies", label: "联合国机构", short: "UNESCO、ITU 等规范与建议" }
       ]
@@ -44,6 +49,10 @@ window.PRO_LIBRARY = {
         { id: "nvidia", label: "NVIDIA", short: "开发者文档、模型与硬件技术资料" },
         { id: "hugging-face-official", label: "Hugging Face 官方", short: "官方文档、课程与平台公告" },
         { id: "aws", label: "AWS", short: "Bedrock、SageMaker 与云端 AI 文档" },
+        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" },
+        { id: "qwen", label: "Qwen（阿里）", short: "官方文档、模型卡与开源仓库" },
+        { id: "moonshot-ai", label: "Moonshot AI（Kimi）", short: "技术报告、模型权重与训练 Infra 开源" },
+        { id: "zhipu-ai", label: "Zhipu AI（GLM）", short: "开放平台文档、模型卡与技术报告" },
         { id: "vendor-docs-other", label: "其他厂商官方资料", short: "经单独登记的产品官方文档" }
       ]
     },
@@ -51,13 +60,21 @@ window.PRO_LIBRARY = {
       id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B",
       subcategories: [
         { id: "mitre-atlas", label: "MITRE ATLAS", short: "AI 对抗威胁知识库" },
+        { id: "owasp-genai", label: "OWASP GenAI Security Project", short: "LLM Top 10、智能体 Top 10 与 ACS 标准" },
+        { id: "aiid", label: "AI Incident Database", short: "AI 事故编号、档案与统计" },
+        { id: "mit-ai-risk-repository", label: "MIT AI Risk Repository", short: "AI 风险分类法与事故映射" },
         { id: "mlcommons", label: "MLCommons", short: "训练、推理与安全公共基准" },
+        { id: "metr", label: "METR", short: "预部署评测与任务时长曲线" },
+        { id: "arc-prize", label: "ARC Prize Foundation", short: "ARC-AGI 抽象推理基准与验证榜" },
         { id: "stanford-crfm", label: "Stanford CRFM / HELM", short: "基础模型透明度与评测" },
-        { id: "lmsys-arena", label: "LMSYS / Arena", short: "模型竞技场与开放评测" },
-        { id: "papers-with-code", label: "Papers with Code", short: "论文、代码与基准成绩索引" },
+        { id: "lmsys-arena", label: "LMArena（原 LMSYS / Arena）", short: "模型竞技场与开放评测" },
         { id: "artificial-analysis", label: "Artificial Analysis", short: "模型性能、价格与速度评测" },
-        { id: "nvd-cve", label: "NVD / CVE", short: "漏洞与安全事件数据库" },
-        { id: "benchmark-other", label: "专项评测机构", short: "经登记的领域基准与测试组织" }
+        { id: "opencompass", label: "OpenCompass 司南", short: "开源评测体系与月度更新榜单" },
+        { id: "superclue", label: "SuperCLUE", short: "中文大模型月度原创新题榜单" },
+        { id: "flageval", label: "FlagEval（智源）", short: "语言与多模态评测体系" },
+        { id: "swe-bench", label: "SWE-bench", short: "仓库级修复真实缺陷的官方榜单" },
+        { id: "bfcl", label: "Berkeley BFCL", short: "工具调用与函数调用专榜" },
+        { id: "nvd-cve", label: "NVD / CVE", short: "漏洞与安全事件数据库" }
       ]
     },
     {
@@ -70,6 +87,7 @@ window.PRO_LIBRARY = {
         { id: "deloitte", label: "Deloitte", short: "行业应用与组织调研" },
         { id: "rand", label: "RAND", short: "政策、安全与战略研究" },
         { id: "semianalysis", label: "SemiAnalysis", short: "AI 基础设施与半导体分析" },
+        { id: "cset", label: "CSET（乔治城）", short: "新兴技术安全研究与原始数据集" },
         { id: "specialist-research-other", label: "其他专项研究机构", short: "经范围认证的行业与专家研究" }
       ]
     },
