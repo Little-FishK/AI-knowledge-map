@@ -5,6 +5,20 @@ window.PRO_LIBRARY = {
     updatedAt: "2026-09-22",
     note: "二级来源按「一手 / 首创 / 应答 / 归属」四闸门重建：删除已停止运营来源，补齐追前沿、安全事件与一手监管文本三类空白，官方技术资料补入中国前沿实验室。来源治理元数据见 library-source-meta.js。"
   },
+  topicTaxonomies: {
+    openai: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
+    ]
+  },
   sourceClasses: [
     {
       id: "academic", order: 1, label: "学术投稿", short: "论文、正式出版与预印本", color: "#7797c7", authority: "A2–R",
