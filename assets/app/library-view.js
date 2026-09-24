@@ -26,6 +26,11 @@
     const bundle = [
       "data/library.js?v=20260924-knowledge-core-1",
       "data/library-official-technical.js",
+      "data/library-official-openai-importance-01.js",
+      "data/library-official-openai-importance-02.js",
+      "data/library-official-openai-importance-03.js",
+      "data/library-official-openai-importance-04.js",
+      "data/library-official-openai-importance-05.js",
       "data/library-official-china.js",
       "data/library-platform-profiles.js",
       "data/library-source-meta.js",
