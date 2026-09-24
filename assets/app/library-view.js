@@ -205,7 +205,7 @@
         return `<article class="lib-card" data-library-item="${esc(canonicalItem.id)}" style="--source-color:${source.color}" tabindex="0">
           <div class="lib-card-top">
             <span class="lib-badge">${esc(source.label)}</span><span class="lib-subbadge">${esc(subcategory.label)}</span>
-            ${item.discoveryOnly ? `<span class="lib-discovery">${esc(t("library.discoveryOnly"))}</span>` : ""}<span class="lib-tier">${esc(item.authorityTier)}</span>
+            ${item.discoveryOnly ? `<span class="lib-discovery">${esc(t("library.discoveryOnly"))}</span>` : ""}${item.regulatoryStatus ? `<span class="lib-discovery">${esc(t(`library.regulatoryStatus.${item.regulatoryStatus}`))}</span>` : ""}<span class="lib-tier">${esc(item.authorityTier)}</span>
           </div>
           <h3 class="lib-title">${esc(item.title)}</h3>
           <div class="lib-publisher">${esc(item.publisher)} · ${esc(item.contentKind)}</div>
@@ -262,6 +262,7 @@
       const linkedNodes = (item.linkedNodes || []).filter(nodeId => byId[nodeId]);
       const linkedSoftware = (item.linkedSoftware || []).map(softwareId =>
         software && (software.items || []).find(entry => entry.id === softwareId)).filter(Boolean);
+      const codedLabel = (prefix, value) => value ? t(`${prefix}.${value}`) : "";
       let html = `<div class="d-domain" style="color:${source.color}">${source.order}. ${esc(source.label)}
         <span style="color:var(--fg-faint)"> · ${esc(item.authorityTier)} · ${esc(item.contentKind)}</span></div>
         <h2 class="d-title">${esc(item.title)}</h2>
@@ -270,6 +271,9 @@
           <dt>${esc(t("library.primarySourceClass"))}</dt><dd>${esc(source.label)}</dd><dt>${esc(t("library.secondarySourceClass"))}</dt><dd>${esc(subcategory.label)}</dd>
           <dt>${esc(t("library.publisher"))}</dt><dd>${esc(item.publisher)}</dd><dt>${esc(t("library.collection"))}</dt><dd>${esc(item.collection)}</dd>
           <dt>${esc(t("library.reviewStatus"))}</dt><dd>${esc(item.reviewStatus)}</dd><dt>${esc(t("library.primarySource"))}</dt><dd>${esc(t(item.primarySource ? "common.yes" : "common.no"))}</dd>
+          ${item.officialIdentifier ? `<dt>${esc(t("library.officialIdentifier"))}</dt><dd>${esc(item.officialIdentifier)}</dd>` : ""}
+          ${item.regulatoryStatus ? `<dt>${esc(t("library.regulatoryStatus"))}</dt><dd>${esc(codedLabel("library.regulatoryStatus", item.regulatoryStatus))}</dd>` : ""}
+          ${item.bindingForce ? `<dt>${esc(t("library.bindingForce"))}</dt><dd>${esc(codedLabel("library.bindingForce", item.bindingForce))}</dd>` : ""}
           <dt>${esc(t("library.accessedAt"))}</dt><dd>${esc(item.accessedAt)}</dd>
         </dl></div>
         ${item.selectionReason ? `<div class="d-sec"><h4>${esc(t("library.selectionReason"))}</h4><div class="d-body"><p>${esc(item.selectionReason)}</p></div></div>` : ""}
