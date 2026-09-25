@@ -35,8 +35,6 @@
     "official/nvidia": platform("https://developer.nvidia.com/", "GPU、CUDA、AI 框架、模型和部署技术资料的一手来源。", "NVIDIA 于 1993 年成立，随后由图形计算扩展到通用 GPU 计算和 AI 基础设施。", "NVIDIA Corporation。", "Jensen Huang、Chris Malachowsky、Curtis Priem 共同创立。"),
     "official/hugging-face-official": platform("https://huggingface.co/docs", "Hugging Face 平台、Transformers 等官方库和课程资料的一手来源。", "Hugging Face 于 2016 年成立，后来发展为模型、数据集、应用和开源工具协作平台。", "Hugging Face, Inc.。", "Clément Delangue、Julien Chaumond、Thomas Wolf 共同创立。"),
     "official/aws": platform("https://aws.amazon.com/ai/", "AWS 云端 AI、Bedrock、SageMaker 和基础设施资料的一手来源。", "Amazon Web Services 于 2006 年正式推出，随后形成覆盖训练、推理、托管模型和企业服务的云平台。", "Amazon Web Services，隶属 Amazon。", "由 Amazon 内部团队创建，早期业务建设由 Andy Jassy 等领导；不是独立创业公司。"),
-    "official/vendor-docs-other": collection("尚未单列的厂商官方文档、模型卡、系统卡和更新日志。", "用于容纳经过逐一登记但数量不足以独立成类的厂商；不能把厂商官网整体视为可信。", "随具体资料记录实际公司、研究机构和产品团队。"),
-
     "knowledge-base/mitre-atlas": platform("https://atlas.mitre.org/", "面向 AI 系统的对抗威胁战术、技术和案例知识库。", "MITRE 于 2020 年前后公开 ATLAS，并与政府、企业和研究社区持续维护攻击技术与案例。", "The MITRE Corporation 及 ATLAS 社区。", "由 MITRE 研究团队与合作机构发起，不属于商业创业平台。"),
     "knowledge-base/mlcommons": platform("https://mlcommons.org/", "面向机器学习训练、推理、存储和安全的公共基准组织。", "MLCommons 于 2020 年围绕 MLPerf 等项目形成工程与研究联盟，推动可比较的公开测量。", "MLCommons Association，非营利工程联盟。", "由 MLPerf 社区、产业和学术参与者共同组建，不对应单一创始人。"),
     "knowledge-base/stanford-crfm": platform("https://crfm.stanford.edu/", "基础模型研究、透明度、评测和 HELM 基准平台。", "Stanford CRFM 于 2021 年在 Stanford HAI 体系内成立，推动基础模型的系统研究与社会分析。", "Stanford Center for Research on Foundation Models。", "由 Percy Liang 等 Stanford 研究者和跨学科团队发起。"),

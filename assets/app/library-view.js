@@ -25,8 +25,8 @@
     let query = "";
 
     const bundle = [
-      "data/library.js?v=20260924-anthropic-topics-1",
-      "data/library-official-technical.js",
+      "data/library.js?v=20260925-remove-secondary-1",
+      "data/library-official-technical.js?v=20260925-remove-secondary-1",
       "data/library-official-openai-importance-01.js",
       "data/library-official-openai-importance-02.js",
       "data/library-official-openai-importance-03.js",
@@ -59,9 +59,9 @@
       "data/library-official-nvidia-importance-05.js?v=20260925-meta-nvidia-1",
       "data/library-official-nvidia-importance-06.js?v=20260925-meta-nvidia-1",
       "data/library-official-nvidia-importance-07.js?v=20260925-meta-nvidia-1",
-      "data/library-official-china.js",
-      "data/library-platform-profiles.js",
-      "data/library-source-meta.js",
+      "data/library-official-china.js?v=20260925-remove-secondary-1",
+      "data/library-platform-profiles.js?v=20260925-remove-secondary-1",
+      "data/library-source-meta.js?v=20260925-remove-secondary-1",
       "data/library-knowledge-base-core.js?v=20260924-knowledge-repair-1",
       "data/library-knowledge-base-expanded.js?v=20260924-knowledge-repair-1",
       "data/library-new-sources.js?v=20260924-knowledge-reset-1",

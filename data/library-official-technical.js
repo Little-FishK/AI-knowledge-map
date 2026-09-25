@@ -346,38 +346,4 @@
       "它把单项服务知识提升到系统架构评审层，适合作为生产门禁清单。"]
   ]);
 
-  addGroup({
-    id: "vendor-docs-other",
-    publisher: "多家厂商",
-    collection: "其他厂商官方技术资料",
-    tags: ["厂商官方资料"]
-  }, [
-    ["mistral-ai-docs", "Mistral AI Documentation", "https://docs.mistral.ai/",
-      "覆盖 Mistral API、模型、工具调用、Agent、微调与部署。",
-      "Mistral 是重要的欧洲模型厂商，文档同时覆盖开放与商业模型生态。", "Mistral AI", "Mistral AI Documentation"],
-    ["cohere-docs", "Cohere Documentation", "https://docs.cohere.com/",
-      "介绍生成、嵌入、重排、工具使用与企业检索工作流。",
-      "Cohere 在企业 RAG 和重排方面具有代表性，能补充通用聊天模型视角。", "Cohere", "Cohere Documentation"],
-    ["stability-ai-api-docs", "Stability AI Developer Platform", "https://platform.stability.ai/docs",
-      "说明 Stability AI 图像生成与编辑 API、参数和调用方式。",
-      "它提供独立图像模型厂商的一手接口资料，扩大视觉生成覆盖。", "Stability AI", "Stability AI Documentation"],
-    ["runway-api-docs", "Runway API documentation", "https://docs.dev.runwayml.com/",
-      "介绍 Runway 视频与图像生成 API、任务状态、输入和输出。",
-      "视频生成具有异步任务和媒体约束，这份资料提供专业视频平台的工程视角。", "Runway", "Runway API Documentation"],
-    ["xai-api-docs", "xAI API documentation", "https://docs.x.ai/",
-      "说明 xAI 模型 API、鉴权、文本与工具等开发能力。",
-      "收录它可覆盖另一条主流模型服务路线，并以官方文档限制能力断言。", "xAI", "xAI Documentation"],
-    ["groqcloud-docs", "GroqCloud documentation", "https://console.groq.com/docs/overview",
-      "介绍 GroqCloud API、模型、流式输出、工具调用和速率限制。",
-      "Groq 代表强调低延迟推理的专用硬件与云服务组合。", "Groq", "GroqCloud Documentation"],
-    ["perplexity-api-docs", "Perplexity API documentation", "https://docs.perplexity.ai/",
-      "说明面向搜索与研究的 API、模型、引用和请求参数。",
-      "它能提供检索原生模型产品的官方实现和引用行为依据。", "Perplexity", "Perplexity API Documentation"],
-    ["adobe-firefly-api-docs", "Adobe Firefly Services documentation", "https://developer.adobe.com/firefly-services/docs/firefly-api/",
-      "介绍 Firefly 图像生成、编辑、鉴权和企业内容工作流。",
-      "Adobe 的内容生产生态与商业安全定位具有独特代表性。", "Adobe", "Adobe Developer Documentation"],
-    ["databricks-mosaic-ai-docs", "Databricks AI capabilities", "https://docs.databricks.com/aws/en/agents/gen-ai-capabilities",
-      "覆盖模型服务、向量搜索、Agent、评测、治理与数据平台集成。",
-      "Databricks 将数据、模型和治理放在统一湖仓平台中，补充纯模型 API 的视角。", "Databricks", "Databricks Documentation"]
-  ]);
 })();

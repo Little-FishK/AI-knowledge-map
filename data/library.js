@@ -75,11 +75,7 @@ window.PRO_LIBRARY = {
         { id: "nvidia", label: "NVIDIA", short: "开发者文档、模型与硬件技术资料" },
         { id: "hugging-face-official", label: "Hugging Face 官方", short: "官方文档、课程与平台公告" },
         { id: "aws", label: "AWS", short: "Bedrock、SageMaker 与云端 AI 文档" },
-        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" },
-        { id: "qwen", label: "Qwen（阿里）", short: "官方文档、模型卡与开源仓库" },
-        { id: "moonshot-ai", label: "Moonshot AI（Kimi）", short: "技术报告、模型权重与训练 Infra 开源" },
-        { id: "zhipu-ai", label: "Zhipu AI（GLM）", short: "开放平台文档、模型卡与技术报告" },
-        { id: "vendor-docs-other", label: "其他厂商官方资料", short: "经单独登记的产品官方文档" }
+        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" }
       ]
     },
     {
@@ -222,28 +218,6 @@ window.PRO_LIBRARY = {
       linkedNodes: ["governance", "model-evaluation", "training-data-governance"],
       linkedSoftware: [],
       relatedItemIds: ["nist-ai-100-1"]
-    },
-    {
-      id: "elevenlabs-voice-cloning-docs",
-      sourceClass: "official",
-      sourceSubcategory: "vendor-docs-other",
-      title: "Voice cloning：how it works",
-      publisher: "ElevenLabs",
-      collection: "ElevenLabs Documentation",
-      contentKind: "官方技术文档",
-      authorityTier: "A1",
-      reviewStatus: "current",
-      primarySource: true,
-      discoveryOnly: false,
-      url: "https://elevenlabs.io/docs/eleven-api/concepts/voice-cloning",
-      accessedAt: "2026-07-24",
-      summary: "说明 Instant Voice Cloning 与 Professional Voice Cloning 的产品机制、输入要求和适用边界。",
-      selectionReason: "声音克隆是专门化生成式 AI 能力；这份厂商原始文档能准确界定 ElevenLabs 两类克隆流程、输入要求与产品边界。",
-      evidenceUse: "可直接支持 ElevenLabs 当前产品行为；跨产品机制仍需论文和独立资料。",
-      limitations: ["厂商文档不构成跨平台性能比较", "界面、配额和能力会随版本变化"],
-      tags: ["声音克隆", "官方文档", "音频"],
-      linkedNodes: ["voice-cloning", "speech"],
-      linkedSoftware: ["elevenlabs"]
     },
     {
       id: "stanford-ai-index-2026",

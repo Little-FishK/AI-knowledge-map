@@ -1,6 +1,5 @@
-/* 中国前沿实验室官方技术资料包：DeepSeek、Qwen、Moonshot AI、Zhipu AI 各 10 条。
-   与 library-official-technical.js 互补 —— 该文件覆盖美系厂商，本文件补齐中国侧，
-   解决「official 类原有 90 条全为美系、中国侧几乎为零」的空白。
+/* 中国前沿实验室官方技术资料包：当前仅发布 DeepSeek。
+   Qwen、Moonshot AI、Zhipu AI 已按资料库治理要求下线。
 
    登记规则（与 data/library-new-sources.js 一致）：
    - selectionReason 必须写明通过的是哪道闸门（一手 / 首创 / 应答 / 归属）；
@@ -17,10 +16,7 @@
   const ACCESSED_AT = "2026-09-23";
 
   const publishers = {
-    "deepseek": "DeepSeek（深度求索）",
-    "qwen": "Qwen（阿里云通义千问）",
-    "moonshot-ai": "Moonshot AI（月之暗面）",
-    "zhipu-ai": "Zhipu AI（智谱）"
+    "deepseek": "DeepSeek（深度求索）"
   };
 
   /* 不同内容类型的使用边界不同：文档、模型卡、代码仓库、发布公告各有各的失效方式。 */
@@ -594,7 +590,7 @@
     }
   ];
 
-  entries.forEach((entry) => {
+  entries.filter((entry) => entry.vendor === "deepseek").forEach((entry) => {
     const item = {
       id: entry.id,
       sourceClass: "official",
