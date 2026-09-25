@@ -42,6 +42,8 @@
       "data/library-knowledge-base-core.js?v=20260924-knowledge-repair-1",
       "data/library-knowledge-base-expanded.js?v=20260924-knowledge-repair-1",
       "data/library-new-sources.js?v=20260924-knowledge-reset-1",
+      "data/library-hackathon-kaggle.js?v=20260924-hackathon-library-1",
+      "data/library-hackathon-reviewed.js?v=20260924-hackathon-library-1",
       "data/library-arxiv.js",
       "data/library-neurips-proceedings.js",
       "data/library-pmlr.js",

@@ -63,8 +63,6 @@
     "hackathon/kaggle": platform("https://www.kaggle.com/competitions", "数据科学竞赛、数据集、Notebook 和社区方案平台。", "Kaggle 于 2010 年成立，2017 年被 Google 收购；竞赛常由企业和研究机构提供赛题与数据。", "Kaggle，隶属 Google。", "Anthony Goldbloom 与 Ben Hamner 共同创立。"),
     "hackathon/devpost": platform("https://devpost.com/hackathons", "企业、学校和社区黑客马拉松的组织与项目展示平台。", "平台前身 ChallengePost，于 2009 年成立，后更名为 Devpost。", "Devpost, Inc.。", "Brandon Kessler 创立。"),
     "hackathon/lablab": platform("https://lablab.ai/", "围绕生成式 AI、智能体和厂商技术举办在线黑客马拉松。", "通过限时活动、团队协作、导师支持和项目展示推动 AI 原型开发。", "lablab.ai。", "由 New Native 生态团队创建并运营。"),
-    "hackathon/mlh": platform("https://mlh.io/", "面向学生和开发者社区的黑客马拉松联盟与活动体系。", "Major League Hacking 于 2013 年成立，为校园和社区活动提供认证、资源和组织支持。", "Major League Hacking。", "Mike Swift 与 Jonathan Gottfried 共同创立。"),
-    "hackathon/hugging-face-events": platform("https://huggingface.co/events", "Hugging Face 社区冲刺、课程活动、挑战赛和项目展示入口。", "依托 Hugging Face 模型、数据集和 Spaces 生态组织开放协作活动。", "Hugging Face, Inc. 与活动合作方。", "平台由 Clément Delangue、Julien Chaumond、Thomas Wolf 创立；每场活动另有主办团队。"),
     "hackathon/tianchi": platform("https://tianchi.aliyun.com/", "中文算法竞赛、数据集、学习和产业赛题平台。", "由阿里云运营，连接企业问题、公开数据和数据科学开发者。", "阿里云计算有限公司。", "由阿里云内部团队建设；阿里巴巴由马云等创始团队建立。"),
     "hackathon/datafountain": platform("https://www.datafountain.cn/", "中文数据科学竞赛、数据开放与人才实践平台。", "通过政府、企业和科研赛题组织算法竞赛与解决方案征集。", "DataFountain 平台运营团队。", "公开资料未稳定披露单一创始人，按平台运营主体与具体赛事主办方记录。"),
     "hackathon/zindi": platform("https://zindi.africa/", "面向非洲及全球问题的数据科学竞赛与人才社区。", "Zindi 于 2018 年上线，通过企业、政府和社会议题连接数据科学人才。", "Zindi Africa。", "Celina Lee、Megan Yates、Ekow Duker 共同创立。"),
