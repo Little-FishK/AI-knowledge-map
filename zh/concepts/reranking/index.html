@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>重排 Reranking是什么？原理通俗讲解 | AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js?v=a5e5847472fe3716"></script><script defer src="/assets/reading.js"></script><title>重排 Reranking是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/reranking/">
@@ -29,7 +29,7 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/reranking/#page","name":"重排 Reranking是什么？原理通俗讲解 | AI 知识地图","description":"理解双塔召回、交叉编码器、late interaction、LLM 重排和位置偏差，并设计 Recall@k 到端到端答案的评测。","url":"https://ai-knowledge-map.com/zh/concepts/reranking/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"重排 Reranking：在高召回候选中做精细相关性判断","item":"https://ai-knowledge-map.com/zh/concepts/reranking/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=4c26e9dfb416d57b"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -123,7 +123,7 @@
 <p>沿着这条链回看全章各环节的决策，可以看到它们彼此约束。架构选择（双塔、交叉编码器或 Late interaction）决定精细交互能做到什么程度，也决定单位候选的计算与存储成本；候选深度 k 由 Recall@k 曲线的饱和位置和重排延迟公式 T_rerank = T_fixed + ⌈k/b⌉ × T_batch 共同决定；评测则必须同时报告排序指标、证据覆盖、引用忠实、延迟、费用与任务成功率，并守住版本、权限与时效的切片门禁。任何单一环节的指标提升——无论是 MRR 从 0.5 到 1.0，还是 NDCG 的整体上浮——都只说明该环节局部变好，只有沿因果链逐环验证到最终答案，才能确认一次重排改动是真正有效的。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Sentence-BERT</a>：双塔与交叉编码比较</li><li><a href="https://arxiv.org/abs/2004.12832" target="_blank" rel="noopener">ColBERT</a>：late interaction</li><li><a href="https://arxiv.org/abs/2304.09542" target="_blank" rel="noopener">Is ChatGPT Good at Search? RankGPT</a>：LLM 列表重排</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/reranking">在地图中查看概念关系</a><a href="/en/concepts/reranking/" lang="en">Read in English</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans&amp;node=reranking">在地图中查看概念关系</a><a href="/en/concepts/reranking/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css">
 
-<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js"></script><script defer src="/assets/reading.js"></script><title>分布式训练与并行策略是什么？原理通俗讲解 | AI 知识地图</title>
+<link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/progress.css"><script defer src="/assets/vendor/supabase-2.115.0.min.js"></script><script defer src="/assets/progress-model.js"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js"></script><script defer src="/assets/progress-ui.js?v=a5e5847472fe3716"></script><script defer src="/assets/reading.js"></script><title>分布式训练与并行策略是什么？原理通俗讲解 | AI 知识地图</title>
 <meta name="description" content="从全局批量与 all-reduce，到张量并行、pipeline bubble、ZeRO/FSDP、3D 并行和故障检查点。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ai-knowledge-map.com/zh/concepts/distributed-training/">
@@ -29,7 +29,7 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","@id":"https://ai-knowledge-map.com/zh/concepts/distributed-training/#page","name":"分布式训练与并行策略是什么？原理通俗讲解 | AI 知识地图","description":"从全局批量与 all-reduce，到张量并行、pipeline bubble、ZeRO/FSDP、3D 并行和故障检查点。","url":"https://ai-knowledge-map.com/zh/concepts/distributed-training/","inLanguage":"zh-Hans","learningResourceType":"Concept explanation","isAccessibleForFree":true,"isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 学习指南","item":"https://ai-knowledge-map.com/zh/"},{"@type":"ListItem","position":3,"name":"分布式训练：沿数据、张量、流水线和状态四个轴拆分","item":"https://ai-knowledge-map.com/zh/concepts/distributed-training/"}]}]</script>
-<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=cd25c98168a2356f"></script></head><body class="concept-preview">
+<link rel="stylesheet" href="/assets/progress.css"><link rel="stylesheet" href="/assets/onboarding.css"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js"></script><script defer src="/assets/reading-shell.js?v=4c26e9dfb416d57b"></script></head><body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header id="topbar" data-reading-shell data-base="/">
     <div class="brand">
@@ -127,7 +127,7 @@
 <div class="dd-agent-response"><p>把整条路径串起来，分布式训练从“能否放下”的问题出发，最终要落到可验证的实践上。第一步是核算参数、优化器状态与激活的峰值占用，这一步决定哪些轴真正必要——账没算清就选并行策略，等于在不知道瓶颈的情况下开药方。第二步据此选择 DP、TP、PP 与分片的组合：状态冗余大用 ZeRO/FSDP，单层太大用张量并行，层序列太长用流水线并行，只有样本维度才交给数据并行。第三步按设备拓扑映射通信域，把最频繁的 TP 通信放在高速互连内，避免把几乎每层都发生的集合通信甩给慢网络。第四步固定全局批量与数值语义：B全局 = B微批 × a × N数据并行，只由数据并行维度决定；学习率、token 数、数据顺序、dropout 随机流、loss scaling 与归约精度都要与基线对齐，否则性能结论不可比。第五步用 trace 把 step 拆开，找到数据读取、前向、反向、集合通信、优化器和检查点之间的等待依赖，通过计算与通信的异步重叠把空闲填满。最后一步是真实恢复与联合验收：演练故障恢复、比较恢复前后的 loss 与样本序列，并以质量与效率的联合结果——而非单独的吞吐——判定这次扩展是否成立。任何一步被跳过，前面各步留下的因果都会在下游被放大。</p></div>
 </section>
 <div class="dd-src"><b>资料来源与改编说明</b><ul><li><a href="https://arxiv.org/abs/1909.08053" target="_blank" rel="noopener">Megatron-LM</a>：张量模型并行</li><li><a href="https://arxiv.org/abs/1910.02054" target="_blank" rel="noopener">ZeRO</a>：训练状态分片</li><li><a href="https://arxiv.org/abs/1811.06965" target="_blank" rel="noopener">GPipe</a>：流水线并行与 micro-batch</li><li><a href="https://pytorch.org/docs/stable/fsdp.html" target="_blank" rel="noopener">PyTorch FSDP</a>：全分片数据并行实现语义</li></ul><div class="dd-src-date">访问日期：2026-07-22</div></div><!-- source-body:end -->
-<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans#/map/distributed-training">在地图中查看概念关系</a><a href="/en/concepts/distributed-training/" lang="en">Read in English</a></nav>
+<nav class="preview-next" aria-label="继续学习"><a href="/?lang=zh-Hans&amp;node=distributed-training">在地图中查看概念关系</a><a href="/en/concepts/distributed-training/" lang="en">Read in English</a></nav>
 </article></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
     <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
             data-i18n-aria-label="settings.close"></button>

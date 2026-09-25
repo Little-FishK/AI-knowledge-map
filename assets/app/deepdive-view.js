@@ -155,7 +155,7 @@
     }
 
     function leave() {
-      const route = router.parse(global.location.hash);
+      const route = router.parseLocation();
       if (route.name === "tutorial") {
         navigate({ name: "software-item", id: route.id }, { replace: true });
       } else {

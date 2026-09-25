@@ -160,7 +160,7 @@
 
   function showNodeOnMap(id, jumped) {
     if (!byId[id]) return;
-    if (mode === "graph" && ROUTER.parse(window.location.hash).name === "map") {
+    if (mode === "graph" && ROUTER.parseLocation().name === "map") {
       select(id, jumped);
       return;
     }
@@ -171,12 +171,12 @@
   // Ordinary map exploration stays transient. A page opened via a node link
   // keeps that link accurate as the selected node changes or is dismissed.
   function syncMapSelectionUrl(id) {
-    const route = ROUTER.parse(window.location.hash);
+    const route = ROUTER.parseLocation();
     if (route.name !== "map" || !route.id) return;
     const nextRoute = id ? { name: "map", id } : { name: "map" };
-    const url = new URL(window.location.href);
-    url.hash = ROUTER.format(nextRoute).slice(1);
-    window.history.replaceState(null, "", url.href);
+    // Rewrite in place without emitting a location event; a re-apply here would
+    // loop straight back into selection.
+    ROUTER.navigate(nextRoute, { replace: true, silent: true });
     activeRoute = nextRoute;
     setDocumentTitle(id ? localizedGraphNode(id)?.title : undefined);
   }
@@ -293,7 +293,7 @@
     search.disabled = !isGraph;
   }
 
-  async function applyRoute(route = ROUTER.parse(window.location.hash)) {
+  async function applyRoute(route = ROUTER.parseLocation()) {
     const token = ++routeApplyToken;
     const stale = () => token !== routeApplyToken;
     const previousRoute = activeRoute;
@@ -389,14 +389,18 @@
     }));
 
   function applyLocationRoute() {
-    const route = ROUTER.parse(window.location.hash);
-    // Old bookmarks remain valid; ordinary map URLs have no fragment.
-    if (route.name === "map" && !route.id && window.location.hash) {
-      ROUTER.navigate(route, { replace: true });
+    const route = ROUTER.parseLocation();
+    // Old #/... bookmarks stay valid and are upgraded to the clean URL in place
+    // (silently, so this handler still runs exactly once). #/concept is left to
+    // release-navigation, which forwards published pages to their article.
+    if (window.location.hash && route.name !== "concept" && route.name !== "not-found") {
+      ROUTER.navigate(route, { replace: true, silent: true });
     }
     applyRoute(route);
   }
   window.addEventListener("hashchange", applyLocationRoute);
+  // pushState navigation reports back/forward through popstate, not hashchange.
+  window.addEventListener("popstate", applyLocationRoute);
   applyLocationRoute();
 
   // 暴露给调试用
