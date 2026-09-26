@@ -8,7 +8,7 @@ const snapshot = { schemaVersion: 1, pageId: "supervised-learning", sourceLocale
 const result = render(snapshot, "/AI-knowledge-map/");
 assert.ok(result.includes(`<!-- source-body:start -->${page.html}<!-- source-body:end -->`), "Preserve original body byte for byte, including figures, tables and self-test.");
 assert.ok(result.includes("监督学习 &lt;test&gt;"));
-assert.ok(result.includes('href="/AI-knowledge-map/?lang=zh-Hans#/map/supervised-learning"'));
+assert.ok(result.includes('href="/AI-knowledge-map/?lang=zh-Hans&amp;node=supervised-learning"'));
 assert.ok(result.includes('href="/AI-knowledge-map/assets/style.css"'));
 assert.ok(result.includes('name="robots" content="noindex, nofollow"'));
 assert.ok(!/rel="canonical"|hreflang|<script/i.test(result), "Preview must not invent production or translation metadata.");

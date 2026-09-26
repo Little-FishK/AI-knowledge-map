@@ -19,8 +19,8 @@ let locale='en';window.DEEPDIVE={};const id='supervised-learning';
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const t=key=>window.AI_LOCALES[locale].messages[key]||key;
 const ids=new Set([id]);const loader=AIMap.createDeepDiveLoader({runtime:{base:'/source'},ids,registry:DEEPDIVE,revision:'isolated-candidate',t,getLocale:()=>locale,englishTimeoutMs:500});
-const view=AIMap.createDeepDiveView({element:document.getElementById('deepdive'),ids,byId:{},escapeHtml:esc,ensurePage:loader.ensure,renderLearning:()=>'',bindLearning:()=>{},preloadNeighbors:()=>{},router:{parse:()=>({name:'concept',id})},navigate:route=>{location.hash='/map/'+route.id;view.close();},t});
-document.getElementById('open').onclick=()=>{location.hash='/concept/'+id;view.open(id);};
+const view=AIMap.createDeepDiveView({element:document.getElementById('deepdive'),ids,byId:{},escapeHtml:esc,ensurePage:loader.ensure,renderLearning:()=>'',bindLearning:()=>{},preloadNeighbors:()=>{},router:{parse:()=>({name:'concept',id})},navigate:route=>{history.replaceState(null,'','/?node='+encodeURIComponent(route.id));view.close();},t});
+document.getElementById('open').onclick=()=>{history.replaceState(null,'','/?concept='+encodeURIComponent(id));view.open(id);};
 document.getElementById('language').onchange=event=>{locale=event.target.value;document.documentElement.lang=locale;view.open(id);};
 </script></html>`;
 let mode = "approved", browser, server;
@@ -105,7 +105,7 @@ const checks = [];
     for (const action of ["#dd-back", "#dd-close", "Escape"]) {
       await open(); await title(translated.title);
       if (action === "Escape") await page.keyboard.press(action); else await page.locator(action).click();
-      assert(await page.locator("#deepdive").isHidden()); assert(page.url().endsWith("#/map/supervised-learning"));
+      assert(await page.locator("#deepdive").isHidden()); assert(new URL(page.url()).searchParams.get("node") === "supervised-learning");
     }
   });
   assert.deepEqual(errors, []);

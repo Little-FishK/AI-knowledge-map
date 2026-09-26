@@ -93,12 +93,17 @@ function browserExecutable(chromium) {
 
 async function exerciseApp(browser, baseUrl, label) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const supportsCleanUrls = /^https?:/i.test(baseUrl);
   const errors = [];
   page.on("console", message => {
     if (message.type() === "error") errors.push(message.text());
   });
   page.on("pageerror", error => errors.push(error.message));
-  const waitForHash = hash => page.waitForFunction(expected => window.location.hash === expected, hash);
+  // The address is path + query; a stray fragment means the router regressed.
+  const waitForQuery = (key, value) => page.waitForFunction(
+    ([expectedKey, expectedValue]) => !window.location.hash && new URLSearchParams(window.location.search).get(expectedKey) === expectedValue,
+    [key, value]);
+  const waitForNoQuery = key => page.waitForFunction(expected => !window.location.hash && !new URLSearchParams(window.location.search).has(expected), key);
 
   try {
     await page.goto(`${baseUrl}#/map`, { waitUntil: "load" });
@@ -241,28 +246,36 @@ async function exerciseApp(browser, baseUrl, label) {
 
     await page.locator("#search").fill("神经网络");
     await page.locator('#search-results [data-id="neural-network"]').click();
-    if (new URL(page.url()).hash !== "") throw new Error(`${label}：普通节点选择改变了 URL`);
+    if (supportsCleanUrls && new URL(page.url()).hash !== "") throw new Error(`${label}：普通节点选择改变了 URL`);
     await page.locator("#detail h2").filter({ hasText: "神经网络" }).waitFor();
 
     await page.locator('[data-dd="neural-network"]').click();
-    await waitForHash("#/concept/neural-network");
+    if (supportsCleanUrls) await waitForQuery("concept", "neural-network");
     await page.locator("#deepdive h1").filter({ hasText: "神经网络" }).waitFor();
     await page.locator('[data-learn-node="neural-network"]').click();
     if (await page.locator('[data-learn-node="neural-network"]').getAttribute("aria-pressed") !== "true") {
       throw new Error(`${label}：学习进度按钮没有更新`);
     }
-    await page.goBack();
-    await waitForHash("");
+    if (supportsCleanUrls) {
+      await page.goBack();
+      await waitForNoQuery("concept");
+    } else {
+      await page.locator("#dd-close").click();
+      await page.locator("#deepdive").waitFor({ state: "hidden" });
+    }
     await page.locator("#detail h2").filter({ hasText: "神经网络" }).waitFor();
 
     await page.goto(`${baseUrl}#/software`, { waitUntil: "load" });
     await page.locator('[data-sw="chatgpt"]').first().click();
-    await waitForHash("#/software/chatgpt");
+    if (supportsCleanUrls) await waitForQuery("item", "chatgpt");
     await page.locator("#detail h2").filter({ hasText: "ChatGPT" }).waitFor();
 
     await page.goto(`${baseUrl}#/library`, { waitUntil: "load" });
     await page.locator("#library-view .lib-grid [data-library-item]").first().click();
-    if (!/#\/library\/[^/]+$/.test(page.url())) throw new Error(`${label}：资料详情没有独立 URL`);
+    const libraryUrl = new URL(page.url());
+    if (supportsCleanUrls && (!libraryUrl.pathname.endsWith("/library/") || !libraryUrl.searchParams.get("item") || libraryUrl.hash)) {
+      throw new Error(`${label}：资料详情没有独立的路径地址（${libraryUrl.href}）`);
+    }
     await page.locator("#detail:not(.closed)").waitFor();
 
     if (errors.length) throw new Error(`${label}：浏览器错误：${errors.join(" | ")}`);

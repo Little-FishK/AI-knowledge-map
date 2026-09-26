@@ -55,13 +55,18 @@ async function verifyBrowser(siteRoot, browser) {
     await page.goto(base + "#/library");
     const skip = page.locator("#onboarding [data-skip]");
     if (await skip.isVisible()) await skip.click();
-    await page.waitForFunction(() => document.querySelectorAll("#library-view .lib-card").length > 150);
+    await page.waitForSelector('[data-library-class="academic"]').catch(async error => {
+      console.error("Browser errors:", errors);
+      console.error("Page text:", (await page.locator("body").innerText()).slice(0, 2000));
+      throw error;
+    });
     await page.locator('[data-library-class="academic"]').click();
+    await page.waitForSelector('[data-library-subcategory="acm-dl"]');
     await page.locator('[data-library-subcategory="acm-dl"]').click();
     assert.equal(await page.locator("#library-view .lib-card").count(), 9);
     for (const id of expectedIds) {
       await page.goto(base + `#/library/${id}`);
-      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && location.hash.endsWith(expected), id);
+      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && new URLSearchParams(location.search).get("item") === expected && !location.hash, id);
       const detail = await page.locator("#detail-body").innerText();
       assert.match(detail, /没有 AI 重大贡献外部说明/);
       assert.match(detail, /上线不代表/);
@@ -73,13 +78,37 @@ async function verifyBrowser(siteRoot, browser) {
   }
 }
 
+async function verifyLiveBrowser(base, browser) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
+  try {
+    await page.goto(new URL(`?deploy=${Date.now()}#/library`, base).href, { waitUntil: "networkidle" });
+    const skip = page.locator("#onboarding [data-skip]");
+    if (await skip.isVisible()) await skip.click();
+    await page.waitForSelector('[data-library-class="academic"]');
+    await page.locator('[data-library-class="academic"]').click();
+    await page.locator('[data-library-subcategory="acm-dl"]').click();
+    assert.equal(await page.locator("#library-view .lib-card").count(), 9);
+    for (const id of expectedIds) {
+      await page.goto(new URL(`?deploy=${Date.now()}#/library/${id}`, base).href, { waitUntil: "networkidle" });
+      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && new URLSearchParams(location.search).get("item") === expected && !location.hash, id);
+      const detail = await page.locator("#detail-body").innerText();
+      assert.match(detail, /没有 AI 重大贡献外部说明/);
+      assert.match(detail, /上线不代表/);
+    }
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
+}
+
 (async () => {
+  const releaseRoot = process.env.LIBRARY_RELEASE_ROOT ? path.resolve(process.env.LIBRARY_RELEASE_ROOT) : path.join(PROJECT_ROOT, "site-release");
   const candidates = [playwright.chromium.executablePath(), "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"].filter(Boolean);
   const browser = await playwright.chromium.launch({ headless: true, executablePath: candidates.find(candidate => fs.existsSync(candidate)) });
   try {
     await verifyBrowser(PROJECT_ROOT, browser);
-    await verifyBrowser(path.join(PROJECT_ROOT, "site-release"), browser);
+    await verifyBrowser(releaseRoot, browser);
+    if (process.env.LIBRARY_LIVE_URL) await verifyLiveBrowser(process.env.LIBRARY_LIVE_URL, browser);
   } finally { await browser.close(); }
   console.log("PASS ACM Digital Library nine public needs-evidence records");
 })().catch(error => { console.error(error); process.exitCode = 1; });
-

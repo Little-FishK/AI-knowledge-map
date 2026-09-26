@@ -2,10 +2,14 @@
 // Promote an already verified production artifact to the exact directory consumed by CI.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {verify}=require('./verify-website');
+const {verifyCrawlable}=require('./readiness/verify-site-seo');
 const root=path.resolve(__dirname,'..'),source=path.resolve(process.argv[2]||''),target=path.join(root,'site-release');
 function insideWorkspace(value){const relative=path.relative(root,value);return relative&&!relative.startsWith('..')&&!path.isAbsolute(relative);}
 if(!insideWorkspace(source)||source===target)throw Error('Source must be a generated artifact inside this workspace');
 const sourceResult=verify(source,true);
+// A published release must be readable to crawlers that do not execute JavaScript.
+// Run this on the source, before anything is copied into place.
+const crawlable=verifyCrawlable(source);
 const staging=path.join(root,`.site-release-${crypto.randomUUID()}.tmp`);
 if(fs.existsSync(staging))throw Error('Unexpected staging collision');
 fs.cpSync(source,staging,{recursive:true,errorOnExist:true,force:false});
@@ -18,4 +22,4 @@ if(fs.existsSync(target)){
 }
 try{fs.renameSync(staging,target);}catch(error){if(backup&&!fs.existsSync(target))fs.renameSync(backup,target);throw error;}
 const finalResult=verify(target,true);
-console.log(JSON.stringify({state:'promoted',source,target,backup,verification:finalResult},null,2));
+console.log(JSON.stringify({state:'promoted',source,target,backup,verification:finalResult,crawlable},null,2));

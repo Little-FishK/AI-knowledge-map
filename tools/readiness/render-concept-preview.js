@@ -28,9 +28,9 @@ function render(snapshot, siteBase = "/") {
       throw new Error("Active content is not supported in static previews.");
     }
   }
-  const map = `${siteBase}?lang=zh-Hans#/map/${snapshot.pageId}`;
+  const map = `${siteBase}?lang=zh-Hans&node=${encodeURIComponent(snapshot.pageId)}`;
   const next = snapshot.pageId === "supervised-learning"
-    ? `<a href="${escape(siteBase)}?lang=zh-Hans#/concept/information-theory">下一学习项：信息论与熵 →</a>` : "";
+    ? `<a href="${escape(siteBase)}?lang=zh-Hans&concept=information-theory">下一学习项：信息论与熵 →</a>` : "";
   return `<!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
@@ -45,7 +45,7 @@ function render(snapshot, siteBase = "/") {
 <body class="concept-preview">
 <a class="preview-skip" href="#main-content">跳到正文</a>
 <header class="preview-header">
-  <a class="preview-brand" href="${escape(siteBase)}?lang=zh-Hans#/map">◈ AI 知识地图</a>
+  <a class="preview-brand" href="${escape(siteBase)}?lang=zh-Hans">◈ AI 知识地图</a>
   <span class="preview-label">阅读预览 · 简体中文</span>
   <a class="preview-map" href="${escape(map)}">在地图中查看关系 ↗</a>
 </header>

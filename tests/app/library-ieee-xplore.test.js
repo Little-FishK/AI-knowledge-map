@@ -56,7 +56,7 @@ async function verifyBrowser(siteRoot, browser) {
     assert.equal(await page.locator("#library-view .lib-card").count(), 4);
     for (const id of expectedIds) {
       await page.goto(base + `#/library/${id}`);
-      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && location.hash.endsWith(expected), id);
+      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && new URLSearchParams(location.search).get("item") === expected && !location.hash, id);
       assert.match(await page.locator("#detail-body").innerText(), /缺乏 AI 重大贡献外部说明/);
       assert.match(await page.locator("#detail-body").innerText(), /上线不代表/);
     }

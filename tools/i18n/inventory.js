@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { PROJECT_ROOT } = require("../shared/project-root");
+const { LIBRARY_DATA_FILES } = require("../shared/library-data-files");
 const { validateGraphNodeTranslation } = require("../../assets/app/content-i18n.js");
 
 const SOURCE_LOCALE = "zh-Hans";
@@ -28,20 +29,7 @@ const DATA_SCRIPTS = [
   "data/tutorials-codex-youtube.js",
   "data/tutorials-claude-code.js",
   "data/tutorials-video-generated.js",
-  "data/library.js",
-  "data/library-official-technical.js",
-  "data/library-official-china.js",
-  "data/library-platform-profiles.js",
-  "data/library-source-meta.js",
-  "data/library-new-sources.js",
-  "data/library-arxiv.js",
-  "data/library-neurips-proceedings.js",
-  "data/library-pmlr.js",
-  "data/library-openreview.js",
-  "data/library-acl-anthology.js",
-  "data/library-cvf-open-access.js",
-  "data/library-ieee-xplore.js",
-  "data/library-acm-digital-library.js",
+  ...LIBRARY_DATA_FILES,
 ];
 
 function read(relativePath) {

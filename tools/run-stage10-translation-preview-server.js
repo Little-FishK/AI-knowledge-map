@@ -169,7 +169,7 @@ function staticPath(urlPath) {
     const port = server.address().port;
     process.stdout.write(`${JSON.stringify({
       state: "ready",
-      url: `http://127.0.0.1:${port}/?quality-audit=1#/concept/${pageId}`,
+      url: `http://127.0.0.1:${port}/?quality-audit=1&concept=${pageId}`,
       infoUrl: `http://127.0.0.1:${port}/__translation-pilot/info`,
       artifactHash: candidate.artifactHash,
       resourceCount: candidate.payload.resources.length,

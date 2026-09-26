@@ -51,8 +51,39 @@
     ["openai","OpenAI","openai-codex-environments","Codex environments","https://learn.chatgpt.com/docs/environments/modes","产品技术文档",["agent","code-generation","deployment"],"补足本地、云端和 worktree 隔离模型。","影响 Codex 执行环境选型。"],
     ["openai","OpenAI","openai-plugin-architecture","Plugin architecture","https://developers.openai.com/plugins/concepts/plugins","架构文档",["mcp","agent","tool-calling"],"补足技能、MCP 服务器和可选 UI 的组合架构。","说明 OpenAI 插件封装模型。"],
     ["openai","OpenAI","openai-plugin-mcp-server","Build an MCP server","https://developers.openai.com/plugins/build/mcp-server","开发者指南",["mcp","tool-calling"],"补足插件 MCP 的数据、动作和权限实现。","提供插件服务端的官方构建路径。"],
-    ["openai","OpenAI","openai-workspace-agents-api","Workspace Agents API","https://developers.openai.com/workspace-agents/llms.txt","API 指南",["agent","deployment"],"补足已发布工作区代理的触发和运行结果读取。","说明 Workspace Agents 的后端自动化边界。"],
+    ["openai","OpenAI","openai-workspace-agents-api","Trigger workspace agent runs","https://developers.openai.com/workspace-agents/trigger-runs","API 指南",["agent","deployment"],"补足已发布工作区代理的触发和运行结果读取。","说明 Workspace Agents 的后端自动化边界。"],
     ["openai","OpenAI","openai-deprecations","Deprecations","https://developers.openai.com/api/docs/deprecations","状态文档",["deployment","model-selection"],"提供模型与 API 淘汰时间和替代路径。","作为 OpenAI 资料时效审核的权威入口。"],
+    ["openai","OpenAI","openai-async-tool-calling","Async tool calling","https://developers.openai.com/api/docs/guides/async-tool-calling","开发者指南",["tool-calling","agent"],"补足异步工具调用、等待与恢复协议。","影响长耗时工具的 OpenAI 集成方式。"],
+    ["openai","OpenAI","openai-chatkit","ChatKit","https://developers.openai.com/api/docs/guides/chatkit","开发者指南",["agent","deployment"],"补足嵌入式对话界面和代理工作流集成。","说明 OpenAI ChatKit 的产品边界。"],
+    ["openai","OpenAI","openai-citation-formatting","Citation formatting","https://developers.openai.com/api/docs/guides/citation-formatting","开发者指南",["citations","retrieval"],"补足可验证引用的输出组织与展示模式。","说明 OpenAI 模型引用的推荐实现。"],
+    ["openai","OpenAI","openai-code-generation","Code generation","https://developers.openai.com/api/docs/guides/code-generation","开发者指南",["code-generation","prompt-engineering"],"补足代码生成任务的提示、模型和验证方法。","保留 OpenAI 编码能力的 API 实现指南。"],
+    ["openai","OpenAI","openai-computer-use-integration","Computer use integration recipes","https://developers.openai.com/api/docs/guides/tools-computer-use-integration","实现指南",["computer-use","agent","tool-calling"],"补足执行环境、动作处理器和用户同意流程。","内容不能被 Computer use 总览完整替代。"],
+    ["openai","OpenAI","openai-content-provenance","Content provenance","https://developers.openai.com/api/docs/guides/content-provenance","安全指南",["multimodal","content-detection"],"补足图像与音频内容凭证、水印和验证方法。","提供 OpenAI 生成内容溯源边界。"],
+    ["openai","OpenAI","openai-error-codes","Error codes","https://developers.openai.com/api/docs/guides/error-codes","故障排查",["deployment"],"补足 API 与 SDK 错误分类和处理方法。","是生产故障诊断的独立资料。"],
+    ["openai","OpenAI","openai-external-model-evals","Evaluate external models","https://developers.openai.com/api/docs/guides/external-models","评测指南",["model-evaluation","model-selection"],"补足在 OpenAI 平台评测非 OpenAI 模型的方法。","影响跨品牌模型比较流程。"],
+    ["openai","OpenAI","openai-file-inputs","File inputs","https://developers.openai.com/api/docs/guides/file-inputs","开发者指南",["multimodal","context-window"],"补足 PDF、文档和代码文件的输入处理差异。","文件类型与 API 支持差异直接影响实现。"],
+    ["openai","OpenAI","openai-latency-optimization","Latency optimization","https://developers.openai.com/api/docs/guides/latency-optimization","生产指南",["inference-optimization","deployment"],"补足生成长度、并行、流式和请求架构的延迟优化。","提供 OpenAI 平台的性能权衡。"],
+    ["openai","OpenAI","openai-rbac","Manage permissions in the OpenAI platform","https://developers.openai.com/api/docs/guides/rbac","安全指南",["agent-identity-access","deployment"],"补足组织、项目、角色和最小权限管理。","影响企业 OpenAI 平台治理。"],
+    ["openai","OpenAI","openai-agent-orchestration","Orchestration and handoffs","https://developers.openai.com/api/docs/guides/agents/orchestration","框架文档",["agent","multi-agent","workflow-orchestration"],"补足 handoff 与 agents-as-tools 的编排差异。","不能由 Agents SDK 总览完整替代。"],
+    ["openai","OpenAI","openai-programmatic-tool-calling","Programmatic Tool Calling","https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling","工具指南",["tool-calling","code-generation","agent"],"补足由模型生成程序编排多个工具的执行模式。","说明 OpenAI PTC 的专用控制边界。"],
+    ["openai","OpenAI","openai-rate-limits","Rate limits","https://developers.openai.com/api/docs/guides/rate-limits","生产指南",["deployment","inference-optimization"],"补足配额、速率限制和退避处理。","是生产容量规划的独立资料。"],
+    ["openai","OpenAI","openai-retrieval","Retrieval","https://developers.openai.com/api/docs/guides/retrieval","开发者指南",["retrieval","rag","vector-db"],"补足向量存储、语义搜索和检索参数。","与 File Search 工具页作用不同。"],
+    ["openai","OpenAI","openai-safety-classifiers","Safety classifiers","https://developers.openai.com/api/docs/guides/safety-checks","安全指南",["content-detection","guardrails","alignment"],"补足请求级安全分类、安全标识和处置方式。","说明 OpenAI 平台侧防护边界。"],
+    ["openai","OpenAI","openai-secure-mcp-tunnel","Secure MCP Tunnel","https://developers.openai.com/api/docs/guides/secure-mcp-tunnels","安全指南",["mcp","agent-identity-access","tool-calling"],"补足私有 MCP 的出站隧道和认证模型。","影响私网工具接入架构。"],
+    ["openai","OpenAI","openai-spend-limits","Spend limits","https://developers.openai.com/api/docs/guides/spend-limits","生产指南",["deployment"],"补足组织和项目级费用硬限制。","与一般成本优化指南作用不同。"],
+    ["openai","OpenAI","openai-speech-to-text","File transcription","https://developers.openai.com/api/docs/guides/speech-to-text","开发者指南",["speech","multimodal"],"补足录音转写、流式文件转写和专用功能。","作为 OpenAI 语音识别的独立实现资料。"],
+    ["openai","OpenAI","openai-text-to-speech","Text to speech","https://developers.openai.com/api/docs/guides/text-to-speech","开发者指南",["speech","audio-generation"],"补足语音合成、格式和流式播放。","作为 OpenAI 语音生成的独立实现资料。"],
+    ["openai","OpenAI","openai-tool-search","Tool search","https://developers.openai.com/api/docs/guides/tools-tool-search","工具指南",["tool-calling","context-window","agent"],"补足大型工具面的按需加载和命名空间。","影响工具数量较多时的上下文设计。"],
+    ["openai","OpenAI","openai-trace-grading","Trace grading","https://developers.openai.com/api/docs/guides/trace-grading","评测指南",["model-evaluation","observability","agent"],"补足按执行轨迹建立数据集和评分器的方法。","不能由一般 Agent evals 总览替代。"],
+    ["openai","OpenAI","openai-models-catalog","Models","https://developers.openai.com/api/docs/models","模型目录",["model-selection","model-families"],"提供当前模型类别、能力和状态入口。","用于核对 OpenAI 当前可用模型。"],
+    ["openai","OpenAI","openai-models-compare","Compare models","https://developers.openai.com/api/docs/models/compare","选型参考",["model-selection","model-evaluation"],"补足上下文、能力和价格的横向比较。","直接支持 OpenAI 模型选型。"],
+    ["openai","OpenAI","openai-sdks-cli","SDKs and CLI","https://developers.openai.com/api/docs/libraries","SDK 文档",["deployment","code-generation"],"提供官方 SDK、CLI 与 Agents SDK 的入口和支持范围。","影响语言与工具链选择。"],
+    ["openai","OpenAI","openai-cli","OpenAI CLI","https://developers.openai.com/api/docs/libraries/openai-cli","CLI 文档",["deployment","tool-calling"],"补足命令行调用 Responses、图像、语音和 shell 的方式。","具备独立操作价值。"],
+    ["openai","OpenAI","openai-workload-identity","Workload identity federation","https://developers.openai.com/api/docs/guides/workload-identity-federation","安全指南",["agent-identity-access","deployment"],"补足短期工作负载身份和无长期密钥认证。","影响生产身份架构。"],
+    ["openai","OpenAI","openai-ip-allowlist","IP allowlist","https://developers.openai.com/api/docs/guides/ip-allowlist","安全指南",["agent-identity-access","deployment"],"补足固定出口网络的访问边界。","是企业 API 网络控制的独立资料。"],
+    ["openai","OpenAI","openai-agent-observability","Integrations and observability","https://developers.openai.com/api/docs/guides/agents/integrations-observability","框架文档",["observability","agent","mcp"],"补足智能体跟踪、调试和 MCP 集成。","不能由 Agents SDK 总览完整替代。"],
+    ["openai","OpenAI","openai-agent-running","Running agents","https://developers.openai.com/api/docs/guides/agents/running-agents","框架文档",["agent","agent-loop","streaming"],"补足运行循环、流式输出和会话状态策略。","具备独立运行时知识价值。"],
+    ["openai","OpenAI","openai-agent-sandboxes","Sandbox Agents","https://developers.openai.com/api/docs/guides/agents/sandboxes","安全指南",["agent","code-execution","deployment"],"补足编排与执行隔离的关系。","说明 Agents SDK 沙箱的独立安全边界。"],
     ["anthropic","Anthropic","anthropic-tool-use","Tool use with Claude","https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview","开发者指南",["tool-calling","agent"],"解释工具定义、选择、调用和结果回传的完整协议。","核对 Claude 工具使用特有的消息结构与约束。"],
     ["anthropic","Anthropic","anthropic-tool-context","Manage tool context","https://platform.claude.com/docs/en/agents-and-tools/tool-use/manage-tool-context","开发者指南",["context-engineering","tool-calling","prompt-caching"],"覆盖工具搜索、程序化调用与上下文压缩的组合策略。","体现 Anthropic 在大规模工具集上下文管理上的实现。"],
     ["anthropic","Anthropic","anthropic-citations","Citations","https://platform.claude.com/docs/en/build-with-claude/citations","开发者指南",["citations","rag"],"说明可追溯引用的输入组织和输出结构。","核对 Claude Citations 的当前支持范围。"],
@@ -90,6 +121,16 @@
     "openai-image-generation":"openai-image-api-choice", "openai-responses-migration":"openai-responses-migration",
     "openai-model-guidance":"openai-model-selection"
   };
+  const openaiRereviewBatch1 = new Set([
+    "openai-async-tool-calling","openai-chatkit","openai-citation-formatting","openai-code-generation",
+    "openai-computer-use-integration","openai-content-provenance","openai-error-codes","openai-external-model-evals",
+    "openai-file-inputs","openai-latency-optimization","openai-rbac","openai-agent-orchestration",
+    "openai-programmatic-tool-calling","openai-rate-limits","openai-retrieval","openai-safety-classifiers",
+    "openai-secure-mcp-tunnel","openai-spend-limits","openai-speech-to-text","openai-text-to-speech",
+    "openai-tool-search","openai-trace-grading","openai-models-catalog","openai-models-compare",
+    "openai-sdks-cli","openai-cli","openai-workload-identity","openai-ip-allowlist",
+    "openai-agent-observability","openai-agent-running","openai-agent-sandboxes"
+  ]);
   window.PRO_LIBRARY.items.push(...rows.map(([sourceSubcategory,publisher,id,title,url,contentKind,linkedNodes,knowledgeDelta,brandEvidenceDelta]) => {
     const item = {
       id, sourceClass:"official", sourceSubcategory, title, publisher, collection:`${publisher} 官方技术资料`, contentKind,
@@ -101,7 +142,7 @@
       tags:[sourceSubcategory,contentKind,"官方技术资料"], linkedNodes, linkedSoftware:[]
     };
     if (sourceSubcategory === "openai") Object.assign(item, {
-      reviewBatch:"openai-full-corpus-20260924", reviewDecision:"admitted-brand-evidence",
+      reviewBatch:openaiRereviewBatch1.has(id) ? "openai-rereview-batch-01" : "openai-full-corpus-20260924", reviewDecision:"admitted-brand-evidence",
       contributionType:"brand-evidence", topicKey:openaiTopics[id] || id.replace(/^openai-/, "openai-"), currentStatus:"current"
     });
     if (id === "openai-agent-evals") item.recheckTriggers = ["官方评测入口发生变化", "Agent evals 页面被替换或归档"];

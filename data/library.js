@@ -5,6 +5,32 @@ window.PRO_LIBRARY = {
     updatedAt: "2026-09-24",
     note: "官方技术资料按知识矩阵重建：取消品牌篇数配额和混合兜底分类，只保留具有知识增量或会影响理解、使用、选型与比较的品牌差异证据。来源治理元数据见 library-source-meta.js。"
   },
+  topicTaxonomies: {
+    openai: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
+    ],
+    anthropic: [
+      "security-governance",
+      "responses-agents-tools",
+      "codex-engineering",
+      "mcp-plugins-skills",
+      "production-observability",
+      "multimodal-realtime",
+      "evals-finetuning",
+      "models-prompting-output",
+      "migration-lifecycle",
+      "agentic-commerce"
+    ]
+  },
   sourceClasses: [
     {
       id: "academic", order: 1, label: "学术投稿", short: "论文、正式出版与预印本", color: "#7797c7", authority: "A2–R",
@@ -49,14 +75,13 @@ window.PRO_LIBRARY = {
         { id: "nvidia", label: "NVIDIA", short: "开发者文档、模型与硬件技术资料" },
         { id: "hugging-face-official", label: "Hugging Face 官方", short: "官方文档、课程与平台公告" },
         { id: "aws", label: "AWS", short: "Bedrock、SageMaker 与云端 AI 文档" },
-        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" },
-        { id: "qwen", label: "Qwen（阿里）", short: "官方文档、模型卡与开源仓库" },
-        { id: "moonshot-ai", label: "Moonshot AI（Kimi）", short: "技术报告、模型权重与训练 Infra 开源" },
-        { id: "zhipu-ai", label: "Zhipu AI（GLM）", short: "开放平台文档、模型卡与技术报告" }
+        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" }
       ]
     },
     {
       id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B",
+      reviewMode: "source-specific",
+      reviewPolicy: "核心资料全收；按各二级来源自身的数据库、方法、版本与榜单结构收录，不设跨机构统一评分机制。",
       subcategories: [
         { id: "mitre-atlas", label: "MITRE ATLAS", short: "AI 对抗威胁知识库" },
         { id: "owasp-genai", label: "OWASP GenAI Security Project", short: "LLM Top 10、智能体 Top 10 与 ACS 标准" },
@@ -108,8 +133,6 @@ window.PRO_LIBRARY = {
         { id: "kaggle", label: "Kaggle", short: "数据科学竞赛、数据集与方案" },
         { id: "devpost", label: "Devpost", short: "企业与社区黑客马拉松项目" },
         { id: "lablab", label: "lablab.ai", short: "AI 专题黑客马拉松与项目" },
-        { id: "mlh", label: "Major League Hacking", short: "学生与社区黑客马拉松" },
-        { id: "hugging-face-events", label: "Hugging Face 活动", short: "社区冲刺、竞赛与 Spaces 项目" },
         { id: "tianchi", label: "阿里云天池", short: "算法竞赛、数据集与获奖方案" },
         { id: "datafountain", label: "DataFountain", short: "中文数据科学竞赛平台" },
         { id: "zindi", label: "Zindi", short: "非洲与全球数据科学竞赛" }

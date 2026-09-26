@@ -75,6 +75,23 @@
 .site-directory > h1 { font-size: clamp(28px,4vw,44px); letter-spacing: -.04em; }
 .directory-item { padding: 20px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-panel); }
 @media print {
-  .dd-scroll, .dd-thesis, .dd-goals, .reading-toc, .directory-item { background: transparent !important; box-shadow: none !important; }
+  .dd-scroll, .dd-thesis, .dd-goals, .reading-toc, .directory-item, .rd-item { background: transparent !important; box-shadow: none !important; }
   .dd-h1:not(.dd-h1-provisional):not(.dd-h1-editorial-draft), .dd-sub, .dd-eyebrow { color: black; }
 }
+/* Server-rendered directory pages for the library and the software catalogue.
+   These carry the records the interactive views render from JavaScript. */
+.rd-intro, .rd-note, .rd-subnote { color: var(--fg-dim); }
+.rd-classnav, .rd-subnav, .rd-sources { border: 1px solid var(--line); border-radius: .5rem; padding: 1rem; margin: 1.5rem 0; }
+.rd-classnav ul, .rd-subnav ul { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; margin: 0; padding: 0; }
+.rd-sources > h2 { font-size: 1.05rem; margin: 0 0 .4rem; }
+.rd-sources > p { margin: 0 0 .6rem; font-size: .9rem; color: var(--fg-dim); }
+.rd-sources ul { list-style: none; margin: 0; padding: 0; }
+.rd-sources li { padding: .35rem 0; border-top: 1px solid var(--line); font-size: .9375rem; }
+.rd-list { list-style: none; padding: 0; }
+.rd-item { padding: 20px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-panel); }
+.rd-item h3 { font-size: 1.1rem; margin: 0 0 .4rem; }
+.rd-meta, .rd-access { color: var(--fg-dim); font-size: .875rem; margin: .2rem 0; }
+.rd-summary { margin: .4rem 0; }
+.rd-use, .rd-limit, .rd-nodes, .rd-models { margin: .35rem 0; font-size: .9375rem; }
+.rd-badge { display: inline-block; margin: .3rem 0; padding: .2rem .6rem; border: 1px solid #d0b15c66; border-radius: 999px; color: #e3c98a; font-size: .8rem; }
+.rd-subnav { border: 0; padding: 0; }

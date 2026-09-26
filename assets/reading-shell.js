@@ -9,9 +9,11 @@
   const language = window.AIMap.i18n.createI18n({manifest:window.I18N_MANIFEST,registry:window.AI_LOCALES});
   await language.initialize({urlLocale:new URLSearchParams(location.search).get('lang') || contentLocale});
   window.createMapSettings({language,manifest:window.I18N_MANIFEST,content:{ensureLocale:async () => {}}});
-  const route = (hash, extra = '') => `${base}?lang=${encodeURIComponent(language.getLocale())}${extra}${hash}`;
+  // Clean view paths; the active language travels as a query parameter.
+  const route = (path = '', extra = '') => `${base}${path}?lang=${encodeURIComponent(language.getLocale())}${extra}`;
   bar.querySelectorAll('[data-mode]').forEach(button => {
-    button.onclick = () => location.assign(route(button.dataset.mode === 'graph' ? '' : '#/' + button.dataset.mode));
+    const mode = button.dataset.mode;
+    button.onclick = () => location.assign(route(mode === 'graph' ? '' : `${mode}/`));
   });
   document.getElementById('btn-reset')?.addEventListener('click', () => location.assign(route('')));
   document.getElementById('btn-onboarding')?.addEventListener('click', () => location.assign(route('', '&onboarding=1')));

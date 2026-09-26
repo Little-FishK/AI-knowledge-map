@@ -10,9 +10,9 @@ try {
   fs.writeFileSync(path.join(root,'index.html'),'<html><head><title data-i18n="app.title.graph">旧标题</title></head><body><header><span class="brand-name" id="brand-name">AI 知识地图</span></header><main id="stage"></main></body></html>');
   const mono=renderConcept(entry,[entry],siteUrl,true);
   assert(mono.includes('class="preview-brand" href="/map/?lang=zh-Hans"'), 'article brand returns to the fragment-free homepage');
-  assert(mono.includes('/map/?lang=zh-Hans#/map/sample'), 'article node-location links retain their target');
+  assert(mono.includes('/map/?lang=zh-Hans&amp;node=sample'), 'article node-location links retain their target');
   assert(mono.includes('<p>有完整正文'));assert(mono.includes('noindex'));assert(!mono.includes('hreflang="en"'));assert(!mono.includes('/en/concepts/sample/'));
-  assert(mono.includes('/map/?lang=zh-Hans#/map/other'));assert(mono.includes('保留图表'));
+  assert(mono.includes('/map/?lang=zh-Hans&amp;node=other'));assert(mono.includes('保留图表'));
   const en={...entry,locale:'en',page:{...page,title:'Test'}};
   en.englishVerified=true;en.translationEnvelope={schemaVersion:1,status:'machine-reviewed',payload:{pageId:'sample'}};
   const bilingual=renderConcept(entry,[entry,en],siteUrl,false);assert(bilingual.includes('hreflang="en"'));assert(bilingual.includes('/map/en/concepts/sample/'));
@@ -28,12 +28,24 @@ try {
   assert(fs.readFileSync(path.join(output,'search/index.html'),'utf8').includes('概念关系（→ 有向，— 无向）'));
   const directoryHtml=fs.readFileSync(path.join(output,'search/index.html'),'utf8');
   assert(directoryHtml.includes('href="/map/zh/concepts/sample/">示例</a>'));
-  assert(!directoryHtml.includes('#/map/sample'), 'published concept and relationship links must resolve without JavaScript');
-  assert(directoryHtml.includes('href="/map/?lang=zh-Hans#/map/other"'), 'unpublished concepts must retain map fallback');
+  assert(!directoryHtml.includes('#/'), 'no released page may carry a fragment route');
+  assert(directoryHtml.includes('href="/map/?lang=zh-Hans&amp;node=other"'), 'unpublished concepts must retain map fallback');
   assert(!directoryHtml.includes('/zh/concepts/other/'), 'never link to an unpublished article');
   assert.equal(verify(output).pages,1);assert.throws(()=>verify(output,true),/production/);
   fs.appendFileSync(path.join(output,'zh/concepts/sample/index.html'),'tampered');assert.throws(()=>verify(output),/changed/);
   const production=path.join(root,'production');writeArtifact({root,output:production,entries:[entry],inventory:[],siteUrl,mode:'production',graph:{nodes:[],edges:[]}});assert.equal(verify(production,true).status,'pass');
+  // Hash-free view URLs: each interactive view ships a real, indexable directory
+  // so GitHub Pages serves it without a rewrite and refresh keeps resolving.
+  const libraryShell=fs.readFileSync(path.join(production,'library/index.html'),'utf8');
+  const softwareShell=fs.readFileSync(path.join(production,'software/index.html'),'utf8');
+  assert(libraryShell.includes('<base href="../">'),'view shells must resolve every asset against the site root');
+  assert(softwareShell.includes('<base href="../">'));
+  assert(libraryShell.includes('<link rel="canonical" href="https://example.org/map/library/">'));
+  assert(softwareShell.includes('<link rel="canonical" href="https://example.org/map/software/">'));
+  assert(!libraryShell.includes('#/')&&!softwareShell.includes('#/'),'view shells must not ship fragment routes');
+  const releaseSitemap=fs.readFileSync(path.join(production,'sitemap.xml'),'utf8');
+  assert(releaseSitemap.includes('<loc>https://example.org/map/library/</loc>'));
+  assert(releaseSitemap.includes('<loc>https://example.org/map/software/</loc>'));
   const release=JSON.parse(fs.readFileSync(path.join(production,'release-manifest.json'),'utf8'));
   const monoPage=release.seoPages.find(p=>p.kind==='LearningResource');
   assert.deepEqual(monoPage.alternates,[],'missing translations must not be advertised');
@@ -110,7 +122,7 @@ try {
   const publicHtml=fs.readFileSync(path.join(publicOutput,'zh/concepts/sample/index.html'),'utf8');
   assert(publicHtml.includes('data-review-status="pending-review"'));
   assert(publicHtml.includes('持续修订中'));
-  assert(publicHtml.includes('<!-- source-body:start -->'+page.html.replace('<span class="xref" data-goto="other">另一个概念</span>','<a class="xref" data-goto="other" href="/map/?lang=zh-Hans#/map/other">另一个概念</a>')+'<!-- source-body:end -->'));
+  assert(publicHtml.includes('<!-- source-body:start -->'+page.html.replace('<span class="xref" data-goto="other">另一个概念</span>','<a class="xref" data-goto="other" href="/map/?lang=zh-Hans&amp;node=other">另一个概念</a>')+'<!-- source-body:end -->'));
   assert.throws(()=>writeArtifact({...publicArgs,publicationPolicy:'approved-only',output:path.join(root,'strict-public')}),/Production requires/);
   assert.throws(()=>writeArtifact({...publicArgs,entries:[{...publicEntry,reviewStatus:'reviewed'}],output:path.join(root,'false-approval')}),/Production requires/);
   assert.throws(()=>writeArtifact({...publicArgs,entries:[{...publicEntry,locale:'en'}],output:path.join(root,'unapproved-english')}),/Production requires/);
