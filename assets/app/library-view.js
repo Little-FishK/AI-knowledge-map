@@ -17,6 +17,14 @@
     let library = global.PRO_LIBRARY || null;
     let profiles = global.LIBRARY_PLATFORM_PROFILES || {};
     let profileGuidance = global.LIBRARY_PROFILE_GUIDANCE || {};
+    // Record text is published in Chinese. When the interface is English, the
+    // view reads a translated copy built from data/content-locales/en/library.js
+    // (a Chinese → English string table, loaded only when first needed). Any
+    // string without a translation stays in Chinese rather than disappearing.
+    const ENGLISH_TABLE = "data/content-locales/en/library.js";
+    let source = null;
+    let viewLocale = "zh";
+    const localeNow = () => /^en\b/i.test((global.document && global.document.documentElement.lang) || "") ? "en" : "zh";
     let software = global.SOFTWARE || null;
     let built = false;
     let selectedClass = "all";
@@ -157,13 +165,59 @@
       scheduleRender();
     });
 
+    // Concept names follow the interface language, from the English graph
+    // locale the app loads alongside the English interface.
+    function nodeTitle(nodeId) {
+      if (viewLocale === "en") {
+        const nodes = global.AI_CONTENT_LOCALES && global.AI_CONTENT_LOCALES.en && global.AI_CONTENT_LOCALES.en.graph
+          && global.AI_CONTENT_LOCALES.en.graph.collections && global.AI_CONTENT_LOCALES.en.graph.collections["graph.nodes"];
+        const record = nodes && nodes[nodeId];
+        if (record && record.fields && record.fields.title) return record.fields.title;
+      }
+      return byId[nodeId].title;
+    }
+
+    function translateDeep(value, table) {
+      if (typeof value === "string") return Object.prototype.hasOwnProperty.call(table, value) ? table[value] : value;
+      if (Array.isArray(value)) return value.map(entry => translateDeep(entry, table));
+      if (value && typeof value === "object") {
+        const copy = {};
+        for (const key of Object.keys(value)) copy[key] = translateDeep(value[key], table);
+        return copy;
+      }
+      return value;
+    }
+
+    // Points library, profiles and profileGuidance at the records for the
+    // current interface language, loading the English table on first use.
+    async function applyLocale() {
+      const locale = localeNow();
+      if (!source) return;
+      if (locale === "en") {
+        if (!global.AI_LIBRARY_LOCALES || !global.AI_LIBRARY_LOCALES.en) {
+          try { await loadScriptsInOrder([ENGLISH_TABLE]); } catch (error) { console.error(error); }
+        }
+        const table = global.AI_LIBRARY_LOCALES && global.AI_LIBRARY_LOCALES.en && global.AI_LIBRARY_LOCALES.en.strings;
+        if (table) {
+          if (!source.english) source.english = {library: translateDeep(source.library, table), profiles: translateDeep(source.profiles, table), profileGuidance: translateDeep(source.profileGuidance, table)};
+          ({library, profiles, profileGuidance} = source.english);
+          viewLocale = "en";
+          return;
+        }
+      }
+      ({library, profiles, profileGuidance} = source);
+      viewLocale = "zh";
+    }
+
     async function ensureReady() {
       if (!built) view.innerHTML = `<div class="view-loading" role="status">${esc(t("library.loading"))}</div>`;
       await loadScriptsInOrder(bundle);
-      library = global.PRO_LIBRARY || library;
-      profiles = global.LIBRARY_PLATFORM_PROFILES || profiles;
-      profileGuidance = global.LIBRARY_PROFILE_GUIDANCE || profileGuidance;
+      if (!source && global.PRO_LIBRARY) source = {library: global.PRO_LIBRARY, profiles: global.LIBRARY_PLATFORM_PROFILES || {}, profileGuidance: global.LIBRARY_PROFILE_GUIDANCE || {}};
       software = global.SOFTWARE || software;
+      if (localeNow() !== viewLocale || !library) {
+        built = false;
+        await applyLocale();
+      }
       build();
     }
 
@@ -185,7 +239,9 @@
       const profile = platformProfile(source, subcategory);
       if (!subcategory || !profile) return "";
       const guidance = profileGuidance[source.id] || {};
-      const overview = profile.overview || `${profile.positioning}${profile.background}其运营或维护主体为${profile.organization}；关于创始或发起团队：${profile.foundingTeam}`;
+      const overview = profile.overview || (viewLocale === "en"
+        ? `${profile.positioning} ${profile.background} Operated or maintained by ${profile.organization}. Founders or initiators: ${profile.foundingTeam}`
+        : `${profile.positioning}${profile.background}其运营或维护主体为${profile.organization}；关于创始或发起团队：${profile.foundingTeam}`);
       const strengths = profile.strengths || guidance.strengths || [];
       const offers = profile.offers || guidance.offers || [];
       const howToUse = profile.howToUse || guidance.howToUse || [];
@@ -417,7 +473,7 @@
         <div class="d-sec"><h4>${esc(t("library.evidenceUse"))}</h4><div class="d-body"><p>${esc(item.evidenceUse)}</p></div></div>
         <div class="d-sec"><h4>${esc(t("library.boundaries"))}</h4><div class="d-body"><p>${(item.limitations || []).map(limit => `· ${esc(limit)}`).join("<br>")}</p></div></div>`;
       if (linkedNodes.length) html += `<div class="d-sec"><h4>${esc(t("library.linkedNodes"))}</h4>${linkedNodes.map(nodeId =>
-        `<div class="rel"><span class="rel-to" data-goto="${esc(nodeId)}">${esc(byId[nodeId].title)}</span><span class="rel-lbl">${esc(t("library.viewOnMap"))}</span></div>`).join("")}</div>`;
+        `<div class="rel"><span class="rel-to" data-goto="${esc(nodeId)}">${esc(nodeTitle(nodeId))}</span><span class="rel-lbl">${esc(t("library.viewOnMap"))}</span></div>`).join("")}</div>`;
       if (linkedSoftware.length) html += `<div class="d-sec"><h4>${esc(t("library.linkedSoftware"))}</h4>${linkedSoftware.map(itemSoftware =>
         `<div class="rel"><span class="rel-to" data-library-software="${esc(itemSoftware.id)}">${esc(itemSoftware.name)}</span><span class="rel-lbl">${esc(t("library.viewInSoftware"))}</span></div>`).join("")}</div>`;
       html += `<a class="lib-source-link" href="${esc(item.url)}" target="_blank" rel="noopener">${esc(t("library.openOriginal"))} ↗</a>`;
@@ -438,7 +494,9 @@
     function refreshLanguage() {
       if (!built) return;
       built = false;
-      build();
+      if (localeNow() === viewLocale) { build(); return; }
+      view.innerHTML = `<div class="view-loading" role="status">${esc(t("library.loading"))}</div>`;
+      applyLocale().then(build, error => { console.error(error); build(); });
     }
 
     return Object.freeze({ ensureReady, findItem, openItem, refreshLanguage, view });
