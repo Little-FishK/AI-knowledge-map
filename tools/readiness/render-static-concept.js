@@ -15,7 +15,7 @@ function render(pageId, page, locale, siteUrl) {
   const english = locale === "en", lang = english ? "en" : "zh-Hans";
   const route = language => `${language}/concepts/${pageId}/`;
   const canonical = new URL(route(locale), siteUrl).href;
-  const map = `${base}?lang=${lang}#/map/${pageId}`;
+  const map = `${base}?lang=${lang}&node=${encodeURIComponent(pageId)}`;
   const other = english ? "zh" : "en";
   const schema = { "@context": "https://schema.org", "@type": "LearningResource", name: page.title,
     description: page.subtitle || page.title, inLanguage: lang, url: canonical, learningResourceType: "Concept explanation", isAccessibleForFree: true };

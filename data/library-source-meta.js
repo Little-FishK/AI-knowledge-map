@@ -4,7 +4,12 @@
    2. 修正已过时的档案事实；
    3. 为全部二级来源写入治理字段：tier（级别）、provenance（一手/二手）、originScope（归属区）、
       purposes（用途）、cadence（复核节奏）、health（健康度）、sourceUse（在本站的角色）、lastVerifiedAt（状态复核日期）。
-   判定依据见 docs/FRONTIER_SOURCE_POLICY.md。 */
+   判定依据见 docs/FRONTIER_SOURCE_POLICY.md。
+
+   关于 tier（2026-09-25 冻结）：它是 v1 遗留的编辑分层（S/A/B/archive），不是当前来源准入依据。
+   v2 已取消以 S/A/B 作为来源准入门槛，改用「一手 / 首创 / 应答 / 归属」四道闸门；旧等级不替代证据，
+   也不能抵消任何闸门。本字段暂时冻结保留，仅供来源档案卡展示历史分层；校验器不再由它驱动
+   provenance 与 health 约束。待四道闸门覆盖全部二级来源后，应迁移为新字段并删除 tier。 */
 (function () {
   "use strict";
 
@@ -27,9 +32,6 @@
     "standards/china-caict": platform("https://www.caict.ac.cn/", "中国信息通信研究院的 AI 评测、标准与产业研究原始报告。", "作为国家级研究机构，发布模型评测、可信 AI 评估、标准研究与产业数据报告，并承担多项评测标准与测试体系建设。注：该站对自动化访问返回 412，链接存活需人工核对。", "中国信息通信研究院（CAICT）。", "中国国家级研究机构，没有商业创始团队。"),
 
     "official/deepseek": platform("https://api-docs.deepseek.com/", "DeepSeek 模型的技术报告、模型卡、API 文档与变更日志的一手来源。", "深度求索以开源权重与公开技术报告为主要发布方式，API 变更日志逐次记录模型版本、能力指标与价格调整，是核对模型事实最直接的入口。", "杭州深度求索人工智能基础技术研究有限公司（DeepSeek）。", "由梁文锋创立，团队源自幻方量化体系；具体版本细节以其技术报告为准。"),
-    "official/qwen": platform("https://qwen.readthedocs.io/", "Qwen 模型系列的官方文档、模型卡与开源仓库入口。", "阿里 Qwen 团队以开源权重、官方文档与模型卡发布版本细节，覆盖语言、视觉、音频模型及推理部署工具链。", "Alibaba Group 通义千问（Qwen）团队。", "由阿里巴巴 Qwen 团队研发并发布，官方文档托管于 Read the Docs。"),
-    "official/moonshot-ai": platform("https://github.com/MoonshotAI/Kimi-K3", "Moonshot AI 的模型技术报告、权重发布与训练 Infra 开源记录。", "月之暗面以「权重 + 技术报告 + 训练 Infra」同步开源的方式发布 Kimi 系列；Kimi K3 于 2026 年 7 月开源 2.8 万亿参数权重、技术报告，以及 MoonEP、FlashKDA、AgentEnv 三项训练基础设施。", "Moonshot AI（月之暗面）。", "由杨植麟等创立；公开资料以其技术报告与模型仓库为准。"),
-    "official/zhipu-ai": platform("https://docs.bigmodel.cn/", "Zhipu AI（GLM）开放平台的官方文档、模型卡与接口说明。", "智谱 AI 通过 BigModel 开放平台发布 GLM 系列模型文档、接口、定价与版本更新，并以技术报告与开放权重披露模型细节。", "北京智谱华章科技有限公司（Zhipu AI）。", "源自清华大学知识工程实验室团队，由唐杰等发起。"),
 
     "knowledge-base/owasp-genai": platform("https://genai.owasp.org/", "生成式 AI 与智能体应用安全风险的开放知识库与清单标准。", "项目由 OWASP 社区自 2023 年发展而来；2026 年 8 月发布 OWASP GenAI LLM Top 10 2026，首次把数千条真实事故数据计入排名，并同期扩出 Top 10 for Agentic Applications 与 Agent Control Standard。", "OWASP GenAI Security Project（OWASP 基金会下的开放社区项目）。", "由 Steve Wilson 等安全从业者发起，现由社区委员会与数百位贡献者维护。"),
     "knowledge-base/aiid": platform("https://incidentdatabase.ai/", "为 AI 现实损害事件编号、建档并做统计分析的公开数据库。", "参照航空业事故学习机制建立，持续收录媒体与研究报告中的 AI 事件并归类；2026 年事件编号已到 #1700 段位，并按季度发布分批汇总与统计。", "Responsible AI Collaborative（非营利组织）。", "由研究者社区发起，现由非营利团队与志愿者编辑共同维护。"),
@@ -63,8 +65,8 @@
     "academic/pmlr": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/cvf-open-access": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "yearly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
     "academic/ieee-xplore": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
-    "academic/acm-dl": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
-    "academic/springer-nature": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
+    "academic/acm-dl": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
+    "academic/springer-nature": { tier: "S", provenance: "primary", originScope: "foundations", purposes: ["concept"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-24" },
 
     "standards/nist": { tier: "S", provenance: "primary", originScope: "safety", purposes: ["concept", "fact"], cadence: "quarterly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "standards/iso-iec": { tier: "S", provenance: "primary", originScope: "safety", purposes: ["concept"], cadence: "quarterly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
@@ -89,9 +91,6 @@
     "official/hugging-face-official": { tier: "A", provenance: "primary", originScope: "building", purposes: ["fact"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "official/aws": { tier: "A", provenance: "primary", originScope: "building", purposes: ["fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-07-25" },
     "official/deepseek": { tier: "S", provenance: "primary", originScope: "frontier", purposes: ["fact", "news"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },
-    "official/qwen": { tier: "S", provenance: "primary", originScope: "frontier", purposes: ["fact", "news"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },
-    "official/moonshot-ai": { tier: "S", provenance: "primary", originScope: "frontier", purposes: ["fact", "news"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },
-    "official/zhipu-ai": { tier: "S", provenance: "primary", originScope: "frontier", purposes: ["fact", "news"], cadence: "weekly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },
 
     "knowledge-base/mitre-atlas": { tier: "S", provenance: "primary", originScope: "safety", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },
     "knowledge-base/owasp-genai": { tier: "S", provenance: "primary", originScope: "safety", purposes: ["concept", "fact"], cadence: "monthly", health: "active", sourceUse: "evidence", lastVerifiedAt: "2026-09-22" },

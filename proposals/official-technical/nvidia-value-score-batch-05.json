@@ -1,0 +1,2552 @@
+{
+  "policy": "nvidia-official-value-score-v1",
+  "batch": {
+    "id": "nvidia-value-score-batch-05",
+    "reviewedAt": "2026-09-25",
+    "candidateCount": 60,
+    "selection": "NVIDIA 400 份待审母集按冻结顺序排列的第 5 批 60 份资料",
+    "admissionRule": "总分至少 6/10，且知识重要性至少 2/3；Digest/Blog 默认进入补充层"
+  },
+  "results": [
+    {
+      "sequence": 241,
+      "inventorySequence": 3572,
+      "id": "nvidia-nemo-guardrails-observability-tracing",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Tracing Guardrails",
+      "url": "https://docs.nvidia.com/nemo/guardrails/observability/tracing",
+      "description": "Enable distributed tracing with OpenTelemetry to monitor guardrails execution and LLM calls.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 941695,
+        "headingCount": 9,
+        "articleTextChars": 12180,
+        "sha256": "a94e95980396663fafa63c5baeef0102de5d638a5f33ac2fc6ff980e61506c95"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "OpenTelemetry 分布式追踪把 rail 执行与 LLM 调用连接成端到端因果链，是防护系统诊断核心。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-logs"
+      ],
+      "uniqueDelta": "相较于《OpenTelemetry Integration》、《Exporting Guardrails Logs to OpenTelemetry》，本资料的独立增量是：OpenTelemetry 分布式追踪把 rail 执行与 LLM 调用连接成端到端因果链，是防护系统诊断核心。"
+    },
+    {
+      "sequence": 242,
+      "inventorySequence": 3575,
+      "id": "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "OpenTelemetry Integration",
+      "url": "https://docs.nvidia.com/nemo/guardrails/observability/tracing/opentelemetry-integration",
+      "description": "Configure OpenTelemetry SDK with OTLP exporters for production monitoring backends.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1090296,
+        "headingCount": 7,
+        "articleTextChars": 11363,
+        "sha256": "bac15774e53ed5f58d0affa8700a74b34773367fa80a8d1c713b840a2d5ccd2b"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "OTLP exporter 的生产追踪集成说明 guardrail span 如何进入统一观测后端。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-logs"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《Exporting Guardrails Logs to OpenTelemetry》，本资料的独立增量是：OTLP exporter 的生产追踪集成说明 guardrail span 如何进入统一观测后端。"
+    },
+    {
+      "sequence": 243,
+      "inventorySequence": 3576,
+      "id": "nvidia-nemo-guardrails-observability-tracing-opentelemetry-logs",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Exporting Guardrails Logs to OpenTelemetry",
+      "url": "https://docs.nvidia.com/nemo/guardrails/observability/tracing/opentelemetry-logs",
+      "description": "Forward Python logs from the NeMo Guardrails library into your OpenTelemetry backend with automatic trace correlation.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1161568,
+        "headingCount": 9,
+        "articleTextChars": 17312,
+        "sha256": "ea38bd716bf37159d1148fe059a65a3f10b94788192ee30f930d3c511d6ca944"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "将 Python 日志送入 OpenTelemetry 并自动关联 trace，可联合分析决策日志与调用链。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：将 Python 日志送入 OpenTelemetry 并自动关联 trace，可联合分析决策日志与调用链。"
+    },
+    {
+      "sequence": 244,
+      "inventorySequence": 3578,
+      "id": "nvidia-nemo-guardrails-observability-tracing-span-reference",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Span Reference",
+      "url": "https://docs.nvidia.com/nemo/guardrails/observability/tracing/span-reference",
+      "description": "Reference the LLMRails, IORails, and canonical outbound HTTP spans and attributes emitted when tracing is enabled.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1308460,
+        "headingCount": 16,
+        "articleTextChars": 29924,
+        "sha256": "48fe1cc81f5b239db71315a84732b846cfb28f872c11b222d12dd3927072754f"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "LLMRails、IORails 和 HTTP span 属性参考为精确查询、告警和跨服务关联提供契约。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：LLMRails、IORails 和 HTTP span 属性参考为精确查询、告警和跨服务关联提供契约。"
+    },
+    {
+      "sequence": 245,
+      "inventorySequence": 3590,
+      "id": "nvidia-nemo-guardrails-resources-guidelines",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Security Guidelines for LLM Integrations",
+      "url": "https://docs.nvidia.com/nemo/guardrails/resources/guidelines",
+      "description": "Follow security best practices when integrating LLMs with external resources and APIs.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 945991,
+        "headingCount": 15,
+        "articleTextChars": 20389,
+        "sha256": "94ebe0cab60265cc71c3b1a0b96f0f923658c9ddf1e0b616c7b1a6a997d7ddc9"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "外部资源与 API 集成中的凭据、数据和执行安全原则是 Guardrails 生产使用的关键边界。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：外部资源与 API 集成中的凭据、数据和执行安全原则是 Guardrails 生产使用的关键边界。"
+    },
+    {
+      "sequence": 246,
+      "inventorySequence": 3591,
+      "id": "nvidia-nemo-guardrails-resources-research",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Research on Guardrails",
+      "url": "https://docs.nvidia.com/nemo/guardrails/resources/research",
+      "description": "This document summarizes the most important public research on existing guardrails techniques.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 939632,
+        "headingCount": 7,
+        "articleTextChars": 12951,
+        "sha256": "066a605b91f37a80eccaecc35cbaf8d42a405107112782161170df30670251e8"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 1,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "对公开 guardrail 研究的官方梳理有助于比较方法，但属于学习补充资料。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：对公开 guardrail 研究的官方梳理有助于比较方法，但属于学习补充资料。"
+    },
+    {
+      "sequence": 247,
+      "inventorySequence": 3592,
+      "id": "nvidia-nemo-guardrails-resources-runtime-security-faq",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "AI Runtime Security FAQ",
+      "url": "https://docs.nvidia.com/nemo/guardrails/resources/runtime-security-faq",
+      "description": "Answers to common security architecture, enforcement, deployment, observability, and evaluation questions about the NVIDIA NeMo Guardrails library.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 978823,
+        "headingCount": 23,
+        "articleTextChars": 22844,
+        "sha256": "6d31559115348aa34af7f0e5d6a4ac14c813f34717dec3cf97feb01af02c4296"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "运行时安全 FAQ 汇总架构、执行、部署、观测和评测边界，适合作为补充决策依据。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：运行时安全 FAQ 汇总架构、执行、部署、观测和评测边界，适合作为补充决策依据。"
+    },
+    {
+      "sequence": 248,
+      "inventorySequence": 3594,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-run-rails",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "About Running Guardrailed Inference",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/run-rails",
+      "description": "Run guardrailed inference using the Python API or Guardrails API server.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 950869,
+        "headingCount": 6,
+        "articleTextChars": 10892,
+        "sha256": "3c0f7b96248579bbb863130c5c1a4d6e6b272bde9fd0bc2ae24e45af471e9585"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Running Guardrailed Inference 总览主要导航到 API server 和 Python API 子专题。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 249,
+      "inventorySequence": 3595,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Use the Guardrails API Server",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server",
+      "description": "Expose guardrails through an HTTP API using the Guardrails API server.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 877925,
+        "headingCount": 1,
+        "articleTextChars": 8812,
+        "sha256": "2ab694f8f903f8aade5e8d1f305e3e6f31cca2c357fd62d164cd56b272f40e93"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Use the Guardrails API Server 与更明确的安全隔离总览、Actions Server 和运行专题重复。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 250,
+      "inventorySequence": 3596,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server-actions-server",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Use the Actions Server",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server/actions-server",
+      "description": "Run guardrail actions in a secure, isolated environment.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1428586,
+        "headingCount": 19,
+        "articleTextChars": 14462,
+        "sha256": "d3066581f6edbf5feeb856eb1bb31516f04b9c63ed26a0cd6f5fdc5b2f8ecfd0"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "Actions Server 把 guardrail 动作放入安全隔离环境，直接降低外部执行和自定义代码风险。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：Actions Server 把 guardrail 动作放入安全隔离环境，直接降低外部执行和自定义代码风险。"
+    },
+    {
+      "sequence": 251,
+      "inventorySequence": 3597,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server-chat-with-guardrailed-model",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Chat with Guardrailed Model",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server/chat-with-guardrailed-model",
+      "description": "Send chat requests, use streaming, and manage conversation threads.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1926823,
+        "headingCount": 19,
+        "articleTextChars": 18818,
+        "sha256": "6f2f14694f58f2e828662b89ff01074f80b0e901c7c63ec9e2de2ab0fb20f9a3"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Chat 页面集中于请求、流式和线程操作，核心机制由专门 API 资料覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 252,
+      "inventorySequence": 3599,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server-list-models",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "List Available Models",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server/list-models",
+      "description": "Query the available LLM models from the configured provider.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1187869,
+        "headingCount": 16,
+        "articleTextChars": 11740,
+        "sha256": "4e357704f4647059a39a713ba6e08ebc4551135128b13e6fb490da36d15f6496"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 1,
+        "applicability": 1,
+        "total": 4,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "List Available Models 是易变化的供应商模型查询操作。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 253,
+      "inventorySequence": 3600,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server-overview",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Overview of the NVIDIA NeMo Guardrails Library API Server",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server/overview",
+      "description": "The NVIDIA NeMo Guardrails library API server runs guardrails in a secure, isolated environment.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 975856,
+        "headingCount": 7,
+        "articleTextChars": 10406,
+        "sha256": "7c9fc157f02568c0161dd6f2dcf6d8c36d4521ef617ffb65d213710cf9c15ec9"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "API Server 总览明确 guardrail 服务的隔离、请求边界和部署责任。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：API Server 总览明确 guardrail 服务的隔离、请求边界和部署责任。"
+    },
+    {
+      "sequence": 254,
+      "inventorySequence": 3601,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-fastapi-server-run-guardrails-server",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Run the Guardrails Server",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-fastapi-server/run-guardrails-server",
+      "description": "Start the Guardrails API server, configure CORS, and enable auto-reload.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1257840,
+        "headingCount": 15,
+        "articleTextChars": 15454,
+        "sha256": "e94a2121f9b7ae397d05d381f61b268a9782f7580f671402e06dfb4fb3d48558"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 1,
+        "applicability": 1,
+        "total": 4,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "启动服务、CORS 和 auto-reload 属于常规运行操作。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 255,
+      "inventorySequence": 3602,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Use the NeMo Guardrails Python APIs",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis",
+      "description": "Run guardrailed inference using the NeMo Guardrails Python API.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 873442,
+        "headingCount": 1,
+        "articleTextChars": 8828,
+        "sha256": "f136087841a9a98ea3da6c16e1c36d0edc791ca96fe5a49fe62fe151ccffd56a"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Use Python APIs 是子专题导航，核心类与执行机制由专页覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 256,
+      "inventorySequence": 3603,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-check-messages",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Checking Messages Against Rails",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/check-messages",
+      "description": "Validate messages against input and output rails using check_async and check methods on the LLMRails and IORails engines.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1328084,
+        "headingCount": 22,
+        "articleTextChars": 20989,
+        "sha256": "0c55614f3fed4664d1c4b2f4e022dc8e3cb9bc8f4f198a450cbd62633c23f6e8"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "输入和输出消息的同步/异步 rail 检查提供生成前后独立安全门控。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：输入和输出消息的同步/异步 rail 检查提供生成前后独立安全门控。"
+    },
+    {
+      "sequence": 257,
+      "inventorySequence": 3604,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-core-classes",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Core Classes Reference",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/core-classes",
+      "description": "RailsConfig and LLMRails class reference for loading and running guardrails.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1918823,
+        "headingCount": 25,
+        "articleTextChars": 19814,
+        "sha256": "a4d5ea04b063686751245ad87c6c3242589931fb0fefdf0e7a747607787586c9"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "RailsConfig 与 LLMRails 的加载和运行契约是扩展 Guardrails Python 集成的基础。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：RailsConfig 与 LLMRails 的加载和运行契约是扩展 Guardrails Python 集成的基础。"
+    },
+    {
+      "sequence": 258,
+      "inventorySequence": 3605,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-event-based-api",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Event-Based API",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/event-based-api",
+      "description": "Use generate_events for low-level control over guardrails execution.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1467554,
+        "headingCount": 12,
+        "articleTextChars": 13101,
+        "sha256": "8bfcdbb011adb52fd4cafc4cfb3111d9379fff33e3e4ee5a09cfc5a87dbae0e4"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "generate_events 暴露底层事件流，为自定义控制、审计和状态机集成提供核心接口。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：generate_events 暴露底层事件流，为自定义控制、审计和状态机集成提供核心接口。"
+    },
+    {
+      "sequence": 259,
+      "inventorySequence": 3606,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-generation-options",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Generation Options Reference",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/generation-options",
+      "description": "Configure logging, LLM parameters, and rail selection for generation.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1766362,
+        "headingCount": 19,
+        "articleTextChars": 28520,
+        "sha256": "00879f78210336f6899f66d2b55c0e14ab671a8a1a034608787543678284e0c7"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "生成选项统一日志、模型参数和 rail 选择，补充逐请求防护控制。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：生成选项统一日志、模型参数和 rail 选择，补充逐请求防护控制。"
+    },
+    {
+      "sequence": 260,
+      "inventorySequence": 3607,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-overview",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Overview of the NeMo Guardrails Python APIs",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/overview",
+      "description": "RailsConfig and LLMRails core classes for generating guarded responses.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1011996,
+        "headingCount": 7,
+        "articleTextChars": 11786,
+        "sha256": "100cfabc1dd1dcece64a577ca9d11731638b4088a6c2fc28d43856b6ff3b3e1d"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Python API Overview 与核心类、事件和消息检查专题重复。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 261,
+      "inventorySequence": 3608,
+      "id": "nvidia-nemo-guardrails-run-guardrailed-inference-using-python-apis-streaming",
+      "family": "nemo-guardrails",
+      "familyTitle": "NVIDIA NeMo Guardrails",
+      "topic": "agent-safety",
+      "title": "Streaming Responses",
+      "url": "https://docs.nvidia.com/nemo/guardrails/run-guardrailed-inference/using-python-apis/streaming",
+      "description": "Stream LLM responses in real-time with the stream_async method.",
+      "linkedNodes": [
+        "guardrails",
+        "observability",
+        "model-evaluation"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1598288,
+        "headingCount": 11,
+        "articleTextChars": 21791,
+        "sha256": "9e458796a84afceedc0eec335e8e128e0e77eb3b8536d4b7af9e370fde7eccf4"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "Guardrails 流式响应说明如何在实时 token 输出中维持防护与客户端交互。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-guardrails-observability-tracing",
+        "nvidia-nemo-guardrails-observability-tracing-opentelemetry-integration"
+      ],
+      "uniqueDelta": "相较于《Tracing Guardrails》、《OpenTelemetry Integration》，本资料的独立增量是：Guardrails 流式响应说明如何在实时 token 输出中维持防护与客户端交互。"
+    },
+    {
+      "sequence": 262,
+      "inventorySequence": 3899,
+      "id": "nvidia-nemo-gym-about-architecture",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Architecture",
+      "url": "https://docs.nvidia.com/nemo/gym/about/architecture",
+      "description": "Understand how NeMo Gym implements environments as composable server components.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 567803,
+        "headingCount": 10,
+        "articleTextChars": 8930,
+        "sha256": "7b641edbe23be8d33df0d85a0fe8f4edc97cb4e37a0e23f5dcc9a8be642941af"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "NeMo Gym 将 environment 实现为可组合服务组件，统一评测、优化和训练基础设施。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-concepts-environments",
+        "nvidia-nemo-gym-about-concepts-evaluation"
+      ],
+      "uniqueDelta": "相较于《Environments》、《Evaluation》，本资料的独立增量是：NeMo Gym 将 environment 实现为可组合服务组件，统一评测、优化和训练基础设施。"
+    },
+    {
+      "sequence": 263,
+      "inventorySequence": 3900,
+      "id": "nvidia-nemo-gym-about-concepts",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Concepts",
+      "url": "https://docs.nvidia.com/nemo/gym/about/concepts",
+      "description": "Understand what environments are, how they power evaluation, agent optimization, and training, and how the same components serve all three.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 485589,
+        "headingCount": 2,
+        "articleTextChars": 4298,
+        "sha256": "7677e60b9ef2de9e2545a2dfafb39f62e63b7dde280354305505e522a7eab8e7"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Concepts 页面被 Environment、Evaluation 和 Training 专题完整展开。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 264,
+      "inventorySequence": 3901,
+      "id": "nvidia-nemo-gym-about-concepts-environments",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Environments",
+      "url": "https://docs.nvidia.com/nemo/gym/about/concepts/environments",
+      "description": "Environments decompose into dataset, agent harness, verifier, and state — unifying evaluation, agent optimization, and training.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 519015,
+        "headingCount": 9,
+        "articleTextChars": 8010,
+        "sha256": "6ab8470b73d3fcc063261e84172b4e480207b069bdd0f3a7875282759bea6fd1"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "dataset、agent harness、verifier 与 state 的环境分解形成评测和训练的核心可组合单元。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-evaluation"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Evaluation》，本资料的独立增量是：dataset、agent harness、verifier 与 state 的环境分解形成评测和训练的核心可组合单元。"
+    },
+    {
+      "sequence": 265,
+      "inventorySequence": 3902,
+      "id": "nvidia-nemo-gym-about-concepts-evaluation",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Evaluation",
+      "url": "https://docs.nvidia.com/nemo/gym/about/concepts/evaluation",
+      "description": "What evaluation is, how to evaluate agents and models, and what makes a good eval.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 533772,
+        "headingCount": 14,
+        "articleTextChars": 9524,
+        "sha256": "ced3a3c5e8216e795f05319e070e7d240bdb077d078764da9bf2229d25e51508"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 9,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "评测目标、代理与模型评估差异和优质 eval 原则提供持久方法框架。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：评测目标、代理与模型评估差异和优质 eval 原则提供持久方法框架。"
+    },
+    {
+      "sequence": 266,
+      "inventorySequence": 3903,
+      "id": "nvidia-nemo-gym-about-concepts-key-terminology",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Key Terminology",
+      "url": "https://docs.nvidia.com/nemo/gym/about/concepts/key-terminology",
+      "description": "Essential vocabulary for agent evaluation, policy-model training, RL workflows, and NeMo Gym.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 567488,
+        "headingCount": 8,
+        "articleTextChars": 9937,
+        "sha256": "73d90e1ab9fe73863a3e63c5456fa957c4eba2395af278024dba68edf23f6e84"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 2,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Key Terminology 是术语表，缺少独立方法增量。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 267,
+      "inventorySequence": 3904,
+      "id": "nvidia-nemo-gym-about-concepts-training",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Training",
+      "url": "https://docs.nvidia.com/nemo/gym/about/concepts/training",
+      "description": "Post-training techniques and how environments are used for training.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 519585,
+        "headingCount": 10,
+        "articleTextChars": 7885,
+        "sha256": "0225c4ce7004e632962541b2766835e04d7a75a0b550f9f8823c05237a61ea0a"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "环境复用于监督微调、强化学习和代理优化，连接评测任务与后训练过程。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：环境复用于监督微调、强化学习和代理优化，连接评测任务与后训练过程。"
+    },
+    {
+      "sequence": 268,
+      "inventorySequence": 3913,
+      "id": "nvidia-nemo-gym-build-verifiers-multi-reward-verification",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Multi-Reward Verification",
+      "url": "https://docs.nvidia.com/nemo/gym/build-verifiers/multi-reward-verification",
+      "description": "Score a rollout on multiple reward components for richer evaluation and multi-objective RL",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 982277,
+        "headingCount": 12,
+        "articleTextChars": 13846,
+        "sha256": "a0ca9c1ccbff6ec4b31048af22bf38bc5de08474b02ce76e2c00195afeead40f"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "多奖励验证同时评分多个目标，为多目标代理评测和 RL 提供结构化 reward 信号。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：多奖励验证同时评分多个目标，为多目标代理评测和 RL 提供结构化 reward 信号。"
+    },
+    {
+      "sequence": 269,
+      "inventorySequence": 3914,
+      "id": "nvidia-nemo-gym-build-verifiers-verification-patterns",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Verification Patterns",
+      "url": "https://docs.nvidia.com/nemo/gym/build-verifiers/verification-patterns",
+      "description": "Patterns for evaluating agent behavior and computing scores.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 473125,
+        "headingCount": 1,
+        "articleTextChars": 4285,
+        "sha256": "083cb41cc6976319d4d60a5d3e97964d97671696148c18724a887927f703cb0d"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "验证模式对确定性匹配、执行结果和模型裁判进行分类，是 verifier 设计主框架。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：验证模式对确定性匹配、执行结果和模型裁判进行分类，是 verifier 设计主框架。"
+    },
+    {
+      "sequence": 270,
+      "inventorySequence": 3915,
+      "id": "nvidia-nemo-gym-build-verifiers-verification-patterns-equivalence-match",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Equivalence Match",
+      "url": "https://docs.nvidia.com/nemo/gym/build-verifiers/verification-patterns/equivalence-match",
+      "description": "Extract an agent's answer and compare it deterministically with a reference value, structure, or rule.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1311603,
+        "headingCount": 14,
+        "articleTextChars": 16991,
+        "sha256": "9072e13e5c4cec55f77a53e7f1be6865f9bcd384400ee2f7b888897ae6af22c8"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "等价匹配以参考值、结构或规则进行确定性判分，提供低方差评测基线。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：等价匹配以参考值、结构或规则进行确定性判分，提供低方差评测基线。"
+    },
+    {
+      "sequence": 271,
+      "inventorySequence": 3916,
+      "id": "nvidia-nemo-gym-build-verifiers-verification-patterns-execution-and-state-match",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Execution and State Match",
+      "url": "https://docs.nvidia.com/nemo/gym/build-verifiers/verification-patterns/execution-and-state-match",
+      "description": "Run generated code, queries, actions, or proofs and score the observed output or resulting state.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1065116,
+        "headingCount": 11,
+        "articleTextChars": 15202,
+        "sha256": "83b4f10a3df8e9d36efe99dbdd1e91bd613c1b15fc55246f50c7a2c7b4031274"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "执行生成代码、查询或动作并比较最终状态，可评估仅看文本无法验证的代理行为。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：执行生成代码、查询或动作并比较最终状态，可评估仅看文本无法验证的代理行为。"
+    },
+    {
+      "sequence": 272,
+      "inventorySequence": 3917,
+      "id": "nvidia-nemo-gym-build-verifiers-verification-patterns-llm-as-judge",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "LLM-as-Judge",
+      "url": "https://docs.nvidia.com/nemo/gym/build-verifiers/verification-patterns/llm-as-judge",
+      "description": "Prompt an LLM to evaluate the agent's output against rubrics, instructions, or reference answers.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1148793,
+        "headingCount": 19,
+        "articleTextChars": 21221,
+        "sha256": "60ece6050ed07b18761d5eaa4679ebed00563a75fb7e008f05eb319a5157f4f4"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "LLM-as-Judge 的 rubric、指令和参考答案机制补充开放式输出评价，但需关注裁判偏差。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：LLM-as-Judge 的 rubric、指令和参考答案机制补充开放式输出评价，但需关注裁判偏差。"
+    },
+    {
+      "sequence": 273,
+      "inventorySequence": 3932,
+      "id": "nvidia-nemo-gym-data-prompt-config",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Prompt Config",
+      "url": "https://docs.nvidia.com/nemo/gym/data/prompt-config",
+      "description": "Apply YAML-based prompt templates at rollout time to build responsescreateparams.input on the fly. This enables prompt sweeps without re-preparing JSONL data.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 648048,
+        "headingCount": 14,
+        "articleTextChars": 7774,
+        "sha256": "318a5b365da84a8b77b5f08be5b3e03d9528e678c37de80ea19f7a5eea42eafb"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "YAML prompt template 支持不重建数据即可进行 prompt sweep，便于控制变量实验。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：YAML prompt template 支持不重建数据即可进行 prompt sweep，便于控制变量实验。"
+    },
+    {
+      "sequence": 274,
+      "inventorySequence": 3938,
+      "id": "nvidia-nemo-gym-environment-tutorials-real-world-environment-generating-training-data",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Generating Training Data",
+      "url": "https://docs.nvidia.com/nemo/gym/environment-tutorials/real-world-environment/generating-training-data",
+      "description": "Generate synthetic task data (user queries) for the Workplace Assistant environment using NeMo Data Designer.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 502776,
+        "headingCount": 4,
+        "articleTextChars": 5019,
+        "sha256": "1f2f6020a3f5b237357c0ed6f9da3632af1c1b80a67e1dfbe7fbcc8d40d1b7c2"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Workplace Assistant 合成任务数据是单一环境教程，通用数据生成方法已有专题资料。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 275,
+      "inventorySequence": 3943,
+      "id": "nvidia-nemo-gym-evaluation",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Evaluate",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation",
+      "description": "Run repeatable model and agent evaluations with NeMo Gym environments.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 534887,
+        "headingCount": 6,
+        "articleTextChars": 7631,
+        "sha256": "9e7b384270e0b9ca57bd59a7ae292f089f6aed049239f8b2a5eddbfed6e00d56"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "可重复运行模型与代理环境评测，提供从环境到 rollout 和评分的执行入口。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：可重复运行模型与代理环境评测，提供从环境到 rollout 和评分的执行入口。"
+    },
+    {
+      "sequence": 276,
+      "inventorySequence": 3944,
+      "id": "nvidia-nemo-gym-evaluation-aggregate-metrics",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Aggregate Metrics",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/aggregate-metrics",
+      "description": "Compute summary statistics, customize per-environment metrics, and merge shard outputs from gym eval aggregate.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 973296,
+        "headingCount": 13,
+        "articleTextChars": 13528,
+        "sha256": "25cb1999f2365369e2efd796e40d9426a69d1a4b7f4d59340a9a307930edd477"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "聚合统计、自定义环境指标和分片合并是大规模评测结果汇总的必要方法。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：聚合统计、自定义环境指标和分片合并是大规模评测结果汇总的必要方法。"
+    },
+    {
+      "sequence": 277,
+      "inventorySequence": 3945,
+      "id": "nvidia-nemo-gym-evaluation-benchmarks",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Benchmarks",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/benchmarks",
+      "description": "What benchmarks are, how they relate to environments, how to choose one, and how to interpret results.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 590862,
+        "headingCount": 7,
+        "articleTextChars": 9154,
+        "sha256": "7f6b3856cb25f20f51e19f38ec6ea5b78b91462754f6bc9f1cc63cab06f6d624"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 9,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "benchmark 与 environment 的关系、选择和结果解释有助于避免评测集误用。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：benchmark 与 environment 的关系、选择和结果解释有助于避免评测集误用。"
+    },
+    {
+      "sequence": 278,
+      "inventorySequence": 3946,
+      "id": "nvidia-nemo-gym-evaluation-diagnose-results",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Diagnose Results",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/diagnose-results",
+      "description": "Use BLADE and other analysis skills to diagnose evaluation results — why scores changed, which tasks failed, and what intervention to prioritize.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 540130,
+        "headingCount": 5,
+        "articleTextChars": 7471,
+        "sha256": "37bfae3c09a9a60acfa7e8ebbc10866b54eddc686126de64c589306f81a7978b"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "使用 BLADE 等分析能力定位分数变化、失败任务和优先干预项，补充评测诊断闭环。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：使用 BLADE 等分析能力定位分数变化、失败任务和优先干预项，补充评测诊断闭环。"
+    },
+    {
+      "sequence": 279,
+      "inventorySequence": 3947,
+      "id": "nvidia-nemo-gym-evaluation-environment-list",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Browse Environments",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/environment-list",
+      "description": "Browse built-in benchmark and training environments.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 719129,
+        "headingCount": 7,
+        "articleTextChars": 11498,
+        "sha256": "5774100315ae0cb313003332da04947de5216d4dc6536050581ce801d8d29ac9"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 1,
+        "applicability": 1,
+        "total": 4,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Environment List 是内置 benchmark 与训练环境目录。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 280,
+      "inventorySequence": 3948,
+      "id": "nvidia-nemo-gym-evaluation-harness",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Compare Harnesses",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/harness",
+      "description": "Ablate the agent harness the same way you ablate the model — swap it, hold everything else fixed, and measure the score delta.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 562647,
+        "headingCount": 4,
+        "articleTextChars": 7275,
+        "sha256": "e43839b6607b16673d5219f83a3cdeaa00b4c9c7a3dec65fd63547acc456e4b5"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "固定模型和任务只替换 agent harness 的消融实验，可以量化编排层对成绩的真实贡献。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：固定模型和任务只替换 agent harness 的消融实验，可以量化编排层对成绩的真实贡献。"
+    },
+    {
+      "sequence": 281,
+      "inventorySequence": 3949,
+      "id": "nvidia-nemo-gym-evaluation-rollout-health",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Rollout Health Checks",
+      "url": "https://docs.nvidia.com/nemo/gym/evaluation/rollout-health",
+      "description": "Verify that evaluation rollouts contain complete, internally consistent trajectory and model-call evidence.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 939028,
+        "headingCount": 16,
+        "articleTextChars": 21630,
+        "sha256": "67295446cc382ff52e6ef2dfe3a3db563186f13f8299c8a8d7575e3ab3c45ae1"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "rollout 完整性、内部一致性和模型调用证据检查防止用损坏轨迹得出错误评测结论。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：rollout 完整性、内部一致性和模型调用证据检查防止用损坏轨迹得出错误评测结论。"
+    },
+    {
+      "sequence": 282,
+      "inventorySequence": 3959,
+      "id": "nvidia-nemo-gym-infrastructure-engineering-notes-system-design",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "System Design",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/engineering-notes/system-design",
+      "description": "This section describes how NeMo Gym components interact during startup and execution.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 583338,
+        "headingCount": 10,
+        "articleTextChars": 8171,
+        "sha256": "ec177e1c26855ad6c2b236f3d9064ac99840b5d95b7eecb03f87cb6f007c260b"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "System Design 说明启动与执行期间组件交互，是 Gym 分布式评测运行时的主架构。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：System Design 说明启动与执行期间组件交互，是 Gym 分布式评测运行时的主架构。"
+    },
+    {
+      "sequence": 283,
+      "inventorySequence": 3960,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Sandbox API",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox",
+      "description": "Use the provider-neutral sandbox module for isolated execution in NeMo Gym agents and environments.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1167330,
+        "headingCount": 12,
+        "articleTextChars": 14624,
+        "sha256": "8f13acfd7e588e3ddde96602cb6beed42cd3fe91a4b417db2903da6294d964d4"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "供应商中立 sandbox API 为代理与环境提供隔离执行的统一安全契约。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：供应商中立 sandbox API 为代理与环境提供隔离执行的统一安全契约。"
+    },
+    {
+      "sequence": 284,
+      "inventorySequence": 3961,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-adding-a-provider",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Adding a Sandbox Provider",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/adding-a-provider",
+      "description": "Implement and register a sandbox runtime backend for NeMo Gym.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 973742,
+        "headingCount": 6,
+        "articleTextChars": 10050,
+        "sha256": "8318d2af6be09c9689a958e45c369115289f94b7d9fc59313ef3b7d87aa9f69c"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "实现并注册 sandbox backend 的扩展接口支持在保持上层评测一致的情况下替换隔离运行时。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：实现并注册 sandbox backend 的扩展接口支持在保持上层评测一致的情况下替换隔离运行时。"
+    },
+    {
+      "sequence": 285,
+      "inventorySequence": 3962,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-apptainer",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Apptainer Provider",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/apptainer",
+      "description": "Configure NeMo Gym sandboxes backed by local Apptainer instances.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 626000,
+        "headingCount": 9,
+        "articleTextChars": 9040,
+        "sha256": "6ab6bb62e0f28cce56c0707ca422e1f002063e1c50d0726301f19afea9b434a7"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Apptainer Provider 是单一沙箱后端配置。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 286,
+      "inventorySequence": 3963,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-compose",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Compose Services",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/compose",
+      "description": "Run Docker Compose services through the asynchronous sandbox API.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 822986,
+        "headingCount": 8,
+        "articleTextChars": 15106,
+        "sha256": "a98c82ad11a066cebda99844af3f5d0b1ceb1f5e08ec7b19195d149f5cf12e7b"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Docker Compose services 页面偏具体运行方式，通用 sandbox API 已覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 287,
+      "inventorySequence": 3964,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-daytona-access",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Daytona Access",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/daytona-access",
+      "description": "Obtain hosted Daytona credentials and check permissions and quota before running Gym workloads.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 493131,
+        "headingCount": 3,
+        "articleTextChars": 4716,
+        "sha256": "bf7a67906bdc27a5fb0e24d9fc703439733b5f5f274b871312b83475f5ecf8d0"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 1,
+        "applicability": 1,
+        "total": 4,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Daytona Access 是凭据、权限和配额获取操作。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 288,
+      "inventorySequence": 3966,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-e2b",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "E2B Provider",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/e2b",
+      "description": "Configure NeMo Gym sandboxes backed by E2B or an E2B-compatible gateway.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 679821,
+        "headingCount": 9,
+        "articleTextChars": 12563,
+        "sha256": "25792156e9e861a297e758d81caa045b0e9bf23520352c2800bcbc5240058853"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "E2B Provider 是单一托管沙箱配置。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 289,
+      "inventorySequence": 3967,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-ecs-fargate",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "ECS Fargate",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/ecs-fargate",
+      "description": "Run sandboxes as AWS ECS Fargate tasks reached over an SSH sidecar.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 720038,
+        "headingCount": 12,
+        "articleTextChars": 12288,
+        "sha256": "b4855d61618f758e699f96b8e8fb30a5ebf3e61b4deb3554f2c95997cac76d72"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "ECS Fargate 页面绑定 AWS 任务与 SSH sidecar，适用范围过窄。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 290,
+      "inventorySequence": 3968,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-opensandbox",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "OpenSandbox Provider",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/opensandbox",
+      "description": "Configure NeMo Gym sandboxes backed by an OpenSandbox server.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 821713,
+        "headingCount": 14,
+        "articleTextChars": 16782,
+        "sha256": "1aca3e8f19a003f103b70a1a34275c286580859778ace7ede6f29eb4bc54e750"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "OpenSandbox Provider 是单一后端配置，核心接口由通用 Sandbox API 覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 291,
+      "inventorySequence": 3969,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-opensandbox-best-practices",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "OpenSandbox Best Practices",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/opensandbox-best-practices",
+      "description": "Resource requests vs limits, timeouts, retries, and the failure signatures that look like bugs but are not — lessons from running thousands of concurrent sandboxes.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 706278,
+        "headingCount": 11,
+        "articleTextChars": 18875,
+        "sha256": "3df2516acb841ac86bb57aa7d3e8d9bdbd1037afbb671d713df663417712c569"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "资源 requests/limits、超时、重试和常见失败特征是大规模隔离执行的可迁移运维原则。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：资源 requests/limits、超时、重试和常见失败特征是大规模隔离执行的可迁移运维原则。"
+    },
+    {
+      "sequence": 292,
+      "inventorySequence": 3970,
+      "id": "nvidia-nemo-gym-infrastructure-sandbox-opensandbox-debugging",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Debugging OpenSandbox Sandboxes",
+      "url": "https://docs.nvidia.com/nemo/gym/infrastructure/sandbox/opensandbox-debugging",
+      "description": "How to see what CPU and memory a sandbox is getting and using, and how to detect OOM kills from the client.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 690804,
+        "headingCount": 11,
+        "articleTextChars": 10188,
+        "sha256": "4de6bc12fee68cb9078bd499a6d4df0021e60594c73b248c485671b2bcd30ef3"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "OpenSandbox 调试页聚焦单一后端的 CPU、内存和 OOM 排查。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 293,
+      "inventorySequence": 3978,
+      "id": "nvidia-nemo-gym-model-server-inference-providers",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Inference Providers",
+      "url": "https://docs.nvidia.com/nemo/gym/model-server/inference-providers",
+      "description": "Use hosted inference providers like Fireworks, Together.ai, OpenRouter, and more for eval workloads",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 597702,
+        "headingCount": 9,
+        "articleTextChars": 6927,
+        "sha256": "df52a2eee7d6e69d82827fac1c98051714d7fb63079dffea9acb88ff8fefc485"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 1,
+        "durability": 1,
+        "applicability": 1,
+        "total": 4,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Inference Providers 是易变化的托管供应商列表。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 294,
+      "inventorySequence": 4155,
+      "id": "nvidia-nemo-gym-observability",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Observability",
+      "url": "https://docs.nvidia.com/nemo/gym/observability",
+      "description": "Collect rollout evidence and monitor Gym services.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 486001,
+        "headingCount": 2,
+        "articleTextChars": 4395,
+        "sha256": "6805c7a611a428c286675d08e94de0e666a214ba9e3e79658b42175e93bf0c02"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "Observability 总览较短，且被追踪、指标和 rollout evidence 专题覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 295,
+      "inventorySequence": 4157,
+      "id": "nvidia-nemo-gym-observability-distributed-tracing",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Distributed Tracing",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/distributed-tracing",
+      "description": "A NeMo Gym rollout crosses several processes. This page explains how those hops become a single trace, and what to check when they do not.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 611780,
+        "headingCount": 11,
+        "articleTextChars": 8904,
+        "sha256": "dd1fbdceb083caeaf28ce599e57a6c1a46714b6af90bcbae8646f965c6e554d8"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "把跨多个进程的 rollout 合并为单一 trace，可定位代理、模型和环境间的端到端延迟。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：把跨多个进程的 rollout 合并为单一 trace，可定位代理、模型和环境间的端到端延迟。"
+    },
+    {
+      "sequence": 296,
+      "inventorySequence": 4158,
+      "id": "nvidia-nemo-gym-observability-eval-submit-collector",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Collector for Submitted Jobs",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/eval-submit-collector",
+      "description": "gym eval submit runs an OpenTelemetry Collector beside every benchmark job.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 544940,
+        "headingCount": 5,
+        "articleTextChars": 7157,
+        "sha256": "da47577dbf9e47089506a9963d637587295fae3d0332fb11e1d6a9b8ee02c2f9"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 2,
+        "total": 7,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "为每个提交的 benchmark job 配置 OpenTelemetry Collector，补充批量评测观测部署模式。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：为每个提交的 benchmark job 配置 OpenTelemetry Collector，补充批量评测观测部署模式。"
+    },
+    {
+      "sequence": 297,
+      "inventorySequence": 4159,
+      "id": "nvidia-nemo-gym-observability-extending",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Extending",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/extending",
+      "description": "Add spans to your own resources server, agent harness, or model server.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 778099,
+        "headingCount": 10,
+        "articleTextChars": 9836,
+        "sha256": "bf48460a17adf67e99e25d25d5fb41195b0a8d5920df280eac5906496ef999cf"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 2,
+        "irreplaceability": 2,
+        "durability": 2,
+        "applicability": 2,
+        "total": 8,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "为自定义资源服务器、agent harness 和模型服务器添加 span，支持观测体系扩展。"
+      },
+      "finalDecision": "admitted-supporting",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：为自定义资源服务器、agent harness 和模型服务器添加 span，支持观测体系扩展。"
+    },
+    {
+      "sequence": 298,
+      "inventorySequence": 4160,
+      "id": "nvidia-nemo-gym-observability-metrics",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Metrics",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/metrics",
+      "description": "NeMo Gym emits a small, deliberate set of metrics. This page lists them, and explains what is deliberately absent and why.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 542099,
+        "headingCount": 9,
+        "articleTextChars": 9797,
+        "sha256": "cd8bce82c8696d9f827f1a7e8e23f2c7b73d014f296dd4898715a29c0b7a1dfb"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "精简且有意限制的指标集合说明哪些 SLO 应测以及为何避免高基数或误导性信号。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：精简且有意限制的指标集合说明哪些 SLO 应测以及为何避免高基数或误导性信号。"
+    },
+    {
+      "sequence": 299,
+      "inventorySequence": 4161,
+      "id": "nvidia-nemo-gym-observability-opentelemetry",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "OpenTelemetry",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/opentelemetry",
+      "description": "Trace and measure Gym services with nemo-lens.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 540414,
+        "headingCount": 3,
+        "articleTextChars": 5000,
+        "sha256": "c7541ffdb80592a4c4e24f08e9cdfce1711348e6cf0220c098a5e3e305201e24"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 1,
+        "irreplaceability": 2,
+        "durability": 1,
+        "applicability": 1,
+        "total": 5,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": false,
+        "rationale": "OpenTelemetry 快速页被分布式追踪、Collector 和扩展专题覆盖。"
+      },
+      "finalDecision": "rejected-low-value-score"
+    },
+    {
+      "sequence": 300,
+      "inventorySequence": 4162,
+      "id": "nvidia-nemo-gym-observability-rollout-evidence",
+      "family": "nemo-gym",
+      "familyTitle": "NVIDIA NeMo Gym",
+      "topic": "evaluation",
+      "title": "Rollout Evidence",
+      "url": "https://docs.nvidia.com/nemo/gym/observability/rollout-evidence",
+      "description": "Collect, join, and inspect model-call and agent evidence.",
+      "linkedNodes": [
+        "model-evaluation",
+        "inference-optimization",
+        "deployment"
+      ],
+      "contentVerification": {
+        "verifiedAt": "2026-09-25",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 951433,
+        "headingCount": 7,
+        "articleTextChars": 11112,
+        "sha256": "8d1a3f1d10146ae61a0a1877dd97a65231a65f66860cddd54a7bb1c81c70483a"
+      },
+      "scores": {
+        "policy": "nvidia-official-value-score-v1",
+        "reviewedAt": "2026-09-25",
+        "knowledgeImportance": 3,
+        "irreplaceability": 3,
+        "durability": 2,
+        "applicability": 2,
+        "total": 10,
+        "threshold": 6,
+        "knowledgeImportanceMinimum": 2,
+        "passed": true,
+        "rationale": "收集、关联并检查模型调用与代理轨迹证据，是可审计评测和训练数据可信度的基础。"
+      },
+      "finalDecision": "admitted-core",
+      "comparedWith": [
+        "nvidia-nemo-gym-about-architecture",
+        "nvidia-nemo-gym-about-concepts-environments"
+      ],
+      "uniqueDelta": "相较于《Architecture》、《Environments》，本资料的独立增量是：收集、关联并检查模型调用与代理轨迹证据，是可审计评测和训练数据可信度的基础。"
+    }
+  ],
+  "summary": {
+    "reviewed": 60,
+    "retained": 39,
+    "removed": 21
+  }
+}

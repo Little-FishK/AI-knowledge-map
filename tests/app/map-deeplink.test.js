@@ -46,7 +46,14 @@ async function exercise(browser, base, viewport) {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await context.addInitScript(() => localStorage.setItem("ai-knowledge-map.locale.v1", "zh-Hans"));
-  const hash = expected => page.waitForFunction(value => location.hash === value, expected);
+  // Addresses are path + query: node selection lives in ?node= and the local
+  // reader in ?concept=. A fragment means the legacy contract leaked back in.
+  const mapNode = id => page.waitForFunction(value => !location.hash && new URLSearchParams(location.search).get("node") === value, id);
+  const mapRoot = () => page.waitForFunction(() => {
+    const query = new URLSearchParams(location.search);
+    return !location.hash && !query.has("node") && !query.has("concept");
+  });
+  const reader = id => page.waitForFunction(value => !location.hash && new URLSearchParams(location.search).get("concept") === value, id);
   const selected = id => page.waitForFunction(value => window.__cy?.nodes(".sel").map(node => node.id()).join() === value, id);
   try {
     await page.goto(`${base}?lang=en#/map/supervised-learning`);
@@ -67,25 +74,25 @@ async function exercise(browser, base, viewport) {
 
     await page.locator("#search").fill("神经网络");
     await page.locator('#search-results [data-id="neural-network"]').click();
-    await hash("#/map/neural-network");
+    await mapNode("neural-network");
     await selected("neural-network");
     await page.locator('[data-dd="neural-network"]').click();
-    await hash("#/concept/neural-network");
+    await reader("neural-network");
     await page.locator("#deepdive h1").filter({ hasText: "Navigation fixture" }).waitFor();
     await page.goBack();
-    await hash("#/map/neural-network");
+    await mapNode("neural-network");
     await selected("neural-network");
     await page.goForward();
-    await hash("#/concept/neural-network");
+    await reader("neural-network");
     await page.locator("#dd-back").click();
-    await hash("#/map/neural-network");
+    await mapNode("neural-network");
     await selected("neural-network");
     await page.evaluate(() => window.__cy.emit("tap"));
-    await hash("");
+    await mapRoot();
     await selected("");
 
     await page.goto(`${base}#/map/not-a-real-node`);
-    await hash("");
+    await mapRoot();
     await page.waitForFunction(() => Boolean(window.__cy));
     await selected("");
     // Preserve existing ordinary exploration semantics.
@@ -96,11 +103,11 @@ async function exercise(browser, base, viewport) {
     await page.goto(`${base}#/map/supervised-learning`);
     await selected("supervised-learning");
     await page.locator("#btn-reset").click();
-    await hash("");
+    await mapRoot();
     await selected("");
     // Local layout changes coordinates only and restores the exact map after closing.
     await page.goto(`${base}?lang=en#/map`);
-    await hash("");
+    await mapRoot();
     await page.waitForFunction(() => Boolean(window.__cy));
     assert.equal(page.url(), `${base}?lang=en`, 'legacy homepage retains language and deployment path');
     await page.reload();
@@ -109,14 +116,14 @@ async function exercise(browser, base, viewport) {
     await page.evaluate(() => { location.hash = '/map/supervised-learning'; });
     await selected('supervised-learning');
     await page.locator('[data-mode="graph"]').click();
-    await hash('');
+    await mapRoot();
     await selected('');
     assert.equal(page.url(), `${base}?lang=en`, 'map navigation leaves no trailing hash');
     await page.goBack();
-    await hash('#/map/supervised-learning');
+    await mapNode('supervised-learning');
     await selected('supervised-learning');
     await page.goForward();
-    await hash('');
+    await mapRoot();
     await selected('');
     assert.deepEqual(errors, []);
     if (process.env.ROUTING_ONLY === '1') return;

@@ -34,6 +34,9 @@ function publicFile(urlPath) {
     }
     return file;
   }
+  // The published artifact serves the interactive views from real directories.
+  // The source tree carries a single shell, so both paths resolve to it.
+  if (/^(?:library|software)\/(?:index\.html)?$/.test(relative)) return path.join(root, "index.html");
   const staticPage = /^(zh|en)\/concepts\/[a-z0-9]+(?:-[a-z0-9]+)*\/(?:index\.html)?$/.test(relative);
   if (relative !== "index.html" && relative !== "sitemap-concepts.xml" && !staticPage && !relative.startsWith("assets/") && !relative.startsWith("data/")) return null;
   const target = path.resolve(root, staticPage && relative.endsWith("/") ? relative + "index.html" : relative);
@@ -69,7 +72,7 @@ const server = http.createServer((request, response) => {
 
 server.listen(requestedPort, "127.0.0.1", () => {
   const port = server.address().port;
-  process.stdout.write(`${JSON.stringify({ state: "ready", url: `http://127.0.0.1:${port}/?quality-audit=1#/concept/neural-network` })}\n`);
+  process.stdout.write(`${JSON.stringify({ state: "ready", url: `http://127.0.0.1:${port}/?quality-audit=1&concept=neural-network` })}\n`);
 });
 const close = () => server.close(() => process.exit(0));
 process.once("SIGINT", close);

@@ -2,8 +2,8 @@
    一般来源的 selectionReason 写明一手 / 首创 / 应答 / 归属四闸门；
    standards 来源按 standards-regulatory-v1.1 写明六项单层硬门槛。
 
-   2026-09-23：原先在此的四条官方种子（DeepSeek / Qwen / Moonshot AI / Zhipu AI 的文档入口）
-   已被 data/library-official-china.js 的 40 条逐页真实条目取代，故移除，避免同一来源重复登记。 */
+   2026-09-23：原先在此的 DeepSeek 官方种子已被 data/library-official-china.js
+   的逐页真实条目取代，故移除，避免同一来源重复登记。 */
 (function () {
   "use strict";
 

@@ -58,7 +58,7 @@ async function main() {
         assert.equal(await details.getAttribute("open"), "", "Native self-test disclosure works without JavaScript.");
       }
       await page.locator(".preview-map").click();
-      assert.equal(new URL(page.url()).hash, "#/map/supervised-learning");
+      assert.equal(new URL(page.url()).searchParams.get("node"), "supervised-learning");
       await page.goBack();
       assert.equal(await page.locator("h1").textContent(), snapshot.page.title);
       const privateCopy = await context.request.get(`${origin}/.tmp/website-preview/supervised-learning.snapshot.json`);

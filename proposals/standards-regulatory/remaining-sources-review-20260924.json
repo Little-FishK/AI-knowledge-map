@@ -1,0 +1,44 @@
+{
+  "policy": "standards-regulatory-v1.1",
+  "batch": "remaining-standards-regulatory-secondary-sources-20260924",
+  "reviewedAt": "2026-09-24",
+  "scope": {
+    "secondarySources": ["ieee-standards", "eu-institutions", "uk-aisi", "intl-ai-safety-report", "us-ftc", "us-caisi", "china-cac", "china-tc260", "china-caict", "oecd", "un-agencies"],
+    "included": "各二级来源官方 AI 规范、监管文本、治理/评测框架、正式执法对象、正式草案与当前主报告；保留仍有引用价值的版本更新。",
+    "excluded": "新闻与活动索引、领导讲话、宣传页、第三方转载、无独立内容的摘要和重复语言入口。",
+    "cutoff": "2026-09-24"
+  },
+  "counts": {
+    "officialDirectoryRecordsDiscovered": 62,
+    "candidatesAfterObviousNonObjectsRemoved": 56,
+    "admitted": 46,
+    "mergeUpdate": 3,
+    "pending": 0,
+    "ineligible": 7,
+    "publishedIndependentCards": 46,
+    "publishedRelatedRecords": 3
+  },
+  "outcomesBySource": {
+    "ieee-standards": { "admitted": 6, "mergeUpdate": 0, "ids": ["ieee-7000-2021", "ieee-7001-2021", "ieee-7003-2024", "ieee-7010-2020", "ieee-3119-2025", "ieee-2863-2026"] },
+    "eu-institutions": { "admitted": 5, "mergeUpdate": 0, "ids": ["eu-ai-act-2024", "eu-ai-act-prohibited-practices-guidelines-2025", "eu-ai-system-definition-guidelines-2025", "eu-gpai-code-of-practice-2025", "eu-gpai-provider-guidelines-2025"] },
+    "uk-aisi": { "admitted": 5, "mergeUpdate": 0, "ids": ["uk-aisi-inspect", "uk-aisi-evaluation-approach", "uk-aisi-research-agenda", "uk-aisi-safeguard-evaluation-principles", "uk-aisi-frontier-ai-trends-report"] },
+    "intl-ai-safety-report": { "admitted": 1, "mergeUpdate": 3, "ids": ["international-ai-safety-report-2026", "international-ai-safety-report-2025", "international-ai-safety-report-key-update-1", "international-ai-safety-report-key-update-2"] },
+    "us-ftc": { "admitted": 4, "mergeUpdate": 0, "ids": ["ftc-impersonation-rule", "ftc-rite-aid-facial-recognition-order", "ftc-donotpay-order", "ftc-mindsift-order"] },
+    "us-caisi": { "admitted": 3, "mergeUpdate": 0, "ids": ["caisi-nist-ai-800-2-ipd", "caisi-nist-ai-800-3", "caisi-deepseek-v4-evaluation"] },
+    "china-cac": { "admitted": 5, "mergeUpdate": 0, "ids": ["cac-algorithm-recommendation-provisions", "cac-deep-synthesis-provisions", "cac-generative-ai-interim-measures", "cac-ai-generated-content-labeling-measures", "cac-anthropomorphic-ai-interaction-measures"] },
+    "china-tc260": { "admitted": 6, "mergeUpdate": 0, "ids": ["tc260-gb-45438-2025", "tc260-ai-safety-governance-framework-2", "tc260-ai-application-security-general-2026", "tc260-ai-application-security-education-2026", "tc260-ai-application-security-health-2026", "tc260-ai-application-security-media-2026"] },
+    "china-caict": { "admitted": 3, "mergeUpdate": 0, "ids": ["caict-trustworthy-ai-whitepaper-2021", "caict-large-model-governance-bluebook-2023", "caict-large-model-benchmark-system-2024"] },
+    "oecd": { "admitted": 4, "mergeUpdate": 0, "ids": ["oecd-ai-principles", "oecd-ai-classification-framework", "oecd-ai-definition-memorandum-2024", "oecd-responsible-ai-due-diligence-2026"] },
+    "un-agencies": { "admitted": 4, "mergeUpdate": 0, "ids": ["unesco-ai-ethics-recommendation", "un-ga-resolution-78-265", "un-global-digital-compact", "un-governing-ai-for-humanity-2024"] }
+  },
+  "ineligibleClasses": [
+    { "count": 2, "class": "机构新闻或活动页", "failedGate": "eligibleObject", "reason": "只报道发布或活动，本身不是规范、框架、指南或执法对象。" },
+    { "count": 2, "class": "重复摘要或语言入口", "failedGate": "identityAndVersion", "reason": "与已收录正式对象同一身份，不重复建卡。" },
+    { "count": 1, "class": "已被当前主报告吸收的扩展摘要", "failedGate": "identityAndVersion", "reason": "没有独立版本用途。" },
+    { "count": 1, "class": "合作或资助公告", "failedGate": "eligibleObject", "reason": "不包含可独立引用的评测或治理规范。" },
+    { "count": 1, "class": "会议成果报道", "failedGate": "eligibleObject", "reason": "属于事件记录，不是正式规范性成果。" }
+  ],
+  "uncovered": [],
+  "accessNotes": ["CAICT 官方站对部分自动化访问返回 412；本批次使用其官方 PDF 固定入口并保留人工复核提示。", "ISO/IEC 与 NIST 已在前两批完成，不在本文件重复统计。"],
+  "completion": "在冻结范围和截止日期内，每个候选均已获得 admitted、merge-update 或 ineligible 处置；无 pending 和未覆盖栏目。"
+}

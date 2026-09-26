@@ -75,14 +75,13 @@ window.PRO_LIBRARY = {
         { id: "nvidia", label: "NVIDIA", short: "开发者文档、模型与硬件技术资料" },
         { id: "hugging-face-official", label: "Hugging Face 官方", short: "官方文档、课程与平台公告" },
         { id: "aws", label: "AWS", short: "Bedrock、SageMaker 与云端 AI 文档" },
-        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" },
-        { id: "qwen", label: "Qwen（阿里）", short: "官方文档、模型卡与开源仓库" },
-        { id: "moonshot-ai", label: "Moonshot AI（Kimi）", short: "技术报告、模型权重与训练 Infra 开源" },
-        { id: "zhipu-ai", label: "Zhipu AI（GLM）", short: "开放平台文档、模型卡与技术报告" }
+        { id: "deepseek", label: "DeepSeek", short: "技术报告、模型卡与 API 变更日志" }
       ]
     },
     {
       id: "knowledge-base", order: 4, label: "专业知识库与评测机构", short: "知识库、基准与公共评测", color: "#9b82c4", authority: "A2–B",
+      reviewMode: "source-specific",
+      reviewPolicy: "核心资料全收；按各二级来源自身的数据库、方法、版本与榜单结构收录，不设跨机构统一评分机制。",
       subcategories: [
         { id: "mitre-atlas", label: "MITRE ATLAS", short: "AI 对抗威胁知识库" },
         { id: "owasp-genai", label: "OWASP GenAI Security Project", short: "LLM Top 10、智能体 Top 10 与 ACS 标准" },

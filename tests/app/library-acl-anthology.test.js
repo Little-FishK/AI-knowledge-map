@@ -45,10 +45,10 @@ async function verifyBrowser(siteRoot, browser) {
     await page.goto(base + "#/library");
     const skip = page.locator("#onboarding [data-skip]");
     if (await skip.isVisible()) await skip.click();
-    await page.waitForFunction(() => document.querySelectorAll("#library-view .lib-card").length > 150);
+    await page.waitForFunction(() => document.querySelectorAll("#library-view .lib-card").length >= 15);
     await page.locator('[data-library-class="academic"]').click();
     await page.locator('[data-library-subcategory="acl-anthology"]').click();
-    assert.equal(await page.locator("#library-view .lib-card").count(), 52);
+    assert.equal(Number.parseInt(await page.locator("#library-view .lib-filter-note").innerText(), 10), 52);
     await page.goto(base + "#/library/acl-anthology-2025.acl-long.1126");
     await page.waitForFunction(() => document.querySelector(".d-title")?.textContent.startsWith("Native Sparse Attention"));
     assert.match(await page.locator("body").innerText(), /缺乏 AI 重大贡献独立证据/);

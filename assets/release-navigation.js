@@ -30,9 +30,13 @@
     event.preventDefault();event.stopImmediatePropagation();location.assign(target);
   },true);
   function legacy() {
-    const match=location.hash.match(/^#\/concept\/([a-z0-9-]+)$/);if(!match)return;
-    const target=readingTarget(match[1]);
+    // Clean locations carry the reader as ?concept=; old bookmarks use #/concept/.
+    const match=location.hash.match(/^#\/concept\/([a-z0-9-]+)$/);
+    const query=match?null:new URLSearchParams(location.search).get('concept');
+    const id=match?match[1]:(query&&/^[a-z0-9-]+$/.test(query)?query:'');
+    if(!id)return;
+    const target=readingTarget(id);
     if(target) location.replace(target);
   }
-  window.addEventListener('hashchange',legacy);legacy();
+  window.addEventListener('hashchange',legacy);window.addEventListener('popstate',legacy);legacy();
 })();

@@ -43,6 +43,9 @@
     if (article?.dataset.conceptId) return article.dataset.conceptId;
     const path = location.pathname.match(/\/concepts\/([a-z0-9-]+)\/?$/);
     if (path) return path[1];
+    const query = new URLSearchParams(location.search);
+    const fromQuery = query.get('concept') || query.get('node');
+    if (fromQuery && /^[a-z0-9-]+$/.test(fromQuery)) return fromQuery;
     const hash = location.hash.match(/^#\/(?:concept|map)\/([a-z0-9-]+)/);
     return hash ? hash[1] : '';
   }

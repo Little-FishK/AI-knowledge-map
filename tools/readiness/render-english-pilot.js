@@ -113,7 +113,7 @@ function render(value, source) {
 <meta name="robots" content="noindex, nofollow"><title>${escape(page.title)} · Review draft</title>
 <link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"></head>
 <body class="concept-preview"><a class="preview-skip" href="#main-content">Skip to content</a>
-<header class="preview-header"><a class="preview-brand" href="/?lang=en#/map">◈ AI Knowledge Map</a><span class="preview-label">English · Review draft</span><a href="/preview/zh/concepts/supervised-learning/" lang="zh-Hans">简体中文</a></header>
+<header class="preview-header"><a class="preview-brand" href="/?lang=en">◈ AI Knowledge Map</a><span class="preview-label">English · Review draft</span><a href="/preview/zh/concepts/supervised-learning/" lang="zh-Hans">简体中文</a></header>
 <main id="main-content" class="preview-main" tabindex="-1"><article id="dd-article">
 <p role="note">${semanticReviewed ? "Draft translation — final acceptance is pending." : "Draft translation — independent review is pending."}</p>
 <header class="dd-hero"><div class="dd-eyebrow">Understanding the principles</div><h1 class="dd-h1">${escape(page.title)}</h1>
@@ -122,7 +122,7 @@ ${page.aliases ? `<p class="dd-ali">${escape(Array.isArray(page.aliases) ? page.
 ${page.meta ? `<p class="dd-metabar">${escape(page.meta)}</p>` : ""}
 ${page.thesis ? `<div class="dd-thesis"><span class="dd-thesis-l">Core idea</span> ${escape(page.thesis)}</div>` : ""}</header>
 <!-- source-body:start -->${resourceLayout(page.html)}<!-- source-body:end -->
-<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en#/map/supervised-learning">Explore the connections on the map</a><a href="/preview/zh/concepts/supervised-learning/" lang="zh-Hans">阅读中文原文</a></nav>
+<nav class="preview-next" aria-label="Continue learning"><a href="/?lang=en&amp;node=supervised-learning">Explore the connections on the map</a><a href="/preview/zh/concepts/supervised-learning/" lang="zh-Hans">阅读中文原文</a></nav>
 </article></main></body></html>`;
 }
 if (require.main === module) {

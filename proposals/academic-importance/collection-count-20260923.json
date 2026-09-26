@@ -1,0 +1,30 @@
+{
+  "asOf": "2026-09-23",
+  "collectionPolicy": "docs/ARXIV_COLLECTION_POLICY.md",
+  "status": "partial-local-count-not-total",
+  "fullThreeRouteUniquePaperCount": null,
+  "localEvidence": {
+    "database": ".local/arxiv-discovery/20260923-r2/discovery.sqlite",
+    "readMode": "read-only",
+    "oldIndexDistinctArxivIds": 288759,
+    "matchingCurrentCategoryRouteDistinctArxivIds": 251284,
+    "categories": ["cs.AI", "cs.LG", "stat.ML", "cs.CL", "cs.CV", "cs.NE", "cs.MA", "cs.RO"],
+    "countMethod": "Iterate papers metadata; count a row once if its categories intersect the eight-category set. papers.id is the primary key.",
+    "oldQueryStatuses": {"complete": 12, "running": 1},
+    "statusCaveat": "Stored query status is historical metadata, not evidence of a currently running process."
+  },
+  "onlineCategoryCountAttempt": {
+    "endpoint": "https://export.arxiv.org/api/query",
+    "query": "(cat:cs.AI OR cat:cs.LG OR cat:stat.ML OR cat:cs.CL OR cat:cs.CV OR cat:cs.NE OR cat:cs.MA OR cat:cs.RO) AND submittedDate:[199101010000 TO 202609232359]",
+    "maxResults": 1,
+    "result": "HTTP 406 Not Acceptable",
+    "totalResults": null
+  },
+  "interpretation": "251284 locally available distinct arXiv IDs meet the category collection rule and require initial relevance screening. This is not the complete category count, three-route total, full-review count, or admission count. Separate IDs representing the same paper still require identity resolution.",
+  "remaining": [
+    "Complete historical eight-category coverage",
+    "Freeze and execute the versioned supplementary keyword queries",
+    "Register and process the external award and literature lead inventory",
+    "Merge all routes and resolve cross-ID paper identity duplicates"
+  ]
+}

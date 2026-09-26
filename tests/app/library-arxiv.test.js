@@ -33,7 +33,7 @@ catch (_) { playwright = require(path.join(os.homedir(), ".cache/codex-runtimes/
       await page.goto(base + "#/library");
       const skip=page.locator('#onboarding [data-skip]');
       if(await skip.isVisible()) await skip.click();
-      await page.waitForFunction(()=>document.querySelectorAll('#library-view .lib-card').length>100);
+      await page.waitForFunction(()=>document.querySelectorAll('#library-view .lib-card').length >= 15);
       await page.locator('[data-library-class="academic"]').click();
       await page.locator('[data-library-subcategory="arxiv"]').click();
       assert.equal(await page.locator('#library-view .lib-card').count(),14);

@@ -1,7 +1,45 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
 const {fingerprint,robots:expectedRobots}=require('./site-seo');
+const {readableLength,MIN_INDEXABLE_TEXT}=require('./crawlable-text');
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Every interactive view on this site renders from window.* data scripts, so a
+// page can be correct in a browser and empty to a crawler. This is the assertion
+// that was missing: it would have caught the library becoming uncrawlable the
+// moment the source data grew past what the concept pages advertise.
+//
+// A page below the threshold may instead name crawlableVia companions — the
+// static pages that carry its records. Naming one is not an exemption: each named
+// page must exist, be indexable, and meet the threshold itself.
+function verifyCrawlable(root,manifest,options={}) {
+  const record=manifest||JSON.parse(fs.readFileSync(path.join(root,'release-manifest.json'),'utf8'));
+  const minimum=options.minimum??MIN_INDEXABLE_TEXT;
+  if(!Array.isArray(record.seoPages)||!record.seoPages.length)throw Error('SEO: missing page registry');
+  const byFile=new Map(record.seoPages.map(page=>[page.file,page]));
+  const measured=new Map();
+  const chars=file=>{
+    if(!measured.has(file)){
+      const target=path.join(root,file);
+      measured.set(file,fs.existsSync(target)?readableLength(fs.readFileSync(target,'utf8')):0);
+    }
+    return measured.get(file);
+  };
+  const failures=[];
+  for(const page of record.seoPages){
+    if(page.indexable===false)continue;
+    const own=chars(page.file);
+    if(own>=minimum)continue;
+    const declared=(page.crawlableVia||[]).map(entry=>entry.endsWith('/')?entry+'index.html':entry);
+    if(!declared.length){failures.push(`${page.file}（${own} 字符）未声明 crawlableVia`);continue;}
+    const unusable=declared.filter(file=>{
+      const peer=byFile.get(file);
+      return !peer||peer.indexable===false||chars(file)<minimum;
+    });
+    if(unusable.length)failures.push(`${page.file}（${own} 字符）声明的附属页不合格：${unusable.join('、')}`);
+  }
+  if(failures.length)throw Error(`SEO: 可索引页面缺少服务端渲染内容（阈值 ${minimum} 字符）——${failures.join('；')}。交互视图需补静态目录页，或在 seoPages 中把承载其记录的页面登记为 crawlableVia。`);
+  return {minimum,indexable:record.seoPages.filter(page=>page.indexable!==false).length,measured:measured.size};
+}
 function verifySeo(root,manifest) {
   const fail=message=>{throw Error('SEO: '+message);};
   const pages=manifest.seoPages;
@@ -62,4 +100,4 @@ function verifySeo(root,manifest) {
   if(robots!==expectedRobots(manifest.siteUrl,manifest.mode==='preview',manifest.crawlPolicy))fail('robots differs from release mode or crawl policy');
   return {pages:pages.length,indexable:expectedUrls.length};
 }
-module.exports={verifySeo};
+module.exports={verifySeo,verifyCrawlable};

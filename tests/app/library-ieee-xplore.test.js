@@ -50,13 +50,13 @@ async function verifyBrowser(siteRoot, browser) {
     await page.goto(base + "#/library");
     const skip = page.locator("#onboarding [data-skip]");
     if (await skip.isVisible()) await skip.click();
-    await page.waitForFunction(() => document.querySelectorAll("#library-view .lib-card").length > 150);
+    await page.waitForFunction(() => document.querySelectorAll("#library-view .lib-card").length >= 15);
     await page.locator('[data-library-class="academic"]').click();
     await page.locator('[data-library-subcategory="ieee-xplore"]').click();
     assert.equal(await page.locator("#library-view .lib-card").count(), 4);
     for (const id of expectedIds) {
       await page.goto(base + `#/library/${id}`);
-      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && location.hash.endsWith(expected), id);
+      await page.waitForFunction(expected => document.querySelector(".d-title")?.textContent.length > 0 && new URLSearchParams(location.search).get("item") === expected && !location.hash, id);
       assert.match(await page.locator("#detail-body").innerText(), /缺乏 AI 重大贡献外部说明/);
       assert.match(await page.locator("#detail-body").innerText(), /上线不代表/);
     }

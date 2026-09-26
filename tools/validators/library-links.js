@@ -24,6 +24,8 @@ try {
   require(path.join(PROJECT_ROOT, "data", "library-platform-profiles.js"));
   require(path.join(PROJECT_ROOT, "data", "library-source-meta.js"));
   require(path.join(PROJECT_ROOT, "data", "library-new-sources.js"));
+  require(path.join(PROJECT_ROOT, "data", "library-knowledge-base-core.js"));
+  require(path.join(PROJECT_ROOT, "data", "library-knowledge-base-expanded.js"));
   require(path.join(PROJECT_ROOT, "data", "library-hackathon-kaggle.js"));
   require(path.join(PROJECT_ROOT, "data", "library-arxiv.js"));
   require(path.join(PROJECT_ROOT, "data", "library-neurips-proceedings.js"));
@@ -33,6 +35,7 @@ try {
   require(path.join(PROJECT_ROOT, "data", "library-cvf-open-access.js"));
   require(path.join(PROJECT_ROOT, "data", "library-ieee-xplore.js"));
   require(path.join(PROJECT_ROOT, "data", "library-acm-digital-library.js"));
+  require(path.join(PROJECT_ROOT, "data", "library-springer-nature.js"));
 } catch (error) {
   console.error("✗ 专业资料库存在语法错误：\n  " + error.message);
   process.exit(1);
