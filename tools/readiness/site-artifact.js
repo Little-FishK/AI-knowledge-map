@@ -200,7 +200,7 @@ function writeArtifact({root, output, entries, inventory, siteUrl, mode, graph, 
     put('licenses/MIT.txt',fs.readFileSync(safeFile(root,'LICENSE')));
   }
   const seoPages=[
-    seo.metadata({siteUrl,path:'',title:positioning.homeTitle,description:positioning.homeDescription,crawlableVia:['search/']}),
+    seo.metadata({siteUrl,path:'',title:positioning.homeTitle,description:positioning.homeDescription,crawlableVia:['search/'],fullTitle:true}),
     seo.metadata({siteUrl,path:'search/',title:'搜索与文字目录',description:'按概念名称、别名和已发布理解页正文搜索 AI 知识地图，并以文字形式浏览概念关系。',kind:'CollectionPage'}),
     seo.metadata({siteUrl,path:'library/',title:'专业资料库与来源治理',description:'按一级来源与机构浏览 AI 官方技术资料、学术投稿、标准与监管、黑客马拉松、评测基准与专业知识库，并查看每个来源的档案、审核机制与复核状态。',kind:'CollectionPage',crawlableVia:companionsFor('library/')}),
     seo.metadata({siteUrl,path:'software/',title:'AI 软件目录与使用教程',description:'按用途浏览常用 AI 软件与工具，查看每个软件的定位、适用场景、关联概念和配套使用教程。',kind:'CollectionPage',crawlableVia:companionsFor('software/')}),

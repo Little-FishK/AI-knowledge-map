@@ -3,14 +3,14 @@ const crypto=require('node:crypto');
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plain=value=>String(value??'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
 const brand=locale=>locale==='en'?'AI Knowledge Map':'AI 知识地图';
-function metadata({siteUrl,path,title,description,locale='zh-Hans',kind='WebPage',indexable=true,alternates=[],breadcrumbs=[],crawlableVia=[],extraSchemas=[]}) {
+function metadata({siteUrl,path,title,description,locale='zh-Hans',kind='WebPage',indexable=true,alternates=[],breadcrumbs=[],crawlableVia=[],extraSchemas=[],fullTitle=false}) {
   const url=new URL(path,siteUrl);
   if(url.protocol!=='https:'||url.origin!==new URL(siteUrl).origin||url.search||url.hash)throw Error('Invalid canonical URL');
   if(!['zh-Hans','en'].includes(locale))throw Error('Unsupported metadata language');
   const name=plain(title),summary=plain(description);
   if(!name||!summary)throw Error('Missing page title or description');
   for(const companion of crawlableVia)new URL(companion,siteUrl);
-  return {path,canonical:url.href,title:name,description:summary,locale,kind,indexable,alternates,breadcrumbs,crawlableVia,extraSchemas};
+  return {path,canonical:url.href,title:name,description:summary,locale,kind,indexable,alternates,breadcrumbs,crawlableVia,extraSchemas,fullTitle};
 }
 // Site icon for browser tabs and search results. Root-relative, so it resolves
 // the same on every page depth and on a /<repo>/ subpath; the release verifier
@@ -34,8 +34,9 @@ function head(meta,siteUrl,preview=false) {
     for(const extra of meta.extraSchemas||[])schemas.push(extra);
   }
   // Concept search titles are already complete, locale-specific search phrases.
-  // Other site pages retain the compact site-name suffix.
-  const documentTitle=meta.kind==='LearningResource'?meta.title:`${meta.title} · ${brand(meta.locale)}`;
+  // A page may declare a complete title (fullTitle); other site pages retain
+  // the compact site-name suffix.
+  const documentTitle=meta.kind==='LearningResource'||meta.fullTitle?meta.title:`${meta.title} · ${brand(meta.locale)}`;
   return icons(siteUrl)+`<title>${esc(documentTitle)}</title>\n<meta name="description" content="${esc(meta.description)}">\n<meta name="robots" content="${preview||!meta.indexable?'noindex, nofollow':'index, follow'}">\n`+
     (meta.indexable?`<link rel="canonical" href="${esc(meta.canonical)}">\n`+meta.alternates.map(a=>`<link rel="alternate" hreflang="${esc(a.locale)}" href="${esc(a.url)}">`).join('\n')+`\n<meta property="og:type" content="website">\n<meta property="og:site_name" content="${brand(meta.locale)}">\n<meta property="og:title" content="${esc(meta.title)}">\n<meta property="og:description" content="${esc(meta.description)}">\n<meta property="og:url" content="${esc(meta.canonical)}">\n<meta property="og:locale" content="${meta.locale==='en'?'en_US':'zh_CN'}">\n<meta property="og:image" content="${esc(image)}">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="${esc(meta.title)}">\n<meta name="twitter:description" content="${esc(meta.description)}">\n<meta name="twitter:image" content="${esc(image)}">\n<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">\n`:'')+
     (schemas.length?`<script type="application/ld+json">${JSON.stringify(schemas).replace(/</g,'\\u003c')}</script>\n`:'');

@@ -14,7 +14,9 @@ const copy = {
     roadmap: '后续计划：加入精选专业 AI 资料库和实用的智能体教程，帮助你从理解概念走向动手实践。'
   }
 };
-const homeTitle = '零基础免费学 AI | Learn AI from Scratch';
+// Search engines show this as the homepage title link. It is used verbatim
+// (no site-name suffix): brand first, then what the site offers, in English.
+const homeTitle = 'AI Knowledge Map - Learn AI from Scratch, Free for Beginners';
 const homeDescription = copy.en.description + ' 零基础免费学 AI，通过概念地图系统入门人工智能。';
 function homeIntro(base='/') {
   return `<details id="learning-intro" style="flex:0 0 auto;padding:6px 16px;background:var(--bg-panel,#1b1e24);border-bottom:1px solid var(--line,#343944);max-height:40vh;overflow:auto"><summary style="cursor:pointer"><span lang="zh-Hans">零基础免费学 AI</span> · <span lang="en">Learn AI from scratch, for free</span></summary><div style="max-width:960px;margin:12px auto;line-height:1.7"><section lang="en"><h2>AI Knowledge Map: a free starting point for beginners</h2><p>${copy.en.introduction}</p><p>${copy.en.roadmap}</p><a href="${base}en/">Start learning AI in English →</a></section><section lang="zh-Hans"><h2>从零开始，理解 AI 的全貌</h2><p>${copy.zh.introduction}</p><p>${copy.zh.roadmap}</p><a href="${base}zh/">开始中文学习 →</a></section></div></details>`;
