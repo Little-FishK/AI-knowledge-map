@@ -23,6 +23,9 @@
     let selectedSubcategory = "all";
     let selectedTopicCategory = "all";
     let query = "";
+    // The grid shows one page of cards at a time; any filter change returns to page 1.
+    const PAGE_SIZE = 15;
+    let page = 1;
 
     const bundle = [
       "data/library.js?v=20260925-remove-secondary-1",
@@ -80,6 +83,14 @@
     ];
 
     view.addEventListener("click", event => {
+      const pageButton = event.target.closest("[data-library-page]");
+      if (pageButton) {
+        page = Number(pageButton.getAttribute("data-library-page")) || 1;
+        renderItems();
+        const toolbar = view.querySelector(".lib-toolbar");
+        if (toolbar && toolbar.scrollIntoView) toolbar.scrollIntoView({ block: "start" });
+        return;
+      }
       const item = event.target.closest("[data-library-item]");
       if (item) {
         navigate({ name: "library-item", id: item.getAttribute("data-library-item") });
@@ -89,6 +100,7 @@
       if (sourceClass) {
         selectedClass = sourceClass.getAttribute("data-library-class");
         selectedSubcategory = "all";
+        page = 1;
         selectedTopicCategory = "all";
         view.querySelectorAll("[data-library-class]").forEach(button => button.classList.toggle("active", button === sourceClass));
         renderSubcategories();
@@ -99,6 +111,7 @@
       const subcategory = event.target.closest("[data-library-subcategory]");
       if (subcategory) {
         selectedSubcategory = subcategory.getAttribute("data-library-subcategory");
+        page = 1;
         selectedTopicCategory = "all";
         renderSubcategories();
         renderTopicCategories();
@@ -108,6 +121,7 @@
       const topic = event.target.closest("[data-library-topic]");
       if (topic) {
         selectedTopicCategory = topic.getAttribute("data-library-topic");
+        page = 1;
         renderTopicCategories();
         renderItems();
       }
@@ -125,6 +139,7 @@
       const dropdown = event.target.closest(".lib-sub-select");
       if (!dropdown || !dropdown.value) return;
       [selectedClass, selectedSubcategory] = dropdown.value.split("::");
+      page = 1;
       selectedTopicCategory = "all";
       view.querySelectorAll("[data-library-class]").forEach(button =>
         button.classList.toggle("active", button.getAttribute("data-library-class") === selectedClass));
@@ -138,6 +153,7 @@
       const searchInput = event.target.closest(".lib-search");
       if (!searchInput) return;
       query = searchInput.value;
+      page = 1;
       scheduleRender();
     });
 
@@ -281,8 +297,14 @@
         return [item.title, item.publisher, item.collection, item.contentKind, item.summary, source && source.label, subcategory && subcategory.label, topicCategoryLabel(item.primaryCategory)]
           .concat(item.tags || [], (item.relatedMaterials || []).flatMap(record => [record.title, record.summary, ...(record.tags || [])])).join(" ").toLocaleLowerCase().includes(normalizedQuery);
       });
-      if (note) note.textContent = t("library.itemCount", { count: items.length });
-      grid.innerHTML = items.length ? items.map(canonicalItem => {
+      const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+      page = Math.min(Math.max(1, page), pages);
+      const visible = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+      if (note) note.textContent = pages > 1
+        ? `${t("library.itemCount", { count: items.length })} · ${pagerText("library.page.status", `${page} / ${pages}`, { page, pages })}`
+        : t("library.itemCount", { count: items.length });
+      renderPager(pages);
+      grid.innerHTML = visible.length ? visible.map(canonicalItem => {
         const item = sourceRecords(canonicalItem).find(matchesSource) || canonicalItem;
         const source = sourceClassById(item.sourceClass) || { label: item.sourceClass, color: "#7aa2d8" };
         const subcategory = subcategoryById(source, item.sourceSubcategory) || { label: item.sourceSubcategory };
@@ -298,6 +320,32 @@
           <div class="lib-card-foot">${(item.tags || []).slice(0, 4).map(tag => `<span class="lib-tag">${esc(tag)}</span>`).join("")}</div>
         </article>`;
       }).join("") : `<div class="lib-empty">${esc(t("library.empty"))}</div>`;
+    }
+
+    // Numbered pager: first, last, and two pages either side of the current one.
+    // A freshly deployed view can briefly meet a cached locale file; fall back
+    // to a built-in label instead of showing the raw key.
+    function pagerText(key, fallback, variables) {
+      const text = t(key, variables);
+      return text === key ? fallback : text;
+    }
+
+    function renderPager(pages) {
+      const pager = view.querySelector(".lib-pager");
+      if (!pager) return;
+      if (pages < 2) { pager.hidden = true; pager.innerHTML = ""; return; }
+      const shown = [...new Set([1, pages, page - 2, page - 1, page, page + 1, page + 2])].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b);
+      const button = (n, label, extra = "") => `<button type="button" class="lib-page${n === page ? " active" : ""}" data-library-page="${n}"${n === page ? ' aria-current="page"' : ""}${extra}>${label}</button>`;
+      const parts = [];
+      parts.push(page > 1 ? button(page - 1, esc(pagerText("library.page.prev", "‹")), ' rel="prev"') : `<button type="button" class="lib-page" disabled>${esc(pagerText("library.page.prev", "‹"))}</button>`);
+      shown.forEach((n, index) => {
+        if (index && n - shown[index - 1] > 1) parts.push('<span class="lib-page-gap" aria-hidden="true">…</span>');
+        parts.push(button(n, String(n)));
+      });
+      parts.push(page < pages ? button(page + 1, esc(pagerText("library.page.next", "›")), ' rel="next"') : `<button type="button" class="lib-page" disabled>${esc(pagerText("library.page.next", "›"))}</button>`);
+      pager.hidden = false;
+      pager.setAttribute("aria-label", pagerText("library.page.aria", "Pages"));
+      pager.innerHTML = parts.join("");
     }
 
     function build() {
@@ -328,6 +376,7 @@
             <span class="lib-filter-note"></span>
           </div>
           <div class="lib-grid"></div>
+          <nav class="lib-pager" hidden></nav>
         </section>
       </div>`;
       view.querySelector(".lib-search").value = query;

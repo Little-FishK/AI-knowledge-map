@@ -180,6 +180,14 @@ html, body {
 .lib-summary { color: var(--fg-dim); font-size: 12px; line-height: 1.65; margin: 0 0 12px; }
 .lib-card-foot { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
 .lib-tag { padding: 1px 6px; border-radius: 4px; background: #191c22; color: var(--fg-faint); font-size: 10px; }
+.lib-pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 16px; }
+.lib-pager[hidden] { display: none; }
+.lib-page { min-width: 32px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: transparent; color: var(--fg); font-size: 12px; cursor: pointer; }
+.lib-page:hover:not(:disabled) { border-color: var(--accent); }
+.lib-page.active { border-color: var(--accent); background: var(--accent); color: var(--bg, #14161a); cursor: default; }
+.lib-page:disabled { opacity: .4; cursor: default; }
+.lib-page-gap { color: var(--fg-faint); font-size: 12px; padding: 0 2px; }
 .lib-empty { padding: 45px 20px; border: 1px dashed var(--line); border-radius: 8px;
              color: var(--fg-faint); text-align: center; }
 .lib-detail-meta { display: grid; grid-template-columns: 76px 1fr; gap: 5px 10px; font-size: 12px; }
