@@ -3280,8 +3280,8 @@
   const original = library.items.find(item => item.id === retained.id);
   if (!original) throw new Error("VALL-E原始条目缺失");
   Object.assign(original, retained);
-  const framework = library.items.find(item => item.id === "microsoft-autogen-docs");
-  if (!framework) throw new Error("AutoGen官方资料缺失，无法合并研究入口");
+  const framework = library.items.find(item => item.id === "microsoft-agent-framework");
+  if (!framework) throw new Error("Microsoft Agent Framework 官方资料缺失，无法合并 AutoGen 历史研究入口");
   framework.relatedMaterials = [{
   "id": "arxiv-2308-08155",
   "sourceClass": "academic",
