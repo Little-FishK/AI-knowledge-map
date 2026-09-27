@@ -9,15 +9,54 @@
   const adapterFactory = global.AI_PROGRESS_SUPABASE;
   if (!model || !runtimeFactory) return;
 
-  let adapter = null;
-  if (global.supabase?.createClient && adapterFactory) {
-    const client = global.supabase.createClient(PROJECT_URL, PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ai-knowledge-map.auth.v1'},
-    });
-    adapter = adapterFactory.create(client);
-  }
   let localProgressStorage = null;
   try { localProgressStorage = global.localStorage; } catch (_) {}
+  // Guests use local progress without downloading the account SDK. Existing
+  // sessions still restore on page load; first sign-in loads the SDK on demand.
+  const sdkUrl = new URL('vendor/supabase-2.115.0.min.js', document.currentScript?.src || global.location.href).href;
+  let clientAdapter = null;
+  let sdkPromise = null;
+  let authSubscriber = null;
+  async function ensureAdapter() {
+    if (clientAdapter) return clientAdapter;
+    if (!adapterFactory) throw Error('Account adapter unavailable');
+    if (!sdkPromise) {
+      sdkPromise = (async () => {
+        if (!global.supabase?.createClient) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = sdkUrl;
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = () => reject(Error('Account SDK failed to load'));
+            document.head.append(script);
+          });
+        }
+        if (!global.supabase?.createClient) throw Error('Account SDK unavailable');
+        const client = global.supabase.createClient(PROJECT_URL, PUBLISHABLE_KEY, {
+          auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ai-knowledge-map.auth.v1'},
+        });
+        clientAdapter = adapterFactory.create(client);
+        if (authSubscriber) clientAdapter.onAuthChange(authSubscriber);
+        return clientAdapter;
+      })().catch(error => { sdkPromise = null; throw error; });
+    }
+    return sdkPromise;
+  }
+  const hasStoredSession = () => {
+    try { return Boolean(localProgressStorage?.getItem('ai-knowledge-map.auth.v1')); }
+    catch (_) { return false; }
+  };
+  const adapter = adapterFactory ? {
+    session: async () => hasStoredSession() ? (await ensureAdapter()).session() : null,
+    onAuthChange(callback) { authSubscriber = callback; if (clientAdapter) clientAdapter.onAuthChange(callback); },
+    sendCode: async email => (await ensureAdapter()).sendCode(email),
+    verifyCode: async (email, token) => (await ensureAdapter()).verifyCode(email, token),
+    signOut: async () => (await ensureAdapter()).signOut(),
+    deleteAccount: async () => (await ensureAdapter()).deleteAccount(),
+    load: async () => (await ensureAdapter()).load(),
+    apply: async op => (await ensureAdapter()).apply(op),
+  } : null;
   const runtime = runtimeFactory.create({model, adapter, storage:localProgressStorage,eventTarget:global,
     legacyKey:'ai-knowledge-map.learned.v1', randomUUID:()=>global.crypto.randomUUID()});
   let snapshot = runtime.get();
