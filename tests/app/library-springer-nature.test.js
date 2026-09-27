@@ -31,8 +31,8 @@ function loadData(root) {
   return window.PRO_LIBRARY.items;
 }
 
-const releaseRoot = process.env.LIBRARY_RELEASE_ROOT ? path.resolve(process.env.LIBRARY_RELEASE_ROOT) : path.join(PROJECT_ROOT, "site-release");
-for (const root of [PROJECT_ROOT, releaseRoot]) {
+const releaseRoot = process.env.LIBRARY_RELEASE_ROOT ? path.resolve(process.env.LIBRARY_RELEASE_ROOT) : null;
+for (const root of [PROJECT_ROOT, ...(releaseRoot ? [releaseRoot] : [])]) {
   const records = loadData(root);
   assert.equal(records.filter(item => item.sourceSubcategory === "acm-dl").length, 9);
   const springer = records.filter(item => item.sourceSubcategory === "springer-nature");
@@ -111,7 +111,7 @@ async function verifyLiveBrowser(base, browser) {
   const browser = await playwright.chromium.launch({ headless: true, executablePath: candidates.find(candidate => fs.existsSync(candidate)) });
   try {
     await verifyBrowser(PROJECT_ROOT, browser);
-    await verifyBrowser(releaseRoot, browser);
+    if (releaseRoot) await verifyBrowser(releaseRoot, browser);
     if (process.env.LIBRARY_LIVE_URL) await verifyLiveBrowser(process.env.LIBRARY_LIVE_URL, browser);
   } finally { await browser.close(); }
   console.log("PASS ACM nine plus Springer Nature one public records");

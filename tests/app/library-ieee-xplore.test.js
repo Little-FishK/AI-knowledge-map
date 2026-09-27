@@ -72,7 +72,7 @@ async function verifyBrowser(siteRoot, browser) {
   const browser = await playwright.chromium.launch({ headless: true, executablePath: candidates.find(candidate => fs.existsSync(candidate)) });
   try {
     await verifyBrowser(PROJECT_ROOT, browser);
-    await verifyBrowser(path.join(PROJECT_ROOT, "site-release"), browser);
+    if (process.env.LIBRARY_RELEASE_ROOT) await verifyBrowser(path.resolve(process.env.LIBRARY_RELEASE_ROOT), browser);
   } finally { await browser.close(); }
   console.log("PASS IEEE Xplore four public needs-evidence records");
 })().catch(error => { console.error(error); process.exitCode = 1; });

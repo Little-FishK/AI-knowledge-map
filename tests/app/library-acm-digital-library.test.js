@@ -102,12 +102,12 @@ async function verifyLiveBrowser(base, browser) {
 }
 
 (async () => {
-  const releaseRoot = process.env.LIBRARY_RELEASE_ROOT ? path.resolve(process.env.LIBRARY_RELEASE_ROOT) : path.join(PROJECT_ROOT, "site-release");
+  const releaseRoot = process.env.LIBRARY_RELEASE_ROOT ? path.resolve(process.env.LIBRARY_RELEASE_ROOT) : null;
   const candidates = [playwright.chromium.executablePath(), "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"].filter(Boolean);
   const browser = await playwright.chromium.launch({ headless: true, executablePath: candidates.find(candidate => fs.existsSync(candidate)) });
   try {
     await verifyBrowser(PROJECT_ROOT, browser);
-    await verifyBrowser(releaseRoot, browser);
+    if (releaseRoot) await verifyBrowser(releaseRoot, browser);
     if (process.env.LIBRARY_LIVE_URL) await verifyLiveBrowser(process.env.LIBRARY_LIVE_URL, browser);
   } finally { await browser.close(); }
   console.log("PASS ACM Digital Library nine public needs-evidence records");

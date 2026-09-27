@@ -19,7 +19,7 @@ const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 const t=key=>window.AI_LOCALES[locale].messages[key]||key;
 const ids=new Set(['sample']);
 const loader=AIMap.createDeepDiveLoader({runtime:{base:'/source'},ids,registry:DEEPDIVE,revision:'fixture',t,getLocale:()=>locale,englishTimeoutMs:500});
-const view=AIMap.createDeepDiveView({element:document.getElementById('deepdive'),ids,byId:{},escapeHtml:esc,ensurePage:loader.ensure,renderLearning:()=>'',bindLearning:()=>{},preloadNeighbors:()=>{},router:{parse:()=>({name:'map'})},navigate:()=>view.close(),t});
+const view=AIMap.createDeepDiveView({element:document.getElementById('deepdive'),ids,byId:{},escapeHtml:esc,ensurePage:loader.ensure,renderLearning:()=>'',bindLearning:()=>{},preloadNeighbors:()=>{},router:{parseLocation:()=>({name:'map'})},navigate:()=>view.close(),t});
 document.getElementById('open').onclick=()=>view.open('sample');
 document.getElementById('settings').onclick=()=>document.getElementById('language').hidden=false;
 document.getElementById('language').onchange=event=>{locale=event.target.value;document.documentElement.lang=locale;view.open('sample');};
@@ -52,7 +52,8 @@ async function test(name, action) { await action(); count++; console.log(`PASS $
     res.writeHead(204).end();
   });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
-  browser = await chromium.launch({ channel: process.env.TRANSLATION_BROWSER_CHANNEL || "msedge", headless: true });
+  const channel = process.env.TRANSLATION_BROWSER_CHANNEL || (process.platform === "win32" ? "msedge" : null);
+  browser = await chromium.launch({ ...(channel ? { channel } : {}), headless: true });
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   const errors = []; page.on("pageerror", error => errors.push(error.message));
   const url = `http://127.0.0.1:${server.address().port}`;

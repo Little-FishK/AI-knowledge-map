@@ -46,9 +46,10 @@ source closeout; do not reset it merely to make `git status` clean.
 `site-release/` is fully tracked as the existing 130-page Chinese publication fixture. Its
 manifest is verified by `tests/tooling/website-release.test.js`. It is a historical snapshot,
 not the current bilingual production version. The manually dispatched `publish-website.yml`
-uploads this directory, so do not dispatch it to redeploy the current site without first
-preparing the intended complete artifact. This categorization does not trigger deployment.
-The current live version remains the `gh-pages` commit referenced by the deployment baseline.
+now exports the current `gh-pages` tip, restores only manifest-proven LF bytes, verifies the
+complete production artifact, and refuses to deploy if that branch advances. Dispatch requires
+the exact current `gh-pages` commit SHA. The workflow never uploads `site-release/`.
+The current live version must still be confirmed from the deployment receipt and live checks.
 
 Personal assistant memory, temporary inspection helpers, the local promotion workbook, and
 the duplicate Baidu download stay local and ignored. The canonical public ownership proof

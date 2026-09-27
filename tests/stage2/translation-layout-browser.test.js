@@ -3,7 +3,8 @@ const assert=require('node:assert/strict'),path=require('node:path'),os=require(
 const {inspectLayout}=require('../../tools/deepdive-stage2/lib/translation-layout-checks');
 const {chromium}=require(require.resolve('playwright',{paths:[path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node')]}));
 (async()=>{
-  const browser=await chromium.launch({channel:'msedge',headless:true});
+  const channel=process.env.TRANSLATION_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : null);
+  const browser=await chromium.launch({...(channel ? {channel} : {}),headless:true});
   try {
     const page=await browser.newPage();
     async function inspect(body){await page.setContent('<article>'+body+'</article>');await page.evaluate(()=>document.fonts.ready);return page.locator('article').evaluate(inspectLayout);}

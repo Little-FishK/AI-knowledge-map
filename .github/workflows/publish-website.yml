@@ -1,6 +1,11 @@
 name: Publish verified website
 on:
   workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact current gh-pages commit to deploy
+        required: true
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -8,28 +13,70 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      release_sha: ${{ steps.revision.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: source
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: published
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Refuse missing, preview or modified artifacts
-        run: node tools/verify-website.js site-release --production
+      - name: Pin the current release commit
+        id: revision
+        env:
+          EXPECTED_RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          if [[ ! "$EXPECTED_RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'Provide the full lowercase gh-pages commit SHA.' >&2
+            exit 1
+          fi
+          actual="$(git -C published rev-parse HEAD)"
+          remote="$(git -C source ls-remote origin refs/heads/gh-pages | cut -f1)"
+          if [[ "$actual" != "$EXPECTED_RELEASE_SHA" || "$remote" != "$actual" ]]; then
+            echo 'gh-pages changed or the requested commit is not its current tip.' >&2
+            exit 1
+          fi
+          echo "sha=$actual" >> "$GITHUB_OUTPUT"
+      - name: Export exact tracked release files
+        run: |
+          mkdir release-artifact
+          git -C published archive HEAD | tar -x -C release-artifact
+      - name: Restore manifest-bound LF bytes
+        run: node source/tools/restore-release-line-endings.js release-artifact
+      - name: Verify complete production release
+        run: node source/tools/verify-publish-target.js release-artifact --site-url https://ai-knowledge-map.com/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site-release
+          path: release-artifact
   deploy:
     needs: verify
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+      - name: Refuse a superseded release
+        env:
+          VERIFIED_RELEASE_SHA: ${{ needs.verify.outputs.release_sha }}
+        run: |
+          remote="$(git ls-remote origin refs/heads/gh-pages | cut -f1)"
+          if [[ "$remote" != "$VERIFIED_RELEASE_SHA" ]]; then
+            echo 'gh-pages advanced after verification; dispatch the new commit instead.' >&2
+            exit 1
+          fi
       - name: Deploy exact verified artifact
         id: deployment
         uses: actions/deploy-pages@v4

@@ -6,7 +6,9 @@ const http = require("node:http");
 const os = require("node:os");
 const path = require("node:path");
 
-const root = path.resolve(__dirname, "../..", "site-release");
+const root = process.env.LIBRARY_RELEASE_ROOT
+  ? path.resolve(process.env.LIBRARY_RELEASE_ROOT)
+  : path.resolve(__dirname, "../..", "site-release");
 let playwright;
 try { playwright = require("playwright"); }
 catch (_) { playwright = require(path.join(os.homedir(), ".cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright")); }
