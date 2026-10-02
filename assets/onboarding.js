@@ -97,7 +97,7 @@
     const lesson = lessons[state.cursor];
     const isMap = view === 'map';
     document.title = isMap
-      ? (english() ? 'Learn AI from Scratch: Free Guide for Beginners | AI Knowledge Map' : '零基础免费学 AI：概念与入门学习指南 | AI 知识地图')
+      ? (english() ? 'AI Knowledge Map – A Beginner’s Guide to AI Fundamentals and Connections' : 'AI 知识地图 – 面向初学者的 AI 基础与概念关联指南')
       : `${lesson.title} | ${copy('新手导览 · AI 知识地图', 'Beginner guide · AI Knowledge Map')}`;
     root.removeAttribute(isMap ? 'aria-labelledby' : 'aria-label');
     root.setAttribute(isMap ? 'aria-label' : 'aria-labelledby', isMap ? copy("六站新手地图", "Six-stop beginner map") : 'onboarding-lesson-title');
@@ -109,7 +109,7 @@
       ${isMap ? `<div class="onboarding-hero">
         <div class="onboarding-hero-copy">
           <h1 id="onboarding-title">${copy("看懂 AI，<br>从<span>这里</span>开始。", "Understand AI.<br>Start <span>here</span>.")}</h1>
-          <p class="onboarding-lead">${copy("不必先懂算法，也不用追赶每一个新名词。<br>从六个简单的问题出发，建立属于你的知识地图。", "No algorithms to master. No buzzwords to chase.<br>Six simple questions to build your own knowledge map.")}</p>
+          <p class="onboarding-lead">${copy("无需 AI 或编程基础。<br>从六个简单的问题出发，理解 AI 基础与概念之间的联系。", "No prior AI or coding experience required.<br>Explore AI fundamentals and how concepts connect, starting with six simple questions.")}</p>
           <div class="onboarding-hero-actions"><button class="onboarding-launch" type="button" data-start>${state.read >= count ? copy("重温第一站", "Revisit stop one") : state.read ? copy("继续我的探索", "Continue exploring") : copy("开启第一站", "Start the journey")}<span aria-hidden="true">↗</span></button>${state.read ? `<span class="onboarding-journey-note">${copy(`已完成 ${state.read} / ${count} 站`, `${state.read} / ${count} stops completed`)}</span>` : ''}</div>
           <div class="onboarding-metrics"><span><strong>${String(count).padStart(2, '0')}</strong> ${copy("入门章节", "intro lessons")}</span><span><strong>${global.GRAPH?.nodes?.length || 130}</strong> ${copy("概念节点", "concepts")}</span><span><strong>${String(global.GRAPH?.recommendedLearningPath?.length || 9).padStart(2, '0')}</strong> ${copy("官方推荐阶段", "learning stages")}</span></div>
         </div>
