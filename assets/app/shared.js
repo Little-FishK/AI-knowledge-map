@@ -37,8 +37,31 @@
       return load;
     }
 
-    async function loadInOrder(srcs) {
-      for (const src of srcs) await loadOnce(src);
+    async function loadInOrder(srcs, options = {}) {
+      // Fetch ahead without executing: data scripts mutate shared registries and
+      // must still execute in order, stopping at the first failure for retries.
+      const ahead = Math.max(0, Math.min(6, Math.floor(Number(options.preload) || 0)));
+      const hints = new Map();
+      let next = 0;
+      try {
+        for (let index = 0; index < srcs.length; index += 1) {
+          while (ahead && next < Math.min(srcs.length, index + ahead)) {
+            const src = srcs[next++];
+            if (loads.has(src) || hints.has(src)) continue;
+            const hint = document.createElement("link");
+            hint.rel = "preload";
+            hint.as = "script";
+            hint.href = src;
+            hints.set(src, hint);
+            document.head.appendChild(hint);
+          }
+          await loadOnce(srcs[index]);
+          hints.get(srcs[index])?.remove();
+          hints.delete(srcs[index]);
+        }
+      } finally {
+        hints.forEach(hint => hint.remove());
+      }
     }
 
     return Object.freeze({ loadOnce, loadInOrder });

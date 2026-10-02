@@ -148,8 +148,9 @@
         const script = documentRef.createElement("script");
         script.src = path;
         script.async = true;
-        script.onload = () => { script.remove(); resolve(); };
-        script.onerror = () => { script.remove(); reject(new Error(`内容语言资源加载失败：${locale}/${assetName}`)); };
+        const timeout = setTimeout(() => script.onerror(), config.localeTimeoutMs || 8000);
+        script.onload = () => { clearTimeout(timeout); script.remove(); resolve(); };
+        script.onerror = () => { clearTimeout(timeout); script.remove(); reject(new Error(`内容语言资源加载失败：${locale}/${assetName}`)); };
         documentRef.head.appendChild(script);
       });
     }

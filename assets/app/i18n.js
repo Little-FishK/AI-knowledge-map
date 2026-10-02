@@ -170,11 +170,14 @@
         const script = documentRef.createElement("script");
         script.src = entry.ui;
         script.async = true;
+        const timeout = setTimeout(() => script.onerror(), config.localeTimeoutMs || 8000);
         script.onload = () => {
+          clearTimeout(timeout);
           script.remove();
           resolve();
         };
         script.onerror = () => {
+          clearTimeout(timeout);
           script.remove();
           reject(new Error(`语言资源加载失败：${locale}`));
         };
@@ -247,7 +250,18 @@
           typeof navigator !== "undefined" ? navigator.languages : []
         ),
       });
-      return setLocale(locale, { persist: false });
+      try {
+        return await setLocale(locale, { persist: false });
+      } catch (error) {
+        if (locale === sourceLocale) throw error;
+        // A failed optional language must not prevent the map from starting.
+        // Preserve the saved preference so the next visit can try it again.
+        const fallback = await setLocale(sourceLocale, { persist: false });
+        if (typeof config.onInitialFallback === "function") {
+          config.onInitialFallback({ locale, fallback, error });
+        }
+        return fallback;
+      }
     }
 
     function translate(key, variables) {

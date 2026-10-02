@@ -211,7 +211,7 @@
 
     async function ensureReady() {
       if (!built) view.innerHTML = `<div class="view-loading" role="status">${esc(t("library.loading"))}</div>`;
-      await loadScriptsInOrder(bundle);
+      await loadScriptsInOrder(bundle, { preload: 6 });
       if (!source && global.PRO_LIBRARY) source = {library: global.PRO_LIBRARY, profiles: global.LIBRARY_PLATFORM_PROFILES || {}, profileGuidance: global.LIBRARY_PROFILE_GUIDANCE || {}};
       software = global.SOFTWARE || software;
       if (localeNow() !== viewLocale || !library) {

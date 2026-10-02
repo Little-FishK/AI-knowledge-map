@@ -19,9 +19,11 @@
   }
   if (!I18N_MANIFEST) throw new Error("语言清单未加载");
   window.AI_LOCALES = window.AI_LOCALES || {};
+  let initialLanguageFallback = false;
   const language = APP.i18n.createI18n({
     manifest: I18N_MANIFEST,
     registry: window.AI_LOCALES,
+    onInitialFallback: () => { initialLanguageFallback = true; },
   });
   await language.initialize({ urlLocale: new URLSearchParams(window.location.search).get("lang") });
   const t = language.t;
@@ -35,10 +37,15 @@
   try {
     await content.ensureLocale(language.getLocale());
   } catch (error) {
-    console.error(error);
-    await language.setLocale(I18N_MANIFEST.sourceLocale);
+    console.warn("内容语言资源加载失败，使用源语言", error);
+    await language.setLocale(I18N_MANIFEST.sourceLocale, { persist: false });
+    initialLanguageFallback = true;
   }
   const {renderLanguageSettings} = window.createMapSettings({language, content, manifest: I18N_MANIFEST});
+  if (initialLanguageFallback) {
+    document.getElementById("settings-language-status").textContent =
+      "语言资源暂时无法加载，已使用简体中文。可在此重新选择语言。";
+  }
   if (window.AI_ONBOARDING) await window.AI_ONBOARDING.ready;
 
   const DOMAINS = G.domains;
