@@ -25,7 +25,10 @@
     registry: window.AI_LOCALES,
     onInitialFallback: () => { initialLanguageFallback = true; },
   });
-  await language.initialize({ urlLocale: new URLSearchParams(window.location.search).get("lang") });
+  await language.initialize({
+    urlLocale: new URLSearchParams(window.location.search).get("lang"),
+    navigatorLanguages: [], // Use the site default unless the visitor explicitly chose a language.
+  });
   const t = language.t;
   language.localize(document);
   window.AI_CONTENT_LOCALES = window.AI_CONTENT_LOCALES || {};

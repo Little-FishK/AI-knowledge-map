@@ -27,8 +27,11 @@
     if (resolvedLocale) return document.documentElement.lang === 'en';
     const requested = new URLSearchParams(global.location.search).get('lang');
     if (requested === 'en' || requested === 'zh-Hans') return requested === 'en';
-    try { return storage?.getItem('ai-knowledge-map.locale.v1') === 'en' || document.documentElement.lang === 'en'; }
-    catch (_) { return document.documentElement.lang === 'en'; }
+    try {
+      const saved = storage?.getItem('ai-knowledge-map.locale.v1');
+      if (saved === 'en' || saved === 'zh-Hans') return saved === 'en';
+    } catch (_) {}
+    return true;
   };
   const copy = (zh, en) => english() ? en : zh;
   function persist() {

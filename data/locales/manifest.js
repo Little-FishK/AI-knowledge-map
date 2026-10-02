@@ -3,7 +3,7 @@ window.I18N_MANIFEST = Object.freeze({
   schemaVersion: 1,
   revision: "2026-09-04-architecture-batch-2",
   sourceLocale: "zh-Hans",
-  defaultLocale: "zh-Hans",
+  defaultLocale: "en",
   storageKey: "ai-knowledge-map.locale.v1",
   terminology: "data/locales/terminology.js",
   locales: Object.freeze({
