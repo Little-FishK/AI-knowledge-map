@@ -352,23 +352,17 @@
         setDocumentTitle(t("pageTitle.software"));
         return;
       }
-      const software = softwareView.findSoftware(route.id);
-      if (!software) {
+      const module = softwareView.findTutorial(route.id);
+      if (!module) {
         goToRoute({ name: "software" }, { replace: true });
         return;
       }
-      softwareView.openSoftware(route.id);
-      if (route.name === "tutorial") {
-        const tutorial = softwareView.findTutorial(route.id);
-        if (!tutorial) {
-          goToRoute({ name: "software-item", id: route.id }, { replace: true });
-          return;
-        }
-        softwareView.openTutorial(route.id);
-        setDocumentTitle(tutorial.title);
-      } else {
-        setDocumentTitle(software.name);
+      if (route.name === "software-item") {
+        goToRoute({ name: "tutorial", id: route.id }, { replace: true });
+        return;
       }
+      softwareView.openTutorial(route.id);
+      setDocumentTitle(t("tutorial.language") === "en" ? module.titleEn : module.title);
       return;
     }
 

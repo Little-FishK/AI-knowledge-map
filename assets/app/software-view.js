@@ -1,211 +1,95 @@
-/* AI 知识地图 — 软件目录、软件详情与教程视图 */
+/* 软件教程：一个前置模块，六个学习方向。 */
 (function (global) {
   "use strict";
-
   const app = global.AIMap = global.AIMap || {};
-
-  app.createSoftwareView = function createSoftwareView(options) {
-    const view = options.view;
-    const detail = options.detail;
-    const detailBody = options.detailBody;
-    const deepDiveElement = options.deepDiveElement;
-    const byId = options.byId;
-    const esc = options.escapeHtml;
-    const mdLite = options.markdown;
-    const loadScriptsInOrder = options.loadScriptsInOrder;
-    const navigate = options.navigate;
-    const t = options.t;
-    let software = global.SOFTWARE || null;
-    let tutorials = global.TUTORIALS || null;
+  app.createSoftwareView = function (options) {
+    const { view, deepDiveElement, escapeHtml: esc, loadScriptsInOrder, navigate, t } = options;
+    let tutorials = null;
     let built = false;
-
-    const bundle = [
-      "data/software.js",
-      "data/tutorials.js",
-      "data/tutorials-codex-youtube.js",
-      "data/tutorials-claude-code.js",
-      "data/tutorials-video-generated.js",
-    ];
-
-    view.addEventListener("click", event => {
-      const card = event.target.closest("[data-sw]");
-      if (card) navigate({ name: "software-item", id: card.getAttribute("data-sw") });
-    });
-
+    let disposeWorkflow = null;
+    let disposeExamples = null;
+    const bundle = ["data/tutorials.js?v=532f9364cc77f0f7", "assets/app/prompt-foundations.js?v=78f927eb6e546250", "assets/app/prompt-workflow.js?v=0d655282890c07ff", "data/tutorials-faq.js?v=b0f74c8595f04822", "assets/app/prompt-faq.js?v=41e9d19df92d1a2d", "data/tutorials-prompts.js?v=3a06c26de557b9f6", "assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
+    const label = (module, field) => t("tutorial.language") === "en" ? module[field + "En"] || module[field] : module[field];
+    const findTutorial = id => tutorials?.modules.find(module => module.id === id);
+    function card(module, index, foundation = false) {
+      return `<button type="button" class="course-card${foundation ? " course-foundation" : ""}" data-module="${esc(module.id)}" style="--module-color:${esc(module.color)}">
+        <span class="course-number">${String(index + 1).padStart(2, "0")}</span>
+        <span class="course-card-copy"><span class="course-tag">${esc(t(foundation ? "tutorial.prerequisite" : "tutorial.direction"))}</span>
+        <span class="course-title">${esc(label(module, "title"))}</span>
+        <span class="course-summary">${esc(label(module, "summary"))}</span>
+        <span class="course-status">${esc(t(module.status === "available" ? "tutorial.available" : "tutorial.planned"))}</span></span>
+        <span class="course-arrow" aria-hidden="true">↗</span></button>`;
+    }
+    function build() {
+      if (built || !tutorials) return;
+      const foundation = findTutorial(tutorials.foundationId);
+      view.innerHTML = `<div class="course-home">
+        <header class="sw-head"><span class="course-eyebrow">${esc(t("tutorial.pathLabel"))}</span><h2>${esc(t("software.title"))}</h2><p>${esc(t("software.intro"))}</p></header>
+        <section aria-labelledby="course-foundation-heading"><h3 class="course-section-title" id="course-foundation-heading">${esc(t("tutorial.start"))}</h3>${card(foundation, 0, true)}</section>
+        <div class="course-connection"><span aria-hidden="true">↓</span> ${esc(t("tutorial.branchHint"))}</div>
+        <section aria-labelledby="course-directions-heading"><h3 class="course-section-title" id="course-directions-heading">${esc(t("tutorial.directions"))}</h3>
+        <div class="course-grid">${tutorials.modules.filter(module => module.id !== foundation.id).map((module, index) => card(module, index + 1)).join("")}</div></section>
+      </div>`;
+      built = true;
+    }
+    const handleClick = event => {
+      const sectionLink = event.target.closest("[data-course-section]");
+      if (sectionLink) {
+        const section = document.getElementById(sectionLink.dataset.courseSection);
+        if (section) {
+          section.scrollIntoView({block: "start"});
+          const heading = section.matches("h2, h3") ? section : section.querySelector("h2, h3");
+          heading?.setAttribute("tabindex", "-1");
+          heading?.focus({preventScroll: true});
+        }
+        return;
+      }
+      const target = event.target.closest("[data-module]");
+      if (target) navigate({ name: "tutorial", id: target.dataset.module });
+    };
+    view.addEventListener("click", handleClick);
+    deepDiveElement.addEventListener("click", handleClick);
     async function ensureReady() {
       if (!built) view.innerHTML = `<div class="view-loading" role="status">${esc(t("software.loading"))}</div>`;
       await loadScriptsInOrder(bundle);
-      software = global.SOFTWARE || software;
-      tutorials = global.TUTORIALS || tutorials;
+      tutorials = global.TUTORIALS;
       build();
     }
-
-    function build() {
-      if (built || !software) return;
-      const catItems = {};
-      software.categories.forEach(category => { catItems[category.id] = []; });
-      software.items.forEach(item => { (catItems[item.cat] || (catItems[item.cat] = [])).push(item); });
-      let html = `<div class="sw-head"><h2>${esc(t("software.title"))}</h2>
-        <p>${t("software.intro")}</p></div>`;
-      software.categories.forEach(category => {
-        const items = catItems[category.id] || [];
-        if (!items.length) return;
-        html += `<section class="sw-cat"><h3 style="color:${category.color}">${category.emoji} ${esc(category.label)}<em>${items.length}</em></h3><div class="sw-grid">`;
-        items.forEach(item => {
-          html += `<div class="sw-card" data-sw="${esc(item.id)}" style="border-left-color:${category.color}">
-            <div class="sw-name">${esc(item.name)}</div>
-            <div class="sw-by">${esc(item.by || "")}</div>
-            <div class="sw-sum">${esc(item.summary || "")}</div></div>`;
-        });
-        html += `</div></section>`;
-      });
-      view.innerHTML = html;
-      built = true;
-    }
-
-    function findSoftware(id) {
-      return software && (software.items || []).find(item => item.id === id);
-    }
-
-    function findTutorial(id) {
-      return tutorials && tutorials.items && tutorials.items[id];
-    }
-
-    function openSoftware(id) {
-      const item = findSoftware(id);
-      if (!item) return false;
-      const category = software.categories.find(entry => entry.id === item.cat)
-        || { label: "", color: "#888", emoji: "" };
-      const hasTutorial = !!findTutorial(id);
-      let html = `<div class="d-domain" style="color:${category.color}">${category.emoji} ${esc(category.label)}`
-        + (item.by ? `<span style="color:var(--fg-faint)"> · ${esc(item.by)}</span>` : "")
-        + (hasTutorial ? `<button class="dd-open" data-tutorial="${esc(id)}" title="${esc(t("software.tutorial.open"))}">🎓 ${esc(t("software.tutorial.button"))}</button>` : "")
-        + `</div>`;
-      html += `<h2 class="d-title">${esc(item.name)}</h2>`;
-      html += `<div class="d-summary">${esc(item.summary || "")}</div>`;
-      if (item.body) html += `<div class="d-sec"><div class="d-body">${mdLite(item.body)}</div></div>`;
-      if (Array.isArray(item.models) && item.models.length) {
-        html += `<div class="d-sec"><h4>${esc(t("software.models"))} <span class="d-asof">· ${esc(t("software.models.asOf", { date: "2026-07" }))}</span></h4><div class="d-models">`
-          + item.models.map(model => `<div class="d-model"><b>${esc(model.name)}</b>${model.note ? `<span>${esc(model.note)}</span>` : ""}</div>`).join("")
-          + `</div></div>`;
-      }
-      if (item.concept && byId[item.concept]) {
-        html += `<div class="d-sec"><h4>${esc(t("software.concept"))}</h4>
-          <div class="rel"><span class="rel-to" data-goto="${esc(item.concept)}">${esc(byId[item.concept].title)}</span>
-          <span class="rel-lbl">${esc(t("software.viewOnMap"))}</span></div></div>`;
-      }
-      detailBody.innerHTML = html;
-      detail.classList.remove("closed");
-      detailBody.scrollTop = 0;
-      return true;
-    }
-
     function openTutorial(id) {
-      const tutorial = findTutorial(id);
-      if (!tutorial || !deepDiveElement) return false;
-      let body = `<div class="dd-hero">
-          <div class="dd-eyebrow">${esc(t("tutorial.eyebrow"))}</div>
-          <h1 class="dd-h1">${esc(tutorial.title)}</h1>
-          ${tutorial.subtitle ? `<div class="dd-sub">${esc(tutorial.subtitle)}</div>` : ""}
-          ${tutorial.meta ? `<div class="dd-metabar">${esc(tutorial.meta)}</div>` : ""}
-          ${tutorial.overview ? `<div class="dd-thesis"><span class="dd-thesis-l">${esc(t("tutorial.coreMethod"))}</span> ${esc(tutorial.overview)}</div>` : ""}
-        </div>`;
-
-      if (Array.isArray(tutorial.learningPath) && tutorial.learningPath.length) {
-        body += `<section class="dd-sec tutorial-learning"><h2>${esc(t("tutorial.learningPath"))}</h2><ol class="dd-chain">`
-          + tutorial.learningPath.map(item => `<li>${esc(item)}</li>`).join("") + `</ol></section>`;
-      }
-
-      const platforms = tutorials.platforms || [];
-      const firstPopulated = platforms.find(platform => (tutorial.resources || []).some(resource => resource.platform === platform.id));
-      const initialPlatform = firstPopulated ? firstPopulated.id : (platforms[0] && platforms[0].id);
-      body += `<div class="tutorial-layout">
-        <nav class="tutorial-sidebar" aria-label="${esc(t("tutorial.platforms.aria"))}">
-          <div class="tutorial-sidebar-title">${esc(t("tutorial.platforms"))}</div>
-          ${platforms.map(platform => {
-            const count = (tutorial.resources || []).filter(resource => resource.platform === platform.id).length;
-            return `<button class="tutorial-platform-btn${platform.id === initialPlatform ? " active" : ""}" type="button" data-platform="${esc(platform.id)}" style="--platform-color:${platform.color}">
-              <span class="tutorial-platform-label"><span>${platform.emoji}</span>${esc(platform.label)}</span><span class="tutorial-count">${count}</span>
-            </button>`;
-          }).join("")}
-        </nav>
-        <div class="tutorial-platform-content" id="tutorial-platform-content"></div>
-      </div>`;
-
-      if (tutorial.sourceNote) body += `<div class="dd-src"><b>${esc(t("tutorial.sourceScope"))}</b><p>${esc(tutorial.sourceNote)}</p>
-        ${(tutorial.officialSources || []).length ? `<b>${esc(t("tutorial.calibrationSources"))}</b><ul>${tutorial.officialSources.map(source => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener">${esc(source.label)}</a></li>`).join("")}</ul>` : ""}
-        ${tutorial.accessDate ? `<div class="dd-src-date">${esc(t("tutorial.accessDate", { date: tutorial.accessDate }))}</div>` : ""}</div>`;
-      document.getElementById("dd-top-name").textContent = tutorial.title;
-      document.getElementById("dd-article").innerHTML = body;
-
-      const contentElement = document.getElementById("tutorial-platform-content");
-      const renderPlatform = platformId => {
-        const platform = platforms.find(item => item.id === platformId);
-        if (!platform || !contentElement) return;
-        const resources = (tutorial.resources || []).filter(resource => resource.platform === platform.id);
-        let html = `<section class="tutorial-platform"><header class="tutorial-platform-head">
-          <div><div class="tutorial-platform-kicker">${esc(t("tutorial.currentPlatform"))}</div><h2>${platform.emoji} ${esc(platform.label)}</h2></div>
-          <span>${esc(t("tutorial.reviewedCount", { count: resources.length }))}</span>
-        </header>`;
-        if (!resources.length) {
-          contentElement.innerHTML = html + `<div class="tutorial-empty">${esc(t("tutorial.empty", { platform: platform.label }))}</div></section>`;
-          return;
-        }
-        resources.forEach((resource, index) => {
-          const coverage = (resource.coverage || []).map(item => `<section class="tutorial-action">
-            <h5>${esc(item.title)}</h5>
-            ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
-            ${item.done ? `<div class="tutorial-done"><b>${esc(t("tutorial.done"))}</b>${esc(item.done)}</div>` : ""}
-          </section>`).join("");
-          const unique = (resource.uniqueTechniques || []).map(item => `<section class="tutorial-unique">
-            <h5>${esc(item.title)}</h5>
-            ${item.scenario ? `<p><b>${esc(t("tutorial.scenario"))}</b>${esc(item.scenario)}</p>` : ""}
-            ${(item.steps || []).length ? `<ol>${item.steps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>` : ""}
-            ${item.result ? `<div class="tutorial-done"><b>${esc(t("tutorial.result"))}</b>${esc(item.result)}</div>` : ""}
-          </section>`).join("");
-          html += `<details class="tutorial-card" style="border-left-color:${platform.color}"${index === 0 ? " open" : ""}>
-            <summary class="tutorial-card-head"><div>
-              <h3>${esc(resource.title)}</h3>
-              <div class="tutorial-meta">${esc(resource.creator || "")} · ${esc(resource.publishedAt || "")}${resource.duration ? ` · ${esc(resource.duration)}` : ""}</div>
-            </div><span class="tutorial-expand" aria-hidden="true">⌄</span></summary>
-            <div class="tutorial-card-body">
-              ${resource.audience ? `<div class="tutorial-audience"><b>${esc(t("tutorial.audience"))}</b>${esc(resource.audience)}</div>` : ""}
-              ${resource.summary ? `<h4>${esc(t("tutorial.summary"))}</h4><p class="tutorial-summary">${esc(resource.summary)}</p>` : ""}
-              ${coverage ? `<h4>${esc(t("tutorial.coverage"))}</h4><div class="tutorial-actions">${coverage}</div>` : ""}
-              ${unique ? `<h4>${esc(t("tutorial.unique"))} <span>· ${esc(t("tutorial.uniqueComparison"))}</span></h4><div class="tutorial-uniques">${unique}</div>` : ""}
-              ${resource.caution ? `<div class="dd-note warn"><b>${esc(t("tutorial.caution"))}</b>　${esc(resource.caution)}</div>` : ""}
-              <a class="tutorial-link" href="${esc(resource.url)}" target="_blank" rel="noopener">${esc(t("tutorial.openOriginal", { platform: platform.label }))} ↗</a>
-            </div>
-          </details>`;
-        });
-        contentElement.innerHTML = html + `</section>`;
-      };
-
-      deepDiveElement.querySelectorAll(".tutorial-platform-btn").forEach(button => button.addEventListener("click", () => {
-        deepDiveElement.querySelectorAll(".tutorial-platform-btn").forEach(item => item.classList.remove("active"));
-        button.classList.add("active");
-        renderPlatform(button.getAttribute("data-platform"));
-      }));
-      if (initialPlatform) renderPlatform(initialPlatform);
+      const module = findTutorial(id);
+      if (!module) return false;
+      if (disposeWorkflow) { disposeWorkflow(); disposeWorkflow = null; }
+      if (disposeExamples) { disposeExamples(); disposeExamples = null; }
+      const foundation = findTutorial(tutorials.foundationId);
+      const hasWorkflow = module.lessons.some(lesson => lesson.id === "prompt-workflow");
+      const isEnglish = t("tutorial.language") === "en";
+      const chapters = isEnglish ? ["Introduction", "I Choosing a prompt", "II Workflow"] : ["引言", "一 提示词的选择", "二 流程图"];
+      document.getElementById("dd-top-name").textContent = label(module, "title");
+      const topics = isEnglish ? ["Length", "Prompt basics", "Necessary materials", "Boundaries and rules", "Actionable requirements", "Iteration"] : ["长就是好？", "提示词基础", "提供必要材料", "明确边界与规则", "可执行要求", "迭代"];
+      const sectionLink = (id, text, child = false) => `<button type="button" class="course-nav-link${child ? " course-nav-child" : ""}" data-course-section="${id}">${esc(text)}</button>`;
+      const sidebar = `<nav class="course-sidebar" aria-label="${isEnglish ? "Lesson contents" : "本课目录"}"><div class="course-sidebar-label">${isEnglish ? "ON THIS PAGE" : "本课目录"}</div>
+        ${sectionLink("course-introduction", chapters[0])}${sectionLink("course-prompt-selection", chapters[1])}
+        ${topics.map((text, i) => sectionLink("course-topic-" + (i + 1), (i + 1) + "  " + text, true)).join("")}
+        ${sectionLink("course-workflow", chapters[2])}${sectionLink("course-examples", isEnglish ? "Prompt examples" : "优秀提示词案例", true)}${sectionLink("course-faq", isEnglish ? "III Frequently asked questions" : "三 常见疑问")}
+        ${isEnglish ? "" : global.TUTORIAL_FAQ.groups.map(g => sectionLink("course-faq-" + g.id, g.id + "  " + g.title, true)).join("")}
+      </nav>`;
+      const hero = `<div class="dd-hero">
+        <div class="dd-eyebrow">${esc(t("software.title"))} · ${esc(t(module.id === foundation.id ? "tutorial.prerequisite" : "tutorial.direction"))}</div>
+        <h1 class="dd-h1">${esc(label(module, "title"))}</h1><div class="dd-sub">${esc(label(module, "summary"))}</div></div>
+        ${module.id !== foundation.id ? `<div class="course-prerequisite"><span>${esc(t("tutorial.prerequisite"))}</span><button type="button" class="course-inline-link" data-module="${esc(foundation.id)}">${esc(label(foundation, "title"))} →</button></div>` : `<p class="course-prerequisite">${esc(t("tutorial.foundationHint"))}</p>`}
+        `;
+      const next = module.id === foundation.id ? `<section class="course-next"><h2>${esc(t("tutorial.directions"))}</h2><div class="course-next-links">${tutorials.modules.filter(item => item.id !== foundation.id).map(item => `<button type="button" class="course-inline-link" data-module="${esc(item.id)}">${esc(label(item, "title"))} →</button>`).join("")}</div></section>` : "";
+      document.getElementById("dd-article").innerHTML = hasWorkflow ? `<div class="course-layout">
+        ${sidebar}<div class="course-main">${hero}${app.renderPromptFoundations(t("tutorial.language"))}</div>
+        <aside class="course-workflow-rail" aria-labelledby="course-workflow-title"><section class="dd-sec course-workflow-chapter" id="course-workflow"><h2 id="course-workflow-title" tabindex="-1">${chapters[2]}</h2><div id="prompt-workflow"></div></section>${app.renderPromptExamples(t("tutorial.language"))}</aside>
+        ${app.renderPromptFaq(t("tutorial.language"))}${next}</div>` : `${hero}<section class="course-empty"><span class="course-tag">${esc(t("tutorial.planned"))}</span><h2>${esc(t("tutorial.emptyTitle"))}</h2><p>${esc(t("tutorial.emptyBody"))}</p></section>${next}`;
       deepDiveElement.classList.remove("hidden");
+      if (hasWorkflow) disposeWorkflow = app.mountPromptWorkflow(document.getElementById("prompt-workflow"), {language: t("tutorial.language")});
+      if (hasWorkflow) disposeExamples = app.mountPromptExamples(document.getElementById("course-examples"), {language: t("tutorial.language")});
       deepDiveElement.querySelector(".dd-scroll").scrollTop = 0;
       return true;
     }
-
-    function refreshLanguage() {
-      if (!built) return;
-      built = false;
-      build();
-    }
-
-    return Object.freeze({
-      ensureReady,
-      findSoftware,
-      findTutorial,
-      openSoftware,
-      openTutorial,
-      refreshLanguage,
-      view,
-    });
+    function refreshLanguage() { built = false; build(); }
+    return Object.freeze({ ensureReady, findTutorial, openTutorial, refreshLanguage, view });
   };
 })(window);

@@ -157,7 +157,7 @@
     function leave() {
       const route = router.parseLocation();
       if (route.name === "tutorial") {
-        navigate({ name: "software-item", id: route.id }, { replace: true });
+        navigate({ name: "software" }, { replace: true });
       } else {
         navigate(route.name === "concept" ? { name: "map", id: route.id } : { name: "map" }, { replace: true });
       }
