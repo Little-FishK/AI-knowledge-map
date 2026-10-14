@@ -2875,3 +2875,93 @@
 ### ElevenLabs 使用教程 — 从第一条经审核的视频资源建立可复现的上手路径
 
 - [How to Clone Your Voice with AI - Realistic AI Voice Clones](https://www.youtube.com/watch?v=AiRksVoiUAI)（ElevenLabs · youtube · 2025-09-04 · 11:15） — 教程先用短录音创建 Instant Voice Clone，再用较长且经过清理的单说话人素材创建 Professional Voice Clone，覆盖模型选择、录音质量、样本管理、说话人分离、同意确认、声音验证和生成测试。
+
+## AI 对话与使用基础：常见疑问
+
+- [按五项能力浏览全部问题](https://ai-knowledge-map.com/software/conversation-basics/faq/)
+
+### A 表达意图
+
+- [A006 如果需求含有错误前提，怎样允许 AI 先指出问题而不是顺着回答？](https://ai-knowledge-map.com/software/conversation-basics/faq/a006/) — 可以明确要求 AI 检查前提，但这只能给它纠错的任务，不能保证它识别出错误。 尤其不要把“我已经确定……”写成事实，然后只问它为什么。
+- [Q001 先让 AI 扮演专家再提问题，有没有用？](https://ai-knowledge-map.com/software/conversation-basics/faq/q001/) — 让 AI 扮演专家，有时能改善表现，但它不是一种能稳定提高正确率的通用技巧。研究既发现过提升，也发现过无明显变化和下降。 不能简单写成“有用”，也不能写成“只是改变语气”。
+- [Q002 主语用你、我，还是你们、我们？要不要加敬语？对 AI 的态度如何？](https://ai-knowledge-map.com/software/conversation-basics/faq/q002/) — 主语负责说明谁做什么；敬语负责表达语气。它们都不是必须填写的提示词模块。 可以直接说“总结下面的文章”，也可以说“请你总结下面的文章”。当涉及分工、作者身份或代写时，再明确“我”“你”“我们”分别是谁。主语的细分问题见 A011。
+- [A007 “扮演专家”是在规定视角、语气，还是能提高事实准确性？应分别怎样检查？](https://ai-knowledge-map.com/software/conversation-basics/faq/a007/) — 角色既可能改变语气和分析视角，也可能改变正确率；这几种变化不能混为一谈。 “像专家”很容易从措辞看出来，“判断正确”必须另外核对。
+- [A008 与其指定职业角色，直接列出分析标准有什么不同？](https://ai-knowledge-map.com/software/conversation-basics/faq/a008/) — 指定职业角色，是让 AI 根据这个身份推测工作方式；列出分析标准，是直接规定你要它检查什么。 两者可以一起用，也可以只用标准。
+- [A009 让一个 AI 扮演多位专家讨论，能否当作独立意见？](https://ai-knowledge-map.com/software/conversation-basics/faq/a009/) — 不能把一个 AI 写出的多位专家发言，当成多份独立证据。 它可以提供不同思路，但“有三位专家都赞同”并不等于有三个独立来源支持。
+- [A010 夸奖、责备、催促或威胁措辞会如何影响 AI？](https://ai-knowledge-map.com/software/conversation-basics/faq/a010/) — 这些措辞可能影响回答，但目前不能排出一张跨模型、跨任务都成立的“夸奖—责备—催促—威胁”效果榜。 尤其要把情绪表达与具体反馈分开。
+- [A011 “你”“我们”“我”等提示词的主语该怎么选？是必要的吗？影响答案吗？](https://ai-knowledge-map.com/software/conversation-basics/faq/a011/) — 按实际指代选择主语；没有指代歧义时可以省略。没有足够证据证明中文提示词统一使用“你”“我”或“我们”中的某一个，就能获得最高正确率。
+- [Q003 用词是否必须专业规范，还是可以使用民间用词？](https://ai-knowledge-map.com/software/conversation-basics/faq/q003/) — 不必先学会全部专业词汇才能提问。能把你指的东西说清楚，日常用语、自定义名称和规范术语都可以使用。 真正需要避免的是一个词可能指向几个不同概念，却没有说明本次是哪一个。
+- [A012 不知道专业名称时，能否通过用途、特征、例子和反例让 AI 帮忙确定概念？](https://ai-knowledge-map.com/software/conversation-basics/faq/a012/) — 可以从用途、特征和例子出发寻找名称，但应把 AI 给出的词先当作候选。 “描述事物，再找对应词”本身就是一个成熟的语言处理任务，叫反向词典。
+- [A013 和 AI 对话时使用的专有名词是一直用一个还是可以换着用？是否要以 AI 生成的专有名词为基准？](https://ai-knowledge-map.com/software/conversation-basics/faq/a013/) — 同一个对象最好保留一个主名称；可以换着用，但要说明别名。没有证据要求必须使用 AI 的用词，也没有证据证明同义词切换一定导致质量下降。
+- [A015 项目内自定义名称、缩写和行话，应怎样定义并保持一致？](https://ai-knowledge-map.com/software/conversation-basics/faq/a015/) — 自定义名称要与定义一起给，缩写要与完整名称一起给；容易混淆的词，还要说明彼此区别。 只写“按我们之前的叫法”并不能补上当前上下文里没有的定义。
+- [A016 中文、英文、方言、网络用语或混合语言，何时需要补充解释？](https://ai-knowledge-map.com/software/conversation-basics/faq/a016/) — 可以用中文、英文或混合语言，但不要假定模型对所有方言、圈内用语和语言组合都同样熟悉。 是否需要解释，取决于那个词是不是决定任务含义的关键点。
+- [Q004 问题描述多清楚算清楚？主谓宾都要有吗？环境描写、背景信息有帮助吗？](https://ai-knowledge-map.com/software/conversation-basics/faq/q004/) — 清楚到什么程度，要看未说明的部分会不会把结果带向你不接受的方向，没有固定字数，也不要求每句话主谓宾齐全。 “把下面这段话译成英文”已经确定了动作和对象；“帮我做个方案”则留下了用途、对象和取舍。
+- [Q007 标点符号是否必须完美？为什么？](https://ai-knowledge-map.com/software/conversation-basics/faq/q007/) — 自然语言提示词的标点不必完美，但不能因此认为标点完全不影响输出。 要区分两件事：标点改变了句意，和句意没变但模型对格式敏感。
+- [A019 不完整句子、错别字、语音转写错误，哪些会改变任务含义？](https://ai-knowledge-map.com/software/conversation-basics/faq/a019/) — 最应检查的错误，是把对象、动作、否定、数量或条件改掉的错误。 句子不完整未必有问题，句子很完整也可能表达错了任务。
+- [A021 标点、换行、标题、列表和引号分别在什么时候帮助区分含义？](https://ai-knowledge-map.com/software/conversation-basics/faq/a021/) — 这些格式的主要用途，是让不同部分的关系更容易辨认；没有一种符号是所有任务的通用最优选择。
+- [A023 把要求放在开头、结尾或重复多次，是否必要，怎样避免写成互相冲突的要求？](https://ai-knowledge-map.com/software/conversation-basics/faq/a023/) — 位置和重复都可能影响表现，但都不是每条提示的必做步骤。 “关键要求应当容易找到”比“永远放第一句／最后一句”更接近可迁移的原则。
+- [Q005 提供一个案例能让 AI 生成的内容提高多少？](https://ai-knowledge-map.com/software/conversation-basics/faq/q005/) — 没有“加一个案例平均提高多少”的通用数字；可能明显改善，也可能不变或变差。 首先要确定，你希望这个例子教会 AI 什么：输出格式、措辞风格、分类标准，还是一套解题方法。
+- [A028 怎样避免 AI 把示例中的姓名、数字和情节复制到新任务？](https://ai-knowledge-map.com/software/conversation-basics/faq/a028/) — 先说明示例里哪些东西要继承，哪些只是这一个案例的数据，再把本次材料单独给出。 只说“照这个写”，既可能被理解成照结构，也可能被理解成照人物、数字和情节。
+- [A029 怎样区分“更像示例”和“内容更正确”，评价案例带来的改善？](https://ai-knowledge-map.com/software/conversation-basics/faq/a029/) — 把“像不像”与“对不对”分开评分。 语气、句式和结构属于模仿效果；事实、计算、适用条件和结论属于内容正确性。二者可以同时变好，也可以一项变好、另一项变差。
+- [Q008 如果描述不出需求，该怎么办？遵循哪些步骤？](https://ai-knowledge-map.com/software/conversation-basics/faq/q008/) — 可以让 AI 帮你把需求问清楚，但不必让它一直问到“没有任何疑问”。 应优先澄清那些会改变成果类型、适用对象或取舍的信息；其余细节可以在看到草稿后再决定。
+- [A035 如何发现AI在长任务中擅自改变目标或完成标准，并尽量不打断工作？](https://ai-knowledge-map.com/software/conversation-basics/faq/a035/) — 最容易漏掉的偏离，是AI仍在做与你有关的事情，却把任务换成了更容易完成的版本。例如，你要求“用研究结果回答问题”，它最后只给每题附上一篇相关论文；你要求“实现可用的功能”，它交付的却是只能展示的样例。因此，监控不能只看它有没有继续工作，还要看它现在认为什么算完成，以及成果是否真的满足最初的要求。
+- [Q009 提问模板是否有用？多大程度上有用？是否会一直有用？](https://ai-knowledge-map.com/software/conversation-basics/faq/q009/) — 模板有用，主要因为它能复用任务结构、提醒你补齐必要信息；没有证据表明某套固定措辞能在所有模型、所有任务上持续最优。 “方便表达”与“提高模型得分”要分开判断。
+
+### B 提供条件
+
+- [B006 贴入网址、文件名或路径，是否意味着 AI 已经访问了其中内容？怎样确认？](https://ai-knowledge-map.com/software/conversation-basics/faq/b006/) — 贴入网址、文件名或路径，只是指出材料在哪里；是否读到了内容，要看当前工具有没有访问并返回正文。 有联网功能的助手可能主动打开网址；能访问本地文件的助手也可能按路径读取。登录状态、文件权限和所在设备都会影响这一步。
+- [B007 上传成功是否等于全文已被读取？怎样发现遗漏页、截断或解析失败？](https://ai-knowledge-map.com/software/conversation-basics/faq/b007/) — 上传成功表示文件已被接收；全文是否被正确解析、是否都进入本次处理范围，需要另外检查。 有些工具按问题检索片段，有些只提取文字，也有些同时处理页面图像。
+- [B008 扫描件、图片里的文字、表格、脚注和图表，应怎样检查识别是否正确？](https://ai-knowledge-map.com/software/conversation-basics/faq/b008/) — 应把识别结果与原图对照，既检查字有没有认对，也检查行列、脚注和图例之间的关系有没有保留。 一段文字读起来通顺，并不能说明原图已被忠实还原。
+- [B009 文件中有多个工作表、附件或隐藏内容时，怎样明确需要读取的范围？](https://ai-knowledge-map.com/software/conversation-basics/faq/b009/) — 先列清文件内部有哪些内容，再指定本次要处理的对象、范围和版本。 “看这个 Excel”没有说明是当前工作表、全部明细、筛选后的记录，还是隐藏表中的参数。
+- [B014 AI 说“记住了”，应怎样确认记住的内容、有效范围与持续时间？](https://ai-knowledge-map.com/software/conversation-basics/faq/b014/) — 先确认“记住了”指的是当前对话中的信息，还是已经保存、可在后续对话调用的记忆。 一句口头回应没有说明保存位置、适用范围和保留时间。
+- [B015 在新对话中继续任务，需要重新提供哪些信息？](https://ai-knowledge-map.com/software/conversation-basics/faq/b015/) — 新对话需要拿到足以继续工作的当前状态：要完成什么、以哪份成果为准、必须遵守什么，以及下一步从哪里开始。 不必复制全部聊天记录，但也不要只说“接着上次做”。
+- [B016 对话很长时，怎样检查早期约定是否仍被正确使用？](https://ai-knowledge-map.com/software/conversation-basics/faq/b016/) — 检查早期约定是否仍有效，重点看当前成果如何使用它们，并与原始记录对照。 问一句“还记得吗”，只能得到一次自我报告。
+- [B017 怎样制作交接摘要，保留决定、依据、例外和未解决问题？](https://ai-knowledge-map.com/software/conversation-basics/faq/b017/) — 交接摘要应让下一段工作从正确状态开始，因此要保留决定、依据、适用条件和未完成项，而不只是概括“讨论过什么”。 有争议或需要逐字遵守的内容，应保留原文位置。
+- [B018 哪些长期偏好可以复用，哪些任务特例不应变成永久规则？](https://ai-knowledge-map.com/software/conversation-basics/faq/b018/) — 适合复用的长期偏好，是你愿意在一类未来任务中继续采用的选择；由某个项目、读者或临时限制决定的做法，应保留对应范围。 一次选择和一次满意反馈，都不必自动升级为永久规则。
+- [B022 提供全文、摘录或摘要，各会失去哪些信息，应如何选择？](https://ai-knowledge-map.com/software/conversation-basics/faq/b022/) — 按任务需要保留的信息选择：全文保留的上下文最多，摘录保留局部原话，摘要便于把握主线。 当某个条件、例外或推导步骤会影响答案时，就应提供对应原文，而不能只留下概括。
+- [B023 要求只依据所给资料时，应怎样处理资料没有回答的问题？](https://ai-knowledge-map.com/software/conversation-basics/faq/b023/) — 资料没有直接写出答案时，先判断能否从已有信息推出；还缺关键前提的部分，应明确留空或说明缺什么。 “只依据资料”可以允许计算和推理，但不能悄悄加入资料之外的事实。
+- [B024 什么时候需要查找外部信息，什么时候引入外部信息反而偏离任务？](https://ai-knowledge-map.com/software/conversation-basics/faq/b024/) — 当答案依赖资料之外的事实，或需要核实资料是否真实、完整、仍然有效时，应查外部信息。 如果任务只是忠实总结、翻译、改写或分析给定设定，外部事实应按需要另行处理，避免改掉原任务的证据范围。
+- [B025 怎样选出有代表性的示例，而不是只挑最容易的情况？](https://ai-knowledge-map.com/software/conversation-basics/faq/b025/) — 先确定示例要说明什么，再选择覆盖真实任务差异的案例。 有代表性不等于最漂亮、最容易，也不等于只选最难的例外。
+- [B033 要求 AI“不保存”是否等同于产品真的不保留数据，应去哪里核实设置与政策？](https://ai-knowledge-map.com/software/conversation-basics/faq/b033/) — 要求 AI“不保存”，不等于服务端不会保留数据。 这句话可以表达你的使用要求；真正的数据处理取决于产品功能、账户设置、服务条款，以及连接的外部工具。
+
+### C 控制变化
+
+- [C005 如果正确修改必须触及禁止修改的部分，怎样要求 AI 先说明冲突？](https://ai-knowledge-map.com/software/conversation-basics/faq/c005/) — 把“哪些地方不能改”与“遇到冲突怎么处理”一起写清楚：先指出冲突、给出最小改动方案，再由你决定是否放宽边界。 AI 发现了问题，并不自动获得修改禁区的授权。
+- [C006 哪些要求是硬限制，哪些只是偏好，怎样标明？](https://ai-knowledge-map.com/software/conversation-basics/faq/c006/) — 硬限制是违反后结果就不能接受的条件；偏好是在满足硬限制之后尽量实现的选择。 判断依据是任务后果，而不是句子写得多强硬。同一要求在不同任务中也会变：投稿字数上限可能是硬限制，内部讨论稿的篇幅通常可以商量。
+- [C013 字数、篇幅和细节要求冲突时，怎样规定取舍？](https://ai-knowledge-map.com/software/conversation-basics/faq/c013/) — 先确定长度是硬上限还是大致目标，再规定什么信息必须保留、什么可以删或移到别处。 “越短越好”和“每个细节都讲透”没有明确取舍，AI 就只能替你猜哪些内容更重要。
+- [C015 如何区分“可以提出新想法”和“可以补造事实”？](https://ai-knowledge-map.com/software/conversation-basics/faq/c015/) — 可以允许 AI 创造方案、故事或假设，但要把它们与描述真实世界的陈述分开。 “想一个新的宣传创意”允许提出新做法；“写我们的成功案例”则需要真实经历、数据和来源。一个方案新颖，并不会使配套的数字和案例自动变真。
+- [C021 怎样中止任务、撤销授权或恢复到修改前的状态？](https://ai-knowledge-map.com/software/conversation-basics/faq/c021/) — 中止任务、撤销授权和恢复旧状态是三件事，要分别执行和核实。 中止是停止继续工作，撤权是收回后续操作许可，恢复则需要版本、备份或对应系统的补救功能。
+- [C025 临时改变风格或规则时，怎样说明只对当前输出有效？](https://ai-knowledge-map.com/software/conversation-basics/faq/c025/) — 写清临时规则针对哪个输出、何时结束，以及结束后恢复什么规则。 “这次活泼一点”可能指下一条回复，也可能指整篇文稿；明确到“只改第二版的开场段”会更容易检查。
+
+### D 组织复杂过程
+
+- [D001 一个请求里包含多个任务时，怎样明确交付物和相互关系？](https://ai-knowledge-map.com/software/conversation-basics/faq/d001/) — 先说清要交付哪些成品、各自依据什么，以及哪些结果必须先完成；具体实施步骤可以交给 AI 安排。 “写报告、做演示、列行动项”包含三个交付物，但还没有说明三者使用同一份结论，还是分别分析。
+- [D002 什么时候一次完成更合适，什么时候需要分阶段？](https://ai-knowledge-map.com/software/conversation-basics/faq/d002/) — 目标、材料和验收标准已经明确，且结果容易检查时，通常可以一次委托完成；需要先取得新信息、验证关键前提或作出实质选择时，再分阶段。 一次委托也可以包含 AI 自行安排的多步工作，不等于只能生成一次。
+- [D003 哪些中间结论必须先核实，才可以作为下一步依据？](https://ai-knowledge-map.com/software/conversation-basics/faq/d003/) — 优先核实那些一旦出错就会改变后续方向、计算结果或操作对象的中间结论。 不必把每句过渡文字都升级为检查点；关键是找出后面哪些工作正在依赖它。
+- [D004 拆得过细会增加哪些沟通负担，怎样判断拆分是否有必要？](https://ai-knowledge-map.com/software/conversation-basics/faq/d004/) — 拆分有价值，是因为它降低了出错或返工的代价；拆分本身也会消耗沟通、等待和整合成本。 如果用户需要反复解释同一背景、复制中间答案、回复“继续”，而质量没有明显改善，流程很可能拆得过细。
+- [D008 什么时候看提纲、样例或小规模试做，比直接生成完整结果更有效？](https://ai-knowledge-map.com/software/conversation-basics/faq/d008/) — 当错误方向会被大量复制，或你必须看到实物才能判断偏好时，先看提纲、样例或小规模试做更有价值。 选择哪一种，要对应尚未解决的问题：提纲检查覆盖与结构，样例检查语气和表现形式，试做检查材料、工具与流程能否跑通。
+- [D009 怎样设置有意义的检查点，而不是每一步都停下来？](https://ai-knowledge-map.com/software/conversation-basics/faq/d009/) — 检查点应设在“现在检查能改变后续投入”的地方，并明确通过后继续什么、何种情况才需要用户作决定。 进度汇报、自动检查和请求批准是三件事，不必绑在一起。
+- [D011 在一条对话里切换话题，什么时候会混入旧目标或旧材料？](https://ai-knowledge-map.com/software/conversation-basics/faq/d011/) — 旧目标或旧材料仍在可见上下文里，而新要求没有明确对象和适用范围时，AI 可能把两者混用。 典型信号是沿用上一个项目的数字、客户名称、写作风格，或把已经否定的方案继续当作前提。无需等到对话很长，这些混用就可能出现。
+- [D012 何时继续原对话，何时另开对话，应保存什么交接信息？](https://ai-knowledge-map.com/software/conversation-basics/faq/d012/) — 同一任务的目标和有效材料仍连续时，继续原对话比较方便；任务已经换了对象，或旧假设反复干扰结果时，可以整理交接信息后另开对话。 不必按固定轮数清空，也不宜只复制最后一句“继续做”。
+- [D014 任务中断或工具失败后，怎样确认已完成部分，避免重复操作？](https://ai-knowledge-map.com/software/conversation-basics/faq/d014/) — 先确认外部状态，再从尚未完成的部分继续；“没收到成功回复”不等于“操作没有发生”。 读取资料失败通常容易重试，但创建记录、发送内容或提交写入时，盲目重来可能产生重复结果。
+- [D019 让多个 AI 或多个角色讨论，什么时候有价值，什么时候只是增加重复内容？](https://ai-knowledge-map.com/software/conversation-basics/faq/d019/) — 多个 AI 有价值，通常是因为它们完成了不同工作、提出了可比较的候选答案，或发现了单次尝试遗漏的证据。 如果只是轮流复述同一观点，角色数量增加并没有增加信息。
+- [D022 怎样在开始前约定投入时间、费用、尝试次数和输出深度？](https://ai-knowledge-map.com/software/conversation-basics/faq/d022/) — 只约定与你有关的资源限制，并区分“希望控制在多少”与“系统必须在何处停止”。 时间、费用、尝试次数和输出深度不是同一个指标；答得短也可能经过很多搜索，限制字数不能代替限制成本。
+- [D024 反复尝试没有进步时，应换表达、补资料、换工具，还是改变目标？](https://ai-knowledge-map.com/software/conversation-basics/faq/d024/) — 先定位阻碍进展的环节，再选择改变什么；不要把所有失败都归因于提问方式。 换表达适合解决误解，补资料适合解决信息缺口，换工具适合解决执行或计算问题，改变目标则涉及你是否愿意接受新的取舍。
+- [D025 如何先用低成本试做判断方案是否可行？](https://ai-knowledge-map.com/software/conversation-basics/faq/d025/) — 低成本试做应测试最可能使方案失败的关键环节，并走完一条真实的小流程。 仅做一个外观精致的演示，往往只能证明“能展示”，未必证明原始材料能处理、结果能核对或规模扩大后能承担成本。
+- [D031 怎样避免把 AI 的建议自动当成自己的偏好或最终决定？](https://ai-knowledge-map.com/software/conversation-basics/faq/d031/) — 把“这个建议的事实依据成立”与“我愿意接受它的价值取舍”分开。 AI 可以帮助比较后果，也可以按你已经确定的偏好代选；尚未确定的偏好，不应因为它反复推荐就被当成你的决定。
+
+### E 判断与修正
+
+- [E006 AI 的引用是否真实存在，是否真的支持对应结论，怎样检查？](https://ai-knowledge-map.com/software/conversation-basics/faq/e006/) — 检查引用要分两步：先确认文献确实存在，再确认原文支持答案中的那句话。 作者、期刊、DOI 看起来专业，只能算待核对的书目信息。
+- [E007 来源真实但过时、断章取义或适用范围不同，应怎样识别？](https://ai-knowledge-map.com/software/conversation-basics/faq/e007/) — 来源真实只是第一关；还要检查它是否仍适用，以及答案有没有扩大原文的结论。 年份较早不自动等于过时，新发表也不自动等于更可靠。
+- [E009 AI 表示“很确定”或给出置信度数字时，应该怎样看待？](https://ai-knowledge-map.com/software/conversation-basics/faq/e009/) — “很确定”是回答的一部分；“置信度95%”只有经过相应任务的校准检验，才有可解释的准确率含义。 数字精细，并不意味着它来自真实的统计测量。
+- [E013 结果不好，是目标不清、材料不足、输入误读、能力限制，还是评价标准不一致？](https://ai-knowledge-map.com/software/conversation-basics/faq/e013/) — 先指出结果在哪一项验收条件上失败，再判断原因；一句“效果不好”不足以区分表达、资料、理解和能力问题。 同一次失败也可能有多个原因。
+- [E017 AI 改对一处却改坏另一处时，应怎样检查回归问题？](https://ai-knowledge-map.com/software/conversation-basics/faq/e017/) — 修复一处后，要同时检查“原错误是否消失”和“原来正确的内容是否保留”。 后一种检查就是回归检查，适用于代码，也适用于文档、表格和分类规则。
+- [E019 让 AI 自己检查答案，能发现什么，不能替代哪些独立验证？](https://ai-knowledge-map.com/software/conversation-basics/faq/e019/) — 自检适合做第一轮筛查；事实、计算和外部操作是否成立，需要能独立核对的证据。 要求 AI 按清单查漏项、矛盾、格式和引用位置，能让检查对象更具体；单纯问“你确定没有问题吗”，得到的可能只是另一句判断。
+- [E020 我反复质疑后 AI 改口，怎样判断是真纠错还是迎合？](https://ai-knowledge-map.com/software/conversation-basics/faq/e020/) — 判断改口是否有根据，要看新增证据、可定位的错误和重新核验的结果。 道歉、语气变坚定，或者改成与你一致，都不是正确性的证据。
+- [E021 让 AI 反驳我时，怎样避免得到为了反驳而反驳的内容？](https://ai-knowledge-map.com/software/conversation-basics/faq/e021/) — 把任务写成“找出会影响结论的漏洞和反证”，比指定“必须反驳我”更符合审查目的。 好的反驳应当指向真实主张、有可核查依据，并说明问题是否足以改变决定；合理的部分可以保留。
+- [E026 比较两种提问方法时，需要保持哪些条件一致？](https://ai-knowledge-map.com/software/conversation-basics/faq/e026/) — 比较两种提问方法时，先固定任务与评分标准，再尽量只改变你要研究的那项写法。 一次生成的胜负，只能说明那次结果，不能代表长期表现。
+- [E032 怎样发现自己越来越依赖 AI 的认可，而不再独立判断？](https://ai-knowledge-map.com/software/conversation-basics/faq/e032/) — 关键不在于用了多少次 AI，而在于自己能否保留判断理由、接受现实反馈，并在需要时停止寻求认可。 经常借助工具处理工作，与必须获得它的赞同才敢决定，是不同的使用方式。
+- [E035 结果交给他人使用前，应说明哪些 AI 参与、核验范围和剩余限制？](https://ai-knowledge-map.com/software/conversation-basics/faq/e035/) — 交付说明应让接收者知道：AI 做了什么、哪些内容确实查过，以及哪些限制会影响使用。 具体披露要求先看交付场景的规则与约定，不能把某个期刊或单位的要求写成所有人的统一义务。
+- [E036 怎样把一次错误整理成可复用的检查项，而不是积累越来越长的禁令？](https://ai-knowledge-map.com/software/conversation-basics/faq/e036/) — 把错误转成“什么条件下，要检查什么、怎样算通过”的检查项，比不断追加“以后不要再错”更容易复用。 检查项要对应可观察的行为，而不是抽象的态度要求。
+

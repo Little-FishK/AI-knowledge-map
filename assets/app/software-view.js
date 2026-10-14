@@ -8,7 +8,7 @@
     let built = false;
     let disposeWorkflow = null;
     let disposeExamples = null;
-    const bundle = ["data/tutorials.js?v=532f9364cc77f0f7", "assets/app/prompt-foundations.js?v=78f927eb6e546250", "assets/app/prompt-workflow.js?v=0d655282890c07ff", "data/tutorials-faq.js?v=b0f74c8595f04822", "assets/app/prompt-faq.js?v=41e9d19df92d1a2d", "data/tutorials-prompts.js?v=3a06c26de557b9f6", "assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
+    const bundle = ["data/tutorials.js?v=532f9364cc77f0f7", "assets/app/prompt-foundations.js?v=78f927eb6e546250", "assets/app/prompt-workflow.js?v=0d655282890c07ff", "data/tutorials-faq.js?v=b0f74c8595f04822", "assets/app/prompt-faq.js?v=3afe562049c24609", "data/tutorials-prompts.js?v=3a06c26de557b9f6", "assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
     const label = (module, field) => t("tutorial.language") === "en" ? module[field + "En"] || module[field] : module[field];
     const findTutorial = id => tutorials?.modules.find(module => module.id === id);
     function card(module, index, foundation = false) {
