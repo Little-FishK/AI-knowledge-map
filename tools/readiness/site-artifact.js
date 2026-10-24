@@ -5,6 +5,7 @@ const {LIBRARY_DATA_FILES} = require('../shared/library-data-files');
 const renderer = require('./render-static-concept');
 const seo = require('./site-seo');
 const positioning = require('./learning-positioning');
+const analytics = require('./analytics');
 const {policy:validatePolicy,canPublish} = require('./publication-policy');
 const publicationNotice = require('../../assets/publication-notice');
 const {conceptSearchTitle} = require('./concept-search-title');
@@ -62,6 +63,7 @@ function writeArtifact({root, output, entries, inventory, siteUrl, mode, graph, 
   validatePolicy(publicationPolicy);
   if (!preview && (!entries.length || entries.some(e => !canPublish(e,publicationPolicy)))) throw Error('Production requires eligible or explicitly public reading pages');
   const files = {};
+  const analyticsConfig = analytics.read(root);
   const publishingPath=safeFile(root,'config/site-publishing.json');
   const publishing=fs.existsSync(publishingPath)?JSON.parse(fs.readFileSync(publishingPath,'utf8')):null;
   const brandPath=safeFile(root,'config/brand.json');
@@ -247,6 +249,7 @@ function writeArtifact({root, output, entries, inventory, siteUrl, mode, graph, 
       return bytes ? `src="${prefix || ''}${asset}?v=${digest(bytes).slice(7, 23)}"` : match;
     });
     html = require('./initial-canvas').apply(html);
+    html = analytics.apply(html, analyticsConfig, siteUrl, preview);
     files[file]=Buffer.from(html);meta.file=file;meta.contentHash=seo.fingerprint(html);
   }
   put('sitemap.xml',seo.sitemap(seoPages,preview));
