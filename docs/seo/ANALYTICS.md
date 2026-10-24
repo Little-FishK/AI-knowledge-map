@@ -8,6 +8,9 @@
 - 报告时区：America/New_York。
 - 后台：https://analytics.google.com/analytics/web/#/a413294701p560639574/reports/intelligenthome
 - 实时：https://analytics.google.com/analytics/web/#/a413294701p560639574/realtime/overview
+- 已保存的增长总览（报告库）：https://analytics.google.com/analytics/web/#/a413294701p560639574/assetlibrary/explorer/edit?r=16195502782
+- 已保存的回访分析：https://analytics.google.com/analytics/web/#/analysis/a413294701p560639574/edit/5mp7VZBFQkyI9Rbf_EodGw
+- 原生留存率：后台“报告 → 生命周期 → 留存”，已发布此菜单。它显示新用户、回访用户，以及首次访问同类群组的逐日留存百分比；逐日留存率与整个期间的回访用户占比不是同一个口径。
 
 ## 指标口径
 
@@ -20,6 +23,8 @@
 | 推广渠道 | 带来会话的来源/媒介、广告系列 | UTM 显式归因；无 UTM 时尽量使用 referrer。缺少 referrer 的旧链接、聊天应用或复制链接可能计为 direct。 |
 
 从接入后开始收集，历史 PV/UV 不能补算。标准报表需要处理时间，先看实时报告。拒绝统计、DNT/GPC、拦截器、Google 网络不可达会造成漏计。
+
+当前 GA4 的计算指标选择器没有提供“回访用户数”，因此没有创建错误的 `1−新用户数/用户总数` 替代指标。已保存的新老访客探索显示 returning 行和去重总计，期间回访率按这两个数相除；原生留存报表直接显示逐日留存百分比。数据尚未累积时不应把空白当作真实 0% 回访。
 
 ## 推广链接约定
 
