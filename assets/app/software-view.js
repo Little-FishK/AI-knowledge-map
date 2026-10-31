@@ -9,7 +9,7 @@
     let disposeWorkflow = null;
     let disposeExamples = null;
     let disposeDiagrams = null;
-    const bundle = ["data/tutorials.js?v=685e36baf9a63425","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","assets/app/prompt-faq.js?v=3afe562049c24609","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f","data/tutorials-coding.js?v=de93e79c5802a865"];
+    const bundle = ["data/tutorials.js?v=24210adddea6aadf","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","assets/app/prompt-faq.js?v=3afe562049c24609","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f","data/tutorials-coding.js?v=4b17c8cfcca9df58"];
     const label = (module, field) => t("tutorial.language") === "en" ? module[field + "En"] || module[field] : module[field];
     const findTutorial = id => tutorials?.modules.find(module => module.id === id);
     const readingTutorial = (id, lessonId) => {

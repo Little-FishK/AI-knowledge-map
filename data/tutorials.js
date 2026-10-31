@@ -64,7 +64,8 @@ window.TUTORIALS = {
           "titleEn": "Traditional programming",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -74,7 +75,8 @@ window.TUTORIALS = {
           "titleEn": "How AI assists programming",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ],
@@ -88,8 +90,10 @@ window.TUTORIALS = {
           "number": 1,
           "status": "available",
           "source": "docs/AI_CODING.md",
+          "sourceEn": "docs/en/AI_CODING.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -101,8 +105,10 @@ window.TUTORIALS = {
           "number": 2,
           "status": "available",
           "source": "docs/AI_CODING.md",
+          "sourceEn": "docs/en/AI_CODING.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ]
