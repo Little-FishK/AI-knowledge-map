@@ -1,0 +1,126 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/brand/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<title>Connect AI Agents to Photoshop: MCP, UXP and Windows COM · AI Knowledge Map</title>
+<meta name="description" content="Compare Photoshop&#39;s built-in assistant with external agents. Review UXP and Windows COM MCP integrations, connection checks, task instructions and common setup problems.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="Connect AI Agents to Photoshop: MCP, UXP and Windows COM">
+<meta property="og:description" content="Compare Photoshop&#39;s built-in assistant with external agents. Review UXP and Windows COM MCP integrations, connection checks, task instructions and common setup problems.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Connect AI Agents to Photoshop: MCP, UXP and Windows COM">
+<meta name="twitter:description" content="Compare Photoshop&#39;s built-in assistant with external agents. Review UXP and Windows COM MCP integrations, connection checks, task instructions and common setup problems.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/#page","name":"Connect AI Agents to Photoshop: MCP, UXP and Windows COM","description":"Compare Photoshop's built-in assistant with external agents. Review UXP and Windows COM MCP integrations, connection checks, task instructions and common setup problems.","url":"https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/","inLanguage":"en","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI Software Tutorials","item":"https://ai-knowledge-map.com/en/software/catalog/"},{"@type":"ListItem","position":3,"name":"Chapter 2 Use an agent to operate Photoshop","item":"https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/"}]}]</script>
+<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+</head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">Skip to content</a><header class="preview-header"><a href="/?lang=en">AI Knowledge Map</a><a href="/search/">Search / Text directory</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/software/catalog/">AI Software Tutorials</a></li><li><span aria-current="page">Chapter 2 Use an agent to operate Photoshop</span></li></ol></nav><h1>Chapter 2 Use an agent to operate Photoshop</h1><nav class="tutorial-language" aria-label="Language"><a href="/software/image-creation/image-photoshop-agent/" lang="zh-Hans" hreflang="zh-Hans">简体中文</a></nav><nav class="tutorial-actions" aria-label="Course navigation"><a href="/en/software/catalog/">All tutorials</a><a href="/software/?tutorial=image-creation&amp;lesson=image-photoshop-agent&amp;lang=en">Open the interactive course</a></nav><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="Chapter contents"><strong>On this page</strong><ul><li><a href="#course-image-photoshop-agent-introduction">Reading note</a></li><li><a href="#course-image-photoshop-agent-section-1">Choose a connection method</a></li><li><a href="#course-image-photoshop-agent-section-2">Route A: drmedia/photoshop-mcp (UXP plugin)</a></li><li><a href="#course-image-photoshop-agent-section-3">Route B: airtaxi/PhotoshopMcpServer (Windows COM)</a></li><li><a href="#course-image-photoshop-agent-section-4">Verify the connection</a></li><li><a href="#course-image-photoshop-agent-section-5">Give tasks after connecting</a></li><li><a href="#course-image-photoshop-agent-section-6">Common connection problems</a></li></ul></nav><article class="tutorial-content"><section id="course-image-photoshop-agent-introduction"><h2>Reading note</h2><p>This chapter is for users who can already describe requirements in natural language. Its goal is to connect an agent so it can operate Photoshop directly. Once connected, ask it to inspect images, organize layers, change text, adjust the image and export files, then request further changes based on the result. The main skills are connection and use.</p></section><section id="course-image-photoshop-agent-section-1"><h2>Choose a connection method</h2><p>There are two routes: Photoshop&#39;s built-in assistant or an external agent:</p>
+<ul><li><strong>Official Photoshop AI Assistant</strong>: type requests inside Photoshop without setting up MCP yourself. At the time of verification, Adobe still labeled the desktop feature an early-access Photoshop (Beta) feature. Install Photoshop (Beta) through Creative Cloud, open an image and click the AI Assistant icon at the upper right to start a conversation. Availability depends on your current version and account. <a href="https://helpx.adobe.com/photoshop/desktop/whats-new/ai-assistant-overview.html" target="_blank" rel="noopener noreferrer">Official overview and entry point</a></li><li><strong>External agent + MCP</strong>: chat in an AI client that supports local MCP tools; a connector sends the operations to Photoshop. Here, MCP is an interface through which the agent calls Photoshop tools. Choose either project below.</li></ul>
+<table class="d-table"><thead><tr><th>Project</th><th>Control method</th><th>Capabilities described by the project</th></tr></thead><tbody><tr><td><a href="https://github.com/drmedia/photoshop-mcp" target="_blank" rel="noopener noreferrer">drmedia/photoshop-mcp</a></td><td>Photoshop UXP plugin bridge</td><td>Documents, layers, selections, screenshots, saving and exporting</td></tr><tr><td><a href="https://github.com/airtaxi/PhotoshopMcpServer" target="_blank" rel="noopener noreferrer">airtaxi/PhotoshopMcpServer</a></td><td>Windows COM automation</td><td>Exposes Photoshop automation to MCP agents, including document and layer information, exports and Photoshop script execution</td></tr></tbody></table>
+<p>The following instructions are for Windows. Choose one external route; both are third-party projects with their own version requirements and operation limits.</p></section><section id="course-image-photoshop-agent-section-2"><h2>Route A: drmedia/photoshop-mcp (UXP plugin)</h2><p><strong>1. Prepare the environment</strong></p>
+<p>You need Git, Node.js 22.12 or later, Photoshop and Adobe UXP Developer Tool. The project declares Photoshop 25.0 as its minimum; the author records testing with 27.8. Complete macOS validation is still missing, so this section uses Windows. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md#필요한-것" target="_blank" rel="noopener noreferrer">Project requirements</a></p>
+<p>Install UXP Developer Tool through Creative Cloud. On first launch, follow the instructions to enable Developer Mode and allow loading development plugins. <a href="https://developer.adobe.com/photoshop/uxp/2022/guides/devtool/installation" target="_blank" rel="noopener noreferrer">Adobe installation guide</a></p>
+<p><strong>2. Download and build the project</strong></p>
+<p>This example installs to <code>C:/AI/Tools</code>. Run the following in PowerShell:</p>
+<pre><code class="language-powershell">New-Item -ItemType Directory -Path C:/AI/Tools -Force
+Set-Location C:/AI/Tools
+git clone https://github.com/drmedia/photoshop-mcp.git
+Set-Location C:/AI/Tools/photoshop-mcp
+npm install
+npm run build</code></pre>
+<p>The build generates the files needed by the server and plugin. At verification time, the project had not been published to npm; install from source. <a href="https://github.com/drmedia/photoshop-mcp#quick-start" target="_blank" rel="noopener noreferrer">Build instructions</a>, <a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md" target="_blank" rel="noopener noreferrer">release status</a></p>
+<p><strong>3. Load the plugin in Photoshop</strong></p>
+<ol><li>Start Photoshop and UXP Developer Tool.</li><li>Select <strong>Add Plugin</strong> in the developer tool and locate <code>C:/AI/Tools/photoshop-mcp/photoshop-uxp/manifest.json</code>.</li><li>Click <strong>Load</strong>, then open the <strong>Photoshop MCP</strong> panel through Photoshop&#39;s <strong>Plugins</strong> menu.</li></ol>
+<p>Keep Photoshop and the plugin panel open while configuring the AI client. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/photoshop-uxp/README.md#설치" target="_blank" rel="noopener noreferrer">Plugin loading instructions</a></p>
+<p><strong>4. Add the MCP server to the agent client</strong></p>
+<p>The client must support starting a local <strong>stdio MCP server</strong>. For example, in Claude Desktop, open <code>%APPDATA%\Claude\claude_desktop_config.json</code> and add the server entry below. If other servers already exist, merge this entry into the existing <code>mcpServers</code> object.</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;photoshop-uxp&quot;: {
+      &quot;command&quot;: &quot;node&quot;,
+      &quot;args&quot;: [
+        &quot;C:/AI/Tools/photoshop-mcp/packages/mcp-server/bin/photoshop-mcp.js&quot;
+      ],
+      &quot;env&quot;: {
+        &quot;PHOTOSHOP_MCP_BRIDGE&quot;: &quot;uxp&quot;,
+        &quot;PHOTOSHOP_MCP_PROFILE&quot;: &quot;full&quot;,
+        &quot;PHOTOSHOP_MCP_ALLOW&quot;: &quot;read,edit,external&quot;,
+        &quot;PHOTOSHOP_MCP_EXTENSIONS_ENABLED&quot;: &quot;none&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>Replace the installation path with your actual path, save and restart the client. The client starts the configured server; do not run another <code>npm start</code> instance manually.</p>
+<p>These settings select the real UXP bridge, expose the full Photoshop tool set, allow reading and editing plus Save As / export operations, and disable extensions not needed here. The default permission is <code>read,edit</code>; this example adds <code>external</code> for saving and exporting. Overwriting original files belongs to a different permission level and is not included. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/.mcp.json" target="_blank" rel="noopener noreferrer">Project launch configuration</a>, <a href="https://github.com/drmedia/photoshop-mcp#configuration" target="_blank" rel="noopener noreferrer">environment variables and permissions</a>, <a href="https://github.com/airtaxi/PhotoshopMcpServer#claude-desktop" target="_blank" rel="noopener noreferrer">Claude Desktop configuration location</a></p>
+<p>For other agents, use the same command, arguments and environment variables in that client&#39;s configuration format. For example, in VS Code, run <strong>MCP: Add Server → Command (stdio)</strong> from the command palette. Clients may use <code>mcpServers</code> or <code>servers</code> as their top-level field; do not interchange them. <a href="https://code.visualstudio.com/docs/agent-customization/mcp-servers" target="_blank" rel="noopener noreferrer">Official VS Code connection guide</a></p>
+<p><strong>5. Connect the plugin and choose an output folder</strong></p>
+<p>Return to the Photoshop MCP panel and click <strong>Connect</strong>. <strong>Loading the plugin does not connect it automatically</strong>, so this is a separate step. Once connected, the panel shows bridge status and the port. It searches local ports 8765–8774 by default; you usually do not need to enter a port. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/photoshop-uxp/README.md#설치" target="_blank" rel="noopener noreferrer">Connection behavior</a></p>
+<p>For saving or exporting, select and authorize an output folder in the panel yourself. The agent then supplies a filename such as <code>poster-v1.psd</code>, which is written there. This project does not accept arbitrary full output paths chosen by the agent. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md#파일-저장" target="_blank" rel="noopener noreferrer">Output folder and saving rules</a></p></section><section id="course-image-photoshop-agent-section-3"><h2>Route B: airtaxi/PhotoshopMcpServer (Windows COM)</h2><p>This route controls Photoshop through Windows COM without the UXP plugin above. It requires Windows, Photoshop with COM automation and <code>DoJavaScript</code> support, and .NET 10 SDK or later. See the <a href="https://github.com/airtaxi/PhotoshopMcpServer#requirements" target="_blank" rel="noopener noreferrer">project documentation</a> for installation and client configuration.</p>
+<p><strong>1. Download and publish the executable</strong></p>
+<p>Run in PowerShell:</p>
+<pre><code class="language-powershell">New-Item -ItemType Directory -Path C:/AI/Tools -Force
+Set-Location C:/AI/Tools
+git clone https://github.com/airtaxi/PhotoshopMcpServer.git
+Set-Location C:/AI/Tools/PhotoshopMcpServer
+dotnet publish PhotoshopMcpServer/PhotoshopMcpServer.csproj -c Release -r win-x64 --self-contained</code></pre>
+<p>Publishing builds the project. With its current directory structure and target framework, the executable is at the location used below. <a href="https://github.com/airtaxi/PhotoshopMcpServer#installation" target="_blank" rel="noopener noreferrer">Publish steps</a>, <a href="https://github.com/airtaxi/PhotoshopMcpServer/blob/master/PhotoshopMcpServer/PhotoshopMcpServer.csproj" target="_blank" rel="noopener noreferrer">target framework</a></p>
+<p><strong>2. Configure the client and connect</strong></p>
+<p>Again using Claude Desktop, add this server entry to its configuration:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;photoshop-com&quot;: {
+      &quot;command&quot;: &quot;C:/AI/Tools/PhotoshopMcpServer/PhotoshopMcpServer/bin/Release/net10.0-windows/win-x64/publish/PhotoshopMcpServer.exe&quot;
+    }
+  }
+}</code></pre>
+<p>Use your actual path, save, restart the client and open Photoshop. Other agents can use the same executable as the command for a local stdio server. <a href="https://github.com/airtaxi/PhotoshopMcpServer#option-b-run-published-executable" target="_blank" rel="noopener noreferrer">Executable connection example</a></p>
+<p>The project provides tools for reading documents, querying layers and exporting; it also lets the agent write and execute Photoshop JavaScript. Describe everyday tasks directly; you do not need to write scripts first. <a href="https://github.com/airtaxi/PhotoshopMcpServer#available-tools" target="_blank" rel="noopener noreferrer">Tool list</a></p></section><section id="course-image-photoshop-agent-section-4"><h2>Verify the connection</h2><p>Open a test image in Photoshop, enable the relevant MCP tools in the agent client and enter:</p>
+<blockquote class="quote"><p>Actually call the Photoshop tools to read the current document&#39;s name, width, height and layer names. Query only; do not make changes yet.</p></blockquote>
+<p>Compare the returned information with the open document and confirm that the client shows actual tool calls. The UXP route has document and layer query tools; the COM route can use <code>GetActiveDocumentInfo</code> and <code>GetLayerInfo</code>. A server configuration or a chat message saying “connected” is not sufficient evidence. <a href="https://github.com/drmedia/photoshop-mcp/blob/main/docs/CORE_API.md" target="_blank" rel="noopener noreferrer">UXP tool reference</a>, <a href="https://github.com/airtaxi/PhotoshopMcpServer#available-tools" target="_blank" rel="noopener noreferrer">COM tool reference</a></p>
+<p>Then verify a small edit:</p>
+<blockquote class="quote"><p>Create a blank layer at the top of the current document named “Connection test.” Query the layers again and report its name and position.</p></blockquote>
+<p>Finally, test Save As and export, and confirm the files actually appear in the selected folder. With the UXP route, enter:</p>
+<blockquote class="quote"><p>Save the current document as connect-test-v1.psd, preserving layers, and export connect-test-v1.png. Use the folder I selected in the Photoshop MCP panel and report the result for each file.</p></blockquote>
+<p>These three steps verify reading, editing and file output separately. Once complete, proceed to everyday conversation-based operation.</p></section><section id="course-image-photoshop-agent-section-5"><h2>Give tasks after connecting</h2><p>If you can already write prompts, describe the object, requested changes, content to preserve and deliverables. For example:</p>
+<blockquote class="quote"><p>Change the text layer named “Title” in the current poster to “Autumn arrivals,” preserving the font, size and position. Save the result as poster-v1.psd and export poster-v1.png.</p></blockquote>
+<p>After seeing the result, continue with “split the title into two lines,” “make the whole image brighter” or “adjust only the background.” When objects are unclear, ask the agent to query the layers first. With UXP, you can also request a screenshot and use it to guide changes.</p>
+<p>Available operations depend on the selected tools. Reading and adjusting layers or placing an existing background are different from calling Generative Fill. Check the tool list and test whether a new background or a particular AI feature is actually supported.</p></section><section id="course-image-photoshop-agent-section-6"><h2>Common connection problems</h2><table class="d-table"><thead><tr><th>Symptom</th><th>Check first</th></tr></thead><tbody><tr><td>Client cannot start the server; tool list is empty</td><td>Installation directory, build output and configuration format; for UXP, ensure the client can find Node and restart it after installing the runtime</td></tr><tr><td>UXP returns <code>PHOTOSHOP_NOT_CONNECTED</code></td><td>Photoshop is open, the plugin is loaded and Connect was clicked; confirm the client starts the real <code>uxp</code> bridge</td></tr><tr><td>Reading and editing work, but saving or exporting fails</td><td>For UXP, check <code>external</code> permission and the panel&#39;s output folder; choose a new filename if one already exists</td></tr><tr><td>COM server starts, but Photoshop operations fail</td><td>Call <code>IsPhotoshopRunning</code> and <code>GetPhotoshopVersion</code>; check the installed version supports the required COM interface</td></tr><tr><td>A feature has no tool or a call fails</td><td>Ask the agent to inspect the actual tool list and error; for UXP, use <code>photoshop.diagnostics</code> and follow its findings</td></tr></tbody></table>
+<p>Resources and configurations were checked on <strong>October 31, 2026</strong>, against Adobe and client documentation and the two projects&#39; source documentation. This section has not been installed and acceptance-tested in local Photoshop.</p></section><nav class="tutorial-pagination" aria-label="Previous and next chapters"><a href="/en/software/image-creation/image-generation/">AI Image Workflows: Midjourney, Stable Diffusion, ControlNet and LoRA</a><a href="/en/software/image-creation/image-workflow-reuse/">Reuse AI Image Workflows: Consistent Characters, Product Images and Upscaling</a></nav><footer class="tutorial-footer"><a href="/about/">About and corrections</a></footer></article></div></main></body></html>

@@ -1,0 +1,126 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/brand/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<title>如何让 AI Agent 操作 Photoshop：MCP 接入与排查 · AI 知识地图</title>
+<meta name="description" content="比较 Photoshop 内置助手与外部 Agent 的接入方式，了解 UXP 插件和 Windows COM 两种 MCP 方案、连接验证、任务表达及常见接入问题。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/software/image-creation/image-photoshop-agent/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="如何让 AI Agent 操作 Photoshop：MCP 接入与排查">
+<meta property="og:description" content="比较 Photoshop 内置助手与外部 Agent 的接入方式，了解 UXP 插件和 Windows COM 两种 MCP 方案、连接验证、任务表达及常见接入问题。">
+<meta property="og:url" content="https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="如何让 AI Agent 操作 Photoshop：MCP 接入与排查">
+<meta name="twitter:description" content="比较 Photoshop 内置助手与外部 Agent 的接入方式，了解 UXP 插件和 Windows COM 两种 MCP 方案、连接验证、任务表达及常见接入问题。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/#page","name":"如何让 AI Agent 操作 Photoshop：MCP 接入与排查","description":"比较 Photoshop 内置助手与外部 Agent 的接入方式，了解 UXP 插件和 Windows COM 两种 MCP 方案、连接验证、任务表达及常见接入问题。","url":"https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"第二章 使用 Agent 辅助操作 Photoshop","item":"https://ai-knowledge-map.com/software/image-creation/image-photoshop-agent/"}]}]</script>
+<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+</head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">第二章 使用 Agent 辅助操作 Photoshop</span></li></ol></nav><h1>第二章 使用 Agent 辅助操作 Photoshop</h1><nav class="tutorial-language" aria-label="语言"><a href="/en/software/image-creation/image-photoshop-agent/" lang="en" hreflang="en">English</a></nav><nav class="tutorial-actions" aria-label="课程导航"><a href="/software/catalog/">全部教程</a><a href="/software/?tutorial=image-creation&amp;lesson=image-photoshop-agent&amp;lang=zh-Hans">打开交互课程</a></nav><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-image-photoshop-agent-introduction">阅读说明</a></li><li><a href="#course-image-photoshop-agent-section-1">选择接入方式</a></li><li><a href="#course-image-photoshop-agent-section-2">接入方案 A：drmedia/photoshop-mcp（UXP 插件）</a></li><li><a href="#course-image-photoshop-agent-section-3">接入方案 B：airtaxi/PhotoshopMcpServer（Windows COM）</a></li><li><a href="#course-image-photoshop-agent-section-4">确认接入成功</a></li><li><a href="#course-image-photoshop-agent-section-5">接入后怎样下达任务</a></li><li><a href="#course-image-photoshop-agent-section-6">常见接入问题</a></li></ul></nav><article class="tutorial-content"><section id="course-image-photoshop-agent-introduction"><h2>阅读说明</h2><p>本章面向已经会用自然语言描述需求的用户，目标是完成接入，让 Agent 直接操作 Photoshop。接通后，可以在对话中要求它检查图片、整理图层、修改文字、调整画面和导出文件，再根据结果继续提出修改意见。主要需要掌握的是接入与使用方法。</p></section><section id="course-image-photoshop-agent-section-1"><h2>选择接入方式</h2><p>有 Photoshop 内置助手和外部 Agent 两条路线：</p>
+<ul><li><strong>Photoshop 官方 AI Assistant</strong>：在 Photoshop 内直接输入要求，无需自行搭建 MCP。核对时，Adobe 仍将桌面端功能标为 Photoshop（Beta）早期测试功能。可在 Creative Cloud 中安装 Photoshop（Beta），打开图片后，点击应用右上角的 AI Assistant 图标进入对话；具体开放情况以当前版本与账户中的入口为准。<a href="https://helpx.adobe.com/photoshop/desktop/whats-new/ai-assistant-overview.html" target="_blank" rel="noopener noreferrer">官方介绍与入口说明</a></li><li><strong>外部 Agent + MCP</strong>：在支持本地 MCP 工具调用的 AI 客户端中对话，由连接程序把操作传给 Photoshop。这里的 MCP 可以理解为让 Agent 调用 Photoshop 工具的接口。外部接入可选择下面任意一个项目。</li></ul>
+<table class="d-table"><thead><tr><th>项目</th><th>控制方式</th><th>项目说明中的能力</th></tr></thead><tbody><tr><td><a href="https://github.com/drmedia/photoshop-mcp" target="_blank" rel="noopener noreferrer">drmedia/photoshop-mcp</a></td><td>Photoshop UXP 插件桥接</td><td>文档、图层、选区、截图、保存与导出等操作</td></tr><tr><td><a href="https://github.com/airtaxi/PhotoshopMcpServer" target="_blank" rel="noopener noreferrer">airtaxi/PhotoshopMcpServer</a></td><td>Windows COM 自动化</td><td>向支持 MCP 的 Agent 暴露 Photoshop 自动化操作，包括文档与图层信息、导出，以及执行 Photoshop 脚本</td></tr></tbody></table>
+<p>下面给出 Windows 接入步骤。两套外部方案选一套即可；它们都是第三方项目，版本要求与操作范围分别以各自说明为准。</p></section><section id="course-image-photoshop-agent-section-2"><h2>接入方案 A：drmedia/photoshop-mcp（UXP 插件）</h2><p><strong>1. 准备运行环境</strong></p>
+<p>需要 Git、Node.js 22.12 或以上、Photoshop，以及 Adobe UXP Developer Tool。项目声明 Photoshop 最低版本为 25.0，作者记录的实际验证版本为 27.8；macOS 尚缺少完整验证，本节按 Windows 编写。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md#필요한-것" target="_blank" rel="noopener noreferrer">项目环境要求</a></p>
+<p>UXP Developer Tool 可通过 Creative Cloud 安装，首次启动时按提示启用 Developer Mode，允许加载开发中的插件。<a href="https://developer.adobe.com/photoshop/uxp/2022/guides/devtool/installation" target="_blank" rel="noopener noreferrer">Adobe 安装说明</a></p>
+<p><strong>2. 下载并构建项目</strong></p>
+<p>以下使用 <code>C:/AI/Tools</code> 作为示例安装目录。在 PowerShell 中依次执行：</p>
+<pre><code class="language-powershell">New-Item -ItemType Directory -Path C:/AI/Tools -Force
+Set-Location C:/AI/Tools
+git clone https://github.com/drmedia/photoshop-mcp.git
+Set-Location C:/AI/Tools/photoshop-mcp
+npm install
+npm run build</code></pre>
+<p>构建会生成服务器与插件需要的文件。该项目核对时尚未发布到 npm，应按源码方式安装。<a href="https://github.com/drmedia/photoshop-mcp#quick-start" target="_blank" rel="noopener noreferrer">构建说明</a>、<a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md" target="_blank" rel="noopener noreferrer">发布状态说明</a></p>
+<p><strong>3. 把插件加载进 Photoshop</strong></p>
+<ol><li>启动 Photoshop 和 UXP Developer Tool。</li><li>在 Developer Tool 中选择 <strong>Add Plugin</strong>，找到 <code>C:/AI/Tools/photoshop-mcp/photoshop-uxp/manifest.json</code>。</li><li>点击 <strong>Load</strong>，再在 Photoshop 的“插件 / Plugins”菜单中打开 <strong>Photoshop MCP</strong> 面板。</li></ol>
+<p>保留 Photoshop 与插件面板，接着配置 AI 客户端。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/photoshop-uxp/README.md#설치" target="_blank" rel="noopener noreferrer">插件加载说明</a></p>
+<p><strong>4. 在 Agent 客户端中添加 MCP 服务器</strong></p>
+<p>客户端必须支持启动本地 <strong>stdio MCP 服务器</strong>。以下以 Claude Desktop 的配置方式举例：打开 <code>%APPDATA%\Claude\claude_desktop_config.json</code>，把下面的服务器条目加入配置；已有其他服务器时，将其合并进现有 <code>mcpServers</code> 对象。</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;photoshop-uxp&quot;: {
+      &quot;command&quot;: &quot;node&quot;,
+      &quot;args&quot;: [
+        &quot;C:/AI/Tools/photoshop-mcp/packages/mcp-server/bin/photoshop-mcp.js&quot;
+      ],
+      &quot;env&quot;: {
+        &quot;PHOTOSHOP_MCP_BRIDGE&quot;: &quot;uxp&quot;,
+        &quot;PHOTOSHOP_MCP_PROFILE&quot;: &quot;full&quot;,
+        &quot;PHOTOSHOP_MCP_ALLOW&quot;: &quot;read,edit,external&quot;,
+        &quot;PHOTOSHOP_MCP_EXTENSIONS_ENABLED&quot;: &quot;none&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>将安装路径换成自己的实际路径，保存后重启客户端。服务器由客户端按配置启动，无需再手工运行一个 <code>npm start</code> 实例。</p>
+<p>这些设置分别表示：连接真实的 UXP 插件、显示完整 Photoshop 工具、允许读取与编辑以及另存/导出文件、关闭本章用不到的扩展。项目默认只允许 <code>read,edit</code>，所以这里加入了保存与导出需要的 <code>external</code>；覆盖原文件等操作属于另一权限级别，不包含在此示例中。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/.mcp.json" target="_blank" rel="noopener noreferrer">项目启动配置</a>、<a href="https://github.com/drmedia/photoshop-mcp#configuration" target="_blank" rel="noopener noreferrer">环境变量与权限说明</a>、<a href="https://github.com/airtaxi/PhotoshopMcpServer#claude-desktop" target="_blank" rel="noopener noreferrer">Claude Desktop 配置位置示例</a></p>
+<p>使用其他 Agent 时，填写相同的启动命令、参数和环境变量，但采用该客户端自己的配置格式。例如 VS Code 可通过命令面板运行 <strong>MCP: Add Server → Command (stdio)</strong> 添加；不同客户端的顶层字段可能是 <code>mcpServers</code> 或 <code>servers</code>，不能直接混用。<a href="https://code.visualstudio.com/docs/agent-customization/mcp-servers" target="_blank" rel="noopener noreferrer">VS Code 官方接入说明</a></p>
+<p><strong>5. 连接插件，并选择输出目录</strong></p>
+<p>回到 Photoshop MCP 面板，点击 <strong>Connect</strong>。<strong>插件加载成功后，默认仍不会主动连接</strong>，所以这一步需要单独执行。正常连接后，面板会显示桥接状态与端口；默认会在本机 8765–8774 端口中寻找服务器，通常无需手填端口。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/photoshop-uxp/README.md#설치" target="_blank" rel="noopener noreferrer">连接行为说明</a></p>
+<p>如需保存或导出，在该面板中由用户选择并授权一个输出文件夹。Agent 随后提供文件名，例如 <code>poster-v1.psd</code>，文件会写入这个文件夹；此项目不接受由 Agent 任意指定完整输出路径。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/README_KO.md#파일-저장" target="_blank" rel="noopener noreferrer">输出文件夹与保存规则</a></p></section><section id="course-image-photoshop-agent-section-3"><h2>接入方案 B：airtaxi/PhotoshopMcpServer（Windows COM）</h2><p>这条路线通过 Windows COM 调用 Photoshop，无需加载上述 UXP 插件。需要 Windows、支持 COM 自动化和 <code>DoJavaScript</code> 的 Photoshop，以及 .NET 10 SDK 或以上。具体安装与客户端配置见<a href="https://github.com/airtaxi/PhotoshopMcpServer#requirements" target="_blank" rel="noopener noreferrer">项目说明</a>。</p>
+<p><strong>1. 下载并生成可执行文件</strong></p>
+<p>在 PowerShell 中执行：</p>
+<pre><code class="language-powershell">New-Item -ItemType Directory -Path C:/AI/Tools -Force
+Set-Location C:/AI/Tools
+git clone https://github.com/airtaxi/PhotoshopMcpServer.git
+Set-Location C:/AI/Tools/PhotoshopMcpServer
+dotnet publish PhotoshopMcpServer/PhotoshopMcpServer.csproj -c Release -r win-x64 --self-contained</code></pre>
+<p>发布过程会构建项目。按照项目当前目录与目标框架，可执行文件位于下方配置所示位置。<a href="https://github.com/airtaxi/PhotoshopMcpServer#installation" target="_blank" rel="noopener noreferrer">发布步骤</a>、<a href="https://github.com/airtaxi/PhotoshopMcpServer/blob/master/PhotoshopMcpServer/PhotoshopMcpServer.csproj" target="_blank" rel="noopener noreferrer">项目目标框架</a></p>
+<p><strong>2. 配置客户端并连接</strong></p>
+<p>同样以 Claude Desktop 为例，把服务器条目加入其配置：</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;photoshop-com&quot;: {
+      &quot;command&quot;: &quot;C:/AI/Tools/PhotoshopMcpServer/PhotoshopMcpServer/bin/Release/net10.0-windows/win-x64/publish/PhotoshopMcpServer.exe&quot;
+    }
+  }
+}</code></pre>
+<p>换成自己的实际路径，保存并重启客户端，然后打开 Photoshop。其他 Agent 使用相同可执行文件作为本地 stdio 服务器的启动命令即可。<a href="https://github.com/airtaxi/PhotoshopMcpServer#option-b-run-published-executable" target="_blank" rel="noopener noreferrer">可执行文件接入示例</a></p>
+<p>此项目既提供读取文档、查询图层和导出的工具，也允许 Agent 编写并执行 Photoshop JavaScript。日常使用时直接描述任务即可；用户无需先自行编写脚本。<a href="https://github.com/airtaxi/PhotoshopMcpServer#available-tools" target="_blank" rel="noopener noreferrer">工具清单</a></p></section><section id="course-image-photoshop-agent-section-4"><h2>确认接入成功</h2><p>在 Photoshop 中打开一张测试图片，在 Agent 客户端启用对应 MCP 工具，然后输入：</p>
+<blockquote class="quote"><p>请实际调用 Photoshop 工具，读取当前文档名称、宽高和图层名称。只查询，先不要修改。</p></blockquote>
+<p>检查返回信息是否与 Photoshop 中的文档一致，并确认客户端出现了实际的工具调用记录。UXP 方案可以调用文档与图层查询工具；COM 方案可使用 <code>GetActiveDocumentInfo</code> 和 <code>GetLayerInfo</code>。仅显示服务器配置，或聊天中回复“已连接”，还不足以证明 Photoshop 已经接通。<a href="https://github.com/drmedia/photoshop-mcp/blob/main/docs/CORE_API.md" target="_blank" rel="noopener noreferrer">UXP 工具参考</a>、<a href="https://github.com/airtaxi/PhotoshopMcpServer#available-tools" target="_blank" rel="noopener noreferrer">COM 工具参考</a></p>
+<p>随后可做一次小修改验证：</p>
+<blockquote class="quote"><p>在当前文档最上方新建一个空白图层，命名为“连接测试”，完成后重新查询图层，告诉我它的名称与位置。</p></blockquote>
+<p>最后测试一次另存与导出，确认指定目录中确实出现文件。使用 UXP 方案时，可输入：</p>
+<blockquote class="quote"><p>将当前文档另存为 connect-test-v1.psd，保留图层，再导出 connect-test-v1.png。保存到我在 Photoshop MCP 面板中选定的文件夹，告诉我各文件的保存结果。</p></blockquote>
+<p>以上三步分别验证读取、编辑和文件输出。完成后即可进入日常对话操作。</p></section><section id="course-image-photoshop-agent-section-5"><h2>接入后怎样下达任务</h2><p>已经会写提示词的用户，可以直接按“对象、修改要求、保留内容、交付结果”描述任务。例如：</p>
+<blockquote class="quote"><p>把当前海报中名为“标题”的文字图层改成“秋季新品”，保留原字体、字号和位置。将结果另存为 poster-v1.psd，并导出 poster-v1.png。</p></blockquote>
+<p>看到结果后继续说“标题改成两行”“整体再亮一点”“只调整背景”即可。遇到对象不明确的图片，可以先要求 Agent 查询图层；使用 UXP 方案时，还可以要求它返回当前画面截图，再据此修改。</p>
+<p>接入后的可操作范围取决于所选工具。例如，读取和调整图层、置入已有背景，与调用生成式填充是不同功能；是否能够生成新背景、使用某项新 AI 功能，应查看工具清单并实际验证。</p></section><section id="course-image-photoshop-agent-section-6"><h2>常见接入问题</h2><table class="d-table"><thead><tr><th>现象</th><th>优先检查</th></tr></thead><tbody><tr><td>客户端启动服务器失败，工具列表为空</td><td>检查安装目录、构建产物和配置格式；UXP 方案确认 Node 可被客户端找到，安装运行环境后重启客户端</td></tr><tr><td>UXP 返回 <code>PHOTOSHOP_NOT_CONNECTED</code></td><td>确认 Photoshop 已打开、插件已 Load，并在面板中点击 Connect；确认客户端启动的是真实 <code>uxp</code> 桥接模式</td></tr><tr><td>能查询、能修改，但无法保存或导出</td><td>UXP 方案检查 <code>external</code> 权限与面板输出文件夹；同名文件已存在时换用新文件名</td></tr><tr><td>COM 服务器已启动，但 Photoshop 操作失败</td><td>先调用 <code>IsPhotoshopRunning</code>、<code>GetPhotoshopVersion</code>，核对本机版本是否支持项目要求的 COM 接口</td></tr><tr><td>某项功能没有工具或调用失败</td><td>让 Agent 查看实际工具列表与错误信息；UXP 方案可调用 <code>photoshop.diagnostics</code>，按诊断结果处理</td></tr></tbody></table>
+<p>资料与配置于 <strong>2026 年 10 月 31 日</strong>依据 Adobe、客户端官方文档及两个项目的源码说明核对；本节尚未在本机 Photoshop 中完成安装和操作验收。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/image-creation/image-generation/">AI 图像生成工作流：Midjourney、Stable Diffusion 与参数控制</a><a href="/software/image-creation/image-workflow-reuse/">如何复用 AI 图像工作流：人物一致性、商品图与放大</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main></body></html>

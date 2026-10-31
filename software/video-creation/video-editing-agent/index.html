@@ -1,0 +1,91 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/brand/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<title>如何用 AI Agent 剪辑视频：达芬奇与 Premiere 接入 · AI 知识地图</title>
+<meta name="description" content="了解 DaVinci Resolve Studio 与 Adobe Premiere Pro 的 Agent 接入方式，核对版本和脚本条件，连接外部工具，并检查视频工程操作的结果及常见问题。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/software/video-creation/video-editing-agent/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/software/video-creation/video-editing-agent/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/software/video-creation/video-editing-agent/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 知识地图">
+<meta property="og:title" content="如何用 AI Agent 剪辑视频：达芬奇与 Premiere 接入">
+<meta property="og:description" content="了解 DaVinci Resolve Studio 与 Adobe Premiere Pro 的 Agent 接入方式，核对版本和脚本条件，连接外部工具，并检查视频工程操作的结果及常见问题。">
+<meta property="og:url" content="https://ai-knowledge-map.com/software/video-creation/video-editing-agent/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="如何用 AI Agent 剪辑视频：达芬奇与 Premiere 接入">
+<meta name="twitter:description" content="了解 DaVinci Resolve Studio 与 Adobe Premiere Pro 的 Agent 接入方式，核对版本和脚本条件，连接外部工具，并检查视频工程操作的结果及常见问题。">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/video-creation/video-editing-agent/#page","name":"如何用 AI Agent 剪辑视频：达芬奇与 Premiere 接入","description":"了解 DaVinci Resolve Studio 与 Adobe Premiere Pro 的 Agent 接入方式，核对版本和脚本条件，连接外部工具，并检查视频工程操作的结果及常见问题。","url":"https://ai-knowledge-map.com/software/video-creation/video-editing-agent/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"第二章 使用 Agent 操作专业视频编辑平台","item":"https://ai-knowledge-map.com/software/video-creation/video-editing-agent/"}]}]</script>
+<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+</head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">第二章 使用 Agent 操作专业视频编辑平台</span></li></ol></nav><h1>第二章 使用 Agent 操作专业视频编辑平台</h1><nav class="tutorial-language" aria-label="语言"><a href="/en/software/video-creation/video-editing-agent/" lang="en" hreflang="en">English</a></nav><nav class="tutorial-actions" aria-label="课程导航"><a href="/software/catalog/">全部教程</a><a href="/software/?tutorial=video-creation&amp;lesson=video-editing-agent&amp;lang=zh-Hans">打开交互课程</a></nav><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-video-editing-agent-introduction">阅读说明</a></li><li><a href="#course-video-editing-agent-section-1">1. 选定两个编辑平台</a></li><li><a href="#course-video-editing-agent-section-2">2. DaVinci Resolve Studio：连接外部 Agent</a></li><li><a href="#course-video-editing-agent-section-3">3. Adobe Premiere Pro：内置助手与外部 Agent</a></li><li><a href="#course-video-editing-agent-section-4">4. 常见问题与结果检查</a></li></ul></nav><article class="tutorial-content"><section id="course-video-editing-agent-introduction"><h2>阅读说明</h2><p>AI 生成镜头后，通常还要调整片段长度、镜头顺序、画面构图、颜色和声音。本章先选定专业视频编辑平台，再完成 Agent 接入，让你通过自然语言操作已有工程，并根据预览继续修改。</p></section><section id="course-video-editing-agent-section-1"><h2>1. 选定两个编辑平台</h2><p>本章选择 <strong>DaVinci Resolve Studio（达芬奇）</strong> 和 <strong>Adobe Premiere Pro</strong>，依据是专业后期能力、可继续编辑的工程，以及有资料可核对的 Agent 接入方式。两者选一个学习即可。</p>
+<table class="d-table"><thead><tr><th>平台</th><th>选择理由</th><th>Agent 接入路线</th><th>建议怎样选</th></tr></thead><tbody><tr><td><a href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noopener noreferrer">DaVinci Resolve Studio</a></td><td>在同一工程中完成剪辑、调色、Fusion 合成与 Fairlight 声音后期</td><td>21.1 已加入官方 AI 助手集成；也可使用下文的第三方 MCP</td><td>新建后期流程、重视画面与声音统一处理时，优先从它开始</td></tr><tr><td><a href="https://www.adobe.com/products/premiere.html" target="_blank" rel="noopener noreferrer">Adobe Premiere Pro</a></td><td>时间线精剪、文字与图形制作，以及 Adobe 素材协作</td><td>内置 AI Assistant（beta）；外部 Agent 可通过第三方 PPMCP 接入</td><td>已在使用 Photoshop、After Effects 或 Premiere 工程时，优先沿用它</td></tr></tbody></table>
+<p>平台具备某项编辑功能，与 Agent 能调用这项功能，需要分别确认。学习时先接通查询、一次小修改和工程保存，再扩大任务范围。</p></section><section id="course-video-editing-agent-section-2"><h2>2. DaVinci Resolve Studio：连接外部 Agent</h2><p><strong>官方接入与本章采用的步骤</strong></p>
+<p>Blackmagic 已在 <a href="https://www.blackmagicdesign.com/media/partial/release/20260908-03" target="_blank" rel="noopener noreferrer">Resolve 21.1 官方更新说明</a>中确认 AI 助手集成，列出的任务包括分析工程、整理素材、调整设置、剪出精选片段和批量渲染。使用对应版本时，可先查 <a href="https://www.blackmagicdesign.com/support" target="_blank" rel="noopener noreferrer">官方支持中心</a>中的 21.1 手册与新版功能介绍，采用随软件提供的接入方式。</p>
+<p>下面展开的是 <strong>第三方 <code>samuelgursky/davinci-resolve-mcp</code> 路线</strong>，便于按作者安装文档逐项完成环境准备、客户端配置和连接检查。它与官方集成是两套方案，选择其中一套连接即可。<a href="https://github.com/samuelgursky/davinci-resolve-mcp" target="_blank" rel="noopener noreferrer">项目说明</a></p>
+<p><strong>1. 准备软件与脚本环境</strong></p>
+<p>按作者要求准备 Resolve Studio 18.5 或以上、Git，以及 64 位 Python 3.10 或以上；下面的命令使用 Python 3.12。媒体分析还需 ffmpeg，并确保命令能从 PATH 找到；转录等功能的额外依赖按任务补齐。启动 Resolve，打开用于练习的工程。在 <strong>Preferences → System → General → External scripting using</strong> 中选择 <strong>Local</strong>，保存设置。<a href="https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md" target="_blank" rel="noopener noreferrer">安装与版本要求</a></p>
+<p>本节按 Studio 编写。免费版的脚本接口与桥接条件随版本变化，不直接套用本节步骤。</p>
+<p><strong>2. 下载项目并生成客户端配置</strong></p>
+<p>在选定的工具目录打开 PowerShell，依次执行：</p>
+<pre><code class="language-powershell">git clone https://github.com/samuelgursky/davinci-resolve-mcp.git
+Set-Location davinci-resolve-mcp
+py -3.12 install.py --clients manual</code></pre>
+<p>安装器会建立运行环境并输出手动接入配置。将它生成的启动命令、参数与环境变量加入你的 Agent 客户端；路径使用安装器给出的实际值。已有其他 MCP 配置时，合并服务器条目。其他安装方式与故障诊断见同一份 <a href="https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md" target="_blank" rel="noopener noreferrer">作者安装文档</a>。</p>
+<p><strong>3. 连接并检查当前工程</strong></p>
+<p>客户端需要支持启动本地 <strong>stdio MCP 服务</strong>。保存配置并重启客户端，启用 Resolve 工具，同时保持 Resolve 和工程打开。先让 Agent 读取当前工程名称、时间线、轨道和片段，核对返回信息与软件界面是否一致。</p>
+<p><strong>4. 从明确支持的编辑操作开始</strong></p>
+<p>可以先练习素材整理、片段属性调整、标记、渲染设置等任务。涉及剪切、移动或替换片段时，让 Agent 先检查当前接口是否支持相应操作，再执行。<a href="https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/kernels/timeline-edit-kernel.md" target="_blank" rel="noopener noreferrer">时间线操作边界</a>区分支持、部分支持和受限操作；软件界面能完成的任务，接口未必提供相同控制。</p>
+<p><strong>软件与接入教程</strong>：<a href="https://www.blackmagicdesign.com/products/davinciresolve/training" target="_blank" rel="noopener noreferrer">Blackmagic 官方培训</a>、<a href="https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md" target="_blank" rel="noopener noreferrer">MCP 安装指南</a>、<a href="https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/kernels/timeline-edit-kernel.md" target="_blank" rel="noopener noreferrer">时间线能力说明</a>。</p></section><section id="course-video-editing-agent-section-3"><h2>3. Adobe Premiere Pro：内置助手与外部 Agent</h2><p><strong>路线 A：内置 AI Assistant</strong></p>
+<p>如果当前版本与账户已提供助手，在 Premiere 中打开工程，通过 <strong>Window → Assistant</strong> 进入对话。Adobe 的 <a href="https://helpx.adobe.com/premiere/desktop/premiere-ai-assistant/overview.html" target="_blank" rel="noopener noreferrer">官方说明</a>仍将其标为 beta；列出的任务包括素材分箱与重命名、转录、标记，以及初步片段组合。</p>
+<p>这条路线适合先用自然语言整理素材和搭建粗剪。需要精确修改片段、构图或音量时，检查助手当时支持的动作，也可选择下面的外部接入路线。</p>
+<p><strong>路线 B：外部 Agent + PPMCP</strong></p>
+<p>本章选用第三方项目 <a href="https://github.com/CaYatur/PremiereProMCP" target="_blank" rel="noopener noreferrer">CaYatur/PremiereProMCP（PPMCP）</a>。它通过 UXP 插件与本地桥接程序连接 Premiere，再把编辑工具提供给 Agent。下面按作者主要测试的 Windows 环境编写。</p>
+<p><strong>1. 准备 Premiere 与插件加载工具</strong></p>
+<p>使用 <strong>Premiere 26.0 或以上</strong>，安装 Adobe UXP Developer Tool。在 Premiere 的 <strong>Settings → Plugins</strong> 中启用 <strong>Enable developer mode</strong>，重启 Premiere。Adobe 通用 UXP 教程支持的最低版本与这个项目的最低版本不同，本节采用项目要求的 26.0。<a href="https://github.com/CaYatur/PremiereProMCP" target="_blank" rel="noopener noreferrer">项目版本要求</a>、<a href="https://developer.adobe.com/premiere-pro/uxp/plugins/" target="_blank" rel="noopener noreferrer">Adobe 插件加载说明</a></p>
+<p><strong>2. 安装 PPMCP</strong></p>
+<p>从 <a href="https://github.com/CaYatur/PremiereProMCP/releases" target="_blank" rel="noopener noreferrer">作者 Releases</a> 下载 <code>PPMCP-Setup-x.x.x.zip</code>，完整解压，保留 <code>Setup.bat</code> 与 <code>payload</code> 的相对位置，再运行 <code>Setup.bat</code>。安装后打开作者生成的连接说明：</p>
+<ul><li><code>%APPDATA%/PPMCP/HOW-TO-USE.txt</code>：使用步骤与本机实际路径。</li><li><code>%APPDATA%/PPMCP/HOW-TO-CONNECT.txt</code>：程序、服务器与插件入口。</li><li><code>%APPDATA%/PPMCP/mcp-config-snippet.json</code>：供客户端合并使用的配置片段。</li></ul>
+<p>以上为作者提供的发布包安装方式，本章没有在本机执行安装。<a href="https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md" target="_blank" rel="noopener noreferrer">完整安装指南</a></p>
+<p><strong>3. 启动桥接并加载插件</strong></p>
+<p>运行安装器建立的 <strong>PPMCP Bridge</strong> 快捷方式。打开 Premiere 与 UXP Developer Tool，在后者选择 <strong>Add Plugin</strong>，使用 <code>HOW-TO-CONNECT.txt</code> 中的插件 manifest 路径，再点击 <strong>Load</strong>。在 Premiere 中打开 PPMCP 面板，确认状态为 <strong>Active</strong>；面板关闭后，可从 <strong>Window → UXP Plugins</strong> 找回。<a href="https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md" target="_blank" rel="noopener noreferrer">作者连接步骤</a>、<a href="https://developer.adobe.com/premiere-pro/uxp/plugins/" target="_blank" rel="noopener noreferrer">Adobe 面板入口说明</a></p>
+<p><strong>4. 配置 Agent 客户端</strong></p>
+<p>将生成的 MCP 配置片段合并到客户端，保存后重启。PPMCP 使用本地 <strong>stdio</strong>：客户端启动指定的 Node 程序，并以服务器入口文件作为参数。它不能填进只接受远程 MCP URL 的连接框。不同客户端配置格式有差异，按 <a href="https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md" target="_blank" rel="noopener noreferrer">作者的客户端配置章节</a>填写；使用安装器生成的真实路径。</p>
+<p><strong>5. 核对能够执行的操作</strong></p>
+<p>作者记录的实机验证包含读取工程与序列、部分片段剪辑、位置与缩放、音量增益，以及工程保存和序列截图。完整工具表还包含未逐项实测的功能，不能仅凭工具数量判断可靠性。<a href="https://github.com/CaYatur/PremiereProMCP/blob/main/docs/FEATURES.md" target="_blank" rel="noopener noreferrer">工具与验证状态</a></p>
+<p>可编辑 MOGRT 文字需要作者另列的 CEP Text Bridge；PNG 文字覆盖层与可编辑字幕不同。新增轨道等操作也可能受 UXP 接口限制，先检查当前版本的支持状态。</p>
+<p><strong>软件与接入教程</strong>：<a href="https://helpx.adobe.com/premiere/desktop.html" target="_blank" rel="noopener noreferrer">Premiere 官方帮助</a>、<a href="https://helpx.adobe.com/premiere/desktop/premiere-ai-assistant/overview.html" target="_blank" rel="noopener noreferrer">内置助手说明</a>、<a href="https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md" target="_blank" rel="noopener noreferrer">PPMCP 安装指南</a>、<a href="https://github.com/CaYatur/PremiereProMCP/blob/main/docs/FEATURES.md" target="_blank" rel="noopener noreferrer">工具能力与限制</a>。</p></section><section id="course-video-editing-agent-section-4"><h2>4. 常见问题与结果检查</h2><table class="d-table"><thead><tr><th>现象</th><th>优先检查</th></tr></thead><tbody><tr><td>Agent 只有建议，软件没有变化</td><td>是否启用了实际编辑工具，是否出现调用记录，回读的工程是否正确</td></tr><tr><td>Resolve 服务启动但读不到工程</td><td>Studio 版本、本地脚本设置、Resolve 是否运行，以及工程是否打开</td></tr><tr><td>Premiere 插件没有连接</td><td>开发者模式、UXP 插件是否 Load、PPMCP Bridge 是否运行、面板是否 Active</td></tr><tr><td>MCP 工具为空</td><td>客户端是否支持本地 stdio、启动路径是否有效、配置是否按客户端格式合并</td></tr><tr><td>某个菜单功能无法通过 Agent 执行</td><td>查看当前接口与工具的支持范围；保留错误信息，转到软件中完成该步骤</td></tr><tr><td>保存成功但没有测试视频</td><td>工程保存与视频导出分别检查，核对渲染状态和实际输出文件</td></tr></tbody></table></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/video-creation/video-generation/">AI 视频生成怎么入门？即梦、通义万相与海螺教程</a><a href="/software/video-creation/video-workflow-reuse/">新人如何复用 AI 视频工作流：即梦、Wan 与 H3 案例</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main></body></html>

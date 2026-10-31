@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/brand/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<title>How to Write AI Prompts: Tasks, Context, Constraints and Iteration · AI Knowledge Map</title>
+<meta name="description" content="Learn to describe tasks, provide necessary context, set constraints and give actionable requirements, then revise prompts based on results. Continue with the interactive workflow, examples and FAQ.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ai-knowledge-map.com/en/software/conversation-basics/">
+<link rel="alternate" hreflang="en" href="https://ai-knowledge-map.com/en/software/conversation-basics/">
+<link rel="alternate" hreflang="zh-Hans" href="https://ai-knowledge-map.com/software/conversation-basics/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI Knowledge Map">
+<meta property="og:title" content="How to Write AI Prompts: Tasks, Context, Constraints and Iteration">
+<meta property="og:description" content="Learn to describe tasks, provide necessary context, set constraints and give actionable requirements, then revise prompts based on results. Continue with the interactive workflow, examples and FAQ.">
+<meta property="og:url" content="https://ai-knowledge-map.com/en/software/conversation-basics/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Write AI Prompts: Tasks, Context, Constraints and Iteration">
+<meta name="twitter:description" content="Learn to describe tasks, provide necessary context, set constraints and give actionable requirements, then revise prompts based on results. Continue with the interactive workflow, examples and FAQ.">
+<meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
+<meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/en/software/conversation-basics/#page","name":"How to Write AI Prompts: Tasks, Context, Constraints and Iteration","description":"Learn to describe tasks, provide necessary context, set constraints and give actionable requirements, then revise prompts based on results. Continue with the interactive workflow, examples and FAQ.","url":"https://ai-knowledge-map.com/en/software/conversation-basics/","inLanguage":"en","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI Knowledge Map","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI Software Tutorials","item":"https://ai-knowledge-map.com/en/software/catalog/"},{"@type":"ListItem","position":3,"name":"Conversation and basic tasks","item":"https://ai-knowledge-map.com/en/software/conversation-basics/"}]}]</script>
+<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+</head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">Skip to content</a><header class="preview-header"><a href="/?lang=en">AI Knowledge Map</a><a href="/search/">Search / Text directory</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://ai-knowledge-map.com/">AI Knowledge Map</a></li><li><a href="https://ai-knowledge-map.com/en/software/catalog/">AI Software Tutorials</a></li><li><span aria-current="page">Conversation and basic tasks</span></li></ol></nav><h1>Conversation and basic tasks</h1><nav class="tutorial-language" aria-label="Language"><a href="/software/conversation-basics/" lang="zh-Hans" hreflang="zh-Hans">简体中文</a></nav><nav class="tutorial-actions" aria-label="Course navigation"><a href="/en/software/catalog/">All tutorials</a><a href="/software/?tutorial=conversation-basics&amp;lang=en">Open the interactive course</a></nav><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="Chapter contents"><strong>On this page</strong><ul><li><a href="#prompt-foundations">Prompt foundations</a></li></ul></nav><article class="tutorial-content"><section id="prompt-foundations"><h2>Prompt foundations</h2><section class="dd-sec course-reading" id="course-introduction" aria-labelledby="course-introduction-title"><h2 id="course-introduction-title" tabindex="-1">Introduction</h2>
+<p>For most AI users, prompts are the foundation of their work and the starting point for AI-generated content. But what does a good prompt look like? Are rigid, mechanical-sounding templates the best approach? Or will advances in AI mean we no longer need to think about prompting? In practice, many AI developers have not mastered prompting techniques, which costs them time and tokens. How should we write prompts? What do prompt engineers study? Learning how to ask AI for what we need is a prerequisite for exploring any field of AI use.</p>
+</section>
+<section class="dd-sec course-reading" id="course-prompt-selection" aria-labelledby="course-prompt-selection-title"><h2 id="course-prompt-selection-title" tabindex="-1">I Choosing a prompt</h2>
+<p>Here are three prompts for the same task:</p>
+<h3>A Short version</h3>
+<blockquote class="course-prompt-example">
+<p>Write a customer service reply under the store rules. State whether the customer can apply, whether a refund is guaranteed, and how long review takes. Do not add shipping or refund-arrival promises. One paragraph, no more than 120 Chinese characters.</p>
+</blockquote>
+<h3>B Concise and precise version</h3>
+<blockquote class="course-prompt-example">
+<p>A customer asks whether applying now guarantees a refund. Using the store rules below, reply in a friendly, direct tone. Explain whether they can apply, whether applying guarantees a refund, and how long review usually takes. Shipping costs and refund-arrival times are not provided, so do not make promises about them. Keep the reply to one paragraph of no more than 120 Chinese characters.</p>
+</blockquote>
+<h3>C Detailed template</h3>
+<blockquote class="course-prompt-example">
+<p><strong>1 Goal and purpose</strong></p>
+<p>Clearly explain the customer's eligibility to apply and the uncertainty of the outcome.</p>
+<p><strong>2 Evidence and conditions</strong></p>
+<p>The following materials and agreements apply to this task. Distinguish facts, the request to handle, and rules, and use each for its intended purpose.</p>
+<p>Fictional store return rules: Customers may apply for a return within seven days of receipt if the product is unused. Refund approval depends on review. Review usually takes two business days.</p>
+<p>Customer: It is day five since I received the product, and I have not used it. If I apply now, am I guaranteed a refund?</p>
+<p><strong>3 What to preserve and boundaries</strong></p>
+<p>Explain only the fictional store rules provided. Do not introduce external law or additional return policies. Distinguish eligibility to apply from a guaranteed refund, and preserve “usually” when stating the review time.</p>
+<p><strong>4 Delivery and collaboration</strong></p>
+<p>One friendly, direct customer service paragraph, no more than 120 Chinese characters, covering eligibility, refund conditions, and review time.</p>
+<p><strong>5 Check before delivery</strong></p>
+<p>Check that the result meets the goal, factual scope, limits, and delivery requirements above. Correct any discrepancies before delivering. Do not show each check, add a self-assessment, or append a checking report; keep the requested output format.</p>
+</blockquote>
+<p>Which of these three prompts produces a better answer? Many beginners may assume C must be best: with such detailed goals and materials, surely AI will follow everything carefully. A universal template would then produce the best result for any question. In practice, C is not necessarily best.</p>
+<p>Could B be best? Modern AI understands natural language. Perhaps C restricts its creativity, and only concise, precise prompts produce the best results.</p>
+<p>Or perhaps A is best: many high-scoring prompts are short. A is also easy to write and can be improved later.</p>
+<p>What is the answer? A, B, and C each have strengths and limits. For most questions, B and C tend to do slightly better than A, while B and C remain close. On a smaller number of questions, A can lead. What does each version get right, and where does it fall short? That is what the following sections explore. First, recognize that no perfect universal template can generate good results for every task in one attempt.</p>
+<h3 id="course-topic-1">1 Is longer better?</h3>
+<p>Why do C and B perform similarly? The context window and attention mechanism work together. Suppose your prompt has five requirements: two that must be met, and three to meet if possible. In C, the three less important requirements may draw attention away from the two more important ones, or the AI may fail to fully follow any of them. The concise, precise B retains the key information and lets AI focus on the two most important requirements, reducing errors. New requirements that conflict with earlier ones or introduce irrelevant content can also make execution harder. A longer prompt is therefore not necessarily better.</p>
+<p>This raises another question: if C has these problems, why can it still perform about as well as B? Shouldn't it make more errors? Look at what C adds and what necessary information B leaves out. Understanding what those additions do, when to include them, and when to leave them out is a central prompting skill.</p>
+<h3 id="course-topic-2">2 Prompting basics</h3>
+<p>Before adding useful information to B, start with a concise, precise basic prompt. State the task and purpose, clarify known limits and decision authority where possible, then either finish or iterate based on the result. Consistent quantities, subjects, terminology, and correct punctuation matter. Iteration matters even more. Even a very simple prompt can improve substantially when you inspect results and revise it; you do not need to finish a task with one prompt. For unfamiliar tasks, using earlier results to state explicitly what the next prompt should avoid can greatly improve output.</p>
+<p>If your needs are vague or difficult to describe, let AI ask questions to clarify them. Once settled, consolidate and confirm the final requirements before execution. If earlier discussion contains mistaken assumptions or confusion, correct it or start another conversation. If it contains no mistaken assumptions, you need not worry about that context reducing later output quality. For very simple tasks, saying too much can make results less stable. Today's AI can produce excellent results from short prompts; some prompts that receive full marks are very short.</p>
+<h3 id="course-topic-3">3 Provide necessary materials</h3>
+<p><strong>There are two kinds of materials: task materials and examples.</strong> To have AI revise an article, provide the original. To answer a customer under store rules, provide the rules and the customer's message together. Because AI has context limits, more material is not always better; provide it at the right point. If a task needs a table of delivery dates and product-use status, supply it when AI needs to evaluate that table, rather than at every stage, where it may distract from the current work. Explain how the materials should be used.</p>
+<p><strong>The second kind is examples.</strong> If your desired approach is abstract or hard to describe, such as “write more naturally,” provide a passage you like and explain: “I like its everyday language and the way it states the conclusion before explaining.” Choose examples close to the current task. For classification or rewriting, show both the original input and the processed result so AI can see how to classify or revise. For easily confused cases, compare two examples and explain the difference, including correct and incorrect examples. If the instructions are already clear, adding examples may not help. Poorly chosen examples, conflicts with the instructions, or copying irrelevant details can make results worse. Evaluations of the original DeepSeek R1 included cases where adding examples reduced performance.</p>
+<h3 id="course-topic-4">4 Define boundaries and rules</h3>
+<p>There are many ways to write a friendly customer reply. AI might reassure the customer by explaining the process, or write, “Don't worry, you will definitely get a refund.” The latter sounds reassuring but turns eligibility to apply into a guaranteed refund. State both the effect you want and the approaches or content changes that are prohibited. Boundaries and rules matter because they determine how AI may complete the task and what it must preserve when making trade-offs—things we often overlook on a first attempt. Clarifying them during iteration is especially important and can greatly improve consistency. Include known non-negotiable limits from the start, then add other rules based on actual errors.</p>
+<p>Make boundaries concrete: “You may adjust the tone, but do not change the refund conditions.” When revising an article: “Change only the wording; preserve the arguments and data.” These define the scope of changes. “Don't change things randomly” or “Don't make things up” still leaves unclear which changes you consider inappropriate. Good boundaries and rules must be actionable and assessable, rather than vague adjectives such as “careful,” “professional,” or “advanced.”</p>
+<p>Boundaries and rules also support timely interaction. Even “Ask me directly when you are unsure” can reveal gaps we missed in the prompt. For particular tasks, define what may change and what must be preserved, as well as what AI may decide independently and what needs your confirmation.</p>
+<h3 id="course-topic-5">5 Actionable requirements</h3>
+<p>“Be more careful” and “Write professionally” express expectations without specifying what to do. Professional writing might mean accurate terminology, complete explanations, or a formal tone. If you want better terminology but AI only makes the tone more serious, it has not solved the problem. Actionable requirements translate expectations into concrete actions, so AI knows what to change and you can tell whether it has done so.</p>
+<p>When an actionable requirement is hard to express, use an example and explain what is correct or incorrect about it in that respect. Consider actionable requirements in a strong prompt:<br>Task type: <strong>Meeting notes</strong></p>
+<blockquote class="course-prompt-example"><p>Organize the following notes for people who did not attend the meeting. Extract only decisions and action items explicitly stated in the notes. For each action, include an owner and deadline; if missing, mark it “Not specified.” In Markdown, output three sections—“Decisions,” “Action items,” and “Unresolved questions”—using lists in each section. Keep the total under 200 English words.<br>Meeting notes: [paste notes]</p></blockquote>
+<p>The actionable requirements specify <strong>what to extract, what each item must include, and how to handle missing information. The example also includes boundaries:</strong> use lists in each section and stay under 200 English words. It also includes the example placeholder, “Meeting notes: [paste notes].” The task and purpose need only one sentence in the concise prompt.</p>
+<h3 id="course-topic-6">6 Iteration</h3>
+<p>First identify the cause of the problem, then decide how to revise the prompt. If the return decision is wrong, check whether you provided the receipt date and product-use status. If not, add them. If the materials are complete but AI overlooked a condition, identify it and ask AI to reconsider under that condition. For stronger prompts, iteration more often adds examples of errors and clearer boundaries. Iteration can make a substantial difference, turning a rough prompt into one that produces usable results.</p>
+<p>If AI keeps getting distracted by specific details, ask it to first identify the principles that determine the answer, then work through the details. For example, establish the applicable rules or decision criteria first, then use them to analyze the current problem.</p>
+<p>Iteration cannot solve everything. Sometimes no amount of revision seems to fix a result. Earlier answers may keep influencing later ones, requirements may conflict, or execution may be inconsistent. Try a new conversation, or branch from a point that retains only the context before the mistake.</p>
+<p>A conversation can be restarted, but a project cannot always be rebuilt from scratch, so make sure you can roll back the project with Git.</p>
+</section></section><p><a href="/en/software/conversation-basics/faq/">Read all 70 questions and answers</a></p><nav class="tutorial-pagination" aria-label="Previous and next chapters"></nav><footer class="tutorial-footer"><a href="/about/">About and corrections</a></footer></article></div></main></body></html>
