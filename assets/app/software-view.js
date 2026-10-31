@@ -9,8 +9,10 @@
     let disposeWorkflow = null;
     let disposeExamples = null;
     let disposeDiagrams = null;
-    const bundle = ["data/tutorials.js?v=e3a27661d44340d1","data/tutorials-images.js?v=0f084913aac007fb","data/tutorials-video.js?v=4adbab949a00c304","data/tutorials-coding.js?v=4b17c8cfcca9df58","data/tutorials-agents.js?v=b91eccd88469dbb7","data/tutorials-agent-building.js?v=e0683f23f38acef8","data/tutorials-agent-discovery.js?v=46a2d5d48bc75085","data/tutorials-automation.js?v=f6965d4d46a38c8e","data/tutorials-agent-evaluation.js?v=781aacec04ba8b1f","assets/app/tutorial-diagrams.js?v=9064973bf5ba9630","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","assets/app/prompt-faq.js?v=3afe562049c24609","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
+    const bundle = ["data/tutorials.js?v=bf0aa312b0f236e2","data/tutorials-images.js?v=d05b2b4586b83f46","data/tutorials-video.js?v=39080bc16e7d5719","data/tutorials-coding.js?v=4b17c8cfcca9df58","data/tutorials-agents.js?v=b91eccd88469dbb7","data/tutorials-agent-building.js?v=e0683f23f38acef8","data/tutorials-agent-discovery.js?v=46a2d5d48bc75085","data/tutorials-automation.js?v=f6965d4d46a38c8e","data/tutorials-agent-evaluation.js?v=781aacec04ba8b1f","assets/app/tutorial-diagrams.js?v=9064973bf5ba9630","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","data/tutorials-faq-en.js?v=1d0a8bfcbd626c98","assets/app/prompt-faq.js?v=f36828a6f9669257","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
     const label = (module, field) => t("tutorial.language") === "en" ? module[field + "En"] || module[field] : module[field];
+    const chapterLabel = chapter => (t("tutorial.language") === "en" ? ["I", "II", "III", "IV", "V"][chapter.number - 1] : ["一", "二", "三", "四", "五"][chapter.number - 1]) + ". " + label(chapter, "title").replace(/^(?:第[一二三四五]章\s*|[一二三四五IVX]+\.\s*|Chapter \d+\s*)/, "");
+    const sectionLabel = (section, index) => (index + 1) + ". " + section.title.replace(/^\d+\.\s*/, "");
     const findTutorial = id => tutorials?.modules.find(module => module.id === id);
     const readingTutorial = (id, lessonId) => {
       const original = id === "video-creation" ? global.VIDEO_TUTORIALS?.[lessonId || "video-generation"] || null : id === "image-creation" ? global.IMAGE_TUTORIALS?.[lessonId || "image-generation"] || null : id === "ai-coding" ? global.CODING_TUTORIALS?.[lessonId || "coding-foundations"] || null : id !== "agents-automation" ? null : ({
@@ -22,8 +24,12 @@
       })[lessonId || "agent-foundations"] || null;
       return t("tutorial.language") === "en" ? original?.translations?.en || original : original;
     };
-    const findLesson = (id, lessonId) => findTutorial(id)?.lessons.some(lesson => lesson.kind === "reading" && lesson.id === lessonId)
-      ? readingTutorial(id, lessonId)?.chapter : null;
+    const findLesson = (id, lessonId) => {
+      const module=findTutorial(id);
+      if(!module?.lessons.some(lesson=>lesson.kind==="reading"&&lesson.id===lessonId))return null;
+      const chapter=readingTutorial(id,lessonId)?.chapter,meta=module.chapters?.find(item=>item.id===lessonId);
+      return chapter?{...chapter,title:meta?chapterLabel(meta):chapter.title}:null;
+    };
     function resolveLegacyRoute(id) {
       if (["agent-work", "multi-agent-collaboration", "agent-monitoring"].includes(id)) return {name: "tutorial", id: "agents-automation"};
       const chapter = findTutorial("agents-automation")?.chapters.find(item => item.legacyModuleId === id);
@@ -42,7 +48,7 @@
             return `<button type="button" class="course-card course-chapter-card${available ? "" : " course-chapter-planned"}" ${available ? `data-lesson="${esc(chapter.id)}" data-lesson-module="${esc(module.id)}"` : `data-planned-chapter="${esc(chapter.id)}" disabled`} style="--module-color:${esc(module.color)}">
             <span class="course-number">${String(chapter.number).padStart(2, "0")}</span>
             <span class="course-card-copy"><span class="course-tag">${isEnglish ? "Chapter" : "章节"}</span>
-              <span class="course-title">${esc(label(chapter, "title"))}</span>
+              <span class="course-title">${esc(chapterLabel(chapter))}</span>
               ${available && chapter.summary ? `<span class="course-summary">${esc(label(chapter, "summary"))}</span>` : ""}
               <span class="course-status">${available ? isEnglish ? "Start learning →" : "开始学习 →" : isEnglish ? "Content in preparation" : "正文待补充"}</span></span>
             ${available ? '<span class="course-arrow" aria-hidden="true">↗</span>' : ""}</button>`;
@@ -133,41 +139,42 @@
         ${sectionLink("course-introduction", chapters[0])}${sectionLink("course-prompt-selection", chapters[1])}
         ${topics.map((text, i) => sectionLink("course-topic-" + (i + 1), (i + 1) + "  " + text, true)).join("")}
         ${sectionLink("course-workflow", chapters[2])}${sectionLink("course-examples", isEnglish ? "Prompt examples" : "优秀提示词案例", true)}${sectionLink("course-faq", isEnglish ? "III Frequently asked questions" : "三 常见疑问")}
-        ${isEnglish ? "" : global.TUTORIAL_FAQ.groups.map(g => sectionLink("course-faq-" + g.id, g.id + "  " + g.title, true)).join("")}
+        ${(isEnglish ? global.TUTORIAL_FAQ_EN : global.TUTORIAL_FAQ).groups.map(g => sectionLink("course-faq-" + g.id, g.id + "  " + g.title, true)).join("")}
       </nav>`;
       const hero = `<div class="dd-hero">
         <div class="dd-eyebrow">${esc(t("software.title"))} · ${esc(t(module.id === foundation.id ? "tutorial.prerequisite" : "tutorial.direction"))}</div>
         <h1 class="dd-h1">${esc(label(module, "title"))}</h1><div class="dd-sub">${esc(label(module, "summary"))}</div></div>
-        ${module.id === "agents-automation" ? "" : module.id !== foundation.id ? `<div class="course-prerequisite"><span>${esc(t("tutorial.prerequisite"))}</span><button type="button" class="course-inline-link" data-module="${esc(foundation.id)}">${esc(label(foundation, "title"))} →</button></div>` : `<p class="course-prerequisite">${esc(t("tutorial.foundationHint"))}</p>`}
+        ${module.id === foundation.id ? `<p class="course-prerequisite">${esc(t("tutorial.foundationHint"))}</p>` : ""}
         `;
       const next = module.id === foundation.id ? `<section class="course-next"><h2>${esc(t("tutorial.directions"))}</h2><div class="course-next-links">${tutorials.modules.filter(item => item.id !== foundation.id).map(item => `<button type="button" class="course-inline-link" data-module="${esc(item.id)}">${esc(label(item, "title"))} →</button>`).join("")}</div></section>` : "";
       let agentContent = "";
       if (hasAgentLesson) {
         const lesson = findLesson(id, lessonId);
         if (!lesson) {
-          agentContent = `<div class="course-agent-overview">${hero}${["image-creation", "video-creation"].includes(id) && !isEnglish && agentTutorial.introduction ? `<div class="course-reading">${agentTutorial.introduction.html}</div>` : ""}${agentDirectory(module)}</div>`;
+          agentContent = `<div class="course-agent-overview">${hero}${agentDirectory(module)}</div>`;
         } else if (isEnglish && agentTutorial.language !== "en") {
           const chineseUrl = new URL(global.location.href);
           chineseUrl.searchParams.set("lang", "zh-Hans");
           agentContent = `${hero}<section class="course-empty"><h2>Read this chapter</h2><p>This chapter is available in Simplified Chinese. The English version is in preparation.</p><p><a href="${esc(chineseUrl.href)}">Read in Simplified Chinese →</a></p></section>`;
         } else {
           const {introduction, chapter} = agentTutorial;
+          const chapterMeta = module.chapters.find(item => item.id === (lessonId || module.lessons[0].id));
           const contentsLabel = isEnglish ? "Chapter contents" : "本章目录";
           const returnLabel = isEnglish ? "← Back to chapters" : "← 返回章节目录";
             agentContent = `<div class="course-layout course-agent-layout">
               <nav class="course-sidebar" aria-label="${contentsLabel}"><button type="button" class="course-inline-link course-return" data-module="${id}">${returnLabel}</button><div class="course-sidebar-label">${contentsLabel}</div>
-                ${introduction ? sectionLink(introduction.id, introduction.title) : ""}${chapter.sections.map(section => sectionLink(section.id, section.title) + (section.headings || []).map(heading => sectionLink(heading.id, heading.title, true)).join("")).join("")}
-              </nav><div class="course-main course-agent-chapter" id="${chapter.id}"><header class="dd-hero"><div class="dd-eyebrow">${esc(label(module, "title"))}</div><h1 class="dd-h1">${esc(chapter.title)}</h1></header>
+                ${introduction ? sectionLink(introduction.id, introduction.title) : ""}${chapter.sections.map((section, i) => sectionLink(section.id, sectionLabel(section, i)) + (section.headings || []).map(heading => sectionLink(heading.id, heading.title, true)).join("")).join("")}
+              </nav><div class="course-main course-agent-chapter" id="${chapter.id}"><header class="dd-hero"><div class="dd-eyebrow">${esc(label(module, "title"))}</div><h1 class="dd-h1">${esc(chapterMeta ? chapterLabel(chapterMeta) : chapter.title)}</h1></header>
                 ${introduction ? `<section class="dd-sec course-reading" id="${introduction.id}"><h2>${esc(introduction.title)}</h2><div class="course-agent-intro-body">${introduction.html}</div></section>` : ""}
-                ${chapter.sections.map(section => `<section class="dd-sec course-reading course-agent-section" id="${section.id}"><h2>${esc(section.title)}</h2><div class="course-agent-section-body">${section.html}</div></section>`).join("")}
+                ${chapter.sections.map((section, i) => `<section class="dd-sec course-reading course-agent-section" id="${section.id}"><h2>${esc(sectionLabel(section, i))}</h2><div class="course-agent-section-body">${section.html}</div></section>`).join("")}
                 <button type="button" class="course-inline-link" data-module="${id}">${returnLabel}</button>
               </div></div>`;
         }
       }
-      document.getElementById("dd-article").innerHTML = hasAgentLesson ? agentContent : hasWorkflow ? `<div class="course-layout">
-        ${sidebar}<div class="course-main">${hero}${app.renderPromptFoundations(t("tutorial.language"))}</div>
-        <aside class="course-workflow-rail" aria-labelledby="course-workflow-title"><section class="dd-sec course-workflow-chapter" id="course-workflow"><h2 id="course-workflow-title" tabindex="-1">${chapters[2]}</h2><div id="prompt-workflow"></div></section>${app.renderPromptExamples(t("tutorial.language"))}</aside>
-        ${app.renderPromptFaq(t("tutorial.language"))}${next}</div>` : hasPlannedChapters ? `<div class="course-agent-overview">${directionNavigation(id)}${hero}${plannedDirectory(module)}</div>` : `${directionNavigation(id)}${hero}<section class="course-empty"><span class="course-tag">${esc(t("tutorial.planned"))}</span><h2>${esc(t("tutorial.emptyTitle"))}</h2><p>${esc(t("tutorial.emptyBody"))}</p></section>${next}`;
+      document.getElementById("dd-article").innerHTML = hasAgentLesson ? agentContent : hasWorkflow ? `<div class="course-layout course-agent-layout">
+        ${sidebar}<div class="course-main course-agent-chapter" id="course-conversation-basics">${hero}<div class="course-agent-section-body">${app.renderPromptFoundations(t("tutorial.language"))}</div>
+        <section class="dd-sec course-reading course-workflow-chapter" id="course-workflow"><h2 id="course-workflow-title" tabindex="-1">${chapters[2]}</h2><div id="prompt-workflow"></div></section>${app.renderPromptExamples(t("tutorial.language"))}
+        ${app.renderPromptFaq(t("tutorial.language"))}${next}</div></div>` : hasPlannedChapters ? `<div class="course-agent-overview">${hero}${plannedDirectory(module)}</div>` : `<div class="course-agent-overview">${hero}<section class="course-empty"><span class="course-tag">${esc(t("tutorial.planned"))}</span><h2>${esc(t("tutorial.emptyTitle"))}</h2><p>${esc(t("tutorial.emptyBody"))}</p></section></div>`;
       deepDiveElement.classList.remove("hidden");
       if (hasAgentLesson) disposeDiagrams = app.mountTutorialDiagrams?.(document.getElementById("dd-article"), {loadScriptsInOrder, language: t("tutorial.language")});
       if (hasWorkflow) disposeWorkflow = app.mountPromptWorkflow(document.getElementById("prompt-workflow"), {language: t("tutorial.language")});

@@ -2,7 +2,7 @@
 window.VIDEO_TUTORIALS = {
   "video-generation": {
     "source": "docs/VIDEO_CREATION_CURRICULUM.md",
-    "sourceHash": "44ec3cf3097312e3bba79f91fdd84cf9f7fded4532819d35c2da6838e1485a65",
+    "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a",
     "language": "zh-Hans",
     "introduction": {
       "id": "course-video-generation-introduction",
@@ -16,7 +16,7 @@ window.VIDEO_TUTORIALS = {
         {
           "id": "course-video-generation-section-1",
           "title": "1. 先分清模型、平台和工作流",
-          "html": "<table class=\"d-table\"><thead><tr><th>输入与任务</th><th>主要控制什么</th><th>首次练习可以怎样做</th></tr></thead><tbody><tr><td>文字生成视频</td><td>主体、动作、场景与摄影方式</td><td>一个主体、一个动作、一个短镜头</td></tr><tr><td>图片生成视频</td><td>初始外观与构图，再补充运动</td><td>用产品或场景图生成缓慢运动</td></tr><tr><td>首尾帧生成</td><td>起点、终点及两者之间的变化</td><td>同一对象的两种相近状态</td></tr><tr><td>多素材参考</td><td>人物、道具、动作、镜头或声音</td><td>给每份素材指定一种用途</td></tr><tr><td></td></tr><tr><td>多片段成片</td><td>顺序、节奏、转场及音画衔接</td><td>把三个通过检查的镜头组成短片</td></tr></tbody></table>",
+          "html": "<table class=\"d-table\"><thead><tr><th>输入与任务</th><th>主要控制什么</th><th>首次练习可以怎样做</th></tr></thead><tbody><tr><td>文字生成视频</td><td>主体、动作、场景与摄影方式</td><td>一个主体、一个动作、一个短镜头</td></tr><tr><td>图片生成视频</td><td>初始外观与构图，再补充运动</td><td>用产品或场景图生成缓慢运动</td></tr><tr><td>首尾帧生成</td><td>起点、终点及两者之间的变化</td><td>同一对象的两种相近状态</td></tr><tr><td>多素材参考</td><td>人物、道具、动作、镜头或声音</td><td>给每份素材指定一种用途</td></tr><tr><td>多片段成片</td><td>顺序、节奏、转场及音画衔接</td><td>把三个通过检查的镜头组成短片</td></tr></tbody></table>",
           "headings": []
         },
         {
@@ -38,11 +38,57 @@ window.VIDEO_TUTORIALS = {
           "headings": []
         }
       ]
+    },
+    "translations": {
+      "en": {
+        "source": "docs/en/VIDEO_CREATION_CURRICULUM.md",
+        "sourceHash": "218f4bb9b5e7c47b50be2d89d894a52779d9511de206192555586955dd40331f",
+        "language": "en",
+        "introduction": {
+          "id": "course-video-generation-introduction",
+          "title": "Reading note",
+          "html": "<p>This course is for readers who can already express requirements in natural language and want greater control over video results. Chapter 1 introduces professional generation platforms and tutorials; Chapter 2 covers refinement after generating an initial result and ways to let AI operate tools directly; Chapter 3 provides existing workflows beginners can follow.</p>\n<p>Resources checked: October 31, 2026. Research verification and the three chapters are complete; connection and generation instructions have not been tested in local software, paid calls or output acceptance checks. Chapter 3 collects creators&#39; published cases and tutorials, distinguishing their demonstrations from actual reproduction by this site. Research choices and workflow file records are in the [research verification notes](VIDEO_CREATION_RESEARCH.md).</p>"
+        },
+        "chapter": {
+          "id": "course-video-generation",
+          "title": "Chapter 1 Professional video generation platforms and tutorials",
+          "sections": [
+            {
+              "id": "course-video-generation-section-1",
+              "title": "1. Distinguish models, platforms and workflows",
+              "html": "<table class=\"d-table\"><thead><tr><th>Input and task</th><th>Main controls</th><th>A first exercise</th></tr></thead><tbody><tr><td>Text-to-video</td><td>Subject, action, scene and cinematography</td><td>One subject, one action and one short shot</td></tr><tr><td>Image-to-video</td><td>Initial appearance and composition, followed by motion</td><td>Add slow movement to a product or scene image</td></tr><tr><td>First and last frames</td><td>Starting point, endpoint and the transition</td><td>Two similar states of the same object</td></tr><tr><td>Multiple references</td><td>Characters, props, actions, camera movement or sound</td><td>Assign one purpose to each reference</td></tr><tr><td>Combining clips</td><td>Order, pacing, transitions and audiovisual continuity</td><td>Assemble three checked shots into a short video</td></tr></tbody></table>",
+              "headings": []
+            },
+            {
+              "id": "course-video-generation-section-2",
+              "title": "2. Three generation platforms",
+              "html": "<p>Based on the independent evaluations, creative controls and course needs available at verification time, this chapter focuses on three routes. Their order is a learning sequence. Text-to-video, image-to-video and editing have different leaderboards; they are not merged into an undefined overall ranking.</p>\n<table class=\"d-table\"><thead><tr><th>Platform and focus model</th><th>Reasons and suitable tasks</th><th>Official entry points and tutorials</th></tr></thead><tbody><tr><td>Jimeng / Dreamina: Seedance 2.5</td><td>First overall choice for this course, suitable for reference-based multishot content and subsequent instruction editing. Ranked first in the checked Artificial Analysis image-to-video list and second in video editing</td><td><a href=\"https://jimeng.jianying.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Jimeng</a>, <a href=\"https://seed.bytedance.com/en/seedance2_5\" target=\"_blank\" rel=\"noopener noreferrer\">model overview</a>, <a href=\"https://docs.volcengine.com/docs/ark/seedance-2-5-prompt-guide?lang=zh\" target=\"_blank\" rel=\"noopener noreferrer\">official prompt guide</a></td></tr><tr><td>Tongyi Wan: Wan 3.0</td><td>Focus on generating shots from text and editing afterward. Ranked first in both checked Artificial Analysis text-to-video and editing lists</td><td><a href=\"https://www.alibabacloud.com/blog/wan3-0-30-second-ai-video-generation-from-any-input_603452\" target=\"_blank\" rel=\"noopener noreferrer\">Alibaba Cloud model overview and entry point</a></td></tr><tr><td>Hailuo: MiniMax H3</td><td>Focus on image-to-video and multimodal references. Ranked first in the checked Arena image-to-video list and third in Artificial Analysis text-to-video</td><td><a href=\"https://hailuoai.video/\" target=\"_blank\" rel=\"noopener noreferrer\">Hailuo</a>, <a href=\"https://platform.minimax.io/docs/guides/video-generation\" target=\"_blank\" rel=\"noopener noreferrer\">official MiniMax video tutorial</a></td></tr></tbody></table>",
+              "headings": []
+            },
+            {
+              "id": "course-video-generation-section-3",
+              "title": "3. Where to start learning each platform",
+              "html": "<table class=\"d-table\"><thead><tr><th>Platform</th><th>First-choice tutorial</th><th>Supplement</th></tr></thead><tbody><tr><td>Jimeng / Dreamina: Seedance 2.5</td><td><a href=\"https://docs.volcengine.com/docs/ark/seedance-2-5-prompt-guide?lang=zh\" target=\"_blank\" rel=\"noopener noreferrer\">Official Seedance 2.5 prompt guide (Chinese)</a></td><td><a href=\"https://xyq.jianying.com/tutorials/seedance-2-5\" target=\"_blank\" rel=\"noopener noreferrer\">Official Xiaoyunque Seedance 2.5 manual (Xiaoyunque interface)</a></td></tr><tr><td>Tongyi Wan: Wan 3.0</td><td><a href=\"https://help.aliyun.com/zh/model-studio/wan3-video-generation-prompt-guide\" target=\"_blank\" rel=\"noopener noreferrer\">Official Wan 3.0 video prompt guide (Chinese)</a></td><td><a href=\"https://help.aliyun.com/zh/model-studio/wan3-video-generation-guide\" target=\"_blank\" rel=\"noopener noreferrer\">Official Wan 3.0 video generation guide (API)</a></td></tr><tr><td>Hailuo: MiniMax H3</td><td><a href=\"https://design.minimax.io/h3\" target=\"_blank\" rel=\"noopener noreferrer\">Official MiniMax H3 tutorial and workflow center</a></td><td><a href=\"https://platform.minimax.io/docs/guides/video-generation\" target=\"_blank\" rel=\"noopener noreferrer\">Official MiniMax H3 video generation guide (API)</a></td></tr></tbody></table>",
+              "headings": []
+            },
+            {
+              "id": "course-video-generation-section-4",
+              "title": "4. Learn the main video controls",
+              "html": "<p><strong>Control actions before increasing complexity.</strong> For a short shot, specify who does what, how the action starts and ends, and whether the camera moves. If the image already contains the subject, repeated appearance adjectives can obscure the action that matters. For multiple shots, explain each shot&#39;s role separately. See the <a href=\"https://helpx.adobe.com/firefly/web/work-with-audio-and-video/work-with-video/writing-effective-text-prompts-for-video-generation.html\" target=\"_blank\" rel=\"noopener noreferrer\">Adobe prompt tutorial</a>.</p>\n<p><strong>Give references separate roles.</strong> A character image supplies identity, a product image appearance, a video action or camera movement, and audio dialogue or rhythm. When references conflict, reduce them first and inspect the result. References are conditioning inputs; outputs still need inspection by frame or segment.</p>\n<p><strong>First and last frames constrain the ends; the transition still needs design.</strong> If the first frame is a closed box and the last an open box, describe the opening action. Large differences in scene, angle or objects leave more changes for the model to invent. Start with two images having similar framing and composition. <a href=\"https://support.google.com/flow/answer/16353334?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Flow first/last-frame documentation</a></p>",
+              "headings": []
+            }
+          ]
+        },
+        "translatedFrom": {
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a"
+        }
+      }
     }
   },
   "video-editing-agent": {
     "source": "docs/VIDEO_CREATION_CURRICULUM.md",
-    "sourceHash": "44ec3cf3097312e3bba79f91fdd84cf9f7fded4532819d35c2da6838e1485a65",
+    "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a",
     "language": "zh-Hans",
     "introduction": {
       "id": "course-video-editing-agent-introduction",
@@ -73,16 +119,62 @@ window.VIDEO_TUTORIALS = {
         },
         {
           "id": "course-video-editing-agent-section-4",
-          "title": "5. 常见问题与结果检查",
+          "title": "4. 常见问题与结果检查",
           "html": "<table class=\"d-table\"><thead><tr><th>现象</th><th>优先检查</th></tr></thead><tbody><tr><td>Agent 只有建议，软件没有变化</td><td>是否启用了实际编辑工具，是否出现调用记录，回读的工程是否正确</td></tr><tr><td>Resolve 服务启动但读不到工程</td><td>Studio 版本、本地脚本设置、Resolve 是否运行，以及工程是否打开</td></tr><tr><td>Premiere 插件没有连接</td><td>开发者模式、UXP 插件是否 Load、PPMCP Bridge 是否运行、面板是否 Active</td></tr><tr><td>MCP 工具为空</td><td>客户端是否支持本地 stdio、启动路径是否有效、配置是否按客户端格式合并</td></tr><tr><td>某个菜单功能无法通过 Agent 执行</td><td>查看当前接口与工具的支持范围；保留错误信息，转到软件中完成该步骤</td></tr><tr><td>保存成功但没有测试视频</td><td>工程保存与视频导出分别检查，核对渲染状态和实际输出文件</td></tr></tbody></table>",
           "headings": []
         }
       ]
+    },
+    "translations": {
+      "en": {
+        "source": "docs/en/VIDEO_CREATION_CURRICULUM.md",
+        "sourceHash": "218f4bb9b5e7c47b50be2d89d894a52779d9511de206192555586955dd40331f",
+        "language": "en",
+        "introduction": {
+          "id": "course-video-editing-agent-introduction",
+          "title": "Reading note",
+          "html": "<p>After generating shots, you generally still need to adjust clip lengths, shot order, composition, color and sound. This chapter first chooses professional editors, then connects an agent so you can operate an existing project through natural language and refine it after previewing.</p>"
+        },
+        "chapter": {
+          "id": "course-video-editing-agent",
+          "title": "Chapter 2 Use an agent to operate professional video editors",
+          "sections": [
+            {
+              "id": "course-video-editing-agent-section-1",
+              "title": "1. Choose between two editors",
+              "html": "<p>This chapter selects <strong>DaVinci Resolve Studio</strong> and <strong>Adobe Premiere Pro</strong> for their professional postproduction capabilities, editable projects and documented agent connections. Choose either one to learn.</p>\n<table class=\"d-table\"><thead><tr><th>Platform</th><th>Why it was selected</th><th>Agent connection route</th><th>How to choose</th></tr></thead><tbody><tr><td><a href=\"https://www.blackmagicdesign.com/products/davinciresolve\" target=\"_blank\" rel=\"noopener noreferrer\">DaVinci Resolve Studio</a></td><td>Editing, grading, Fusion compositing and Fairlight audio in one project</td><td>Version 21.1 added official AI assistant integration; third-party MCP is another option below</td><td>Start here for a new postproduction workflow emphasizing integrated image and audio work</td></tr><tr><td><a href=\"https://www.adobe.com/products/premiere.html\" target=\"_blank\" rel=\"noopener noreferrer\">Adobe Premiere Pro</a></td><td>Precise timeline editing, text and graphics, and Adobe asset collaboration</td><td>Built-in AI Assistant (beta); third-party PPMCP for an external agent</td><td>Continue with it if you already use Photoshop, After Effects or Premiere projects</td></tr></tbody></table>\n<p>An editor having a feature and an agent being able to call it are separate questions. Begin by connecting queries, one small edit and project saving, then expand the task.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-editing-agent-section-2",
+              "title": "2. DaVinci Resolve Studio: connect an external agent",
+              "html": "<p><strong>Official integration and the route used here</strong></p>\n<p>Blackmagic confirmed AI assistant integration in its <a href=\"https://www.blackmagicdesign.com/media/partial/release/20260908-03\" target=\"_blank\" rel=\"noopener noreferrer\">official Resolve 21.1 release notes</a>. Listed tasks include project analysis, media organization, setting changes, highlight edits and batch rendering. For that version, consult the 21.1 manual and new-feature guides in the <a href=\"https://www.blackmagicdesign.com/support\" target=\"_blank\" rel=\"noopener noreferrer\">official support center</a> and use the connection method supplied with the software.</p>\n<p>The instructions below cover the <strong>third-party <code>samuelgursky/davinci-resolve-mcp</code> route</strong>, whose installation documentation provides environment preparation, client configuration and connection checks. This and the official integration are separate solutions; choose one. <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp\" target=\"_blank\" rel=\"noopener noreferrer\">Project documentation</a></p>\n<p><strong>1. Prepare the editor and scripting environment</strong></p>\n<p>The author requires Resolve Studio 18.5 or later, Git, and 64-bit Python 3.10 or later; the commands below use Python 3.12. Media analysis also needs ffmpeg available on PATH; add dependencies for transcription and other features as needed. Start Resolve and open a practice project. Set <strong>Preferences → System → General → External scripting using</strong> to <strong>Local</strong>, then save. <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md\" target=\"_blank\" rel=\"noopener noreferrer\">Installation and version requirements</a></p>\n<p>This section is written for Studio. Scripting and bridge conditions in the free edition vary by version; do not apply these steps unchanged.</p>\n<p><strong>2. Download the project and generate client configuration</strong></p>\n<p>Open PowerShell in your chosen tools directory and run:</p>\n<pre><code class=\"language-powershell\">git clone https://github.com/samuelgursky/davinci-resolve-mcp.git\nSet-Location davinci-resolve-mcp\npy -3.12 install.py --clients manual</code></pre>\n<p>The installer creates the runtime environment and prints manual connection settings. Add its generated command, arguments and environment variables to your agent client using the actual paths it supplies. Merge the server entry if other MCP configurations exist. The same <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md\" target=\"_blank\" rel=\"noopener noreferrer\">author&#39;s installation guide</a> covers other installation methods and troubleshooting.</p>\n<p><strong>3. Connect and inspect the current project</strong></p>\n<p>Your client must support launching a local <strong>stdio MCP service</strong>. Save the configuration, restart the client and enable the Resolve tools while leaving Resolve and the project open. First ask the agent to read the project name, timelines, tracks and clips, then compare its response with the editor.</p>\n<p><strong>4. Begin with explicitly supported edits</strong></p>\n<p>Start with media organization, clip-property changes, markers or render settings. Before cutting, moving or replacing clips, ask the agent to check that its interface supports the operation. The <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/kernels/timeline-edit-kernel.md\" target=\"_blank\" rel=\"noopener noreferrer\">timeline operation limits</a> distinguish supported, partially supported and restricted operations; an interface may not expose everything available in the editor UI.</p>\n<p><strong>Editor and connection tutorials</strong>: <a href=\"https://www.blackmagicdesign.com/products/davinciresolve/training\" target=\"_blank\" rel=\"noopener noreferrer\">official Blackmagic training</a>, <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/install.md\" target=\"_blank\" rel=\"noopener noreferrer\">MCP installation guide</a>, <a href=\"https://github.com/samuelgursky/davinci-resolve-mcp/blob/main/docs/kernels/timeline-edit-kernel.md\" target=\"_blank\" rel=\"noopener noreferrer\">timeline capabilities</a>.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-editing-agent-section-3",
+              "title": "3. Adobe Premiere Pro: built-in assistant and external agents",
+              "html": "<p><strong>Route A: built-in AI Assistant</strong></p>\n<p>If your version and account include the assistant, open a project in Premiere and choose <strong>Window → Assistant</strong>. Adobe&#39;s <a href=\"https://helpx.adobe.com/premiere/desktop/premiere-ai-assistant/overview.html\" target=\"_blank\" rel=\"noopener noreferrer\">official overview</a> still labels it beta; listed tasks include bins and renaming, transcription, markers and initial clip assembly.</p>\n<p>Use this route to organize media and build a rough cut with natural language. For precise clip, composition or volume edits, check the assistant&#39;s current supported actions, or choose the external route below.</p>\n<p><strong>Route B: external agent + PPMCP</strong></p>\n<p>This chapter uses the third-party project <a href=\"https://github.com/CaYatur/PremiereProMCP\" target=\"_blank\" rel=\"noopener noreferrer\">CaYatur/PremiereProMCP (PPMCP)</a>. A UXP plugin and local bridge connect Premiere and expose editing tools to an agent. The following instructions use Windows, the author&#39;s primary testing environment.</p>\n<p><strong>1. Prepare Premiere and the plugin loader</strong></p>\n<p>Use <strong>Premiere 26.0 or later</strong> and install Adobe UXP Developer Tool. Enable <strong>Enable developer mode</strong> in Premiere&#39;s <strong>Settings → Plugins</strong>, then restart Premiere. Adobe&#39;s general UXP tutorials and this project have different minimum versions; this section follows the project&#39;s 26.0 requirement. <a href=\"https://github.com/CaYatur/PremiereProMCP\" target=\"_blank\" rel=\"noopener noreferrer\">Project requirements</a>, <a href=\"https://developer.adobe.com/premiere-pro/uxp/plugins/\" target=\"_blank\" rel=\"noopener noreferrer\">Adobe plugin loading documentation</a></p>\n<p><strong>2. Install PPMCP</strong></p>\n<p>Download <code>PPMCP-Setup-x.x.x.zip</code> from the <a href=\"https://github.com/CaYatur/PremiereProMCP/releases\" target=\"_blank\" rel=\"noopener noreferrer\">author&#39;s releases</a>. Extract it completely, keeping the relative locations of <code>Setup.bat</code> and <code>payload</code>, then run <code>Setup.bat</code>. After installation, open the generated instructions:</p>\n<ul><li><code>%APPDATA%/PPMCP/HOW-TO-USE.txt</code>: usage and actual local paths.</li><li><code>%APPDATA%/PPMCP/HOW-TO-CONNECT.txt</code>: application, server and plugin entry points.</li><li><code>%APPDATA%/PPMCP/mcp-config-snippet.json</code>: configuration to merge into your client.</li></ul>\n<p>This is the author&#39;s release-package installation method; it has not been run on this site&#39;s local machine. <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md\" target=\"_blank\" rel=\"noopener noreferrer\">Full installation guide</a></p>\n<p><strong>3. Start the bridge and load the plugin</strong></p>\n<p>Run the <strong>PPMCP Bridge</strong> shortcut created by the installer. Open Premiere and UXP Developer Tool; select <strong>Add Plugin</strong> in the latter using the plugin manifest path in <code>HOW-TO-CONNECT.txt</code>, then click <strong>Load</strong>. Open the PPMCP panel in Premiere and confirm <strong>Active</strong> status. Reopen a closed panel through <strong>Window → UXP Plugins</strong>. <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md\" target=\"_blank\" rel=\"noopener noreferrer\">Author&#39;s connection steps</a>, <a href=\"https://developer.adobe.com/premiere-pro/uxp/plugins/\" target=\"_blank\" rel=\"noopener noreferrer\">Adobe panel entry points</a></p>\n<p><strong>4. Configure the agent client</strong></p>\n<p>Merge the generated MCP snippet into the client, save and restart it. PPMCP uses local <strong>stdio</strong>: the client launches the specified Node program with the server entry file as an argument. It cannot be entered into a connector accepting only remote MCP URLs. Configuration formats vary; follow the <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md\" target=\"_blank\" rel=\"noopener noreferrer\">author&#39;s client configuration section</a> using the installer&#39;s actual paths.</p>\n<p><strong>5. Verify supported operations</strong></p>\n<p>The author&#39;s recorded real-machine checks include reading projects and sequences, some clip edits, position and scale, audio gain, project saving and sequence screenshots. The full tool list also includes features not individually tested; tool count alone does not establish reliability. <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/docs/FEATURES.md\" target=\"_blank\" rel=\"noopener noreferrer\">Tools and validation status</a></p>\n<p>Editable MOGRT text needs the author&#39;s additional CEP Text Bridge. A PNG text overlay is different from editable captions. Creating tracks and other operations can also be constrained by UXP; check the current version&#39;s support first.</p>\n<p><strong>Editor and connection tutorials</strong>: <a href=\"https://helpx.adobe.com/premiere/desktop.html\" target=\"_blank\" rel=\"noopener noreferrer\">official Premiere help</a>, <a href=\"https://helpx.adobe.com/premiere/desktop/premiere-ai-assistant/overview.html\" target=\"_blank\" rel=\"noopener noreferrer\">built-in assistant overview</a>, <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/INSTALL.md\" target=\"_blank\" rel=\"noopener noreferrer\">PPMCP installation guide</a>, <a href=\"https://github.com/CaYatur/PremiereProMCP/blob/main/docs/FEATURES.md\" target=\"_blank\" rel=\"noopener noreferrer\">tool capabilities and limits</a>.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-editing-agent-section-4",
+              "title": "4. Troubleshooting and result checks",
+              "html": "<table class=\"d-table\"><thead><tr><th>Symptom</th><th>Check first</th></tr></thead><tbody><tr><td>Agent gives advice but the editor does not change</td><td>Actual editing tools are enabled, calls are recorded, and project readback identifies the right project</td></tr><tr><td>Resolve service starts but cannot read a project</td><td>Studio version, local scripting settings, running Resolve and an open project</td></tr><tr><td>Premiere plugin is not connected</td><td>Developer mode, loaded UXP plugin, running PPMCP Bridge and Active panel status</td></tr><tr><td>MCP tool list is empty</td><td>Client support for local stdio, valid launch paths and correctly merged client-specific configuration</td></tr><tr><td>A menu feature cannot be called by the agent</td><td>Current interface/tool support; retain the error and complete that step in the editor</td></tr><tr><td>Saving succeeds but there is no test video</td><td>Check project saving and video export separately, including render status and the actual file</td></tr></tbody></table>",
+              "headings": []
+            }
+          ]
+        },
+        "translatedFrom": {
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a"
+        }
+      }
     }
   },
   "video-workflow-reuse": {
     "source": "docs/VIDEO_CREATION_CURRICULUM.md",
-    "sourceHash": "44ec3cf3097312e3bba79f91fdd84cf9f7fded4532819d35c2da6838e1485a65",
+    "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a",
     "language": "zh-Hans",
     "introduction": {
       "id": "course-video-workflow-reuse-introduction",
@@ -130,6 +222,64 @@ window.VIDEO_TUTORIALS = {
           "headings": []
         }
       ]
+    },
+    "translations": {
+      "en": {
+        "source": "docs/en/VIDEO_CREATION_CURRICULUM.md",
+        "sourceHash": "218f4bb9b5e7c47b50be2d89d894a52779d9511de206192555586955dd40331f",
+        "language": "en",
+        "introduction": {
+          "id": "course-video-workflow-reuse-introduction",
+          "title": "Reading note",
+          "html": "<p>This chapter collects creators&#39; published production cases, emphasizing Jimeng. Each entry identifies the creator, tutorial, actual tools and where to obtain assets or prompts. Only sequences explicitly documented in the sources are summarized; follow the original tutorials for complete operation.</p>\n<table class=\"d-table\"><thead><tr><th>Route</th><th>Original creator and existing case</th><th>What you can find directly</th></tr></thead><tbody><tr><td>Jimeng Agent: start here</td><td>AI Product Sniper / Kevin Zhu: Mid-Autumn animation</td><td>Illustrated tutorial, Jimeng work, shot descriptions and a “Make similar” entry point</td></tr><tr><td>Jimeng Smart Multiframe</td><td>AI Product Sniper / Kevin Zhu: drink product showcase</td><td>Creator&#39;s demonstration and using multiple images as keyframes</td></tr><tr><td>Jimeng Seedance 2.0</td><td>HiShineAi: grid-storyboard workflow for a racing short</td><td>Original video, tool combination and storyboard-to-video process</td></tr><tr><td>Wan 3.0</td><td>The Workflow Lab / Terence Sia: replace your video character</td><td>Illustrated steps, screenshots, editable prompts and final output</td></tr><tr><td>MiniMax H3 + Seedance 2.5</td><td>Curious Refuge / Tyler Smith: drafts before final output</td><td>Actual iterations, references, before/after outputs and a full illustrated tutorial</td></tr></tbody></table>\n<p>Keep the authors&#39; versions and interfaces: the Jimeng cases include older models; the Wan and H3 cases use Higgsfield and Magnific, respectively. They are not button-by-button tutorials for the Wan or Hailuo original sites, and the newer model names in Chapter 1 cannot simply be substituted. A readable tutorial does not mean all assets are public; see each entry&#39;s access conditions.</p>"
+        },
+        "chapter": {
+          "id": "course-video-workflow-reuse",
+          "title": "Chapter 3 Existing workflows for beginners",
+          "sections": [
+            {
+              "id": "course-video-workflow-reuse-section-1",
+              "title": "1. Jimeng Agent: reuse the creator's Mid-Autumn animation",
+              "html": "<p><strong>Original creator</strong>: AI Product Sniper / Kevin Zhu. Published October 9, 2025.</p>\n<p><strong>Tutorial and work</strong>: <a href=\"https://www.techgogogo.com/2025/10/09/一分钟生成中秋动画！即梦智能体实战/\" target=\"_blank\" rel=\"noopener noreferrer\">“Generate a Mid-Autumn animation in one minute! Jimeng Agent in practice!”</a>; <a href=\"https://jimeng.jianying.com/ai-tool/work-detail/7557309615910686002?itemType=53&amp;workDetailType=AiVideo\" target=\"_blank\" rel=\"noopener noreferrer\">creator&#39;s Jimeng work and Make similar entry</a>.</p>\n<p>The creator used Jimeng Agent for a family-reunion animation and supplied a link to the work. The public storyboard runs from returning home with a lantern through a family reunion to moon viewing in a courtyard. The page labels it <strong>Seedance 1.0 mini, 42 seconds, 16:9</strong>.</p>\n<p><strong>Creator&#39;s process</strong>: describe the animation to the agent, generate a multishot work, then use the shared work to begin a similar creation.</p>\n<p><strong>How to reuse this existing process</strong>: read the tutorial, inspect each shot on the work page, then use “Make similar” to enter the platform&#39;s reuse flow and follow the original instructions. Retain the storyboard structure before adjusting theme and content.</p>\n<p><strong>Assets and version conditions</strong>: the original page exposes shot images and video prompts. The complete initial request to the agent was not obtained in this research, so no substitute is written here. Confirm the editable scope and continued availability of the older model after logging in.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-workflow-reuse-section-2",
+              "title": "2. Jimeng Smart Multiframe: reuse the drink showcase method",
+              "html": "<p><strong>Original creator</strong>: AI Product Sniper / Kevin Zhu. Published August 20, 2025.</p>\n<p><strong>Original tutorial</strong>: <a href=\"https://www.techgogogo.com/2025/08/20/一键生成炸裂产品展示视频！即梦实战第27集/\" target=\"_blank\" rel=\"noopener noreferrer\">“Create an explosive product showcase in one click! Jimeng practice, episode 27!”</a>.</p>\n<p>The creator demonstrated a fictional drink of their own design with Jimeng&#39;s then-current <strong>Smart Multiframe</strong> feature.</p>\n<p><strong>Creator&#39;s process</strong>: prepare several product images as keyframes and describe the transition from each frame to the next to assemble the showcase.</p>\n<p><strong>How to reuse this existing process</strong>: study the image ordering and transition descriptions, then substitute your product images. Reuse the keyframe organization method; identify models and controls from the original tutorial rather than calling this a Seedance 2.5-specific workflow.</p>\n<p><strong>Asset conditions</strong>: the inspected article did not publish an original product-image package, complete interframe prompts or fixed generation settings. This is a demonstration tutorial, not a downloadable one-click workflow.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-workflow-reuse-section-3",
+              "title": "3. Jimeng Seedance 2.0: follow the racing storyboard workflow",
+              "html": "<p><strong>Original creator</strong>: HiShineAi. Published February 27, 2026.</p>\n<p><strong>Original video tutorial</strong>: <a href=\"https://www.bilibili.com/video/BV1xYADzCERe/\" target=\"_blank\" rel=\"noopener noreferrer\">“10× efficiency! A workflow for AI shorts using nine-panel storyboards”</a>.</p>\n<p>The creator demonstrates the overall process with a racing short, listing <strong>Gemini, Nano Banana Pro and Jimeng Seedance 2.0</strong> as the core tools.</p>\n<p><strong>Creator&#39;s process</strong>: organize shot logic in Gemini, establish consistent visuals through nine- or twenty-five-panel grids, then combine Seedance 2.0 and individual-frame shots into a short.</p>\n<p><strong>How to reuse this existing process</strong>: follow the original video to learn how storyboard planning, grid images and individual shots work together. Keep the creator&#39;s tool combination for a first attempt, then change the subject; do not replace the storyboard method with an invented single prompt.</p>\n<p><strong>Asset conditions</strong>: the creator&#39;s description says prompt templates require contacting them as instructed; there is no public direct download. This research verified the original account, case description and workflow summary, but did not obtain full subtitles, step-by-step parameters or template text. Consult the video for those details; they are not filled in here.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-workflow-reuse-section-4",
+              "title": "4. Wan 3.0: retain your performance while changing the character",
+              "html": "<p><strong>Original creator</strong>: The Workflow Lab / Terence Sia. The tutorial&#39;s stated verification date is October 23, 2026.</p>\n<p><strong>Original tutorial</strong>: <a href=\"https://theworkflowlab.ai/tutorials/transform-yourself-with-wan-3-0\" target=\"_blank\" rel=\"noopener noreferrer\">“Transform yourself with Wan 3.0”</a>; <a href=\"https://theworkflowlab.ai/about\" target=\"_blank\" rel=\"noopener noreferrer\">about the creator</a>; <a href=\"https://www.instagram.com/reel/DeyCIiwTPxv/\" target=\"_blank\" rel=\"noopener noreferrer\">Instagram demonstration linked by the tutorial</a>.</p>\n<p>This tutorial actually uses <strong>Wan 3.0 inside Higgsfield</strong> and discloses a partnership with Higgsfield. It includes interface screenshots, a character reference, prompts and the final output.</p>\n<p><strong>Creator&#39;s process</strong>:</p>\n<ol><li>Record your performance, retaining movement, expressions and sound.</li><li>Create a character image using the provided character-reference prompt.</li><li>Select Wan 3.0 in Higgsfield under Video → Create Video.</li><li>Upload the character image and performance video under <strong>References</strong> and check their identifiers.</li><li>Copy <strong>Your editable transformation prompt</strong> from the original article and replace fields such as duration and aspect ratio.</li><li>Set the output, enable sound, generate and inspect character, motion and audio, then download.</li></ol>\n<p><strong>Obtaining the prompts</strong>: use the two editable templates in the original tutorial. It also lists the creator&#39;s actual longer prompt, including the extra action of adding a coffee cup at a specified time. The author explicitly distinguishes it from the simpler reusable template.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-workflow-reuse-section-5",
+              "title": "5. MiniMax H3: approve a draft before generating the final",
+              "html": "<p><strong>Original creator</strong>: Curious Refuge / Tyler Smith. The original page displays October 9.</p>\n<p><strong>Original tutorial</strong>: <a href=\"https://curiousrefuge.com/blog/how-to-save-money-on-ai-generations\" target=\"_blank\" rel=\"noopener noreferrer\">“How to Save Money on AI Video Generation”</a>.</p>\n<p>The creator made a three-shot bar conversation in <strong>Magnific</strong>, publishing character images, scene references, multiple iterations and the final assembly. This section covers the <strong>MiniMax H3 draft → Seedance 2.5 final</strong> route.</p>\n<p><strong>Creator&#39;s process</strong>:</p>\n<ol><li>Divide the three shots into two parts: combine the first two into approximately ten seconds and make the third separately.</li><li>Upload character and scene references; iterate on composition and staging with low-resolution MiniMax H3 Max outputs.</li><li>Once the direction is approved, use the revised prompt in Seedance 2.5 standard mode for the final version.</li><li>For the third shot, add the previously generated clip as a continuity reference, then assemble the results.</li></ol>\n<p><strong>Assets and usage conditions</strong>: the article includes references and iteration results but does not publish the full generation prompt for this case; no template is invented here. Its cost, time and quality judgments come from that Magnific test, not a Hailuo-site price or quality promise.</p>\n<p>The article also tests Seedance&#39;s own Draft → HD route and compares the methods. Read that comparison if you want fewer platform and model switches.</p>",
+              "headings": []
+            },
+            {
+              "id": "course-video-workflow-reuse-section-6",
+              "title": "6. Choose how to reuse an original tutorial",
+              "html": "<table class=\"d-table\"><thead><tr><th>How you want to start</th><th>Corresponding original tutorial</th></tr></thead><tbody><tr><td>Open an existing work and make a similar one</td><td>Mid-Autumn Agent animation: includes a Jimeng work entry point</td></tr><tr><td>Make a showcase with your product images</td><td>Drink Smart Multiframe: study keyframes and transitions</td></tr><tr><td>Learn to organize a multishot short</td><td>HiShineAi racing short: follow the original video</td></tr><tr><td>Obtain publicly available editable prompts</td><td>Terence Sia&#39;s Wan 3.0 character-transformation tutorial</td></tr><tr><td>Study generation iterations and final-output costs</td><td>Tyler Smith&#39;s H3 drafts to Seedance final tutorial</td></tr></tbody></table>\n<p>This chapter checked creator pages, original articles or public descriptions and links, but has not reproduced the cases in accounts. Original assets, prompts, parameters or subtitles that were not published are not reverse-engineered from finished videos and invented here.</p>",
+              "headings": []
+            }
+          ]
+        },
+        "translatedFrom": {
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceHash": "390dd385bada0fc0ac37f2400f6f21a12a8e738ebe26d433dd680ea57b86732a"
+        }
+      }
     }
   }
 };

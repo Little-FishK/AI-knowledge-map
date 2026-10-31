@@ -272,7 +272,8 @@ window.TUTORIALS = {
           "titleEn": "Professional image generation and workflows",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -282,7 +283,8 @@ window.TUTORIALS = {
           "titleEn": "Use an agent to operate Photoshop",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -292,7 +294,8 @@ window.TUTORIALS = {
           "titleEn": "Find and reuse existing workflows",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ],
@@ -306,8 +309,10 @@ window.TUTORIALS = {
           "number": 1,
           "status": "available",
           "source": "docs/IMAGE_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/IMAGE_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -319,8 +324,10 @@ window.TUTORIALS = {
           "number": 2,
           "status": "available",
           "source": "docs/IMAGE_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/IMAGE_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -332,8 +339,10 @@ window.TUTORIALS = {
           "number": 3,
           "status": "available",
           "source": "docs/IMAGE_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/IMAGE_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ]
@@ -359,7 +368,8 @@ window.TUTORIALS = {
           "titleEn": "Professional video generation platforms and tutorials",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -369,7 +379,8 @@ window.TUTORIALS = {
           "titleEn": "Use an agent to operate professional video editors",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -379,7 +390,8 @@ window.TUTORIALS = {
           "titleEn": "Existing workflows for beginners",
           "language": "zh-Hans",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ],
@@ -393,8 +405,10 @@ window.TUTORIALS = {
           "number": 1,
           "status": "available",
           "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/VIDEO_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -406,8 +420,10 @@ window.TUTORIALS = {
           "number": 2,
           "status": "available",
           "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/VIDEO_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         },
         {
@@ -419,8 +435,10 @@ window.TUTORIALS = {
           "number": 3,
           "status": "available",
           "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "sourceEn": "docs/en/VIDEO_CREATION_CURRICULUM.md",
           "languages": [
-            "zh-Hans"
+            "zh-Hans",
+            "en"
           ]
         }
       ]
