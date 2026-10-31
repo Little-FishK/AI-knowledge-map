@@ -1,0 +1,316 @@
+{
+  "format": "ai-knowledge-map/tutorial-v1",
+  "canonical": "https://ai-knowledge-map.com/software/agents-automation/agent-building/",
+  "language": "zh-Hans",
+  "title": "二. 如何制作 Agent？",
+  "summary": "从话题助手开始，学习为 Agent 配置知识库、跨对话记忆与语音交流，设置定时和事件触发的后台任务，并了解发布、维护与开源许可。",
+  "questions": [
+    {
+      "question": "怎样制作基于自有知识库的话题助手？",
+      "answer": "先确定助手面向谁、依据哪些资料、允许处理什么，再配置指令和知识库，用可核对的小任务检查回答。",
+      "sections": [
+        {
+          "id": "course-agent-building-topic-1",
+          "title": "1. 制作有知识库的话题助手",
+          "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-1"
+        }
+      ]
+    },
+    {
+      "question": "怎样给 Agent 配置跨对话记忆和语音交流？",
+      "answer": "先选定记忆的保存方式和更新方式，再连接语音输入输出；需要跨设备或跨 Agent 使用时，再考虑外部记忆服务。",
+      "sections": [
+        {
+          "id": "course-agent-building-topic-2",
+          "title": "2. 制作有记忆的语音 Agent",
+          "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+        }
+      ]
+    },
+    {
+      "question": "怎样安排 Agent 在后台运行，并处理无人值守和发布维护？",
+      "answer": "说明触发时间或事件、处理范围和结果交付方式，检查无人值守时的权限与失败处理；发布时区分助手、配置和源码。",
+      "sections": [
+        {
+          "id": "course-agent-building-topic-3",
+          "title": "3. 制作后台自动运行 Agent",
+          "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+        },
+        {
+          "id": "course-agent-building-topic-4",
+          "title": "4. 发布与维护 Agent",
+          "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+        }
+      ]
+    }
+  ],
+  "scope": "摘要与短答依据正式课程整理。以下完整章节保留原始来源名称、配置细节、适用版本与实测限制。此文件为公开阅读格式，不代表独立审核或实测结果。",
+  "sources": [
+    {
+      "url": "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context",
+      "title": "Claude 官方记忆教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory",
+      "title": "WorkBuddy 官方记忆教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/customization/memories",
+      "title": "OpenAI 官方记忆教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/memory",
+      "title": "Claude Code 官方记忆教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/features/voice",
+      "title": "OpenAI 官方语音教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://support.claude.com/en/articles/11101966-use-voice-mode",
+      "title": "Claude 官方语音教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://elevenlabs.io/",
+      "title": "ElevenLabs",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://elevenlabs.io/docs/eleven-agents/customization/conversation-flow",
+      "title": "官方对话节奏配置教程",
+      "section": "course-agent-building-topic-2",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/automations",
+      "title": "OpenAI 官方定时任务教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide",
+      "title": "WorkBuddy 官方定时任务教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/automations#trigger-tasks-from-app-events",
+      "title": "OpenAI 官方事件触发说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger",
+      "title": "n8n 官方定时触发教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/use-chatgpt#choose-cloud-or-local-work",
+      "title": "OpenAI 官方云端 Work 说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/enterprise/cloud-local-access",
+      "title": "官方本地访问说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/dots/getting-started",
+      "title": "官方创建教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/dots/tasks-and-memory",
+      "title": "持续任务说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/deploy/use-n8n-cloud.md",
+      "title": "n8n Cloud 官方说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Setting",
+      "title": "WorkBuddy 官方系统设置",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.workbuddy.cn/docs/workbuddyapp/features/Multidevice",
+      "title": "锁屏运行说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/long-running-work",
+      "title": "OpenAI 官方长任务教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/how-claude-code-works#when-context-fills-up",
+      "title": "Claude Code 官方上下文说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/developer-commands#keep-transcripts-lean-with-compact",
+      "title": "OpenAI 官方命令说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents",
+      "title": "Anthropic 官方上下文管理实践",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.anthropic.com/research/effective-harnesses-for-long-running-agents",
+      "title": "官方长任务实践",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/build/understand-workflows/workflow-components/work-with-nodes.md#node-settings",
+      "title": "n8n 官方节点设置",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/build/manage-workflows/configure-workflow-settings.md#timeout-workflow",
+      "title": "官方工作流超时设置",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/tools-agent#max-iterations",
+      "title": "Agent 轮次设置",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide#结果通知",
+      "title": "官方通知说明",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/build/flow-logic/handle-errors-gracefully.md",
+      "title": "官方错误通知教程",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.errortrigger",
+      "title": "Error Trigger 的测试条件",
+      "section": "course-agent-building-topic-3",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3"
+    },
+    {
+      "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository",
+      "title": "GitHub 官方许可说明",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://choosealicense.com/licenses/mit/",
+      "title": "MIT 许可证全文与说明",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "title": "Apache-2.0 官方条款第 3、4、6 节",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://opensource.org/license/gpl-3.0",
+      "title": "GPL-3.0 条款第 1、5、6 节",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://choosealicense.com/licenses/gpl-3.0/",
+      "title": "GPL-3.0 定义及第 2 节",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://opensource.org/license/agpl-3.0",
+      "title": "AGPL-3.0 第 13 节及对应源码定义",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://choosealicense.com/licenses/agpl-3.0/",
+      "title": "AGPL-3.0 许可说明与全文",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://opensource.org/osd",
+      "title": "OSI 开源定义",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    },
+    {
+      "url": "https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository",
+      "title": "GitHub 官方添加许可证教程",
+      "section": "course-agent-building-topic-4",
+      "context": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4"
+    }
+  ],
+  "sections": [
+    {
+      "id": "course-agent-building-introduction",
+      "title": "引言",
+      "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-introduction",
+      "html": "<p>制作通常有三个入口：</p>\n<ul><li>从空白项目开始，逐项添加所需能力；</li><li>使用模板，在已有配置上修改；</li><li>用自然语言描述需求，让平台先生成一个版本。</li></ul>\n<p>本部分先从少量配置开始，带你看清每一项设置的作用。使用模板或自然语言创建时，也可以按同样的方法检查生成的内容。</p>\n<p>我们先制作一个依据资料回答问题的话题助手，再学习判断与调度、工具执行、后台运行和实时语音。第一次制作时，先让它完成一件可以检查的小事。例如，依据一份活动说明回答时间、费用和参加条件；这些回答通过检查后，再考虑连接报名系统、查询个人记录等能力。</p>\n<p>制作前，还需要确定成品放在哪里、供谁使用。问答助手可以做成一个通过链接打开的聊天网页；工作流中的 Agent 可以作为其中一个处理步骤；后台任务则需要配置无人值守时的运行入口。制作平台要根据这些用途选择。第一节学习平台内专用助手的创建，以及已有 Agent 的知识配置。</p>"
+    },
+    {
+      "id": "course-agent-building-topic-1",
+      "title": "1. 制作有知识库的话题助手",
+      "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-1",
+      "html": "<h3 id=\"course-agent-building-topic-1-heading-1\">1.1 在平台中创建专用话题助手——以 ChatGPT 为例</h3>\n<p>打开 ChatGPT 网页端，点击左侧的三个点后选择“GPT”。<br>点击右上角“创建”，之后选择“创建插件”或创建“GPT”（后者即将被取消）。</p>\n<table class=\"d-table\"><thead><tr><th>配置项</th><th>需要填写或准备的内容</th></tr></thead><tbody><tr><td>名字、描述</td><td>核心用途、面向谁使用、语气和回答深度</td></tr><tr><td>指令</td><td>具体功能、操作范围、运行限制、使用示例（用户需要提供什么、结果应是什么样、信息不足时怎么办）</td></tr><tr><td>对话开场白</td><td>开场白展示可以问什么，指令中的示例展示应该怎样回答</td></tr><tr><td>知识</td><td>数据来源、已有资料、每份资料的用途</td></tr><tr><td>工具能力</td><td>需要启用的能力；涉及外部服务时再配置连接</td></tr></tbody></table>\n<p>填写配置项的要点和写优秀提示词一样，只不过更需要能反复处理不同用户、不同材料的同类任务，也不存在必须使用的特殊格式或神奇词语。我们分别来看指令、对话开场白、知识和工具能力如何配置。</p>\n<h4 id=\"course-agent-building-topic-1-heading-2\">指令：</h4>\n<h5 id=\"course-agent-building-topic-1-heading-3\">一. 具体功能：</h5>\n<ol><li>动词开头写出要负责的任务</li><li>说明任务需要的材料，区分每个任务需要的必需材料和可选材料。</li><li>每个任务的处理步骤。</li><li>可检查可核对的交付内容。</li></ol>\n<h5 id=\"course-agent-building-topic-1-heading-4\">二. 操作范围：</h5>\n<ol><li>定义主题范围(和具体功能类似)</li><li>定义行动范围(指出每个任务的改动边界，哪些操作不能做，哪些需要确认)</li></ol>\n<h5 id=\"course-agent-building-topic-1-heading-5\">三. 运行限制：</h5>\n<p>写出遇到什么情况如何处理（是否需要追问，是否可以默认或标注未说明），通常包括：</p>\n<ol><li>缺少决定结果的关键信息</li><li>所需事实不在资料中</li><li>材料结论冲突</li><li>工具失效</li><li>缺少影响较小的偏好</li><li>完成任务/未完成任务/尝试无效</li></ol>\n<h5 id=\"course-agent-building-topic-1-heading-6\">四. 使用示例：</h5>\n<p>列出用户经常问的问题，以及我们回复的优秀案例。</p>\n<p>示例需要教会模型以下情况的处理：</p>\n<ol><li>正常情况下怎样完成任务</li><li>什么时候追问，什么时候继续</li><li>混淆的要求如何处理</li><li>遇到冲突怎样处理</li><li>如何使用工具</li></ol>\n<p>在及基础上，示例也需要教模型回答格式，回答语气和答案结构。且不同示例需要保持差异避免模型学到不该学到的规律。例如，如果示例中全部以追问结尾，模型可能会无意中学到”必须追问“。</p>\n<p>有些示例可能会采用特殊写法：</p>\n<p><code>&lt;examples&gt;</code> 和 <code>&lt;/examples&gt;</code>：标记整组示例的开始与结束。</p>\n<p><code>&lt;input&gt;</code>、<code>&lt;output&gt;</code>：区分用户输入和理想回答。</p>\n<p>但普通文字写法也没有问题。</p>\n<h4 id=\"course-agent-building-topic-1-heading-7\">对话开场白：</h4>\n<p>这部分在开始使用时展示给用户，让用户知道可以怎么写提示词，怎么问问题，以及间接传达该agent的核心功能。</p>\n<p>优秀的开场白应该：</p>\n<ol><li>简短</li><li>对应真实用户问题</li><li>明确动作和处理对象</li><li>只展示已经具备的能力</li><li>涉及的数据应当是助手能够访问的或用户后续能提供的</li></ol>\n<p>通常设计至少3段对话开场白。</p>\n<h4 id=\"course-agent-building-topic-1-heading-8\">知识：</h4>\n<p>数据来源、已有资料、每份资料的用途可以写进一段中。</p>\n<p>数据来源包括1. 来源名称，2.版本， 3.获取方式， 4.适用范围。</p>\n<p>每份资料的用途需要说明：遇到什么任务，使用哪份资料，取得什么信息；必要时说明不能从中推断什么。</p>\n<p>如果知识里没有填写数据来源、已有资料、每份资料的用途的地方，只有上传按钮，我们可以将该部分写在指令里。如果资料很多且难以分类，可以额外写一份资料使用说明文档上传，并在指令中让agent需要时读取它。</p>\n<h4 id=\"course-agent-building-topic-1-heading-9\">工具能力:</h4>\n<p>接入外部工具的入口，在ChatGPT的&quot;创建GPT&quot;中，我们使用&quot;Actions&quot;来接入工具。ChatGPT的Enterprise用户的&quot;创建GPT&quot;在12月后将被取消并转换为插件，现在的插件制作skill中可以通过agent很轻松地接入外部工具。</p>\n<p>如果你没有看到Actions，有可能是勾选了Apps，或者还没有跟&quot;创建GPT&quot;中的agent说话。在第一次对话后，Actions和推荐模型才会出现。</p>\n<p>接下来只需要在对应的工具平台上充值后使用API key连接到我们的Agent上就可以了。如果你找不到API key的网址入口，就直接让AI帮你找。</p>\n<p>尽管同一个api key可以分给不同agent和其他接入软件，但还是推荐对每个agent和用途建立不同的key，这样方便进行单独停用，用量查看和权限管理。此外注意key属于隐私信息，一旦泄露相当于别人可以使用你的平台余额，需要妥善保管。</p>\n<h3 id=\"course-agent-building-topic-1-heading-10\">1.2 给已有 Agent 配置知识库</h3>\n<p>如果你已经在使用 Claude、WorkBuddy 或 Codex，可以把自己的资料接入原来的 Agent。除了处理单次任务的附件外，我们可以把需要反复使用的资料，再放进项目知识区、资料库或固定目录。</p>\n<h4 id=\"course-agent-building-topic-1-heading-11\">一. 全局与项目AGENTS.md</h4>\n<p>AGENTS.md是给Agents看的命令文件中最常用的（注意大小写固定）。如果你希望ChatGPT与你的所有对话都带有某种特征或遵循某个规则，可以在设置全局AGENTS.md（路径是~/.codex/AGENTS.md）。不同的模型都有类似的设置，例如Claude Code的全局文件CLAUDE.md(路径是~\\.claude\\CLAUDE.md)。这些文件会在全局启动时加载。</p>\n<p>对于单独的项目，也可以在项目文件夹中加入针对该项目的AGENTS.md，里面说明了AGENTS.md该如何使用知识库，该在什么条件下加载哪份资料，从而避免对于任何问题都花费大量时间和token查看无用资料。</p>\n<p>注意AGENTS.md也会被放入上下文，因此尽量简洁明确，彼此不矛盾。更复杂的信息和长篇操作流程可以另放文件。</p>\n<h4 id=\"course-agent-building-topic-1-heading-12\">二. 让 Agent 读取电脑上的资料目录</h4>\n<p>以 Codex 为例：</p>\n<ol><li>把相关资料整理到一个文件夹中；已有项目也可以在原目录中增加“资料”子文件夹。</li><li>在 Codex 中将该文件夹设为当前项目或工作目录。</li><li>在任务中给出要读取的文件或目录路径，并说明资料用于什么。</li><li>需要以后继续遵守的规则，保存到项目根目录的 <code>AGENTS.md</code>。已有这个文件时，在原有内容中补充相关要求。</li></ol>\n<p>例如，资料目录中分别保存产品手册和写作示例，</p>\n<pre><code class=\"language-text\">资料库/\n├── AGENTS.md\n├── 产品资料/\n│   ├── 产品手册.md\n│   └── 常见问题.md\n└── 写作参考/\n    └── 文章示例.md</code></pre>\n<p>可以在 <code>AGENTS.md</code> 中写：</p>\n<pre><code class=\"language-text\">回答产品功能和操作问题时，先查阅“资料/产品手册”。\n“资料/写作示例”用于参考表达，其中的具体事实不直接用于新任务。\n回答中注明所用文件及对应章节。\n本项目的资料问答任务只读取文件；修改资料需要明确的更新要求。</code></pre>\n<p>注意有些旧版本的平台不支持根文件夹下放子文件夹时直接读取子文件夹里的资料，会导致子文件夹无法读取，请检查这一点。</p>\n<h4 id=\"course-agent-building-topic-1-heading-13\">三. 连接外部文档、知识库或数据库</h4>\n<p>资料已经保存在团队文档、网盘、业务系统中，且需要持续更新时，可以先查看 Agent 是否支持相应连接器。这样，后续任务可以查询原系统中的资料。</p>\n<h5 id=\"course-agent-building-topic-1-heading-14\">对于文档资料库：</h5>\n<table class=\"d-table\"><thead><tr><th>准备项</th><th>具体内容</th><th>通常由谁提供</th></tr></thead><tbody><tr><td>访问账号</td><td>能够读取这些资料的企业账号</td><td>企业管理员授权</td></tr><tr><td>接入方式</td><td>软件已有的连接器，或企业提供的 MCP／API</td><td>自己查找；没有时找技术人员</td></tr><tr><td>使用说明</td><td>资料分别用于什么，哪些版本有效，回答如何标注来源</td><td>你和业务负责人</td></tr><tr><td>测试问题</td><td>几个已知答案的问题，以及对应原文</td><td>你</td></tr></tbody></table>\n<h5 id=\"course-agent-building-topic-1-heading-15\">对于业务数据库：</h5>\n<h6 id=\"course-agent-building-topic-1-heading-16\">第一步：先告诉技术人员你要查什么</h6>\n<p>不要只说“帮我把数据库接上”。可以直接提交这样的需求：</p>\n<blockquote class=\"quote\"><p>我需要让 Agent 查询订单状态，并按日期、地区统计已付款销售额。</p>\n<p>请提供允许查询的数据范围、只读访问方式、字段与统计口径说明，以及可用于核对结果的测试问题。</p>\n<p>如果企业已有查询 API 或 MCP，请提供接入配置；如果需要直接连接数据库，请提供对应工具的配置方法。</p></blockquote>\n<p>技术人员可以据此选择两种做法：</p>\n<ul><li>任务比较固定：提供“查询订单”“统计销售额”等专用工具，你填写订单号、日期等条件。</li><li>需要灵活分析：提供 SQL 查询工具，让 Agent 查看允许访问的表结构，并生成查询。</li></ul>\n<h6 id=\"course-agent-building-topic-1-heading-17\">第二步：将查询工具接入 Agent</h6>\n<p>如果企业提供远程 MCP，按前面的“添加 MCP 服务”步骤连接即可。数据库凭据可以保留在企业服务端，你使用企业账号登录。</p>\n<p>如果企业允许从本地直接连接，也有现成工具。例如，Google 开源的 MCP Toolbox for Databases 提供 PostgreSQL 等数据库的接入方案。PostgreSQL 官方接入教程</p>\n<p>以 PostgreSQL 为例，需要先由技术人员：</p>\n<ol><li>安装 Toolbox，确认可执行文件位置。</li><li>准备只读数据库账号。</li><li>在运行环境中配置数据库地址、端口、库名、用户名和密码。</li><li>确认网络与加密连接设置正确。</li></ol>\n<p>注意对Agent的只读限制需要落实到数据库账号或服务端。之后进行连接验证和小测试。</p>"
+    },
+    {
+      "id": "course-agent-building-topic-2",
+      "title": "2. 制作有记忆的语音 Agent",
+      "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-2",
+      "html": "<h3 id=\"course-agent-building-topic-2-heading-1\">2.1 配置跨对话使用的记忆</h3>\n<p>如果你希望 Agent 在新对话中继续了解你的偏好、已经确认的事情和正在推进的工作，就需要配置跨对话使用的记忆。例如，学习助手记住你已经学到哪里，写作助手记住你认可的表达方式，工作助手记住上次确定的方案。</p>\n<p>先确定这些信息保存在哪里。使用平台自带的助手，可以先开启内置记忆；希望自己查看、修改和迁移记录，可以使用记忆文件；需要让多个设备或不同 Agent 共用记忆，可以考虑外部记忆服务。</p>\n<h4 id=\"course-agent-building-topic-2-heading-2\">一. 使用平台内置记忆</h4>\n<p>如果主要在同一个产品中使用自己的助手，先检查内置记忆是否够用。通常不需要另建数据库，也不需要购买其他服务的 API。</p>\n<h5 id=\"course-agent-building-topic-2-heading-3\">Claude：在设置中开启并管理记忆</h5>\n<ol><li>打开 <strong>Settings → Your Claude</strong>，开启 <strong>Memory from chats</strong>。部分界面的入口仍叫 <strong>Settings → Memory</strong>。</li><li>在聊天中直接说明需要长期保存的信息，例如“记住：我学习新软件时，希望先看具体操作，再看解释”。</li><li>回到 <strong>Your memory → Manage</strong>，查看保存的主题；点击某一项可以阅读、编辑或删除。</li><li>信息变化时，直接要求它更正或忘记，再检查对应记录是否变化。</li></ol>\n<p>Claude 的项目也有自己的记忆。在项目页面的 Memory 设置中，可以用 <strong>Use account memory</strong> 控制是否同时使用账号记忆。不要把一个项目里保存的信息，当作所有项目都会使用的信息。<a href=\"https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context\" target=\"_blank\" rel=\"noopener noreferrer\">Claude 官方记忆教程</a></p>\n<h5 id=\"course-agent-building-topic-2-heading-4\">WorkBuddy：开启“生成对话记忆”</h5>\n<p>点击头像，进入 <strong>设置 → 记忆</strong>，检查“生成对话记忆”是否开启。打开已生成的记忆可以查看内容，点击编辑图标可以通过对话提出修改要求。</p>\n<p>WorkBuddy 官方说明会每晚整理当天会话，因此刚说完一件事，记忆摘要不一定立即更新。需要检查保存结果时，要考虑这个更新时间。<a href=\"https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory\" target=\"_blank\" rel=\"noopener noreferrer\">WorkBuddy 官方记忆教程</a></p>\n<h5 id=\"course-agent-building-topic-2-heading-5\">ChatGPT：开启本机记忆</h5>\n<p>进入 <strong>Settings → Personalization</strong>，开启 <strong>Enable Codex memories</strong>；在当前聊天中输入 <code>/memories</code>，检查是否允许使用已有记忆，以及让本次聊天参与生成后续记忆。涉及 MCP 工具或网页搜索的聊天，还要检查 <strong>Allow memories from tool-assisted chats</strong>。</p>\n<p>这里的记忆在后台整理，不一定立即生成；它和 ChatGPT 网页端的账号记忆是两套存储。换到网页端或另一台电脑时，需要另外检查，不能因为登录同一账号就认定已经共用。<a href=\"https://learn.chatgpt.com/docs/customization/memories\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方记忆教程</a></p>\n<h4 id=\"course-agent-building-topic-2-heading-6\">二. 用文件保存并更新记忆</h4>\n<p>如果你希望明确知道保存了什么，能够自己修改、备份，或者把记录交给另一个 Agent，可以使用普通文本文件。这种方式适合能够读写本地文件的 Agent；只有上传附件功能的聊天界面，不能据此自动更新你电脑上的文件。</p>\n<h5 id=\"course-agent-building-topic-2-heading-7\">第一步：建立一个固定的记忆文件</h5>\n<p>在 Agent 可以访问的工作目录中新建 <code>memory.md</code>，可以先只写三个分类：</p>\n<pre><code class=\"language-markdown\"># 用户偏好\n\n# 已确认的背景信息\n\n# 正在进行的事情</code></pre>\n<p>这里的文件名是我们自己约定的。文件叫 <code>memory.md</code>，并不意味着任何 Agent 都会自动读取它。</p>\n<h5 id=\"course-agent-building-topic-2-heading-8\">第二步：在持久指令中说明如何读写</h5>\n<p>在上一节配置的项目指令文件中，补充记忆文件的实际路径和使用要求。下面是一份可以按需修改的写法：</p>\n<pre><code class=\"language-text\">记忆文件位于当前项目根目录的 memory.md。\n\n每次开始新对话时，先读取该文件，使用其中与当前任务有关的信息。\n当我明确要求“记住”，或确认某项偏好以后继续适用时，更新该文件。\n只记录我已经确认的信息，不把你的猜测、举例或待选方案记成事实。\n每条记录写明内容和确认日期；临时事项另外写明适用时间或完成状态。\n同一事项发生变化时，更新原条目，避免同时保留两个相互矛盾的当前结论。\n我要求忘记某项信息时，删除对应条目。\n只有文件写入成功后，才告诉我已经保存；没有写入权限时说明原因。</code></pre>\n<p>这份写法选择“明确要求或确认后保存”。如果希望 Agent 自动整理，也可以改成允许它保存已确认的偏好和工作进展，同时保留“不记录猜测”和“更新旧条目”的要求。</p>\n<p>有些产品已经提供自动维护记忆文件的功能。例如，Claude Code 的普通本地会话默认开启自动记忆，可以输入 <code>/memory</code> 查看设置和记录。其记忆按项目保存在本机，官方说明不会自动跨电脑共享。使用这类功能前，可以先检查是否已经满足需要，再决定是否另外维护文件。<a href=\"https://code.claude.com/docs/en/memory\" target=\"_blank\" rel=\"noopener noreferrer\">Claude Code 官方记忆教程</a></p>\n<h4 id=\"course-agent-building-topic-2-heading-9\">三. 接入外部记忆服务</h4>\n<p>如果你希望不同设备、不同客户端中的 Agent 共用一份记忆，可以把记录放在外部服务中。前提是这些 Agent 都能连接该服务，并使用同一份记忆范围。仅仅分别打开两个软件的内置记忆开关，不会把它们连起来。<br>例如Mem0 。它提供保存、搜索、修改和删除记忆的工具，支持通过 MCP 接入。</p>\n<h4 id=\"course-agent-building-topic-2-heading-10\">四. 记忆应该保存到什么程度</h4>\n<p>配置时，可以先确定以下几类信息的处理方式：</p>\n<ol><li><strong>长期偏好：</strong>保存以后仍要使用的要求，区分“今天回答简短一点”和“以后默认回答简短一点”。</li><li><strong>个人背景：</strong>保存用户已经确认、对后续任务有帮助的信息；不凭一次问题推断职业、性格或身份。</li><li><strong>持续事项：</strong>记录当前进度、已经确定的决定和下一步；事情完成后更新状态。</li><li><strong>容易过期的信息：</strong>记录适用日期或条件，使用前必要时重新确认。</li><li><strong>不应保存的信息：</strong>例如密码、API key，以及用户明确要求只在本次对话中使用的内容。</li></ol>\n<p>如果需要回看某次讨论的完整经过，应查原始对话或工作记录。不要要求一条简短记忆同时充当完整聊天备份。</p>\n<h3 id=\"course-agent-building-topic-2-heading-11\">2.2 配置语音交流</h3>\n<p>如果希望像通话一样连续交流，让 Agent 听你说话并用声音回应，就需要完整的语音对话功能。</p>\n<h4 id=\"course-agent-building-topic-2-heading-12\">一. 开启已有助手的语音模式</h4>\n<h5 id=\"course-agent-building-topic-2-heading-13\">ChatGPT 桌面端</h5>\n<ol><li>打开准备继续交流的聊天或 Codex 任务。</li><li>点击 <strong>Start voice chat</strong>；新建时选择 <strong>Start new voice chat</strong>。</li><li>首次使用时允许麦克风访问，并选择声音。</li><li>开始说话，结束时点击 <strong>Stop voice chat</strong>。也可以在 <strong>Settings → Voice → Voice chat hotkey</strong> 中设置快捷键。</li></ol>\n<p>如果已有任务中没有语音按钮，先更新桌面应用和运行任务的 Codex 主机，再检查账号与工作区是否开放该功能。语音输入和实时语音对话是不同入口，看到麦克风按钮不一定代表能够连续通话。<a href=\"https://learn.chatgpt.com/docs/features/voice\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方语音教程</a></p>\n<h5 id=\"course-agent-building-topic-2-heading-14\">Claude</h5>\n<ol><li>在网页端或 Claude Desktop 打开聊天，点击输入框附近的声波图标；手机端同样使用声波图标进入语音模式。</li><li>允许麦克风访问。手机端首次进入时可以选择声音，之后可在语音界面的设置中调整声音和语速。</li><li>安静环境可以直接连续说话；背景较吵时，切换到 <strong>Push-to-talk</strong>，按住说话、松开发送。</li></ol>\n<p>Claude 支持在同一段对话中切换文字和语音，之前的上下文会延续。需要补充网址、专有名词或其他容易听错的内容时，可以改用文字输入。<a href=\"https://support.claude.com/en/articles/11101966-use-voice-mode\" target=\"_blank\" rel=\"noopener noreferrer\">Claude 官方语音教程</a></p>\n<h4 id=\"course-agent-building-topic-2-heading-15\">二. 在语音 Agent 平台中制作专用助手</h4>\n<p>如果希望单独设置助手的声音、开场话术、等待时间，并把它提供给别人使用，可以选择带有语音配置界面的搭建平台。下面以 <strong>ElevenLabs Agents</strong> 为例：它可以在网页中配置语音助手，并提供测试入口和网站组件。</p>\n<h5 id=\"course-agent-building-topic-2-heading-16\">第一步：创建助手，复用已经写好的任务配置</h5>\n<p>登录 <a href=\"https://elevenlabs.io/\" target=\"_blank\" rel=\"noopener noreferrer\">ElevenLabs</a>，进入 Agents 控制台，新建助手并选择 <strong>Blank template</strong>。</p>\n<p>在 <strong>Agent</strong> 页中填写：</p>\n<ul><li><strong>System prompt：</strong>按 1.1 的方法填写任务、范围和处理要求。已经写好的指令可以作为起点，补充后面介绍的语音交流要求。</li><li><strong>First message：</strong>用户接通后，助手实际说出的第一句话。它可以介绍身份并询问用户需要什么帮助，和展示给用户点击的“对话开场白”按钮不同。</li></ul>\n<h5 id=\"course-agent-building-topic-2-heading-17\">第二步：配置语言、声音和语速</h5>\n<p>进入 <strong>Voice</strong> 页选择声音和调整 Speed。</p>\n<h5 id=\"course-agent-building-topic-2-heading-18\">第三步：配置什么时候接话、能否打断</h5>\n<p>在 Agent 设置中找到 <strong>Turn eagerness</strong>，先用 <strong>Normal</strong>；经常需要思考、组织长句时，可以改成 <strong>Patient</strong>，让它多等一会儿。</p>\n<p>需要随时插话时，在 <strong>Advanced → Client Events</strong> 中确认选中了 <code>interruption</code>。等待时间、打断等行为要在相应设置中配置，不能只在指令里写一句“不要抢话”。<a href=\"https://elevenlabs.io/docs/eleven-agents/customization/conversation-flow\" target=\"_blank\" rel=\"noopener noreferrer\">官方对话节奏配置教程</a></p>\n<h4 id=\"course-agent-building-topic-2-heading-19\">三. 给自己的应用或已有 Agent 接入语音服务</h4>\n<p>如果希望保留自己的网页、角色形象，或继续使用已经开发好的 Agent，可以通过 API 接入语音。已有 Agent 需要提供可调用的接口，或者你能够修改它的代码。</p>\n<pre><code class=\"language-text\">Agent 生成最终回答\n        ↓\n程序自动取得这段回答文字\n        ↓\n后端调用 ElevenLabs等平台，提交文字、声音编号和模型\n        ↓\nElevenLabs 返回音频\n        ↓\n后端把音频传给当前用户的网页\n        ↓\n网页播放器播放声音</code></pre>"
+    },
+    {
+      "id": "course-agent-building-topic-3",
+      "title": "3. 制作后台自动运行 Agent",
+      "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-3",
+      "html": "<h3 id=\"course-agent-building-topic-3-heading-1\">3.1 定时与事件触发运行</h3>\n<h4 id=\"course-agent-building-topic-3-heading-2\">一. 直接让已有助手创建定时任务</h4>\n<h5 id=\"course-agent-building-topic-3-heading-3\">先说明时间和每次要做的工作</h5>\n<p>可以通过对话提出要求，不必先学习定时表达式。下面这些信息需要讲清楚，可以按实际任务替换方括号中的内容：</p>\n<pre><code class=\"language-text\">请创建一个定时任务。\n执行时间：[单次日期，或重复频率、具体时间、时区]。\n每次任务：[要执行的工作]。\n资料来源：[文件、项目、已连接的服务或指定网站]。\n处理范围：[本次要处理哪些对象，或哪个时间段的内容]。\n交付结果：[输出内容，以及保存位置或通知方式]。\n没有符合条件的内容时：[结束本次任务，或记录“无更新”等处理方式]。</code></pre>\n<p>“提醒我整理周报”和“读取本周记录并生成周报”是两个不同要求。希望 Agent 完成工作时，要把实际工作写进任务，而不只是设置提醒。</p>\n<h5 id=\"course-agent-building-topic-3-heading-4\">ChatGPT：通过对话创建，到 Scheduled 核对</h5>\n<p>在聊天中提出定时要求，并说明以后回到当前对话继续处理，还是每次独立运行。创建后打开 <strong>Scheduled</strong>，检查保存的任务内容、执行时间和状态。</p>\n<p>需要在电脑项目中读写文件时，使用桌面端对应项目，保持电脑开机、应用运行；网页任务使用可访问的上传材料或连接服务，不能直接使用电脑上的文件夹。<a href=\"https://learn.chatgpt.com/docs/automations\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方定时任务教程</a></p>\n<h5 id=\"course-agent-building-topic-3-heading-5\">WorkBuddy：对话创建，或在“定时任务”中填写</h5>\n<p>可以直接在普通对话中描述周期性需求。也可以点击左侧 <strong>定时任务 → 新建旁的下拉箭头 → 从任务新建</strong>，补充需求后发送。</p>\n<p>需要手动配置时，点击 <strong>定时任务 → 新建</strong>，填写：</p>\n<ol><li><strong>名称、提示词：</strong>任务名称和每次执行的工作。</li><li><strong>模型、专家、技能、连接器：</strong>选择本次工作需要的能力。</li><li><strong>工作空间：</strong>需要使用本地文件时，指定执行目录。</li><li><strong>重复、时间、有效期：</strong>选择单次或重复规则、执行时刻及生效范围。</li></ol>\n<p>保存后，查看卡片上的下一次执行时间，点击运行按钮试跑；在“运行记录”中查看结果。不再需要重复执行时，可用卡片开关暂停。暂停后续执行不会中断已经开始的那一次。</p>\n<p>本地任务依赖电脑和客户端；标有“云端”的任务在云端执行，但不能直接访问本机文件。<a href=\"https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide\" target=\"_blank\" rel=\"noopener noreferrer\">WorkBuddy 官方定时任务教程</a></p>\n<h4 id=\"course-agent-building-topic-3-heading-6\">二. 使用软件自带的事件触发入口</h4>\n<p>如果只想在某类事情发生时工作，先找软件已经支持的事件，例如“收到邮件”“出现新消息”“代码仓库有更新”。连接到某个应用，并不意味着所有事件都能触发任务，需要检查支持的事件清单。</p>\n<p>以 ChatGPT 为例，符合条件的账号可以在网页端或手机端创建 Gmail、Slack、GitHub 的事件任务，桌面端没有这个创建入口。</p>\n<p>先连接并授权应用，再在对话中描述：</p>\n<pre><code class=\"language-text\">请创建一个事件触发任务。\n事件来源：[账号、频道或仓库]。\n触发条件：[哪些新事件需要处理，以及筛选条件]。\n每次任务：[根据收到的内容执行什么工作]。\n交付结果：[保存在哪里，什么情况通知我]。</code></pre>\n<p>创建后到 <strong>Scheduled</strong> 核对。是否可用受套餐和工作区设置影响；一个任务不能同时使用事件触发和时间计划。<a href=\"https://learn.chatgpt.com/docs/automations#trigger-tasks-from-app-events\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方事件触发说明</a></p>\n<p>筛选条件尽量放在触发设置中。例如，只处理某个发件人的邮件时，优先配置发件人条件，减少无关邮件触发 Agent。任务指令则说明收到符合条件的内容后，该如何处理。</p>\n<h4 id=\"course-agent-building-topic-3-heading-7\">三. 没有合适入口时，使用自动化平台(可以查看自动工作流章节)</h4>\n<p>需要连接的软件或触发条件不在原产品的支持范围内时，可以使用 n8n 这类自动化平台。它把“什么时候启动”“交给谁处理”“结果送到哪里”连接起来。</p>\n<p>下面以 n8n 为例。可以使用云端版，省去本地安装；已经有企业提供的 n8n，也可以在现有环境中配置(可能需要Docker)。这里先做最短的流程：</p>\n<pre><code class=\"language-text\">定时或事件触发 → Agent 处理 → 保存结果或通知</code></pre>\n<p>在新工作流中添加触发节点。节点可以理解为流程中的一个步骤。</p>\n<p><strong>定时运行：添加 Schedule Trigger。</strong></p>\n<p>在 <strong>Trigger Rules</strong> 中添加规则，用 <strong>Trigger Interval</strong> 选择天、周、小时等单位，再填写对应时间。在工作流设置中核对时区，避免把服务器时区当成自己的时区。保存后还需要发布工作流，才会按计划执行。<a href=\"https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger\" target=\"_blank\" rel=\"noopener noreferrer\">n8n 官方定时触发教程</a></p>\n<p><strong>事件触发：选择对应应用的 Trigger。</strong></p>\n<p>以邮件为例，添加 <strong>Gmail Trigger</strong>：</p>\n<ol><li>在 <strong>Credential to connect with</strong> 中创建或选择 Google 连接。n8n Cloud 可以使用 <strong>Sign in with Google</strong> 登录授权，无需自己配置 Google Cloud 应用。</li><li>选择 <strong>Message Received</strong> 事件。</li><li>在 <strong>Poll Times</strong> 中设置检查频率；按需要设置发件人、标签或搜索条件。</li><li>测试获取一封符合条件的邮件，查看节点输出。</li></ol>\n<h3 id=\"course-agent-building-topic-3-heading-8\">3.2 24小时不间断运行</h3>\n<p>希望 Agent 全天接收任务、在你离开后继续工作，首先要给它一个持续可用的运行位置。最方便的是使用产品已经提供的云端功能；必须使用本机软件和文件时，再配置电脑持续运行；已经开发成独立程序时，可以部署到云端托管平台或服务器。</p>\n<p>这里要区分两种需求：一是随时等待新任务，有任务才处理；二是围绕一个目标持续推进，完成一部分后继续下一部分。程序保持在线，只解决运行位置的问题；要让工作继续推进，还需要配置后面的目标与进度。</p>\n<h4 id=\"course-agent-building-topic-3-heading-9\">一. 优先使用现成云端功能</h4>\n<p>如果任务可以使用上传的资料、在线文档、远程工具和接口完成，可以先选择云端运行。这样，自己的电脑不必一直开机。</p>\n<h5 id=\"course-agent-building-topic-3-heading-10\">WorkBuddy：在云上模式中运行任务</h5>\n<h5 id=\"course-agent-building-topic-3-heading-11\">ChatGPT：选择 Work 的云端运行环境</h5>\n<p>在 ChatGPT 网页端选择 <strong>Work</strong> 发起工作；在支持切换的桌面端，新建任务时选择 <strong>Cloud</strong>。上传需要的资料、连接工具，再说明要完成的工作。</p>\n<p>官方说明，云端 Work 任务可以在关闭桌面应用后继续，并从网页或手机跟进。仍需留意任务是否已经完成，或正在等待补充信息与确认。<a href=\"https://learn.chatgpt.com/docs/use-chatgpt#choose-cloud-or-local-work\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方云端 Work 说明</a></p>\n<p>如果任务还需要通过连接的电脑读取本地文件、操作本机工具，那台电脑仍要在线。选择云端协调，不会把电脑里的所有文件和软件一起搬到云端。<a href=\"https://learn.chatgpt.com/docs/enterprise/cloud-local-access\" target=\"_blank\" rel=\"noopener noreferrer\">官方本地访问说明</a></p>\n<h5 id=\"course-agent-building-topic-3-heading-12\">希望长期负责一件事时</h5>\n<p>账号中有 <strong>dots</strong> 入口时，也可以使用这种持续型助手。它有自己的云端电脑，可以在对话之间继续跟进工作，并按需要暂停、唤醒和继续。</p>\n<p>配置时，先打开 dots 完成创建，再连接工作需要的应用；随后交代持续负责的目标、资料来源、交付结果，以及什么时候需要你决定。之后可以从它的 <strong>Activity</strong> 查看具体任务。需要使用你自己的电脑时，仍要单独连接并保持电脑在线。<a href=\"https://learn.chatgpt.com/docs/dots/getting-started\" target=\"_blank\" rel=\"noopener noreferrer\">官方创建教程</a>、<a href=\"https://learn.chatgpt.com/docs/dots/tasks-and-memory\" target=\"_blank\" rel=\"noopener noreferrer\">持续任务说明</a></p>\n<p>如果已经在 n8n Cloud 中搭好 3.1 的流程，可以继续使用云端实例并发布工作流，无需为了保持运行而开着个人电脑。不过，流程调用的 Agent 接口、资料和工具也必须持续可达；若其中一步依赖本机程序，本机离线仍会影响这一步。<a href=\"https://docs.n8n.io/deploy/use-n8n-cloud.md\" target=\"_blank\" rel=\"noopener noreferrer\">n8n Cloud 官方说明</a></p>\n<h4 id=\"course-agent-building-topic-3-heading-13\">二. 必须使用电脑上的资料和软件时，让本机持续运行</h4>\n<p>需要处理本地文件、使用本机登录状态，或者操作没有云端接口的软件时，可以继续在自己的电脑上运行 Agent。先配置运行条件，再考虑是否需要额外服务器。</p>\n<h5 id=\"course-agent-building-topic-3-heading-14\">配置防休眠与后台运行</h5>\n<p>以 WorkBuddy 桌面端为例：</p>\n<ol><li>保持电脑接通电源、联网，并登录 WorkBuddy。</li><li>打开 <strong>设置 → 通用 → 权限</strong>，检查 <strong>运行时防止系统休眠</strong> 是否开启。它在本地任务执行期间阻止因空闲而自动休眠，屏幕仍可熄灭。</li><li>如果希望任务之间也保持可远程访问，找到 <strong>设置 → 通用 → 允许锁屏运行</strong>，选择 <strong>熄屏后保持唤醒</strong>，或按需要选择保持屏幕常亮。</li><li>在通用设置中检查 <strong>开机自启</strong>。它用于重启后启动客户端，已经执行到一半的任务是否恢复，还要另外验证。</li></ol>\n<p>“运行时防止系统休眠”在任务结束后就不再阻止休眠；它也不能阻止主动关机或睡眠。需要全天待命时，不能只检查任务运行期间的这个开关。<a href=\"https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Setting\" target=\"_blank\" rel=\"noopener noreferrer\">WorkBuddy 官方系统设置</a>、<a href=\"https://www.workbuddy.cn/docs/workbuddyapp/features/Multidevice\" target=\"_blank\" rel=\"noopener noreferrer\">锁屏运行说明</a></p>\n<p>其他本地 Agent 也需要检查相应的防休眠、退出行为和启动设置。缩小窗口、关闭窗口、退出程序可能产生不同结果，要按具体软件确认。涉及桌面操作时，还应实际检查锁屏后能否完成所需操作。</p>\n<h4 id=\"course-agent-building-topic-3-heading-15\">三. 让一个长期任务持续推进</h4>\n<p>如果希望 Agent 整理大量材料、逐步完成一个项目，除了保持运行，还要让它清楚下一步做什么、做到哪里结束。</p>\n<h5 id=\"course-agent-building-topic-3-heading-16\">优先使用产品已有的持续目标功能</h5>\n<p>以 ChatGPT 桌面端或 Codex 的 <strong>Goal mode</strong> 为例，在对话中输入 <code>/goal</code>，填写目标、约束和可检查的完成条件。运行时可以通过目标进度栏暂停、恢复或修改目标。</p>\n<p>这个功能帮助 Agent 围绕目标持续工作，不会替它扩大权限，也不能让断网或关机后的本地程序继续执行。官方建议在预计失去连接前暂停，恢复条件后再继续。<a href=\"https://learn.chatgpt.com/docs/long-running-work\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方长任务教程</a></p>\n<h5 id=\"course-agent-building-topic-3-heading-17\">把实际进度保存下来</h5>\n<p>对于自己配置的 Agent，可以要求它在每个阶段结束时，更新一份进度文件或数据库记录，至少包含：</p>\n<ul><li>已经完成的部分，以及对应成果位置。</li><li>正在处理什么，最后成功到哪一步。</li><li>尚未完成的工作和已知问题。</li></ul>\n<p>再次启动时，先读取并核对这些记录，再继续剩余任务。保存方法可以沿用 2.1 的文件或外部存储方式；这里需要记录的是任务执行进度。</p>\n<h5 id=\"course-agent-building-topic-3-heading-18\">管理不断增长的上下文</h5>\n<p>长任务会不断积累对话、文件内容和工具结果。保存进度以后，还需要控制每一轮带入的信息，否则任务可能在完成前就耗尽上下文，或者难以从大量旧内容中找到当前需要的依据。</p>\n<p><strong>1. 优先使用产品自带的自动压缩。</strong></p>\n<p>自动压缩会把较早的对话整理成摘要，为后续工作腾出空间。例如，Claude Code 会在接近上下文上限时自动整理；可以用 <code>/context</code> 查看占用，也可以手动执行 <code>/compact</code>，并指定整理重点。</p>\n<p>希望压缩后继续保留某些内容，可以在 <code>CLAUDE.md</code> 中添加 <strong>Compact Instructions</strong>，说明要保留当前目标、关键决定、未完成事项和验证结果。固定规则也应保存在持久指令中，因为摘要可能遗漏早期对话里的细节。<a href=\"https://code.claude.com/docs/en/how-claude-code-works#when-context-fills-up\" target=\"_blank\" rel=\"noopener noreferrer\">Claude Code 官方上下文说明</a></p>\n<p>Codex CLI 也提供 <code>/compact</code>，用于把较早对话替换为简短摘要。这个命令属于对应客户端，不应直接套用到所有聊天软件中。<a href=\"https://learn.chatgpt.com/docs/developer-commands#keep-transcripts-lean-with-compact\" target=\"_blank\" rel=\"noopener noreferrer\">OpenAI 官方命令说明</a></p>\n<p>手动压缩适合有人跟进时使用。无人值守任务需要确认产品能够自动管理上下文，或由程序在合适阶段执行整理；只在提示词中写“上下文满了就压缩”，不能替代这项软件能力。</p>\n<p><strong>2. 每个阶段只读取当前需要的材料。</strong></p>\n<p>把任务拆成可以分别完成和检查的阶段，每次读取当前阶段涉及的文件或检索结果。完整资料、详细日志和已生成成果保存在外部，当前上下文只保留摘要、关键结论和来源位置；需要核对时再读取原文。</p>\n<p>例如，逐份处理大量文档时，可以把每份文档的成果分别保存，后续汇总时读取这些成果；不必让所有文档全文、每次工具输出和修改过程一直留在同一段对话中。<a href=\"https://www.anthropic.com/research/effective-context-engineering-for-ai-agents\" target=\"_blank\" rel=\"noopener noreferrer\">Anthropic 官方上下文管理实践</a></p>\n<p><strong>3. 阶段结束后，可以用新的上下文继续。</strong></p>\n<p>新会话先读取任务说明和最新交接记录，核对已有成果，再按需要读取材料。这样，后续工作通过文件和记录衔接，不必依赖一段无限增长的聊天历史。Anthropic 的长任务实践也采用分段推进、记录成果并让后续会话读取的方式。<a href=\"https://www.anthropic.com/research/effective-harnesses-for-long-running-agents\" target=\"_blank\" rel=\"noopener noreferrer\">官方长任务实践</a></p>\n<p>可以在项目指令中补充：</p>\n<pre><code class=\"language-text\">每个阶段只读取当前任务需要的资料，详细结果保存到成果文件。\n阶段结束时，更新进度记录，保留关键决定、依据位置和下一步。\n新会话开始后，先读取任务说明和最新进度，核对已有成果后再继续。\n摘要不能确定的事实，回到原始资料核对，不凭摘要补全。</code></pre>\n<p>“24小时运行”解决的是持续可用和继续工作的条件。任务完成、没有新工作时可以等待；额度不足、工具故障或需要人工决定时仍可能暂停。下一节继续配置这些无人值守时的处理要求。</p>\n<h3 id=\"course-agent-building-topic-3-heading-19\">3.3 配置无人值守时的处理要求</h3>\n<p>平时聊天时，Agent 可以随时追问，你也可以发现问题后立即纠正。无人值守时，需要提前决定：哪些问题可以按约定继续处理，哪些必须停下，停下后怎样把事情交回给你。</p>\n<p>处理规则可以补充到现有任务提示词或持久指令中；使用 n8n 时，放在 AI Agent 的 <strong>System Message</strong> 中。权限、审批、超时等设置，则需要同时配置在软件或工具中。</p>\n<h4 id=\"course-agent-building-topic-3-heading-20\">一. 缺少信息时，决定继续、跳过还是暂停</h4>\n<p>1.1 已经介绍了缺少信息和材料冲突的处理。这里要补充的是：不能及时得到用户回答时，这次运行怎么收尾。</p>\n<p>可以根据工作性质选择：</p>\n<table class=\"d-table\"><thead><tr><th>遇到的情况</th><th>适合的处理方式</th><th>需要写清楚的要求</th></tr></thead><tbody><tr><td>缺少不影响事实和行动的偏好，例如排版样式</td><td>使用已经约定的默认值继续</td><td>默认采用什么，结果中是否注明</td></tr><tr><td>批量任务中，某一条记录缺少关键字段，其他记录互不依赖</td><td>跳过这一条，继续处理其余记录</td><td>保存记录编号、缺少什么、哪些内容未处理</td></tr><tr><td>缺少决定整体结果的资料，或无法确定操作对象</td><td>停止依赖这些信息的工作</td><td>保存已完成成果，列出需要补充的问题</td></tr><tr><td>需要用户选择方案，或者资料存在无法自行解决的矛盾</td><td>标记待决定，保留候选结果</td><td>说明选项、差异，以及下一步需要用户决定什么</td></tr></tbody></table>\n<p>例如，可以在原有指令后补充：</p>\n<pre><code class=\"language-text\">本任务无人值守运行，遇到问题时按以下规则处理：\n缺少表达或排版偏好时，使用已有默认要求继续，不为此等待。\n单条记录缺少关键材料时，记录编号和原因，跳过该条；仅继续处理不依赖它的记录。\n无法确认整体任务的依据或操作对象时，停止相关操作，保存已有结果并列出待补充问题。\n不要把未处理、待确认或失败的事项计入已完成数量。</code></pre>\n<p>独立记录可以跳过，后续步骤依赖的关键资料则不能跳过。比如某个文件无法读取，可以继续整理其他独立文件；计算总数所需的一整份数据缺失时，就不能把不完整结果当作完整统计交付。</p>\n<h4 id=\"course-agent-building-topic-3-heading-21\">二. 配置可以直接执行的操作，以及人工确认入口</h4>\n<h5 id=\"course-agent-building-topic-3-heading-22\">先落实任务需要的访问范围</h5>\n<p>先检查本次任务实际需要哪些操作。例如，读取资料、生成草稿和正式发送消息，可以分别授权。只需要生成草稿时，可以不提供发送工具；只需要查询数据时，使用只读账号。这些限制应落实到工具、账号或服务端。</p>\n<h5 id=\"course-agent-building-topic-3-heading-23\">需要确认时，向人发送请求</h5>\n<p>适合保留人工确认的情况包括：正式对外发送、修改重要业务记录、删除资料，以及超出预先约定范围的操作。</p>\n<p>以 n8n 为例，可以给指定工具增加审批：</p>\n<ol><li>点击 <strong>AI Agent</strong> 节点的 <strong>Tools</strong> 连接口，打开工具面板。</li><li>在 <strong>Human review</strong> 中选择审批渠道，例如 Slack、Telegram 或 n8n Chat。</li><li>配置渠道凭据和接收人或会话。</li><li>将需要审批的工具接到人工审核步骤的工具连接口；无需审批的工具按原方式连接。</li></ol>\n<p>没有审批功能的助手，可以先生成草稿、操作清单或待处理记录，通知你回来继续。应写清楚“未收到确认时保持待处理，不执行该操作”。如果需要等待期限，也要规定超时后取消还是转交人工，不能把“用户没有回复”当作同意。</p>\n<h4 id=\"course-agent-building-topic-3-heading-24\">三. 工具失败时，设置有限重试和停止条件</h4>\n<p>无人值守时，不要只写“失败后继续尝试”，要区分失败类型：</p>\n<ul><li><strong>临时网络故障、服务短暂不可用：</strong>适合有限次重试，写明次数和间隔。</li><li><strong>登录过期、权限不足、输入格式错误：</strong>记录原因并停止相关步骤，等待修复。</li><li><strong>已经提交操作，但没收到明确结果：</strong>先核对系统中的实际状态，再决定是否重试。</li></ul>\n<p>第三种情况尤其需要注意。例如发送请求超时，可能是消息没发出去，也可能已经发出但回执没回来。查不到结果时，应标为“结果待核实”，不要自动再发一遍。</p>\n<p>在 n8n 中，可以打开节点的 <strong>Settings</strong>，为适合重试的操作配置 <strong>Retry On Fail</strong>，并限制重试次数与等待间隔。需要失败后停止整条流程时，使用 <strong>On Error → Stop Workflow</strong>；希望记录错误后继续独立工作时，选择 <strong>Continue (using error output)</strong>，把错误送到专门的处理分支。<a href=\"https://docs.n8n.io/build/understand-workflows/workflow-components/work-with-nodes.md#node-settings\" target=\"_blank\" rel=\"noopener noreferrer\">n8n 官方节点设置</a></p>\n<p>继续执行的分支要明确处理错误，不能把失败输出继续当成正常材料。认证失效也不应靠反复重试解决。复杂恢复和重复处理防护，在后面的自动化章节展开。</p>\n<h4 id=\"course-agent-building-topic-3-heading-25\">四. 为每次运行设置上限</h4>\n<p>需要检索、调用多个工具或处理大量记录的任务，先设置本次允许处理的数量，以及运行时间、尝试轮次和用量上限。数值按正常试跑的结果确定，给必要波动留余量，不存在适合所有任务的统一数值。</p>\n<p>以 n8n 为例：</p>\n<ol><li>打开工作流右上角菜单 <strong>Settings</strong>，启用 <strong>Timeout Workflow</strong>，在 <strong>Timeout After</strong> 中填写最长执行时间。</li><li>在 <strong>AI Agent</strong> 节点的选项中设置 <strong>Max Iterations</strong>，限制它为当前输入反复处理的轮次。</li><li>查询数据的节点若有数量限制，填写本次最大处理量；剩余内容留给后续运行。</li></ol>\n<p>超时限制和 Agent 轮次限制分别控制整条工作流与 Agent 节点，不能相互替代；n8n Cloud 还受套餐允许的最大超时约束。<a href=\"https://docs.n8n.io/build/manage-workflows/configure-workflow-settings.md#timeout-workflow\" target=\"_blank\" rel=\"noopener noreferrer\">官方工作流超时设置</a>、<a href=\"https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/tools-agent#max-iterations\" target=\"_blank\" rel=\"noopener noreferrer\">Agent 轮次设置</a></p>\n<p>达到上限时，报告已经完成和剩余的工作，不自动提高额度或扩大处理范围。进度按 3.2 的方法分阶段保存，避免等到平台强制超时后才尝试保存。</p>\n<h4 id=\"course-agent-building-topic-3-heading-26\">五. 完成、待处理和失败</h4>\n<p>3.1 已经配置了结果保存位置。这里补充每次运行的状态要求：</p>\n<ul><li><strong>完成：</strong>约定对象已经处理，结果成功保存；有交付动作时还要检查交付结果。</li><li><strong>部分完成：</strong>保留可用成果，列出跳过、失败和未处理的对象。</li><li><strong>待确认：</strong>说明准备执行什么、影响哪些对象，以及需要你决定什么。</li><li><strong>失败或结果待核实：</strong>说明最后成功的步骤、错误信息和需要检查的位置。</li></ul>\n<p>例如，“报告已生成，但发送失败”应分别记录生成和发送的状态，而不是只报“已完成”。</p>\n<p>通知可以按任务需要设置：正常完成按约定汇总，待确认和影响后续工作的失败及时通知；没有变化时，可以只保留运行记录。通知中放任务名称、问题摘要、成果或运行记录链接，以及需要你做的下一步。</p>\n<p>WorkBuddy 的本地定时任务可以在 <strong>设置 → 通用 → 定时任务产物通知</strong> 中开启产物通知。已关联电脑的手机 App 也可以收到完成、待确认或失败通知。<a href=\"https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide#结果通知\" target=\"_blank\" rel=\"noopener noreferrer\">官方通知说明</a></p>\n<p>使用 n8n 时，可以单独配置失败通知：</p>\n<ol><li>新建一个工作流，以 <strong>Error Trigger</strong> 开始，后面连接邮件或消息通知节点，填写接收对象和错误摘要。</li><li>保存后，回到原工作流的 <strong>Settings → Error workflow</strong>，选择刚创建的错误处理流程。</li><li>让已发布的测试流程通过自动触发产生一次受控错误，检查是否收到通知。手动运行流程发生错误，不会触发这个 Error Trigger。<a href=\"https://docs.n8n.io/build/flow-logic/handle-errors-gracefully.md\" target=\"_blank\" rel=\"noopener noreferrer\">官方错误通知教程</a>、<a href=\"https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.errortrigger\" target=\"_blank\" rel=\"noopener noreferrer\">Error Trigger 的测试条件</a></li></ol>"
+    },
+    {
+      "id": "course-agent-building-topic-4",
+      "title": "4. 发布与维护 Agent",
+      "url": "https://ai-knowledge-map.com/software/agents-automation/agent-building/#course-agent-building-topic-4",
+      "html": "<h3 id=\"course-agent-building-topic-4-heading-1\">4.1 发布 Agent</h3>\n<p>发布有三种类型：</p>\n<ul><li><strong>直接使用的助手：</strong>用户打开链接、进入聊天渠道或调用接口，使用你已经配置好的 Agent。</li><li><strong>可以复制的配置：</strong>用户取得指令、资料说明或工作流模板，放进自己的账号，再配置自己的资料和连接。</li><li><strong>可以修改和再发布的源码：</strong>用户取得程序及相应许可，自行修改、部署或继续分发。</li></ul>\n<h4 id=\"course-agent-building-topic-4-heading-2\">一. 产权：先确认哪些内容有权发布</h4>\n<p>这里需要查清两件事：谁有权决定发布，以及用了别人的哪些东西。</p>\n<ol><li><strong>自己或团队制作的内容。</strong>检查代码、指令、文档等的权利归属。合作开发、委托制作或在工作中完成的项目，先查看合同和单位规定，不能仅凭“是我写的”就认定可以个人发布。</li><li><strong>引用的代码、模板和素材。</strong>找到原项目的许可证或授权说明，确认是否允许修改、分发、商用，以及需要保留什么声明。</li><li><strong>知识库中的资料。</strong>购买、下载或有权阅读，不等于有权公开传播。企业内部资料、客户记录和付费内容，应分别确认是否允许用于对外服务，以及允许展示多少内容。</li></ol>\n<h4 id=\"course-agent-building-topic-4-heading-3\">二. 开源许可：明确别人可以怎样使用你的作品</h4>\n<p>如果准备开放源码，让别人修改和分发，就需要选择许可证。没有许可证时，别人不能仅凭仓库公开，就认为自己获得了任意修改、分发的授权。<a href=\"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub 官方许可说明</a></p>\n<p>下面四种许可证，主要区别在于：别人修改你的程序后，是否可以闭源，以及什么情况下必须提供源码。</p>\n<h5 id=\"course-agent-building-topic-4-heading-4\">1. MIT：允许别人修改、商用，也允许把修改版闭源</h5>\n<p>如果你希望代码尽量容易被使用，接受别人基于它制作收费、闭源的产品，可以考虑 MIT。</p>\n<ul><li><strong>别人可以做什么：</strong>复制、修改、合并、分发和销售代码，也可以把它放进自己的闭源软件，不公开新增或修改的源码。</li><li><strong>必须保留什么：</strong>复制或分发代码及其实质部分时，保留原版权声明和完整许可声明。闭源不等于可以抹掉原作者的声明。</li><li><strong>不会要求什么：</strong>不强制别人把改进交回给你，也不要求他们的整个产品继续使用 MIT。</li></ul>\n<p>例如，你用 MIT 发布 Agent 框架，别人改进后做成收费软件，只要履行保留声明等条件，MIT 允许这种做法。若你不能接受别人将修改版闭源，MIT 就不符合这个要求。<a href=\"https://choosealicense.com/licenses/mit/\" target=\"_blank\" rel=\"noopener noreferrer\">MIT 许可证全文与说明</a></p>\n<h5 id=\"course-agent-building-topic-4-heading-5\">2. Apache-2.0：也允许闭源，但明确处理专利授权和修改声明</h5>\n<p>如果你同样接受别人制作闭源产品，但希望许可证明确处理贡献者的相关专利权，可以考虑 Apache-2.0。相比 MIT，它增加了这些具体规定：</p>\n<ul><li><strong>明确的专利授权。</strong>贡献者授予使用其贡献所必需的、许可范围内的专利权。这不代表你取得了贡献者的全部专利，也不保证软件不会侵犯其他人的专利。</li><li><strong>针对该作品的专利诉讼会影响授权。</strong>如果使用者以该作品或其中贡献侵犯专利为由提起许可所规定的诉讼，其依据本许可取得的该作品专利授权会终止。</li><li><strong>分发修改版要说明改过哪些文件。</strong>修改过的文件需要有醒目的修改声明；同时附上许可证，保留适用的版权等声明。原项目有 <code>NOTICE</code> 文件时，还要按条款保留其中适用的署名内容。</li><li><strong>没有一并授予品牌使用权。</strong>取得代码许可，不等于可以把原项目的名称、商标或标志当作自己产品的品牌。</li></ul>\n<p>它允许修改版闭源，不要求把改进交回原作者。它相对 MIT 的主要特点是授权和声明规则更详细。<a href=\"https://www.apache.org/licenses/LICENSE-2.0\" target=\"_blank\" rel=\"noopener noreferrer\">Apache-2.0 官方条款第 3、4、6 节</a></p>\n<h5 id=\"course-agent-building-topic-4-heading-6\">3. GPL-3.0：把程序交给别人时，也要保留他们取得源码和继续修改的权利</h5>\n<p>如果你希望别人分发你的程序或受 GPL 约束的修改版时，仍然让接收者能够查看、修改和再分发源码，可以考虑 GPL-3.0。</p>\n<ul><li><strong>可以收费。</strong>可以销售程序、提供付费安装或维护，但不能通过收费协议剥夺接收者按 GPL 修改和再分发的权利。</li><li><strong>分发程序时，要按条款提供对应源码或获取方式。</strong>例如提供安装包下载时，可以在同一位置提供对应源码下载。只给一个无法对应当前版本的旧仓库链接不够。</li><li><strong>修改版不能直接改成闭源许可。</strong>分发受 GPL 约束的修改版时，整个受约束的作品需要继续按 GPL 授权，不只是公开自己改过的几行。</li></ul>\n<p>这里的“对应源码”包括修改、构建和运行该程序所需的源码及相关脚本；并不自动扩大到同一公司的所有独立软件。判断与其他代码组合后哪些部分受约束，需要看实际组合方式。<a href=\"https://opensource.org/license/gpl-3.0\" target=\"_blank\" rel=\"noopener noreferrer\">GPL-3.0 条款第 1、5、6 节</a></p>\n<p><strong>自己修改、自用，不因此必须发布。</strong>如果程序只在服务器上运行，用户通过网络使用而没有取得程序副本，仅凭这种网络交互，GPL 本身通常不要求把修改版源码提供给这些用户。这也是它与下面 AGPL 的关键区别。<a href=\"https://choosealicense.com/licenses/gpl-3.0/\" target=\"_blank\" rel=\"noopener noreferrer\">GPL-3.0 定义及第 2 节</a></p>\n<h5 id=\"course-agent-building-topic-4-heading-7\">4. AGPL-3.0：修改后只提供在线服务，也要向使用者提供对应源码</h5>\n<p>如果你发布的是 Agent 服务端程序，希望别人修改后部署成网站或在线接口时，也向使用者提供修改版源码，可以考虑 AGPL-3.0。</p>\n<p>它保留了 GPL 类似的分发要求，并增加了针对网络服务的要求：<strong>修改该程序后，如果用户能够通过网络与修改版交互，需要向这些用户醒目地提供免费取得该版本对应源码的方式。</strong>例如，在服务界面提供与线上版本对应的源码下载入口。</p>\n<p>这意味着，别人不能仅以“用户没有下载程序，只是在网页上使用”为由，避开这项源码提供要求。它要求面向与修改版交互的用户提供获取机会，并不指定必须上传 GitHub。它也不因为服务器上运行了一个 AGPL 程序，就自动要求公开所有其他独立系统。<a href=\"https://opensource.org/license/agpl-3.0\" target=\"_blank\" rel=\"noopener noreferrer\">AGPL-3.0 第 13 节及对应源码定义</a></p>\n<p>AGPL 同样允许商业使用和收费服务；它约束的是源码获取与后续使用权，不是禁止别人靠它赚钱。<a href=\"https://choosealicense.com/licenses/agpl-3.0/\" target=\"_blank\" rel=\"noopener noreferrer\">AGPL-3.0 许可说明与全文</a></p>\n<p>这些许可证都允许商业使用。若要求“禁止商用”，可以另行考虑相应的授权方式，但不应把它称为符合开放源代码促进会定义的开源许可。<a href=\"https://opensource.org/osd\" target=\"_blank\" rel=\"noopener noreferrer\">OSI 开源定义</a></p>\n<p>在 GitHub 中添加许可证：</p>\n<ol><li>打开项目仓库，选择 <strong>Add file → Create new file</strong>。</li><li>文件名填写 <code>LICENSE</code>，点击 <strong>Choose a license template</strong>。</li><li>选择已确认适用的许可证，核对年份、权利人等需要填写的内容。</li><li>点击 <strong>Review and submit</strong>，再选择 <strong>Commit changes</strong> 保存。</li></ol>\n<p>在本地项目中，也可以直接创建 <code>LICENSE</code> 文件，放入对应的完整许可文本。不要只写一句“本项目开源”，也不要自行删改许可条款后仍沿用原许可证名称。<a href=\"https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub 官方添加许可证教程</a></p>\n<h4 id=\"course-agent-building-topic-4-heading-8\">三. 对发布内容的介绍</h4>\n<p>发布在线助手时，把使用说明放在介绍页或入口附近，通常放在项目根目录的 <code>README.md</code> 中。</p>\n<p>分享可复制的项目时，额外提供安装、配置和启动步骤。把 API Key、数据库密码等改成占位符，例如在 <code>.env.example</code> 中只保留变量名和填写说明；实际密钥放在部署平台的密钥或服务端环境变量设置中。</p>"
+    }
+  ]
+}

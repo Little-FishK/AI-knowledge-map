@@ -1,0 +1,118 @@
+{
+  "format": "ai-knowledge-map/tutorial-v1",
+  "canonical": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/",
+  "language": "en",
+  "title": "I. What is an agent, and when should you use one?",
+  "summary": "Understand how agents relate to models and workflows, how action and feedback loops work, and what tools, knowledge and memory do. Learn when an agent is appropriate and how to set permissions.",
+  "questions": [
+    {
+      "question": "How do AI agents relate to models and workflows?",
+      "answer": "A model provides understanding and generation; a workflow specifies steps and information flow; an agent can choose its next action from the goal and current feedback.",
+      "sections": [
+        {
+          "id": "course-agent-topic-1",
+          "title": "1. Agents, models and workflows",
+          "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-1"
+        }
+      ]
+    },
+    {
+      "question": "Why do agents need tools, knowledge, memory and feedback?",
+      "answer": "Tools perform actions, knowledge supplies task information, and memory retains information needed later. Action results provide feedback for the next decision.",
+      "sections": [
+        {
+          "id": "course-agent-topic-2",
+          "title": "2. The action and feedback loop",
+          "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-2"
+        },
+        {
+          "id": "course-agent-topic-3",
+          "title": "3. Tools, knowledge and memory",
+          "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+        }
+      ]
+    },
+    {
+      "question": "When should I use an agent, and how much autonomy and access should it have?",
+      "answer": "Consider an agent when work involves repeated actions and decisions. Set autonomy and access according to consequences, how results can be checked, and where a person must decide.",
+      "sections": [
+        {
+          "id": "course-agent-topic-4",
+          "title": "4. When to use an agent, autonomy and permissions",
+          "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-4"
+        }
+      ]
+    }
+  ],
+  "scope": "Summary and short answers are derived from the canonical chapter. Original source labels, setup details, version context and testing limitations are retained in the complete sections below. This is a public reading format, not an independent review or test result.",
+  "sources": [
+    {
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "title": "Workflows and agents",
+      "section": "course-agent-topic-1",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-1"
+    },
+    {
+      "url": "https://github.com/microsoft/ai-agents-for-beginners/blob/main/STUDY_GUIDE.md",
+      "title": "What tools do",
+      "section": "course-agent-topic-3",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+    },
+    {
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro",
+      "title": "MCP introduction",
+      "section": "course-agent-topic-3",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+      "title": "Authorization",
+      "section": "course-agent-topic-3",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+    },
+    {
+      "url": "https://agentskills.io/home",
+      "title": "Agent Skills",
+      "section": "course-agent-topic-3",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/retrieval",
+      "title": "Retrieval and its results",
+      "section": "course-agent-topic-3",
+      "context": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3"
+    }
+  ],
+  "sections": [
+    {
+      "id": "course-agent-introduction",
+      "title": "Introduction",
+      "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-introduction",
+      "html": "<p>In “Conversation and basic tasks,” we learned how to describe a task, provide materials, set boundaries and revise the result. With a clear task and enough information, AI can organize documents, edit an article or analyze a problem. But if a task involves research, judgment and operating software, do we still have to tell it what to do at every step?</p>\n<p>This is where the term agent comes in. What does it add? Does a longer prompt, or asking AI to act as a customer service representative, already create an agent? If it can work on its own, when should we take part? This chapter focuses on software agents built around large language models.</p>"
+    },
+    {
+      "id": "course-agent-topic-1",
+      "title": "1. Agents, models and workflows",
+      "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-1",
+      "html": "<p>A shop receives many inquiries every day. You want a system to read each question, look up the order, apply the rules and draft a reply. You can arrange the process in advance: retrieve the order, ask the customer about missing usage information, check eligibility once the necessary facts are available, then draft a reply.</p>\n<p>This is a workflow. <strong>A workflow defines how steps connect, how information passes between them and which path to take in a given situation.</strong> It can include branches, loops and AI judgments. For example, AI can identify the inquiry type before sending it down a predefined returns, delivery or product information path.</p>\n<p>Given the same goal, an agent can choose its next action from the available information: look up the order first or ask the customer; continue with the search result or obtain more evidence. A workflow can arrange these operations too. The difference is who chooses the path: a workflow follows predefined paths, while an agent lets the model choose some subsequent actions based on the current situation.</p>\n<p><strong>In this course, an agent is a system that works toward a goal by choosing subsequent actions from current information and action feedback.</strong> Products use the term differently, so look at how a system selects and executes its next step. The number of steps, prompt length and interface alone do not tell you whether it is an agent. <a href=\"https://www.anthropic.com/engineering/building-effective-agents\" target=\"_blank\" rel=\"noopener noreferrer\">Workflows and agents</a></p>\n<p>What does the model do? It understands tasks, generates content and may choose tools and interpret their results. Connected tools carry out operations such as querying orders or modifying files. Writing “You are an experienced customer service representative” describes a preferred working style; it does not create an agent capable of retrieving and processing orders.</p>"
+    },
+    {
+      "id": "course-agent-topic-2",
+      "title": "2. The action and feedback loop",
+      "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-2",
+      "html": "<p>Consider a returns inquiry. To draft a reply, the agent must find the relevant order, verify when the customer received it and apply the rules. To register a return request, a draft is insufficient: it must submit the request and obtain the system&#39;s registration record.</p>\n<p>The customer has not provided an order number, but the system can retrieve their purchase history. The agent queries recent orders. The tool may return one order, several candidates or a permission error.</p>\n<p>One matching order lets it check when the customer received it. Several candidates require asking the customer which one they mean. A permission error requires authorization or order information from the user. <strong>The result of an action becomes input to the next decision.</strong> Choosing an action, executing it, receiving feedback and choosing again is the action and feedback loop.</p>\n<p>If the task pauses, the system also needs to save progress: which order it found, what information is missing and whether the request was registered. It can then resume without duplicate registrations or missed work.</p>\n<p>The loop needs stopping conditions. A successful registration can end the task; a question about the order can pause it; missing permissions and unavailable information should produce a clear account of what is missing and where work stopped. Repeating the same unauthorized query will not retrieve the order. Agree in advance when to stop and how to report completed and unfinished work.</p>"
+    },
+    {
+      "id": "course-agent-topic-3",
+      "title": "3. Tools, knowledge and memory",
+      "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-3",
+      "html": "<p>Start with <strong>tools</strong>. They let an agent search, calculate, read files, operate a browser or save drafts. <a href=\"https://github.com/microsoft/ai-agents-for-beginners/blob/main/STUDY_GUIDE.md\" target=\"_blank\" rel=\"noopener noreferrer\">What tools do</a></p>\n<p>Why does AI sometimes return revised text when you ask it to edit a file? Check whether it can write files. Without the tool, account authorization or a writable environment, “edit it directly” cannot make the change happen.</p>\n<p>When connecting tools, you will encounter APIs, connectors and MCP. An <strong>API</strong> is an interface software exposes to programs; an email API might allow reading and sending messages. A <strong>connector</strong> integrates an application with the agent&#39;s system. <strong>Model Context Protocol (MCP)</strong> provides standard communication rules for AI applications connecting to external tools and data. <a href=\"https://modelcontextprotocol.io/docs/getting-started/intro\" target=\"_blank\" rel=\"noopener noreferrer\">MCP introduction</a></p>\n<p>First check whether your software supports the target application. With an existing connector or MCP integration, follow its instructions to sign in, authorize access, enter an API key or configure a server address. Otherwise, additional setup or development may be needed. An API key is an access credential; whether you need one depends on the service&#39;s authorization method. <a href=\"https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization\" target=\"_blank\" rel=\"noopener noreferrer\">Authorization</a></p>\n<p>Next is <strong>knowledge</strong>. Being able to write customer replies does not mean the agent knows this shop&#39;s current policies. You can provide rules, orders, working methods and experience in several ways. They address different needs and can be combined.</p>\n<p><strong>Fine-tuning:</strong> Consider this when you repeatedly perform the same type of work, know what a good result looks like and still cannot achieve it consistently with ordinary prompts. Training teaches the model patterns from examples. It requires reliable examples, evaluation criteria and work on data preparation, training and testing. Beginners usually do not need to start here. If the method is unsettled, first use real tasks to clarify the requirements.</p>\n<p><strong>Skills:</strong> Use these when you repeat a type of work, have a clear method and want to avoid explaining the same steps and rules each time. A skill packages working instructions and reference materials, optionally with helper programs, for an agent to load as needed. The software must support skills. <a href=\"https://agentskills.io/home\" target=\"_blank\" rel=\"noopener noreferrer\">Agent Skills</a></p>\n<p><strong>Retrieval-Augmented Generation (RAG):</strong> Use this when materials are extensive, frequently searched or often updated. It retrieves content relevant to the current question before the model generates an answer. When a product manual is updated, for example, update the library so the agent can retrieve the relevant sections. Prepare reliable sources, connect retrieval and check whether it finds the evidence needed. <a href=\"https://developers.openai.com/api/docs/guides/retrieval\" target=\"_blank\" rel=\"noopener noreferrer\">Retrieval and its results</a></p>\n<p><strong>Project documents:</strong> For ongoing work, record the goal, completed work, next tasks and confirmed decisions so the agent knows where to resume. Have it read the current version and update the documents as work progresses.</p>\n<p><strong>Provide materials directly:</strong> Paste text or upload files when you can supply what the current task needs. This is often the simplest starting point. Explain what each source is for and confirm the system can read the required content. File formats, parsing capabilities and processing limits affect what it can actually access.</p>\n<p><strong>Long-term memory:</strong> Use this to retain confirmed preferences, background information or decisions across conversations. The system must support saving and retrieving records, and let you correct or delete mistaken and outdated information.</p>"
+    },
+    {
+      "id": "course-agent-topic-4",
+      "title": "4. When to use an agent, autonomy and permissions",
+      "url": "https://ai-knowledge-map.com/en/software/agents-automation/agent-foundations/#course-agent-topic-4",
+      "html": "<p>When is an agent worthwhile? Start with <strong>which repeated actions and decisions you want it to take over</strong>. If you keep copying materials, choosing the next step and transferring answers to other software, an agent with suitable tools may take over part of that work. Judge its value by what it saves you, rather than how many steps it runs.</p>\n<p>These three tasks suggest different starting points:</p>\n<table class=\"d-table\"><thead><tr><th>Task</th><th>Where to start</th><th></th></tr></thead><tbody><tr><td>Translate an email</td><td>Call a translation tool.</td><td></td></tr><tr><td>Retrieve and translate new messages from several mailboxes every hour</td><td>A simple workflow or program is sufficient.</td><td></td></tr><tr><td>Summarize file contents and categorize emails</td><td>Let an agent classify them using the retrieved content and classification rules.</td><td></td></tr></tbody></table>\n<p>You can combine these approaches. A weekly report may have fixed calculations, with an agent investigating unusual figures. Arranging known steps first and assigning judgment where it is needed often works better.</p>\n<p>Using an agent does not automatically make a project more advanced or reliable. Multiple agents do not necessarily outperform one. Models introduce uncertainty into processes that require exact execution, while multiple agents can spend extra tokens passing information around. Choose the system and agent involvement to suit the task.</p>\n<p>To set autonomy, specify what you need to decide yourself. A research agent might choose search terms, add sources and reorder its search. A presentation agent might adjust layouts while preserving conclusions you approved. A file-organizing agent might propose categories while you decide what to delete.</p>\n<p>“Ask me if there is a problem” might make it stop over a title color. “Decide everything yourself” might let it delete files you intended to keep. Defining autonomy is a central part of agent setup.</p>\n<p><strong>Permissions are what the software actually allows it to do.</strong> “Only read files” in a prompt does not remove a tool&#39;s delete capability. Check the operations granted when connecting tools. With broad permissions, especially when an agent can judge its own completion criteria, reward hacking can lead it to distort those criteria. Its own judgment that a task is complete can also be wrong.</p>"
+    }
+  ]
+}
