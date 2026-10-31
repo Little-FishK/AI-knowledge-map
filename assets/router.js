@@ -131,7 +131,7 @@
     }
     if (relative === "software") {
       const tutorial = query.get("tutorial");
-      if (tutorial) return { name: "tutorial", id: tutorial };
+      if (tutorial) return { name: "tutorial", id: tutorial, ...(query.get("lesson") ? {lesson:query.get("lesson")} : {}) };
       const item = query.get("item");
       return item ? { name: "software-item", id: item } : { name: "software" };
     }
@@ -184,6 +184,7 @@
         if (!id) return null;
         pathname += "software/";
         params.set("tutorial", id);
+        if (value.lesson) params.set("lesson", String(value.lesson));
         break;
       case "library":
         pathname += "library/";

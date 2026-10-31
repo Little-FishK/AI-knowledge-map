@@ -361,7 +361,7 @@
         goToRoute({ name: "tutorial", id: route.id }, { replace: true });
         return;
       }
-      softwareView.openTutorial(route.id);
+      softwareView.openTutorial(route.id, route.lesson);
       setDocumentTitle(t("tutorial.language") === "en" ? module.titleEn : module.title);
       return;
     }

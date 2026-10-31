@@ -1346,3 +1346,22 @@ html[lang="en"] #controls .sidebar-heading-text {
   .prompt-workflow .pw-flow { max-width: 380px; margin: 0 auto; }
   .prompt-workflow .pw-heading h2 { font-size: 22px; }
 }
+
+/* AI coding reading layout */
+.course-layout.course-agent-layout { grid-template-columns: 220px minmax(0, 820px); justify-content: center; }
+.course-agent-layout .course-sidebar { grid-row: 1; }
+.course-agent-layout .course-reading { margin-bottom: 40px; overflow-wrap: anywhere; }
+.course-agent-layout .d-table { display: block; max-width: 100%; overflow-x: auto; margin-bottom: 20px; }
+.course-agent-layout .course-sidebar .course-nav-child { display: block; }
+.course-agent-section-body h3 { margin: 32px 0 16px; font-size: 20px; }
+.course-agent-section-body h4 { margin: 28px 0 12px; font-size: 17px; }
+.course-agent-section-body h5, .course-agent-section-body h6 { margin: 24px 0 10px; font-size: 15px; line-height: 1.7; }
+.course-agent-section-body :is(h3, h4, h5, h6)[id] { scroll-margin-top: 24px; }
+.course-agent-section-body :is(ul, ol) { margin: 0 0 20px; padding-left: 1.6em; line-height: 1.9; }
+.course-agent-section-body li + li { margin-top: 6px; }
+.course-agent-section-body pre { max-width: 100%; margin: 16px 0 24px; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--bg-panel); white-space: pre-wrap; overflow-wrap: anywhere; }
+#dd-article .course-agent-section-body pre code { padding: 0; border: 0; background: transparent; font: 13px/1.8 Consolas, monospace; white-space: inherit; }
+.course-agent-section-body blockquote { margin: 16px 0 24px; padding: 12px 18px; border-left: 2px solid var(--accent); background: var(--bg-panel); }
+.course-agent-section-body blockquote p:last-child { margin-bottom: 0; }
+
+@media(max-width:900px){.course-layout.course-agent-layout{grid-template-columns:minmax(0,1fr)}.course-agent-layout .course-sidebar{position:static;max-height:none}.course-agent-layout .course-main{min-width:0}}

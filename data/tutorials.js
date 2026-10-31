@@ -1,5 +1,3 @@
-/* Task-oriented curriculum. The foundation includes an interactive prompting workflow.
- * Empty legacy collections preserve read-only tooling compatibility; brand ingestion is retired. */
 window.TUTORIALS = {
   "schemaVersion": 2,
   "meta": {
@@ -19,12 +17,14 @@ window.TUTORIALS = {
       "topics": [],
       "status": "available",
       "subcategories": [],
-      "lessons": [{
-        "id": "prompt-workflow",
-        "kind": "interactive-workflow",
-        "title": "从一句需求到可用结果",
-        "titleEn": "From a request to a usable result"
-      }]
+      "lessons": [
+        {
+          "id": "prompt-workflow",
+          "kind": "interactive-workflow",
+          "title": "从一句需求到可用结果",
+          "titleEn": "From a request to a usable result"
+        }
+      ]
     },
     {
       "id": "agents-automation",
@@ -47,16 +47,65 @@ window.TUTORIALS = {
       "id": "ai-coding",
       "title": "AI 编程",
       "titleEn": "AI coding",
-      "summary": "用 AI 辅助理解、编写、调试与验证代码，完成软件开发任务。",
-      "summaryEn": "Use AI to understand, write, debug and verify code for software projects.",
+      "summary": "从传统编程的五个核心环节出发，学习编程思路与重要技术，再了解 AI 如何逐步提供帮助。",
+      "summaryEn": "Learn programming methods and essential techniques through five core stages, then explore how AI can assist each stage.",
       "color": "#d2ac72",
       "prerequisites": [
         "conversation-basics"
       ],
       "topics": [],
-      "status": "planned",
+      "status": "available",
       "subcategories": [],
-      "lessons": []
+      "lessons": [
+        {
+          "id": "coding-foundations",
+          "kind": "reading",
+          "title": "传统编程",
+          "titleEn": "Traditional programming",
+          "language": "zh-Hans",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "coding-assistance",
+          "kind": "reading",
+          "title": "AI 如何助力传统编程",
+          "titleEn": "How AI assists programming",
+          "language": "zh-Hans",
+          "languages": [
+            "zh-Hans"
+          ]
+        }
+      ],
+      "chapters": [
+        {
+          "id": "coding-foundations",
+          "title": "传统编程",
+          "titleEn": "Traditional programming",
+          "summary": "认识编程的五个核心环节，以及运行环境、程序结构、Git、测试与调试等重要技术。",
+          "summaryEn": "Learn the five core stages of programming, from environments and code structure to Git, testing and debugging.",
+          "number": 1,
+          "status": "available",
+          "source": "docs/AI_CODING.md",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "coding-assistance",
+          "title": "AI 如何助力传统编程",
+          "titleEn": "How AI assists programming",
+          "summary": "沿着五个核心环节，了解可以直接使用的 Agent、Skill 和工具。",
+          "summaryEn": "Explore agents, skills and tools that help with each of the five programming stages.",
+          "number": 2,
+          "status": "available",
+          "source": "docs/AI_CODING.md",
+          "languages": [
+            "zh-Hans"
+          ]
+        }
+      ]
     },
     {
       "id": "image-creation",
