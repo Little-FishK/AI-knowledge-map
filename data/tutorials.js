@@ -132,16 +132,88 @@ window.TUTORIALS = {
       "id": "video-creation",
       "title": "视频创作",
       "titleEn": "Video creation",
-      "summary": "围绕视频作品，学习从创意构思到画面生成与制作。",
-      "summaryEn": "Explore video ideas, generated footage and production workflows.",
+      "summary": "学习即梦、通义万相与海螺的视频生成，通过 Agent 操作编辑软件，并复用原作者工作流。",
+      "summaryEn": "Generate with Jimeng, Wan and Hailuo, connect agents to video editors and follow original creators' workflows.",
       "color": "#d293a9",
       "prerequisites": [
         "conversation-basics"
       ],
       "topics": [],
-      "status": "planned",
+      "status": "available",
       "subcategories": [],
-      "lessons": []
+      "lessons": [
+        {
+          "id": "video-generation",
+          "kind": "reading",
+          "title": "专业视频生成平台、基本介绍与教程",
+          "titleEn": "Professional video generation platforms and tutorials",
+          "language": "zh-Hans",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "video-editing-agent",
+          "kind": "reading",
+          "title": "使用 Agent 操作专业视频编辑平台",
+          "titleEn": "Use an agent to operate professional video editors",
+          "language": "zh-Hans",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "video-workflow-reuse",
+          "kind": "reading",
+          "title": "新人可以复用的工作流",
+          "titleEn": "Existing workflows for beginners",
+          "language": "zh-Hans",
+          "languages": [
+            "zh-Hans"
+          ]
+        }
+      ],
+      "chapters": [
+        {
+          "id": "video-generation",
+          "title": "专业视频生成平台、基本介绍与教程",
+          "titleEn": "Professional video generation platforms and tutorials",
+          "summary": "了解即梦、通义万相与海螺，阅读官方教程并掌握视频生成的控制点。",
+          "summaryEn": "Explore Jimeng, Wan and Hailuo, their official tutorials and generation controls.",
+          "number": 1,
+          "status": "available",
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "video-editing-agent",
+          "title": "使用 Agent 操作专业视频编辑平台",
+          "titleEn": "Use an agent to operate professional video editors",
+          "summary": "选择达芬奇或 Premiere，连接 Agent，通过自然语言处理视频工程。",
+          "summaryEn": "Connect an agent to DaVinci Resolve or Premiere for natural-language editing.",
+          "number": 2,
+          "status": "available",
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "languages": [
+            "zh-Hans"
+          ]
+        },
+        {
+          "id": "video-workflow-reuse",
+          "title": "新人可以复用的工作流",
+          "titleEn": "Existing workflows for beginners",
+          "summary": "跟随原作者的即梦、Wan 和 H3 案例，查看教程、素材获取条件与实际使用版本。",
+          "summaryEn": "Follow original creators' Jimeng, Wan and H3 workflows with source tutorials and version details.",
+          "number": 3,
+          "status": "available",
+          "source": "docs/VIDEO_CREATION_CURRICULUM.md",
+          "languages": [
+            "zh-Hans"
+          ]
+        }
+      ]
     },
     {
       "id": "music-creation",
