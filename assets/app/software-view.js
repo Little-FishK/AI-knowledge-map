@@ -9,11 +9,11 @@
     let disposeWorkflow = null;
     let disposeExamples = null;
     let disposeDiagrams = null;
-    const bundle = ["data/tutorials.js?v=e8299f8c45e4b1d6","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","assets/app/prompt-faq.js?v=3afe562049c24609","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f","data/tutorials-coding.js?v=4b17c8cfcca9df58","data/tutorials-video.js?v=4adbab949a00c304"];
+    const bundle = ["data/tutorials.js?v=e3a27661d44340d1","data/tutorials-images.js?v=0f084913aac007fb","data/tutorials-video.js?v=4adbab949a00c304","data/tutorials-coding.js?v=4b17c8cfcca9df58","data/tutorials-agents.js?v=b91eccd88469dbb7","data/tutorials-agent-building.js?v=e0683f23f38acef8","data/tutorials-agent-discovery.js?v=46a2d5d48bc75085","data/tutorials-automation.js?v=f6965d4d46a38c8e","data/tutorials-agent-evaluation.js?v=781aacec04ba8b1f","assets/app/tutorial-diagrams.js?v=9064973bf5ba9630","assets/app/prompt-foundations.js?v=4a23ebfad8791218","assets/app/prompt-workflow.js?v=0d655282890c07ff","data/tutorials-faq.js?v=b0f74c8595f04822","assets/app/prompt-faq.js?v=3afe562049c24609","data/tutorials-prompts.js?v=3a06c26de557b9f6","assets/app/prompt-examples.js?v=666b3d4c5288f43f"];
     const label = (module, field) => t("tutorial.language") === "en" ? module[field + "En"] || module[field] : module[field];
     const findTutorial = id => tutorials?.modules.find(module => module.id === id);
     const readingTutorial = (id, lessonId) => {
-      const original = id === "video-creation" ? global.VIDEO_TUTORIALS?.[lessonId || "video-generation"] || null : id === "ai-coding" ? global.CODING_TUTORIALS?.[lessonId || "coding-foundations"] || null : id !== "agents-automation" ? null : ({
+      const original = id === "video-creation" ? global.VIDEO_TUTORIALS?.[lessonId || "video-generation"] || null : id === "image-creation" ? global.IMAGE_TUTORIALS?.[lessonId || "image-generation"] || null : id === "ai-coding" ? global.CODING_TUTORIALS?.[lessonId || "coding-foundations"] || null : id !== "agents-automation" ? null : ({
       "agent-foundations": global.AGENT_TUTORIAL,
       "agent-building": global.AGENT_BUILDING_TUTORIAL,
       "agent-discovery": global.AGENT_DISCOVERY_TUTORIAL,
@@ -145,7 +145,7 @@
       if (hasAgentLesson) {
         const lesson = findLesson(id, lessonId);
         if (!lesson) {
-          agentContent = `<div class="course-agent-overview">${hero}${id === "video-creation" && !isEnglish && agentTutorial.introduction ? `<div class="course-reading">${agentTutorial.introduction.html}</div>` : ""}${agentDirectory(module)}</div>`;
+          agentContent = `<div class="course-agent-overview">${hero}${["image-creation", "video-creation"].includes(id) && !isEnglish && agentTutorial.introduction ? `<div class="course-reading">${agentTutorial.introduction.html}</div>` : ""}${agentDirectory(module)}</div>`;
         } else if (isEnglish && agentTutorial.language !== "en") {
           const chineseUrl = new URL(global.location.href);
           chineseUrl.searchParams.set("lang", "zh-Hans");

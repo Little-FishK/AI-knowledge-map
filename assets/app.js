@@ -352,6 +352,11 @@
         setDocumentTitle(t("pageTitle.software"));
         return;
       }
+      const legacyTutorialRoute = route.name === "tutorial" ? softwareView.resolveLegacyRoute(route.id) : null;
+      if (legacyTutorialRoute) {
+        goToRoute(legacyTutorialRoute, { replace: true });
+        return;
+      }
       const module = softwareView.findTutorial(route.id);
       if (!module) {
         goToRoute({ name: "software" }, { replace: true });
@@ -361,12 +366,13 @@
         goToRoute({ name: "tutorial", id: route.id }, { replace: true });
         return;
       }
-      if (route.id === "video-creation" && route.lesson && !softwareView.findLesson(route.id, route.lesson)) {
+      const lesson = route.lesson ? softwareView.findLesson(route.id, route.lesson) : null;
+      if (route.lesson && !lesson) {
         goToRoute({ name: "tutorial", id: route.id }, { replace: true });
         return;
       }
       softwareView.openTutorial(route.id, route.lesson);
-      setDocumentTitle(t("tutorial.language") === "en" ? module.titleEn : module.title);
+      setDocumentTitle(lesson?.title || (t("tutorial.language") === "en" ? module.titleEn : module.title));
       return;
     }
 

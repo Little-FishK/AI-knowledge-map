@@ -1201,6 +1201,19 @@ html[lang="en"] #controls .sidebar-heading-text {
 .course-summary { display: block; font-size: 13px; color: var(--fg-dim); line-height: 1.8; }
 .course-status { color: var(--fg-faint); font-size: 11px; margin-top: 20px; }
 .course-arrow { color: var(--module-color); }
+.course-direction-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+.course-direction { appearance: none; padding: 10px 16px; border: 1px solid var(--line); border-radius: 7px; font: inherit; font-size: 13px; color: var(--fg-dim); background: var(--bg-panel); cursor: pointer; }
+.course-direction:hover, .course-direction[aria-current="page"] { color: var(--fg); border-color: var(--module-color); background: var(--bg-raise); }
+.course-direction:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.course-category-heading { margin: 0 0 24px; font-size: 23px; }
+.course-chapter-card { min-height: 230px; }
+.course-chapter-card .course-card-copy { align-self: stretch; }
+.course-chapter-card .course-status { margin-top: auto; padding-top: 22px; }
+.course-chapter-planned:disabled { cursor: default; opacity: 1; }
+.course-chapter-planned:disabled:hover { border-color: var(--line); border-top-color: var(--module-color); background: linear-gradient(145deg, var(--bg-raise), var(--bg-panel)); }
+.course-return { margin: 0 0 24px 10px; }
+#dd-article:has(.course-agent-overview) { max-width: 1280px; }
+@media (max-width: 600px) { .course-direction { padding: 9px 12px; font-size: 12px; } .course-chapter-card { min-height: 200px; } }
 .course-foundation { align-items: center; border-top-width: 1px; border-left: 3px solid var(--module-color); padding: 24px 28px; }
 .course-foundation .course-title { font-size: 25px; }
 .course-foundation .course-status { margin-top: 12px; }
@@ -1217,6 +1230,23 @@ html[lang="en"] #controls .sidebar-heading-text {
 @media (max-width: 600px) { .course-grid, .course-next-links { grid-template-columns: minmax(0, 1fr); } .course-card { padding: 20px; } .course-foundation .course-title { font-size: 22px; } .course-empty { padding: 24px; } }
 
 /* Prompt workflow: local lesson styles, independent of the conversation host. */
+/* Workflow diagrams keep readable node sizes; overflow stays inside each figure. */
+.course-diagram { min-width: 0; max-width: 100%; margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: #111b28; color: #edf3fb; }
+.course-diagram > figcaption { font-size: 14px; font-weight: 600; line-height: 1.7; margin-bottom: 12px; }
+.course-diagram-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.course-diagram-controls button { appearance: none; border: 1px solid #607b98; border-radius: 5px; background: #202f41; color: #edf3fb; font: inherit; font-size: 12px; padding: 7px 10px; cursor: pointer; min-height: 36px; }
+.course-diagram-controls button:hover { background: #304761; }
+.course-diagram-controls button:focus-visible, .course-diagram-viewport:focus-visible, .course-diagram-source summary:focus-visible { outline: 2px solid #b3ddff; outline-offset: 3px; }
+.course-diagram-controls button:disabled { opacity: .45; cursor: default; }
+.course-diagram-scale { font-size: 12px; color: #becfe1; min-width: 4ch; }
+.course-reading .course-diagram-hint { font-size: 12px; line-height: 1.6; color: #becfe1; margin: 10px 0; }
+.course-diagram-viewport { max-width: 100%; max-height: min(80dvh, 900px); overflow: auto; padding: 12px; border: 1px solid #35475d; border-radius: 6px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.course-diagram-canvas { margin: 0 auto; }
+.course-diagram-canvas > svg { display: block; }
+.course-diagram-status { padding: 24px 0; font-size: 13px; color: #becfe1; }
+.course-diagram-source { margin-top: 12px; font-size: 12px; }
+.course-diagram-source summary { cursor: pointer; color: #becfe1; padding: 4px 0; }
+@media (max-width: 600px) { .course-diagram { padding: 12px; } .course-diagram-controls { gap: 6px; } .course-diagram-controls button { min-height: 40px; } }
 /* Tutorial reading layout; scoped so understanding pages retain their typography. */
 #dd-article:has(.course-layout) { max-width: 1800px; padding: 32px 28px 100px; }
 .course-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(320px, 390px); column-gap: 36px; row-gap: 40px; align-items: start; }
@@ -1228,6 +1258,34 @@ html[lang="en"] #controls .sidebar-heading-text {
 .course-nav-link:hover, .course-nav-link:focus-visible { background: var(--bg-raise); color: var(--accent); }
 .course-nav-link:focus-visible, .course-faq-item summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .course-main { grid-column: 2; grid-row: 1; }
+.course-layout.course-agent-layout { grid-template-columns: 220px minmax(0, 820px); justify-content: center; }
+.course-agent-layout .course-sidebar { grid-row: 1; }
+.course-agent-layout .course-reading { margin-bottom: 40px; overflow-wrap: anywhere; }
+.course-agent-layout .d-table { display: block; max-width: 100%; overflow-x: auto; margin-bottom: 20px; }
+.course-agent-layout .course-sidebar .course-nav-child { display: block; }
+.course-agent-section-body h3 { margin: 32px 0 16px; font-size: 20px; }
+.course-agent-section-body h4 { margin: 28px 0 12px; font-size: 17px; }
+.course-agent-section-body h5, .course-agent-section-body h6 { margin: 24px 0 10px; font-size: 15px; line-height: 1.7; }
+.course-agent-section-body :is(h3, h4, h5, h6)[id] { scroll-margin-top: 24px; }
+.course-agent-section-body :is(ul, ol) { margin: 0 0 20px; padding-left: 1.6em; line-height: 1.9; }
+.course-agent-section-body li + li { margin-top: 6px; }
+.course-agent-section-body pre { max-width: 100%; margin: 16px 0 24px; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--bg-panel); white-space: pre-wrap; overflow-wrap: anywhere; }
+#dd-article .course-agent-section-body pre code { padding: 0; border: 0; background: transparent; font: 13px/1.8 Consolas, monospace; white-space: inherit; }
+.course-agent-section-body blockquote { margin: 16px 0 24px; padding: 12px 18px; border-left: 2px solid var(--accent); background: var(--bg-panel); }
+.course-agent-section-body blockquote p:last-child { margin-bottom: 0; }
+@media (min-width: 601px) {
+  html[lang="en"] #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table :is(th, td):first-child { min-width: 140px; }
+  html[lang="en"] #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table :is(th, td):nth-child(2) { min-width: 210px; }
+}
+@media (max-width: 600px) {
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table { display: block; width: 100%; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table thead { display: none; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table tbody { display: grid; gap: 12px; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table tr { display: block; border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table td { display: block; border: 0; padding: 0; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table td:first-child { font-weight: 600; color: var(--fg); font-size: 14px; }
+  #course-agent-discovery > .course-agent-section:nth-of-type(n+2) .d-table td + td { margin-top: 7px; }
+}
 .course-layout .course-faq { grid-column: 2; grid-row: 2; margin: 0; }
 .course-layout .course-next { grid-column: 2; grid-row: 3; margin: 0; border-top: 1px solid var(--line); padding-top: 28px; }
 .course-workflow-rail { grid-column: 3; grid-row: 1 / 4; position: sticky; top: 24px; max-height: calc(100dvh - 98px); overflow-y: auto; scrollbar-width: thin; scrollbar-gutter: stable; border-left: 1px solid var(--line); padding: 0 4px 0 24px; }
@@ -1347,21 +1405,16 @@ html[lang="en"] #controls .sidebar-heading-text {
   .prompt-workflow .pw-heading h2 { font-size: 22px; }
 }
 
-/* AI coding reading layout */
-.course-layout.course-agent-layout { grid-template-columns: 220px minmax(0, 820px); justify-content: center; }
-.course-agent-layout .course-sidebar { grid-row: 1; }
-.course-agent-layout .course-reading { margin-bottom: 40px; overflow-wrap: anywhere; }
-.course-agent-layout .d-table { display: block; max-width: 100%; overflow-x: auto; margin-bottom: 20px; }
-.course-agent-layout .course-sidebar .course-nav-child { display: block; }
-.course-agent-section-body h3 { margin: 32px 0 16px; font-size: 20px; }
-.course-agent-section-body h4 { margin: 28px 0 12px; font-size: 17px; }
-.course-agent-section-body h5, .course-agent-section-body h6 { margin: 24px 0 10px; font-size: 15px; line-height: 1.7; }
-.course-agent-section-body :is(h3, h4, h5, h6)[id] { scroll-margin-top: 24px; }
-.course-agent-section-body :is(ul, ol) { margin: 0 0 20px; padding-left: 1.6em; line-height: 1.9; }
-.course-agent-section-body li + li { margin-top: 6px; }
-.course-agent-section-body pre { max-width: 100%; margin: 16px 0 24px; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--bg-panel); white-space: pre-wrap; overflow-wrap: anywhere; }
-#dd-article .course-agent-section-body pre code { padding: 0; border: 0; background: transparent; font: 13px/1.8 Consolas, monospace; white-space: inherit; }
-.course-agent-section-body blockquote { margin: 16px 0 24px; padding: 12px 18px; border-left: 2px solid var(--accent); background: var(--bg-panel); }
-.course-agent-section-body blockquote p:last-child { margin-bottom: 0; }
+/* Keep the fifth chapter's long step list compact on phones. */
+@media (max-width: 600px) {
+  .course-agent-layout:has(#course-agent-evaluation) .course-sidebar { display: block; max-height: 240px; overflow-y: auto; }
+}
 
-@media(max-width:900px){.course-layout.course-agent-layout{grid-template-columns:minmax(0,1fr)}.course-agent-layout .course-sidebar{position:static;max-height:none}.course-agent-layout .course-main{min-width:0}}
+@media (max-width: 600px) {
+  #course-agent-evaluation-topic-1 .d-table thead { display: none; }
+  #course-agent-evaluation-topic-1 .d-table tbody { display: grid; gap: 12px; }
+  #course-agent-evaluation-topic-1 .d-table tr { display: block; border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
+  #course-agent-evaluation-topic-1 .d-table td { display: block; border: 0; padding: 0; }
+  #course-agent-evaluation-topic-1 .d-table td:first-child { font-weight: 600; font-size: 14px; }
+  #course-agent-evaluation-topic-1 .d-table td + td { margin-top: 7px; }
+}

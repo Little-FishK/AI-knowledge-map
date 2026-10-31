@@ -131,7 +131,10 @@
     }
     if (relative === "software") {
       const tutorial = query.get("tutorial");
-      if (tutorial) return { name: "tutorial", id: tutorial, ...(query.get("lesson") ? {lesson:query.get("lesson")} : {}) };
+      if (tutorial) {
+        const lesson = query.get("lesson");
+        return lesson ? { name: "tutorial", id: tutorial, lesson } : { name: "tutorial", id: tutorial };
+      }
       const item = query.get("item");
       return item ? { name: "software-item", id: item } : { name: "software" };
     }
