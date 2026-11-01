@@ -310,8 +310,8 @@
       ? t("app.title.software")
       : isLibrary ? t("app.title.library") : t("app.title.graph");
     const search = document.getElementById("search");
-    search.placeholder = isGraph ? t("search.graph") : isSW ? t("search.software") : t("search.library");
-    search.disabled = !isGraph;
+    search.placeholder = isGraph ? t("search.graph") : language.getLocale()==='en' ? 'Search all pages and tutorials…' : '搜索全站页面与教程…';
+    search.disabled = false;
   }
 
   async function applyRoute(route = ROUTER.parseLocation()) {

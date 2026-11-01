@@ -17,6 +17,7 @@
     let session = null;
     let lastError = null;
     let flushPromise = null;
+    let flushGeneration = -1;
     let guestImportPreview = [];
     let sessionGeneration = 0;
     let loading = false;
@@ -61,10 +62,10 @@
     }
     async function flush() {
       if (!adapter || state.owner === 'guest') return snapshot();
-      if (flushPromise) return flushPromise;
+      if (flushPromise && flushGeneration === sessionGeneration) return flushPromise;
       const owner = state.owner;
       const generation = sessionGeneration;
-      flushPromise = (async () => {
+      const flight = (async () => {
         lastError = null;
         while (sessionGeneration === generation && state.owner === owner && state.pending.length) {
           const op = state.pending[0];
@@ -81,7 +82,11 @@
         }
         return snapshot();
       })();
-      try { return await flushPromise; } finally { flushPromise = null; }
+      // A previous account's request may still be in flight. Its completion
+      // must neither block this account nor clear this account's flight.
+      flushPromise = flight;
+      flushGeneration = generation;
+      try { return await flight; } finally { if (flushPromise === flight) flushPromise = null; }
     }
     async function refresh() {
       if(!adapter||state.owner==='guest')return snapshot();

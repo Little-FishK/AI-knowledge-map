@@ -25,16 +25,21 @@
         if (!global.supabase?.createClient) {
           await new Promise((resolve, reject) => {
             const script = document.createElement('script');
+            const timer = setTimeout(() => {
+              script.remove();
+              const error = Error('Account SDK timed out'); error.code = 'request_timeout'; reject(error);
+            }, 15000);
             script.src = sdkUrl;
             script.async = true;
-            script.onload = resolve;
-            script.onerror = () => reject(Error('Account SDK failed to load'));
+            script.onload = () => { clearTimeout(timer); resolve(); };
+            script.onerror = () => { clearTimeout(timer); script.remove(); reject(Error('Account SDK failed to load')); };
             document.head.append(script);
           });
         }
         if (!global.supabase?.createClient) throw Error('Account SDK unavailable');
         const client = global.supabase.createClient(PROJECT_URL, PUBLISHABLE_KEY, {
           auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ai-knowledge-map.auth.v1'},
+          global:{fetch:adapterFactory.createFetch(global.fetch.bind(global))},
         });
         clientAdapter = adapterFactory.create(client);
         if (authSubscriber) clientAdapter.onAuthChange(authSubscriber);
@@ -68,7 +73,7 @@
   function authErrorMessage(error) {
     if (error.code === 'otp_expired') return text('验证码无效或已过期。服务端未区分具体原因，请核对邮箱与最新邮件中的验证码，或重新发送。','The code is invalid or expired. The server did not distinguish the cause. Check the email address and latest email, or resend the code.');
     if (['over_email_send_rate_limit','over_request_rate_limit'].includes(error.code) || error.status === 429) return text('请求过于频繁，请稍后再试。若已收到邮件，请使用最新邮件中的验证码。','Too many requests. Try again later. If an email has arrived, use the code from the latest email.');
-    if (error.name === 'AuthRetryableFetchError' || error.code === 'request_timeout' || error instanceof TypeError) return text('未能连接登录服务或请求超时，请检查网络后重试。','Could not reach the sign-in service or the request timed out. Check your connection and retry.');
+    if (error.name === 'AuthRetryableFetchError' || error.code === 'request_timeout' || error instanceof TypeError) return text('未能连接登录服务或请求超时，请检查网络。如在请求验证码，请先查收最新邮件再决定重发。','Could not reach the sign-in service or the request timed out. Check your connection. If requesting a code, check your latest email before resending.');
     if (['validation_failed','email_address_invalid'].includes(error.code)) return text('邮箱或验证码格式不正确，请检查输入。','Check the format of your email address and code.');
     return text('登录服务暂时无法完成请求，请稍后重试。','The sign-in service could not complete the request. Please try again later.');
   }

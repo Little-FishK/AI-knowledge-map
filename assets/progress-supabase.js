@@ -4,6 +4,23 @@
   else root.AI_PROGRESS_SUPABASE = factory();
 })(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
+  function createFetch(fetchImpl, options = {}) {
+    const timeoutMs = options.timeoutMs ?? 15000;
+    return async function (input, init = {}) {
+      const controller = new AbortController();
+      const caller = init.signal || input?.signal;
+      const abort = () => controller.abort(caller.reason);
+      if (caller?.aborted) abort();
+      else caller?.addEventListener('abort', abort, {once:true});
+      let timedOut = false;
+      const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+      try { return await fetchImpl(input, {...init, signal:controller.signal}); }
+      catch (error) {
+        if (timedOut) { const failure = Error('Account request timed out'); failure.code = 'request_timeout'; throw failure; }
+        throw error;
+      } finally { clearTimeout(timer); caller?.removeEventListener('abort', abort); }
+    };
+  }
   // The official Supabase client owns session storage, refresh and auth errors.
   // Construct it with a publishable key; administrative secrets never belong here.
   function create(client) {
@@ -40,5 +57,5 @@
       },
     });
   }
-  return Object.freeze({create});
+  return Object.freeze({create, createFetch});
 });

@@ -439,6 +439,8 @@
     curtains.appendChild(stars);
     cy.container().appendChild(curtains);
     let cullingDirty = true;
+    const curtainBounds = new Map();
+    let updatingCulling = false;
     function updateCurtainCulling() {
       if (!cullingDirty) return;
       cullingDirty = false;
@@ -457,15 +459,23 @@
       curtains.style.setProperty('--curtain-radius', radius + 'px');
       const left = cx - radius, right = cx + radius;
       const sides = new Map();
+      const zoom = cy.zoom();
+      updatingCulling = true;
       cy.batch(() => {
         cy.nodes().forEach(node => {
-          const {x, y} = node.renderedPosition(), zoom = cy.zoom();
+          if (node.hasClass('hidden')) return;
+          const {x, y} = node.renderedPosition();
           // Bounds must be independent of visibility; hidden renderer bounds can
           // collapse and cause repeated hide/show cycles at the curtain edge.
-          const label = String(node.style('label') || node.data('label') || '');
-          const labelWidth = Math.max(...label.split('\n').map(line => line.length)) * parseFloat(node.style('font-size')) * zoom;
-          const halfWidth = Math.max(node.width() * zoom * .7, labelWidth / 2) + 8;
-          const halfHeight = node.height() * zoom * .7 + (label.split('\n').length + 2) * parseFloat(node.style('font-size')) * zoom + 8;
+          let bounds = curtainBounds.get(node.id());
+          if (!bounds) {
+            const lines = String(node.style('label') || node.data('label') || '').split('\n');
+            const font = parseFloat(node.style('font-size'));
+            bounds = {width:Math.max(node.width() * .7, Math.max(...lines.map(line => line.length)) * font / 2), height:node.height() * .7 + (lines.length + 2) * font};
+            curtainBounds.set(node.id(), bounds);
+          }
+          const halfWidth = bounds.width * zoom + 8;
+          const halfHeight = bounds.height * zoom + 8;
           const hidden = Math.hypot(Math.max(0, Math.abs(x - cx) - halfWidth), Math.max(0, Math.abs(y - cyCenter) - halfHeight)) > radius;
           const side = x + halfWidth < left ? -1 : x - halfWidth > right ? 1 : 0;
           sides.set(node.id(), side);
@@ -473,15 +483,22 @@
           if (hidden) dragArtworkCache.delete(node.id());
         });
         cy.edges().forEach(edge => {
+          if (edge.hasClass('hidden')) return;
           const side = sides.get(edge.source().id());
           const hidden = Boolean(side && side === sides.get(edge.target().id()));
           if (edge.hasClass('viewport-occluded') !== hidden) edge.toggleClass('viewport-occluded', hidden);
         });
       });
+      updatingCulling = false;
     }
     cy.on('pan zoom resize position data', () => { cullingDirty = true; });
+    cy.on('style data', 'node', event => {
+      if (updatingCulling) return;
+      curtainBounds.delete(event.target.id()); cullingDirty = true;
+    });
     const ringContext = ringCanvas.getContext('2d');
     const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
+    const compactViewport = global.matchMedia('(max-width: 720px)');
     const ringSprites = {};
     const ringStates = new Map();
     const dragArtworkCache = new Map();
@@ -497,8 +514,15 @@
       hoveredRing = null;
       ringStates.forEach(motion => { motion.emphasis = 0; });
       ringLastTime = performance.now(); ringDirty = true;
+      cullingDirty = true;
       if (state.selected) return;
       clearTimeout(edgeRestoreTimer);
+      if (compactViewport.matches || motionPreference.matches) {
+        // On a small viewport avoid hundreds of simultaneous opacity
+        // transitions. Restore the complete relations when the gesture ends.
+        cy.edges().removeClass('viewport-drag-restore viewport-drag-fade').addClass('viewport-drag-hidden');
+        return;
+      }
       cy.batch(() => {
         cy.edges().removeClass('viewport-drag-restore');
         cy.edges().addClass('viewport-drag-fade');
@@ -587,7 +611,7 @@
       ringContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       ringContext.clearRect(0, 0, w, h);
       const active = isActive() && !document.hidden;
-      curtains.classList.toggle('map-stars-paused', !active);
+      curtains.classList.toggle('map-stars-paused', !active || viewportDragging || motionPreference.matches);
       if (ringActive !== active) {
         ringActive = active;
         cy.nodes().toggleClass('motion-art', active);
@@ -629,7 +653,8 @@
       if (ringDisposed) return;
       // Viewport renders only invalidate this layer. All painting happens here,
       // so bursts of map renders cannot paint the rings repeatedly in one frame.
-      if (ringDirty || (!viewportDragging && time - ringLastTime >= 1000 / 30)) {
+      const animate = isActive() && !document.hidden && !motionPreference.matches && !viewportDragging;
+      if (ringDirty || (animate && time - ringLastTime >= 1000 / 30)) {
         ringDirty = false;
         updateCurtainCulling();
         renderRings(time);
@@ -1138,11 +1163,12 @@
       }
       // 核心视图下，点开一个节点就揭开它的邻居
       if (reveal(id)) changed = true;
-      if (changed) { syncControls(); applyFilters(); }
       state.selected = id;
-      cy.nodes(".sel").removeClass("sel");
-      node.addClass("sel");
-      applyFocus();
+      cy.batch(() => { cy.nodes(".sel").removeClass("sel"); node.addClass("sel"); });
+      // Filtering already applies focus. Do not render the old selection and
+      // then immediately repeat culling, styles and layout for the new one.
+      if (changed) { syncControls(); applyFilters(); }
+      else applyFocus();
       const detailWasClosed = detail.classList.contains("closed");
       openDetail(id);
       centerOnNode(node, detailWasClosed);
@@ -1342,8 +1368,10 @@
 
     const search = document.getElementById("search");
     const results = document.getElementById("search-results");
+    let searchLimit = 12;
 
     function doSearch() {
+      if (cy.container().classList.contains('hidden')) {results.classList.remove('open');return;}
       const q = search.value.trim().toLowerCase();
       if (!q) { results.classList.remove("open"); return; }
       const terms=q.normalize('NFKC').split(/\s+/).filter(Boolean);
@@ -1356,18 +1384,23 @@
         if(!terms.every(term=>names.some(name=>match(name,term,true))||match(summary,term,false)))return null;
         const score=names.some(name=>name===q)?100:names.some(name=>name.startsWith(q))?80:names.some(name=>terms.every(term=>match(name,term,true)))?60:20;
         return {n,score,index};
-      }).filter(Boolean).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,12).map(hit=>hit.n);
+      }).filter(Boolean).sort((a,b)=>b.score-a.score||a.index-b.index).map(hit=>hit.n);
+      const en = document.documentElement.lang === 'en';
 
       results.innerHTML = hits.length
-        ? hits.map(n => `<button type="button" class="sr-item" data-id="${esc(n.id)}">
+        ? hits.slice(0,searchLimit).map(n => `<button type="button" class="sr-item" data-id="${esc(n.id)}">
               <span class="sr-title">${esc(n.title)}</span>
               <span class="sr-sum">${esc(n.summary || "")}</span></button>`).join("")
         : `<div class="sr-none">${esc(tr("search.empty"))}</div>`;
+      if(hits.length>searchLimit)results.insertAdjacentHTML('beforeend',`<button type="button" class="sr-more">${en?'Show more concepts':'显示更多概念'} (${Math.min(searchLimit,hits.length)}/${hits.length})</button>`);
+      const directory=new URL('search/',document.baseURI);directory.searchParams.set('q',search.value.trim());directory.searchParams.set('lang',en?'en':'zh-Hans');
+      results.insertAdjacentHTML('beforeend',`<a class="sr-directory" href="${esc(directory.href)}">${en?'Search all pages and tutorial text':'搜索全站页面与教程正文'} →</a>`);
       results.classList.add("open");
     }
 
     // 搜索结果点击统一委托到结果容器
     results.addEventListener("click", event => {
+      if(event.target.closest('.sr-more')){searchLimit+=12;doSearch();results.querySelectorAll('.sr-item')[searchLimit-12]?.focus();return;}
       const item = event.target.closest(".sr-item");
       if (!item) return;
       select(item.dataset.id, true);
@@ -1375,11 +1408,18 @@
       search.value = "";
     });
 
-    search.addEventListener("input", debounce(doSearch, 120));
+    search.addEventListener("input", debounce(() => {searchLimit=12;doSearch();}, 120));
+    search.addEventListener('keydown', event => {
+      if(event.key!=='Enter'||!cy.container().classList.contains('hidden')||!search.value.trim())return;
+      event.preventDefault();event.stopImmediatePropagation();
+      const url=new URL('search/',document.baseURI);url.searchParams.set('q',search.value.trim());url.searchParams.set('lang',document.documentElement.lang);location.assign(url.href);
+    },true);
     search.addEventListener("keydown", e => {
       if (e.key === 'ArrowDown') { e.preventDefault(); results.querySelector('.sr-item')?.focus(); }
       if (e.key === "Escape") { results.classList.remove("open"); search.blur(); }
       if (e.key === "Enter") {
+        if (!search.value.trim()) return;
+        doSearch();
         const first = results.querySelector(".sr-item");
         if (first) first.click();
       }
@@ -1406,14 +1446,16 @@
 
     renderLegend();
 
-    applyFilters();
     restorePresetLayout();
 
     function refreshLanguage() {
-      cy.nodes().forEach(node => {
+      let labelsChanged = false;
+      cy.batch(() => cy.nodes().forEach(node => {
         const localized = localizedNode(node.id());
-        if (localized) node.data("label", localized.title);
-      });
+        if (localized && node.data('label') !== localized.title) {
+          node.data("label", localized.title); labelsChanged = true;
+        }
+      }));
       renderDomainControls();
       renderEdgeControls();
       const officialButton = document.getElementById("official-path-toggle");
@@ -1434,7 +1476,7 @@
       setControlsExpanded(!appShell.classList.contains("controls-collapsed"));
       listLabel.textContent=document.documentElement.lang==='en'?'Concept list':'概念列表';
       mobileHint.textContent=document.documentElement.lang==='en'?'Pan to explore · Find concepts in the list or search.':'拖动探索 · 可从概念列表或搜索查找';
-      separateLabelBounds();
+      if (labelsChanged) separateLabelBounds();
       renderLegend();
       if (results.classList.contains("open")) doSearch();
       if (state.selected) openDetail(state.selected);

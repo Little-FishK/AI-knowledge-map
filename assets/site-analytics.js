@@ -97,6 +97,7 @@
     const toggle = doc.createElement('button'); toggle.id = 'analytics-privacy-toggle'; toggle.type = 'button'; toggle.setAttribute('aria-controls', panel.id); toggle.textContent = 'Analytics privacy / 统计隐私';
     function render() {
       const en = english();
+      toggle.textContent = protectedChoice || consent === 'denied' ? (en ? 'Analytics off · Privacy' : '统计已关闭 · 隐私') : consent === 'granted' ? (en ? 'Analytics privacy' : '统计隐私') : (en ? 'Analytics off · Privacy options' : '统计默认关闭 · 隐私设置');
       panel.replaceChildren();
       const text = doc.createElement('p'), title = doc.createElement('strong'); title.textContent = en ? 'Help improve AI Knowledge Map' : '帮助改进 AI 知识地图'; text.appendChild(title);
       text.appendChild(doc.createTextNode(protectedChoice ? (en ? 'Your browser asks not to be tracked. Analytics is off.' : '你的浏览器已要求不跟踪，访问统计已关闭。') : (en ? 'With your permission, Google Analytics uses first-party cookies to measure page views, returning visits, time in focus and referral channels. We exclude account details and search text. You can change your choice here anytime.' : '经你允许后，Google Analytics 使用第一方 Cookie 统计浏览量、回访、前台停留时间和推广来源。我们排除账号信息和搜索文本；你随时可以在此更改选择。')));
@@ -111,10 +112,11 @@
       }
       if (!protectedChoice) button(en ? 'Allow analytics' : '允许统计', () => choose('granted'), true);
       button(protectedChoice ? (en ? 'Close' : '关闭') : (en ? 'Decline / turn off' : '拒绝 / 关闭统计'), () => choose('denied'));
+      if (!protectedChoice) button(en ? 'Decide later' : '暂不设置', () => { panel.hidden = true; toggle.setAttribute('aria-expanded','false'); toggle.focus(); });
       panel.appendChild(actions);
     }
     toggle.addEventListener('click', () => { render(); panel.hidden = !panel.hidden; toggle.setAttribute('aria-expanded', String(!panel.hidden)); });
-    doc.body.appendChild(toggle); doc.body.appendChild(panel); render(); panel.hidden = consent !== null || protectedChoice; toggle.setAttribute('aria-expanded', String(!panel.hidden));
+    doc.body.appendChild(toggle); doc.body.appendChild(panel); render(); panel.hidden = true; toggle.setAttribute('aria-expanded', 'false');
     // Locale initialization happens after this deferred script. Refresh consent
     // copy without changing the visitor's stored choice or starting analytics.
     if(win.MutationObserver)new win.MutationObserver(render).observe(doc.documentElement, {attributes:true,attributeFilter:['lang']});
