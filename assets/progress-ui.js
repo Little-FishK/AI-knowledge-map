@@ -59,6 +59,7 @@
   } : null;
   const runtime = runtimeFactory.create({model, adapter, storage:localProgressStorage,eventTarget:global,
     legacyKey:'ai-knowledge-map.learned.v1', randomUUID:()=>global.crypto.randomUUID()});
+  global.AI_PROGRESS = runtime;
   let snapshot = runtime.get();
   let authBusy = false;
   let accountReturnFocus = null;
@@ -90,6 +91,7 @@
   }
   function recordValue(id, field) { return snapshot.state.records[model.key(id, field)]?.value === true; }
   function statusCopy() {
+    if(snapshot.localSaveFailed)return text('本机保存失败，请导出备份；刷新后可能丢失新标记。','Local saving failed. Export a backup; new marks may be lost after reloading.');
     if(snapshot.loading)return text('已登录，正在读取云端进度…','Signed in. Loading cloud progress…');
     if (Object.keys(snapshot.state.conflicts).length) return text('发现同步冲突，请选择保留哪个版本', 'Sync conflict: choose which version to keep.');
     if (snapshot.error) return text('同步失败，记录保留在本机，可稍后重试', 'Sync failed. Your change remains on this device.');
@@ -101,7 +103,7 @@
   function renderCard(article) {
     const id = nodeIdFor(article);
     if (!id) return;
-    const signature = [snapshot.state.owner, Boolean(snapshot.error), Boolean(snapshot.loading), snapshot.state.pending.some(op=>op.nodeId===id),
+    const signature = [english(), snapshot.state.owner, Boolean(snapshot.localSaveFailed), Boolean(snapshot.error), Boolean(snapshot.loading), snapshot.state.pending.some(op=>op.nodeId===id),
       JSON.stringify(Object.values(snapshot.state.conflicts).filter(item=>item.local.nodeId===id)),
       ...['read','understood','practiced'].map(field=>recordValue(id,field))].join('|');
     let card = article.querySelector(':scope > .progress-card');
@@ -167,6 +169,11 @@
     });return overlay;
   }
   function setDialogMessage(message,error=false){const node=dialog().querySelector('.progress-account-message');if(node){node.textContent=message;node.classList.toggle('is-error',error);delete node.dataset.errorCode;}}
+  function exportProgress() {
+    const blob=new Blob([runtime.exportData()],{type:'application/json'}),link=document.createElement('a');
+    link.href=URL.createObjectURL(blob);link.download='ai-knowledge-map-progress.json';link.click();
+    setTimeout(()=>URL.revokeObjectURL(link.href),0);
+  }
   function openDialog(){const overlay=dialog(),content=overlay.querySelector('.progress-account-content');overlay.classList.remove('hidden');
     accountReturnFocus=document.activeElement;
     const settings=document.getElementById('settings-overlay');if(settings)settings.inert=true;
@@ -174,13 +181,25 @@
       const imports=snapshot.importPreview||[];
       content.innerHTML=`<p>${text('你已登录，学习进度会跨设备同步。','You are signed in. Progress syncs across devices.')}</p>${imports.length?`<form data-import-form><fieldset><legend>${text('导入登录前保存在此浏览器的进度','Import progress saved in this browser before sign-in')}</legend>${imports.map((item,index)=>{const label=`${item.local.nodeId} · ${item.local.field}`,local=`${text('本机','This device')}: ${item.local.value?'✓':'—'}`,remote=item.remote?`${text('云端','Cloud')}: ${item.remote.value?'✓':'—'}`:text('云端没有记录','No cloud record');return `<div class="progress-import-row"><strong>${label}</strong><label><input type="radio" name="import-${index}" value="local" ${item.conflict?'':'checked'}>${local}</label><label><input type="radio" name="import-${index}" value="remote" ${item.conflict?'checked':''}>${remote}</label></div>`;}).join('')}<button type="submit">${text('应用选择','Apply choices')}</button></fieldset></form>`:''}<p class="progress-account-message"></p><div class="progress-account-actions"><button type="button" data-export>${text('导出进度','Export progress')}</button><button type="button" data-sign-out>${text('退出登录','Sign out')}</button><button type="button" class="progress-delete-account" data-delete>${text('删除账号','Delete account')}</button></div>`;
       content.querySelector('[data-import-form]')?.addEventListener('submit',async event=>{event.preventDefault();const choices={};imports.forEach((item,index)=>{choices[item.key]=event.currentTarget.elements[`import-${index}`].value;});try{await runtime.completeGuestImport(choices);closeDialog();}catch(error){setDialogMessage(error.message,true);}});
-      content.querySelector('[data-export]').onclick=()=>{const blob=new Blob([runtime.exportData()],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='ai-knowledge-map-progress.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),0);};
+      content.querySelector('[data-export]').onclick=exportProgress;
       content.querySelector('[data-sign-out]').onclick=async()=>{if(snapshot.state.pending.length&&!global.confirm(text('仍有未同步记录。确认退出并保留记录供下次恢复？','Some changes are not synced. Sign out and keep them for the next session?')))return;await runtime.signOut();closeDialog();};
       content.querySelector('[data-delete]').onclick=async()=>{if(!global.confirm(text('删除账号会永久删除云端学习进度。确认继续？','Deleting your account permanently removes cloud progress. Continue?')))return;try{await runtime.deleteAccount();closeDialog();}catch(error){setDialogMessage(error.message,true);}};
     }
     else content.innerHTML=`<form data-email-form><label>${text('邮箱','Email')}<input type="email" required autocomplete="email"></label><button type="submit">${text('发送验证码','Send code')}</button></form><form data-code-form class="hidden"><label>${text('六位验证码','Six-digit code')}<input inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"></label><button type="submit">${text('登录','Sign in')}</button></form><p class="progress-account-message" role="status"></p>`;
     const emailForm=content.querySelector('[data-email-form]'),codeForm=content.querySelector('[data-code-form]');
     if(emailForm) {
+      const backup=document.createElement('section');backup.className='progress-guest-backup';
+      backup.innerHTML=`<p>${text('访客的概念学习标记保存在本浏览器。导出后可在其他浏览器恢复；恢复仅补充缺失标记，保留已有选择。六站新手导览进度单独保存在本机。','Guest concept marks stay in this browser. Export them to restore in another browser. Restore adds missing marks and keeps existing choices. The six-stop guide is stored separately on this device.')}</p><button type="button" data-export>${text('导出访客标记','Export guest marks')}</button> <label class="progress-backup-label">${text('恢复访客标记','Restore guest marks')}<input type="file" data-restore-guest accept="application/json,.json"></label>`;
+      content.append(backup);backup.querySelector('[data-export]').onclick=exportProgress;
+      backup.querySelector('[data-restore-guest]').addEventListener('change',async event=>{
+        const file=event.target.files[0];if(!file)return;
+        try {
+          if(file.size>2*1024*1024)throw Error('Too large');
+          runtime.restoreGuest(JSON.parse(await file.text()));
+          setDialogMessage(snapshot.localSaveFailed?text('恢复已读取，但浏览器无法保存，请保留备份文件。','Restored in memory, but this browser cannot save. Keep your backup.'):text('已补充缺失标记，原有选择保持不变。','Missing marks restored. Existing choices were kept.'));
+        } catch (_) { setDialogMessage(text('无法恢复：请选择有效的访客进度JSON备份。账号备份不能导入访客。','Could not restore. Choose a valid guest progress JSON backup. Account backups cannot be imported as guest progress.'),true); }
+        finally { event.target.value=''; }
+      });
       let loginEmail='';
       const recipient=document.createElement('p');recipient.dataset.codeRecipient='';codeForm.prepend(recipient);
       const actions=document.createElement('div');actions.className='progress-account-actions';
@@ -223,6 +242,7 @@
     if(value.state.owner!=='guest'&&overlay?.querySelector('[data-code-form]')&&!overlay.classList.contains('hidden'))closeDialog();
   });
   const observer=new MutationObserver(refreshCards);observer.observe(document.body,{childList:true,subtree:true});
+  new MutationObserver(refreshCards).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   runtime.start().catch(error=>console.error('Progress initialization failed',error));
   refreshCards();
 })(window);

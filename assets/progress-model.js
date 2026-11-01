@@ -78,5 +78,29 @@
       conflict: !!account.records[k] && account.records[k].value !== record.value,
     }));
   }
-  return Object.freeze({fields, key, empty, migrateLegacy, change, receive, acknowledge, resolve, importPreview});
+  // "Learned" is the reader's understanding mark, plus retained legacy marks.
+  // Read/self-test flags alone do not assert understanding.
+  function learnedIds(state) {
+    return [...new Set(Object.values(state.records || {}).filter(record =>
+      record?.value === true && typeof record.nodeId === 'string' && ['understood', 'legacyLearned'].includes(record.field)
+    ).map(record => record.nodeId))];
+  }
+  function restoreGuest(state, backup) {
+    if (state.owner !== 'guest') throw Error('Sign out before restoring guest progress');
+    if (backup?.exportVersion !== 1 || backup.progress?.schemaVersion !== 1 || backup.progress.owner !== 'guest'
+        || !backup.progress.records || Array.isArray(backup.progress.records)) throw Error('Invalid guest backup');
+    const records = Object.entries(backup.progress.records);
+    if (records.length > 10000) throw Error('Backup is too large');
+    const next = clone(state);
+    // Merge missing marks only. Existing true/false choices always win.
+    for (const [k, record] of records) {
+      validate(record?.nodeId, record?.field, record?.value);
+      if (k !== key(record.nodeId, record.field)) throw Error('Invalid backup record');
+      if (!Object.hasOwn(next.records, k)) next.records[k] = {
+        nodeId: record.nodeId, field: record.field, value: record.value, version: 0, contentRevision: null,
+      };
+    }
+    return next;
+  }
+  return Object.freeze({fields, key, empty, migrateLegacy, change, receive, acknowledge, resolve, importPreview, learnedIds, restoreGuest});
 });

@@ -21,7 +21,8 @@
     const elements = {};
     const buttons = new Map();
     const nodeIndex = new Map(graph.nodes.map((node, index) => [node.id, index]));
-    const learnedNodes = loadLearnedNodes();
+    const progress = global.AI_PROGRESS;
+    const learnedNodes = new Set();
 
     function localizedNode(id) {
       const source = byId[id];
@@ -132,6 +133,9 @@
       elements["learning-progress-bar"].style.width = `${percent}%`;
       elements["learning-done-label"].textContent = doneCount;
       elements["learning-todo-label"].textContent = total - doneCount;
+      elements["learning-done-count"].parentElement.title = document.documentElement.lang === 'en'
+        ? 'Counts “I understand” and retained legacy learning marks. Read and self-test are tracked separately.'
+        : '统计“自认为理解”及保留的旧版已学标记；读过、完成自测分别记录。';
     }
 
     function renderPanel() {
@@ -165,9 +169,18 @@
       list.appendChild(button);
     }
 
-    function toggle(id) {
+    async function toggle(id) {
       if (!byId[id]) return;
       const nowLearned = !learnedNodes.has(id);
+      if (progress) {
+        try {
+          await progress.change(id, 'understood', nowLearned);
+          if (!nowLearned && progress.get().state.records[id + '/legacyLearned']?.value) {
+            await progress.change(id, 'legacyLearned', false);
+          }
+        } catch (error) { console.warn('Learning mark update failed', error); }
+        return;
+      }
       if (nowLearned) learnedNodes.add(id);
       else learnedNodes.delete(id);
       saveLearnedNodes();
@@ -215,7 +228,18 @@
           if (button) selectNode(button.getAttribute("data-learning-goto"), true);
         });
       });
-      renderPanel();
+      if (progress) progress.subscribe(snapshot => {
+        learnedNodes.clear();
+        global.AI_PROGRESS_MODEL.learnedIds(snapshot.state).filter(id => byId[id]).forEach(id => learnedNodes.add(id));
+        renderPanel();
+        const current = document.querySelector('[data-learn-node]');
+        if (current) {
+          current.setAttribute('aria-pressed', String(learnedNodes.has(current.dataset.learnNode)));
+          current.classList.toggle('is-learned', learnedNodes.has(current.dataset.learnNode));
+          current.textContent = t(learnedNodes.has(current.dataset.learnNode) ? 'learning.marked' : 'learning.mark');
+        }
+      });
+      else { loadLearnedNodes().forEach(id => learnedNodes.add(id)); renderPanel(); }
     }
 
     return Object.freeze({

@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css?v=47c98a768d3308b3"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css?v=62ea32be5fc73dc3">
 
 
 
@@ -50,9 +50,16 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/image-creation/image-workflow-reuse/#page","name":"如何复用 AI 图像工作流：人物一致性、商品图与放大","description":"按人物一致性、商品重新布光、局部修改和图片放大，查阅 IP-Adapter FaceID、ComfyUI Inpainting 与 ESRGAN 案例，核对复用前的准备和结果记录。","url":"https://ai-knowledge-map.com/software/image-creation/image-workflow-reuse/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"第三章 寻找与复用现成工作流","item":"https://ai-knowledge-map.com/software/image-creation/image-workflow-reuse/"}]}]</script>
-<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
-<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
-<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/image-creation/image-workflow-reuse/index.ai.json"><link rel="describedby" href="/software/llms.txt"></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">第三章 寻找与复用现成工作流</span></li></ol></nav><h1>第三章 寻找与复用现成工作流</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-image-workflow-reuse-introduction">阅读说明</a></li><li><a href="#course-image-workflow-reuse-section-1">人物一致性案例 IP-Adapter FaceID Plus v2</a></li><li><a href="#course-image-workflow-reuse-section-2">商品图案例 产品重新布光与背景协调</a></li><li><a href="#course-image-workflow-reuse-section-3">局部修改案例 ComfyUI 官方 Inpainting</a></li><li><a href="#course-image-workflow-reuse-section-4">图片放大案例 ESRGAN 与 Real-ESRGAN 模型放大</a></li><li><a href="#course-image-workflow-reuse-section-5">复用前的共同准备与结果记录</a></li></ul></nav><article class="tutorial-content"><section id="course-image-workflow-reuse-introduction"><h2>阅读说明</h2><p>本章围绕人物一致性、商品图、局部修改和图片放大，选取已有完整流程、配套说明与公开示例的方案。它们可作为复用起点，具体效果仍取决于输入素材与运行条件。本次于 2026 年 10 月 31 日核对资料和原始工作流配置，尚未进行本机图像生成验收。</p>
+<link rel="stylesheet" href="/assets/site-analytics.css?v=efa5eff23c74397c" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js?v=32948d8c69df918b" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/image-creation/image-workflow-reuse/index.ai.json"><link rel="describedby" href="/software/llms.txt"><link rel="stylesheet" href="/assets/progress.css?v=eed109dcac746245"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js?v=8301171804d0aafc"></script><script defer src="/assets/tutorial-settings.js?v=488cfd8551be8ca3"></script><script defer src="/assets/progress-model.js?v=693a69023749db1c"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js?v=72f86c7d2ef0a6d1"></script><script defer src="/assets/progress-ui.js?v=1bab3d666a908964"></script></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header id="topbar" class="preview-header tutorial-settingsbar" data-tutorial-settings><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a><button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">第三章 寻找与复用现成工作流</span></li></ol></nav><h1>第三章 寻找与复用现成工作流</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><details open><summary>本章目录</summary><ul><li><a href="#course-image-workflow-reuse-introduction">阅读说明</a></li><li><a href="#course-image-workflow-reuse-section-1">人物一致性案例 IP-Adapter FaceID Plus v2</a></li><li><a href="#course-image-workflow-reuse-section-2">商品图案例 产品重新布光与背景协调</a></li><li><a href="#course-image-workflow-reuse-section-3">局部修改案例 ComfyUI 官方 Inpainting</a></li><li><a href="#course-image-workflow-reuse-section-4">图片放大案例 ESRGAN 与 Real-ESRGAN 模型放大</a></li><li><a href="#course-image-workflow-reuse-section-5">复用前的共同准备与结果记录</a></li></ul></details></nav><article class="tutorial-content"><section id="course-image-workflow-reuse-introduction"><h2>阅读说明</h2><p>本章围绕人物一致性、商品图、局部修改和图片放大，选取已有完整流程、配套说明与公开示例的方案。它们可作为复用起点，具体效果仍取决于输入素材与运行条件。本次于 2026 年 10 月 31 日核对资料和原始工作流配置，尚未进行本机图像生成验收。</p>
 <p><strong>工作流资源入口</strong></p>
 <table class="d-table"><thead><tr><th>来源</th><th>提供什么</th><th>适合怎样使用</th></tr></thead><tbody><tr><td><a href="https://docs.comfy.org/interface/features/template" target="_blank" rel="noopener noreferrer">ComfyUI 官方模板</a></td><td>可加载的工作流、模型链接和运行说明</td><td>从模板开始，补齐模型后运行</td></tr><tr><td><a href="https://comfy.org/hub/workflows/" target="_blank" rel="noopener noreferrer">Comfy 官方工作流目录</a></td><td>按商品图、光线、人物多角度、局部修改和放大等任务整理的流程</td><td>按目标任务查找候选</td></tr><tr><td><a href="https://comfyanonymous.github.io/ComfyUI_examples/" target="_blank" rel="noopener noreferrer">ComfyUI 维护者示例库</a></td><td>SDXL、图生图、局部重绘、LoRA、ControlNet 和放大等示例</td><td>下载含工作流信息的原始图片并载入</td></tr><tr><td><a href="https://www.runcomfy.com/comfyui-workflows" target="_blank" rel="noopener noreferrer">RunComfy 工作流库</a></td><td>案例说明、工作流 JSON 和平台预配置环境</td><td>在云端跟做，或按依赖说明在本地复用</td></tr></tbody></table>
 <p><strong>四类任务的选择对照</strong></p>
@@ -88,4 +95,35 @@
 <p>从官方模板开始时，可使用 Workflow → Browse Workflow Templates，按缺失提示补齐模型；作者分享的流程按 JSON 或原始 PNG 载入，再核对自定义节点。参考<a href="https://docs.comfy.org/interface/features/template" target="_blank" rel="noopener noreferrer">模板操作说明</a>与<a href="https://support.comfy.org/articles/1536450065-missing-nodes-workflow-won-t-load" target="_blank" rel="noopener noreferrer">缺失节点和模型排查</a>。</p>
 <p>建议每次保留以下记录，便于继续修改或比较候选：</p>
 <table class="d-table"><thead><tr><th>记录项</th><th>内容</th></tr></thead><tbody><tr><td>流程来源</td><td>页面、文件名、下载日期，以及能够确认的版本或提交</td></tr><tr><td>运行配置</td><td>ComfyUI 与自定义节点版本、模型与配套文件、关键参数</td></tr><tr><td>输入与目标</td><td>参考图、蒙版、提示词、需要保留和修改的内容</td></tr><tr><td>检查结果</td><td>人物特征、产品细节、修改范围或放大纹理是否符合要求</td></tr><tr><td>实际投入</td><td>耗时、运行错误和人工修正量</td></tr></tbody></table>
-<p>随机种子与参数相同也不保证跨环境完全一致，复现条件见 <a href="https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds" target="_blank" rel="noopener noreferrer">Diffusers 指南</a>。用同一批素材比较多个候选，才能判断哪条流程更适合当前任务。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/image-creation/image-photoshop-agent/">如何让 AI Agent 操作 Photoshop：MCP 接入与排查</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main></body></html>
+<p>随机种子与参数相同也不保证跨环境完全一致，复现条件见 <a href="https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds" target="_blank" rel="noopener noreferrer">Diffusers 指南</a>。用同一批素材比较多个候选，才能判断哪条流程更适合当前任务。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/image-creation/image-photoshop-agent/">如何让 AI Agent 操作 Photoshop：MCP 接入与排查</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

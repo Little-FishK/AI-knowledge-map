@@ -104,7 +104,7 @@
     root.innerHTML = `<div class="onboarding-shell${isMap ? ' is-map' : ''}">
       <header class="onboarding-top"><div class="onboarding-brand"><span class="onboarding-brand-symbol" aria-hidden="true">✳</span><div>${copy("AI 知识地图", "AI Knowledge Map")}<small>THE KNOWLEDGE ATLAS</small></div></div>
         <button class="onboarding-skip btn" type="button" data-skip>${english() ? 'Back to map' : '返回地图'}</button><button class="btn icon-btn" type="button" data-settings aria-label="${copy("设置", "Settings")}" aria-haspopup="dialog" aria-controls="settings-dialog">${document.getElementById('btn-settings').innerHTML}</button></header>
-      ${isMap ? '' : `<nav class="onboarding-reader-nav" aria-label="${copy("新手导览", "Beginner guide")}"><button class="onboarding-prev" type="button" data-map>${copy("← 返回新手地图", "\u2190 Back to beginner map")}</button></nav>`}
+      ${isMap ? '' : `<nav class="onboarding-reader-nav" aria-label="${copy("新手导览", "Beginner guide")}"><button class="onboarding-prev" type="button" data-map>${copy("← 返回新手地图", "\u2190 Back to beginner map")}</button><button class="onboarding-next" type="button" data-read>${copy("已读，解锁下一站", "Mark read · unlock next stop")}</button></nav>`}
       ${isMap ? '' : `<p class="onboarding-storage" ${storageFailed ? '' : 'hidden'}>${copy("当前浏览器无法保存进度，仍可继续阅读或跳过；刷新后可能需要重新开始。", "This browser cannot save your progress. You can still read or skip, but may need to start again after refreshing.")}</p>`}
       ${isMap ? `<div class="onboarding-hero">
         <div class="onboarding-hero-copy">
@@ -123,6 +123,7 @@
         </div>
       </div>
       <div class="onboarding-route-heading"><div><span class="onboarding-kicker">YOUR LEARNING JOURNEY</span><h2>${copy("六站，走进 AI 的世界", "Six stops into the world of AI")}</h2></div></div>
+      <p class="onboarding-unlock-help">${copy('读完当前站后，点击“已读”解锁下一站；也可以随时返回地图自由探索。','After reading a stop, select “Mark as read” to unlock the next. You can return to the map to explore anytime.')}</p>
       <ol class="onboarding-route" aria-label="${copy("六站新手地图", "Six-stop beginner map")}">${lessons.map((item, index) => {
         const read = index < state.read;
         const locked = index > state.read;

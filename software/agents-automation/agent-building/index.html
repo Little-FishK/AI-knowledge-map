@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css?v=47c98a768d3308b3"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css?v=62ea32be5fc73dc3">
 
 
 
@@ -50,9 +50,16 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/agents-automation/agent-building/#page","name":"如何制作 AI Agent：知识库、记忆、语音与后台运行","description":"从话题助手开始，学习为 Agent 配置知识库、跨对话记忆与语音交流，设置定时和事件触发的后台任务，并了解发布、维护与开源许可。","url":"https://ai-knowledge-map.com/software/agents-automation/agent-building/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"二. 如何制作 Agent？","item":"https://ai-knowledge-map.com/software/agents-automation/agent-building/"}]}]</script>
-<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
-<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
-<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/agent-building/index.ai.json"><link rel="describedby" href="/software/llms.txt"></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">二. 如何制作 Agent？</span></li></ol></nav><h1>二. 如何制作 Agent？</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-agent-building-introduction">引言</a></li><li><a href="#course-agent-building-topic-1">1. 制作有知识库的话题助手</a></li><li><a href="#course-agent-building-topic-2">2. 制作有记忆的语音 Agent</a></li><li><a href="#course-agent-building-topic-3">3. 制作后台自动运行 Agent</a></li><li><a href="#course-agent-building-topic-4">4. 发布与维护 Agent</a></li></ul></nav><article class="tutorial-content"><section id="course-agent-building-introduction"><h2>引言</h2><p>制作通常有三个入口：</p>
+<link rel="stylesheet" href="/assets/site-analytics.css?v=efa5eff23c74397c" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js?v=32948d8c69df918b" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/agent-building/index.ai.json"><link rel="describedby" href="/software/llms.txt"><link rel="stylesheet" href="/assets/progress.css?v=eed109dcac746245"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js?v=8301171804d0aafc"></script><script defer src="/assets/tutorial-settings.js?v=488cfd8551be8ca3"></script><script defer src="/assets/progress-model.js?v=693a69023749db1c"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js?v=72f86c7d2ef0a6d1"></script><script defer src="/assets/progress-ui.js?v=1bab3d666a908964"></script></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header id="topbar" class="preview-header tutorial-settingsbar" data-tutorial-settings><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a><button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">二. 如何制作 Agent？</span></li></ol></nav><h1>二. 如何制作 Agent？</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><details open><summary>本章目录</summary><ul><li><a href="#course-agent-building-introduction">引言</a></li><li><a href="#course-agent-building-topic-1">1. 制作有知识库的话题助手</a></li><li><a href="#course-agent-building-topic-2">2. 制作有记忆的语音 Agent</a></li><li><a href="#course-agent-building-topic-3">3. 制作后台自动运行 Agent</a></li><li><a href="#course-agent-building-topic-4">4. 发布与维护 Agent</a></li></ul></details></nav><article class="tutorial-content"><section id="course-agent-building-introduction"><h2>引言</h2><p>制作通常有三个入口：</p>
 <ul><li>从空白项目开始，逐项添加所需能力；</li><li>使用模板，在已有配置上修改；</li><li>用自然语言描述需求，让平台先生成一个版本。</li></ul>
 <p>本部分先从少量配置开始，带你看清每一项设置的作用。使用模板或自然语言创建时，也可以按同样的方法检查生成的内容。</p>
 <p>我们先制作一个依据资料回答问题的话题助手，再学习判断与调度、工具执行、后台运行和实时语音。第一次制作时，先让它完成一件可以检查的小事。例如，依据一份活动说明回答时间、费用和参加条件；这些回答通过检查后，再考虑连接报名系统、查询个人记录等能力。</p>
@@ -371,4 +378,35 @@ ElevenLabs 返回音频
 <p>在本地项目中，也可以直接创建 <code>LICENSE</code> 文件，放入对应的完整许可文本。不要只写一句“本项目开源”，也不要自行删改许可条款后仍沿用原许可证名称。<a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository" target="_blank" rel="noopener noreferrer">GitHub 官方添加许可证教程</a></p>
 <h4 id="course-agent-building-topic-4-heading-8">三. 对发布内容的介绍</h4>
 <p>发布在线助手时，把使用说明放在介绍页或入口附近，通常放在项目根目录的 <code>README.md</code> 中。</p>
-<p>分享可复制的项目时，额外提供安装、配置和启动步骤。把 API Key、数据库密码等改成占位符，例如在 <code>.env.example</code> 中只保留变量名和填写说明；实际密钥放在部署平台的密钥或服务端环境变量设置中。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/agent-foundations/">什么是 AI Agent？与模型、工作流有什么区别</a><a href="/software/agents-automation/agent-discovery/">去哪里找 AI Agent、Skill、Harness 和现成工作流</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main></body></html>
+<p>分享可复制的项目时，额外提供安装、配置和启动步骤。把 API Key、数据库密码等改成占位符，例如在 <code>.env.example</code> 中只保留变量名和填写说明；实际密钥放在部署平台的密钥或服务端环境变量设置中。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/agent-foundations/">什么是 AI Agent？与模型、工作流有什么区别</a><a href="/software/agents-automation/agent-discovery/">去哪里找 AI Agent、Skill、Harness 和现成工作流</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

@@ -27,7 +27,7 @@
   });
   await language.initialize({
     urlLocale: new URLSearchParams(window.location.search).get("lang"),
-    navigatorLanguages: [], // Use the site default unless the visitor explicitly chose a language.
+    navigatorLanguages: navigator.languages || [navigator.language],
   });
   const t = language.t;
   language.localize(document);
@@ -91,6 +91,8 @@
   let routeApplyToken = 0;
   let activeRoute = null;
   let pendingMapNode = null;
+  let applyingMapRoute = false;
+  let firstMapVisit = true;
 
   function setDocumentTitle(label) {
     const siteTitle = t("app.title.graph");
@@ -182,11 +184,15 @@
   // keeps that link accurate as the selected node changes or is dismissed.
   function syncMapSelectionUrl(id) {
     const route = ROUTER.parseLocation();
-    if (route.name !== "map" || !route.id) return;
+    if (applyingMapRoute || route.name !== "map" || route.id === id || (!route.id && !id)) return;
     const nextRoute = id ? { name: "map", id } : { name: "map" };
-    // Rewrite in place without emitting a location event; a re-apply here would
-    // loop straight back into selection.
-    ROUTER.navigate(nextRoute, { replace: true, silent: true });
+    // One history entry for an open detail. Further node choices replace it,
+    // so Back closes the detail rather than leaving the map.
+    if (!id && window.history.state?.akmMapDetail) window.history.back();
+    else {
+      ROUTER.navigate(nextRoute, { replace: Boolean(route.id), silent: true });
+      if (id) window.history.replaceState({...window.history.state,akmMapDetail:true},'',location.href);
+    }
     activeRoute = nextRoute;
     setDocumentTitle(id ? localizedGraphNode(id)?.title : undefined);
   }
@@ -247,6 +253,11 @@
 
   function applyCurrentLanguage() {
     language.localize(document);
+    document.querySelectorAll('#topbar .release-directory-link').forEach(link=>{
+      const path=new URL(link.href,location.href).pathname;
+      if(path==='/about/')link.textContent=language.getLocale()==='en'?'About / Corrections':'关于与纠错';
+      if(path==='/search/')link.textContent=language.getLocale()==='en'?'Text directory / Search':'文字目录 / Search';
+    });
     renderLanguageSettings();
     graphView.refreshLanguage();
     learningView.refreshLanguage();
@@ -322,10 +333,13 @@
       if (stale()) return;
       const pending = pendingMapNode;
       pendingMapNode = null;
-      if (route.id) select(route.id, true);
+      applyingMapRoute = true;
+      try {
+      if (route.id) { select(route.id, true); if(firstMapVisit)graphView.restoreView(route.id); }
       else if (pending && byId[pending.id]) select(pending.id, pending.jumped);
       else if (previousRoute && previousRoute.name === "concept" && byId[previousRoute.id]) select(previousRoute.id, true);
-      else clearGraphSelection();
+      else if (!(firstMapVisit && graphView.restoreView())) clearGraphSelection();
+      } finally { applyingMapRoute = false; firstMapVisit = false; }
       setDocumentTitle(route.id ? localizedGraphNode(route.id)?.title : undefined);
       return;
     }
@@ -420,6 +434,9 @@
   // 暴露给调试用
   window.__cy = cy;
   window.__i18n = language;
+  document.documentElement.dataset.appReady = 'true';
+  window.dispatchEvent(new Event('ai-app-ready'));
 })().catch(error => {
   console.error("应用初始化失败", error);
+  window.dispatchEvent(new Event('ai-app-failed'));
 });

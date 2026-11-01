@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css?v=47c98a768d3308b3"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css?v=62ea32be5fc73dc3">
 
 
 
@@ -50,9 +50,16 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/agents-automation/automation/#page","name":"如何设计 AI 自动化工作流：任务拆分、分支与反馈","description":"学习拆分工作流、分配模型与程序和人的职责、设计分支及检查反馈，并通过入职指南、邮件日程、客户咨询等十个案例理解完整处理路径。","url":"https://ai-knowledge-map.com/software/agents-automation/automation/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"四. 自动化工作流","item":"https://ai-knowledge-map.com/software/agents-automation/automation/"}]}]</script>
-<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
-<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
-<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/automation/index.ai.json"><link rel="describedby" href="/software/llms.txt"></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">四. 自动化工作流</span></li></ol></nav><h1>四. 自动化工作流</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-agent-automation-topic-1">1. 如何拆分工作流</a></li><li><a href="#course-agent-automation-topic-2">2. 为模型、程序和人分配工作</a></li><li><a href="#course-agent-automation-topic-3">3. 为不同情况设计处理路径</a></li><li><a href="#course-agent-automation-topic-4">4. 检查和反馈循环</a></li><li><a href="#course-agent-automation-topic-5">5. 工作流案例</a></li></ul></nav><article class="tutorial-content"><section id="course-agent-automation-topic-1"><h2>1. 如何拆分工作流</h2><p>两种情况下，一个任务步骤需要被拆分出来：</p>
+<link rel="stylesheet" href="/assets/site-analytics.css?v=efa5eff23c74397c" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js?v=32948d8c69df918b" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/automation/index.ai.json"><link rel="describedby" href="/software/llms.txt"><link rel="stylesheet" href="/assets/progress.css?v=eed109dcac746245"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js?v=8301171804d0aafc"></script><script defer src="/assets/tutorial-settings.js?v=488cfd8551be8ca3"></script><script defer src="/assets/progress-model.js?v=693a69023749db1c"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js?v=72f86c7d2ef0a6d1"></script><script defer src="/assets/progress-ui.js?v=1bab3d666a908964"></script></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header id="topbar" class="preview-header tutorial-settingsbar" data-tutorial-settings><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a><button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">四. 自动化工作流</span></li></ol></nav><h1>四. 自动化工作流</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><details open><summary>本章目录</summary><ul><li><a href="#course-agent-automation-topic-1">1. 如何拆分工作流</a></li><li><a href="#course-agent-automation-topic-2">2. 为模型、程序和人分配工作</a></li><li><a href="#course-agent-automation-topic-3">3. 为不同情况设计处理路径</a></li><li><a href="#course-agent-automation-topic-4">4. 检查和反馈循环</a></li><li><a href="#course-agent-automation-topic-5">5. 工作流案例</a></li></ul></details></nav><article class="tutorial-content"><section id="course-agent-automation-topic-1"><h2>1. 如何拆分工作流</h2><p>两种情况下，一个任务步骤需要被拆分出来：</p>
 <h3 id="course-agent-automation-topic-1-heading-1">1.1 需要单独控制的独立环节</h3>
 <p>通常有以下几种情况：</p>
 <ul><li>必须先取得外部事实或其余结果才能决定后续操作</li><li>必须按固定规则或程序作出</li><li>需要单独复用、重试或采用不同权限</li><li>希望对该部分插入检查</li></ul>
@@ -261,4 +268,35 @@ issues：问题字段、当前值、原文依据、应如何修改</code></pre>
     J --&gt; K</code></pre>
 <p>这里固定的是调查的控制过程，具体搜索什么由实际结果决定。例如，发现两个来源的数字冲突，就进一步核对统计时间和口径。</p>
 <p>下一步应依据已经读到的证据选择。达到查询上限时交代现有结论和缺口，避免为了交付完整答案而补写没有依据的内容。</p>
-<p>来源：<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">Anthropic：基于实际反馈选择后续行动</a>。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/agent-discovery/">去哪里找 AI Agent、Skill、Harness 和现成工作流</a><a href="/software/agents-automation/agent-evaluation/">如何评估与改进 AI Agent：LangSmith 测试集与评分</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main><script defer src="/assets/app/shared.js"></script><script defer src="/assets/app/tutorial-diagrams.js"></script><script defer src="/assets/tutorial-static.js"></script></body></html>
+<p>来源：<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">Anthropic：基于实际反馈选择后续行动</a>。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/agent-discovery/">去哪里找 AI Agent、Skill、Harness 和现成工作流</a><a href="/software/agents-automation/agent-evaluation/">如何评估与改进 AI Agent：LangSmith 测试集与评分</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main><script defer src="/assets/app/shared.js"></script><script defer src="/assets/app/tutorial-diagrams.js"></script><script defer src="/assets/tutorial-static.js"></script><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>

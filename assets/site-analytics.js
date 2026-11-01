@@ -115,6 +115,14 @@
     }
     toggle.addEventListener('click', () => { render(); panel.hidden = !panel.hidden; toggle.setAttribute('aria-expanded', String(!panel.hidden)); });
     doc.body.appendChild(toggle); doc.body.appendChild(panel); render(); panel.hidden = consent !== null || protectedChoice; toggle.setAttribute('aria-expanded', String(!panel.hidden));
+    // Locale initialization happens after this deferred script. Refresh consent
+    // copy without changing the visitor's stored choice or starting analytics.
+    if(win.MutationObserver)new win.MutationObserver(render).observe(doc.documentElement, {attributes:true,attributeFilter:['lang']});
+    let resumePanel = false;
+    win.addEventListener('ai-settings-visibility', event => {
+      if(event.detail?.open) { resumePanel=!panel.hidden;panel.hidden=true;toggle.hidden=true; }
+      else { panel.hidden=!resumePanel;toggle.hidden=false;toggle.setAttribute('aria-expanded',String(!panel.hidden)); }
+    });
     state('off'); if (consent === 'granted' && !protectedChoice) start();
     const schedule = () => { win.clearTimeout(timer); timer = win.setTimeout(pageView, 0); };
     for (const method of ['pushState', 'replaceState']) {

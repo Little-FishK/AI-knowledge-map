@@ -62,6 +62,7 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
     settingsOverlay.classList.remove("hidden");
     settingsOverlay.setAttribute("aria-hidden", "false");
     settingsButton.setAttribute("aria-expanded", "true");
+    global.dispatchEvent(new CustomEvent('ai-settings-visibility', {detail:{open:true}}));
     topbar.inert = true;
     main.inert = true;
     if (document.getElementById("onboarding")) document.getElementById("onboarding").inert = true;
@@ -73,6 +74,7 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
     settingsOverlay.classList.add("hidden");
     settingsOverlay.setAttribute("aria-hidden", "true");
     settingsButton.setAttribute("aria-expanded", "false");
+    global.dispatchEvent(new CustomEvent('ai-settings-visibility', {detail:{open:false}}));
     topbar.inert = false;
     main.inert = false;
     if (document.getElementById("onboarding")) document.getElementById("onboarding").inert = false;

@@ -122,6 +122,35 @@
       revealed: new Set(),                  // 核心视图下被点开而揭示出来的节点
       selected: null
     };
+    const viewKey = 'ai-knowledge-map.map-view.v1';
+    let restoredViewport = null;
+    const savedView = (() => {
+      try {
+        const value = JSON.parse(global.localStorage.getItem(viewKey));
+        return value?.version === 1 && value.graphVersion === G.meta.version ? value : null;
+      } catch (_) { return null; }
+    })();
+    function saveView() {
+      if (!isActive()) return;
+      try { global.localStorage.setItem(viewKey, JSON.stringify({
+        version:1, graphVersion:G.meta.version, scope:state.scope, domains:state.domains, edges:state.edges,
+        revealed:[...state.revealed], selected:state.selected, zoom:cy.zoom(),pan:cy.pan(),
+      })); } catch (_) { /* View preferences are optional; learning records are separate. */ }
+    }
+    function restoreView(selected = null) {
+      if (selected && savedView?.selected !== selected) return false;
+      if (!savedView || !Number.isFinite(savedView.zoom) || !Number.isFinite(savedView.pan?.x) || !Number.isFinite(savedView.pan?.y)) return false;
+      state.scope = savedView.scope === 'all' ? 'all' : 'core';
+      for (const key of Object.keys(state.domains)) state.domains[key] = savedView.domains?.[key] !== false;
+      for (const key of Object.keys(state.edges)) state.edges[key] = savedView.edges?.[key] !== false;
+      state.revealed = new Set((Array.isArray(savedView.revealed) ? savedView.revealed : []).filter(id=>byId[id]));
+      syncControls();applyFilters();
+      // A clean map URL restores viewport/filter preferences, not a stale modal.
+      viewportMoveToken++;cy.stop(true,false);
+      restoredViewport={zoom:Math.max(cy.minZoom(),Math.min(cy.maxZoom(),savedView.zoom)),pan:savedView.pan};
+      cy.viewport(restoredViewport);
+      return true;
+    }
 
     // 某节点在当前 scope 下是否该出现
     function inScope(id) {
@@ -667,8 +696,31 @@
           if (position) node.position(position);
         });
       });
+      separateLabelBounds();
       if (result.report.sameDomainOverlaps.length || result.report.occlusionViolations.length) {
         console.warn("布局碰撞消解未完全收敛：", result.report);
+      }
+    }
+
+    // Use the renderer's actual localized label bounds, including cross-domain
+    // pairs, while keeping the authoritative graph positions untouched.
+    function separateLabelBounds() {
+      const nodes=cy.nodes().filter(n=>!n.hasClass('hidden')).toArray();
+      for(let pass=0;pass<32;pass++) {
+        let moved=false;
+        const boxes=nodes.map(n=>n.boundingBox({includeLabels:true,includeOverlays:false}));
+        for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++) {
+          const a=boxes[i],b=boxes[j],dx=Math.min(a.x2,b.x2)-Math.max(a.x1,b.x1)+8,dy=Math.min(a.y2,b.y2)-Math.max(a.y1,b.y1)+8;
+          if(dx<=0||dy<=0)continue;
+          const axis=dx<dy?'x':'y',delta=(axis==='x'?dx:dy)/2+1;
+          const sign=nodes[i].position(axis)<=nodes[j].position(axis)?1:-1;
+          nodes[i].position(axis,nodes[i].position(axis)-delta*sign);
+          nodes[j].position(axis,nodes[j].position(axis)+delta*sign);
+          if(axis==='x'){a.x1-=delta*sign;a.x2-=delta*sign;b.x1+=delta*sign;b.x2+=delta*sign;}
+          else{a.y1-=delta*sign;a.y2-=delta*sign;b.y1+=delta*sign;b.y2+=delta*sign;}
+          moved=true;
+        }
+        if(!moved)break;
       }
     }
 
@@ -700,6 +752,11 @@
       if (cy.zoom() > 1.5) {
         cy.zoom({ level: 1.5, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
         cy.center(vis);
+      }
+      if (global.matchMedia('(max-width: 720px)').matches && cy.zoom() < 1) {
+        cy.zoom(1);
+        const first = cy.getElementById(state.selected || [...CORE][0]);
+        cy.center(first.length ? first : vis);
       }
     }
 
@@ -923,9 +980,10 @@
         const x2 = Math.max(...points.map(p => p.x)) + 105;
         const y1 = Math.min(...points.map(p => p.y)) - 70;
         const y2 = Math.max(...points.map(p => p.y)) + 70;
-        const zoom = Math.max(cy.minZoom(), Math.min(1.25, cy.maxZoom(), (cy.width() - 50) / (x2 - x1), (cy.height() - 50) / (y2 - y1)));
+        const zoom = Math.max(global.matchMedia('(max-width: 720px)').matches ? 1 : cy.minZoom(), Math.min(1.25, cy.maxZoom(), (cy.width() - 50) / (x2 - x1), (cy.height() - 50) / (y2 - y1)));
         cy.stop(true, false);
-        cy.animate({zoom, pan: {x: cy.width() / 2 - (x1 + x2) / 2 * zoom, y: cy.height() / 2 - (y1 + y2) / 2 * zoom}}, {duration, queue: false, easing: 'ease-in-out-cubic'});
+        if(restoredViewport){cy.viewport(restoredViewport);restoredViewport=null;}
+        else cy.animate({zoom, pan: {x: cy.width() / 2 - (x1 + x2) / 2 * zoom, y: cy.height() / 2 - (y1 + y2) / 2 * zoom}}, {duration, queue: false, easing: 'ease-in-out-cubic'});
       }, reduced ? 0 : 360);
     }
 
@@ -1068,6 +1126,7 @@
     }
 
     function select(id, jumped) {
+      restoredViewport=null;
       const node = cy.getElementById(id);
       if (!node.length) return;
       const n = byId[id];
@@ -1216,7 +1275,7 @@
         state.scope = btn.dataset.scope;
         applyFilters();
         cy.stop(true, false);
-        cy.zoom(state.scope === "core" ? 1 : 0.5);
+        cy.zoom(global.matchMedia('(max-width: 720px)').matches ? 1 : state.scope === "core" ? 1 : 0.5);
         const visibleNodes = cy.nodes().not(".hidden");
         if (visibleNodes.length) cy.center(visibleNodes);
       });
@@ -1275,6 +1334,8 @@
     controlsToggle.addEventListener("click", () => {
       setControlsExpanded(appShell.classList.contains("controls-collapsed"));
     });
+    const listLabel=document.createElement('span');listLabel.className='controls-mobile-label';controlsToggle.append(listLabel);
+    const mobileHint=document.createElement('p');mobileHint.className='map-mobile-hint';document.getElementById('cy').after(mobileHint);
     if (global.matchMedia?.('(max-width: 720px)').matches) setControlsExpanded(false);
 
     /* ───────────────────────── 搜索 ───────────────────────── */
@@ -1285,11 +1346,17 @@
     function doSearch() {
       const q = search.value.trim().toLowerCase();
       if (!q) { results.classList.remove("open"); return; }
-      const hits = G.nodes.map(n => localizedNode(n.id)).filter(n =>
-        n.title.toLowerCase().includes(q) ||
-        (n.aliases || []).some(a => a.toLowerCase().includes(q)) ||
-        (n.summary || "").toLowerCase().includes(q)
-      ).slice(0, 12);
+      const terms=q.normalize('NFKC').split(/\s+/).filter(Boolean);
+      const normalize=value=>String(value||'').normalize('NFKC').toLowerCase();
+      const match=(value,term,prefix)=>/[^\x00-\x7f]/.test(term)
+        ? value.includes(term)
+        : value.split(/[^\p{L}\p{N}]+/u).some(word=>prefix?word.startsWith(term):word===term);
+      const hits=G.nodes.map((source,index)=>{
+        const n=localizedNode(source.id),names=[n.title,...(n.aliases||[])].map(normalize),summary=normalize(n.summary);
+        if(!terms.every(term=>names.some(name=>match(name,term,true))||match(summary,term,false)))return null;
+        const score=names.some(name=>name===q)?100:names.some(name=>name.startsWith(q))?80:names.some(name=>terms.every(term=>match(name,term,true)))?60:20;
+        return {n,score,index};
+      }).filter(Boolean).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,12).map(hit=>hit.n);
 
       results.innerHTML = hits.length
         ? hits.map(n => `<button type="button" class="sr-item" data-id="${esc(n.id)}">
@@ -1365,12 +1432,17 @@
       });
       updateScopeUI();
       setControlsExpanded(!appShell.classList.contains("controls-collapsed"));
+      listLabel.textContent=document.documentElement.lang==='en'?'Concept list':'概念列表';
+      mobileHint.textContent=document.documentElement.lang==='en'?'Pan to explore · Find concepts in the list or search.':'拖动探索 · 可从概念列表或搜索查找';
+      separateLabelBounds();
       renderLegend();
       if (results.classList.contains("open")) doSearch();
       if (state.selected) openDetail(state.selected);
     }
 
 
+    cy.on('pan zoom',debounce(saveView,250));
+    global.addEventListener('pagehide',saveView);
     return Object.freeze({
       clearSelection: clearGraphSelection,
       cy,
@@ -1378,6 +1450,7 @@
       detailBody,
       refreshLanguage,
       resize: () => cy.resize(),
+      restoreView,
       selectNode: select,
       zoomRoot: zoomUi.root,
     });

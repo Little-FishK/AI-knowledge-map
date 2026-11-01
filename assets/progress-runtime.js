@@ -20,6 +20,7 @@
     let guestImportPreview = [];
     let sessionGeneration = 0;
     let loading = false;
+    let localSaveFailed = false;
 
     function safeGet(key) { try { return storage?.getItem(key) || ''; } catch (_) { return ''; } }
     function safeSet(key, value) { try { storage?.setItem(key, value); return true; } catch (_) { return false; } }
@@ -32,14 +33,14 @@
       return model.empty(owner);
     }
     function stateKey(owner = state.owner) { return owner === 'guest' ? GUEST_KEY : ACCOUNT_PREFIX + owner + '.v1'; }
-    function persist() { return safeSet(stateKey(), JSON.stringify(state)); }
+    function persist() { localSaveFailed = !safeSet(stateKey(), JSON.stringify(state)); return !localSaveFailed; }
     function finishImport() {
       const decision=state.guestImportDecision;
       if(!decision?.pendingKeys)return;
       if(decision.pendingKeys.some(key=>state.conflicts[key]||state.pending.some(op=>model.key(op.nodeId,op.field)===key)))return;
       state.guestImportDecision={completedAt:new Date().toISOString()};
     }
-    function snapshot() { return {state: JSON.parse(JSON.stringify(state)), session, error:lastError, loading, importPreview:JSON.parse(JSON.stringify(guestImportPreview))}; }
+    function snapshot() { return {state: JSON.parse(JSON.stringify(state)), session, error:lastError, loading, localSaveFailed, importPreview:JSON.parse(JSON.stringify(guestImportPreview))}; }
     function emit() { const value = snapshot(); listeners.forEach(listener => listener(value)); }
     function operationId() {
       if (options.randomUUID) return options.randomUUID();
@@ -162,8 +163,13 @@
       return flush();
     }
     function exportData() { return JSON.stringify({exportVersion:1,exportedAt:new Date().toISOString(),progress:snapshot().state},null,2); }
+    function restoreGuest(backup) {
+      state = model.restoreGuest(state, backup);
+      persist(); emit();
+      return snapshot();
+    }
     function subscribe(listener) { listeners.add(listener); listener(snapshot()); return () => listeners.delete(listener); }
-    return Object.freeze({change, completeGuestImport, deleteAccount, exportData, flush, get:snapshot, migrateLegacy, refresh, resolveConflict, sendCode, signOut, start, subscribe, verifyCode});
+    return Object.freeze({change, completeGuestImport, deleteAccount, exportData, flush, get:snapshot, migrateLegacy, refresh, resolveConflict, restoreGuest, sendCode, signOut, start, subscribe, verifyCode});
   }
   return Object.freeze({create});
 });

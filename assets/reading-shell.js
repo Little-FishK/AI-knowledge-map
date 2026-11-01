@@ -47,6 +47,12 @@
         const expected = location.pathname.replace(/\/(zh|en)\/concepts\//, `/${locale === 'en' ? 'en' : 'zh'}/concepts/`);
         if (target.origin === location.origin && target.pathname === expected && target.pathname !== location.pathname) {
           target.searchParams.delete('lang');
+          // Published counterparts retain stable section IDs. Preserve the
+          // current section (including the nearest heading during free scroll).
+          const sections = [...article.querySelectorAll('h2[id], h3[id]')];
+          const current = sections.filter(node => node.getBoundingClientRect().top <= 140).at(-1);
+          const id = current?.id || location.hash.slice(1);
+          if (id && /^[a-zA-Z0-9_-]+$/.test(id)) target.hash = id;
           location.assign(target.href);
           return;
         }

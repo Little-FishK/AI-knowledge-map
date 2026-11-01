@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css">
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style id="initial-canvas">:root{color-scheme:dark;background:#14161a;color:#dfe3ea}body{background:#14161a}@media print{:root{color-scheme:light;background:#fff;color:#000}body{background:#fff}}</style><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/style.css?v=47c98a768d3308b3"><link rel="stylesheet" href="/assets/concept-preview.css"><link rel="stylesheet" href="/assets/reading.css"><link rel="stylesheet" href="/assets/tutorial-static.css?v=62ea32be5fc73dc3">
 
 
 
@@ -50,9 +50,16 @@
 <meta name="twitter:image" content="https://ai-knowledge-map.com/assets/social/site-card.png">
 <meta name="twitter:image:alt" content="AI 知识地图 / AI Knowledge Map">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","@id":"https://ai-knowledge-map.com/software/agents-automation/agent-evaluation/#page","name":"如何评估与改进 AI Agent：LangSmith 测试集与评分","description":"认识四类评估工具，按 LangSmith 教学步骤准备测试集、设置评分、解读报告并比较提示词版本；保留课程对资料核对、演示结果和未完整试跑的说明。","url":"https://ai-knowledge-map.com/software/agents-automation/agent-evaluation/","inLanguage":"zh-Hans","isPartOf":{"@id":"https://ai-knowledge-map.com/#website"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"AI 知识地图","item":"https://ai-knowledge-map.com/"},{"@type":"ListItem","position":2,"name":"AI 软件教程","item":"https://ai-knowledge-map.com/software/catalog/"},{"@type":"ListItem","position":3,"name":"五. 评分与改进系统","item":"https://ai-knowledge-map.com/software/agents-automation/agent-evaluation/"}]}]</script>
-<link rel="stylesheet" href="/assets/site-analytics.css" data-site-analytics="true">
-<script defer src="/assets/site-analytics.js" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
-<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/agent-evaluation/index.ai.json"><link rel="describedby" href="/software/llms.txt"></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header class="preview-header"><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">五. 评分与改进系统</span></li></ol></nav><h1>五. 评分与改进系统</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><strong>本章目录</strong><ul><li><a href="#course-agent-evaluation-introduction">阅读说明</a></li><li><a href="#course-agent-evaluation-topic-1">1. 评估工具的种类</a></li><li><a href="#course-agent-evaluation-topic-2">2. 独立评估平台和使用</a></li><li><a href="#course-agent-evaluation-topic-3">3. 改进</a></li></ul></nav><article class="tutorial-content"><section id="course-agent-evaluation-introduction"><h2>阅读说明</h2><p>本稿第二、三节采用 LangSmith 云端界面编写具体教学，供课程审阅。操作入口依据2026年10月30日可查的官方文档核对，尚未使用登录账号完整试跑；文中的演示回答不代表实测结果。</p></section><section id="course-agent-evaluation-topic-1"><h2>1. 评估工具的种类</h2><p>本节介绍独立评估平台、制作平台内置的评估工具、评估框架，以及安全与对抗测试工具四类。前三类按产品形态划分，第四类按测试用途单列，部分工具会同时出现在不同类别中。同一类别中的工具有较多功能重叠，通常按需要选择一种；独立评估平台不需要全部使用。</p>
+<link rel="stylesheet" href="/assets/site-analytics.css?v=efa5eff23c74397c" data-site-analytics="true">
+<script defer src="/assets/site-analytics.js?v=32948d8c69df918b" data-site-analytics="true" data-measurement-id="G-RTDE80YXPH" data-site-host="ai-knowledge-map.com"></script>
+<link rel="alternate" type="application/json" title="Tutorial machine-readable companion" href="/software/agents-automation/agent-evaluation/index.ai.json"><link rel="describedby" href="/software/llms.txt"><link rel="stylesheet" href="/assets/progress.css?v=eed109dcac746245"><script defer src="/data/locales/manifest.js"></script><script defer src="/data/locales/zh-Hans/ui.js"></script><script defer src="/data/locales/en/ui.js"></script><script defer src="/assets/app/i18n.js"></script><script defer src="/assets/shared-settings.js?v=8301171804d0aafc"></script><script defer src="/assets/tutorial-settings.js?v=488cfd8551be8ca3"></script><script defer src="/assets/progress-model.js?v=693a69023749db1c"></script><script defer src="/assets/progress-supabase.js"></script><script defer src="/assets/progress-runtime.js?v=72f86c7d2ef0a6d1"></script><script defer src="/assets/progress-ui.js?v=1bab3d666a908964"></script></head><body class="concept-preview tutorial-static"><a class="preview-skip" href="#main-content">跳到正文 / Skip to content</a><header id="topbar" class="preview-header tutorial-settingsbar" data-tutorial-settings><a href="/">AI 知识地图</a><a href="/search/">搜索与文字目录 / Search</a><button id="btn-settings" class="btn icon-btn" type="button" title="打开设置"
+              aria-label="打开设置" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"
+              data-i18n-title="settings.open" data-i18n-aria-label="settings.open">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 8.25A3.75 3.75 0 1 0 12 15.75 3.75 3.75 0 0 0 12 8.25Z"></path>
+          <path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.65-1.27-1.8-3.12-1.94.79a7.75 7.75 0 0 0-2.6-1.5L14.42 3h-3.6l-.3 2.4a7.75 7.75 0 0 0-2.59 1.5l-1.94-.79-1.8 3.12L5.84 10.5a7.8 7.8 0 0 0 0 3L4.2 14.77l1.8 3.12 1.94-.79a7.75 7.75 0 0 0 2.6 1.5l.29 2.4h3.6l.3-2.4a7.75 7.75 0 0 0 2.59-1.5l1.94.79 1.8-3.12L19.4 13.5Z"></path>
+        </svg>
+      </button></header><main id="main-content" class="site-directory" tabindex="-1"><nav class="site-breadcrumbs" aria-label="面包屑导航"><ol><li><a href="https://ai-knowledge-map.com/">AI 知识地图</a></li><li><a href="https://ai-knowledge-map.com/software/catalog/">AI 软件教程</a></li><li><span aria-current="page">五. 评分与改进系统</span></li></ol></nav><h1>五. 评分与改进系统</h1><div class="tutorial-layout"><nav class="tutorial-toc" aria-label="本章目录"><details open><summary>本章目录</summary><ul><li><a href="#course-agent-evaluation-introduction">阅读说明</a></li><li><a href="#course-agent-evaluation-topic-1">1. 评估工具的种类</a></li><li><a href="#course-agent-evaluation-topic-2">2. 独立评估平台和使用</a></li><li><a href="#course-agent-evaluation-topic-3">3. 改进</a></li></ul></details></nav><article class="tutorial-content"><section id="course-agent-evaluation-introduction"><h2>阅读说明</h2><p>本稿第二、三节采用 LangSmith 云端界面编写具体教学，供课程审阅。操作入口依据2026年10月30日可查的官方文档核对，尚未使用登录账号完整试跑；文中的演示回答不代表实测结果。</p></section><section id="course-agent-evaluation-topic-1"><h2>1. 评估工具的种类</h2><p>本节介绍独立评估平台、制作平台内置的评估工具、评估框架，以及安全与对抗测试工具四类。前三类按产品形态划分，第四类按测试用途单列，部分工具会同时出现在不同类别中。同一类别中的工具有较多功能重叠，通常按需要选择一种；独立评估平台不需要全部使用。</p>
 <p><strong>第一类：独立评估平台</strong></p>
 <table class="d-table"><thead><tr><th>工具</th><th>主要用途</th></tr></thead><tbody><tr><td><a href="https://docs.langchain.com/langsmith/evaluation" target="_blank" rel="noopener noreferrer">LangSmith</a></td><td>管理测试案例，评价回答与 Agent 执行表现，进行人工复核并比较不同版本。</td></tr><tr><td><a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener noreferrer">Braintrust</a></td><td>管理数据集与评分器，运行评估实验，结合人工审核和实际运行数据比较质量变化。</td></tr><tr><td><a href="https://langfuse.com/docs/evaluation/overview" target="_blank" rel="noopener noreferrer">Langfuse</a></td><td>对执行记录进行评分，将实际案例整理为数据集，比较提示词、模型或应用改动的效果。</td></tr><tr><td><a href="https://arize.com/docs/phoenix/" target="_blank" rel="noopener noreferrer">Arize Phoenix</a></td><td>结合执行记录检查检索、模型调用和工具执行，对输出评分并比较实验结果。</td></tr><tr><td><a href="https://www.comet.com/docs/opik/evaluation/overview" target="_blank" rel="noopener noreferrer">Opik</a></td><td>将真实失败整理为测试案例，使用自然语言检查条件或评价指标进行评估，发现行为与质量退步。</td></tr></tbody></table>
 <p><strong>第二类：平台内置的评估工具</strong></p>
@@ -216,4 +223,35 @@
 <h4 id="course-agent-evaluation-topic-3-heading-8">三. 验证候选并决定是否采用</h4>
 <p>用第三节前面的比较方法检查自动候选：原失败是否改善、原通过题是否退步、独立题是否正确，以及额外费用和耗时是否值得。费用、评分错误和缺失结果都应保留在记录里。</p>
 <p>保存一份简要的优化记录：初始提示词版本、允许修改的范围、train／dev／test分组、固定评分规则、优化轮数、候选版本、实验链接、独立测试结果，以及采用或不采用的理由。没有改善时保留初始版本；一旦把独立测试反馈用于再次修改，下一轮就要补充新的保留测试。</p>
-<p>自动优化可以自动生成和比较候选，本教程中的采用与发布仍沿用前面的结果核对。得到候选提示词不代表Dify应用已经更新，实际使用时还要在目标应用中配置并验证。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/automation/">如何设计 AI 自动化工作流：任务拆分、分支与反馈</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main></body></html>
+<p>自动优化可以自动生成和比较候选，本教程中的采用与发布仍沿用前面的结果核对。得到候选提示词不代表Dify应用已经更新，实际使用时还要在目标应用中配置并验证。</p></section><nav class="tutorial-pagination" aria-label="前后章节"><a href="/software/agents-automation/automation/">如何设计 AI 自动化工作流：任务拆分、分支与反馈</a></nav><footer class="tutorial-footer"><a href="/about/">关于项目与纠错</a></footer></article></div></main><div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+    <button id="settings-backdrop" class="settings-backdrop" type="button" tabindex="-1" aria-label="关闭设置"
+            data-i18n-aria-label="settings.close"></button>
+    <section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-head">
+        <div>
+          <span class="settings-eyebrow" data-i18n="settings.eyebrow">偏好设置</span>
+          <h2 id="settings-title" data-i18n="settings.title">设置</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" title="关闭设置" aria-label="关闭设置"
+                data-i18n-title="settings.close" data-i18n-aria-label="settings.close">×</button>
+      </header>
+      <div class="settings-body">
+        <section class="settings-group" id="settings-account"></section>
+        <section class="settings-group" aria-labelledby="settings-language-title">
+          <h3 id="settings-language-title" data-i18n="settings.language.section">语言</h3>
+          <div class="settings-row">
+            <div>
+              <strong id="settings-language-label" data-i18n="settings.language.label">显示语言</strong>
+              <span id="settings-language-description" data-i18n="settings.language.description">控制界面语言；未翻译的知识内容显示中文原文</span>
+            </div>
+            <select id="settings-language-select" class="settings-select"
+                    aria-labelledby="settings-language-label" aria-describedby="settings-language-description settings-language-note">
+              <option value="zh-Hans">简体中文</option>
+            </select>
+          </div>
+          <p id="settings-language-note" class="settings-note" data-i18n="settings.language.comingSoon">语言更改会立即生效，并保存在当前浏览器中。</p>
+          <p id="settings-language-status" class="settings-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+  </div></body></html>
