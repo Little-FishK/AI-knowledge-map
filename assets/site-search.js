@@ -35,6 +35,6 @@
   function loadFullText() {
     requested = true;
     const controller = new AbortController(), timeout = setTimeout(() => controller.abort(),8000);
-    fetch(new URL('../assets/site-search-index.json',location.href), {signal:controller.signal}).then(r=>{if(!r.ok)throw Error('Search index unavailable');return r.json();}).then(data=>{if(!Array.isArray(data)||!data.length||data.some(r=>typeof r.href!=='string'||typeof r.text!=='string'))throw Error('Invalid search index');fullText=new Map(data.map(row=>[new URL(row.href,location.href).pathname,row]));failed=false;search();}).catch(()=>{failed=true;search();}).finally(()=>clearTimeout(timeout));
+    fetch(new URL('../assets/site-search-index.json',location.href), {signal:controller.signal}).then(r=>{if(!r.ok)throw Error('Search index unavailable');return r.json();}).then(data=>{if(!Array.isArray(data)||!data.length||data.some(r=>typeof r.href!=='string'||(r.text!==undefined&&typeof r.text!=='string')))throw Error('Invalid search index');fullText=new Map(data.map(row=>[new URL(row.href,location.href).pathname,row]));failed=false;search();}).catch(()=>{failed=true;search();}).finally(()=>clearTimeout(timeout));
   }
 })();
