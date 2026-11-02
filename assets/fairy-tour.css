@@ -1,0 +1,29 @@
+#fairy-tour { position:fixed; inset:0; z-index:1000; pointer-events:none; color:var(--fg,#e5ecee); font:14px/1.6 system-ui,sans-serif; }
+#fairy-tour[hidden] { display:none; }
+#fairy-tour .fairy-shade { position:fixed; background:rgba(3,9,19,.65); pointer-events:auto; }
+#fairy-tour .fairy-focus { position:fixed; border:2px solid #70e7ed; border-radius:12px; box-shadow:0 0 0 3px #49cddd33,0 0 24px #60e3ee66; pointer-events:none; }
+#fairy-tour .fairy-sprite { position:fixed; width:112px; height:75px; pointer-events:none; transition:transform .6s cubic-bezier(.2,.8,.2,1); will-change:transform; }
+#fairy-tour .fairy-sprite img { display:block; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; animation:fairy-hover 2.5s ease-in-out infinite; }
+#fairy-tour .fairy-sprite::after { content:'· ✧ ·'; position:absolute; left:-26px; top:36px; color:#a3eeee; font-size:23px; letter-spacing:4px; opacity:0; }
+#fairy-tour .fairy-sprite.travelling::after { animation:fairy-trail .7s ease-out; }
+#fairy-tour .fairy-card { position:fixed; width:310px; max-width:calc(100vw - 24px); padding:18px; border:1px solid var(--line,#40536a); border-radius:16px; background:var(--bg-panel,#14202c); box-shadow:0 12px 45px #0005; pointer-events:auto; box-sizing:border-box; }
+#fairy-tour .fairy-step { color:var(--fg-dim,#a7b7c3); font-size:11px; letter-spacing:.06em; }
+#fairy-tour h2 { margin:5px 0 8px; font-size:18px; line-height:1.4; color:var(--fg,#e5ecee); }
+#fairy-tour p { margin:0; color:var(--fg-dim,#a7b7c3); font-size:13px; }
+#fairy-tour .fairy-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+#fairy-tour button { min-height:44px; padding:8px 12px; border:1px solid var(--line,#40536a); border-radius:8px; background:var(--bg-raise,#203344); color:var(--fg,#e5ecee); cursor:pointer; font:inherit; font-size:13px; }
+#fairy-tour button[data-fairy-action] { background:#a9edf0; color:#10343d; border-color:#a9edf0; font-weight:600; }
+#fairy-tour button[data-fairy-skip] { border-color:transparent; background:transparent; color:var(--fg-dim,#a7b7c3); }
+#fairy-tour button:focus-visible { outline:3px solid #40cbdc; outline-offset:3px; }
+#fairy-tour button:disabled { opacity:.55; cursor:wait; }
+#fairy-tour .fairy-pointer { position:fixed; width:22px; height:22px; border-right:3px solid #a2f4f2; border-bottom:3px solid #a2f4f2; transform:rotate(45deg); filter:drop-shadow(0 2px 4px #0008); animation:fairy-point 1.1s ease-in-out 3; }
+#fairy-tour[data-unavailable="true"] .fairy-focus,#fairy-tour[data-unavailable="true"] .fairy-pointer { display:none; }
+@keyframes fairy-hover { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-6px) rotate(3deg); } }
+@keyframes fairy-point { 50% { translate:0 5px; } }
+@keyframes fairy-trail { 0% { opacity:.9; translate:8px 0; } 100% { opacity:0; translate:-14px 8px; } }
+#fairy-tour[data-reduce-motion="true"] .fairy-sprite { transition:none; }
+#fairy-tour[data-reduce-motion="true"] .fairy-sprite img,#fairy-tour[data-reduce-motion="true"] .fairy-pointer,#fairy-tour[data-reduce-motion="true"] .fairy-sprite::after { animation:none; }
+@media(prefers-reduced-motion:reduce) { #fairy-tour .fairy-sprite { transition:none; } #fairy-tour .fairy-sprite img,#fairy-tour .fairy-pointer,#fairy-tour .fairy-sprite::after { animation:none; } }
+@media(max-width:480px) { #fairy-tour .fairy-card { width:292px; padding:14px; } #fairy-tour .fairy-sprite { width:96px; height:64px; } }
+@media print { #fairy-tour { display:none!important; } }
+.fairy-guide-settings [data-fairy-replay] { min-height:44px; flex-shrink:0; font:inherit; font-size:13px; }

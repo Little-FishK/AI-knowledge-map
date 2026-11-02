@@ -11,6 +11,16 @@
   window.createMapSettings({language,manifest:window.I18N_MANIFEST,content:{ensureLocale:async () => {}}});
   // Clean view paths; the active language travels as a query parameter.
   const route = (path = '', extra = '') => `${base}${path}?lang=${encodeURIComponent(language.getLocale())}${extra}`;
+  const conceptId = location.pathname.match(/\/(?:zh|en)\/concepts\/([a-z0-9-]+)\//)?.[1];
+  let mapBack = null;
+  if (article && conceptId) {
+    mapBack = document.createElement('a');
+    mapBack.id = 'reading-map-back'; mapBack.className = 'btn reading-map-back';
+    mapBack.style.cssText = 'display:inline-flex;align-items:center;min-height:44px;margin:12px 0;padding:8px 14px;text-decoration:none';
+    const backRow = document.createElement('nav');
+    backRow.style.cssText = 'max-width:860px;margin:auto;padding:0 24px';
+    backRow.append(mapBack); article.before(backRow);
+  }
   bar.querySelectorAll('[data-mode]').forEach(button => {
     const mode = button.dataset.mode;
     button.onclick = () => location.assign(route(mode === 'graph' ? '' : `${mode}/`));
@@ -33,6 +43,7 @@
   function localize() {
     language.localize(bar);
     const en = language.getLocale() === 'en';
+    if (mapBack) { mapBack.textContent = en ? '← Back to node map' : '← 返回节点地图'; mapBack.href = route('', '&node=' + encodeURIComponent(conceptId)); }
     bar.querySelector('[data-shell-about]').textContent = en ? 'About / Corrections' : '关于与纠错';
     bar.querySelector('[data-shell-search]').textContent = en ? 'Text directory / Search' : '文字目录 / Search';
     let notice = document.getElementById('reading-language-notice');

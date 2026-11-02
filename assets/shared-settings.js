@@ -1,5 +1,6 @@
 (function (global) {
 "use strict";
+const guideRoot = new URL('../', document.currentScript.src);
 global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST}) {
   const settingsButton = document.getElementById("btn-settings");
   const settingsOverlay = document.getElementById("settings-overlay");
@@ -15,11 +16,22 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
   const help = document.createElement('section'); help.className='settings-group site-help';
   help.innerHTML='<h3 data-help-title></h3><details><summary data-help-summary></summary><div data-help-body></div></details><p><a data-help-search></a> · <a data-help-feedback target="_blank" rel="noopener noreferrer"></a></p>';
   settingsDialog.querySelector('.settings-body').append(help);
+  const guideGroup=document.createElement('section');guideGroup.className='settings-group fairy-guide-settings';
+  guideGroup.innerHTML='<h3 data-fairy-settings-title></h3><div class="settings-row"><div><span data-fairy-settings-description></span></div><button type="button" class="btn" data-fairy-replay style="min-height:44px;flex-shrink:0"></button></div>';
+  settingsDialog.querySelector('.settings-body').prepend(guideGroup);
+  guideGroup.querySelector('[data-fairy-replay]').addEventListener('click',()=>{
+    closeSettings();
+    if(global.AI_FAIRY_TOUR){global.AI_FAIRY_TOUR.start();return;}
+    const url=new URL(guideRoot);url.searchParams.set('lang',language.getLocale());url.searchParams.set('walkthrough','1');location.assign(url);
+  });
   const article=document.getElementById('dd-article')||document.querySelector('.tutorial-content');
   let feedback;
   if(article){feedback=document.createElement('p');feedback.className='reading-feedback';feedback.innerHTML='<a target="_blank" rel="noopener noreferrer"></a>';article.after(feedback);}
   function renderHelp() {
     const en=language.getLocale()==='en';
+    guideGroup.querySelector('[data-fairy-settings-title]').textContent=en?'Website walkthrough':'网站引导';
+    guideGroup.querySelector('[data-fairy-settings-description]').textContent=en?'Replay the seven-step walkthrough without changing your six-stop course progress.':'重新体验七步引导，不影响六站入门的学习进度。';
+    guideGroup.querySelector('[data-fairy-replay]').textContent=en?'Fairy guide':'精灵引导';
     help.querySelector('[data-help-title]').textContent=en?'Help and corrections':'使用帮助与纠错';
     help.querySelector('[data-help-summary]').textContent=en?'Map controls, progress and connection issues':'地图操作、学习记录与连接问题';
     const body=help.querySelector('[data-help-body]');body.replaceChildren();
@@ -95,6 +107,9 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
 
   function openSettings() {
     if (!settingsOverlay.classList.contains("hidden")) return;
+    const body=settingsDialog.querySelector('.settings-body');
+    if(body.firstElementChild!==guideGroup)body.prepend(guideGroup);
+    body.scrollTop=0;
     settingsReturnFocus = document.activeElement;
     settingsOverlay.classList.remove("hidden");
     settingsOverlay.setAttribute("aria-hidden", "false");
@@ -151,3 +166,22 @@ global.createMapSettings = function ({language, content, manifest: I18N_MANIFEST
 return {renderLanguageSettings};
 };
 })(window);
+
+// Load the optional walkthrough after the map is usable. The reading shell
+// resumes it across the published LLM reading page without touching its body.
+(function () {
+  'use strict';
+  const assets = new URL('./', document.currentScript.src);
+  let started = false;
+  function loadGuide() {
+    if (started || document.getElementById('fairy-tour-script')) return;
+    if (!document.getElementById('cy') && !/\/(?:zh|en)\/concepts\/llm\//.test(location.pathname)) return;
+    started = true;
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = new URL('fairy-tour.css?v=20261102-1', assets);
+    const script = document.createElement('script'); script.id = 'fairy-tour-script'; script.src = new URL('fairy-tour.js?v=20261102-1', assets); script.async = true;
+    script.onerror = () => { script.remove(); css.remove(); started = false; };
+    document.head.append(css, script);
+  }
+  if (document.getElementById('cy') && document.documentElement.dataset.appReady !== 'true') window.addEventListener('ai-app-ready', loadGuide, {once:true});
+  else loadGuide();
+})();
