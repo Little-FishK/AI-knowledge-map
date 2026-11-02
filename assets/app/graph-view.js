@@ -8,7 +8,9 @@
     const graphStarted = performance.now();
     let initialLayoutDone = false;
     let automaticStatic = false;
-    const motionReduced = () => global.matchMedia('(prefers-reduced-motion: reduce)').matches || global.AI_READER_TOOLS?.preferences().motion === 'reduce' || (automaticStatic && global.AI_READER_TOOLS?.preferences().motion !== 'animate');
+    const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
+    let requestedMotion = global.AI_READER_TOOLS?.preferences().motion || 'auto';
+    const motionReduced = () => motionPreference.matches || requestedMotion === 'reduce' || (automaticStatic && requestedMotion !== 'animate');
     const G = options.graph;
     const DOMAINS = options.domains;
     const ETYPES = options.edgeTypes;
@@ -198,14 +200,29 @@
 
     let graphStyleRules=null;
     const lightTheme=()=>document.documentElement.dataset.readerTheme==='light',themeColorCache=new Map();
-    function themeGraphStyles(rules){graphStyleRules=rules;return rules.map(rule=>({...rule,style:Object.fromEntries(Object.entries(rule.style).map(([property,value])=>{if(!['color','background-color','border-color','line-color','target-arrow-color','source-arrow-color','text-outline-color'].includes(property))return [property,value];return [property,ele=>{const source=typeof value==='function'?value(ele):value;if(!lightTheme())return source;if(property==='color'&&rule.selector.startsWith('node'))return '#000000';if(property==='text-outline-color')return '#ffffff';const role=property==='background-color'||property==='text-outline-color'?'background':'foreground';if(rule.selector==='node.sel'&&property==='border-color')return '#205f9f';const key=role+source;if(!themeColorCache.has(key))themeColorCache.set(key,global.AI_THEME_COLORS?.color(source,role)||source);return themeColorCache.get(key);}];}))}));}
+    function themeGraphStyles(rules) {
+      graphStyleRules = rules;
+      const light = lightTheme();
+      return rules.map(rule => ({...rule, style:Object.fromEntries(Object.entries(rule.style).map(([property,value]) => {
+        if (!light || !['color','background-color','border-color','line-color','target-arrow-color','source-arrow-color','text-outline-color'].includes(property)) return [property,value];
+        if (property === 'color' && rule.selector.startsWith('node')) return [property,'#000000'];
+        if (property === 'text-outline-color') return [property,'#ffffff'];
+        if (rule.selector === 'node.sel' && property === 'border-color') return [property,'#205f9f'];
+        const role = property === 'background-color' ? 'background' : 'foreground';
+        const convert = source => { const key=role+source; if(!themeColorCache.has(key))themeColorCache.set(key,global.AI_THEME_COLORS?.color(source,role)||source);return themeColorCache.get(key); };
+        // Keep constant styles constant. Wrapping every colour in a function
+        // made every visibility change recompute those functions per element.
+        return [property,typeof value === 'function' ? ele => convert(value(ele)) : convert(value)];
+      }))}));
+    }
     const cy = cytoscape({
       container: document.getElementById("cy"),
       elements: elements,
       minZoom: 0.2, maxZoom: 3,
-      // Supersample labels and native graph strokes for readable small text.
-      // Decorative node artwork keeps its independent CSS-pixel canvas/cache.
-      pixelRatio: 2,
+      // Respect the display density instead of supersampling 1x screens at 2x.
+      // Keep the existing cap on high-density displays and crisp native labels.
+      pixelRatio: Math.min(global.devicePixelRatio || 1, 2),
+      textureOnViewport: true,
       style: themeGraphStyles([
         {
           selector: "node",
@@ -375,14 +392,17 @@
           'target-arrow-shape': ele => ele.source().id() === 'llm' ? 'triangle' : 'none',
           'target-arrow-color': '#8fb87f'
         } },
-        { selector: 'edge.viewport-drag-restore', style: {'transition-property': 'opacity', 'transition-duration': '675ms'} },
-        { selector: 'edge.viewport-drag-fade', style: {opacity: 0, events: 'no', 'transition-property': 'opacity', 'transition-duration': '600ms'} },
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
         { selector: ".hidden", style: { "display": "none" } }
       ]),
       layout: { name: "preset", fit: false }
     });
+    const renderNodes = cy.nodes().toArray();
+    const renderEdges = cy.edges().toArray();
+    const artworkMetrics = new Map();
+    let artworkRevision = 0;
+    cy.on('style data', 'node', event => { artworkMetrics.delete(event.target.id()); artworkRevision++; });
 
     // Animate artwork only, never node coordinates or labels. Keep the existing
     // texture as a fallback until every sprite has loaded successfully.
@@ -401,6 +421,7 @@
     stars.appendChild(starDust);
     let dustSize = '';
     function paintStarDust(width, height) {
+      if (lightTheme()) return;
       const dpr = Math.min(global.devicePixelRatio || 1, 2);
       const key = `${width}:${height}:${dpr}`;
       if (dustSize === key) return;
@@ -416,7 +437,7 @@
       const random = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
       // Thousands of subpixel stars form the reference's dense dust texture.
       // Rasterize only on resize; the existing bright stars animate separately.
-      const count = Math.min(100000, Math.round(width * height / 24));
+      const count = Math.min(12000, Math.round(width * height / 80));
       for (let i = 0; i < count; i++) {
         const x = random() * width, y = random() * height;
         const band = Math.exp(-Math.pow((x / width - .18 - .65 * y / height) / .16, 2));
@@ -471,12 +492,12 @@
       curtains.style.setProperty('--curtain-radius', radius + 'px');
       const left = cx - radius, right = cx + radius;
       const sides = new Map();
-      const zoom = cy.zoom();
+      const zoom = cy.zoom(), pan = cy.pan();
       updatingCulling = true;
       cy.batch(() => {
-        cy.nodes().forEach(node => {
+        renderNodes.forEach(node => {
           if (node.hasClass('hidden')) return;
-          const {x, y} = node.renderedPosition();
+          const position = node.position(), x = position.x * zoom + pan.x, y = position.y * zoom + pan.y;
           // Bounds must be independent of visibility; hidden renderer bounds can
           // collapse and cause repeated hide/show cycles at the curtain edge.
           let bounds = curtainBounds.get(node.id());
@@ -496,7 +517,7 @@
           if (node.hasClass('viewport-occluded') !== hidden) node.toggleClass('viewport-occluded', hidden);
           if (hidden) dragArtworkCache.delete(node.id());
         });
-        cy.edges().forEach(edge => {
+        renderEdges.forEach(edge => {
           if (edge.hasClass('hidden')) return;
           const side = sides.get(edge.source().id());
           const hidden = Boolean(side && side === sides.get(edge.target().id()));
@@ -511,8 +532,6 @@
       curtainBounds.delete(event.target.id()); cullingDirty = true;
     });
     const ringContext = ringCanvas.getContext('2d');
-    const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
-    const compactViewport = global.matchMedia('(max-width: 720px)');
     let ringSprites = {};
     const ringSpriteBanks=new Map();let requestedRingTheme=null,ringLoadEpoch=0;
     const ringStates = new Map();
@@ -520,46 +539,24 @@
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
     let ringDisposed = false, ringActive = false;
     let ringDirty = true;
-    let viewportDragging = false, edgeFadeTimer = null, edgeRestoreTimer = null;
+    let viewportDragging = false, gestureTimer = null;
     const heldPointers = new Set();
     function beginViewportDrag() {
-      if (viewportDragging || !heldPointers.size) return;
+      if (viewportDragging) return;
       viewportDragging = true;
-      dragArtworkCache.clear();
       hoveredRing = null;
       ringStates.forEach(motion => { motion.emphasis = 0; });
       ringLastTime = performance.now(); ringDirty = true;
       cullingDirty = true;
-      if (state.selected) return;
-      clearTimeout(edgeRestoreTimer);
-      if (compactViewport.matches || motionReduced()) {
-        // On a small viewport avoid hundreds of simultaneous opacity
-        // transitions. Restore the complete relations when the gesture ends.
-        cy.edges().removeClass('viewport-drag-restore viewport-drag-fade').addClass('viewport-drag-hidden');
-        return;
-      }
-      cy.batch(() => {
-        cy.edges().removeClass('viewport-drag-restore');
-        cy.edges().addClass('viewport-drag-fade');
-      });
-      clearTimeout(edgeFadeTimer);
-      edgeFadeTimer = setTimeout(() => {
-        if (viewportDragging && !state.selected) cy.edges().addClass('viewport-drag-hidden');
-      }, 650);
+      // One state change, with no animation queue competing with the pointer.
+      cy.edges().addClass('viewport-drag-hidden');
     }
     function finishViewportDrag() {
       heldPointers.clear();
       if (!viewportDragging) return;
       viewportDragging = false;
-      dragArtworkCache.clear();
-      clearTimeout(edgeFadeTimer);
-      const fadedEdges = cy.edges('.viewport-drag-fade');
-      cy.batch(() => {
-        if (!state.selected) fadedEdges.addClass('viewport-drag-restore');
-        cy.edges().removeClass('viewport-drag-hidden viewport-drag-fade');
-      });
-      clearTimeout(edgeRestoreTimer);
-      edgeRestoreTimer = setTimeout(() => cy.edges().removeClass('viewport-drag-restore'), 725);
+      clearTimeout(gestureTimer);
+      cy.edges().removeClass('viewport-drag-hidden');
       ringLastTime = performance.now(); ringDirty = true;
     }
     const holdPointer = event => { heldPointers.add(event.pointerId); };
@@ -573,8 +570,11 @@
     global.addEventListener('pointercancel', releasePointer, true);
     global.addEventListener('blur', finishViewportDrag);
     document.addEventListener('visibilitychange', visibilityChanged);
-    cy.on('pan', beginViewportDrag);
+    cy.on('pan', () => { if (heldPointers.size) beginViewportDrag(); });
     cy.on('tapstart', event => { if (event.target === cy || event.target.isEdge?.()) beginViewportDrag(); });
+    const wheelGesture = () => { beginViewportDrag(); clearTimeout(gestureTimer); gestureTimer=setTimeout(finishViewportDrag,150); };
+    cy.container().addEventListener('wheel', wheelGesture, {passive:true});
+    cy.on('zoom', () => { if (heldPointers.size) beginViewportDrag(); });
 
     function paintNodeArtwork(context, node, sprite, size, motion, hovered, x, y) {
       const scale = 1 + 0.18 * motion.emphasis;
@@ -595,7 +595,7 @@
           context.beginPath(); context.arc(0, 0, size * 0.38, 0, Math.PI * 2);
           context.fillStyle = node.style('background-color'); context.fill();
           context.fillStyle = node.style('color');
-          context.font = `${node.style('font-weight')} ${parseFloat(node.style('font-size')) * cy.zoom()}px ${node.style('font-family')}`;
+          context.font = `${node.style('font-weight')} ${parseFloat(node.style('font-size')) * size / node.width()}px ${node.style('font-family')}`;
           context.textAlign = 'center'; context.textBaseline = 'middle';
           context.fillText(String(node.data('officialOrder')), 0, 0, size * 0.70);
         } else {
@@ -634,30 +634,38 @@
       const dt = Math.min(0.1, Math.max(0, (time - (ringLastTime || time)) / 1000));
       ringLastTime = time;
       if (!active) { hoveredRing = null; return; }
-      cy.nodes().not('.hidden, .viewport-occluded').forEach(node => {
+      const reduced = motionReduced(), zoom = cy.zoom(), pan = cy.pan();
+      renderNodes.forEach(node => {
+        if (node.hasClass('hidden') || node.hasClass('viewport-occluded')) return;
         const sprite = ringSprites[node.data('domain')];
         if (!sprite) return;
-        const p = node.renderedPosition(), size = node.width() * cy.zoom();
+        let metrics = artworkMetrics.get(node.id());
+        if (!metrics) { metrics = {width:node.width(), opacity:node.style('opacity'), revision:artworkRevision}; artworkMetrics.set(node.id(),metrics); }
+        const position = node.position(), p = {x:position.x * zoom + pan.x,y:position.y * zoom + pan.y}, size = metrics.width * zoom;
         if (p.x < -size || p.y < -size || p.x > w + size || p.y > h + size) return;
         let motion = ringStates.get(node.id());
         if (!motion) { motion = { angle: 0, emphasis: 0 }; ringStates.set(node.id(), motion); }
         const hovered = hoveredRing === node.id();
         motion.emphasis += ((hovered ? 1 : 0) - motion.emphasis) * Math.min(1, dt * 12);
-        if (!viewportDragging && !motionReduced()) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
+        if (!viewportDragging && !reduced) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
         const scale = 1 + 0.18 * motion.emphasis;
-        if (viewportDragging) {
+        if (viewportDragging || (reduced && !hovered && motion.emphasis < .005)) {
           // Freeze and rasterize each visible node once per gesture. Pan frames
           // reuse the composed face/ring, including official numbers and gradients.
-          const key = [size, motion.angle, node.classes().join(' '), node.style('opacity'), node.data('officialOrder')].join('|');
+          // Cache in model space, not viewport pixels. Wheel/pinch zoom must
+          // scale the same bitmap rather than allocate one canvas per frame.
+          const cacheScale = 2;
+          const key = `${metrics.width}:${motion.angle}:${metrics.revision}`;
           let cached = dragArtworkCache.get(node.id());
           if (!cached || cached.key !== key) {
             const canvas = document.createElement('canvas');
-            canvas.width = canvas.height = Math.ceil(size * 1.3) + 4;
-            paintNodeArtwork(canvas.getContext('2d'), node, sprite, size, motion, false, canvas.width / 2, canvas.height / 2);
+            canvas.width = canvas.height = Math.ceil(metrics.width * cacheScale * 1.3) + 4;
+            paintNodeArtwork(canvas.getContext('2d'), node, sprite, metrics.width * cacheScale, motion, false, canvas.width / 2, canvas.height / 2);
             cached = {key, canvas};
             dragArtworkCache.set(node.id(), cached);
           }
-          ringContext.drawImage(cached.canvas, p.x - cached.canvas.width / 2, p.y - cached.canvas.height / 2);
+          const renderedSize = cached.canvas.width * zoom / cacheScale;
+          ringContext.drawImage(cached.canvas, p.x - renderedSize / 2, p.y - renderedSize / 2, renderedSize, renderedSize);
         } else {
           paintNodeArtwork(ringContext, node, sprite, size, motion, hovered, p.x, p.y);
         }
@@ -682,7 +690,8 @@
       const x = event.clientX - box.left, y = event.clientY - box.top;
       let nearest = Infinity;
       hoveredRing = null;
-      cy.nodes().not('.hidden, .viewport-occluded').not('.dim').forEach(node => {
+      renderNodes.forEach(node => {
+        if (node.hasClass('hidden') || node.hasClass('viewport-occluded') || node.hasClass('dim')) return;
         const p = node.renderedPosition(), distance = Math.hypot(p.x - x, p.y - y);
         if (distance <= node.width() * cy.zoom() / 2 && distance < nearest) {
           nearest = distance; hoveredRing = node.id();
@@ -695,8 +704,8 @@
     cy.on('render', () => { ringDirty = true; });
     cy.on('destroy', () => { ringDisposed = true; cancelAnimationFrame(ringFrame); ringCanvas.remove(); });
     cy.on('destroy', () => {
-      clearTimeout(edgeFadeTimer);
-      clearTimeout(edgeRestoreTimer);
+      clearTimeout(gestureTimer);
+      cy.container().removeEventListener('wheel', wheelGesture);
       dragArtworkCache.clear();
       curtains.remove();
       global.removeEventListener('pointerup', releasePointer, true);
@@ -737,22 +746,27 @@
     // pairs, while keeping the authoritative graph positions untouched.
     function separateLabelBounds() {
       const nodes=cy.nodes().filter(n=>!n.hasClass('hidden')).toArray();
+      // Labels keep the same dimensions throughout this position-only solve.
+      // Work on translated copies, then notify the renderer once. Re-reading
+      // every bounding box per pass forced repeated label/style calculations.
+      const boxes=nodes.map(n=>({...n.boundingBox({includeLabels:true,includeOverlays:false})}));
+      const positions=nodes.map(n=>({...n.position()}));
       for(let pass=0;pass<32;pass++) {
         let moved=false;
-        const boxes=nodes.map(n=>n.boundingBox({includeLabels:true,includeOverlays:false}));
         for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++) {
           const a=boxes[i],b=boxes[j],dx=Math.min(a.x2,b.x2)-Math.max(a.x1,b.x1)+8,dy=Math.min(a.y2,b.y2)-Math.max(a.y1,b.y1)+8;
           if(dx<=0||dy<=0)continue;
           const axis=dx<dy?'x':'y',delta=(axis==='x'?dx:dy)/2+1;
-          const sign=nodes[i].position(axis)<=nodes[j].position(axis)?1:-1;
-          nodes[i].position(axis,nodes[i].position(axis)-delta*sign);
-          nodes[j].position(axis,nodes[j].position(axis)+delta*sign);
+          const sign=positions[i][axis]<=positions[j][axis]?1:-1;
+          positions[i][axis]-=delta*sign;
+          positions[j][axis]+=delta*sign;
           if(axis==='x'){a.x1-=delta*sign;a.x2-=delta*sign;b.x1+=delta*sign;b.x2+=delta*sign;}
           else{a.y1-=delta*sign;a.y2-=delta*sign;b.y1+=delta*sign;b.y2+=delta*sign;}
           moved=true;
         }
         if(!moved)break;
       }
+      cy.batch(()=>nodes.forEach((node,i)=>node.position(positions[i])));
     }
 
     function restorePresetLayout() {
@@ -1066,8 +1080,6 @@
     function applyFocus() {
       if (state.selected) {
         finishViewportDrag();
-        clearTimeout(edgeRestoreTimer);
-        cy.edges().removeClass('viewport-drag-restore');
       }
       cullingDirty = true;
       updateCurtainCulling();
@@ -1470,7 +1482,7 @@
     initialLayoutDone = true;
     automaticStatic = performance.now() - graphStarted > 1200;
     updateCurtainCulling();
-    global.addEventListener('ai-reading-preferences', () => {cy.style().fromJson(themeGraphStyles(graphStyleRules)).update();loadRingTheme();dragArtworkCache.clear();ringDirty=true;cullingDirty=true;});
+    global.addEventListener('ai-reading-preferences', () => {requestedMotion=global.AI_READER_TOOLS?.preferences().motion||'auto';cy.style().fromJson(themeGraphStyles(graphStyleRules)).update();loadRingTheme();dragArtworkCache.clear();ringDirty=true;cullingDirty=true;});
 
     function refreshLanguage() {
       let labelsChanged = false;

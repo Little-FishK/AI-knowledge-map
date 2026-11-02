@@ -163,6 +163,7 @@
     document.documentElement.classList.remove('onboarding-pending');
   }
   function close() {
+    const wasOpen = isOpen();
     stopNodeMotion();
     root.hidden = true;
     app.inert = false;
@@ -170,7 +171,9 @@
     document.title = previousTitle;
     resolveReady();
     const target = returnFocus && returnFocus !== document.body && returnFocus.isConnected ? returnFocus : document.getElementById('btn-onboarding');
-    target?.focus({preventScroll: true});
+    // A returning visitor never opened this dialog. Focusing the toolbar in
+    // that case forced a synchronous first-page layout and stole initial focus.
+    if (wasOpen) target?.focus({preventScroll: true});
     global.__cy?.resize();
   }
   root.addEventListener('click', event => {

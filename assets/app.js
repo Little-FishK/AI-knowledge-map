@@ -14,7 +14,7 @@
   if (!ROUTER) throw new Error("URL 路由模块未加载");
   if (!APP || !APP.shared || !APP.createDeepDiveLoader || !APP.createGraphView
       || !APP.createLearningView || !APP.createDeepDiveView
-      || !APP.createSoftwareView || !APP.createLibraryView || !APP.i18n || !APP.contentI18n) {
+      || !APP.i18n || !APP.contentI18n) {
     throw new Error("前端模块未完整加载");
   }
   if (!I18N_MANIFEST) throw new Error("语言清单未加载");
@@ -104,7 +104,7 @@
   function goToRoute(route, options = {}) {
     const changed = ROUTER.navigate(route, options);
     // replaceState 不触发 hashchange；重复点击当前路由也应重新应用该状态。
-    if (!changed || options.replace) applyRoute(route);
+    if (!changed || options.replace) applyRoute(route).catch(error => console.error('页面加载失败', error));
   }
 
   const graphView = APP.createGraphView({
@@ -199,7 +199,20 @@
 
   const swView = document.getElementById("software-view");
   const libraryView = document.getElementById("library-view");
-  const softwareView = APP.createSoftwareView({
+  let softwareView = null, libraryCatalogView = null;
+  const viewLoads = new Map();
+  function ensureView(kind) {
+    if (viewLoads.has(kind)) return viewLoads.get(kind);
+    const loading = (async () => {
+      const factory = kind === 'software' ? 'createSoftwareView' : 'createLibraryView';
+      if (!APP[factory]) {
+        const descriptor = document.getElementById(`lazy-${kind}-view`);
+        if (!descriptor) throw new Error(`Missing view resource: ${kind}`);
+        const target = kind === 'software' ? swView : libraryView;
+        target.innerHTML = `<div class="view-loading" role="status">${esc(t(kind === 'software' ? 'software.loading' : 'library.loading'))}</div>`;
+        await resourceLoader.loadOnce(JSON.parse(descriptor.textContent));
+      }
+      if (kind === 'software' && !softwareView) softwareView = APP.createSoftwareView({
     view: swView,
     detail,
     detailBody,
@@ -211,7 +224,7 @@
     navigate: goToRoute,
     t,
   });
-  const libraryCatalogView = APP.createLibraryView({
+      if (kind === 'library' && !libraryCatalogView) libraryCatalogView = APP.createLibraryView({
     view: libraryView,
     detail,
     detailBody,
@@ -222,6 +235,13 @@
     navigate: goToRoute,
     t,
   });
+      const view = kind === 'software' ? softwareView : libraryCatalogView;
+      await view.ensureReady();
+      return view;
+    })().catch(error => { viewLoads.delete(kind); throw error; });
+    viewLoads.set(kind, loading);
+    return loading;
+  }
 
   const detailToggle = document.getElementById("detail-toggle");
   function syncDetailToggle() {
@@ -261,8 +281,8 @@
     renderLanguageSettings();
     graphView.refreshLanguage();
     learningView.refreshLanguage();
-    softwareView.refreshLanguage();
-    libraryCatalogView.refreshLanguage();
+    softwareView?.refreshLanguage();
+    libraryCatalogView?.refreshLanguage();
     updateModeChrome(mode);
     if (!activeRoute || activeRoute.name === "map") setDocumentTitle(activeRoute?.id ? localizedGraphNode(activeRoute.id)?.title : undefined);
     else if (activeRoute.name === "software") setDocumentTitle(t("pageTitle.software"));
@@ -298,8 +318,22 @@
     detail.classList.add("closed");
     if (isGraph) setTimeout(() => cy.resize(), 30);
 
-    if (isSW) await softwareView.ensureReady();
-    if (isLibrary) await libraryCatalogView.ensureReady();
+    if (isSW || isLibrary) {
+      try { await ensureView(m); }
+      catch (error) {
+        const view = isSW ? swView : libraryView;
+        if (mode === m) {
+          view.replaceChildren();
+          const message = document.createElement('p'), retry = document.createElement('button');
+          message.setAttribute('role','status');
+          message.textContent = language.getLocale() === 'en' ? 'This section could not load. You can retry.' : '该板块暂时加载失败，可以重试。';
+          retry.textContent = language.getLocale() === 'en' ? 'Retry' : '重试';
+          retry.onclick = () => applyRoute(ROUTER.parseLocation()).catch(console.error);
+          view.append(message,retry);
+        }
+        throw error;
+      }
+    }
   }
 
   function updateModeChrome(targetMode) {
@@ -424,7 +458,7 @@
     if (window.location.hash && route.name !== "concept" && route.name !== "not-found") {
       ROUTER.navigate(route, { replace: true, silent: true });
     }
-    applyRoute(route);
+    applyRoute(route).catch(error => console.error('页面加载失败', error));
   }
   window.addEventListener("hashchange", applyLocationRoute);
   // pushState navigation reports back/forward through popstate, not hashchange.
