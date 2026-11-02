@@ -19,13 +19,14 @@
     if (input.value.trim() && !requested) loadFullText();
     const q = normalize(input.value.trim()), words = q.split(/\s+/).filter(Boolean); let count = 0;
     items.forEach((item, index) => {
-      const text = normalize(item.dataset.search + ' ' + (fullText?.get(href(item))?.text || ''));
-      const matches=words.every(word=>match(text,word));item.dataset.matches=String(matches);item.hidden=!matches;if(matches)count++;
+      const title=item.querySelector('a').textContent, body=item.dataset.search+' '+(fullText?.get(href(item))?.text||'');
+      const score=window.AI_SEARCH_MATCH?AI_SEARCH_MATCH.score(input.value,[title],body):(words.every(word=>match(normalize(body),word))?1:0);item.dataset.rank=score;
+      const matches=score>0;item.dataset.matches=String(matches);item.hidden=!matches;if(matches)count++;
     });
-    const score = item => { const title = normalize(item.querySelector('a').textContent); return !q ? 0 : title === q ? 3 : title.startsWith(q) ? 2 : title.includes(q) ? 1 : 0; };
+    const score=item=>Number(item.dataset.rank||0);
     let shown=0;[...items].sort((a,b) => score(b)-score(a)).forEach(item => {if(item.dataset.matches==='true')item.hidden=++shown>limit;list.append(item);});
     more.hidden=count<=limit;more.textContent=`显示更多 / Show more (${Math.min(limit,count)}/${count})`;retry.hidden=!failed;
-    status.textContent = `${count} / ${items.length} · ${fullText ? '标题、别名与正文 / Titles, aliases and full text' : '标题与简介 / Titles and summaries'}${count ? '' : ' · 没有结果，请尝试更短的关键词 / Try a shorter query'}`;
+    status.textContent = `${count} / ${items.length} · ${fullText ? '标题、别名与正文；支持常见问句和英文拼写近似 / Titles, aliases and full text; common question forms and approximate English spelling' : '标题与简介 / Titles and summaries'}${count ? '' : ' · 没有结果，请尝试更短的关键词 / Try a shorter query'}`;
     if(failed)status.textContent+=' · 正文索引暂不可用，可重试 / Full-text index unavailable; retry';
     const url = new URL(location.href); q ? url.searchParams.set('q', input.value.trim()) : url.searchParams.delete('q'); history.replaceState(null,'',url);
   }

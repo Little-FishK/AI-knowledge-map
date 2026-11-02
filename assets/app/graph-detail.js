@@ -92,6 +92,7 @@
         });
         h += `</div>`;
       }
+      if(hasDeep)h+=`<div class="d-sec"><h4>${esc(document.documentElement.lang==='en'?'References and verification':'参考来源与核验')}</h4><a href="/zh/concepts/${esc(id)}/#reading-sources">${esc(document.documentElement.lang==='en'?'View references in the Chinese reading page':'查看理解页的参考来源')}</a></div>`;
 
       detailBody.innerHTML = h;
       detail.classList.remove("collapsed");

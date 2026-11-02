@@ -87,6 +87,7 @@
       "data/library-ieee-xplore.js",
       "data/library-acm-digital-library.js?v=20260924-acm-springer-1",
       "data/library-springer-nature.js?v=20260924-acm-springer-1",
+      "data/library-feedback-20261101.js",
       "data/software.js",
     ];
 
@@ -197,7 +198,7 @@
         if (!global.AI_LIBRARY_LOCALES || !global.AI_LIBRARY_LOCALES.en) {
           try { await loadScriptsInOrder([ENGLISH_TABLE]); } catch (error) { console.error(error); }
         }
-        const table = global.AI_LIBRARY_LOCALES && global.AI_LIBRARY_LOCALES.en && global.AI_LIBRARY_LOCALES.en.strings;
+        const table = global.AI_LIBRARY_LOCALES?.en?.strings && {...global.AI_LIBRARY_LOCALES.en.strings,...global.AI_LIBRARY_ADDITIONAL_STRINGS};
         if (table) {
           if (!source.english) source.english = {library: translateDeep(source.library, table), profiles: translateDeep(source.profiles, table), profileGuidance: translateDeep(source.profileGuidance, table)};
           ({library, profiles, profileGuidance} = source.english);

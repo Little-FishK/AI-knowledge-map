@@ -5,6 +5,10 @@
   const app = global.AIMap = global.AIMap || {};
 
   app.createGraphView = function createGraphView(options) {
+    const graphStarted = performance.now();
+    let initialLayoutDone = false;
+    let automaticStatic = false;
+    const motionReduced = () => global.matchMedia('(prefers-reduced-motion: reduce)').matches || global.AI_READER_TOOLS?.preferences().motion === 'reduce' || (automaticStatic && global.AI_READER_TOOLS?.preferences().motion !== 'animate');
     const G = options.graph;
     const DOMAINS = options.domains;
     const ETYPES = options.edgeTypes;
@@ -122,6 +126,8 @@
       revealed: new Set(),                  // 核心视图下被点开而揭示出来的节点
       selected: null
     };
+    state.stage = 0;
+    state.focusOnly = false;
     const viewKey = 'ai-knowledge-map.map-view.v1';
     let restoredViewport = null;
     const savedView = (() => {
@@ -134,7 +140,7 @@
       if (!isActive()) return;
       try { global.localStorage.setItem(viewKey, JSON.stringify({
         version:1, graphVersion:G.meta.version, scope:state.scope, domains:state.domains, edges:state.edges,
-        revealed:[...state.revealed], selected:state.selected, zoom:cy.zoom(),pan:cy.pan(),
+        revealed:[...state.revealed], selected:state.selected, zoom:cy.zoom(),pan:cy.pan(),stage:state.stage,focusOnly:state.focusOnly,
       })); } catch (_) { /* View preferences are optional; learning records are separate. */ }
     }
     function restoreView(selected = null) {
@@ -144,6 +150,7 @@
       for (const key of Object.keys(state.domains)) state.domains[key] = savedView.domains?.[key] !== false;
       for (const key of Object.keys(state.edges)) state.edges[key] = savedView.edges?.[key] !== false;
       state.revealed = new Set((Array.isArray(savedView.revealed) ? savedView.revealed : []).filter(id=>byId[id]));
+      state.stage=Number.isInteger(savedView.stage)&&savedView.stage>=0&&savedView.stage<=(G.recommendedLearningPath||[]).length?savedView.stage:0;state.focusOnly=savedView.focusOnly===true;
       syncControls();applyFilters();
       // A clean map URL restores viewport/filter preferences, not a stale modal.
       viewportMoveToken++;cy.stop(true,false);
@@ -154,6 +161,7 @@
 
     // 某节点在当前 scope 下是否该出现
     function inScope(id) {
+      if(state.stage&&!G.recommendedLearningPath[state.stage-1]?.steps.some(step=>step[1]===id))return false;
       return state.scope === "all" || CORE.has(id) || state.revealed.has(id);
     }
 
@@ -188,6 +196,9 @@
       });
     });
 
+    let graphStyleRules=null;
+    const lightTheme=()=>document.documentElement.dataset.readerTheme==='light',themeColorCache=new Map();
+    function themeGraphStyles(rules){graphStyleRules=rules;return rules.map(rule=>({...rule,style:Object.fromEntries(Object.entries(rule.style).map(([property,value])=>{if(!['color','background-color','border-color','line-color','target-arrow-color','source-arrow-color','text-outline-color'].includes(property))return [property,value];return [property,ele=>{const source=typeof value==='function'?value(ele):value;if(!lightTheme())return source;if(property==='color'&&rule.selector.startsWith('node'))return '#000000';if(property==='text-outline-color')return '#ffffff';const role=property==='background-color'||property==='text-outline-color'?'background':'foreground';if(rule.selector==='node.sel'&&property==='border-color')return '#205f9f';const key=role+source;if(!themeColorCache.has(key))themeColorCache.set(key,global.AI_THEME_COLORS?.color(source,role)||source);return themeColorCache.get(key);}];}))}));}
     const cy = cytoscape({
       container: document.getElementById("cy"),
       elements: elements,
@@ -195,14 +206,14 @@
       // Supersample labels and native graph strokes for readable small text.
       // Decorative node artwork keeps its independent CSS-pixel canvas/cache.
       pixelRatio: 2,
-      style: [
+      style: themeGraphStyles([
         {
           selector: "node",
           style: {
             "label": "data(label)",
             "background-color": ele => NODE_ART[ele.data("domain")] || "#888",
             "background-image": ele => NODE_ART[ele.data("domain")]
-              ? new URL(`assets/node-art/${ele.data("domain")}.png?v=2`, document.baseURI).href : "none",
+              ? new URL(lightTheme()?`assets/node-art/light/${ele.data("domain")}.svg?v=1`:`assets/node-art/${ele.data("domain")}.png?v=2`, document.baseURI).href : "none",
             // Local images load normally through <img>, but file origins cannot
             // satisfy Cytoscape's default anonymous CORS request.
             "background-image-crossorigin": global.location.protocol === "file:" ? "null" : "anonymous",
@@ -369,8 +380,8 @@
         { selector: 'edge.viewport-drag-hidden', style: {visibility: 'hidden'} },
         { selector: '.viewport-occluded', style: {visibility: 'hidden', events: 'no'} },
         { selector: ".hidden", style: { "display": "none" } }
-      ],
-      layout: { name: "preset" }
+      ]),
+      layout: { name: "preset", fit: false }
     });
 
     // Animate artwork only, never node coordinates or labels. Keep the existing
@@ -442,6 +453,7 @@
     const curtainBounds = new Map();
     let updatingCulling = false;
     function updateCurtainCulling() {
+      if (!initialLayoutDone) return;
       if (!cullingDirty) return;
       cullingDirty = false;
       curtains.hidden = Boolean(state.selected);
@@ -469,9 +481,11 @@
           // collapse and cause repeated hide/show cycles at the curtain edge.
           let bounds = curtainBounds.get(node.id());
           if (!bounds) {
-            const lines = String(node.style('label') || node.data('label') || '').split('\n');
-            const font = parseFloat(node.style('font-size'));
-            bounds = {width:Math.max(node.width() * .7, Math.max(...lines.map(line => line.length)) * font / 2), height:node.height() * .7 + (lines.length + 2) * font};
+            const official=node.hasClass('official-path-node'),order=String(node.data('officialOrder')||'');
+            const lines=String(official?order:node.data('label')||'').split('\n');
+            const font=official?(order.includes('.')?(order.length<=3?22:19):26):13;
+            const size=official?(order.includes('.')?64:72):node.hasClass('sl-main')||node.hasClass('sl-peer')?72:node.hasClass('sl-support')?36:node.hasClass('sl-output')?58:node.hasClass('sl-risk')?50:30+(node.data('heat')??.5)*26;
+            bounds = {width:Math.max(size * .7, Math.max(...lines.map(line => line.length)) * font / 2), height:size * .7 + (lines.length + 2) * font};
             curtainBounds.set(node.id(), bounds);
           }
           const halfWidth = bounds.width * zoom + 8;
@@ -499,7 +513,8 @@
     const ringContext = ringCanvas.getContext('2d');
     const motionPreference = global.matchMedia('(prefers-reduced-motion: reduce)');
     const compactViewport = global.matchMedia('(max-width: 720px)');
-    const ringSprites = {};
+    let ringSprites = {};
+    const ringSpriteBanks=new Map();let requestedRingTheme=null,ringLoadEpoch=0;
     const ringStates = new Map();
     const dragArtworkCache = new Map();
     let ringReady = false, hoveredRing = null, ringLastTime = 0, ringFrame = null;
@@ -517,7 +532,7 @@
       cullingDirty = true;
       if (state.selected) return;
       clearTimeout(edgeRestoreTimer);
-      if (compactViewport.matches || motionPreference.matches) {
+      if (compactViewport.matches || motionReduced()) {
         // On a small viewport avoid hundreds of simultaneous opacity
         // transitions. Restore the complete relations when the gesture ends.
         cy.edges().removeClass('viewport-drag-restore viewport-drag-fade').addClass('viewport-drag-hidden');
@@ -611,7 +626,7 @@
       ringContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       ringContext.clearRect(0, 0, w, h);
       const active = isActive() && !document.hidden;
-      curtains.classList.toggle('map-stars-paused', !active || viewportDragging || motionPreference.matches);
+      curtains.classList.toggle('map-stars-paused', !active || viewportDragging || motionReduced());
       if (ringActive !== active) {
         ringActive = active;
         cy.nodes().toggleClass('motion-art', active);
@@ -628,7 +643,7 @@
         if (!motion) { motion = { angle: 0, emphasis: 0 }; ringStates.set(node.id(), motion); }
         const hovered = hoveredRing === node.id();
         motion.emphasis += ((hovered ? 1 : 0) - motion.emphasis) * Math.min(1, dt * 12);
-        if (!viewportDragging && !motionPreference.matches) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
+        if (!viewportDragging && !motionReduced()) motion.angle = (motion.angle + dt * Math.PI * 2 / (hovered ? 3 : 48)) % (Math.PI * 2);
         const scale = 1 + 0.18 * motion.emphasis;
         if (viewportDragging) {
           // Freeze and rasterize each visible node once per gesture. Pan frames
@@ -653,7 +668,7 @@
       if (ringDisposed) return;
       // Viewport renders only invalidate this layer. All painting happens here,
       // so bursts of map renders cannot paint the rings repeatedly in one frame.
-      const animate = isActive() && !document.hidden && !motionPreference.matches && !viewportDragging;
+      const animate = isActive() && !document.hidden && !motionReduced() && !viewportDragging;
       if (ringDirty || (animate && time - ringLastTime >= 1000 / 30)) {
         ringDirty = false;
         updateCurtainCulling();
@@ -689,24 +704,15 @@
       global.removeEventListener('blur', finishViewportDrag);
       document.removeEventListener('visibilitychange', visibilityChanged);
     });
-    Promise.all(Object.keys(NODE_ART).map(domain => new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const makeSprite = ring => {
-          const canvas = document.createElement('canvas'); canvas.width = canvas.height = img.naturalWidth;
-          const ctx = canvas.getContext('2d'), half = canvas.width / 2;
-          ctx.beginPath(); ctx.arc(half, half, canvas.width * (ring ? 0.5 : 0.38), 0, Math.PI * 2);
-          if (ring) ctx.arc(half, half, canvas.width * 0.40, 0, Math.PI * 2, true);
-          ctx.clip(); ctx.drawImage(img, 0, 0); return canvas;
-        };
-        ringSprites[domain] = { face: makeSprite(false), ring: makeSprite(true) }; resolve();
-      };
-      img.onerror = reject;
-      img.src = new URL(`assets/node-art/${domain}.png?v=2`, document.baseURI).href;
-    }))).then(() => {
-      if (ringDisposed) return;
-      ringReady = true; ringDirty = true; ringFrame = requestAnimationFrame(ringTick);
-    }).catch(() => { ringCanvas.remove(); });
+    function loadRingTheme(){
+      const theme=lightTheme()?'light':'dark';if(requestedRingTheme===theme)return;requestedRingTheme=theme;const epoch=++ringLoadEpoch;
+      ringReady=false;ringActive=false;cancelAnimationFrame(ringFrame);ringFrame=null;cy.nodes().removeClass('motion-art');ringContext.clearRect(0,0,ringCanvas.width,ringCanvas.height);dragArtworkCache.clear();
+      if(!ringSpriteBanks.has(theme)){const bank={};const promise=Promise.all(Object.keys(NODE_ART).map(domain=>new Promise((resolve,reject)=>{
+        const img=new Image();if(global.location.protocol!=='file:')img.crossOrigin='anonymous';img.onload=()=>{const makeSprite=ring=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=img.naturalWidth;const ctx=canvas.getContext('2d'),half=canvas.width/2;ctx.beginPath();ctx.arc(half,half,canvas.width*(ring ? 0.5 : 0.38),0,Math.PI*2);if(ring)ctx.arc(half,half,canvas.width*.40,0,Math.PI*2,true);ctx.clip();ctx.drawImage(img,0,0);return canvas;};bank[domain]={face:makeSprite(false),ring:makeSprite(true)};resolve();};img.onerror=reject;img.src=new URL(theme==='light'?`assets/node-art/light/${domain}.svg?v=1`:`assets/node-art/${domain}.png?v=2`,document.baseURI).href;
+      }))).then(()=>bank);ringSpriteBanks.set(theme,promise);}
+      ringSpriteBanks.get(theme).then(bank=>{if(ringDisposed||epoch!==ringLoadEpoch)return;ringSprites=bank;ringReady=true;ringDirty=true;ringFrame=requestAnimationFrame(ringTick);}).catch(()=>{ringSpriteBanks.delete(theme);if(epoch===ringLoadEpoch){requestedRingTheme=null;ringReady=false;cy.nodes().removeClass('motion-art');ringContext.clearRect(0,0,ringCanvas.width,ringCanvas.height);}});
+    }
+    loadRingTheme();
 
     function enforceLayoutQuality() {
       if (!window.LAYOUT_QUALITY) return;
@@ -842,7 +848,7 @@
           n.toggleClass("hidden", !ok);
         });
         cy.edges().forEach(e => {
-          const ok = state.edges[e.data("type")] &&
+          const ok = state.edges[e.data("type")] && (!state.focusOnly||!state.selected||e.source().id()===state.selected||e.target().id()===state.selected) &&
                      !e.source().hasClass("hidden") && !e.target().hasClass("hidden");
           e.toggleClass("hidden", !ok);
         });
@@ -946,7 +952,7 @@
           if (attention && a.hasClass('sl-main') && b.hasClass('sl-risk')) edge.addClass('sl-risk-edge');
         });
       }
-      const reduced = global.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const reduced = motionReduced();
       const duration = reduced ? 0 : 650;
       if (!active) {
         if (mapPositions && localLayoutEngaged) {
@@ -1129,7 +1135,7 @@
         cy.animate(
           { center: { eles: node } },
           {
-            duration: officialPathActive ? 160 : 300,
+            duration: motionReduced() ? 0 : officialPathActive ? 160 : 300,
             easing: "ease-out",
             queue: false
           }
@@ -1158,6 +1164,7 @@
       let changed = false;
       // 跳转到被过滤掉的节点时，自动打开它所在的大区、并揭示它
       if (jumped && n) {
+        if(state.stage&&!G.recommendedLearningPath[state.stage-1]?.steps.some(step=>step[1]===id)){state.stage=0;changed=true;}
         if (!state.domains[n.domain]) { state.domains[n.domain] = true; changed = true; }
         if (!inScope(id)) { state.revealed.add(id); changed = true; }
       }
@@ -1324,6 +1331,8 @@
     document.getElementById("edge-key").addEventListener("click", () => setEdges(k => KEY_EDGES.includes(k)));
 
     function syncControls() {
+      if(document.getElementById('map-stage-filter'))document.getElementById('map-stage-filter').value=String(state.stage);
+      if(document.getElementById('map-focus-filter'))document.getElementById('map-focus-filter').checked=state.focusOnly;
       document.querySelectorAll("[data-domain]").forEach(i => { i.checked = state.domains[i.dataset.domain]; });
       document.querySelectorAll("[data-edge]").forEach(i => { i.checked = state.edges[i.dataset.edge]; });
     }
@@ -1334,6 +1343,7 @@
       Object.keys(state.edges).forEach(k => { state.edges[k] = true; });
       state.scope = CORE.size ? "core" : "all";
       state.revealed.clear();
+      state.stage=0;state.focusOnly=false;
       state.selected = null;
       onSelectionChange(null);
       cy.nodes().removeClass("sel");
@@ -1346,6 +1356,14 @@
     const appShell = document.getElementById("app");
     const controls = document.getElementById("controls");
     const controlsToggle = document.getElementById("controls-toggle");
+    const stageBox=document.createElement('div');stageBox.className='map-stage-tools';stageBox.innerHTML='<label><span data-stage-label></span><select id="map-stage-filter"><option value="0"></option>'+(G.recommendedLearningPath||[]).map((p,i)=>`<option value="${i+1}">${i+1}. ${esc(p.phase)}</option>`).join('')+'</select></label><label><input id="map-focus-filter" type="checkbox"><span data-focus-label></span></label><p data-stage-status role="status"></p>';
+    controls.prepend(stageBox);
+    stageBox.querySelector('#map-stage-filter').onchange=event=>{state.stage=Number(event.target.value);state.scope='all';state.revealed.clear();if(state.selected&&!inScope(state.selected))clearGraphSelection();syncControls();applyFilters();fitView();saveView();};
+    stageBox.querySelector('#map-focus-filter').onchange=event=>{state.focusOnly=event.target.checked;applyFilters();saveView();};
+    global.AI_MAP_VIEW=Object.freeze({
+      snapshot:()=>({version:1,graphVersion:G.meta.version,scope:state.scope,domains:{...state.domains},edges:{...state.edges},revealed:[...state.revealed],selected:state.selected,stage:state.stage,focusOnly:state.focusOnly,zoom:cy.zoom(),pan:{...cy.pan()}}),
+      apply:value=>{if(!value||value.version!==1||value.graphVersion!==G.meta.version||!Number.isFinite(value.zoom)||!Number.isFinite(value.pan?.x)||!Number.isFinite(value.pan?.y)||Math.abs(value.pan.x)>1e6||Math.abs(value.pan.y)>1e6)return false;state.scope=value.scope==='all'?'all':'core';state.stage=Number.isInteger(value.stage)&&value.stage>=0&&value.stage<=(G.recommendedLearningPath||[]).length?value.stage:0;state.focusOnly=value.focusOnly===true;for(const key of Object.keys(state.domains))state.domains[key]=value.domains?.[key]!==false;for(const key of Object.keys(state.edges))state.edges[key]=value.edges?.[key]!==false;state.revealed=new Set((Array.isArray(value.revealed)?value.revealed:[]).slice(0,130).filter(id=>byId[id]));syncControls();applyFilters();if(value.selected&&byId[value.selected]&&inScope(value.selected))select(value.selected,true);else clearGraphSelection();viewportMoveToken++;cy.stop(true,false);restoredViewport={zoom:Math.max(cy.minZoom(),Math.min(cy.maxZoom(),value.zoom)),pan:{x:value.pan.x,y:value.pan.y}};cy.viewport(restoredViewport);saveView();return true;}
+    });
 
     function setControlsExpanded(expanded) {
       appShell.classList.toggle("controls-collapsed", !expanded);
@@ -1368,9 +1386,11 @@
 
     const search = document.getElementById("search");
     const results = document.getElementById("search-results");
+    const searchClear=document.createElement('button');searchClear.type='button';searchClear.className='map-search-clear';searchClear.textContent='×';searchClear.hidden=!search.value;searchClear.title=searchClear.ariaLabel=document.documentElement.lang==='en'?'Clear search':'清空搜索';search.after(searchClear);searchClear.onclick=()=>{search.value='';searchClear.hidden=true;results.classList.remove('open');search.focus();};search.addEventListener('input',()=>{searchClear.hidden=!search.value;});
     let searchLimit = 12;
 
     function doSearch() {
+      searchClear.hidden=!search.value;searchClear.title=searchClear.ariaLabel=document.documentElement.lang==='en'?'Clear search':'清空搜索';
       if (cy.container().classList.contains('hidden')) {results.classList.remove('open');return;}
       const q = search.value.trim().toLowerCase();
       if (!q) { results.classList.remove("open"); return; }
@@ -1381,8 +1401,8 @@
         : value.split(/[^\p{L}\p{N}]+/u).some(word=>prefix?word.startsWith(term):word===term);
       const hits=G.nodes.map((source,index)=>{
         const n=localizedNode(source.id),names=[n.title,...(n.aliases||[])].map(normalize),summary=normalize(n.summary);
-        if(!terms.every(term=>names.some(name=>match(name,term,true))||match(summary,term,false)))return null;
-        const score=names.some(name=>name===q)?100:names.some(name=>name.startsWith(q))?80:names.some(name=>terms.every(term=>match(name,term,true)))?60:20;
+        const score=global.AI_SEARCH_MATCH?global.AI_SEARCH_MATCH.score(q,names,summary):(terms.every(term=>names.some(name=>match(name,term,true))||match(summary,term,false))?60:0);
+        if(!score)return null;
         return {n,score,index};
       }).filter(Boolean).sort((a,b)=>b.score-a.score||a.index-b.index).map(hit=>hit.n);
       const en = document.documentElement.lang === 'en';
@@ -1447,6 +1467,10 @@
     renderLegend();
 
     restorePresetLayout();
+    initialLayoutDone = true;
+    automaticStatic = performance.now() - graphStarted > 1200;
+    updateCurtainCulling();
+    global.addEventListener('ai-reading-preferences', () => {cy.style().fromJson(themeGraphStyles(graphStyleRules)).update();loadRingTheme();dragArtworkCache.clear();ringDirty=true;cullingDirty=true;});
 
     function refreshLanguage() {
       let labelsChanged = false;
@@ -1476,6 +1500,7 @@
       setControlsExpanded(!appShell.classList.contains("controls-collapsed"));
       listLabel.textContent=document.documentElement.lang==='en'?'Concept list':'概念列表';
       mobileHint.textContent=document.documentElement.lang==='en'?'Pan to explore · Find concepts in the list or search.':'拖动探索 · 可从概念列表或搜索查找';
+      const en=document.documentElement.lang==='en';stageBox.querySelector('[data-stage-label]').textContent=en?'Learning stage':'学习阶段';stageBox.querySelector('option[value="0"]').textContent=en?'All stages':'全部阶段';stageBox.querySelectorAll('option:not([value="0"])').forEach((o,i)=>{o.textContent=en?`Stage ${i+1}`:`${i+1}. ${G.recommendedLearningPath[i].phase}`;});stageBox.querySelector('[data-focus-label]').textContent=en?'Only selected concept relations':'只显示当前概念的连线';
       if (labelsChanged) separateLabelBounds();
       renderLegend();
       if (results.classList.contains("open")) doSearch();
